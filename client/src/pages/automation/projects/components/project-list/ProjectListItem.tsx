@@ -137,21 +137,33 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
-                            <Link
-                                to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
-                            >
-                                {project.description ? (
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span className="text-base font-semibold">{project.name}</span>
-                                        </TooltipTrigger>
+                            {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (
+                                <Link
+                                    to={`/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}?${searchParams}`}
+                                >
+                                    {project.description ? (
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <span className="text-base font-semibold">{project.name}</span>
+                                            </TooltipTrigger>
 
-                                        <TooltipContent>{project.description}</TooltipContent>
-                                    </Tooltip>
-                                ) : (
-                                    <span className="text-base font-semibold">{project.name}</span>
-                                )}
-                            </Link>
+                                            <TooltipContent>{project.description}</TooltipContent>
+                                        </Tooltip>
+                                    ) : (
+                                        <span className="text-base font-semibold">{project.name}</span>
+                                    )}
+                                </Link>
+                            ) : project.description ? (
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <span className="text-base font-semibold">{project.name}</span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>{project.description}</TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <span className="text-base font-semibold">{project.name}</span>
+                            )}
                         </div>
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">

@@ -10,7 +10,7 @@ import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectC
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {FolderIcon} from 'lucide-react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
 
 import ProjectDialog from './components/ProjectDialog';
 import ProjectList from './components/project-list/ProjectList';
@@ -32,8 +32,6 @@ const Projects = () => {
         id: categoryId ? parseInt(categoryId) : tagId ? parseInt(tagId) : undefined,
         type: tagId ? Type.Tag : Type.Category,
     };
-
-    const navigate = useNavigate();
 
     const {data: categories, error: categoriesError, isLoading: categoriesIsLoading} = useGetProjectCategoriesQuery();
 
@@ -57,19 +55,7 @@ const Projects = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        right={
-                            <ProjectDialog
-                                onClose={(project) => {
-                                    if (project) {
-                                        navigate(
-                                            `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
-                                        );
-                                    }
-                                }}
-                                project={undefined}
-                                triggerNode={<Button>New Project</Button>}
-                            />
-                        }
+                        right={<ProjectDialog project={undefined} triggerNode={<Button>New Project</Button>} />}
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
                     />
                 )
@@ -86,19 +72,7 @@ const Projects = () => {
                     projects && tags && <ProjectList projects={projects} tags={tags} />
                 ) : (
                     <EmptyList
-                        button={
-                            <ProjectDialog
-                                onClose={(project) => {
-                                    if (project) {
-                                        navigate(
-                                            `/automation/projects/${project?.id}/project-workflows/${project?.projectWorkflowIds![0]}`
-                                        );
-                                    }
-                                }}
-                                project={undefined}
-                                triggerNode={<Button>Create Project</Button>}
-                            />
-                        }
+                        button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
                         icon={<FolderIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new project."
                         title="No Projects"
