@@ -4,9 +4,9 @@ import CopilotPanel from '@/pages/platform/copilot/CopilotPanel';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
-import {DesktopSidebar} from '@/shared/layout/DesktopSidebar';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
+import {DesktopSidebar} from '@/shared/layout/desktop-sidebar/DesktopSidebar';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -216,7 +216,7 @@ function App() {
                     <Outlet />
 
                     {ai.enabled && showCopilot && (
-                        <aside className="border-l border-gray-200">
+                        <aside className="border-l">
                             <CopilotPanel />
                         </aside>
                     )}
