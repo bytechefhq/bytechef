@@ -11,8 +11,9 @@ import {Edge, Node, ReactFlowState, useReactFlow, useStore} from 'reactflow';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getNextPlaceholderId from '../utils/getNextPlaceholderId';
 
-const NODE_WIDTH = 200;
-const NODE_HEIGHT = 150;
+const NODE_WIDTH = 240;
+const NODE_HEIGHT = 100;
+const PLACEHOLDER_NODE_HEIGHT = 28;
 const DIRECTION = 'TB';
 const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 
@@ -281,7 +282,21 @@ export default function useLayout({
         edges = taskEdges;
 
         nodes.forEach((node) => {
-            dagreGraph.setNode(node.id, {height: NODE_HEIGHT, width: NODE_WIDTH});
+            let height = NODE_HEIGHT;
+
+            if (node.id.includes('placeholder')) {
+                if (node.id.includes('0')) {
+                    height = PLACEHOLDER_NODE_HEIGHT * 2;
+                } else {
+                    height = NODE_HEIGHT;
+                }
+
+                if (node.id.includes('bottom')) {
+                    height = PLACEHOLDER_NODE_HEIGHT;
+                }
+            }
+
+            dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
         });
 
         edges.forEach((edge) => {
