@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.image.helper.action.ImageHelperCropImageAction;
 import com.bytechef.component.image.helper.action.ImageHelperImageToBase64Action;
 import com.bytechef.component.image.helper.action.ImageHelperResizeImageAction;
 import com.bytechef.component.image.helper.action.ImageHelperRotateImageAction;
@@ -40,7 +41,8 @@ public class ImageHelperComponentHandler implements ComponentHandler {
         .actions(
             ImageHelperImageToBase64Action.ACTION_DEFINITION,
             ImageHelperResizeImageAction.ACTION_DEFINITION,
-            ImageHelperRotateImageAction.ACTION_DEFINITION);
+            ImageHelperRotateImageAction.ACTION_DEFINITION,
+            ImageHelperCropImageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
