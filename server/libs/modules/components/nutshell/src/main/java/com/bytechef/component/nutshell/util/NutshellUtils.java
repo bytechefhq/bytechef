@@ -16,6 +16,7 @@
 
 package com.bytechef.component.nutshell.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
@@ -27,7 +28,6 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONES;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
@@ -68,8 +68,9 @@ public class NutshellUtils {
         return map;
     }
 
-    private static void
-        addToListIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
+    private static void addToListIfPresent(
+        Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
+
         String value = inputParameters.getString(key);
 
         if (value != null) {
@@ -89,28 +90,21 @@ public class NutshellUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringMap, String s,
         Context context) {
 
-        List<Option<String>> options = new ArrayList<>();
         Map<String, ?> body = context.http(http -> http.get("/users"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (body.get("users") instanceof List<?> userList) {
-            options = getOptions(userList, NAME, ID);
-        }
-
-        return options;
-
-    }
-
-    private static List<Option<String>> getOptions(List<?> itemList, String label, String value) {
         List<Option<String>> options = new ArrayList<>();
 
-        for (Object item : itemList) {
-            if (item instanceof Map<?, ?> map) {
-                options.add(ComponentDsl.option((String) map.get(label), String.valueOf(map.get(value))));
+        if (body.get("users") instanceof List<?> userList) {
+            for (Object item : userList) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), String.valueOf(map.get(ID))));
+                }
             }
         }
+
         return options;
     }
 }

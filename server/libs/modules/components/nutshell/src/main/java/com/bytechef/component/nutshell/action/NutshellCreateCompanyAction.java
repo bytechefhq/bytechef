@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
+import static com.bytechef.component.nutshell.constant.NutshellConstants.ID;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.IS_PRIMARY;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.PHONE;
@@ -71,7 +72,7 @@ public class NutshellCreateCompanyAction {
                             .items(
                                 object()
                                     .properties(
-                                        string("id"),
+                                        string(ID),
                                         string("type"),
                                         string(NAME),
                                         string(DESCRIPTION),
