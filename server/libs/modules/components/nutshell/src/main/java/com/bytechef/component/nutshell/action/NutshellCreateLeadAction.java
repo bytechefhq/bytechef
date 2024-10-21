@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
+import static com.bytechef.component.nutshell.constant.NutshellConstants.ID;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.LINKS;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.OWNER;
@@ -64,7 +65,7 @@ public class NutshellCreateLeadAction {
                             .items(
                                 object()
                                     .properties(
-                                        string("id"),
+                                        string(ID),
                                         string("type"),
                                         string(NAME),
                                         string(DESCRIPTION),
@@ -90,13 +91,12 @@ public class NutshellCreateLeadAction {
     }
 
     private static Map<String, Object> createLeadMap(Parameters inputParameters) {
-
         Map<String, Object> leadMap = new HashMap<>();
+
         leadMap.put(DESCRIPTION, inputParameters.getRequiredString(DESCRIPTION));
 
         addIfPresent(inputParameters, OWNER, LINKS, leadMap);
 
         return leadMap;
     }
-
 }
