@@ -3,4 +3,5 @@
 coverage
 dist
 src/components/ui
+src/hooks/use-toast.ts
 mockServiceWorker.js

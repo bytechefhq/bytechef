@@ -1,4 +1,4 @@
-import {useToast} from '@/components/ui/use-toast';
+import {useToast} from '@/hooks/use-toast';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {getCookie} from '@/shared/util/cookie-utils';
