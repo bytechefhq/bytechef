@@ -14,28 +14,28 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
     componentNames: Array<string>;
+    conditionId: string;
     currentNode?: NodeType;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId: string;
     queryClient: QueryClient;
-    setEdges: Instance.SetEdges<unknown>;
     setNodes: Instance.SetNodes<unknown>;
     setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
-    sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleConditionChildOperationClick({
     componentNames,
+    conditionId,
     currentNode,
     operation,
     operationDefinition,
+    placeholderId,
     queryClient,
     setNodes,
     setWorkflow,
-    sourceNodeId,
     updateWorkflowMutation,
     workflow,
 }: HandleConditionChildOperationClickProps) {
@@ -46,9 +46,9 @@ export default function handleConditionChildOperationClick({
 
         const newWorkflowNodeData = {
             componentName: componentName,
+            conditionId,
             icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
             label: componentLabel,
-            metadata: {ui: {condition: sourceNodeId}},
             name: workflowNodeName,
             type: type,
             workflowNodeName,
@@ -70,6 +70,7 @@ export default function handleConditionChildOperationClick({
         const taskAfterCurrentIndex = workflow.tasks?.length;
 
         saveWorkflowDefinition({
+            conditionId,
             nodeData: {
                 ...newWorkflowNodeData,
                 parameters: getParametersWithDefaultValues({
@@ -85,6 +86,7 @@ export default function handleConditionChildOperationClick({
                     }),
                 });
             },
+            placeholderId,
             queryClient,
             updateWorkflowMutation,
             workflow,

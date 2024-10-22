@@ -20,18 +20,22 @@ type UpdateWorkflowRequestType = {
 };
 
 interface SaveWorkflowDefinitionProps {
+    conditionId?: string;
     nodeData: NodeDataType;
     nodeIndex?: number;
     onSuccess?: (workflow: Workflow) => void;
+    placeholderId?: string;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>;
     workflow: Workflow;
 }
 
 export default async function saveWorkflowDefinition({
+    conditionId,
     nodeData,
     nodeIndex,
     onSuccess,
+    placeholderId,
     queryClient,
     updateWorkflowMutation,
     workflow,
@@ -162,14 +166,8 @@ export default async function saveWorkflowDefinition({
         tasks[existingTaskIndex] = combinedTask;
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
-        console.log('newTask', newTask);
-        console.log('nodeData', nodeData);
-        console.log('nodeIndex', nodeIndex);
-        console.log('tasks', tasks);
-
-        if (nodeData.metadata?.ui?.condition) {
-            // tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
-            // tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
+        if (conditionId && placeholderId) {
+            tasks = getTasksWithConditionChildNode({conditionId, newTask, placeholderId, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 

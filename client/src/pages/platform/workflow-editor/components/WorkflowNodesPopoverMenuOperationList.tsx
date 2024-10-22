@@ -20,7 +20,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
-    condition?: boolean;
+    conditionId?: string;
     edge?: boolean;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
@@ -29,7 +29,7 @@ interface WorkflowNodesPopoverMenuOperationListProps {
 
 const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
-    condition,
+    conditionId,
     edge,
     setPopoverOpen,
     sourceNodeId,
@@ -258,36 +258,37 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             setEdges((edges) => edges.filter((edge) => edge.id !== sourceNodeId).concat([sourceEdge, targetEdge]));
         } else {
-            const placeholderNode = getNode(sourceNodeId);
-
-            if (!placeholderNode) {
-                return;
-            }
-
-            captureComponentUsed(componentName, operationName, undefined);
-
-            const placeholderId = placeholderNode.id;
-
-            if (condition) {
+            if (conditionId) {
                 handleConditionChildOperationClick({
                     componentNames,
+                    conditionId,
                     currentNode,
                     operation: clickedOperation,
                     operationDefinition: clickedComponentActionDefinition,
-                    placeholderId,
+                    placeholderId: sourceNodeId,
                     queryClient,
-                    setEdges,
                     setNodes,
                     setWorkflow,
-                    sourceNodeId,
                     updateWorkflowMutation,
                     workflow,
                 });
 
                 setPopoverOpen(false);
 
+                captureComponentUsed(componentName, operationName, undefined);
+
                 return;
             }
+
+            const placeholderNode = getNode(sourceNodeId);
+
+            if (!placeholderNode) {
+                return;
+            }
+
+            const placeholderId = placeholderNode.id;
+
+            captureComponentUsed(componentName, operationName, undefined);
 
             const childPlaceholderId = getRandomId();
 
