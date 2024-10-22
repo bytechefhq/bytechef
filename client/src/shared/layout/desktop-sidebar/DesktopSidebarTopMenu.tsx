@@ -24,42 +24,37 @@ const DesktopSidebarTopMenu = () => {
     };
 
     return (
-        <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <img alt="ByteChef" className="h-8 w-auto cursor-pointer" src={reactLogo} />
-                </DropdownMenuTrigger>
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <img alt="ByteChef" className="h-8 w-auto cursor-pointer" src={reactLogo} />
+            </DropdownMenuTrigger>
 
-                {ff_520 && (
-                    <DropdownMenuContent align="start" className="w-64 space-y-2 p-2" sideOffset={-35}>
-                        <div className="flex items-center space-x-2 px-1.5 py-1 text-base font-semibold">
-                            <img alt="ByteChef" className="h-5 w-auto" src={reactLogo} />
+            {ff_520 && (
+                <DropdownMenuContent align="start" className="w-64 space-y-2 p-2" sideOffset={-35}>
+                    <div className="flex items-center space-x-2 px-1.5 py-1 text-base font-semibold">
+                        <img alt="ByteChef" className="h-5 w-auto" src={reactLogo} />
 
-                            <span>ByteChef</span>
-                        </div>
+                        <span>ByteChef</span>
+                    </div>
 
-                        <DropdownMenuItem>
-                            <button className="flex flex-col items-start" onClick={() => handleClick(AppType.EMBEDDED)}>
-                                <div className="font-semibold">Embedded</div>
+                    <DropdownMenuItem>
+                        <button className="flex flex-col items-start" onClick={() => handleClick(AppType.EMBEDDED)}>
+                            <div className="font-semibold">Embedded</div>
 
-                                <div className="text-muted-foreground">Build integrations for your product</div>
-                            </button>
-                        </DropdownMenuItem>
+                            <div className="text-muted-foreground">Build integrations for your product</div>
+                        </button>
+                    </DropdownMenuItem>
 
-                        <DropdownMenuItem>
-                            <button
-                                className="flex flex-col items-start"
-                                onClick={() => handleClick(AppType.AUTOMATION)}
-                            >
-                                <div className="font-semibold">Automation</div>
+                    <DropdownMenuItem>
+                        <button className="flex flex-col items-start" onClick={() => handleClick(AppType.AUTOMATION)}>
+                            <div className="font-semibold">Automation</div>
 
-                                <div className="text-sm text-muted-foreground">Automate your daily work</div>
-                            </button>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                )}
-            </DropdownMenu>
-        </>
+                            <div className="text-sm text-muted-foreground">Automate your daily work</div>
+                        </button>
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+            )}
+        </DropdownMenu>
     );
 };
 

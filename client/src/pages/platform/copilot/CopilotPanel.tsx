@@ -53,16 +53,16 @@ const CopilotPanel = () => {
         }
     };
 
-    const handleTextAreaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-        setInput(e.target.value);
+    const handleTextAreaChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+        setInput(event.target.value);
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (e.altKey) {
+    const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.altKey) {
             setAltDown(true);
         }
 
-        if (e.key === 'Enter') {
+        if (event.key === 'Enter') {
             if (altDown) {
                 setInput(input + ' \r\n');
             } else {
