@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Image Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -168,9 +167,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Image to Base64",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -535,9 +534,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Resize Image",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -895,9 +894,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Rotate Image",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1217,7 +1216,7 @@
       "label" : "X Coordinate",
       "placeholder" : null,
       "maxValue" : null,
-      "minValue" : null,
+      "minValue" : 0,
       "options" : null,
       "controlType" : "INTEGER",
       "optionsDataSource" : null
@@ -1236,7 +1235,7 @@
       "label" : "Y Coordinate",
       "placeholder" : null,
       "maxValue" : null,
-      "minValue" : null,
+      "minValue" : 0,
       "options" : null,
       "controlType" : "INTEGER",
       "optionsDataSource" : null
@@ -1300,11 +1299,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Crop Image",
-    "workflowNodeDescription" : null,
+    "perform" : { },
     "processErrorResponse" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "dataStream" : null
+  "connection" : null
 }
