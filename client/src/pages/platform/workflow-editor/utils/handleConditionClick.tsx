@@ -98,9 +98,13 @@ export default async function handleConditionClick({
                 saveWorkflowDefinition({
                     nodeData: {
                         ...newConditionNodeData,
-                        parameters: getParametersWithDefaultValues({
-                            properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
-                        }),
+                        parameters: {
+                            ...getParametersWithDefaultValues({
+                                properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                            }),
+                            caseFalse: [],
+                            caseTrue: [],
+                        },
                     },
                     onSuccess: () => {
                         queryClient.invalidateQueries({

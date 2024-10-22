@@ -1,69 +1,44 @@
 import {WorkflowTask} from '@/shared/middleware/automation/configuration';
-import {NodeDataType} from '@/shared/types';
-
-import getNextPlaceholderId from './getNextPlaceholderId';
 
 interface AddConditionChildNodeProps {
+    conditionId: string;
     tasks: Array<WorkflowTask>;
-    nodeData: NodeDataType;
     newTask: WorkflowTask;
-    nodeIndex?: number;
+    placeholderId: string;
 }
 
 export default function getTasksWithConditionChildNode({
+    conditionId,
     newTask,
-    nodeData,
-    nodeIndex,
+    placeholderId,
     tasks,
-}: AddConditionChildNodeProps) {
-    const sourceNodeId = nodeData.metadata?.ui?.condition;
+}: AddConditionChildNodeProps): Array<WorkflowTask> {
+    const conditionTask = tasks.find((task) => task.name === conditionId);
 
-    if (nodeIndex === undefined || nodeIndex === -1 || typeof nodeIndex !== 'number') {
-        tasks.push(newTask);
+    if (!conditionTask) {
+        return tasks;
     }
 
-    const subsequentTasks = tasks.slice(nodeIndex);
+    const conditionCase = placeholderId?.split('-')[1] === 'left' ? 'true' : 'false';
 
-    const updatedSubsequentTasks = subsequentTasks.map((sequentialTask) => {
-        let sequentialTaskCondition = sequentialTask.metadata?.ui?.condition;
+    if (!conditionTask.parameters) {
+        conditionTask.parameters = {
+            caseFalse: [],
+            caseTrue: [],
+        };
+    }
 
-        if (sequentialTaskCondition) {
-            const taskConditionSide = sequentialTaskCondition.includes('left')
-                ? 'left'
-                : sequentialTaskCondition.includes('right')
-                  ? 'right'
-                  : null;
+    if (conditionCase === 'true') {
+        conditionTask.parameters = {
+            ...conditionTask.parameters,
+            caseTrue: [...conditionTask.parameters.caseTrue, newTask],
+        };
+    } else {
+        conditionTask.parameters = {
+            ...conditionTask.parameters,
+            caseFalse: [...conditionTask.parameters.caseFalse, newTask],
+        };
+    }
 
-            const nodeConditionSide = sourceNodeId?.includes('left')
-                ? 'left'
-                : sourceNodeId?.includes('right')
-                  ? 'right'
-                  : null;
-
-            if (taskConditionSide && nodeConditionSide && taskConditionSide === nodeConditionSide) {
-                sequentialTaskCondition = getNextPlaceholderId(sequentialTaskCondition);
-            }
-        }
-
-        if (sequentialTask.metadata?.ui?.condition) {
-            return {
-                ...sequentialTask,
-                metadata: {
-                    ...sequentialTask.metadata,
-                    ui: {
-                        ...sequentialTask.metadata?.ui,
-                        condition: sequentialTaskCondition,
-                    },
-                },
-            };
-        }
-
-        return sequentialTask;
-    });
-
-    tasks = [...tasks.slice(0, nodeIndex), ...updatedSubsequentTasks];
-
-    tasks.splice(nodeIndex!, 0, newTask);
-
-    return tasks;
+    return tasks.map((task) => (task.name === conditionId ? conditionTask : task));
 }

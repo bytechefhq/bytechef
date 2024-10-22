@@ -15,7 +15,7 @@ import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuCom
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
-    condition?: boolean;
+    conditionId?: string;
     sourceNodeId: string;
     edge?: boolean;
     hideActionComponents?: boolean;
@@ -25,7 +25,7 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
 
 const WorkflowNodesPopoverMenu = ({
     children,
-    condition = false,
+    conditionId,
     edge = false,
     hideActionComponents = false,
     hideTaskDispatchers = false,
@@ -140,7 +140,7 @@ const WorkflowNodesPopoverMenu = ({
                     {actionPanelOpen && componentDefinitionToBeAdded && (
                         <WorkflowNodesPopoverMenuOperationList
                             componentDefinition={componentDefinitionToBeAdded}
-                            condition={condition}
+                            conditionId={conditionId}
                             edge={edge}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
