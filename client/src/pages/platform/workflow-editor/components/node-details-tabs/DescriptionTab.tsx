@@ -33,19 +33,18 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             return;
         }
 
-        saveWorkflowDefinition(
-            {...componentData, label: event.target.value},
-            workflow,
-            updateWorkflowMutation,
-            queryClient,
-            undefined,
-            () => {
+        saveWorkflowDefinition({
+            nodeData: {...componentData, label: event.target.value},
+            onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
                     title: event.target.value,
                 });
-            }
-        );
+            },
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+        });
     }, 200);
 
     const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -53,22 +52,18 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             return;
         }
 
-        saveWorkflowDefinition(
-            {
-                ...componentData,
-                description: event.target.value,
-            },
-            workflow,
-            updateWorkflowMutation,
-            queryClient,
-            undefined,
-            () => {
+        saveWorkflowDefinition({
+            nodeData: {...componentData, description: event.target.value},
+            onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
                     notes: event.target.value,
                 });
-            }
-        );
+            },
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+        });
     }, 200);
 
     return (

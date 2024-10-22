@@ -234,8 +234,8 @@ const WorkflowNodeDetailsPanel = ({
 
         const {componentName, notes, title, workflowNodeName} = currentComponent;
 
-        saveWorkflowDefinition(
-            {
+        saveWorkflowDefinition({
+            nodeData: {
                 componentName,
                 description: notes,
                 label: title,
@@ -247,11 +247,7 @@ const WorkflowNodeDetailsPanel = ({
                 trigger: currentNode?.trigger,
                 type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
             },
-            workflow,
-            updateWorkflowMutation,
-            queryClient,
-            undefined,
-            () => {
+            onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
                     displayConditions: {},
@@ -278,8 +274,11 @@ const WorkflowNodeDetailsPanel = ({
                 setComponentActions(formattedComponentActions);
 
                 refetchWorkflowNodeOutput();
-            }
-        );
+            },
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+        });
     };
 
     const handlePanelClose = () => {

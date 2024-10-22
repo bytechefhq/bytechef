@@ -142,17 +142,17 @@ export default function useHandleDrop(): [
             undefined
         );
 
-        saveWorkflowDefinition(
-            {
+        saveWorkflowDefinition({
+            nodeData: {
                 ...newWorkflowNode.data,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
             },
-            workflow,
+            queryClient,
             updateWorkflowMutation,
-            queryClient
-        );
+            workflow,
+        });
     }
 
     async function handleDropOnWorkflowEdge(
@@ -253,18 +253,18 @@ export default function useHandleDrop(): [
             undefined
         );
 
-        saveWorkflowDefinition(
-            {
+        saveWorkflowDefinition({
+            nodeData: {
                 ...newWorkflowNode.data,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
             },
-            workflow,
-            updateWorkflowMutation,
+            nodeIndex: targetEdgeIndex,
             queryClient,
-            targetEdgeIndex
-        );
+            updateWorkflowMutation,
+            workflow,
+        });
     }
 
     async function handleDropOnTriggerNode(droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) {
@@ -336,18 +336,18 @@ export default function useHandleDrop(): [
 
         captureComponentUsed(name, undefined, triggers?.[0].name);
 
-        saveWorkflowDefinition(
-            {
+        saveWorkflowDefinition({
+            nodeData: {
                 ...newTriggerNodeData,
                 operationName: draggedComponentTriggerDefinition.name,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentTriggerDefinition.properties || [],
                 }),
             },
-            workflow,
+            queryClient,
             updateWorkflowMutation,
-            queryClient
-        );
+            workflow,
+        });
     }
 
     return [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode];

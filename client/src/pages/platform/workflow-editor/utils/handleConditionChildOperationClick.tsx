@@ -67,34 +67,28 @@ export default function handleConditionChildOperationClick({
             nodeNames: [...workflow.nodeNames, workflowNodeName],
         });
 
-        let taskAfterCurrentIndex = workflow.tasks?.length;
+        const taskAfterCurrentIndex = workflow.tasks?.length;
 
-        const duplicateSourceNode = workflow.tasks?.find((task) => task.metadata?.ui?.condition === sourceNodeId);
-
-        if (duplicateSourceNode) {
-            taskAfterCurrentIndex = workflow.tasks?.findIndex((task) => task.metadata?.ui?.condition === sourceNodeId);
-        }
-
-        saveWorkflowDefinition(
-            {
+        saveWorkflowDefinition({
+            nodeData: {
                 ...newWorkflowNodeData,
                 parameters: getParametersWithDefaultValues({
                     properties: operationDefinition?.properties as Array<PropertyAllType>,
                 }),
             },
-            workflow!,
-            updateWorkflowMutation,
-            queryClient,
-            taskAfterCurrentIndex,
-            () => {
+            nodeIndex: taskAfterCurrentIndex,
+            onSuccess: () => {
                 queryClient.invalidateQueries({
                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                         id: workflow.id!,
                         lastWorkflowNodeName: currentNode?.name,
                     }),
                 });
-            }
-        );
+            },
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+        });
 
         if (taskAfterCurrentIndex !== undefined && taskAfterCurrentIndex !== -1) {
             return [
