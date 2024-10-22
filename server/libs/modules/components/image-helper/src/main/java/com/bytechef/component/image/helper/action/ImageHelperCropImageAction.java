@@ -16,13 +16,22 @@
 
 package com.bytechef.component.image.helper.action;
 
-import static com.bytechef.component.definition.ComponentDsl.*;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.image.helper.constant.ImageHelperConstants.*;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.HEIGHT;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.IMAGE_PROPERTY;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.RESULT_FILE_NAME_PROPERTY;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.WIDTH;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.X_COORDINATE;
+import static com.bytechef.component.image.helper.constant.ImageHelperConstants.Y_COORDINATE;
 import static com.bytechef.component.image.helper.util.ImageHelperUtils.storeBufferedImage;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.awt.image.BufferedImage;
@@ -35,7 +44,7 @@ import javax.imageio.ImageIO;
  */
 public class ImageHelperCropImageAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("cropImage")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("cropImage")
         .title("Crop Image")
         .description("Crops an image to the specified dimensions.")
         .properties(
@@ -43,10 +52,12 @@ public class ImageHelperCropImageAction {
             integer(X_COORDINATE)
                 .label("X Coordinate")
                 .description("The horizontal starting point of the crop area")
+                .minValue(0)
                 .required(true),
             integer(Y_COORDINATE)
                 .label("Y Coordinate")
                 .description("The vertical starting point of the crop area")
+                .minValue(0)
                 .required(true),
             integer(WIDTH)
                 .label("Width")
@@ -86,7 +97,7 @@ public class ImageHelperCropImageAction {
 
     private static void validate(int x, int y, int width, int height, int imageWidth, int imageHeight)
         throws IllegalArgumentException {
-        if (x < 0 || y < 0 || width <= 0 || height <= 0) {
+        if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Invalid input parameters.");
         }
 
