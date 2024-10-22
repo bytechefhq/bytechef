@@ -17,6 +17,7 @@
 package com.bytechef.component.nutshell.action;
 
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
+import static com.bytechef.component.nutshell.constant.NutshellConstants.LINKS;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.OWNER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -28,6 +29,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -42,9 +44,8 @@ class NutshellCreateLeadActionTest {
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
-    private final Map<String, Object> leadMap = Map.of(DESCRIPTION, "Lead description", OWNER, "userId123");
-    private final Parameters mockedParameters = MockParametersFactory.create(leadMap);
-
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(DESCRIPTION, "Lead description", OWNER, "userId123"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
@@ -62,10 +63,15 @@ class NutshellCreateLeadActionTest {
 
         Object result = NutshellCreateLeadAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(mockedObject, result);
+        Map<String, Object> leadMap = new HashMap<>();
+
+        leadMap.put(DESCRIPTION, "Lead description");
+        leadMap.put(LINKS, Map.of(OWNER, "userId123"));
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("leads", List.of(leadMap)), body.getContent());
+        assertEquals(mockedObject, result);
+
     }
 }
