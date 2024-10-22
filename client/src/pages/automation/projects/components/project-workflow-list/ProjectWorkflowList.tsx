@@ -85,18 +85,18 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
                                     ...(workflow.workflowTaskComponentNames ?? []),
                                 ];
 
-                                componentNames?.map((definitionName) => {
-                                    if (!workflowComponentDefinitions[definitionName]) {
-                                        workflowComponentDefinitions[definitionName] = componentDefinitions?.find(
-                                            (componentDefinition) => componentDefinition.name === definitionName
+                                componentNames?.map((componentName) => {
+                                    if (!workflowComponentDefinitions[componentName]) {
+                                        workflowComponentDefinitions[componentName] = componentDefinitions?.find(
+                                            (componentDefinition) => componentDefinition.name === componentName
                                         );
                                     }
 
-                                    if (!workflowTaskDispatcherDefinitions[definitionName]) {
-                                        workflowTaskDispatcherDefinitions[definitionName] =
+                                    if (!workflowTaskDispatcherDefinitions[componentName]) {
+                                        workflowTaskDispatcherDefinitions[componentName] =
                                             taskDispatcherDefinitions?.find(
                                                 (taskDispatcherDefinition) =>
-                                                    taskDispatcherDefinition.name === definitionName
+                                                    taskDispatcherDefinition.name === componentName
                                             );
                                     }
                                 });

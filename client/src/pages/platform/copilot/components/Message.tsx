@@ -1,6 +1,7 @@
 import {MessageType} from '@/pages/platform/copilot/CopilotPanel';
 import {BotMessageSquareIcon} from 'lucide-react';
 import React from 'react';
+import {twMerge} from 'tailwind-merge';
 
 const Message = ({message}: {message: MessageType}) => {
     return (
@@ -11,15 +12,14 @@ const Message = ({message}: {message: MessageType}) => {
                 </div>
             )}
 
-            {message.sender === 'ai' ? (
-                <div className="flex-1">
-                    <p className="text-sm">{message.text}</p>
-                </div>
-            ) : (
-                <div className="ml-8 flex-1 rounded-lg bg-card p-3 text-card-foreground">
-                    <p className="text-sm">{message.text}</p>
-                </div>
-            )}
+            <div
+                className={twMerge(
+                    'flex-1',
+                    message.sender === 'user' && 'ml-8 rounded-lg bg-card p-3 text-card-foreground'
+                )}
+            >
+                <p className="text-sm">{message.text}</p>
+            </div>
         </div>
     );
 };
