@@ -19,14 +19,23 @@ type UpdateWorkflowRequestType = {
     workflow: Workflow;
 };
 
-export default async function saveWorkflowDefinition(
-    nodeData: NodeDataType,
-    workflow: Workflow,
-    updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>,
-    queryClient: QueryClient,
-    nodeIndex?: number,
-    onSuccess?: (workflow: Workflow) => void
-) {
+interface SaveWorkflowDefinitionProps {
+    nodeData: NodeDataType;
+    nodeIndex?: number;
+    onSuccess?: (workflow: Workflow) => void;
+    queryClient: QueryClient;
+    updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>;
+    workflow: Workflow;
+}
+
+export default async function saveWorkflowDefinition({
+    nodeData,
+    nodeIndex,
+    onSuccess,
+    queryClient,
+    updateWorkflowMutation,
+    workflow,
+}: SaveWorkflowDefinitionProps) {
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     if (nodeData.trigger) {
@@ -64,9 +73,7 @@ export default async function saveWorkflowDefinition(
 
     const {componentName, description, label, metadata, name, parameters, taskDispatcher, type} = nodeData;
 
-    let {version} = nodeData;
-
-    let {operationName} = nodeData;
+    let {operationName, version} = nodeData;
 
     if (taskDispatcher && componentName && version) {
         const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
@@ -155,9 +162,14 @@ export default async function saveWorkflowDefinition(
         tasks[existingTaskIndex] = combinedTask;
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
+        console.log('newTask', newTask);
+        console.log('nodeData', nodeData);
+        console.log('nodeIndex', nodeIndex);
+        console.log('tasks', tasks);
 
         if (nodeData.metadata?.ui?.condition) {
-            tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
+            // tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
+            // tasks = getTasksWithConditionChildNode({newTask, nodeData, nodeIndex, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 

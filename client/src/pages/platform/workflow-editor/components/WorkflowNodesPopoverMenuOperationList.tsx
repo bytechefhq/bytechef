@@ -98,13 +98,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             type: 'workflow',
                         };
 
-                        saveWorkflowDefinition(
-                            newTriggerNode.data,
-                            workflow,
-                            updateWorkflowMutation,
-                            queryClient,
-                            undefined,
-                            () => {
+                        saveWorkflowDefinition({
+                            nodeData: newTriggerNode.data,
+                            onSuccess: () => {
                                 queryClient.invalidateQueries({
                                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                                         id: workflow.id!,
@@ -131,8 +127,11 @@ const WorkflowNodesPopoverMenuOperationList = ({
                                         workflowNodeName: newTriggerNode.data.workflowNodeName,
                                     });
                                 }
-                            }
-                        );
+                            },
+                            queryClient,
+                            updateWorkflowMutation,
+                            workflow,
+                        });
 
                         return newTriggerNode;
                     }
@@ -233,26 +232,26 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const previousWorkflowTaskIndex = workflow.tasks?.findIndex((task) => task.name === clickedEdge.source);
 
-                saveWorkflowDefinition(
-                    {
+                saveWorkflowDefinition({
+                    nodeData: {
                         ...newWorkflowNode.data,
                         parameters: getParametersWithDefaultValues({
                             properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
                         }),
                     },
-                    workflow!,
-                    updateWorkflowMutation,
-                    queryClient,
-                    (previousWorkflowTaskIndex ?? 0) + 1,
-                    () => {
+                    nodeIndex: (previousWorkflowTaskIndex ?? 0) + 1,
+                    onSuccess: () => {
                         queryClient.invalidateQueries({
                             queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                                 id: workflow.id!,
                                 lastWorkflowNodeName: currentNode?.name,
                             }),
                         });
-                    }
-                );
+                    },
+                    queryClient,
+                    updateWorkflowMutation,
+                    workflow,
+                });
 
                 return tempNodes;
             });
@@ -345,26 +344,26 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
                         }
 
-                        saveWorkflowDefinition(
-                            {
+                        saveWorkflowDefinition({
+                            nodeData: {
                                 ...newWorkflowNodeData,
                                 parameters: getParametersWithDefaultValues({
                                     properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
                                 }),
                             },
-                            workflow!,
-                            updateWorkflowMutation,
-                            queryClient,
-                            taskNodeIndex,
-                            () => {
+                            nodeIndex: taskNodeIndex,
+                            onSuccess: () => {
                                 queryClient.invalidateQueries({
                                     queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                                         id: workflow.id!,
                                         lastWorkflowNodeName: currentNode?.name,
                                     }),
                                 });
-                            }
-                        );
+                            },
+                            queryClient,
+                            updateWorkflowMutation,
+                            workflow,
+                        });
 
                         return {
                             ...node,

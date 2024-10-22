@@ -95,26 +95,25 @@ export default async function handleConditionClick({
                     type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
                 };
 
-                saveWorkflowDefinition(
-                    {
+                saveWorkflowDefinition({
+                    nodeData: {
                         ...newConditionNodeData,
                         parameters: getParametersWithDefaultValues({
                             properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
                         }),
                     },
-                    workflow!,
-                    updateWorkflowMutation,
-                    queryClient,
-                    undefined,
-                    () => {
+                    onSuccess: () => {
                         queryClient.invalidateQueries({
                             queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
                                 id: workflow.id!,
                                 lastWorkflowNodeName: currentNode?.name,
                             }),
                         });
-                    }
-                );
+                    },
+                    queryClient,
+                    updateWorkflowMutation,
+                    workflow,
+                });
 
                 return {
                     ...node,
