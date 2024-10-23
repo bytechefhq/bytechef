@@ -1,3 +1,4 @@
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import defaultNodes from '@/shared/defaultNodes';
 import {WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -114,22 +115,95 @@ export default function useLayout({
 
     const allNodes: Array<Node> = [];
 
+    const conditionChildTasks: {
+        [key: string]: {
+            caseTrue: string[];
+            caseFalse: string[];
+        };
+    } = {};
+
+    let caseTrueTaskNames;
+    let caseFalseTaskNames;
+
+    // Prepare auxiliary nodes
     taskNodes.forEach((taskNode) => {
-        if (!taskNode.data.metadata?.ui?.condition) {
-            allNodes.push(taskNode);
+        if (taskNode.data.componentName === 'condition') {
+            caseTrueTaskNames = taskNode.data.parameters.caseTrue.map((task: WorkflowTask) => task.name);
+            caseFalseTaskNames = taskNode.data.parameters.caseFalse.map((task: WorkflowTask) => task.name);
+
+            conditionChildTasks[taskNode.id] = {
+                caseFalse: caseFalseTaskNames,
+                caseTrue: caseTrueTaskNames,
+            };
         }
+
+        const isConditionChildTask = Object.values(conditionChildTasks).some(
+            (conditionCases) =>
+                conditionCases.caseTrue.includes(taskNode.id) || conditionCases.caseFalse.includes(taskNode.id)
+        );
+
+        // Handle placeholder nodes above and below the task node inside the Condition
+        if (isConditionChildTask) {
+            const conditionId = Object.keys(conditionChildTasks).find(
+                (key) =>
+                    conditionChildTasks[key].caseTrue.includes(taskNode.id) ||
+                    conditionChildTasks[key].caseFalse.includes(taskNode.id)
+            );
+
+            if (!conditionId) {
+                return;
+            }
+
+            const conditionCase = conditionChildTasks[conditionId].caseTrue.includes(taskNode.id)
+                ? CONDITION_CASE_TRUE
+                : CONDITION_CASE_FALSE;
+
+            const index = conditionChildTasks[conditionId][conditionCase].indexOf(taskNode.id);
+
+            const sourcePlaceholderIndex = allNodes.findIndex(
+                (node) =>
+                    node.id ===
+                    `${conditionId}-${conditionCase === CONDITION_CASE_TRUE ? 'left' : 'right'}-placeholder-${index}`
+            );
+
+            if (sourcePlaceholderIndex === -1) {
+                return;
+            }
+
+            const sourcePlaceholderNode = allNodes[sourcePlaceholderIndex];
+
+            const belowPlaceholderNodeId = getNextPlaceholderId(sourcePlaceholderNode.id);
+
+            const belowPlaceholderNode = {
+                data: {conditionId, label: '+'},
+                id: belowPlaceholderNodeId,
+                position: {x: 0, y: 0},
+                type: 'placeholder',
+            };
+
+            const conditionChildTaskNode = {
+                ...taskNode,
+                data: {...taskNode.data, conditionData: {conditionCase, conditionId, index}},
+            };
+
+            allNodes.splice(sourcePlaceholderIndex + 1, 0, conditionChildTaskNode, belowPlaceholderNode);
+
+            return;
+        }
+
+        allNodes.push(taskNode);
 
         // Create left, right, and bottom placeholder nodes when the task node is a Condition
         if (taskNode.data.componentName === 'condition') {
             const leftPlaceholderNode: Node = {
-                data: {label: '+', metadata: {ui: {condition: `${taskNode.id}-left-placeholder-0`}}},
+                data: {conditionId: taskNode.id, label: '+'},
                 id: `${taskNode.id}-left-placeholder-0`,
                 position: {x: 0, y: 0},
                 type: 'placeholder',
             };
 
             const rightPlaceholderNode: Node = {
-                data: {label: '+', metadata: {ui: {condition: `${taskNode.id}-right-placeholder-0`}}},
+                data: {conditionId: taskNode.id, label: '+'},
                 id: `${taskNode.id}-right-placeholder-0`,
                 position: {x: 0, y: 0},
                 type: 'placeholder',
@@ -145,28 +219,10 @@ export default function useLayout({
             allNodes.push(leftPlaceholderNode, rightPlaceholderNode, bottomPlaceholderNode);
         }
 
-        // Handle placeholder nodes above and below the task node inside the Condition
-        if (taskNode.data.metadata?.ui?.condition) {
-            const sourcePlaceholderIndex = allNodes.findIndex(
-                (node) => node.id === taskNode.data.metadata.ui.condition
-            );
+        const currentTaskNode = allNodes.find((node) => node.id === taskNode.id);
 
-            if (sourcePlaceholderIndex === -1) {
-                return;
-            }
-
-            const sourcePlaceholderNode = allNodes[sourcePlaceholderIndex];
-
-            const belowPlaceholderNodeId = getNextPlaceholderId(sourcePlaceholderNode.id);
-
-            const belowPlaceholderNode: Node = {
-                data: {label: '+', metadata: {ui: {condition: belowPlaceholderNodeId}}},
-                id: belowPlaceholderNodeId,
-                position: {x: 0, y: 0},
-                type: 'placeholder',
-            };
-
-            allNodes.splice(sourcePlaceholderIndex + 1, 0, taskNode, belowPlaceholderNode);
+        if (currentTaskNode) {
+            Object.assign(taskNode, currentTaskNode);
         }
     });
 
@@ -223,13 +279,18 @@ export default function useLayout({
         }
 
         // Create edges for the Condition child node
-        if (taskNode.data.metadata?.ui?.condition && !taskNode.id.includes('placeholder')) {
-            const sourcePlaceholderId = taskNode.data.metadata.ui.condition;
+        if (taskNode.data.conditionData && !taskNode.id.includes('placeholder')) {
+            const {conditionCase, conditionId, index} = taskNode.data.conditionData;
+
+            const sourcePlaceholderId = `${conditionId}-${
+                conditionCase === CONDITION_CASE_TRUE ? 'left' : 'right'
+            }-placeholder-${index}`;
 
             const targetPlaceholderId = getNextPlaceholderId(sourcePlaceholderId);
+
             const edgeFromSourceNodeToTaskNode = {
                 id: `${sourcePlaceholderId}=>${taskNode.id}`,
-                source: `${sourcePlaceholderId}`,
+                source: sourcePlaceholderId,
                 target: taskNode.id,
                 type: 'smoothstep',
             };
@@ -237,7 +298,7 @@ export default function useLayout({
             const edgeFromTaskNodeToTargetNode = {
                 id: `${taskNode.id}=>${targetPlaceholderId}`,
                 source: taskNode.id,
-                target: `${targetPlaceholderId}`,
+                target: targetPlaceholderId,
                 type: 'smoothstep',
             };
 
