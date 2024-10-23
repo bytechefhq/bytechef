@@ -24,6 +24,7 @@ public class GoogleContactsConstants {
     public static final String COMPANY = "company";
     public static final String CREATE_CONTACT = "createContact";
     public static final String CREATE_GROUP = "createGroup";
+    public static final String UPDATE_CONTACT = "updateContact";
     public static final String EMAIL = "email";
     public static final String FIRST_NAME = "firstName";
     public static final String GOOGLE_CONTACTS = "googleContacts";
@@ -32,6 +33,7 @@ public class GoogleContactsConstants {
     public static final String MIDDLE_NAME = "middleName";
     public static final String NAME = "name";
     public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String RESOURCE_NAME = "resourceName";
 
     private GoogleContactsConstants() {
     }
