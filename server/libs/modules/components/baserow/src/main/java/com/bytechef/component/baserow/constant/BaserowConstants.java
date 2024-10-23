@@ -29,5 +29,4 @@ public class BaserowConstants {
 
     private BaserowConstants() {
     }
-
 }
