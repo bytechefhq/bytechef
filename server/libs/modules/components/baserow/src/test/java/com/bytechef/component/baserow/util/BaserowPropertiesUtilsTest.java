@@ -48,6 +48,7 @@ import org.mockito.MockedStatic;
  * @author Monika Kušter
  */
 class BaserowPropertiesUtilsTest {
+
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TABLE_ID, "table"));
 
