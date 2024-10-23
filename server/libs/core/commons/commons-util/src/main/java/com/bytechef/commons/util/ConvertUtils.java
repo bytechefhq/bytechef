@@ -18,7 +18,9 @@ package com.bytechef.commons.util;
 
 import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.lang.reflect.Type;
 
@@ -40,6 +42,17 @@ public class ConvertUtils {
 
     public static <T> T convertValue(Object fromValue, Class<T> toValueType) {
         return OBJECT_MAPPER.convertValue(fromValue, toValueType);
+    }
+
+    public static <T> T convertValue(Object fromValue, Class<T> toValueType, boolean includeNulls) {
+        ObjectMapper currentObjectMapper = OBJECT_MAPPER;
+
+        if (includeNulls) {
+            currentObjectMapper = currentObjectMapper.copy()
+                .setSerializationInclusion(JsonInclude.Include.ALWAYS);
+        }
+
+        return currentObjectMapper.convertValue(fromValue, toValueType);
     }
 
     public static <T> T convertValue(Object fromValue, Type type) {
