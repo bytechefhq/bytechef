@@ -16,3 +16,6 @@ export const VALUE_PROPERTY_CONTROL_TYPES = {
     STRING: 'TEXT',
     TIME: 'TIME',
 };
+
+export const CONDITION_CASE_TRUE = 'caseTrue';
+export const CONDITION_CASE_FALSE = 'caseFalse';
