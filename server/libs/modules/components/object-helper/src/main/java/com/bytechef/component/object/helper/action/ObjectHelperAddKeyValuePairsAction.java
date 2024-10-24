@@ -33,10 +33,8 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -83,12 +81,12 @@ public class ObjectHelperAddKeyValuePairsAction {
                     array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(), time())
                 .required(true),
             object(VALUE)
-                .label("Array of Key-Value pairs")
-                .description("Array of Key-Value pairs to be added or updated.")
+                .label("Key-Value pairs")
+                .description("Key-Value pairs to be added or updated.")
                 .additionalProperties(bool(), string(), number(), object(), array(), dateTime(), date(), time())
                 .required(true))
-        .perform(ObjectHelperAddKeyValuePairsAction::perform)
-        .output(getOutputSchema());
+        .output()
+        .perform(ObjectHelperAddKeyValuePairsAction::perform);
 
     private ObjectHelperAddKeyValuePairsAction() {
     }
@@ -104,7 +102,7 @@ public class ObjectHelperAddKeyValuePairsAction {
             List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
             for (Object sourceObject : modifiedArray) {
                 Map<String, Object> sourceMap =
-                    OBJECT_MAPPER.convertValue(sourceObject, new TypeReference<Map<String, Object>>() {});
+                    OBJECT_MAPPER.convertValue(sourceObject, new TypeReference<>() {});
 
                 mapList.add(addKeyValuePairsToObject(sourceMap, keyValuePairs));
             }
@@ -114,28 +112,6 @@ public class ObjectHelperAddKeyValuePairsAction {
 
             return addKeyValuePairsToObject(new HashMap<>(modifiedObject), keyValuePairs);
         }
-    }
-
-    private static ActionDefinition.SingleConnectionOutputFunction getOutputSchema() {
-        return (inputParameters, connectionParameters, context) -> {
-            int sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
-
-            if (sourceType == 1) {
-                return new OutputResponse(
-                    array()
-                        .items(
-                            object()
-                                .additionalProperties(
-                                    array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(),
-                                    string(), time())));
-            } else {
-                return new OutputResponse(
-                    object()
-                        .additionalProperties(
-                            array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(),
-                            time()));
-            }
-        };
     }
 
     private static Map<String, Object> addKeyValuePairsToObject(
