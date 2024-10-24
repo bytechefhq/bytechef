@@ -17,8 +17,8 @@ interface HandleConditionClickProps {
     currentNode?: NodeType;
     edge?: boolean;
     getNode: (id: string) => Node | undefined;
+    getNodes: () => Array<Node>;
     queryClient: QueryClient;
-    setNodes: (nodes: unknown) => Array<Node>;
     setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -30,8 +30,8 @@ export default async function handleConditionClick({
     currentNode,
     edge,
     getNode,
+    getNodes,
     queryClient,
-    setNodes,
     setWorkflow,
     sourceNodeId,
     updateWorkflowMutation,
@@ -58,73 +58,60 @@ export default async function handleConditionClick({
         // TODO
     } else {
         const sourceNode = getNode(sourceNodeId);
+        const nodes = getNodes();
 
         if (!sourceNode) {
             return;
         }
 
-        setNodes((nodes: Array<Node>) =>
-            nodes.map((node) => {
-                if (node.id !== sourceNodeId) {
-                    return node;
-                }
+        const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 
-                const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
+        setWorkflow({
+            ...workflow,
+            componentNames: [...componentNames, clickedItem.name],
+            nodeNames: [...workflow.nodeNames, workflowNodeName],
+        });
 
-                setWorkflow({
-                    ...workflow,
-                    componentNames: [...componentNames, clickedItem.name],
-                    nodeNames: [...workflow.nodeNames, workflowNodeName],
+        const newConditionNodeData = {
+            ...clickedTaskDispatcherDefinition,
+            componentName: clickedItem.name,
+            icon: (
+                <>
+                    {clickedItem.icon ? (
+                        <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
+                    ) : (
+                        <Component1Icon className="size-9 text-gray-700" />
+                    )}
+                </>
+            ),
+            label: clickedItem?.title,
+            name: workflowNodeName,
+            taskDispatcher: true,
+            type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
+        };
+
+        saveWorkflowDefinition({
+            nodeData: {
+                ...newConditionNodeData,
+                parameters: {
+                    ...getParametersWithDefaultValues({
+                        properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                    }),
+                    caseFalse: [],
+                    caseTrue: [],
+                },
+            },
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                        id: workflow.id!,
+                        lastWorkflowNodeName: currentNode?.name,
+                    }),
                 });
-
-                const newConditionNodeData = {
-                    ...clickedTaskDispatcherDefinition,
-                    componentName: clickedItem.name,
-                    icon: (
-                        <>
-                            {clickedItem.icon ? (
-                                <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
-                            ) : (
-                                <Component1Icon className="size-9 text-gray-700" />
-                            )}
-                        </>
-                    ),
-                    label: clickedItem?.title,
-                    name: workflowNodeName,
-                    taskDispatcher: true,
-                    type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
-                };
-
-                saveWorkflowDefinition({
-                    nodeData: {
-                        ...newConditionNodeData,
-                        parameters: {
-                            ...getParametersWithDefaultValues({
-                                properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
-                            }),
-                            caseFalse: [],
-                            caseTrue: [],
-                        },
-                    },
-                    onSuccess: () => {
-                        queryClient.invalidateQueries({
-                            queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                                id: workflow.id!,
-                                lastWorkflowNodeName: currentNode?.name,
-                            }),
-                        });
-                    },
-                    queryClient,
-                    updateWorkflowMutation,
-                    workflow,
-                });
-
-                return {
-                    ...node,
-                    data: newConditionNodeData,
-                    type: 'workflow',
-                };
-            })
-        );
+            },
+            queryClient,
+            updateWorkflowMutation,
+            workflow,
+        });
     }
 }
