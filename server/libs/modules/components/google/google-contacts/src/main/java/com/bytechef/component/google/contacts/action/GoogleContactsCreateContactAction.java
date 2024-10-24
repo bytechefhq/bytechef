@@ -17,28 +17,26 @@
 package com.bytechef.component.google.contacts.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_CONTACT;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
+import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
+import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
-import com.google.api.services.people.v1.model.Name;
-import com.google.api.services.people.v1.model.Organization;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 import java.io.IOException;
@@ -49,7 +47,7 @@ import java.util.List;
  */
 public class GoogleContactsCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create contact")
         .description("Creates a new contact")
         .properties(
@@ -76,46 +74,20 @@ public class GoogleContactsCreateContactAction {
             string(EMAIL)
                 .label("Email")
                 .description("The email addresses of the contact")
-                .controlType(Property.ControlType.EMAIL)
+                .controlType(ControlType.EMAIL)
                 .required(false),
             string(PHONE_NUMBER)
                 .label("Phone number")
                 .description("The phone numbers of the contact")
-                .controlType(Property.ControlType.PHONE)
+                .controlType(ControlType.PHONE)
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        array("names")
-                            .items(
-                                object()
-                                    .properties(
-                                        string(FIRST_NAME),
-                                        string(MIDDLE_NAME),
-                                        string(LAST_NAME))),
-                        array("organizations")
-                            .items(
-                                object()
-                                    .properties(
-                                        string(COMPANY),
-                                        string(JOB_TITLE))),
-                        array("emailAddresses")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value"))),
-                        array("phoneNumbers")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("value"))))))
+        .output(outputSchema(CONTACT_OUTPUT_PROPERTY))
         .perform(GoogleContactsCreateContactAction::perform);
 
     private GoogleContactsCreateContactAction() {
     }
 
-    public static Person perform(
+    protected static Person perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
@@ -131,18 +103,4 @@ public class GoogleContactsCreateContactAction {
             .createContact(person)
             .execute();
     }
-
-    private static Organization createOrganization(Parameters inputParameters) {
-        return new Organization()
-            .setName(inputParameters.getString(COMPANY))
-            .setTitle(inputParameters.getString(JOB_TITLE));
-    }
-
-    private static Name createName(Parameters inputParameters) {
-        return new Name()
-            .setGivenName(inputParameters.getRequiredString(FIRST_NAME))
-            .setMiddleName(inputParameters.getString(MIDDLE_NAME))
-            .setFamilyName(inputParameters.getRequiredString(LAST_NAME));
-    }
-
 }

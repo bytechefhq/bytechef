@@ -16,24 +16,53 @@
 
 package com.bytechef.component.google.contacts.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+
 /**
  * @author Monika Domiter
  */
 public class GoogleContactsConstants {
 
     public static final String COMPANY = "company";
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_GROUP = "createGroup";
-    public static final String UPDATE_CONTACT = "updateContact";
     public static final String EMAIL = "email";
     public static final String FIRST_NAME = "firstName";
-    public static final String GOOGLE_CONTACTS = "googleContacts";
     public static final String JOB_TITLE = "jobTitle";
     public static final String LAST_NAME = "lastName";
     public static final String MIDDLE_NAME = "middleName";
     public static final String NAME = "name";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String RESOURCE_NAME = "resourceName";
+
+    public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY =
+        object()
+            .properties(
+                array("names")
+                    .items(
+                        object()
+                            .properties(
+                                string(FIRST_NAME),
+                                string(MIDDLE_NAME),
+                                string(LAST_NAME))),
+                array("organizations")
+                    .items(
+                        object()
+                            .properties(
+                                string(COMPANY),
+                                string(JOB_TITLE))),
+                array("emailAddresses")
+                    .items(
+                        object()
+                            .properties(
+                                string("value"))),
+                array("phoneNumbers")
+                    .items(
+                        object()
+                            .properties(
+                                string("value"))));
 
     private GoogleContactsConstants() {
     }

@@ -18,7 +18,6 @@ package com.bytechef.component.google.contacts;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.contacts.connection.GoogleContactsConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GOOGLE_CONTACTS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GoogleContactsComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_CONTACTS)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleContacts")
         .title("Google Contacts")
         .description(
             "Google Contacts is a cloud-based address book service provided by Google, allowing users to store, " +
