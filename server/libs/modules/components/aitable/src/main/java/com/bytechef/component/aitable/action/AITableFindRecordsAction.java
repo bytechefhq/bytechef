@@ -19,7 +19,6 @@ package com.bytechef.component.aitable.action;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
-import static com.bytechef.component.aitable.constant.AITableConstants.FIND_RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
@@ -44,7 +43,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class AITableFindRecordsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_RECORDS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRecords")
         .title("Find records")
         .description("Find records in datasheet")
         .properties(

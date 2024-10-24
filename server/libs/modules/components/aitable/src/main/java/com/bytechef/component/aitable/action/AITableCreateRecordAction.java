@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable.action;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.CREATE_RECORD;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
@@ -40,7 +39,7 @@ import java.util.Map;
  */
 public class AITableCreateRecordAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_RECORD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRecord")
         .title("Create record")
         .description("Creates a new record in datasheet.")
         .properties(

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aitable;
 
-import static com.bytechef.component.aitable.constant.AITableConstants.AI_TABLE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AITableComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(AI_TABLE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("aitable")
         .title("AITable")
         .description(
             "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data " +

@@ -24,7 +24,6 @@ import static com.bytechef.component.aitable.constant.AITableConstants.OUTPUT_PR
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
-import static com.bytechef.component.aitable.constant.AITableConstants.UPDATE_RECORD;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -33,7 +32,7 @@ import com.bytechef.component.aitable.util.AITableUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 public class AITableUpdateRecordAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_RECORD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRecord")
         .title("Update record")
         .description("Update record in datasheet")
         .properties(
@@ -54,7 +53,7 @@ public class AITableUpdateRecordAction {
                 .label("Record")
                 .description("Record to update")
                 .optionsLookupDependsOn(DATASHEET_ID)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
+                .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),
             FIELDS_DYNAMIC_PROPERTY)
         .output(outputSchema(OUTPUT_PROPERTY))

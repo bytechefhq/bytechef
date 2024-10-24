@@ -39,12 +39,9 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
  */
 public class AITableConstants {
 
-    public static final String AI_TABLE = "aitable";
-    public static final String CREATE_RECORD = "createRecord";
     public static final String DATA = "data";
     public static final String DATASHEET_ID = "datasheetId";
     public static final String FIELDS = "fields";
-    public static final String FIND_RECORDS = "findRecords";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String MAX_RECORDS = "maxRecords";
@@ -53,7 +50,6 @@ public class AITableConstants {
     public static final String RECORDS = "records";
     public static final String SPACE_ID = "spaceId";
     public static final String TYPE = "type";
-    public static final String UPDATE_RECORD = "updateRecord";
 
     public static final ModifiableStringProperty DATASHEET_ID_PROPERTY = string(DATASHEET_ID)
         .label("Datasheet")
