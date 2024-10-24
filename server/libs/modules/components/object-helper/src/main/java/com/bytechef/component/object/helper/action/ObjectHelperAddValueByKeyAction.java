@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.nullable;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
@@ -112,7 +111,7 @@ public class ObjectHelperAddValueByKeyAction {
                 .description("Value to be added or updated.")
                 .displayCondition("valueType == 10")
                 .required(true))
-        .output(outputSchema(object()))
+        .output()
         .perform(ObjectHelperAddValueByKeyAction::perform);
 
     private ObjectHelperAddValueByKeyAction() {
