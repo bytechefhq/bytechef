@@ -18,7 +18,6 @@ package com.bytechef.component.zendesk.sell;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.zendesk.sell.connection.ZendeskSellConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.ZENDESK_SELL;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class ZendeskSellComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ZENDESK_SELL)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("zendeskSell")
         .title("Zendesk Sell")
         .description(
             "Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.")

@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CONTENT;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_TASK;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DATA;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DUE_DATE;
 
@@ -38,7 +37,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class ZendeskSellCreateTaskAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TASK)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create task")
         .description("Creates new Task")
         .properties(
