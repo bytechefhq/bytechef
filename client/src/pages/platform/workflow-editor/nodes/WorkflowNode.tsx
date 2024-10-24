@@ -16,8 +16,7 @@ import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import styles from './NodeTypes.module.css';
-
-const SPACE = 4;
+import handleDeleteNode from '../utils/handleDeleteNode';
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -31,7 +30,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
-    const {getEdges, getNode, getNodes, setEdges, setNodes} = useReactFlow();
+    const {getNode} = useReactFlow();
 
     const isSelected = currentNode?.name === data.name;
 
@@ -47,96 +46,21 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const handleDeleteNodeClick = () => {
-        const nodes = getNodes();
-        const node = getNode(id);
-
-        if (!node) {
-            return;
-        }
-
-        const edges = getEdges();
-
-        const remainingNodes = nodes.filter((node) => node.id !== id);
-
-        setNodes(remainingNodes);
-
-        const connectedEdges = getConnectedEdges([node], edges);
-        const deletedNodeIndex = nodes.findIndex((node) => node.id === id);
-
-        const previousNode = nodes[deletedNodeIndex - 1];
-        const nextNode = nodes[deletedNodeIndex + 1];
-
-        if (previousNode && nextNode) {
-            const connectedEdgeIds = connectedEdges.map((edge) => edge.id);
-
-            setEdges((edges) => {
-                const leftoverEdges = edges.filter((edge) => !connectedEdgeIds.includes(edge.id));
-
-                const edgeType =
-                    previousNode.type === 'workflow' && nextNode.type === 'placeholder' ? 'placeholder' : 'workflow';
-
-                return [
-                    ...leftoverEdges,
-                    {
-                        id: `${previousNode.id}=>${nextNode.id}`,
-                        source: previousNode.id,
-                        target: nextNode.id,
-                        type: edgeType,
-                    },
-                ];
-            });
-        }
-
-        if (!workflow?.definition) {
-            return;
-        }
-
-        const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
-
-        const updatedTasks = workflowDefinition!.tasks?.filter((task) => task.name !== data.name);
-
-        setWorkflow({
-            ...workflow,
-            componentNames: componentNames.filter((componentName) => componentName !== data.componentName),
-            tasks: updatedTasks,
+    const handleDeleteNodeClick = () =>
+        handleDeleteNode({
+            componentNames,
+            currentComponent,
+            currentNode,
+            data,
+            getNode,
+            id,
+            queryClient,
+            setCurrentComponent,
+            setCurrentNode,
+            setWorkflow,
+            updateWorkflowMutation,
+            workflow,
         });
-
-        if (currentNode?.name === data.name) {
-            setCurrentNode(undefined);
-        }
-
-        if (currentComponent?.workflowNodeName === data.name) {
-            setCurrentComponent(undefined);
-        }
-
-        updateWorkflowMutation.mutate(
-            {
-                id: workflow.id!,
-                workflow: {
-                    definition: JSON.stringify(
-                        {
-                            ...workflowDefinition,
-                            tasks: updatedTasks,
-                        },
-                        null,
-                        SPACE
-                    ),
-                    version: workflow.version,
-                },
-            },
-            {
-                onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                            id: workflow.id!,
-                            lastWorkflowNodeName: currentNode?.name,
-                        }),
-                    });
-                },
-            }
-        );
-    };
 
     return (
         <div
