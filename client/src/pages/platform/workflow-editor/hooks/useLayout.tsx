@@ -366,11 +366,7 @@ export default function useLayout({
 
         Dagre.layout(dagreGraph);
 
-        nodes = nodes.map((node) => {
-            const position = dagreGraph.node(node.id);
-
-            return {...node, position};
-        });
+        nodes = nodes.map((node) => ({...node, position: dagreGraph.node(node.id)}));
 
         setNodes(nodes);
         setEdges(edges);
