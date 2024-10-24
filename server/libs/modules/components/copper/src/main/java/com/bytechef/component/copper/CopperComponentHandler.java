@@ -16,7 +16,6 @@
 
 package com.bytechef.component.copper;
 
-import static com.bytechef.component.copper.constant.CopperConstants.COPPER;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class CopperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(COPPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("copper")
         .title("Copper")
         .description(
             "Copper is a customer relationship management (CRM) software designed to streamline and optimize sales " +

@@ -19,11 +19,9 @@ package com.bytechef.component.copper.action;
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.COMPANY;
-import static com.bytechef.component.copper.constant.CopperConstants.CREATE_ACTIVITY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.LEAD;
-import static com.bytechef.component.copper.constant.CopperConstants.OPPORTUNITY;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.PERSON;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
@@ -48,7 +46,7 @@ import java.util.Map;
  */
 public class CopperCreateActivityAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ACTIVITY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createActivity")
         .title("Create activity")
         .description("Creates a new Activity")
         .properties(
@@ -68,7 +66,7 @@ public class CopperCreateActivityAction {
                     option("Lead", LEAD),
                     option("Person", PERSON),
                     option("Company", COMPANY),
-                    option("Opportunity", OPPORTUNITY))
+                    option("Opportunity", "opportunity"))
                 .defaultValue(PERSON)
                 .required(true),
             string(ID)
