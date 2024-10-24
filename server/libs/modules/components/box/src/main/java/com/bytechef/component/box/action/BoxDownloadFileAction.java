@@ -16,7 +16,6 @@
 
 package com.bytechef.component.box.action;
 
-import static com.bytechef.component.box.constant.BoxConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.box.constant.BoxConstants.FILE_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -37,7 +36,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class BoxDownloadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download file")
         .description("Download a selected file.")
         .properties(

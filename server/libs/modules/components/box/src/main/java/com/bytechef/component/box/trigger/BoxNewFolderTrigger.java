@@ -20,7 +20,6 @@ import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPE
 import static com.bytechef.component.box.constant.BoxConstants.FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.FOLDER_ID;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
-import static com.bytechef.component.box.constant.BoxConstants.NEW_FOLDER;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 public class BoxNewFolderTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_FOLDER)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newFolder")
         .title("New Folder")
         .description("Triggers when folder is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

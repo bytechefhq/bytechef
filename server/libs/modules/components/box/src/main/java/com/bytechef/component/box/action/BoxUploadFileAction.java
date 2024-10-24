@@ -21,7 +21,6 @@ import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPE
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
 import static com.bytechef.component.box.constant.BoxConstants.PARENT;
-import static com.bytechef.component.box.constant.BoxConstants.UPLOAD_FILE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class BoxUploadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload file")
         .description("Uploads a small file to Box.")
         .properties(
