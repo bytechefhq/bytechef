@@ -16,7 +16,6 @@
 
 package com.bytechef.component.box.action;
 
-import static com.bytechef.component.box.constant.BoxConstants.CREATE_FOLDER;
 import static com.bytechef.component.box.constant.BoxConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.box.constant.BoxConstants.ID;
 import static com.bytechef.component.box.constant.BoxConstants.NAME;
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public class BoxCreateFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_FOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
         .title("Create folder")
         .description("Creates a new empty folder within the specified parent folder.")
         .properties(

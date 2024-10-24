@@ -16,7 +16,6 @@
 
 package com.bytechef.component.box;
 
-import static com.bytechef.component.box.constant.BoxConstants.BOX;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -36,7 +35,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class BoxComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition componentDefinition = component(BOX)
+    private static final ComponentDefinition componentDefinition = component("box")
         .title("Box")
         .description(
             "Box is a cloud content management and file sharing service that enables businesses to securely " +
