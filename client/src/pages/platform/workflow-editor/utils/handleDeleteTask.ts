@@ -118,7 +118,6 @@ export default function handleDeleteTask({
                 setWorkflow({
                     ...workflow,
                     componentNames: componentNames.filter((componentName) => componentName !== data.componentName),
-                    tasks: updatedTasks,
                 });
 
                 if (currentNode?.name === data.name) {
