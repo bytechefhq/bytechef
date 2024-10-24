@@ -111,7 +111,6 @@ export type NodeDataType = {
     label?: string;
     metadata?: {
         ui?: {
-            condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };

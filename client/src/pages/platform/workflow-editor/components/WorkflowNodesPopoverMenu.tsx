@@ -41,7 +41,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {getNode, setNodes} = useReactFlow();
+    const {getNode, getNodes} = useReactFlow();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -60,9 +60,8 @@ const WorkflowNodesPopoverMenu = ({
                 currentNode,
                 edge,
                 getNode,
+                getNodes,
                 queryClient,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                setNodes: setNodes as any,
                 setWorkflow,
                 sourceNodeId,
                 updateWorkflowMutation,
@@ -92,10 +91,10 @@ const WorkflowNodesPopoverMenu = ({
     };
 
     useEffect(() => {
-        if (componentDefinitionToBeAdded) {
+        if (componentDefinitionToBeAdded?.name) {
             setActionPanelOpen(true);
         }
-    }, [componentDefinitionToBeAdded]);
+    }, [componentDefinitionToBeAdded?.name]);
 
     return (
         <Popover

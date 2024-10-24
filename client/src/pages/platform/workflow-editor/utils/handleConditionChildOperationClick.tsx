@@ -5,7 +5,7 @@ import {ClickedOperationType, NodeType, PropertyAllType, UpdateWorkflowMutationT
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {Instance} from 'reactflow';
+import {Instance, Node} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
@@ -16,6 +16,7 @@ interface HandleConditionChildOperationClickProps {
     componentNames: Array<string>;
     conditionId: string;
     currentNode?: NodeType;
+    nodes: Array<Node>;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
     placeholderId: string;
@@ -30,76 +31,56 @@ export default function handleConditionChildOperationClick({
     componentNames,
     conditionId,
     currentNode,
+    nodes,
     operation,
     operationDefinition,
     placeholderId,
     queryClient,
-    setNodes,
     setWorkflow,
     updateWorkflowMutation,
     workflow,
 }: HandleConditionChildOperationClickProps) {
     const {componentLabel, componentName, icon, type} = operation;
 
-    setNodes((nodes) => {
-        const workflowNodeName = getFormattedName(componentName!, nodes);
+    const workflowNodeName = getFormattedName(componentName!, nodes);
 
-        const newWorkflowNodeData = {
-            componentName: componentName,
-            conditionId,
-            icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
-            label: componentLabel,
-            name: workflowNodeName,
-            type: type,
-            workflowNodeName,
-        };
+    const newWorkflowNodeData = {
+        componentName: componentName,
+        conditionId,
+        icon: icon && <InlineSVG className="size-9" loader={<ComponentIcon className="size-9" />} src={icon} />,
+        label: componentLabel,
+        name: workflowNodeName,
+        type: type,
+        workflowNodeName,
+    };
+    const taskAfterCurrentIndex = workflow.tasks?.length;
 
-        const newWorkflowNode = {
-            data: newWorkflowNodeData,
-            id: workflowNodeName,
-            position: {x: 0, y: 0},
-            type: 'workflow',
-        };
-
-        setWorkflow({
-            ...workflow,
-            componentNames: [...componentNames, componentName],
-            nodeNames: [...workflow.nodeNames, workflowNodeName],
-        });
-
-        const taskAfterCurrentIndex = workflow.tasks?.length;
-
-        saveWorkflowDefinition({
-            conditionId,
-            nodeData: {
-                ...newWorkflowNodeData,
-                parameters: getParametersWithDefaultValues({
-                    properties: operationDefinition?.properties as Array<PropertyAllType>,
+    saveWorkflowDefinition({
+        conditionId,
+        nodeData: {
+            ...newWorkflowNodeData,
+            parameters: getParametersWithDefaultValues({
+                properties: operationDefinition?.properties as Array<PropertyAllType>,
+            }),
+        },
+        nodeIndex: taskAfterCurrentIndex,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                    id: workflow.id!,
+                    lastWorkflowNodeName: currentNode?.name,
                 }),
-            },
-            nodeIndex: taskAfterCurrentIndex,
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                        id: workflow.id!,
-                        lastWorkflowNodeName: currentNode?.name,
-                    }),
-                });
-            },
-            placeholderId,
-            queryClient,
-            updateWorkflowMutation,
-            workflow,
-        });
+            });
 
-        if (taskAfterCurrentIndex !== undefined && taskAfterCurrentIndex !== -1) {
-            return [
-                ...nodes.slice(0, taskAfterCurrentIndex + 1),
-                newWorkflowNode,
-                ...nodes.slice(taskAfterCurrentIndex + 1),
-            ];
-        }
-
-        return [...nodes, newWorkflowNode];
+            setWorkflow({
+                ...workflow,
+                componentNames: [...componentNames, componentName],
+                nodeNames: [...workflow.nodeNames, workflowNodeName],
+            });
+        },
+        placeholderId,
+        queryClient,
+        updateWorkflowMutation,
+        workflow,
     });
 }
