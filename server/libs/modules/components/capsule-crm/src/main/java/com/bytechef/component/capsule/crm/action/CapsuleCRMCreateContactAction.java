@@ -32,17 +32,9 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ST
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.capsule.crm.util.CapsuleCRMUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -165,12 +157,7 @@ public class CapsuleCRMCreateContactAction {
                                 .description("The actual phone number.")
                                 .required(true)))
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .additionalProperties(
-                        array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
-                        time())))
+        .output()
         .perform(CapsuleCRMCreateContactAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_PARTIES_CONTEXT_FUNCTION =
