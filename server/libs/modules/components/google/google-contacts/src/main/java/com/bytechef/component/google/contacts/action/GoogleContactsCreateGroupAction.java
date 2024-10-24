@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CREATE_GROUP;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -37,7 +36,7 @@ import java.io.IOException;
  */
 public class GoogleContactsCreateGroupAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_GROUP)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
         .title("Create groups")
         .description("Creates a new group")
         .properties(
@@ -55,7 +54,7 @@ public class GoogleContactsCreateGroupAction {
     private GoogleContactsCreateGroupAction() {
     }
 
-    public static ContactGroup perform(
+    protected static ContactGroup perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
@@ -70,5 +69,4 @@ public class GoogleContactsCreateGroupAction {
             .create(createContactGroupRequest)
             .execute();
     }
-
 }
