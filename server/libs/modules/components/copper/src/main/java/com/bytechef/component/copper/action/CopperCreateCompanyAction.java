@@ -23,7 +23,6 @@ import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY_LA
 import static com.bytechef.component.copper.constant.CopperConstants.CITY;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.COUNTRY;
-import static com.bytechef.component.copper.constant.CopperConstants.CREATE_COMPANY;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.EMAIL_DOMAIN;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
@@ -59,7 +58,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class CopperCreateCompanyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COMPANY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create company")
         .description("Creates a new Company")
         .properties(
