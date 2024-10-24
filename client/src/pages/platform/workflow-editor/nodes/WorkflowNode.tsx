@@ -3,20 +3,18 @@ import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {WorkflowDefinitionType} from '@/shared/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {Handle, NodeProps, Position, getConnectedEdges, useReactFlow} from 'reactflow';
+import {Handle, NodeProps, Position, useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import handleDeleteTask from '../utils/handleDeleteTask';
 import styles from './NodeTypes.module.css';
-import handleDeleteNode from '../utils/handleDeleteNode';
 
 const WorkflowNode = ({data, id}: NodeProps) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -47,7 +45,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const handleDeleteNodeClick = () =>
-        handleDeleteNode({
+        handleDeleteTask({
             componentNames,
             currentComponent,
             currentNode,

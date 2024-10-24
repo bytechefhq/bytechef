@@ -1,13 +1,19 @@
-import {SPACE} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ComponentType, NodeType, WorkflowDefinitionType} from '@/shared/types';
+import {
+    ComponentType,
+    ConditionTaskDispatcherType,
+    NodeType,
+    WorkflowDefinitionType,
+    WorkflowTaskType,
+} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {Node, NodeProps} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 
-interface HandleDeleteNodeProps {
+interface HandleDeleteTaskProps {
     componentNames: Array<string>;
     currentComponent?: ComponentType;
     currentNode?: NodeType;
@@ -22,7 +28,7 @@ interface HandleDeleteNodeProps {
     workflow: Workflow & WorkflowTaskDataType;
 }
 
-export default function handleDeleteNode({
+export default function handleDeleteTask({
     componentNames,
     currentComponent,
     currentNode,
@@ -35,10 +41,10 @@ export default function handleDeleteNode({
     setWorkflow,
     updateWorkflowMutation,
     workflow,
-}: HandleDeleteNodeProps) {
+}: HandleDeleteTaskProps) {
     const node = getNode(id);
 
-    if (!node) {
+    if (!node || !workflow?.definition) {
         return;
     }
 
@@ -48,7 +54,42 @@ export default function handleDeleteNode({
 
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
 
-    const updatedTasks = workflowDefinition.tasks?.filter((task: WorkflowTask) => task.name !== data.name);
+    const {tasks: workflowTasks} = workflowDefinition;
+
+    if (!workflowTasks) {
+        return;
+    }
+
+    let updatedTasks = workflowTasks;
+
+    if (data.conditionData) {
+        updatedTasks = workflowTasks.map((task: WorkflowTaskType) => {
+            if (task.name !== data.conditionData.conditionId) {
+                return task;
+            }
+
+            const {conditionCase} = data.conditionData;
+
+            let {caseFalse, caseTrue} = (task as ConditionTaskDispatcherType).parameters;
+
+            if (conditionCase === CONDITION_CASE_TRUE) {
+                caseTrue = caseTrue.filter((childTask) => childTask.name !== data.name);
+            } else if (conditionCase === CONDITION_CASE_FALSE) {
+                caseFalse = caseFalse.filter((childTask) => childTask.name !== data.name);
+            }
+
+            return {
+                ...task,
+                parameters: {
+                    ...task.parameters,
+                    caseFalse,
+                    caseTrue,
+                },
+            };
+        });
+    } else {
+        updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
+    }
 
     updateWorkflowMutation.mutate(
         {
