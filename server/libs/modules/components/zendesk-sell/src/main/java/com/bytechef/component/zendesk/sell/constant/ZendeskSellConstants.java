@@ -22,8 +22,6 @@ package com.bytechef.component.zendesk.sell.constant;
 public class ZendeskSellConstants {
 
     public static final String CONTENT = "content";
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_TASK = "createTask";
     public static final String DATA = "data";
     public static final String DUE_DATE = "due_date";
     public static final String EMAIL = "email";
@@ -33,7 +31,6 @@ public class ZendeskSellConstants {
     public static final String NAME = "name";
     public static final String TITLE = "title";
     public static final String WEBSITE = "website";
-    public static final String ZENDESK_SELL = "zendeskSell";
 
     private ZendeskSellConstants() {
     }

@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.CREATE_CONTACT;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.DATA;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.EMAIL;
 import static com.bytechef.component.zendesk.sell.constant.ZendeskSellConstants.FIRST_NAME;
@@ -44,7 +43,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class ZendeskSellCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create contact")
         .description("Creates new contact. A contact may represent a single individual or an organization.")
         .properties(
