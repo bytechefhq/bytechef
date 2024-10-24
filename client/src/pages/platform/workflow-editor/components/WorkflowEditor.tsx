@@ -154,6 +154,8 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }
     };
 
+    useLayout({componentDefinitions, taskDispatcherDefinitions});
+
     // Update workflow node names when nodes change
     useEffect(() => {
         const workflowNodes = getNodes();
@@ -217,8 +219,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.tasks, workflow.triggers]);
-
-    useLayout({componentDefinitions, taskDispatcherDefinitions});
 
     return (
         <div className="flex h-full flex-1 flex-col">
