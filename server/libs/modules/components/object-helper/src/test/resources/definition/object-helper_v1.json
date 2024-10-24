@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Object Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -90,8 +89,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
@@ -110,8 +109,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
@@ -131,8 +130,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Convert to JSON string",
     "processErrorResponse" : null,
@@ -147,8 +146,51 @@
     "name" : "addValueByKey",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : null,
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "properties" : null,
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -169,8 +211,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Key of the value to be added or updated.",
@@ -248,8 +290,8 @@
         "label" : "Time",
         "value" : 10
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -269,8 +311,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -310,8 +352,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE"
+      "controlType" : "DATE",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -327,8 +369,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "DATE_TIME"
+      "controlType" : "DATE_TIME",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -346,8 +388,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -383,8 +425,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -403,8 +445,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
@@ -440,8 +482,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "TIME"
+      "controlType" : "TIME",
+      "optionsDataSource" : null
     } ],
     "title" : "Add value to the object by key",
     "processErrorResponse" : null,
@@ -455,7 +497,7 @@
     "metadata" : null,
     "name" : "addKeyValuePairs",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -485,8 +527,8 @@
         "label" : "Object",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Source object to be added or updated",
@@ -534,8 +576,8 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -575,8 +617,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE"
+          "controlType" : "DATE",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -592,8 +634,8 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "DATE_TIME"
+          "controlType" : "DATE_TIME",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -611,8 +653,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -633,8 +675,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -668,8 +710,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -705,21 +747,21 @@
           "label" : null,
           "placeholder" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "TIME"
+          "controlType" : "TIME",
+          "optionsDataSource" : null
         } ],
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Source object to be added or updated",
@@ -753,8 +795,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -794,8 +836,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE"
+        "controlType" : "DATE",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -811,8 +853,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -830,8 +872,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -852,8 +894,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -887,8 +929,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -924,17 +966,17 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "TIME"
+        "controlType" : "TIME",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Key-Value pairs to be added or updated.",
+      "description" : "Array of Key-Value pairs to be added or updated.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -944,7 +986,7 @@
       "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Key-Value pairs",
+      "label" : "Array of Key-Value pairs",
       "placeholder" : null,
       "additionalProperties" : [ {
         "advancedOption" : null,
@@ -1010,8 +1052,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1030,8 +1072,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1051,8 +1093,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1068,8 +1110,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1085,8 +1127,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE"
+        "controlType" : "DATE",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1102,21 +1144,80 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "TIME"
+        "controlType" : "TIME",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Add Key-Value pairs to object or array",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Deletes a key-value pair in the given object by the specified key. Returns the modified object.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "deleteKeyValuePair",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The object from which to delete the key-value pair.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "input",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Input",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The key of the key-value pair to delete.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "key",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Key",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Delete Key-Value Pair",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
+  "connection" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "dataStream" : null
 }
