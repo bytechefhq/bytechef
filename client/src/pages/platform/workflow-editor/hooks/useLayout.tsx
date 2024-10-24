@@ -372,17 +372,6 @@ export default function useLayout({
             return {...node, position};
         });
 
-        edges = edges.map((edge) => {
-            if (edge.target.includes('0')) {
-                return {
-                    ...edge,
-                    label: edge.target.includes('left') ? 'True' : 'False',
-                };
-            }
-
-            return edge;
-        });
-
         setNodes(nodes);
         setEdges(edges);
 

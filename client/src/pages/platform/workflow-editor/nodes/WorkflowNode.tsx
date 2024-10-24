@@ -139,6 +139,14 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 position={Position.Bottom}
                 type="source"
             />
+
+            {data.name.includes('condition') && (
+                <div className="absolute bottom-0 left-0 font-bold text-muted-foreground">
+                    <span className="absolute -bottom-6 -left-32">TRUE</span>
+
+                    <span className="absolute -bottom-6 left-40">FALSE</span>
+                </div>
+            )}
         </div>
     );
 };
