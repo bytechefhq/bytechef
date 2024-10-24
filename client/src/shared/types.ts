@@ -48,6 +48,14 @@ export type ComponentPropertiesType =
       }
     | undefined;
 
+export type ConditionTaskDispatcherType = {
+    parameters: {
+        caseFalse: Array<WorkflowTaskType>;
+        caseTrue: Array<WorkflowTaskType>;
+        [key: string]: unknown;
+    };
+} & WorkflowTaskType;
+
 export type TaskDispatcherType = {
     componentName: string;
     icon: ReactNode;
