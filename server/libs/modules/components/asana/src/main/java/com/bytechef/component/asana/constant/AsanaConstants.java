@@ -21,10 +21,6 @@ package com.bytechef.component.asana.constant;
  */
 public class AsanaConstants {
 
-    public static final String ASSIGNEE = "assignee";
-    public static final String PROJECT = "project";
-    public static final String TAGS = "tags";
-    public static final String TEAM = "team";
     public static final String WORKSPACE = "workspace";
 
     private AsanaConstants() {

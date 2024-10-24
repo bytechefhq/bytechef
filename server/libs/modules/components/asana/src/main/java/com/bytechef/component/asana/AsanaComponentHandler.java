@@ -16,10 +16,6 @@
 
 package com.bytechef.component.asana;
 
-import static com.bytechef.component.asana.constant.AsanaConstants.ASSIGNEE;
-import static com.bytechef.component.asana.constant.AsanaConstants.PROJECT;
-import static com.bytechef.component.asana.constant.AsanaConstants.TAGS;
-import static com.bytechef.component.asana.constant.AsanaConstants.TEAM;
 import static com.bytechef.component.asana.constant.AsanaConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -71,19 +67,19 @@ public class AsanaComponentHandler extends AbstractAsanaComponentHandler {
                         if (Objects.equals(baseProperty2.getName(), WORKSPACE)) {
                             ((ModifiableStringProperty) baseProperty2)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getWorkspaceIdOptions);
-                        } else if (Objects.equals(baseProperty2.getName(), PROJECT)) {
+                        } else if (Objects.equals(baseProperty2.getName(), "project")) {
                             ((ModifiableStringProperty) baseProperty2)
                                 .optionsLookupDependsOn(WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getProjectIdOptions);
-                        } else if (Objects.equals(baseProperty2.getName(), ASSIGNEE)) {
+                        } else if (Objects.equals(baseProperty2.getName(), "assignee")) {
                             ((ModifiableStringProperty) baseProperty2)
                                 .optionsLookupDependsOn(WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getAssigneeOptions);
-                        } else if (Objects.equals(baseProperty2.getName(), TEAM)) {
+                        } else if (Objects.equals(baseProperty2.getName(), "team")) {
                             ((ModifiableStringProperty) baseProperty2)
                                 .optionsLookupDependsOn("__item.data." + WORKSPACE)
                                 .options((ActionOptionsFunction<String>) AsanaUtils::getTeamOptions);
-                        } else if (Objects.equals(baseProperty2.getName(), TAGS)) {
+                        } else if (Objects.equals(baseProperty2.getName(), "tags")) {
                             ((ModifiableArrayProperty) baseProperty2)
                                 .items(
                                     string()
