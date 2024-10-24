@@ -47,4 +47,6 @@ public class ObjectHelperConstants {
         option("Time", 10));
     public static final String VALUE = "value";
     public static final String VALUE_TYPE = "valueType";
+    public static final String DELETE_KEY_VALUE_PAIR = "deleteKeyValuePair";
+    public static final String INPUT = "input";
 }
