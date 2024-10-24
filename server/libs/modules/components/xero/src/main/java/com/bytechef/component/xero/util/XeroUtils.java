@@ -21,7 +21,6 @@ import static com.bytechef.component.xero.constant.XeroConstants.CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
-import static com.bytechef.component.xero.constant.XeroConstants.CREATE;
 import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.DUE_DATE;
@@ -207,7 +206,7 @@ public class XeroUtils {
                 String eventCategory = (String) eventMap.get("eventCategory");
                 String eventType = (String) eventMap.get("eventType");
 
-                if (eventCategory.equals(category) && eventType.equals(CREATE)) {
+                if (eventCategory.equals(category) && eventType.equals("CREATE")) {
                     String resourceId = (String) eventMap.get("resourceId");
                     String urlPart = category.equals(INVOICE) ? INVOICES : CONTACTS;
 

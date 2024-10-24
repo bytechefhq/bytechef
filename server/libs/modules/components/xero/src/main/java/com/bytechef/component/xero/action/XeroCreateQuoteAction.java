@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xero.constant.XeroConstants.BRANDING_THEME_ID;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
-import static com.bytechef.component.xero.constant.XeroConstants.CREATE_QUOTE;
 import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.DESCRIPTION;
@@ -65,7 +64,7 @@ import java.util.Map;
  */
 public class XeroCreateQuoteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_QUOTE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createQuote")
         .title("Create quote")
         .description("Creates a new quote draft.")
         .properties(

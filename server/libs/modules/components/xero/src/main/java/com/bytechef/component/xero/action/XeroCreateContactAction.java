@@ -33,7 +33,6 @@ import static com.bytechef.component.xero.constant.XeroConstants.CONTACTS;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_STATUS;
 import static com.bytechef.component.xero.constant.XeroConstants.COUNTRY;
-import static com.bytechef.component.xero.constant.XeroConstants.CREATE_CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.EMAIL_ADDRESS;
 import static com.bytechef.component.xero.constant.XeroConstants.FIRST_NAME;
 import static com.bytechef.component.xero.constant.XeroConstants.LAST_NAME;
@@ -63,7 +62,7 @@ import java.util.Map;
  */
 public class XeroCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create contact")
         .description("Creates a new contact.")
         .properties(

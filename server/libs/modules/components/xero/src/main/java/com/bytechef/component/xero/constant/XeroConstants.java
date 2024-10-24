@@ -33,7 +33,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
  */
 public final class XeroConstants {
 
-    public static final String ACCOUNT_CODE = "AccountCode";
     public static final String ACCOUNT_NUMBER = "AccountNumber";
     public static final String ACCPAY = "ACCPAY";
     public static final String ACCREC = "ACCREC";
@@ -49,11 +48,6 @@ public final class XeroConstants {
     public static final String CONTACT = "Contact";
     public static final String CONTACTS = "Contacts";
     public static final String COUNTRY = "Country";
-    public static final String CREATE = "CREATE";
-    public static final String CREATE_BILL = "createBill";
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_SALES_INVOICE = "createSalesInvoice";
-    public static final String CREATE_QUOTE = "createQuote";
     public static final String CURRENCY_CODE = "CurrencyCode";
     public static final String DATE = "Date";
     public static final String DESCRIPTION = "Description";
@@ -67,12 +61,8 @@ public final class XeroConstants {
     public static final String LAST_NAME = "LastName";
     public static final String LINE_AMOUNT_TYPES = "LineAmountTypes";
     public static final String LINE_ITEMS = "LineItems";
-    public static final String LINE_ITEM = "LineItem";
     public static final String MESSAGE = "Message";
     public static final String NAME = "Name";
-    public static final String NEW_BILL = "newBill";
-    public static final String NEW_CONTACT = "newContact";
-    public static final String NEW_INVOICE = "newInvoice";
     public static final String PHONES = "Phones";
     public static final String PHONE_TYPE = "PhoneType";
     public static final String PHONE_NUMBER = "PhoneNumber";
@@ -91,7 +81,6 @@ public final class XeroConstants {
     public static final String TYPE = "Type";
     public static final String UNIT_AMOUNT = "UnitAmount";
     public static final String WEBHOOK_KEY = "webhookKey";
-    public static final String XERO = "xero";
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY = object()
         .properties(
