@@ -17,7 +17,6 @@
 package com.bytechef.component.capsule.crm;
 
 import static com.bytechef.component.capsule.crm.connection.CapsuleCRMConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CAPSULE_CRM;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -33,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class CapsuleCRMComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(CAPSULE_CRM)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("capsuleCRM")
         .title("Capsule CRM")
         .description(
             "Capsule CRM is a cloud-based customer relationship management platform designed to help businesses " +

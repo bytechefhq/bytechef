@@ -20,8 +20,6 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.AB
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ADDRESSES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CITY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.COUNTRY;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CREATE_CONTACT;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.EMAIL_ADDRESSES;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FIRST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME;
@@ -29,11 +27,9 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NA
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NUMBER;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STATE;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STREET;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STRING_DISPLAY_CONDITION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.ZIP;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -62,7 +58,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class CapsuleCRMCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Creates a new Person or Organization")
         .properties(
@@ -134,16 +130,16 @@ public class CapsuleCRMCreateContactAction {
                                 .label("City")
                                 .description("The city of the address.")
                                 .required(false),
-                            string(STATE)
+                            string("state")
                                 .label("State")
                                 .description("The state or province of the address.")
                                 .required(false),
-                            string(COUNTRY)
+                            string("country")
                                 .label("Country")
                                 .description("The country of the address.")
                                 .options((ActionOptionsFunction<String>) CapsuleCRMUtils::getCountryOptions)
                                 .required(false),
-                            string(ZIP)
+                            string("zip")
                                 .label("Zip")
                                 .description("The zip/postal code.")
                                 .required(false)))

@@ -18,7 +18,6 @@ package com.bytechef.component.capsule.crm.action;
 
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CATEGORY;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.COLOUR;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.CREATE_TASK;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DESCRIPTION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DETAIL;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
@@ -42,7 +41,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class CapsuleCRMCreateTaskAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TASK)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
         .description("Creates a new Task")
         .properties(
