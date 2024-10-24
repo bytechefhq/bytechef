@@ -17,7 +17,6 @@
 package com.bytechef.component.xero;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.xero.constant.XeroConstants.XERO;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -40,7 +39,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class XeroComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(XERO)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("xero")
         .title("Xero")
         .description(
             "Xero is an online accounting software platform designed for small businesses and accountants to manage " +

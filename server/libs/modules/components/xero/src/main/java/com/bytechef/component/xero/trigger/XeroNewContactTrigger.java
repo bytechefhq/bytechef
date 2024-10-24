@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_OUTPUT_PROPERTY;
-import static com.bytechef.component.xero.constant.XeroConstants.NEW_CONTACT;
 import static com.bytechef.component.xero.constant.XeroConstants.WEBHOOK_KEY_PROPERTY;
 import static com.bytechef.component.xero.util.XeroUtils.getCreatedObject;
 
@@ -39,7 +38,7 @@ import com.bytechef.component.xero.util.XeroUtils;
  */
 public class XeroNewContactTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_CONTACT)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newContact")
         .title("New Contact")
         .description("Triggers when a contact is created.")
         .type(TriggerType.STATIC_WEBHOOK)

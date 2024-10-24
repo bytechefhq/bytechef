@@ -25,17 +25,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xero.action.XeroCreateInvoiceAction.POST_INVOICES_CONTEXT_FUNCTION;
-import static com.bytechef.component.xero.constant.XeroConstants.ACCOUNT_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
-import static com.bytechef.component.xero.constant.XeroConstants.CREATE_BILL;
 import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.DESCRIPTION;
 import static com.bytechef.component.xero.constant.XeroConstants.DUE_DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.INVOICE_OUTPUT_PROPERTY;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_AMOUNT_TYPE_PROPERTY;
-import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEM;
 import static com.bytechef.component.xero.constant.XeroConstants.LINE_ITEMS;
 import static com.bytechef.component.xero.constant.XeroConstants.QUANTITY;
 import static com.bytechef.component.xero.constant.XeroConstants.REFERENCE;
@@ -52,7 +49,7 @@ import com.bytechef.component.xero.util.XeroUtils;
  */
 public class XeroCreateBillAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_BILL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBill")
         .title("Create bill")
         .description("Creates draft bill (Accounts Payable).")
         .properties(
@@ -77,7 +74,7 @@ public class XeroCreateBillAction {
                 .description("Line items on the bill.")
                 .minItems(1)
                 .items(
-                    object(LINE_ITEM)
+                    object("LineItem")
                         .properties(
                             string(DESCRIPTION)
                                 .label(DESCRIPTION)
@@ -90,7 +87,7 @@ public class XeroCreateBillAction {
                             number(UNIT_AMOUNT)
                                 .label("Price")
                                 .required(false),
-                            string(ACCOUNT_CODE)
+                            string("AccountCode")
                                 .label("Account")
                                 .options((ActionOptionsFunction<String>) XeroUtils::getAccountCodeOptions)
                                 .required(false)))

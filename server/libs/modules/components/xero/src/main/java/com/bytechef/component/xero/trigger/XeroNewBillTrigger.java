@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCPAY;
 import static com.bytechef.component.xero.constant.XeroConstants.INVOICE;
 import static com.bytechef.component.xero.constant.XeroConstants.INVOICE_OUTPUT_PROPERTY;
-import static com.bytechef.component.xero.constant.XeroConstants.NEW_BILL;
 import static com.bytechef.component.xero.constant.XeroConstants.WEBHOOK_KEY_PROPERTY;
 import static com.bytechef.component.xero.util.XeroUtils.getCreatedObject;
 
@@ -41,7 +40,7 @@ import com.bytechef.component.xero.util.XeroUtils;
  */
 public class XeroNewBillTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_BILL)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newBill")
         .title("New Bill")
         .description("Trigger off whenever a new bill is added.")
         .type(TriggerType.STATIC_WEBHOOK)

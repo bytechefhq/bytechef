@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.xero.constant.XeroConstants.ACCREC;
 import static com.bytechef.component.xero.constant.XeroConstants.CONTACT_ID;
-import static com.bytechef.component.xero.constant.XeroConstants.CREATE_SALES_INVOICE;
 import static com.bytechef.component.xero.constant.XeroConstants.CURRENCY_CODE;
 import static com.bytechef.component.xero.constant.XeroConstants.DATE;
 import static com.bytechef.component.xero.constant.XeroConstants.DUE_DATE;
@@ -47,7 +46,7 @@ import com.bytechef.component.xero.util.XeroUtils;
  */
 public class XeroCreateInvoiceAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SALES_INVOICE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSalesInvoice")
         .title("Create invoice")
         .description("Creates draft invoice (Acount Receivable).")
         .properties(
