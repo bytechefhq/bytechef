@@ -91,26 +91,24 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                         <div className="text-sm font-semibold">Output Schema</div>
 
                         <DropdownMenu>
-                            {!currentNode.trigger && (
-                                <DropdownMenuTrigger asChild>
-                                    <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
-                                        {(saveWorkflowNodeTestOutputMutation.isPending ||
-                                            uploadSampleOutputRequestMutation.isPending) && (
+                            <DropdownMenuTrigger asChild>
+                                <Button disabled={saveWorkflowNodeTestOutputMutation.isPending} variant="outline">
+                                    {(saveWorkflowNodeTestOutputMutation.isPending ||
+                                        uploadSampleOutputRequestMutation.isPending) && (
+                                        <>
+                                            <LoadingIcon />
+                                            Testing...
+                                        </>
+                                    )}
+
+                                    {!saveWorkflowNodeTestOutputMutation.isPending &&
+                                        !uploadSampleOutputRequestMutation.isPending && (
                                             <>
-                                                <LoadingIcon />
-                                                Testing...
+                                                Regenerate <CaretDownIcon className="ml-0.5" />
                                             </>
                                         )}
-
-                                        {!saveWorkflowNodeTestOutputMutation.isPending &&
-                                            !uploadSampleOutputRequestMutation.isPending && (
-                                                <>
-                                                    Regenerate <CaretDownIcon className="ml-0.5" />
-                                                </>
-                                            )}
-                                    </Button>
-                                </DropdownMenuTrigger>
-                            )}
+                                </Button>
+                            </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end" className="w-60 cursor-pointer">
                                 {outputDefined && (
