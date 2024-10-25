@@ -15,28 +15,18 @@
 
 import * as runtime from '../runtime';
 import type {
-  CreateJob200Response,
   Job,
-  JobParameters,
   Page,
   TriggerExecution,
 } from '../models/index';
 import {
-    CreateJob200ResponseFromJSON,
-    CreateJob200ResponseToJSON,
     JobFromJSON,
     JobToJSON,
-    JobParametersFromJSON,
-    JobParametersToJSON,
     PageFromJSON,
     PageToJSON,
     TriggerExecutionFromJSON,
     TriggerExecutionToJSON,
 } from '../models/index';
-
-export interface CreateJobRequest {
-    jobParameters: JobParameters;
-}
 
 export interface GetJobRequest {
     id: number;
@@ -58,44 +48,6 @@ export interface StopJobRequest {
  * 
  */
 export class JobApi extends runtime.BaseAPI {
-
-    /**
-     * Create a request for running a new job.
-     * Create a request for running a new job
-     */
-    async createJobRaw(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<CreateJob200Response>> {
-        if (requestParameters['jobParameters'] == null) {
-            throw new runtime.RequiredError(
-                'jobParameters',
-                'Required parameter "jobParameters" was null or undefined when calling createJob().'
-            );
-        }
-
-        const queryParameters: any = {};
-
-        const headerParameters: runtime.HTTPHeaders = {};
-
-        headerParameters['Content-Type'] = 'application/json';
-
-        const response = await this.request({
-            path: `/jobs`,
-            method: 'POST',
-            headers: headerParameters,
-            query: queryParameters,
-            body: JobParametersToJSON(requestParameters['jobParameters']),
-        }, initOverrides);
-
-        return new runtime.JSONApiResponse(response, (jsonValue) => CreateJob200ResponseFromJSON(jsonValue));
-    }
-
-    /**
-     * Create a request for running a new job.
-     * Create a request for running a new job
-     */
-    async createJob(requestParameters: CreateJobRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<CreateJob200Response> {
-        const response = await this.createJobRaw(requestParameters, initOverrides);
-        return await response.value();
-    }
 
     /**
      * Get a job by id.

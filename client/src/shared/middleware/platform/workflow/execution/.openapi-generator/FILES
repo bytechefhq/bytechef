@@ -3,13 +3,11 @@ apis/TriggerExecutionApi.ts
 apis/index.ts
 index.ts
 models/ComponentDefinitionBasic.ts
-models/CreateJob200Response.ts
 models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
 models/JobBasic.ts
 models/JobConnection.ts
-models/JobParameters.ts
 models/Page.ts
 models/TaskExecution.ts
 models/TriggerExecution.ts
