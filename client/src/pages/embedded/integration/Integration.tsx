@@ -47,7 +47,6 @@ import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 const Integration = () => {
     const [showIntegrationVersionHistorySheet, setShowIntegrationVersionHistorySheet] = useState(false);
@@ -252,7 +251,7 @@ const Integration = () => {
     return (
         <>
             <LayoutContainer
-                className={twMerge('bg-muted/50', !leftSidebarOpen && 'border-l')}
+                className="bg-muted/50"
                 leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
                 leftSidebarClass="bg-muted"
                 leftSidebarHeader={<Header right={<IntegrationsSidebarFilterPopover />} title="Integrations" />}
@@ -272,7 +271,7 @@ const Integration = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l bg-muted/50"
+                rightToolbarClass="border-l"
                 rightToolbarOpen={true}
                 topHeader={
                     integrationId && (
@@ -287,12 +286,11 @@ const Integration = () => {
                 }
             >
                 <PageLoader
-                    className="bg-muted/50"
                     errors={[componentsError, taskDispatcherDefinitionsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
                 >
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
-                        <ResizablePanelGroup className="flex-1 bg-muted/50" direction="vertical">
+                        <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel className="relative" defaultSize={65}>
                                 <ConnectionReactQueryProvider
                                     value={{
