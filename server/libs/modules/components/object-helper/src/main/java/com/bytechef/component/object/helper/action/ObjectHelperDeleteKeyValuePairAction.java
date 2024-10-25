@@ -16,12 +16,15 @@
 
 package com.bytechef.component.object.helper.action;
 
-import static com.bytechef.component.definition.ComponentDsl.*;
+import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
 
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,41 +33,32 @@ import java.util.Map;
  */
 public class ObjectHelperDeleteKeyValuePairAction {
 
-    // Definition of the action to delete a key-value pair from an object.
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION =
-        action(ObjectHelperConstants.DELETE_KEY_VALUE_PAIR)
-            .title("Delete Key-Value Pair")
-            .description(
-                "Deletes a key-value pair in the given object by the specified key. Returns the modified object.")
-            .properties(object(ObjectHelperConstants.INPUT) // Input object from which to delete the key-value pair
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteKeyValuePair")
+        .title("Delete Key-Value Pair")
+        .description(
+            "Deletes a key-value pair in the given object by the specified key. Returns the modified object.")
+        .properties(
+            object(INPUT)
                 .label("Input")
                 .description("The object from which to delete the key-value pair.")
                 .required(true),
-                string(ObjectHelperConstants.KEY) // Key of the pair to be deleted
-                    .label("Key")
-                    .description("The key of the key-value pair to delete.")
-                    .required(true))
-            .output() // Specifies that the output will be an object
-            .perform(ObjectHelperDeleteKeyValuePairAction::perform); // Sets the method to perform the action
+            string(KEY)
+                .label("Key")
+                .description("The key of the key-value pair to delete.")
+                .required(true))
+        .output()
+        .perform(ObjectHelperDeleteKeyValuePairAction::perform);
 
-    // Method that performs the action of deleting the key-value pair
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Object inputObject = inputParameters.getRequired(ObjectHelperConstants.INPUT); // Retrieve the input object
-        String keyToDelete = (String) inputParameters.getRequired(ObjectHelperConstants.KEY); // Cast the key to a
-                                                                                              // String
+        Map<String, Object> input = inputParameters.getRequiredMap(INPUT, Object.class);
+        String keyToDelete = inputParameters.getRequiredString(KEY);
 
-        // Cast the input object to a Map
-        Map<String, Object> inputMap = (Map<String, Object>) inputObject;
+        Map<String, Object> mutableMap = new HashMap<>(input);
 
-        // Create a mutable copy of the input map to allow modification
-        Map<String, Object> mutableMap = new HashMap<>(inputMap);
-
-        // Remove the specified key from the mutable map
         mutableMap.remove(keyToDelete);
 
-        return mutableMap; // Return the modified map
+        return mutableMap;
     }
-
 }
