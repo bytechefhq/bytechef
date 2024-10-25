@@ -106,7 +106,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Property outputSchema = Property.toProperty(
             (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
-                sampleOutput, new PropertyFactory(sampleOutput)));
+                sampleOutput, PropertyFactory.PROPERTY_FACTORY));
 
         return workflowNodeTestOutputService.save(
             workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));

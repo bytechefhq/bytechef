@@ -20,6 +20,7 @@ import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
+import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
@@ -55,7 +56,8 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
                 outputDefinition,
                 (property, sampleOutput) -> new OutputResponse(
                     Property.toProperty((com.bytechef.platform.workflow.task.dispatcher.definition.Property) property),
-                    sampleOutput));
+                    sampleOutput),
+                PropertyFactory.PROPERTY_FACTORY);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

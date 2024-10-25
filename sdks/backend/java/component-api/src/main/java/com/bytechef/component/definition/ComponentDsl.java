@@ -393,6 +393,14 @@ public final class ComponentDsl {
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
+            SampleOutput sampleOutput) {
+
+            this.outputDefinition = new OutputDefinition(sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableActionDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
             this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());

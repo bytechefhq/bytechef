@@ -45,6 +45,10 @@ public interface BaseOutputDefinition {
         public OutputResponse(BaseValueProperty<?> outputSchema) {
             this(outputSchema, null);
         }
+
+        public OutputResponse(Object sampleOutput) {
+            this(null, sampleOutput);
+        }
     }
 
     /**

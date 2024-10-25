@@ -42,6 +42,12 @@ public final class OutputDefinition implements BaseOutputDefinition {
         this.outputResponse = new OutputResponse(outputSchema);
     }
 
+    public OutputDefinition(Object sampleOutput) {
+        Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");
+
+        this.outputResponse = new OutputResponse(sampleOutput);
+    }
+
     public OutputDefinition(ValueProperty<?> outputSchema, Object sampleOutput) {
         Objects.requireNonNull(outputSchema, "'outputSchema' mut not be null");
         Objects.requireNonNull(sampleOutput, "'sampleOutput' mut not be null");

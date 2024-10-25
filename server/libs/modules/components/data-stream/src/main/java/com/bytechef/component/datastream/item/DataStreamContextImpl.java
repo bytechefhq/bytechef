@@ -58,6 +58,11 @@ public class DataStreamContextImpl implements DataStreamContext {
     }
 
     @Override
+    public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
+        return actionContext.outputSchema(outputSchemaFunction);
+    }
+
+    @Override
     public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
         return actionContext.xml(xmlFunction);
     }
