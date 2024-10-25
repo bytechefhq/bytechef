@@ -34,32 +34,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Page"
-    post:
-      description: "Create a request for running a new job."
-      summary: "Create a request for running a new job"
-      tags:
-      - "job"
-      operationId: "createJob"
-      requestBody:
-        description: "Parameters required to run a job, for example '{\"workflowId\"\
-          :\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'"
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/JobParameters"
-        required: true
-      responses:
-        "200":
-          description: "The id of a created job."
-          content:
-            application/json:
-              schema:
-                type: "object"
-                properties:
-                  jobId:
-                    description: "The id of an executed job."
-                    type: "integer"
-                    format: "int64"
   /jobs/latest:
     get:
       description: "Get the latest job."
@@ -364,39 +338,6 @@ components:
         workflowId:
           type: "string"
           readOnly: true
-    JobParameters:
-      description: "Defines parameters used to execute a job."
-      type: "object"
-      required:
-        - "workflowId"
-      properties:
-        connections:
-          type: "array"
-          items:
-            $ref: "#/components/schemas/JobConnection"
-        inputs:
-          description: "The inputs expected by the workflow"
-          type: "object"
-          additionalProperties: true
-        label:
-          description: "The job's human-readable name"
-          type: "string"
-        parentTaskExecutionId:
-          description: "The id of the parent task that created this job. Used for\
-            \ sub-flows."
-          type: "string"
-        priority:
-          description: "The priority value used during execution of individual tasks."
-          type: "integer"
-        workflowId:
-          description: "Id of the workflow to execute."
-          type: "string"
-        webhooks:
-          description: "The list of webhooks to register to receive notifications\
-            \ for certain events."
-          type: "array"
-          items:
-            $ref: "#/components/schemas/Webhook"
     JobConnection:
       description: "The connection used in a particular task."
       type: "object"
