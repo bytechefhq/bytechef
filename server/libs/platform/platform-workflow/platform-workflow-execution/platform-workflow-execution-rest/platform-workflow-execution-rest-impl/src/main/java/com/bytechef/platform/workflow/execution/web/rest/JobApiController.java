@@ -19,14 +19,11 @@
 package com.bytechef.platform.workflow.execution.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.workflow.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
-import com.bytechef.platform.workflow.execution.web.rest.model.JobParametersModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.data.domain.Page;
@@ -52,13 +49,6 @@ public class JobApiController implements JobApi {
         this.conversionService = conversionService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
-    }
-
-    @Override
-    public ResponseEntity<CreateJob200ResponseModel> createJob(JobParametersModel jobParametersModel) {
-        return ResponseEntity.ok(
-            new CreateJob200ResponseModel()
-                .jobId(jobFacade.createJob(conversionService.convert(jobParametersModel, JobParameters.class))));
     }
 
     @Override
