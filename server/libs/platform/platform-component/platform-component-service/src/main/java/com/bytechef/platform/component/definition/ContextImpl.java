@@ -22,8 +22,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.file.storage.FilesFileStorage;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,6 +52,7 @@ class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
+    private final OutputSchema outputSchema;
     private final Xml xml;
 
     @SuppressFBWarnings("EI")
@@ -62,6 +65,7 @@ class ContextImpl implements Context {
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
     }
 
@@ -96,6 +100,15 @@ class ContextImpl implements Context {
     public void logger(ContextConsumer<Logger> loggerConsumer) {
         try {
             loggerConsumer.accept(logger);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
+        try {
+            return outputSchemaFunction.apply(outputSchema);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -595,6 +608,15 @@ class ContextImpl implements Context {
             if (logger.isTraceEnabled()) {
                 logger.trace(message, exception);
             }
+        }
+    }
+
+    private record OutputSchemaImpl() implements OutputSchema {
+
+        @Override
+        public BaseProperty.BaseValueProperty<?> getOutputSchema(Object value) {
+            return (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                value, PropertyFactory.PROPERTY_FACTORY);
         }
     }
 

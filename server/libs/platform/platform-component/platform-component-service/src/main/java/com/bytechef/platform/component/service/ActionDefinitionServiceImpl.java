@@ -121,7 +121,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return SchemaUtils.toOutput(
                 outputDefinition,
                 (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                PropertyFactory.PROPERTY_FACTORY);
         } catch (Exception e) {
             throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
         }
@@ -219,7 +220,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             return SchemaUtils.toOutput(
                 outputResponse,
                 (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput));
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                PropertyFactory.PROPERTY_FACTORY);
         } catch (Exception e) {
             if (e instanceof ProviderException) {
                 throw (ProviderException) e;
@@ -382,7 +384,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                                 inputParameters, connectionParameters, context);
 
                             return new BaseOutputDefinition.OutputResponse(
-                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
+                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                                    value, PropertyFactory.PROPERTY_FACTORY),
                                 value);
 
                         };
@@ -394,7 +397,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                             return new BaseOutputDefinition.OutputResponse(
                                 (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                                    value, new PropertyFactory(value)),
+                                    value, PropertyFactory.PROPERTY_FACTORY),
                                 value);
                         };
                     default -> throw new IllegalStateException();

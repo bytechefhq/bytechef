@@ -21,6 +21,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseControlType;
 import com.bytechef.definition.BaseFileEntry;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseBooleanProperty;
 import com.bytechef.definition.BaseProperty.BaseDateProperty;
@@ -69,35 +70,35 @@ public class SchemaUtils {
         com.bytechef.definition.BaseProperty outputProperty;
 
         if (value == null) {
-            outputProperty = propertyFactory.create(name, BaseNullProperty.class);
+            outputProperty = propertyFactory.create(name, null, BaseNullProperty.class);
         } else {
             Class<?> valueClass = value.getClass();
 
             if (value instanceof List<?> || valueClass.isArray()) {
-                outputProperty = propertyFactory.create(name, BaseArrayProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseArrayProperty.class);
             } else if (value instanceof Boolean) {
-                outputProperty = propertyFactory.create(name, BaseBooleanProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseBooleanProperty.class);
             } else if (value instanceof Date || value instanceof LocalDate) {
-                outputProperty = propertyFactory.create(name, BaseDateProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseDateProperty.class);
             } else if (value instanceof LocalDateTime) {
-                outputProperty = propertyFactory.create(name, BaseDateTimeProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseDateTimeProperty.class);
             } else if (value instanceof BaseFileEntry) {
-                outputProperty = propertyFactory.create(name, BaseFileEntryProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseFileEntryProperty.class);
             } else if (value instanceof Integer) {
-                outputProperty = propertyFactory.create(name, BaseIntegerProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseIntegerProperty.class);
             } else if (value instanceof Number) {
-                outputProperty = propertyFactory.create(name, BaseNumberProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseNumberProperty.class);
             } else if (value instanceof Map<?, ?>) {
-                outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseObjectProperty.class);
             } else if (value instanceof String) {
-                outputProperty = propertyFactory.create(name, BaseStringProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseStringProperty.class);
             } else if (value instanceof LocalTime) {
-                outputProperty = propertyFactory.create(name, BaseTimeProperty.class);
+                outputProperty = propertyFactory.create(name, value, BaseTimeProperty.class);
             } else {
                 if (ConvertUtils.canConvert(value, Map.class)) {
-                    outputProperty = propertyFactory.create(name, BaseObjectProperty.class);
+                    outputProperty = propertyFactory.create(name, value, BaseObjectProperty.class);
                 } else {
-                    outputProperty = propertyFactory.create(name, com.bytechef.definition.BaseProperty.class);
+                    outputProperty = propertyFactory.create(name, value, com.bytechef.definition.BaseProperty.class);
                 }
             }
         }
@@ -107,7 +108,8 @@ public class SchemaUtils {
 
     public static OutputResponse toOutput(
         @NonNull com.bytechef.definition.BaseOutputDefinition.OutputResponse outputResponse,
-        @NonNull OutputFactoryFunction outputFactoryFunction) {
+        @NonNull OutputFactoryFunction outputFactoryFunction,
+        @NonNull SchemaPropertyFactory propertyFactoryFunction) {
 
         Object sampleOutput = outputResponse.sampleOutput();
 
@@ -123,7 +125,13 @@ public class SchemaUtils {
             }
         }
 
-        return outputFactoryFunction.apply(outputResponse.outputSchema(), sampleOutput);
+        BaseProperty.BaseValueProperty<?> outputSchema = outputResponse.outputSchema();
+
+        if (outputSchema == null) {
+            outputSchema = (BaseProperty.BaseValueProperty<?>) getOutputSchema(sampleOutput, propertyFactoryFunction);
+        }
+
+        return outputFactoryFunction.apply(outputSchema, sampleOutput);
     }
 
     @SuppressFBWarnings("DLS")
@@ -187,6 +195,6 @@ public class SchemaUtils {
     public interface SchemaPropertyFactory {
 
         com.bytechef.definition.BaseProperty create(
-            String name, Class<? extends com.bytechef.definition.BaseProperty> basePropertyClass);
+            String name, Object value, Class<? extends com.bytechef.definition.BaseProperty> basePropertyClass);
     }
 }

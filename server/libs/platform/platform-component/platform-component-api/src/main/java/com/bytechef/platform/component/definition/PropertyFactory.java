@@ -34,12 +34,14 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  */
-public record PropertyFactory(Object value) implements SchemaPropertyFactory {
+public record PropertyFactory() implements SchemaPropertyFactory {
+
+    public static final PropertyFactory PROPERTY_FACTORY = new PropertyFactory();
 
     @Override
-    public BaseValueProperty<?> create(String name, Class<? extends BaseProperty> baseValueProperty) {
+    public BaseValueProperty<?> create(String name, Object value, Class<? extends BaseProperty> baseValueProperty) {
         if (baseValueProperty == BaseProperty.BaseArrayProperty.class) {
-            return getArrayProperty(name);
+            return getArrayProperty(name, value);
         } else if (baseValueProperty == BaseProperty.BaseBooleanProperty.class) {
             return ComponentDsl.bool(name);
         } else if (baseValueProperty == BaseProperty.BaseDateProperty.class) {
@@ -55,7 +57,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         } else if (baseValueProperty == BaseProperty.BaseNumberProperty.class) {
             return ComponentDsl.number(name);
         } else if (baseValueProperty == BaseProperty.BaseObjectProperty.class) {
-            return getObjectProperty(name);
+            return getObjectProperty(name, value);
         } else if (baseValueProperty == BaseProperty.BaseStringProperty.class) {
             return ComponentDsl.string(name);
         } else if (baseValueProperty == BaseProperty.BaseTimeProperty.class) {
@@ -65,7 +67,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
         }
     }
 
-    private ModifiableArrayProperty getArrayProperty(String name) {
+    private ModifiableArrayProperty getArrayProperty(String name, Object value) {
         ModifiableArrayProperty arrayProperty;
         Class<?> valueClass = value.getClass();
 
@@ -79,14 +81,14 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
             if (!list.isEmpty()) {
                 arrayProperty.items(
                     (ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                        null, list.getFirst(), new PropertyFactory(list.getFirst())));
+                        null, list.getFirst(), PROPERTY_FACTORY));
             }
         }
 
         return arrayProperty;
     }
 
-    private ModifiableObjectProperty getObjectProperty(String name) {
+    private ModifiableObjectProperty getObjectProperty(String name, Object value) {
         ModifiableObjectProperty objectProperty = object(name);
 
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
@@ -101,7 +103,7 @@ public record PropertyFactory(Object value) implements SchemaPropertyFactory {
 
         for (Map.Entry<?, ?> entry : map.entrySet()) {
             properties.add((ModifiableValueProperty<?, ?>) SchemaUtils.getOutputSchema(
-                (String) entry.getKey(), entry.getValue(), new PropertyFactory(entry.getValue())));
+                (String) entry.getKey(), entry.getValue(), PROPERTY_FACTORY));
         }
 
         return objectProperty.properties(properties);

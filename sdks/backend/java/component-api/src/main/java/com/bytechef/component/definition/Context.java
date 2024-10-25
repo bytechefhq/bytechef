@@ -17,6 +17,7 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,6 +63,14 @@ public interface Context {
      * @param logConsumer
      */
     void logger(ContextConsumer<Logger> logConsumer);
+
+    /**
+     *
+     * @param outputSchemaFunction
+     * @return
+     * @param <R>
+     */
+    <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction);
 
     /**
      *
@@ -1116,6 +1125,11 @@ public interface Context {
          * @param exception
          */
         void trace(String message, Exception exception);
+    }
+
+    interface OutputSchema {
+
+        BaseValueProperty<?> getOutputSchema(Object value);
     }
 
     /**
