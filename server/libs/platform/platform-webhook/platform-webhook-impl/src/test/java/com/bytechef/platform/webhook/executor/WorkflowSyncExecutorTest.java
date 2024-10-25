@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.executor;
+package com.bytechef.platform.webhook.executor;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 @Disabled
-public class WebhookTriggerSyncExecutorTest {
+public class WorkflowSyncExecutorTest {
 
     @Test
     public void testExecute() {

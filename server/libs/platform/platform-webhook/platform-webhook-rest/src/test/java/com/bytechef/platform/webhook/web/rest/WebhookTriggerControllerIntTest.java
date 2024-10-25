@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.web.rest;
+package com.bytechef.platform.webhook.web.rest;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -24,11 +24,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
  * @author Ivica Cardic
  */
 @Disabled
-@WebMvcTest(value = WebhookController.class)
-public class WebhookControllerIntTest {
+@WebMvcTest(value = WebhookTriggerController.class)
+public class WebhookTriggerControllerIntTest {
 
     @Test
-    public void testWebhooks() {
+    public void testExecuteWorkflow() {
         // TODO
     }
 }
