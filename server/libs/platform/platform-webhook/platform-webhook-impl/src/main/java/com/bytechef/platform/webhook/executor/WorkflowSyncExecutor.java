@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.executor;
+package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class WebhookTriggerSyncExecutor {
+public class WorkflowSyncExecutor {
 
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -58,7 +58,7 @@ public class WebhookTriggerSyncExecutor {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WebhookTriggerSyncExecutor(
+    public WorkflowSyncExecutor(
         InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,

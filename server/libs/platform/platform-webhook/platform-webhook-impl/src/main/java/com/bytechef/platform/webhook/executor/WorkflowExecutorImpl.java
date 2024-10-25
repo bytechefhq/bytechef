@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.executor;
+package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParameters;
@@ -40,27 +40,27 @@ import org.springframework.context.ApplicationEventPublisher;
 /**
  * @author Ivica Cardic
  */
-public class WebhookExecutorImpl implements WebhookExecutor {
+public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final InstanceJobFacade instanceJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
-    private final WebhookTriggerSyncExecutor webhookTriggerSyncExecutor;
+    private final WorkflowSyncExecutor workflowSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
-    public WebhookExecutorImpl(
+    public WorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
         InstanceJobFacade instanceJobFacade, JobSyncExecutor jobSyncExecutor,
-        WebhookTriggerSyncExecutor webhookTriggerSyncExecutor,
+        WorkflowSyncExecutor workflowSyncExecutor,
         TaskFileStorage taskFileStorage) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.instanceJobFacade = instanceJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
-        this.webhookTriggerSyncExecutor = webhookTriggerSyncExecutor;
+        this.workflowSyncExecutor = workflowSyncExecutor;
         this.taskFileStorage = taskFileStorage;
     }
 
@@ -74,7 +74,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
-        TriggerOutput triggerOutput = webhookTriggerSyncExecutor.execute(workflowExecutionId, webhookRequest);
+        TriggerOutput triggerOutput = workflowSyncExecutor.execute(workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);
         String workflowId = getWorkflowId(workflowExecutionId);
@@ -108,7 +108,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     public WebhookValidateResponse validateAndExecuteAsync(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        WebhookValidateResponse response = webhookTriggerSyncExecutor.validate(workflowExecutionId, webhookRequest);
+        WebhookValidateResponse response = workflowSyncExecutor.validate(workflowExecutionId, webhookRequest);
 
         if (response.status() == HttpStatus.OK.getValue()) {
             execute(workflowExecutionId, webhookRequest);
@@ -121,7 +121,7 @@ public class WebhookExecutorImpl implements WebhookExecutor {
     public WebhookValidateResponse validateOnEnable(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
 
-        return webhookTriggerSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
+        return workflowSyncExecutor.validateOnEnable(workflowExecutionId, webhookRequest);
     }
 
     @SuppressWarnings("unchecked")

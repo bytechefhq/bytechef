@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.config;
+package com.bytechef.platform.webhook.executor.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
@@ -35,10 +35,10 @@ import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;
+import com.bytechef.platform.webhook.executor.WorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.webhook.executor.WebhookExecutor;
-import com.bytechef.platform.workflow.webhook.executor.WebhookExecutorImpl;
-import com.bytechef.platform.workflow.webhook.executor.WebhookTriggerSyncExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -54,7 +54,6 @@ import com.bytechef.task.dispatcher.map.MapTaskDispatcher;
 import com.bytechef.task.dispatcher.map.completion.MapTaskCompletionHandler;
 import com.bytechef.task.dispatcher.parallel.ParallelTaskDispatcher;
 import com.bytechef.task.dispatcher.parallel.completion.ParallelTaskCompletionHandler;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -67,17 +66,16 @@ import org.springframework.context.annotation.Configuration;
 public class WebhookConfiguration {
 
     @Bean
-    WebhookExecutor webhookExecutor(
+    WorkflowExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
         InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade, JobService jobService,
-        ObjectMapper objectMapper, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
-        TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        WebhookTriggerSyncExecutor webhookTriggerSyncExecutor, TaskFileStorage taskFileStorage,
-        WorkflowService workflowService) {
+        List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
+        TaskHandlerRegistry taskHandlerRegistry, WorkflowSyncExecutor triggerSyncExecutor,
+        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
-        return new WebhookExecutorImpl(
+        return new WorkflowExecutorImpl(
             eventPublisher, instanceAccessorRegistry,
             instanceJobFacade,
             new JobSyncExecutor(
@@ -89,7 +87,7 @@ public class WebhookConfiguration {
                     contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
-            webhookTriggerSyncExecutor, taskFileStorage);
+            triggerSyncExecutor, taskFileStorage);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {

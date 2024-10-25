@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.webhook.executor;
+package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -23,7 +23,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 /**
  * @author Ivica Cardic
  */
-public interface WebhookExecutor {
+public interface WorkflowExecutor {
 
     void execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 
