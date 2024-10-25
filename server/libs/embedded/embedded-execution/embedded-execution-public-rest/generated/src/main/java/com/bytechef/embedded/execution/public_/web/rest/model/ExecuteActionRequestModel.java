@@ -1,4 +1,4 @@
-package com.bytechef.embedded.connectivity.public_web.rest.model;
+package com.bytechef.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("executeAction_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:04.421922+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-24T21:51:08.847975+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class ExecuteActionRequestModel {
 
   @Valid

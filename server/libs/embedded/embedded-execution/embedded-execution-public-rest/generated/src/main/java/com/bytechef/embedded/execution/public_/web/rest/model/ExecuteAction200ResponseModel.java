@@ -1,4 +1,4 @@
-package com.bytechef.platform.workflow.execution.web.rest.model;
+package com.bytechef.embedded.execution.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -16,33 +16,33 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateJob200ResponseModel
+ * ExecuteAction200ResponseModel
  */
 
-@JsonTypeName("createJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:08.162024+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
-public class CreateJob200ResponseModel {
+@JsonTypeName("executeAction_200_response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-24T21:51:08.847975+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+public class ExecuteAction200ResponseModel {
 
-  private Long jobId;
+  private Object output;
 
-  public CreateJob200ResponseModel jobId(Long jobId) {
-    this.jobId = jobId;
+  public ExecuteAction200ResponseModel output(Object output) {
+    this.output = output;
     return this;
   }
 
   /**
-   * The id of an executed job.
-   * @return jobId
+   * The result of the action call.
+   * @return output
    */
   
-  @Schema(name = "jobId", description = "The id of an executed job.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("jobId")
-  public Long getJobId() {
-    return jobId;
+  @Schema(name = "output", description = "The result of the action call.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("output")
+  public Object getOutput() {
+    return output;
   }
 
-  public void setJobId(Long jobId) {
-    this.jobId = jobId;
+  public void setOutput(Object output) {
+    this.output = output;
   }
 
   @Override
@@ -53,20 +53,20 @@ public class CreateJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateJob200ResponseModel createJob200Response = (CreateJob200ResponseModel) o;
-    return Objects.equals(this.jobId, createJob200Response.jobId);
+    ExecuteAction200ResponseModel executeAction200Response = (ExecuteAction200ResponseModel) o;
+    return Objects.equals(this.output, executeAction200Response.output);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(jobId);
+    return Objects.hash(output);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateJob200ResponseModel {\n");
-    sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
+    sb.append("class ExecuteAction200ResponseModel {\n");
+    sb.append("    output: ").append(toIndentedString(output)).append("\n");
     sb.append("}");
     return sb.toString();
   }
