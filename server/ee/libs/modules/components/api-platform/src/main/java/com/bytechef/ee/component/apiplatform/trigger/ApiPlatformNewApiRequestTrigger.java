@@ -19,9 +19,9 @@ import com.bytechef.ee.component.apiplatform.util.ApiPlatformUtils;
  *
  * @author Ivica Cardic
  */
-public class ApiPlatformNewAPIRequestTrigger {
+public class ApiPlatformNewApiRequestTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newAPIRequest")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newApiRequest")
         .title("New API Request")
         .description(".")
         .type(TriggerType.STATIC_WEBHOOK)

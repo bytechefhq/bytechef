@@ -14,7 +14,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.ee.component.apiplatform.action.ApiPlatformResponseToApiRequestAction;
-import com.bytechef.ee.component.apiplatform.trigger.ApiPlatformNewAPIRequestTrigger;
+import com.bytechef.ee.component.apiplatform.trigger.ApiPlatformNewApiRequestTrigger;
 import com.google.auto.service.AutoService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -31,7 +31,7 @@ public class ApiPlatformComponentHandler implements ComponentHandler {
         .description("Actions and triggers for using with API platform.")
         .icon("path:assets/api-platform.svg")
         .categories(ComponentCategory.HELPERS)
-        .triggers(ApiPlatformNewAPIRequestTrigger.TRIGGER_DEFINITION)
+        .triggers(ApiPlatformNewApiRequestTrigger.TRIGGER_DEFINITION)
         .actions(ApiPlatformResponseToApiRequestAction.ACTION_DEFINITION);
 
     @Override
