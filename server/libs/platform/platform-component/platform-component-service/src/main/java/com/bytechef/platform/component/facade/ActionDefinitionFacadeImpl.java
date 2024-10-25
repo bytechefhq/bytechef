@@ -138,14 +138,14 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, String workflowId,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions,
-        boolean testEnvironment) {
+        boolean devEnvironment) {
 
         ExecuteFunctionData executeFunctionData = getExecuteFunctionData(
             componentName, componentVersion, actionName, connectionIds);
 
         ActionContext actionContext = contextFactory.createActionContext(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
-            executeFunctionData.componentConnection, testEnvironment);
+            executeFunctionData.componentConnection, devEnvironment);
 
         if (executeFunctionData.singleConnectionPerform) {
             return tokenRefreshHelper.executeSingleConnectionFunction(
@@ -157,7 +157,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentConnection1 -> contextFactory.createActionContext(
                     componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId,
                     jobId,
-                    componentConnection1, testEnvironment));
+                    componentConnection1, devEnvironment));
         } else {
             return actionDefinitionService.executeMultipleConnectionsPerform(
                 componentName, componentVersion, actionName, inputParameters, executeFunctionData.componentConnections,
@@ -182,7 +182,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, actionContextAware.getType(),
                 actionContextAware.getInstanceId(), actionContextAware.getInstanceWorkflowId(),
                 actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection,
-                actionContextAware.isTestEnvironment()));
+                actionContextAware.isDevEnvironment()));
     }
 
     @Override

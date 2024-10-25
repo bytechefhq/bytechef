@@ -51,7 +51,7 @@ public class TestTaskDispatcherPreSendProcessor implements TaskDispatcherPreSend
         }
 
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
-        taskExecution.putMetadata(MetadataConstants.TEST_ENVIRONMENT, true);
+        taskExecution.putMetadata(MetadataConstants.DEV_ENVIRONMENT, true);
 
         return taskExecution;
     }

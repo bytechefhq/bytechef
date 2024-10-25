@@ -26,6 +26,7 @@ public class DataStreamConstants {
 
     public static final String CONNECTION_PARAMETERS = "connectionParameters";
     public static final String DESTINATION = "destination";
+    public static final String DEV_ENVIRONMENT = "devEnvironment";
     public static final String INPUT_PARAMETERS = "inputParameters";
     public static final String INSTANCE_ID = "instanceId";
     public static final String INSTANCE_WORKFLOW_ID = "instanceWorkflowId";
@@ -33,6 +34,5 @@ public class DataStreamConstants {
     public static final String SOURCE = "source";
     public static final String STREAM = "stream";
     public static final String TENANT_ID = "tenantId";
-    public static final String TEST_ENVIRONMENT = "testEnvironment";
     public static final String TYPE = "type";
 }

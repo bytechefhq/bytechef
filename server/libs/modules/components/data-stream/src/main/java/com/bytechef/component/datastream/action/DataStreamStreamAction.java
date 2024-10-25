@@ -18,6 +18,7 @@ package com.bytechef.component.datastream.action;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.DESTINATION;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.DEV_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
@@ -25,7 +26,6 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -117,8 +117,8 @@ public class DataStreamStreamAction {
                         put(SOURCE, new JobParameter<>(extensions.getMap(SOURCE), Map.class));
                         put(TENANT_ID, new JobParameter<>(TenantContext.getCurrentTenantId(), String.class));
                         put(
-                            TEST_ENVIRONMENT,
-                            new JobParameter<>(actionContextAware.isTestEnvironment(), Boolean.class));
+                            DEV_ENVIRONMENT,
+                            new JobParameter<>(actionContextAware.isDevEnvironment(), Boolean.class));
 
                         if (actionContextAware.getType() != null) {
                             put(TYPE, new JobParameter<>(String.valueOf(actionContextAware.getType()), String.class));
