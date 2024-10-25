@@ -58,12 +58,12 @@ class ContextFactoryImpl implements ContextFactory {
     public ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
         Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean testEnvironment) {
+        boolean devEnvironment) {
 
         return new ActionContextImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, workflowId, jobId,
-            connection, testEnvironment, getDataStorage(workflowId, testEnvironment), eventPublisher,
-            getFilesFileStorage(testEnvironment), getHttpClientExecutor(testEnvironment));
+            connection, devEnvironment, getDataStorage(workflowId, devEnvironment), eventPublisher,
+            getFilesFileStorage(devEnvironment), getHttpClientExecutor(devEnvironment));
     }
 
     @Override
@@ -75,32 +75,32 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
-        String workflowReferenceCode, ComponentConnection connection, boolean testEnvironment) {
+        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment) {
 
         return new TriggerContextImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, connection,
-            getDataStorage(workflowReferenceCode, testEnvironment), getFilesFileStorage(testEnvironment),
-            getHttpClientExecutor(testEnvironment));
+            getDataStorage(workflowReferenceCode, devEnvironment), getFilesFileStorage(devEnvironment),
+            getHttpClientExecutor(devEnvironment));
     }
 
-    private DataStorage getDataStorage(String workflowReference, boolean testEnvironment) {
-        if (testEnvironment) {
+    private DataStorage getDataStorage(String workflowReference, boolean devEnvironment) {
+        if (devEnvironment) {
             return new InMemoryDataStorage(workflowReference);
         }
 
         return dataStorage;
     }
 
-    private FilesFileStorage getFilesFileStorage(boolean testEnvironment) {
-        if (testEnvironment) {
+    private FilesFileStorage getFilesFileStorage(boolean devEnvironment) {
+        if (devEnvironment) {
             return new InMemoryFilesFileStorage();
         }
 
         return filesFileStorage;
     }
 
-    private HttpClientExecutor getHttpClientExecutor(boolean testEnvironment) {
+    private HttpClientExecutor getHttpClientExecutor(boolean devEnvironment) {
         return new HttpClientExecutor(
-            applicationContext, connectionDefinitionService, getFilesFileStorage(testEnvironment));
+            applicationContext, connectionDefinitionService, getFilesFileStorage(devEnvironment));
     }
 }

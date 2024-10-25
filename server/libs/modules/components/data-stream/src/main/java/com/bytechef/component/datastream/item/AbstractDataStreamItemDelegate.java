@@ -17,13 +17,13 @@
 package com.bytechef.component.datastream.item;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.DEV_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
 
 import com.bytechef.commons.util.MapUtils;
@@ -45,13 +45,13 @@ import org.springframework.batch.core.annotation.BeforeStep;
  */
 public abstract class AbstractDataStreamItemDelegate {
 
+    protected boolean devEnvironment;
     protected String componentName;
     protected int componentVersion;
     protected Parameters connectionParameters;
     protected DataStreamContext context;
     protected Parameters inputParameters;
     protected String tenantId;
-    protected boolean testEnvironment;
 
     private final String componentTypeName;
     private final ContextFactory contextFactory;
@@ -108,9 +108,9 @@ public abstract class AbstractDataStreamItemDelegate {
         tenantId = (String) Validate.notNull(jobParameter, "tenantId is required")
             .getValue();
 
-        jobParameter = jobParameters.getParameter(TEST_ENVIRONMENT);
+        jobParameter = jobParameters.getParameter(DEV_ENVIRONMENT);
 
-        testEnvironment = (boolean) Validate.notNull(jobParameter, "testEnvironment is required")
+        devEnvironment = (boolean) Validate.notNull(jobParameter, "devEnvironment is required")
             .getValue();
 
         jobParameter = jobParameters.getParameter(TYPE);
@@ -124,7 +124,7 @@ public abstract class AbstractDataStreamItemDelegate {
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
                 componentName, componentVersion, STREAM, type, instanceId, instanceWorkflowId,
-                null, jobId, null, testEnvironment));
+                null, jobId, null, devEnvironment));
 
         doBeforeStep(stepExecution);
     }

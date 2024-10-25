@@ -155,7 +155,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull AppType type, Long instanceId, String workflowReferenceCode,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        Long connectionId, boolean testEnvironment) {
+        Long connectionId, boolean devEnvironment) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
@@ -164,7 +164,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
             componentConnection,
             contextFactory.createTriggerContext(
                 componentName, componentVersion, triggerName, type, workflowReferenceCode, componentConnection,
-                testEnvironment));
+                devEnvironment));
     }
 
     @Override

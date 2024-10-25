@@ -74,7 +74,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull AppType type, Long instanceId, String workflowReferenceCode, @NonNull Map<String, ?> inputParameters,
-        Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean testEnvironment);
+        Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean devEnvironment);
 
     void executeWebhookDisable(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,

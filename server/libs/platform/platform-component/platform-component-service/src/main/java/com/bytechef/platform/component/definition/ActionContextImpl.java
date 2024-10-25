@@ -41,14 +41,15 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final Long instanceId;
     private final Long instanceWorkflowId;
     private final Long jobId;
-    private final boolean testEnvironment;
+    private final boolean devEnvironment;
     private final AppType type;
     private final String workflowId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, AppType type, Long instanceId,
-        Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection, boolean testEnvironment,
+        Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
+        boolean devEnvironment,
         DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
         HttpClientExecutor httpClientExecutor) {
 
@@ -61,7 +62,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.instanceId = instanceId;
         this.instanceWorkflowId = instanceWorkflowId;
         this.jobId = jobId;
-        this.testEnvironment = testEnvironment;
+        this.devEnvironment = devEnvironment;
         this.type = type;
         this.workflowId = workflowId;
     }
@@ -106,8 +107,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public boolean isTestEnvironment() {
-        return testEnvironment;
+    public boolean isDevEnvironment() {
+        return devEnvironment;
     }
 
     @Override

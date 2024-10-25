@@ -66,7 +66,7 @@ public class ComponentTriggerHandler implements TriggerHandler {
                 triggerExecution.getState(),
                 MapUtils.get(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
                 OptionalUtils.orElse(CollectionUtils.findFirst(connectIdMap.values()), null),
-                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.TEST_ENVIRONMENT, false));
+                MapUtils.getBoolean(triggerExecution.getMetadata(), MetadataConstants.DEV_ENVIRONMENT, false));
         } catch (Exception e) {
             throw new TriggerExecutionException(e.getMessage(), e);
         }

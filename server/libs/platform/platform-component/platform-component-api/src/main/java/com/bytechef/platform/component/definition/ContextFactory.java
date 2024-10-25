@@ -31,12 +31,12 @@ public interface ContextFactory {
     ActionContext createActionContext(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
         Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean testEnvironment);
+        boolean devEnvironment);
 
     Context createContext(
         @NonNull String componentName, ComponentConnection connection);
 
     TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
-        String workflowReferenceCode, ComponentConnection connection, boolean testEnvironment);
+        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment);
 }

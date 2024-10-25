@@ -64,7 +64,7 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
                 Validate.notNull(taskExecution.getJobId(), "jobId"),
                 MapUtils.getString(taskExecution.getMetadata(), MetadataConstants.WORKFLOW_ID),
                 taskExecution.getParameters(), connectIdMap, workflowTask.getExtensions(),
-                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.TEST_ENVIRONMENT, false));
+                MapUtils.getBoolean(taskExecution.getMetadata(), MetadataConstants.DEV_ENVIRONMENT, false));
         } catch (Exception e) {
             throw new TaskExecutionException(e.getMessage(), e);
         }
