@@ -8,6 +8,7 @@ export interface HelpHubI {
     addRouter(): void;
     boot(account: UserI): void;
     init(): void;
+    open(): void;
     shutdown(): void;
 }
 
@@ -51,6 +52,11 @@ export const useHelpHub = (): HelpHubI => {
                 init(helpHub.commandBar.orgId);
 
                 initRef.current = true;
+            }
+        },
+        open: () => {
+            if (window.CommandBar) {
+                window.CommandBar.openHelpHub();
             }
         },
         shutdown: () => {
