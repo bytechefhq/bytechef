@@ -29,6 +29,7 @@ public class ObjectHelperConstants {
     private ObjectHelperConstants() {
     }
 
+    public static final String INPUT = "input";
     public static final String KEY = "key";
     public static final String OBJECT_HELPER = "objectHelper";
     public static final String SOURCE = "source";
@@ -47,6 +48,5 @@ public class ObjectHelperConstants {
         option("Time", 10));
     public static final String VALUE = "value";
     public static final String VALUE_TYPE = "valueType";
-    public static final String DELETE_KEY_VALUE_PAIR = "deleteKeyValuePair";
-    public static final String INPUT = "input";
+
 }

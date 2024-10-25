@@ -16,65 +16,42 @@
 
 package com.bytechef.component.object.helper.action;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.INPUT;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
- * Test class for ObjectHelperDeleteKeyValuePairAction.
- *
  * @author Kristián Stutiak
  */
 class ObjectHelperDeleteKeyValuePairActionTest {
 
+    private final ActionContext actionContext = Mockito.mock(ActionContext.class);
+    private Parameters mockedParameters;
+
     @Test
     void testPerformDeleteKeyValuePair() {
-        Context context = Mockito.mock(Context.class); // Mocking the Context class
-        Parameters parameters = Mockito.mock(Parameters.class); // Mocking the Parameters class
+        mockedParameters = MockParametersFactory.create(
+            Map.of(INPUT, Map.of("key1", "value1", "key2", "value2"), KEY, "key1"));
 
-        // Setup test input data
-        Map<String, Object> inputData = Map.of("key1", "value1", "key2", "value2");
-        String keyToDelete = "key1";
+        Object result = ObjectHelperDeleteKeyValuePairAction.perform(mockedParameters, mockedParameters, actionContext);
 
-        // Mock the behavior of parameters to return the input data and key
-        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.INPUT)))
-            .thenReturn(inputData);
-        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.KEY)))
-            .thenReturn(keyToDelete);
-
-        // Perform the action and assert the output
-        Map<String, Object> result =
-            (Map<String, Object>) ObjectHelperDeleteKeyValuePairAction.perform(parameters, parameters, context);
-
-        // Verify that the key-value pair was deleted
-        assertThat(result).isEqualTo(Map.of("key2", "value2"));
+        assertEquals(result, Map.of("key2", "value2"));
     }
 
     @Test
     void testPerformDeleteNonExistentKey() {
-        Context context = Mockito.mock(Context.class);
-        Parameters parameters = Mockito.mock(Parameters.class);
+        mockedParameters = MockParametersFactory.create(
+            Map.of(INPUT, Map.of("key1", "value1"), KEY, "nonExistentKey"));
 
-        // Setup input data
-        Map<String, Object> inputData = Map.of("key1", "value1");
-        String keyToDelete = "nonExistentKey"; // Key that does not exist
+        Object result = ObjectHelperDeleteKeyValuePairAction.perform(mockedParameters, mockedParameters, actionContext);
 
-        // Mock the parameters
-        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.INPUT)))
-            .thenReturn(inputData);
-        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.KEY)))
-            .thenReturn(keyToDelete);
-
-        // Perform the action and assert the output
-        Map<String, Object> result =
-            (Map<String, Object>) ObjectHelperDeleteKeyValuePairAction.perform(parameters, parameters, context);
-
-        // Verify that the input remains unchanged as the key does not exist
-        assertThat(result).isEqualTo(inputData); // The output should be the same as input since the key was not found
+        assertEquals(result, Map.of("key1", "value1"));
     }
 }
