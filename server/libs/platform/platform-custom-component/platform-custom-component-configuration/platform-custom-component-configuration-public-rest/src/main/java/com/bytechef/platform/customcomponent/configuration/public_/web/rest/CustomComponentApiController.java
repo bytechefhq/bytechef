@@ -18,7 +18,6 @@ package com.bytechef.platform.customcomponent.configuration.public_.web.rest;
 
 import com.bytechef.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import com.bytechef.platform.customcomponent.configuration.facade.CustomComponentFacade;
-import com.bytechef.platform.customcomponent.configuration.public_web.rest.CustomComponentApi;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Objects;
