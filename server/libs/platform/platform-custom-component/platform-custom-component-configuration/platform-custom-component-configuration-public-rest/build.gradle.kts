@@ -3,7 +3,7 @@ plugins {
 }
 
 val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.platform.customcomponent.configuration.public_web.rest")
+    apiPackage.set("com.bytechef.platform.customcomponent.configuration.public_.web.rest")
     configOptions.set(
         mapOf(
             "dateLibrary" to "java8-localdatetime",
@@ -15,7 +15,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     generatorName.set("spring")
     inputSpec.set( "$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
-    modelPackage.set("com.bytechef.platform.customcomponent.configuration.public_web.rest.model")
+    modelPackage.set("com.bytechef.platform.customcomponent.configuration.public_.web.rest.model")
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(

@@ -3,7 +3,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.platform.customcomponent.configuration.public_web.rest;
+package com.bytechef.platform.customcomponent.configuration.public_.web.rest;
 
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -61,7 +61,7 @@ public interface CustomComponentApi {
         value = "/custom-components/deploy",
         consumes = { "multipart/form-data" }
     )
-    
+
     default ResponseEntity<Void> deployCustomComponent(
         @Parameter(name = "componentFile", description = "The file of a custom component.") @RequestPart(value = "componentFile", required = false) MultipartFile componentFile
     ) {
