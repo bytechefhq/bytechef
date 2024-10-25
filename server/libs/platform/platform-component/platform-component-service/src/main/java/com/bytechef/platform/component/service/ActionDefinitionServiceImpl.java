@@ -382,8 +382,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                                 inputParameters, connectionParameters, context);
 
                             return new BaseOutputDefinition.OutputResponse(
-                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                                    value, new PropertyFactory(value)),
+                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(value, new PropertyFactory(value)),
                                 value);
 
                         };

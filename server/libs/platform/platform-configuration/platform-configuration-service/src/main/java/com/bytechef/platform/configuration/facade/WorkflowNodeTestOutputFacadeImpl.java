@@ -88,6 +88,30 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
     }
 
+    @Override
+    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
+        String workflowId, String workflowNodeName, Object sampleOutput) {
+
+        Workflow workflow = workflowService.getWorkflow(workflowId);
+
+        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
+            .map(WorkflowTrigger::getType)
+            .orElseGet(() -> {
+                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
+
+                return workflowTask.getType();
+            });
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        Property outputSchema = Property.toProperty(
+            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
+                sampleOutput, new PropertyFactory(sampleOutput)));
+
+        return workflowNodeTestOutputService.save(
+            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));
+    }
+
     @SuppressWarnings("unchecked")
     private WorkflowNodeTestOutput saveActionWorkflowNodeTestOutput(
         String workflowId, String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
@@ -132,29 +156,5 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         }
 
         return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
-    }
-
-    @Override
-    public WorkflowNodeTestOutput saveWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Object sampleOutput) {
-
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        String type = WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(WorkflowTrigger::getType)
-            .orElseGet(() -> {
-                WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
-
-                return workflowTask.getType();
-            });
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-        Property outputSchema = Property.toProperty(
-            (com.bytechef.component.definition.Property) SchemaUtils.getOutputSchema(
-                sampleOutput, new PropertyFactory(sampleOutput)));
-
-        return workflowNodeTestOutputService.save(
-            workflowId, workflowNodeName, workflowNodeType, new OutputResponse(outputSchema, sampleOutput));
     }
 }
