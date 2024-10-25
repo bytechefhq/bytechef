@@ -1,4 +1,4 @@
-package com.bytechef.embedded.connectivity.public_web.rest;
+package com.bytechef.embedded.execution.public_.web.rest;
 
 import org.springframework.web.context.request.NativeWebRequest;
 

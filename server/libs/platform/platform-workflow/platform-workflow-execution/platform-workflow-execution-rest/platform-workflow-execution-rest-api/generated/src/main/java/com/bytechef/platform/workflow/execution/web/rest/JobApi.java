@@ -5,9 +5,7 @@
  */
 package com.bytechef.platform.workflow.execution.web.rest;
 
-import com.bytechef.platform.workflow.execution.web.rest.model.CreateJob200ResponseModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
-import com.bytechef.platform.workflow.execution.web.rest.model.JobParametersModel;
 import com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:08.162024+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-25T07:52:11.447167+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "job", description = "The Platform Workflow Job API")
 public interface JobApi {
@@ -43,48 +41,6 @@ public interface JobApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
-
-    /**
-     * POST /jobs : Create a request for running a new job
-     * Create a request for running a new job.
-     *
-     * @param jobParametersModel Parameters required to run a job, for example &#39;{\&quot;workflowId\&quot;:\&quot;samples/hello\&quot;,\&quot;inputs\&quot;:{\&quot;yourName\&quot;:\&quot;Joe Jones\&quot;}}&#39; (required)
-     * @return The id of a created job. (status code 200)
-     */
-    @Operation(
-        operationId = "createJob",
-        summary = "Create a request for running a new job",
-        description = "Create a request for running a new job.",
-        tags = { "job" },
-        responses = {
-            @ApiResponse(responseCode = "200", description = "The id of a created job.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CreateJob200ResponseModel.class))
-            })
-        }
-    )
-    @RequestMapping(
-        method = RequestMethod.POST,
-        value = "/jobs",
-        produces = { "application/json" },
-        consumes = { "application/json" }
-    )
-    
-    default ResponseEntity<CreateJob200ResponseModel> createJob(
-        @Parameter(name = "JobParametersModel", description = "Parameters required to run a job, for example '{\"workflowId\":\"samples/hello\",\"inputs\":{\"yourName\":\"Joe Jones\"}}'", required = true) @Valid @RequestBody JobParametersModel jobParametersModel
-    ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"jobId\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
-
-    }
-
 
     /**
      * GET /jobs/{id} : Get a job by id
