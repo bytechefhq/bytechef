@@ -162,12 +162,7 @@ const DesktopSidebarBottomMenu = () => {
                         </div>
                     </DropdownMenuItem>
 
-                    <DropdownMenuItem
-                        className="cursor-pointer font-semibold"
-                        onClick={() =>
-                            navigate(`${pathname.startsWith('/automation') ? '/automation' : '/embedded'}/account`)
-                        }
-                    >
+                    <DropdownMenuItem className="cursor-pointer font-semibold" onClick={() => helpHub.open()}>
                         <div className="flex items-center space-x-1">
                             <HelpCircleIcon className="size-5" />
 
