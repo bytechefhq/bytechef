@@ -5,8 +5,10 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,15 +25,27 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:05.825777+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T12:15:45.835503+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class IntegrationInstanceWorkflowModel {
+
+  private String createdBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime createdDate;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private Boolean enabled;
 
+  private Long id;
+
   private Long integrationInstanceConfigurationWorkflowId;
+
+  private String lastModifiedBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime lastModifiedDate;
 
   private String workflowId;
 
@@ -46,6 +60,46 @@ public class IntegrationInstanceWorkflowModel {
     this.enabled = enabled;
     this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
     this.workflowId = workflowId;
+  }
+
+  public IntegrationInstanceWorkflowModel createdBy(String createdBy) {
+    this.createdBy = createdBy;
+    return this;
+  }
+
+  /**
+   * The created by.
+   * @return createdBy
+   */
+  
+  @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdBy")
+  public String getCreatedBy() {
+    return createdBy;
+  }
+
+  public void setCreatedBy(String createdBy) {
+    this.createdBy = createdBy;
+  }
+
+  public IntegrationInstanceWorkflowModel createdDate(LocalDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date.
+   * @return createdDate
+   */
+  @Valid 
+  @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
+  public LocalDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  public void setCreatedDate(LocalDateTime createdDate) {
+    this.createdDate = createdDate;
   }
 
   public IntegrationInstanceWorkflowModel inputs(Map<String, Object> inputs) {
@@ -96,6 +150,26 @@ public class IntegrationInstanceWorkflowModel {
     this.enabled = enabled;
   }
 
+  public IntegrationInstanceWorkflowModel id(Long id) {
+    this.id = id;
+    return this;
+  }
+
+  /**
+   * The id of a project instance workflow.
+   * @return id
+   */
+  
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("id")
+  public Long getId() {
+    return id;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
   public IntegrationInstanceWorkflowModel integrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
     this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
     return this;
@@ -114,6 +188,46 @@ public class IntegrationInstanceWorkflowModel {
 
   public void setIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
     this.integrationInstanceConfigurationWorkflowId = integrationInstanceConfigurationWorkflowId;
+  }
+
+  public IntegrationInstanceWorkflowModel lastModifiedBy(String lastModifiedBy) {
+    this.lastModifiedBy = lastModifiedBy;
+    return this;
+  }
+
+  /**
+   * The last modified by.
+   * @return lastModifiedBy
+   */
+  
+  @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedBy")
+  public String getLastModifiedBy() {
+    return lastModifiedBy;
+  }
+
+  public void setLastModifiedBy(String lastModifiedBy) {
+    this.lastModifiedBy = lastModifiedBy;
+  }
+
+  public IntegrationInstanceWorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+    return this;
+  }
+
+  /**
+   * The last modified date.
+   * @return lastModifiedDate
+   */
+  @Valid 
+  @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
+  public LocalDateTime getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
   }
 
   public IntegrationInstanceWorkflowModel workflowId(String workflowId) {
@@ -145,24 +259,34 @@ public class IntegrationInstanceWorkflowModel {
       return false;
     }
     IntegrationInstanceWorkflowModel integrationInstanceWorkflow = (IntegrationInstanceWorkflowModel) o;
-    return Objects.equals(this.inputs, integrationInstanceWorkflow.inputs) &&
+    return Objects.equals(this.createdBy, integrationInstanceWorkflow.createdBy) &&
+        Objects.equals(this.createdDate, integrationInstanceWorkflow.createdDate) &&
+        Objects.equals(this.inputs, integrationInstanceWorkflow.inputs) &&
         Objects.equals(this.enabled, integrationInstanceWorkflow.enabled) &&
+        Objects.equals(this.id, integrationInstanceWorkflow.id) &&
         Objects.equals(this.integrationInstanceConfigurationWorkflowId, integrationInstanceWorkflow.integrationInstanceConfigurationWorkflowId) &&
+        Objects.equals(this.lastModifiedBy, integrationInstanceWorkflow.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, integrationInstanceWorkflow.lastModifiedDate) &&
         Objects.equals(this.workflowId, integrationInstanceWorkflow.workflowId);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(inputs, enabled, integrationInstanceConfigurationWorkflowId, workflowId);
+    return Objects.hash(createdBy, createdDate, inputs, enabled, id, integrationInstanceConfigurationWorkflowId, lastModifiedBy, lastModifiedDate, workflowId);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class IntegrationInstanceWorkflowModel {\n");
+    sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationInstanceConfigurationWorkflowId: ").append(toIndentedString(integrationInstanceConfigurationWorkflowId)).append("\n");
+    sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
+    sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("}");
     return sb.toString();

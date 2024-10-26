@@ -34,40 +34,35 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T13:08:41.101258+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
-@Tag(name = "request-trigger", description = "The Embedded Request Trigger Public API")
-public interface RequestTriggerApi {
+@Tag(name = "app-event-trigger", description = "The Embedded App Event Trigger Public API")
+public interface AppEventTriggerApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * POST /workflows/{workflowReferenceCode} : Execute workflows
+     * POST /app-events : Execute workflows
      * Execute workflows.
      *
-     * @param workflowReferenceCode The workflow reference code. (required)
      * @param xEnvironment The environment. (optional)
-     * @return The list of active integrations. (status code 200)
+     * @return Successful operation. (status code 200)
      */
     @Operation(
-        operationId = "executeWorkflow",
+        operationId = "executeWorkflows",
         summary = "Execute workflows",
         description = "Execute workflows.",
-        tags = { "request-trigger" },
+        tags = { "app-event-trigger" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
-            })
+            @ApiResponse(responseCode = "200", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/workflows/{workflowReferenceCode}",
-        produces = { "application/json" }
+        value = "/app-events"
     )
     
-    default ResponseEntity<Object> executeWorkflow(
-        @Parameter(name = "workflowReferenceCode", description = "The workflow reference code.", required = true, in = ParameterIn.PATH) @PathVariable("workflowReferenceCode") String workflowReferenceCode,
+    default ResponseEntity<Void> executeWorkflows(
         @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
