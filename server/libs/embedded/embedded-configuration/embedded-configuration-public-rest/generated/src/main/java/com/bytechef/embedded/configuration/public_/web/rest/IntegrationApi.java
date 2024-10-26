@@ -3,8 +3,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.embedded.configuration.frontend.web.rest;
+package com.bytechef.embedded.configuration.public_.web.rest;
 
+import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:04.118048+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T12:01:42.570393+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
-@Tag(name = "integration", description = "The Embedded Integration by Connected User Token accessible API")
+@Tag(name = "integration", description = "The Embedded Integration Public API")
 public interface IntegrationApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -54,7 +56,7 @@ public interface IntegrationApi {
         tags = { "integration" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
             })
         }
     )
@@ -64,8 +66,8 @@ public interface IntegrationApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel>> getIntegrations(
-        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel xEnvironment
+    default ResponseEntity<List<IntegrationModel>> getIntegrations(
+        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
