@@ -33,12 +33,14 @@ public class MondayConstants {
     public static final String CREATE_GROUP = "createGroup";
     public static final String CREATE_ITEM = "createItem";
     public static final String DATA = "data";
+    public static final String DELETE_ITEM = "deleteItem";
     public static final String DESCRIPTION = "description";
     public static final String END_DATE = "endDate";
     public static final String FROM = "from";
     public static final String GROUP_ID = "group_id";
     public static final String GROUP_NAME = "group_name";
     public static final String ID = "id";
+    public static final String ITEM_ID = "item_id";
     public static final String ITEM_NAME = "item_name";
     public static final String LABELS = "labels";
     public static final String MONDAY = "monday";
