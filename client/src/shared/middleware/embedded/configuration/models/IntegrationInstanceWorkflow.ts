@@ -20,6 +20,18 @@ import { mapValues } from '../runtime';
  */
 export interface IntegrationInstanceWorkflow {
     /**
+     * The created by.
+     * @type {string}
+     * @memberof IntegrationInstanceWorkflow
+     */
+    readonly createdBy?: string;
+    /**
+     * The created date.
+     * @type {Date}
+     * @memberof IntegrationInstanceWorkflow
+     */
+    readonly createdDate?: Date;
+    /**
      * The input parameters of an integration instance used as workflow input values.
      * @type {{ [key: string]: any; }}
      * @memberof IntegrationInstanceWorkflow
@@ -32,11 +44,29 @@ export interface IntegrationInstanceWorkflow {
      */
     enabled: boolean;
     /**
+     * The id of a project instance workflow.
+     * @type {number}
+     * @memberof IntegrationInstanceWorkflow
+     */
+    readonly id?: number;
+    /**
      * The id of a integration instance configuration workflow.
      * @type {number}
      * @memberof IntegrationInstanceWorkflow
      */
     integrationInstanceConfigurationWorkflowId: number;
+    /**
+     * The last modified by.
+     * @type {string}
+     * @memberof IntegrationInstanceWorkflow
+     */
+    readonly lastModifiedBy?: string;
+    /**
+     * The last modified date.
+     * @type {Date}
+     * @memberof IntegrationInstanceWorkflow
+     */
+    readonly lastModifiedDate?: Date;
     /**
      * The id of a workflow.
      * @type {string}
@@ -65,9 +95,14 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
     }
     return {
         
+        'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
+        'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'inputs': json['inputs'] == null ? undefined : json['inputs'],
         'enabled': json['enabled'],
+        'id': json['id'] == null ? undefined : json['id'],
         'integrationInstanceConfigurationWorkflowId': json['integrationInstanceConfigurationWorkflowId'],
+        'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
+        'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'workflowId': json['workflowId'],
     };
 }
@@ -76,7 +111,7 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
       return IntegrationInstanceWorkflowToJSONTyped(json, false);
   }
 
-  export function IntegrationInstanceWorkflowToJSONTyped(value?: IntegrationInstanceWorkflow | null, ignoreDiscriminator: boolean = false): any {
+  export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
