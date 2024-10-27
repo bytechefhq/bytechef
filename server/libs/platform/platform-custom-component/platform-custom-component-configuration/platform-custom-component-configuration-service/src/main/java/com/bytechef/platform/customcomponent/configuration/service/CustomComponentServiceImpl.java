@@ -22,6 +22,7 @@ import com.bytechef.platform.customcomponent.configuration.repository.CustomComp
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,7 +77,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     @Override
     @Transactional(readOnly = true)
     public List<CustomComponent> getCustomComponents() {
-        return customComponentRepository.findAll();
+        return customComponentRepository.findAll(Sort.by(Sort.Order.asc("name")));
     }
 
     @Override
