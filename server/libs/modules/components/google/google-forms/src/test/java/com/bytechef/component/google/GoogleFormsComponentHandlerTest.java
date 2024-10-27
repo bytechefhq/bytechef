@@ -28,6 +28,6 @@ class GoogleFormsComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/google-drive_v1.json", new GoogleFormsComponentHandler().getDefinition());
+            "definition/google-forms_v1.json", new GoogleFormsComponentHandler().getDefinition());
     }
 }
