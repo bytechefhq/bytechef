@@ -73,6 +73,26 @@ class MondayOptionUtilsTest {
     }
 
     @Test
+    void testGetBoardItemsOptions() {
+        Map<String, Object> body = Map.of(DATA,
+            Map.of(BOARDS, List.of(Map.of("items_page", Map.of("items", List.of(Map.of(ID, "123", NAME, "name")))))));
+
+        try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(Context.class)))
+                .thenReturn(body);
+
+            List<Option<String>> boardIdOptions =
+                MondayOptionUtils.getBoardItemsOptions(parameters, parameters, Map.of(), "", mockedContext);
+
+            mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
+                "query{boards(ids: [abc]){items_page{items{id name}}}}", mockedContext));
+
+            assertEquals(expectedOptions, boardIdOptions);
+        }
+    }
+
+    @Test
     void testGetColumnTypeOptions() {
         List<Option<String>> options = MondayOptionUtils.getColumnTypeOptions();
 
