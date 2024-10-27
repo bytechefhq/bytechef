@@ -10,7 +10,6 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useToast} from '@/hooks/use-toast';
 import {ApiKey} from '@/shared/middleware/automation/user';
 import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/automation/apiKeys.mutations';
@@ -24,7 +23,6 @@ import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    environment: z.string().min(1, {message: 'Environment is required'}),
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
     }),
@@ -46,7 +44,6 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            environment: apiKey?.environment || '',
             name: apiKey?.name || '',
         },
         resolver: zodResolver(formSchema),
@@ -150,54 +147,21 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                                 </div>
                             </div>
                         ) : (
-                            <>
-                                <FormField
-                                    control={control}
-                                    name="name"
-                                    render={({field}) => (
-                                        <FormItem>
-                                            <FormLabel>Name</FormLabel>
+                            <FormField
+                                control={control}
+                                name="name"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Name</FormLabel>
 
-                                            <FormControl>
-                                                <Input {...field} />
-                                            </FormControl>
+                                        <FormControl>
+                                            <Input {...field} />
+                                        </FormControl>
 
-                                            <FormMessage />
-                                        </FormItem>
-                                    )}
-                                />
-
-                                {!apiKey?.id && (
-                                    <FormField
-                                        control={control}
-                                        name="environment"
-                                        render={({field}) => (
-                                            <FormItem>
-                                                <FormLabel>Environment</FormLabel>
-
-                                                <FormControl>
-                                                    <Select
-                                                        defaultValue={field.value}
-                                                        onValueChange={(value) => field.onChange(value)}
-                                                    >
-                                                        <SelectTrigger className="w-full">
-                                                            <SelectValue placeholder="Select environment" />
-                                                        </SelectTrigger>
-
-                                                        <SelectContent>
-                                                            <SelectItem value="TEST">Test</SelectItem>
-
-                                                            <SelectItem value="PRODUCTION">Production</SelectItem>
-                                                        </SelectContent>
-                                                    </Select>
-                                                </FormControl>
-
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                        <FormMessage />
+                                    </FormItem>
                                 )}
-                            </>
+                            />
                         )}
 
                         <DialogFooter>
