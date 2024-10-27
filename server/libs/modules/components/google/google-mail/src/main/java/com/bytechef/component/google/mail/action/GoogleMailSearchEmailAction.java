@@ -55,6 +55,7 @@ import java.util.List;
  * @author Monika Kušter
  */
 public class GoogleMailSearchEmailAction {
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
         .description("Lists the messages in the user's mailbox.")
