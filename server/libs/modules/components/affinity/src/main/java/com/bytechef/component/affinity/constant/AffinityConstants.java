@@ -24,7 +24,7 @@ public class AffinityConstants {
     public static final String AFFINITY = "affinity";
     public static final String CREATE_ORGANIZATION = "createOrganization";
     public static final String CREATE_PERSON = "createPerson";
-    public static final String CREATE_OPPORTUNITY = "createNote";
+    public static final String CREATE_OPPORTUNITY = "createOpportunity";
     public static final String FIRST_NAME = "first_name";
     public static final String LAST_NAME = "last_name";
     public static final String EMAILS = "emails";
