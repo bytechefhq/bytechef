@@ -58,7 +58,6 @@ public class GoogleMailConstants {
     public static final String METADATA_HEADERS = "metadataHeaders";
     public static final String MINIMAL = "minimal";
     public static final String NAME = "name";
-    public static final String NEW_EMAIL = "newEmail";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";
     public static final String PAGE_TOKEN = "pageToken";
     public static final String PAYLOAD = "payload";

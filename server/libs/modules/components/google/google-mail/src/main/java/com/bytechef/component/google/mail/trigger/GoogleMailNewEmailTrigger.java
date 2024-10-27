@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFL
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.HISTORY_ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.NEW_EMAIL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TOPIC_NAME;
 
 import com.bytechef.component.definition.Parameters;
@@ -57,7 +56,7 @@ import java.util.Optional;
  */
 public class GoogleMailNewEmailTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_EMAIL)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmail")
         .title("New Email")
         .description("Triggers when new mail is found in your Gmail inbox.")
         .type(TriggerType.STATIC_WEBHOOK)
