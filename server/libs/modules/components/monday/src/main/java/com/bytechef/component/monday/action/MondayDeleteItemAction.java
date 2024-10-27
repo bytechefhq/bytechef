@@ -18,13 +18,17 @@ package com.bytechef.component.monday.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.DELETE_ITEM;
 import static com.bytechef.component.monday.constant.MondayConstants.ITEM_ID;
+import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.monday.util.MondayOptionUtils;
 
 /**
  * @author Kalaiyarasan Raja
@@ -35,9 +39,21 @@ public class MondayDeleteItemAction {
         .title("Delete Item")
         .description("Deletes an item from a board")
         .properties(
+            string(WORKSPACE_ID)
+                .label("Workspace")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
+                .required(true),
+            string(BOARD_ID)
+                .label("Board")
+                .description("The board where the item is located.")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
+                .optionsLookupDependsOn(WORKSPACE_ID)
+                .required(true),
             string(ITEM_ID)
                 .label("Item")
                 .description("Item to delete")
+                .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardItemsOptions)
+                .optionsLookupDependsOn(BOARD_ID, WORKSPACE_ID)
                 .required(true))
         .perform(MondayDeleteItemAction::perform);
 
