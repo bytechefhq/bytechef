@@ -40,6 +40,7 @@ public class QuickbooksComponentHandler implements ComponentHandler {
             "QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly " +
                 "toward small and medium-sized businesses and offers on-premises accounting applications as well as " +
                 "cloud-based versions that accept business payments, manage and pay bills, and payroll functions.")
+        .customAction(true)
         .icon("path:assets/quickbooks.svg")
         .connection(QuickbooksConnection.CONNECTION_DEFINITION)
         .categories(ComponentCategory.ACCOUNTING)

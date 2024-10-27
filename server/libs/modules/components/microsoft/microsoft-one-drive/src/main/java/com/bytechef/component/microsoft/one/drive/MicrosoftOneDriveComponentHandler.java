@@ -40,6 +40,7 @@ public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
         .description(
             "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing " +
                 "files online.")
+        .customAction(true)
         .icon("path:assets/microsoft-one-drive.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(MicrosoftOneDriveConnection.CONNECTION_DEFINITION)

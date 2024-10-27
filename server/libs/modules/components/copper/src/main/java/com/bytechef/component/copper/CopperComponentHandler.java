@@ -40,6 +40,7 @@ public class CopperComponentHandler implements ComponentHandler {
                 "processes, providing tools for managing contact, leads, opportunities, and communications in one " +
                 "centralized platform.")
         .icon("path:assets/copper.svg")
+        .customAction(true)
         .categories(ComponentCategory.CRM)
         .connection(CopperConnection.CONNECTION_DEFINITION)
         .actions(

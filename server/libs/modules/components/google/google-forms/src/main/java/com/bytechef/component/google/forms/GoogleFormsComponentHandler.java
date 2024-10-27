@@ -36,6 +36,7 @@ public class GoogleFormsComponentHandler implements ComponentHandler {
         .description(
             "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for " +
                 "data collection and analysis, with real-time collaboration and response tracking.")
+        .customAction(true)
         .icon("path:assets/google-forms.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(CONNECTION_DEFINITION)

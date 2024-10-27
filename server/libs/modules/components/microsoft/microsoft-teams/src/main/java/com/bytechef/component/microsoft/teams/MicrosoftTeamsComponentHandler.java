@@ -38,6 +38,7 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
         .description(
             "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, " +
                 "and application integration.")
+        .customAction(true)
         .icon("path:assets/microsoft-teams.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(MicrosoftTeamsConnection.CONNECTION_DEFINITION)

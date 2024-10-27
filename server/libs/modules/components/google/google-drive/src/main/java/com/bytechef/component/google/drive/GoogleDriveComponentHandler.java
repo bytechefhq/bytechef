@@ -44,6 +44,7 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
         .description(
             "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and " +
                 "collaborate online.")
+        .customAction(true)
         .icon("path:assets/google-drive.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)

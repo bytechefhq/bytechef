@@ -39,6 +39,7 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
         .description(
             "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, " +
                 "providing document management, intranet, and content management features for organizations.")
+        .customAction(true)
         .icon("path:assets/microsoft-share-point.svg")
         .categories(ComponentCategory.FILE_STORAGE, ComponentCategory.COMMUNICATION)
         .connection(MicrosoftSharePointConnection.CONNECTION_DEFINITION)

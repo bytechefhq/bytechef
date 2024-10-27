@@ -45,6 +45,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
             "Gmail is a widely used email service by Google, offering free and feature-rich communication, " +
                 "organization, and storage capabilities accessible through web browsers and mobile apps.")
         .icon("path:assets/google-mail.svg")
+        .customAction(true)
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
         .actions(

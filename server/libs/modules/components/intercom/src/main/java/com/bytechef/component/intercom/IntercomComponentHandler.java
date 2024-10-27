@@ -38,6 +38,7 @@ public class IntercomComponentHandler implements ComponentHandler {
         .title("Intercom")
         .description(
             "Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...")
+        .customAction(true)
         .icon("path:assets/intercom.svg")
         .categories(ComponentCategory.CUSTOMER_SUPPORT)
         .connection(IntercomConnection.CONNECTION_DEFINITION)

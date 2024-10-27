@@ -36,6 +36,7 @@ public final class SlackComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(SLACK)
         .title("Slack")
         .description("Slack is a messaging platform for teams to communicate and collaborate.")
+        .customAction(true)
         .icon("path:assets/slack.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.DEVELOPER_TOOLS)
         .connection(SlackConnection.CONNECTION_DEFINITION)
