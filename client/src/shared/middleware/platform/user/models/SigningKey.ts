@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
-
 /**
  * Contains generated public key used for signing JWT tokens.
  * @export
@@ -39,12 +31,6 @@ export interface SigningKey {
      * @memberof SigningKey
      */
     readonly createdDate?: Date;
-    /**
-     * 
-     * @type {Environment}
-     * @memberof SigningKey
-     */
-    environment?: Environment;
     /**
      * The id of a public key.
      * @type {number}
@@ -83,8 +69,6 @@ export interface SigningKey {
     name: string;
 }
 
-
-
 /**
  * Check if a given object implements the SigningKey interface.
  */
@@ -106,7 +90,6 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'keyId': json['keyId'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -127,7 +110,6 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
 
     return {
         
-        'environment': EnvironmentToJSON(value['environment']),
         'name': value['name'],
     };
 }

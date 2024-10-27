@@ -4,5 +4,4 @@ export * from './AdminApiKey';
 export * from './ApiKey';
 export * from './Authority';
 export * from './CreateAdminApiKey200Response';
-export * from './Environment';
 export * from './SigningKey';

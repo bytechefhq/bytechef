@@ -6,7 +6,6 @@ models/AdminApiKey.ts
 models/ApiKey.ts
 models/Authority.ts
 models/CreateAdminApiKey200Response.ts
-models/Environment.ts
 models/SigningKey.ts
 models/index.ts
 runtime.ts
