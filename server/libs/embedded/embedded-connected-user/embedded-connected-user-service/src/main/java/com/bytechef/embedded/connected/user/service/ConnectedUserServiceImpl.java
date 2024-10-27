@@ -74,6 +74,12 @@ public class ConnectedUserServiceImpl implements ConnectedUserService {
     }
 
     @Override
+    public ConnectedUser getConnectedUser(@NonNull Environment environment, @NonNull String externalId) {
+        return fetchConnectedUser(environment, externalId)
+            .orElseThrow(() -> new IllegalArgumentException("Connected user not found"));
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ConnectedUser getConnectedUser(long id) {
         return connectedUserRepository.findById(id)

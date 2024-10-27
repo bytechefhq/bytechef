@@ -1274,9 +1274,6 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        staticWebhookUrl:
-          description: "The url of a static url used to trigger a workflow."
-          type: "string"
         workflowId:
           description: "The id of a workflow."
           type: "string"
@@ -1333,6 +1330,15 @@ components:
         - "integrationInstanceConfigurationWorkflowId"
         - "workflowId"
       properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         inputs:
           description: "The input parameters of an integration instance used as workflow\
             \ input values."
@@ -1341,10 +1347,24 @@ components:
         enabled:
           description: "If a workflow is enabled or not in the integration instance workflow."
           type: "boolean"
+        id:
+          description: "The id of a project instance workflow."
+          type: "integer"
+          format: "int64"
+          readOnly: true
         integrationInstanceConfigurationWorkflowId:
           description: "The id of a integration instance configuration workflow."
           type: "integer"
           format: "int64"
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
         workflowId:
           description: "The id of a workflow."
           type: "string"

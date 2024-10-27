@@ -68,7 +68,7 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public List<String> getWorkflowIds(long projectId) {
+    public String getLatestIntegrationWorkflowId(String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 

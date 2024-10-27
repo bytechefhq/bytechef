@@ -18,8 +18,11 @@ package com.bytechef.embedded.configuration.repository;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -32,4 +35,18 @@ public interface IntegrationInstanceRepository
     List<IntegrationInstance> findAllByConnectedUserId(long connectedUserId);
 
     List<IntegrationInstance> findAllByConnectedUserIdIn(List<Long> connectedUserIds);
+
+    List<IntegrationInstance> findAllByConnectedUserIdAndEnabled(long connectedUserId, boolean enabled);
+
+    @Query("""
+        SELECT DISTINCT * FROM integration_instance
+        JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
+        JOIN integration_instance_configuration_workflow on integration_instance_configuration.id = integration_instance_configuration_workflow.integration_instance_configuration_id
+        WHERE integration_instance_configuration_workflow.workflow_id = :workflowId
+        AND integration_instance_configuration.environment = :environment
+        AND integration_instance.connected_user_id = :connectedUserId
+        """)
+    Optional<IntegrationInstance> findByWorkflowIdAndEnvironment(
+        @Param("connectedUserId") long connectedUserId, @Param("workflowId") String workflowId,
+        @Param("environment") int environment);
 }

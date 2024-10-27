@@ -16,14 +16,9 @@
 
 package com.bytechef.embedded.configuration.domain;
 
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -33,7 +28,6 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -73,20 +67,10 @@ public class IntegrationInstance {
     @Column("integration_instance_configuration_id")
     private AggregateReference<IntegrationInstanceConfiguration, Long> integrationInstanceConfigurationId;
 
-    @MappedCollection(idColumn = "integration_instance_id")
-    private final Set<IntegrationInstanceWorkflow> integrationInstanceWorkflows = new HashSet<>();
-
     @Version
     private int version;
 
     public IntegrationInstance() {
-    }
-
-    public void addIntegrationWorkflow(
-        long integrationInstanceConfigurationWorkflowId, Map<String, ?> inputs, boolean enabled) {
-
-        integrationInstanceWorkflows.add(
-            new IntegrationInstanceWorkflow(integrationInstanceConfigurationWorkflowId, inputs, enabled));
     }
 
     @Override
@@ -131,10 +115,6 @@ public class IntegrationInstance {
 
     public Long getIntegrationInstanceConfigurationId() {
         return integrationInstanceConfigurationId.getId();
-    }
-
-    public Set<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows() {
-        return Collections.unmodifiableSet(integrationInstanceWorkflows);
     }
 
     public String getLastModifiedBy() {
@@ -190,18 +170,5 @@ public class IntegrationInstance {
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
             '}';
-    }
-
-    public IntegrationInstanceWorkflow updateWorkflowEnabled(
-        long integrationInstanceConfigurationWorkflowId, boolean enable) {
-
-        IntegrationInstanceWorkflow integrationInstanceWorkflow = CollectionUtils.getFirst(
-            integrationInstanceWorkflows,
-            curIntegrationInstanceWorkflow -> curIntegrationInstanceWorkflow
-                .getIntegrationInstanceConfigurationWorkflowId() == integrationInstanceConfigurationWorkflowId);
-
-        integrationInstanceWorkflow.setEnabled(enable);
-
-        return integrationInstanceWorkflow;
     }
 }

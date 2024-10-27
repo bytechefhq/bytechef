@@ -36,6 +36,8 @@ public interface ConnectedUserService {
 
     Optional<ConnectedUser> fetchConnectedUser(@NonNull Environment environment, @NonNull String externalId);
 
+    ConnectedUser getConnectedUser(@NonNull Environment environment, @NonNull String externalId);
+
     ConnectedUser getConnectedUser(long id);
 
     Page<ConnectedUser> getConnectedUsers(

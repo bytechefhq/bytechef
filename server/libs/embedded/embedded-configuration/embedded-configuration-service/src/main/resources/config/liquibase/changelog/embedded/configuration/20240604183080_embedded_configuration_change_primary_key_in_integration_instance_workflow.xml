@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604183080" author="Ivica Cardic">
+        <dropPrimaryKey tableName="integration_instance_workflow" />
+
+        <dropColumn tableName="integration_instance_workflow" columnName="integration_instance_id" />
+        <dropColumn tableName="integration_instance_workflow" columnName="integration_instance_configuration_workflow_id" />
+        <dropColumn tableName="integration_instance_workflow" columnName="inputs" />
+        <dropColumn tableName="integration_instance_workflow" columnName="enabled" />
+
+        <addColumn tableName="integration_instance_workflow">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="integration_instance_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="integration_instance_configuration_workflow_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="inputs" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_workflow" baseColumnNames="integration_instance_id"
+            constraintName="fk_integration_instance_workflow_integration_instance"
+            referencedTableName="integration_instance"
+            referencedColumnNames="id" />
+        <addForeignKeyConstraint
+            baseTableName="integration_instance_workflow" baseColumnNames="integration_instance_configuration_workflow_id"
+            constraintName="fk_integration_instance_workflow_integration_instance_configuration_workflow"
+            referencedTableName="integration_instance_configuration_workflow"
+            referencedColumnNames="id" />
+    </changeSet>
+</databaseChangeLog>

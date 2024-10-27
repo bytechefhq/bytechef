@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -66,8 +67,9 @@ class ComponentHandlerClassLoader extends IsolatingClassLoader<ComponentHandler>
 
     private static String readIcon(IsolatingClassLoader<ComponentHandler> classLoader) {
         try {
-            return StreamUtils.copyToString(
-                classLoader.getResourceAsStream("assets/sample.svg"), StandardCharsets.UTF_8);
+            try (InputStream inputStream = classLoader.getResourceAsStream("assets/sample.svg")) {
+                return StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

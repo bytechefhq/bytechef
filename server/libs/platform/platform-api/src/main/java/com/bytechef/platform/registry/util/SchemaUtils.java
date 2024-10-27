@@ -56,18 +56,18 @@ public class SchemaUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
 
-    public static com.bytechef.definition.BaseProperty getOutputSchema(
+    public static BaseProperty getOutputSchema(
         @NonNull Object value, @NonNull SchemaPropertyFactory propertyFactoryFunction) {
 
         return getOutputSchema(null, value, propertyFactoryFunction);
     }
 
-    public static com.bytechef.definition.BaseProperty getOutputSchema(
+    public static BaseProperty getOutputSchema(
         String name, Object value, @NonNull SchemaPropertyFactory propertyFactory) {
 
         Validate.notNull(propertyFactory, "propertyFactory must not be null");
 
-        com.bytechef.definition.BaseProperty outputProperty;
+        BaseProperty outputProperty;
 
         if (value == null) {
             outputProperty = propertyFactory.create(name, null, BaseNullProperty.class);
@@ -98,7 +98,7 @@ public class SchemaUtils {
                 if (ConvertUtils.canConvert(value, Map.class)) {
                     outputProperty = propertyFactory.create(name, value, BaseObjectProperty.class);
                 } else {
-                    outputProperty = propertyFactory.create(name, value, com.bytechef.definition.BaseProperty.class);
+                    outputProperty = propertyFactory.create(name, value, BaseProperty.class);
                 }
             }
         }
@@ -135,12 +135,12 @@ public class SchemaUtils {
     }
 
     @SuppressFBWarnings("DLS")
-    private static Object getSampleOutput(com.bytechef.definition.BaseProperty definitionProperty) {
+    private static Object getSampleOutput(BaseProperty definitionProperty) {
         return switch (definitionProperty) {
-            case BaseArrayProperty<? extends com.bytechef.definition.BaseProperty> p -> {
+            case BaseArrayProperty<? extends BaseProperty> p -> {
                 List<Object> items = new ArrayList<>();
 
-                List<? extends com.bytechef.definition.BaseProperty> properties = OptionalUtils.orElse(
+                List<? extends BaseProperty> properties = OptionalUtils.orElse(
                     p.getItems(), List.of());
 
                 if (!properties.isEmpty()) {
@@ -159,10 +159,10 @@ public class SchemaUtils {
             case BaseIntegerProperty ignored -> 57;
             case BaseNullProperty ignored -> null;
             case BaseNumberProperty ignored -> 23.34;
-            case BaseObjectProperty<? extends com.bytechef.definition.BaseProperty> p -> {
+            case BaseObjectProperty<? extends BaseProperty> p -> {
                 Map<String, Object> map = new HashMap<>();
 
-                for (com.bytechef.definition.BaseProperty property : OptionalUtils.orElse(
+                for (BaseProperty property : OptionalUtils.orElse(
                     p.getProperties(), List.of())) {
 
                     map.put(property.getName(), getSampleOutput(property));
@@ -188,13 +188,12 @@ public class SchemaUtils {
     @FunctionalInterface
     public interface OutputFactoryFunction {
 
-        OutputResponse apply(com.bytechef.definition.BaseProperty property, Object value);
+        OutputResponse apply(BaseProperty property, Object value);
     }
 
     @FunctionalInterface
     public interface SchemaPropertyFactory {
 
-        com.bytechef.definition.BaseProperty create(
-            String name, Object value, Class<? extends com.bytechef.definition.BaseProperty> basePropertyClass);
+        BaseProperty create(String name, Object value, Class<? extends BaseProperty> basePropertyClass);
     }
 }

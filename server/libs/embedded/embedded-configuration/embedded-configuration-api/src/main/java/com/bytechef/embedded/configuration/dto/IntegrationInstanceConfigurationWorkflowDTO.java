@@ -30,13 +30,13 @@ import java.util.Map;
 public record IntegrationInstanceConfigurationWorkflowDTO(
     List<IntegrationInstanceConfigurationWorkflowConnection> connections, String createdBy, LocalDateTime createdDate,
     Map<String, ?> inputs, boolean enabled, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Long integrationInstanceConfigurationId, String staticWebhookUrl,
-    int version, String workflowId, String workflowReferenceCode)
+    LocalDateTime lastModifiedDate, Long integrationInstanceConfigurationId, int version, String workflowId,
+    String workflowReferenceCode)
     implements Comparable<IntegrationInstanceConfigurationWorkflowDTO> {
 
     public IntegrationInstanceConfigurationWorkflowDTO(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
-        LocalDateTime lastExecutionDate, String staticWebhookUrl, String workflowReferenceCode) {
+        LocalDateTime lastExecutionDate, String workflowReferenceCode) {
 
         this(
             integrationInstanceConfigurationWorkflow.getConnections(),
@@ -48,7 +48,7 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
             lastExecutionDate, integrationInstanceConfigurationWorkflow.getLastModifiedBy(),
             integrationInstanceConfigurationWorkflow.getLastModifiedDate(),
             integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-            staticWebhookUrl, integrationInstanceConfigurationWorkflow.getVersion(),
+            integrationInstanceConfigurationWorkflow.getVersion(),
             integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowReferenceCode);
     }
 
