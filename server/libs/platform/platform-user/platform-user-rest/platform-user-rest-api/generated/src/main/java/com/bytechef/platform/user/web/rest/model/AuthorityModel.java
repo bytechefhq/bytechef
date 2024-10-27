@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Authority", description = "A user authority.")
 @JsonTypeName("Authority")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:07.674543+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T20:43:38.367650+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class AuthorityModel {
 
   private String name;

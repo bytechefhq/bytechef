@@ -2,11 +2,9 @@ package com.bytechef.platform.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -25,15 +23,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
 @JsonTypeName("SigningKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:07.674543+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T20:43:38.367650+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class SigningKeyModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime createdDate;
-
-  private EnvironmentModel environment;
 
   private Long id;
 
@@ -99,26 +95,6 @@ public class SigningKeyModel {
 
   public void setCreatedDate(LocalDateTime createdDate) {
     this.createdDate = createdDate;
-  }
-
-  public SigningKeyModel environment(EnvironmentModel environment) {
-    this.environment = environment;
-    return this;
-  }
-
-  /**
-   * Get environment
-   * @return environment
-   */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
-    return environment;
-  }
-
-  public void setEnvironment(EnvironmentModel environment) {
-    this.environment = environment;
   }
 
   public SigningKeyModel id(Long id) {
@@ -252,7 +228,6 @@ public class SigningKeyModel {
     SigningKeyModel signingKey = (SigningKeyModel) o;
     return Objects.equals(this.createdBy, signingKey.createdBy) &&
         Objects.equals(this.createdDate, signingKey.createdDate) &&
-        Objects.equals(this.environment, signingKey.environment) &&
         Objects.equals(this.id, signingKey.id) &&
         Objects.equals(this.keyId, signingKey.keyId) &&
         Objects.equals(this.lastModifiedBy, signingKey.lastModifiedBy) &&
@@ -263,7 +238,7 @@ public class SigningKeyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, environment, id, keyId, lastModifiedBy, lastModifiedDate, lastUsedDate, name);
+    return Objects.hash(createdBy, createdDate, id, keyId, lastModifiedBy, lastModifiedDate, lastUsedDate, name);
   }
 
   @Override
@@ -272,7 +247,6 @@ public class SigningKeyModel {
     sb.append("class SigningKeyModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    keyId: ").append(toIndentedString(keyId)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
