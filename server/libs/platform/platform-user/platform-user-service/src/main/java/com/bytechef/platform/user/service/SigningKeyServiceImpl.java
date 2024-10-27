@@ -18,7 +18,6 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
@@ -95,9 +94,8 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public PublicKey getPublicKey(@NonNull String keyId, @NonNull Environment environment) {
-        SigningKey signingKey = OptionalUtils.get(
-            signingKeyRepository.findByKeyIdAndEnvironment(keyId, environment.ordinal()), "Signing key not found");
+    public PublicKey getPublicKey(@NonNull String keyId) {
+        SigningKey signingKey = OptionalUtils.get(signingKeyRepository.findByKeyId(keyId), "Signing key not found");
 
         return stringToPublicKey(signingKey.getPublicKey());
     }

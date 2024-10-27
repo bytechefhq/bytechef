@@ -17,7 +17,6 @@
 package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import com.bytechef.platform.tenant.util.TenantUtils;
 import com.bytechef.platform.user.domain.TenantKey;
@@ -54,9 +53,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
     protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
 
-        Environment environment = getEnvironment(request);
-
-        Jws<Claims> jws = getJws(token, environment);
+        Jws<Claims> jws = getJws(token);
 
         Claims payload = jws.getPayload();
 
@@ -66,23 +63,17 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
 
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
-        return new ConnectedUserAuthenticationToken(externalUserId, environment, tenantKey.getTenantId());
+        return new ConnectedUserAuthenticationToken(externalUserId, getEnvironment(request), tenantKey.getTenantId());
     }
 
-    private Jws<Claims> getJws(String secretKey, Environment environment) {
+    private Jws<Claims> getJws(String secretKey) {
         return Jwts.parser()
-            .keyLocator(new SigningKeyLocator(environment))
+            .keyLocator(new SigningKeyLocator())
             .build()
             .parseSignedClaims(secretKey);
     }
 
     private class SigningKeyLocator implements Locator<Key> {
-
-        private final Environment environment;
-
-        private SigningKeyLocator(Environment environment) {
-            this.environment = environment;
-        }
 
         @Override
         public Key locate(Header header) {
@@ -91,7 +82,7 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
             TenantKey tenantKey = TenantKey.parse(keyId);
 
             return TenantUtils.callWithTenantId(
-                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId, environment));
+                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId));
         }
     }
 }

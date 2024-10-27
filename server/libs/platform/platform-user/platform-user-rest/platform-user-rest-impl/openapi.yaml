@@ -192,8 +192,6 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        environment:
-          $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
         id:
           description: "The id of an API key."
           type: "integer"
@@ -244,8 +242,6 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        environment:
-          $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
         id:
           description: "The id of a public key."
           type: "integer"

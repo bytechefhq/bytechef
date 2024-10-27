@@ -56,8 +56,7 @@ public abstract class AbstractApiKeyAuthenticationProvider implements Authentica
         ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
 
         Optional<ApiKey> apiKeyOptional = apiKeyService.fetchApiKey(
-            apiKeyAuthenticationToken.getSecretKey(), apiKeyAuthenticationToken.getEnvironment(),
-            apiKeyAuthenticationToken.getType());
+            apiKeyAuthenticationToken.getSecretKey(), apiKeyAuthenticationToken.getType());
 
         if (apiKeyOptional.isEmpty()) {
             throw new BadCredentialsException("Unknown API secret key");

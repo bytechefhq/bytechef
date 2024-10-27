@@ -36,7 +36,6 @@ public interface AdminApiKeyMapper extends Converter<ApiKey, AdminApiKeyModel> {
 
     @InheritInverseConfiguration
     @DelegatingConverter
-    @Mapping(target = "environment", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "userId", ignore = true)
     ApiKey invertConvert(AdminApiKeyModel adminApiKeyModel);
