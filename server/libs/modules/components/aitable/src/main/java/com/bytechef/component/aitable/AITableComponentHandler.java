@@ -39,6 +39,7 @@ public class AITableComponentHandler implements ComponentHandler {
             "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data " +
                 "visualization and analysis without requiring coding skills.")
         .icon("path:assets/aitable.svg")
+        .customAction(true)
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(AITableConnection.CONNECTION_DEFINITION)
         .actions(

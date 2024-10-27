@@ -39,6 +39,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
         .description(
             "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, " +
                 "calendar, contacts, and tasks to streamline communication and organization.")
+        .customAction(true)
         .icon("path:assets/microsoft-outlook-365.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(MicrosoftOutlook365Connection.CONNECTION_DEFINITION)

@@ -40,6 +40,7 @@ public class BoxComponentHandler implements ComponentHandler {
         .description(
             "Box is a cloud content management and file sharing service that enables businesses to securely " +
                 "store, manage, and collaborate on documents.")
+        .customAction(true)
         .icon("path:assets/box.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(BoxConnection.CONNECTION_DEFINITION)

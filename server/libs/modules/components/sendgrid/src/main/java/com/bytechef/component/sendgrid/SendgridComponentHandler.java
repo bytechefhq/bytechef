@@ -35,6 +35,7 @@ public class SendgridComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(SENDGRID)
         .title("Sendgrid")
         .description("Trusted for reliable email delivery at scale.")
+        .customAction(true)
         .connection(SendgridConnection.CONNECTION_DEFINITION)
         .icon("path:assets/sendgrid.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.MARKETING_AUTOMATION)

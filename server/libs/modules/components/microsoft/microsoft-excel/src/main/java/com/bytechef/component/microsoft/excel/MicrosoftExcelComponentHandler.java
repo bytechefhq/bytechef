@@ -40,6 +40,7 @@ public class MicrosoftExcelComponentHandler implements ComponentHandler {
         .description(
             "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in " +
                 "tabular form.")
+        .customAction(true)
         .icon("path:assets/microsoft-excel.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(MicrosoftExcelConnection.CONNECTION_DEFINITION)

@@ -39,6 +39,7 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
         .description(
             "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to " +
                 "create, edit, and share documents in real-time.")
+        .customAction(true)
         .icon("path:assets/google-docs.svg")
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)

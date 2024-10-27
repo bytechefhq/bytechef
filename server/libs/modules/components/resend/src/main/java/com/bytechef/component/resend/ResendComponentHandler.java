@@ -35,6 +35,7 @@ public class ResendComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component(RESEND)
         .title("Resend")
         .description("Resend is the email API for developers.")
+        .customAction(true)
         .icon("path:assets/resend.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(ResendConnection.CONNECTION_DEFINITION)

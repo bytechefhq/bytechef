@@ -44,6 +44,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
         .description(
             "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate " +
                 "on spreadsheets in real-time.")
+        .customAction(true)
         .icon("path:assets/google-sheets.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(CONNECTION_DEFINITION)

@@ -37,6 +37,7 @@ public class TwilioComponentHandler implements ComponentHandler {
         .description(
             "Twilio is a cloud communications platform that enables developers to integrate messaging, voice, and" +
                 " video capabilities into their applications.")
+        .customAction(true)
         .icon("path:assets/twilio.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(TwilioConnection.CONNECTION_DEFINITION)

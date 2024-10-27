@@ -42,6 +42,7 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
         .description(
             "Google Calendar is a web-based application that allows users to schedule and organize events, " +
                 "appointments, and reminders, synchronizing across multiple devices.")
+        .customAction(true)
         .icon("path:assets/google-calendar.svg")
         .categories(ComponentCategory.CALENDARS_AND_SCHEDULING)
         .connection(CONNECTION_DEFINITION)

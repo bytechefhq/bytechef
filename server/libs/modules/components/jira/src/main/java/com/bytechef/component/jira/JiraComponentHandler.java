@@ -42,6 +42,7 @@ public class JiraComponentHandler implements ComponentHandler {
             "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and " +
                 "agile project management.")
         .icon("path:assets/jira.svg")
+        .customAction(true)
         .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .connection(JiraConnection.CONNECTION_DEFINITION)
         .actions(
