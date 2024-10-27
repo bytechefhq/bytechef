@@ -20,7 +20,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.BO
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CATEGORY;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INCLUDE_SPAM_TRASH;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
@@ -63,7 +62,7 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
 
         Parameters parameters = MockParametersFactory.create(
             Map.of(FROM, "from@mail.com", TO, "to@mail.com", SUBJECT, "subject", BODY, "body", MAX_RESULTS, 1L,
-                PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL, "label", LABEL_IDS, List.of("id1", "id2"),
+                PAGE_TOKEN, "pageToken", CATEGORY, "social", LABEL_IDS, List.of("id1", "id2"),
                 INCLUDE_SPAM_TRASH, true));
 
         when(mockedGmail.users())
@@ -92,7 +91,7 @@ class GoogleMailSearchEmailActionTest extends AbstractGoogleMailActionTest {
         assertEquals(ME, userIdArgumentCaptor.getValue());
         assertEquals(1, maxResultsArgumentCaptor.getValue());
         assertEquals("pageToken", pageTokenArgumentCaptor.getValue());
-        assertEquals(" from:from@mail.com to:to@mail.com subject:subject category:social label:label",
+        assertEquals(" from:from@mail.com to:to@mail.com subject:subject category:social",
             qArgumentCaptor.getValue());
         assertEquals(labelIDs, labelIDsArgumentCaptor.getValue());
         assertEquals(true, includeSpamTrashArgumentCaptor.getValue());
