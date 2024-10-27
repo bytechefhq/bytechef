@@ -18,7 +18,6 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
@@ -62,12 +61,11 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey, Environment environment, AppType type) {
-        if (environment == null) {
-            return apiKeyRepository.findBySecretKeyAndEnvironmentIsNull(secretKey);
+    public Optional<ApiKey> fetchApiKey(@NonNull String secretKey, AppType type) {
+        if (type == null) {
+            return apiKeyRepository.findBySecretKeyAndTypeIsNull(secretKey);
         } else {
-            return apiKeyRepository.findBySecretKeyAndEnvironmentAndType(
-                secretKey, environment.ordinal(), type.ordinal());
+            return apiKeyRepository.findBySecretKeyAndType(secretKey, type.ordinal());
         }
     }
 

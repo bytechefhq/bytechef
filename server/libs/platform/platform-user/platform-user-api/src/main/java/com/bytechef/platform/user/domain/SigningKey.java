@@ -17,7 +17,6 @@
 package com.bytechef.platform.user.domain;
 
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -45,9 +44,6 @@ public class SigningKey {
     @Column("created_date")
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @Column
-    private int environment;
 
     @Column("key_id")
     private String keyId;
@@ -108,10 +104,6 @@ public class SigningKey {
         return createdDate;
     }
 
-    public Environment getEnvironment() {
-        return Environment.values()[environment];
-    }
-
     public String getKeyId() {
         return keyId;
     }
@@ -142,10 +134,6 @@ public class SigningKey {
 
     public Long getUserId() {
         return userId.getId();
-    }
-
-    public void setEnvironment(Environment environment) {
-        this.environment = environment.ordinal();
     }
 
     public void setId(Long id) {
@@ -197,7 +185,6 @@ public class SigningKey {
             ", type=" + type +
             ", publicKey='" + publicKey + '\'' +
             ", userId=" + userId +
-            ", environment='" + environment + '\'' +
             ", lastUsedDate='" + lastUsedDate + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

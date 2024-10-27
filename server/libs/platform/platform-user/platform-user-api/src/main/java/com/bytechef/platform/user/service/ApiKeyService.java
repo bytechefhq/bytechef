@@ -17,7 +17,6 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.ApiKey;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +31,7 @@ public interface ApiKeyService {
 
     void delete(long id);
 
-    Optional<ApiKey> fetchApiKey(@NonNull String secretKey, Environment environment, AppType type);
+    Optional<ApiKey> fetchApiKey(@NonNull String secretKey, AppType type);
 
     ApiKey getApiKey(long id);
 

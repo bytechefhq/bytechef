@@ -17,7 +17,6 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.user.domain.SigningKey;
 import java.security.PublicKey;
 import java.util.List;
@@ -32,7 +31,7 @@ public interface SigningKeyService {
 
     void delete(long id);
 
-    PublicKey getPublicKey(@NonNull String keyId, @NonNull Environment environment);
+    PublicKey getPublicKey(@NonNull String keyId);
 
     SigningKey getSigningKey(long id);
 

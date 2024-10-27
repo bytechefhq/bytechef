@@ -17,7 +17,6 @@
 package com.bytechef.platform.user.domain;
 
 import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -42,9 +41,6 @@ public class ApiKey {
     @Column("created_date")
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @Column
-    private Integer environment;
 
     @Id
     private Long id;
@@ -91,14 +87,6 @@ public class ApiKey {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-
-    public Environment getEnvironment() {
-        if (environment == null) {
-            return null;
-        }
-
-        return Environment.values()[environment];
     }
 
     public Long getId() {
@@ -157,12 +145,6 @@ public class ApiKey {
         this.id = id;
     }
 
-    public void setEnvironment(Environment environment) {
-        if (environment != null) {
-            this.environment = environment.ordinal();
-        }
-    }
-
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
         this.lastUsedDate = lastUsedDate;
     }
@@ -196,7 +178,6 @@ public class ApiKey {
             ", name='" + name + '\'' +
             ", type=" + type +
             ", userId=" + userId +
-            ", environment='" + environment + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", secretKey='" + secretKey + '\'' +
