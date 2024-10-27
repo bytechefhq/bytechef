@@ -82,10 +82,6 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                 cell: (info) => info.getValue() ?? '',
                 header: 'Secret Key',
             }),
-            columnHelper.accessor('environment', {
-                cell: (info) => info.getValue() ?? '',
-                header: 'Environment',
-            }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
                 header: 'Created Date',
@@ -175,7 +171,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('enabled') && 'flex ml-6'
+                                        cell.id.endsWith('name') && 'min-w-64'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

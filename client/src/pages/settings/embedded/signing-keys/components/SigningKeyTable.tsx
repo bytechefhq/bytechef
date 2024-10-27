@@ -99,10 +99,6 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                 ),
                 header: 'Key Id',
             }),
-            columnHelper.accessor('environment', {
-                cell: (info) => info.getValue(),
-                header: 'Environment',
-            }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info.getValue()?.toLocaleDateString()} ${info.getValue()?.toLocaleTimeString()}`,
                 header: 'Created Date',
@@ -186,7 +182,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('enabled') && 'flex ml-6'
+                                        cell.id.endsWith('name') && 'min-w-36 max-w-44 truncate'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {
