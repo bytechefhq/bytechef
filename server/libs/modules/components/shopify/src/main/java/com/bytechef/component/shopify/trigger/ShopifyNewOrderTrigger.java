@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.shopify.constant.ShopifyConstants.ID;
-import static com.bytechef.component.shopify.constant.ShopifyConstants.NEW_ORDER;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -40,7 +39,7 @@ import java.util.Map;
  */
 public class ShopifyNewOrderTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_ORDER)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newOrder")
         .title("New Order")
         .description("Triggers when new order is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
@@ -74,5 +73,4 @@ public class ShopifyNewOrderTrigger {
 
         return body.getContent();
     }
-
 }
