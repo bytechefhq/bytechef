@@ -38,7 +38,7 @@ public final class SecurityUtils {
     }
 
     /**
-     * Get the login of the current user.
+     * Fetch the login of the current user if logged in, otherwise null.
      *
      * @return the login of the current user.
      */
@@ -46,18 +46,6 @@ public final class SecurityUtils {
         SecurityContext securityContext = SecurityContextHolder.getContext();
 
         return Optional.ofNullable(extractPrincipal(securityContext.getAuthentication()));
-    }
-
-    private static String extractPrincipal(Authentication authentication) {
-        if (authentication == null) {
-            return null;
-        } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
-            return springSecurityUser.getUsername();
-        } else if (authentication.getPrincipal() instanceof String s) {
-            return s;
-        }
-
-        return null;
     }
 
     /**
@@ -107,6 +95,18 @@ public final class SecurityUtils {
      */
     public static boolean hasCurrentUserThisAuthority(String authority) {
         return hasCurrentUserAnyOfAuthorities(authority);
+    }
+
+    private static String extractPrincipal(Authentication authentication) {
+        if (authentication == null) {
+            return null;
+        } else if (authentication.getPrincipal() instanceof UserDetails springSecurityUser) {
+            return springSecurityUser.getUsername();
+        } else if (authentication.getPrincipal() instanceof String s) {
+            return s;
+        }
+
+        return null;
     }
 
     private static Stream<String> getAuthorities(Authentication authentication) {

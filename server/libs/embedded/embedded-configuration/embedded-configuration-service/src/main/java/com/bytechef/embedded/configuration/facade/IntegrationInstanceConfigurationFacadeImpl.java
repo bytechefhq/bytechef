@@ -25,8 +25,6 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
@@ -40,9 +38,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
@@ -50,15 +46,12 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -93,23 +86,18 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final IntegrationWorkflowService integrationWorkflowService;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
-    private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerExecutionService triggerExecutionService;
-    private final TriggerLifecycleFacade triggerLifecycleFacade;
-    private final String webhookUrl;
     private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
-        ApplicationProperties applicationProperties, ConnectionService connectionService,
-        ConnectionDefinitionService connectionDefinitionService, InstanceJobFacade instanceJobFacade,
-        InstanceJobService instanceJobService, JobFacade jobFacade, JobService jobService,
-        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        ConnectionService connectionService, ConnectionDefinitionService connectionDefinitionService,
+        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobFacade jobFacade,
+        JobService jobService, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        OAuth2Service oAuth2Service, TagService tagService, TriggerDefinitionService triggerDefinitionService,
-        TriggerExecutionService triggerExecutionService, TriggerLifecycleFacade triggerLifecycleFacade,
+        OAuth2Service oAuth2Service, TagService tagService, TriggerExecutionService triggerExecutionService,
         WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
@@ -124,10 +112,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.integrationWorkflowService = integrationWorkflowService;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
-        this.triggerDefinitionService = triggerDefinitionService;
         this.triggerExecutionService = triggerExecutionService;
-        this.triggerLifecycleFacade = triggerLifecycleFacade;
-        this.webhookUrl = applicationProperties.getWebhookUrl();
         this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
     }
@@ -246,23 +231,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfigurationId);
-
-        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
-
-            if (!integrationInstanceConfigurationWorkflow.isEnabled()) {
-                continue;
-            }
-
-            if (enable) {
-                enableWorkflowTriggers(integrationInstanceConfigurationWorkflow);
-            } else {
-                disableWorkflowTriggers(integrationInstanceConfigurationWorkflow);
-            }
-        }
-
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfigurationId, enable);
     }
 
@@ -273,10 +241,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                 integrationInstanceConfigurationId, workflowId);
-
-        IntegrationInstanceConfiguration integrationInstanceConfiguration =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId());
 
         if (enable) {
             Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -301,14 +265,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 throw new PlatformException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
-            }
-        }
-
-        if (integrationInstanceConfiguration.isEnabled()) {
-            if (enable) {
-                enableWorkflowTriggers(integrationInstanceConfigurationWorkflow);
-            } else {
-                disableWorkflowTriggers(integrationInstanceConfigurationWorkflow);
             }
         }
 
@@ -469,83 +425,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return integrationInstanceConfigurationWorkflows;
     }
 
-    private void disableWorkflowTriggers(
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
-
-        Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
-                workflow.getId());
-
-            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
-
-            triggerLifecycleFacade.executeTriggerDisable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
-                getConnectionId(
-                    integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(), workflow.getId(),
-                    workflowTrigger));
-        }
-    }
-
-    private void enableWorkflowTriggers(
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
-
-        Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-        validateInputs(integrationInstanceConfigurationWorkflow.getInputs(), workflow);
-
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
-                workflow.getId());
-
-            WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
-
-            triggerLifecycleFacade.executeTriggerEnable(
-                workflow.getId(), workflowExecutionId, WorkflowNodeType.ofType(workflowTrigger.getType()),
-                workflowTrigger.getParameters(),
-                getConnectionId(
-                    integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(), workflow.getId(),
-                    workflowTrigger),
-                getWebhookUrl(workflowExecutionId));
-        }
-    }
-
     private List<Tag> filterTags(List<Tag> tags, IntegrationInstanceConfiguration integrationInstanceConfiguration) {
         return CollectionUtils.filter(tags, tag -> containsTag(integrationInstanceConfiguration, tag));
-    }
-
-    private Long getConnectionId(
-        long integrationInstanceConfigurationId, String workflowId, WorkflowTrigger workflowTrigger) {
-
-        return workflowConnectionFacade
-            .getWorkflowConnections(workflowTrigger)
-            .stream()
-            .findFirst()
-            .map(workflowConnection -> getConnectionId(
-                integrationInstanceConfigurationId, workflowId, workflowConnection.workflowNodeName(),
-                workflowConnection.key()))
-            .orElse(null);
-    }
-
-    private Long getConnectionId(
-        long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
-        String workflowConnectionKey) {
-
-        return integrationInstanceConfigurationWorkflowService
-            .fetchIntegrationInstanceConfigurationWorkflowConnection(
-                integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey)
-            .map(IntegrationInstanceConfigurationWorkflowConnection::getConnectionId)
-            .orElse(null);
     }
 
     private static Map<String, ?> getConnectionAuthorizationParameters(
@@ -612,32 +493,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return job.getEndDate();
     }
 
-    private String getStaticWebhookUrl(long integrationInstanceConfigurationId, String workflowId) {
-        Workflow workflow = workflowService.getWorkflow(workflowId);
-
-        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
-
-        for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            WorkflowNodeType triggerWorkflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
-
-            TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                triggerWorkflowNodeType.componentName(), triggerWorkflowNodeType.componentVersion(),
-                triggerWorkflowNodeType.componentOperationName());
-
-            if (triggerDefinition.getType() == TriggerType.STATIC_WEBHOOK) {
-                IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
-                    workflow.getId());
-
-                return getWebhookUrl(
-                    WorkflowExecutionId.of(
-                        AppType.EMBEDDED, integrationInstanceConfigurationId,
-                        integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName()));
-            }
-        }
-
-        return null;
-    }
-
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
         return tagService.getTags(
             integrationInstanceConfigurations
@@ -646,10 +501,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     integrationInstanceConfiguration.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
-    }
-
-    private String getWebhookUrl(WorkflowExecutionId workflowExecutionId) {
-        return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
     @SuppressFBWarnings("NP")
@@ -726,9 +577,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationWorkflow -> new IntegrationInstanceConfigurationWorkflowDTO(
                     integrationInstanceConfigurationWorkflow,
                     getWorkflowLastExecutionDate(integrationInstanceConfigurationWorkflow.getWorkflowId()),
-                    getStaticWebhookUrl(
-                        integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                        integrationInstanceConfigurationWorkflow.getWorkflowId()),
                     getWorkflowReferenceCode(
                         integrationInstanceConfigurationWorkflow.getWorkflowId(),
                         integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),

@@ -8,8 +8,8 @@
 package com.bytechef.ee.embedded.configuration.remote.client.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -32,19 +32,23 @@ public class RemoteIntegrationInstanceServiceClient implements IntegrationInstan
     }
 
     @Override
+    public List<IntegrationInstance> getEnabledIntegrationInstances(long connectedUserId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationInstance getIntegrationInstance(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void updateEnabled(long id, boolean enable) {
+    public IntegrationInstance
+        getIntegrationInstance(long connectedUserId, String workflowId, Environment environment) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public IntegrationInstanceWorkflow updateWorkflowEnabled(
-        long id, long integrationInstanceConfigurationWorkflowId, boolean enable) {
-
+    public void updateEnabled(long id, boolean enable) {
         throw new UnsupportedOperationException();
     }
 }

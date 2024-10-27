@@ -1,0 +1,73 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Embedded Configuration Public V1 API"
+  version: "1"
+servers:
+- url: "/api/embedded/v1"
+tags:
+- name: "integration"
+  description: "The Embedded Integration Public API"
+- name: "workflow"
+  description: "The Embedded Workflow Public API"
+paths:
+  /integrations:
+    get:
+      description: "Get active integrations."
+      summary: "Get active configurations"
+      tags:
+        - "integration"
+      operationId: "getIntegrations"
+      parameters:
+        - name: "x-environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The list of active integrations."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Integration"
+components:
+  schemas:
+    Environment:
+      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+    Integration:
+      description: "A group of workflows that make one logical integration."
+      type: "object"
+      required:
+        - "allowMultipleInstances"
+        - "icon"
+        - "componentName"
+      properties:
+        allowMultipleInstances:
+          description: "If multiple instances of an integration are allowed or not."
+          type: "boolean"
+          default: false
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
+        description:
+          description: "The description of a project."
+          type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
+        id:
+          description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationVersion:
+          description: "The version of an integration."
+          type: "integer"
+          readOnly: true
+        title:
+          description: "The title of the integration's component."
+          type: "string"

@@ -34,36 +34,36 @@ public interface IntegrationRepository
     CustomIntegrationRepository {
 
     @Query("""
-            SELECT integration.* FROM integration
-            JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration.category_id = :categoryId
-            AND integration_tag.tag_id = :tagId
-            ORDER BY component_name
+        SELECT integration.* FROM integration
+        JOIN integration_tag ON integration.id = integration_tag.integration_id
+        WHERE integration.category_id = :categoryId
+        AND integration_tag.tag_id = :tagId
+        ORDER BY component_name
         """)
     List<Integration> findAllByCategoryIdAndTagIdOrderByComponentName(
         @Param("categoryId") long categoryId, @Param("tagId") long tagId);
 
     @Query("""
-            SELECT integration.* FROM integration
-            JOIN integration_tag ON integration.id = integration_tag.integration_id
-            WHERE integration_tag.tag_id = :tagId
-            ORDER BY component_name
+        SELECT integration.* FROM integration
+        JOIN integration_tag ON integration.id = integration_tag.integration_id
+        WHERE integration_tag.tag_id = :tagId
+        ORDER BY component_name
         """)
     List<Integration> findAllByTagIdOrderByName(@Param("tagId") long tagId);
 
     @Query("""
-            SELECT integration.* FROM integration
-            JOIN integration_instance ON integration.id = integration_instance.integration_id
-            WHERE integration_instance.id = :integrationInstanceId
+        SELECT integration.* FROM integration
+        JOIN integration_instance ON integration.id = integration_instance.integration_id
+        WHERE integration_instance.id = :integrationInstanceId
         """)
     Integration findByIntegrationInstanceId(long integrationInstanceId);
 
     Optional<Integration> findByComponentNameIgnoreCase(String name);
 
     @Query("""
-            SELECT integration.* FROM integration
-            JOIN integration_workflow ON integration.id = integration_workflow.integration_id
-            WHERE integration_workflow.workflow_id = :workflowId
+        SELECT integration.* FROM integration
+        JOIN integration_workflow ON integration.id = integration_workflow.integration_id
+        WHERE integration_workflow.workflow_id = :workflowId
         """)
     Optional<Integration> findByWorkflowId(@Param("workflowId") String workflowId);
 }

@@ -27,10 +27,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
-public interface IntegrationWorkflowRepository
-    extends ListCrudRepository<IntegrationWorkflow, Long> {
-
-    int countByIntegrationIdAndIntegrationVersion(long integrationId, int integrationVersion);
+public interface IntegrationWorkflowRepository extends ListCrudRepository<IntegrationWorkflow, Long> {
 
     List<IntegrationWorkflow> findAllByIntegrationId(long integrationId);
 
@@ -51,4 +48,6 @@ public interface IntegrationWorkflowRepository
         """)
     Optional<IntegrationWorkflow> findByIntegrationInstanceIdWorkflowReferenceCode(
         long integrationInstanceId, String workflowReferenceCode);
+
+    Optional<IntegrationWorkflow> findLatestIntegrationWorkflowByWorkflowReferenceCode(String workflowReferenceCode);
 }

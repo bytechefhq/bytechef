@@ -43,7 +43,7 @@ public interface IntegrationWorkflowService {
 
     List<IntegrationWorkflow> getIntegrationWorkflows(long integrationId, int integrationVersion);
 
-    List<String> getWorkflowIds(long integrationId);
+    String getLatestIntegrationWorkflowId(String workflowReferenceCode);
 
     List<String> getWorkflowIds(long integrationId, int integrationVersion);
 
@@ -52,4 +52,5 @@ public interface IntegrationWorkflowService {
     void removeWorkflow(long integrationId, int integrationVersion, String workflowId);
 
     IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow);
+
 }

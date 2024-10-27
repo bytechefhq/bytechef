@@ -41,6 +41,8 @@ public interface IntegrationInstanceConfigurationWorkflowService {
             long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
             String workflowConnectionKey);
 
+    IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(long id);
+
     IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId);
 

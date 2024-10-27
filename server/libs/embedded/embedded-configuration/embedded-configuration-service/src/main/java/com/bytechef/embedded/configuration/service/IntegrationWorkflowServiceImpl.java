@@ -99,11 +99,11 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public List<String> getWorkflowIds(long integrationId) {
-        return integrationWorkflowRepository.findAllByIntegrationId(integrationId)
-            .stream()
-            .map(IntegrationWorkflow::getWorkflowId)
-            .toList();
+    public String getLatestIntegrationWorkflowId(String workflowReferenceCode) {
+        return OptionalUtils.get(
+            integrationWorkflowRepository
+                .findLatestIntegrationWorkflowByWorkflowReferenceCode(workflowReferenceCode)
+                .map(IntegrationWorkflow::getWorkflowId));
     }
 
     @Override

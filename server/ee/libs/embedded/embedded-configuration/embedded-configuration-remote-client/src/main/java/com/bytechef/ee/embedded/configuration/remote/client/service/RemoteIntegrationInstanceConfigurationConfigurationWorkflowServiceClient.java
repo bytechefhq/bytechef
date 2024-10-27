@@ -81,6 +81,11 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     }
 
     @Override
+    public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public IntegrationInstanceConfigurationWorkflow getIntegrationInstanceConfigurationWorkflow(
         long integrationInstanceConfigurationId, String workflowId) {
 

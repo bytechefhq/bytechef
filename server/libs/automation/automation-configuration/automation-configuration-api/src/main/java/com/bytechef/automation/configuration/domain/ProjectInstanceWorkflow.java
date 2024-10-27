@@ -82,14 +82,6 @@ public class ProjectInstanceWorkflow implements Comparable<ProjectInstanceWorkfl
     public ProjectInstanceWorkflow() {
     }
 
-    public ProjectInstanceWorkflow(
-        List<ProjectInstanceWorkflowConnection> connections, Map<String, Object> inputs, String workflowId) {
-
-        this.connections = new HashSet<>(connections);
-        this.inputs = new MapWrapper(inputs);
-        this.workflowId = workflowId;
-    }
-
     @Override
     public int compareTo(ProjectInstanceWorkflow projectInstanceWorkflow) {
         return workflowId.compareTo(projectInstanceWorkflow.workflowId);

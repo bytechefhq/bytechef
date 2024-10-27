@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.platform.constant.Environment;
 import java.util.List;
 
 /**
@@ -29,10 +29,11 @@ public interface IntegrationInstanceService {
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
 
+    List<IntegrationInstance> getEnabledIntegrationInstances(long connectedUserId);
+
     IntegrationInstance getIntegrationInstance(long id);
 
-    IntegrationInstanceWorkflow updateWorkflowEnabled(
-        long id, long integrationInstanceConfigurationWorkflowId, boolean enable);
+    IntegrationInstance getIntegrationInstance(long connectedUserId, String workflowId, Environment environment);
 
     void updateEnabled(long id, boolean enable);
 

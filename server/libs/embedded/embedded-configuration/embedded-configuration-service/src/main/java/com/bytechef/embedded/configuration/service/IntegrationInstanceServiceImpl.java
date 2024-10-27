@@ -17,8 +17,8 @@
 package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.repository.IntegrationInstanceRepository;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -51,10 +51,24 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
+    public List<IntegrationInstance> getEnabledIntegrationInstances(long connectedUserId) {
+        return integrationInstanceRepository.findAllByConnectedUserIdAndEnabled(connectedUserId, true);
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public IntegrationInstance getIntegrationInstance(long id) {
         return integrationInstanceRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new IllegalArgumentException("Integration instance not found"));
+    }
+
+    @Override
+    public IntegrationInstance getIntegrationInstance(
+        long connectedUserId, String workflowId, Environment environment) {
+
+        return integrationInstanceRepository
+            .findByWorkflowIdAndEnvironment(connectedUserId, workflowId, environment.ordinal())
+            .orElseThrow(() -> new IllegalArgumentException("Integration instance not found"));
     }
 
     @Override
@@ -64,19 +78,5 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
         integrationInstance.setEnabled(enable);
 
         integrationInstanceRepository.save(integrationInstance);
-    }
-
-    @Override
-    public IntegrationInstanceWorkflow updateWorkflowEnabled(
-        long id, long integrationInstanceConfigurationWorkflowId, boolean enable) {
-
-        IntegrationInstance integrationInstance = getIntegrationInstance(id);
-
-        IntegrationInstanceWorkflow integrationInstanceWorkflow = integrationInstance.updateWorkflowEnabled(
-            integrationInstanceConfigurationWorkflowId, enable);
-
-        integrationInstanceRepository.save(integrationInstance);
-
-        return integrationInstanceWorkflow;
     }
 }

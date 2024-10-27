@@ -417,10 +417,9 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
-            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
-
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 AppType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
                 projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
@@ -438,6 +437,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         validateInputs(projectInstanceWorkflow.getInputs(), workflow);
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
@@ -445,8 +445,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             if (Objects.equals(workflowNodeType.componentName(), "manual")) {
                 continue;
             }
-
-            ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 AppType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),

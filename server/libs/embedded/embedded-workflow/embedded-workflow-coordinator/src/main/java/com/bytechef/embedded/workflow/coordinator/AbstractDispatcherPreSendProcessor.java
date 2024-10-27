@@ -27,7 +27,7 @@ import java.util.Map;
  */
 public abstract class AbstractDispatcherPreSendProcessor {
 
-    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    protected final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
 
     protected AbstractDispatcherPreSendProcessor(
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService) {

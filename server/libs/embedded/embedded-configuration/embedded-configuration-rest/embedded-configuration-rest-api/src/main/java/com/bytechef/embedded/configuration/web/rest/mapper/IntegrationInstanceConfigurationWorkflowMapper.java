@@ -37,7 +37,6 @@ public class IntegrationInstanceConfigurationWorkflowMapper {
 
         @Override
         @Mapping(target = "lastExecutionDate", ignore = true)
-        @Mapping(target = "staticWebhookUrl", ignore = true)
         @Mapping(target = "workflowReferenceCode", ignore = true)
         IntegrationInstanceConfigurationWorkflowModel convert(
             IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
