@@ -27,13 +27,13 @@ import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.shopify.trigger.ShopifyNewCancelledOrderTrigger;
@@ -53,7 +53,7 @@ import java.util.Optional;
 public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
     @Override
-    public List<ComponentDsl.ModifiableTriggerDefinition> getTriggers() {
+    public List<ModifiableTriggerDefinition> getTriggers() {
         return List.of(
             ShopifyNewCancelledOrderTrigger.TRIGGER_DEFINITION,
             ShopifyNewOrderTrigger.TRIGGER_DEFINITION,
@@ -136,5 +136,4 @@ public class ShopifyComponentHandler extends AbstractShopifyComponentHandler {
 
         return modifiableProperty;
     }
-
 }

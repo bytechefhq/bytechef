@@ -121,5 +121,4 @@ public class ShopifyUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
-
 }
