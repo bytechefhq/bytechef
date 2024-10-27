@@ -1,4 +1,3 @@
-import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {
@@ -19,7 +18,6 @@ import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 interface ApiConnectorItemProps {
     apiConnector: ApiConnector;
@@ -111,14 +109,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
 
                 <div className="flex items-center justify-end gap-x-6">
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge
-                            className={twMerge(
-                                apiConnector.enabled && 'bg-success text-success-foreground hover:bg-success'
-                            )}
-                            variant="secondary"
-                        >
-                            {apiConnector.enabled ? 'Enabled' : 'Disabled'}
-                        </Badge>
+                        <Switch checked={apiConnector.enabled} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -141,8 +132,6 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                             <TooltipContent>Created Date</TooltipContent>
                         </Tooltip>
                     </div>
-
-                    <Switch checked={apiConnector.enabled} onCheckedChange={handleOnCheckedChange} />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
