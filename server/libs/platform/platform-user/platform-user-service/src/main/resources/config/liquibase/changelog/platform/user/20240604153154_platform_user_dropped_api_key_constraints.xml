@@ -3,7 +3,6 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
-
     <property name="uuid_type" value="uuid" dbms="h2"/>
     <property name="uuid_function" value="RANDOM_UUID()" dbms="h2"/>
 
