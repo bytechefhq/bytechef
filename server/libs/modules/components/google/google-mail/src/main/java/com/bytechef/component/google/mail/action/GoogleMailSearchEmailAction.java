@@ -28,7 +28,6 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.CA
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.FROM;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.INCLUDE_SPAM_TRASH;
-import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.MAX_RESULTS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
@@ -94,16 +93,14 @@ public class GoogleMailSearchEmailAction {
                     option("Reservations", "reservations"),
                     option("Purchases", "purchases"))
                 .required(false),
-            string(LABEL)
-                .label("Label")
-                .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions)
-                .required(false),
             array(LABEL_IDS)
                 .label("Labels")
                 .description(
                     "Only return messages with labels that match all of the specified label IDs. Messages in a " +
                         "thread might have labels that other messages in the same thread don't have.")
-                .items(string())
+                .items(
+                    string()
+                        .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions))
                 .required(false),
             bool(INCLUDE_SPAM_TRASH)
                 .label("Include spam trash")
@@ -165,11 +162,6 @@ public class GoogleMailSearchEmailAction {
         if (inputParameters.getString(CATEGORY) != null) {
             query.append(" category:")
                 .append(inputParameters.getString(CATEGORY));
-        }
-
-        if (inputParameters.getString(LABEL) != null) {
-            query.append(" label:")
-                .append(inputParameters.getString(LABEL));
         }
 
         return query;
