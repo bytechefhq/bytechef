@@ -14,7 +14,6 @@ import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 interface CustomComponentItemProps {
     customComponent: CustomComponent;
@@ -103,14 +102,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                     </div>
 
                     <div className="flex flex-col items-end gap-y-4">
-                        <Badge
-                            className={twMerge(
-                                customComponent.enabled && 'bg-success text-success-foreground hover:bg-success'
-                            )}
-                            variant="secondary"
-                        >
-                            {customComponent.enabled ? 'Enabled' : 'Disabled'}
-                        </Badge>
+                        <Switch checked={customComponent.enabled} onCheckedChange={handleOnCheckedChange} />
 
                         <Tooltip>
                             <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -133,8 +125,6 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                             <TooltipContent>Created Date</TooltipContent>
                         </Tooltip>
                     </div>
-
-                    <Switch checked={customComponent.enabled} onCheckedChange={handleOnCheckedChange} />
 
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
