@@ -65,6 +65,34 @@ public class MondayOptionUtils {
         return options;
     }
 
+    public static List<Option<String>> getBoardItemsOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        String query = "query{boards(ids: [%s]){items_page{items{id name}}}}"
+            .formatted(inputParameters.getRequiredString(BOARD_ID));
+
+        Map<String, Object> body = MondayUtils.executeGraphQLQuery(query, context);
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(DATA) instanceof Map<?, ?> map && map.get(BOARDS) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> boardMap &&
+                    boardMap.get("items_page") instanceof Map<?, ?> itemsPage &&
+                    itemsPage.get("items") instanceof List<?> items) {
+                    for (Object item : items) {
+                        if (item instanceof Map<?, ?> itemMap) {
+                            options.add(option((String) itemMap.get(NAME), (String) itemMap.get(ID)));
+                        }
+                    }
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static List<Option<String>> getColumnTypeOptions() {
         return Arrays.stream(MondayColumnType.values())
             .map(mondayColumnType -> option(mondayColumnType.getDisplayValue(), mondayColumnType.getName()))
