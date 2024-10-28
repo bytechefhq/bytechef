@@ -11,9 +11,9 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
-import {ApiKey} from '@/shared/middleware/embedded/user';
-import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/embedded/apiKeys.mutations';
-import {ApiKeyKeys} from '@/shared/queries/embedded/apiKeys.queries';
+import {ApiKey} from '@/shared/middleware/platform/user';
+import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
+import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -86,7 +86,6 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
     }
 
     function saveApiKey() {
-        console.log(apiKey);
         if (apiKey?.id) {
             updateApiKeyMutation.mutate({
                 ...apiKey,
@@ -147,21 +146,23 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                                 </div>
                             </div>
                         ) : (
-                            <FormField
-                                control={control}
-                                name="name"
-                                render={({field}) => (
-                                    <FormItem>
-                                        <FormLabel>Name</FormLabel>
+                            <>
+                                <FormField
+                                    control={control}
+                                    name="name"
+                                    render={({field}) => (
+                                        <FormItem>
+                                            <FormLabel>Name</FormLabel>
 
-                                        <FormControl>
-                                            <Input {...field} />
-                                        </FormControl>
+                                            <FormControl>
+                                                <Input {...field} />
+                                            </FormControl>
 
-                                        <FormMessage />
-                                    </FormItem>
-                                )}
-                            />
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </>
                         )}
 
                         <DialogFooter>

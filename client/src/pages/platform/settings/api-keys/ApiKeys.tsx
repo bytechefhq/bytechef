@@ -1,18 +1,18 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import ApiKeyDialog from '@/pages/settings/automation/api-keys/components/ApiKeyDialog';
-import ApiKeyTable from '@/pages/settings/automation/api-keys/components/ApiKeyTable';
+import ApiKeyDialog from '@/pages/platform/settings/api-keys/components/ApiKeyDialog';
+import ApiKeyTable from '@/pages/platform/settings/api-keys/components/ApiKeyTable';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGeApiKeysQuery} from '@/shared/queries/automation/apiKeys.queries';
+import {useGetApiKeysQuery} from '@/shared/queries/platform/apiKeys.queries';
 import {KeyIcon} from 'lucide-react';
 import {useState} from 'react';
 
-export const ApiKeys = () => {
+const ApiKeys = () => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
-    const {data: apiKeys, error: apiKeysError, isLoading: apiKeysLoading} = useGeApiKeysQuery();
+    const {data: apiKeys, error: apiKeysError, isLoading: apiKeysLoading} = useGetApiKeysQuery();
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading}>
@@ -45,3 +45,5 @@ export const ApiKeys = () => {
         </PageLoader>
     );
 };
+
+export default ApiKeys;

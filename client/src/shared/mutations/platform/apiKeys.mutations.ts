@@ -1,4 +1,4 @@
-import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/automation/user';
+import {ApiKey, ApiKeyApi, type CreateApiKey200Response} from '@/shared/middleware/platform/user';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiKeyMutationProps {
