@@ -1,0 +1,141 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Accelo"
+  description: "Accelo is a cloud-based platform designed to streamline operations for service businesses by integrating project management, CRM, and billing functionalities into one unified system."
+  version: "v1"
+servers:
+  - url: "https://{deployment}.api.accelo.com/api/v0"
+paths:
+  /companies:
+    post:
+      summary: "Create Company"
+      description: "Creates a new company."
+      operationId: "createCompany"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Company"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "The name of the company."
+                website:
+                  type: "string"
+                  title: "Website"
+                  description: "The company's website."
+                phone:
+                  type: "string"
+                  title: "Phone"
+                  description: "A contact phone number for the company."
+                comments:
+                  type: "string"
+                  title: "Comments"
+                  description: "Any comments or notes made against the company."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      response:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                      meta:
+                        type: "object"
+                        properties:
+                          more_info:
+                            type: "string"
+                          status:
+                            type: "string"
+                          message:
+                            type: "string"
+  /contacts:
+    post:
+      summary: "Create Contact"
+      description: "Creates a new contact."
+      operationId: "createContact"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Contact"
+              type: "object"
+              required:
+                - "company_id"
+              properties:
+                firstname:
+                  type: "string"
+                  title: "First name"
+                  description: "The first name of the contact."
+                surname:
+                  type: "string"
+                  title: "Last name"
+                  description: "The last name of the contact."
+                company_id:
+                  type: "string"
+                  title: "Company"
+                  description: "Company the new affiliated contact will be associated with."
+                phone:
+                  type: "string"
+                  title: "Phone"
+                  description: "The contact's phone number in their role in the associated company."
+                email:
+                  type: "string"
+                  title: "Email"
+                  description: "The contact's position in the associated company."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      response:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          firstname:
+                            type: "string"
+                          lastname:
+                            type: "string"
+                          email:
+                            type: "string"
+                      meta:
+                        type: "object"
+                        properties:
+                          more_info:
+                            type: "string"
+                          status:
+                            type: "string"
+                          message:
+                            type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://{deployment}.api.accelo.com/oauth2/v0/authorize"
+          tokenUrl: "https://{deployment}.api.accelo.com/oauth2/v0/token"
+          scopes:
+            write(all): ""

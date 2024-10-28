@@ -16,77 +16,63 @@
 
 package com.bytechef.component.accelo.action;
 
-import static com.bytechef.component.accelo.constant.AcceloConstants.COMMENTS;
-import static com.bytechef.component.accelo.constant.AcceloConstants.CREATE_COMPANY;
-import static com.bytechef.component.accelo.constant.AcceloConstants.NAME;
-import static com.bytechef.component.accelo.constant.AcceloConstants.PHONE;
-import static com.bytechef.component.accelo.constant.AcceloConstants.WEBSITE;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.ComponentDsl;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class AcceloCreateCompanyAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
+        .title("Create Company")
+        .description("Creates a new company.")
+        .metadata(
+            Map.of(
+                "method", "POST",
+                "path", "/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COMPANY)
-        .title("Create company")
-        .description("Creates a new company")
-        .properties(
-            string(NAME)
-                .label("Name")
-                .description("The name of the company")
-                .required(true),
-            string(WEBSITE)
-                .label("Website")
+            ))
+        .properties(object("__item").properties(string("name").label("Name")
+            .description("The name of the company.")
+            .required(true),
+            string("website").label("Website")
                 .description("The company's website.")
                 .required(false),
-            string(PHONE)
-                .label("Phone")
+            string("phone").label("Phone")
                 .description("A contact phone number for the company.")
                 .required(false),
-            string(COMMENTS)
-                .label("Comments")
+            string("comments").label("Comments")
                 .description("Any comments or notes made against the company.")
                 .required(false))
+            .label("Company")
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
         .output(
-            outputSchema(
-                object()
+            outputSchema(object()
+                .properties(object("body")
                     .properties(
-                        object("response")
-                            .properties(
-                                string("id"),
-                                string(NAME)),
+                        object("response").properties(string("id").required(false), string("name").required(false))
+                            .required(false),
                         object("meta")
-                            .properties(
-                                string("more_info"),
-                                string("status"),
-                                string("message")))))
-        .perform(AcceloCreateCompanyAction::perform);
+                            .properties(string("more_info").required(false), string("status").required(false),
+                                string("message").required(false))
+                            .required(false))
+                    .required(false))
+                .metadata(
+                    Map.of(
+                        "responseType", ResponseType.JSON))));
 
     private AcceloCreateCompanyAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(http -> http.post("/companies"))
-            .body(
-                Http.Body.of(
-                    NAME, inputParameters.getRequiredString(NAME),
-                    WEBSITE, inputParameters.getString(WEBSITE),
-                    PHONE, inputParameters.getString(PHONE),
-                    COMMENTS, inputParameters.getString(COMMENTS)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
     }
 }

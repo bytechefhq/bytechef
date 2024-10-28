@@ -21,52 +21,62 @@ import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYP
 import static com.bytechef.component.accelo.constant.AcceloConstants.DATE_STARTED;
 import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class AcceloCreateTaskActionTest extends AbstractAcceloActionTest {
+class AcceloCreateTaskActionTest {
 
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(TITLE, "title", AGAINST_TYPE, "type", AGAINST_ID, "id", DATE_STARTED, date));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
     private static final Date date = new Date();
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+        when(mockedActionContext.http(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn((String) propertyStubsMap.get(TITLE));
-        when(mockedParameters.getRequiredString(AGAINST_TYPE))
-            .thenReturn((String) propertyStubsMap.get(AGAINST_TYPE));
-        when(mockedParameters.getRequiredString(AGAINST_ID))
-            .thenReturn((String) propertyStubsMap.get(AGAINST_ID));
-        when(mockedParameters.getRequiredDate(DATE_STARTED))
-            .thenReturn(date);
+        Object result = AcceloCreateTaskAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        Object result = AcceloCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(responeseMap, result);
+        assertEquals(responseMap, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
+        Map<String, Object> expectedBody = new HashMap<>();
 
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(TITLE, "title");
-        propertyStubsMap.put(AGAINST_TYPE, "type");
-        propertyStubsMap.put(AGAINST_ID, "id");
-        propertyStubsMap.put(DATE_STARTED, date.toInstant()
+        expectedBody.put(TITLE, "title");
+        expectedBody.put(AGAINST_TYPE, "type");
+        expectedBody.put(AGAINST_ID, "id");
+        expectedBody.put(DATE_STARTED, date.toInstant()
             .getEpochSecond());
 
-        return propertyStubsMap;
+        assertEquals(expectedBody, body.getContent());
     }
 }

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.accelo.constant;
+package com.bytechef.component.accelo;
+
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Kušter
+ * Provides the base test implementation for the REST based component.
+ *
+ * @generated
  */
-public class AcceloConstants {
-
-    private AcceloConstants() {
+public abstract class AbstractAcceloComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/accelo_v1.json", new AcceloComponentHandler().getDefinition());
     }
-
-    public static final String AGAINST_ID = "against_id";
-    public static final String AGAINST_TYPE = "against_type";
-    public static final String DATE_STARTED = "date_started";
-    public static final String DEPLOYMENT = "deployment";
-    public static final String ID = "id";
-    public static final String TITLE = "title";
-
 }
