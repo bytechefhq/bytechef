@@ -10,10 +10,10 @@ import {
 } from '@/components/ui/alert-dialog';
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import ApiKeyDialog from '@/pages/settings/automation/api-keys/components/ApiKeyDialog';
-import {ApiKey} from '@/shared/middleware/embedded/user';
-import {useDeleteApiKeyMutation} from '@/shared/mutations/automation/apiKeys.mutations';
-import {ApiKeyKeys} from '@/shared/queries/automation/apiKeys.queries';
+import ApiKeyDialog from '@/pages/platform/settings/api-keys/components/ApiKeyDialog';
+import {ApiKey} from '@/shared/middleware/platform/user';
+import {useDeleteApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
+import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {createColumnHelper, flexRender, getCoreRowModel, useReactTable} from '@tanstack/react-table';
 import {EditIcon, Trash2Icon} from 'lucide-react';
@@ -171,7 +171,7 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('name') && 'min-w-64'
+                                        cell.id.endsWith('enabled') && 'flex ml-6'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

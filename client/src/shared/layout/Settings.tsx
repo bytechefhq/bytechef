@@ -30,16 +30,14 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-445');
         }
 
-        if (navItem.href === '/automation/settings/api-keys' && location.pathname.includes('automation/settings')) {
-            return isFeatureFlagEnabled('ff-1023');
-        }
-
         if (navItem.href === 'custom-components') {
             return isFeatureFlagEnabled('ff-1024');
         }
 
-        if (navItem.href === 'admin-api-keys' || navItem.title === 'Organization') {
-            return isFeatureFlagEnabled('ff-1024') || isFeatureFlagEnabled('ff-1025');
+        if (navItem.href === 'api-keys') {
+            return (
+                isFeatureFlagEnabled('ff-1023') || isFeatureFlagEnabled('ff-1024') || isFeatureFlagEnabled('ff-1025')
+            );
         }
 
         return true;

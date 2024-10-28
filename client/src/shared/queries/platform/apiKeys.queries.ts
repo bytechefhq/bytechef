@@ -1,12 +1,12 @@
 /* eslint-disable sort-keys */
-import {ApiKey, ApiKeyApi} from '@/shared/middleware/automation/user';
+import {ApiKey, ApiKeyApi} from '@/shared/middleware/platform/user';
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiKeyKeys = {
     apiKeys: ['apiKeys'] as const,
 };
 
-export const useGeApiKeysQuery = () =>
+export const useGetApiKeysQuery = () =>
     useQuery<ApiKey[], Error>({
         queryKey: ApiKeyKeys.apiKeys,
         queryFn: () => new ApiKeyApi().getApiKeys(),
