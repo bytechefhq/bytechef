@@ -48,7 +48,6 @@ import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
-import {twMerge} from 'tailwind-merge';
 
 const Project = () => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
@@ -247,7 +246,7 @@ const Project = () => {
     return (
         <>
             <LayoutContainer
-                className={twMerge('bg-muted/50', !leftSidebarOpen && 'border-l')}
+                className="bg-muted/50"
                 leftSidebarBody={<ProjectsSidebar projectId={+projectId!} />}
                 leftSidebarClass="bg-muted"
                 leftSidebarHeader={<Header right={<ProjectsSidebarFilterPopover />} title="Projects" />}
@@ -267,7 +266,7 @@ const Project = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l bg-muted/50"
+                rightToolbarClass="border-l"
                 rightToolbarOpen={true}
                 topHeader={
                     projectId && (
@@ -282,12 +281,11 @@ const Project = () => {
                 }
             >
                 <PageLoader
-                    className="bg-muted/50"
                     errors={[componentsError, taskDispatcherDefinitionsError]}
                     loading={componentsIsLoading || taskDispatcherDefinitionsLoading}
                 >
                     {componentDefinitions && !!taskDispatcherDefinitions && workflow?.id && (
-                        <ResizablePanelGroup className="flex-1 bg-muted/50" direction="vertical">
+                        <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel className="relative" defaultSize={65}>
                                 <ConnectionReactQueryProvider
                                     value={{
