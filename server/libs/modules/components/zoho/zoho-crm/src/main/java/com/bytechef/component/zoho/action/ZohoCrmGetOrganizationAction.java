@@ -17,12 +17,12 @@
 package com.bytechef.component.zoho.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.GET_ORG_DATA;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -32,34 +32,33 @@ import com.bytechef.component.definition.TypeReference;
 /**
  * @author Luka Ljubić
  */
-public class ZohoCrmGetOrganizationData {
+public class ZohoCrmGetOrganizationAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ORG_DATA)
-        .title("Get Organization data")
-        .description("Get info about your organization")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getOrganization")
+        .title("Get Organization")
+        .description("Gets information about the current organization.")
         .output(
             outputSchema(
                 object()
                     .properties(
-                        object("org")
-                            .properties(
-                                string("company_name"),
-                                string("id"),
-                                string("country"),
-                                string("city"),
-                                string("type"),
-                                string("phone"),
-                                string("website"),
-                                string("country_code")))))
-        .perform(ZohoCrmGetOrganizationData::perform);
+                        array("org")
+                            .items(
+                                object()
+                                    .properties(
+                                        string("type"),
+                                        string("id"),
+                                        string("phone"),
+                                        string("company_name"),
+                                        string("primary_email"))))))
+        .perform(ZohoCrmGetOrganizationAction::perform);
 
-    private ZohoCrmGetOrganizationData() {
+    private ZohoCrmGetOrganizationAction() {
     }
 
     protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context.http(http -> http.get("/org"))
+        return actionContext.http(http -> http.get("/org"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
