@@ -1,4 +1,4 @@
-package com.bytechef.embedded.user.web.rest.model;
+package com.bytechef.platform.user.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createApiKey_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:04.921904+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:37:54.621222+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class CreateApiKey200ResponseModel {
 
   private String secretKey;

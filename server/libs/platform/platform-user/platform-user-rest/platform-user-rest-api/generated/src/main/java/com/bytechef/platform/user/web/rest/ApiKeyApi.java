@@ -3,9 +3,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.automation.user.web.rest;
+package com.bytechef.platform.user.web.rest;
 
-import com.bytechef.automation.user.web.rest.model.CreateApiKey200ResponseModel;
+import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.user.web.rest.model.CreateApiKey200ResponseModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-20T13:40:03.740119+02:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:37:54.621222+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
-@Tag(name = "api-key", description = "The Automation User API Key Internal API")
+@Tag(name = "api-key", description = "The Platform User API Key Internal API")
 public interface ApiKeyApi {
 
     default Optional<NativeWebRequest> getRequest() {
@@ -45,7 +46,7 @@ public interface ApiKeyApi {
      * POST /api-keys : Create a new API key
      * Create a new API key.
      *
-     * @param comBytechefPlatformUserWebRestModelApiKeyModel  (required)
+     * @param apiKeyModel  (required)
      * @return The secret API key object. (status code 200)
      */
     @Operation(
@@ -67,7 +68,7 @@ public interface ApiKeyApi {
     )
     
     default ResponseEntity<CreateApiKey200ResponseModel> createApiKey(
-        @Parameter(name = "com.bytechef.platform.user.web.rest.model.ApiKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel
+        @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -126,7 +127,7 @@ public interface ApiKeyApi {
         tags = { "api-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
             })
         }
     )
@@ -136,13 +137,13 @@ public interface ApiKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<com.bytechef.platform.user.web.rest.model.ApiKeyModel> getApiKey(
+    default ResponseEntity<ApiKeyModel> getApiKey(
         @Parameter(name = "id", description = "The id of an API key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -154,19 +155,19 @@ public interface ApiKeyApi {
 
 
     /**
-     * GET /api-keys : Get API keys
+     * GET /api-keys : Get api keys
      * Get API keys.
      *
      * @return The list of API keys. (status code 200)
      */
     @Operation(
         operationId = "getApiKeys",
-        summary = "Get API keys",
+        summary = "Get api keys",
         description = "Get API keys.",
         tags = { "api-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of API keys.", content = {
-                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class)))
+                @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = ApiKeyModel.class)))
             })
         }
     )
@@ -176,13 +177,13 @@ public interface ApiKeyApi {
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<com.bytechef.platform.user.web.rest.model.ApiKeyModel>> getApiKeys(
+    default ResponseEntity<List<ApiKeyModel>> getApiKeys(
         
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ]";
+                    String exampleString = "[ { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -198,7 +199,7 @@ public interface ApiKeyApi {
      * Update an existing API key.
      *
      * @param id The id of an API key. (required)
-     * @param comBytechefPlatformUserWebRestModelApiKeyModel  (required)
+     * @param apiKeyModel  (required)
      * @return The updated API key object. (status code 200)
      */
     @Operation(
@@ -208,7 +209,7 @@ public interface ApiKeyApi {
         tags = { "api-key" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The updated API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.ApiKeyModel.class))
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
             })
         }
     )
@@ -219,14 +220,14 @@ public interface ApiKeyApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<com.bytechef.platform.user.web.rest.model.ApiKeyModel> updateApiKey(
+    default ResponseEntity<ApiKeyModel> updateApiKey(
         @Parameter(name = "id", description = "The id of an API key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "com.bytechef.platform.user.web.rest.model.ApiKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel
+        @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
+                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
