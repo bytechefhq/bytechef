@@ -78,7 +78,7 @@ const CopilotPanel = () => {
     };
 
     return (
-        <div className="relative flex h-full min-h-[50vh] w-[450px] flex-col bg-muted/50 p-3 lg:col-span-2">
+        <div className="relative flex h-full min-h-[50vh] w-[450px] flex-col bg-muted p-3 lg:col-span-2">
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
