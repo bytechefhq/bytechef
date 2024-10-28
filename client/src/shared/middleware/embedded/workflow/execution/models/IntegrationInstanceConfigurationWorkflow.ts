@@ -88,12 +88,6 @@ export interface IntegrationInstanceConfigurationWorkflow {
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The url of a static url used to trigger a workflow.
-     * @type {string}
-     * @memberof IntegrationInstanceConfigurationWorkflow
-     */
-    staticWebhookUrl?: string;
-    /**
      * The id of a workflow.
      * @type {string}
      * @memberof IntegrationInstanceConfigurationWorkflow
@@ -140,7 +134,6 @@ export function IntegrationInstanceConfigurationWorkflowFromJSONTyped(json: any,
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
-        'staticWebhookUrl': json['staticWebhookUrl'] == null ? undefined : json['staticWebhookUrl'],
         'workflowId': json['workflowId'] == null ? undefined : json['workflowId'],
         'workflowReferenceCode': json['workflowReferenceCode'] == null ? undefined : json['workflowReferenceCode'],
         'version': json['__version'] == null ? undefined : json['__version'],
@@ -163,7 +156,6 @@ export function IntegrationInstanceConfigurationWorkflowFromJSONTyped(json: any,
         'enabled': value['enabled'],
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
         'lastExecutionDate': value['lastExecutionDate'] == null ? undefined : ((value['lastExecutionDate']).toISOString()),
-        'staticWebhookUrl': value['staticWebhookUrl'],
         'workflowId': value['workflowId'],
         '__version': value['version'],
     };

@@ -1,11 +1,10 @@
-apis/AdminApiKeyApi.ts
+apis/ApiKeyApi.ts
 apis/AuthorityApi.ts
 apis/index.ts
 index.ts
-models/AdminApiKey.ts
 models/ApiKey.ts
 models/Authority.ts
-models/CreateAdminApiKey200Response.ts
+models/CreateApiKey200Response.ts
 models/SigningKey.ts
 models/index.ts
 runtime.ts

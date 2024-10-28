@@ -1,4 +1,4 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './AdminApiKeyApi';
+export * from './ApiKeyApi';
 export * from './AuthorityApi';
