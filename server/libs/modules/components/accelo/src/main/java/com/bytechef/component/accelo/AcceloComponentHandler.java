@@ -16,39 +16,97 @@
 
 package com.bytechef.component.accelo;
 
-import static com.bytechef.component.accelo.constant.AcceloConstants.ACCELO;
-import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.accelo.constant.AcceloConstants.DEPLOYMENT;
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.accelo.action.AcceloCreateCompanyAction;
-import com.bytechef.component.accelo.action.AcceloCreateContactAction;
+import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.accelo.action.AcceloCreateTaskAction;
-import com.bytechef.component.accelo.connection.AcceloConnection;
+import com.bytechef.component.accelo.util.AcceloUtils;
+import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
-import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Property;
+import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-@AutoService(ComponentHandler.class)
-public class AcceloComponentHandler implements ComponentHandler {
-
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ACCELO)
-        .title("Accelo")
-        .description(
-            "Accelo is a cloud-based platform designed to streamline operations for service businesses by " +
-                "integrating project management, CRM, and billing functionalities into one unified system.")
-        .icon("path:assets/accelo.svg")
-        .categories(ComponentCategory.CRM, ComponentCategory.PROJECT_MANAGEMENT)
-        .connection(AcceloConnection.CONNECTION_DEFINITION)
-        .actions(
-            AcceloCreateCompanyAction.ACTION_DEFINITION,
-            AcceloCreateContactAction.ACTION_DEFINITION,
-            AcceloCreateTaskAction.ACTION_DEFINITION);
+@AutoService(OpenApiComponentHandler.class)
+public class AcceloComponentHandler extends AbstractAcceloComponentHandler {
 
     @Override
-    public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+    public List<? extends ModifiableActionDefinition> getCustomActions() {
+        return List.of(AcceloCreateTaskAction.ACTION_DEFINITION);
+    }
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/accelo.svg")
+            .categories(ComponentCategory.CRM, ComponentCategory.PROJECT_MANAGEMENT);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(DEPLOYMENT)
+                + ".api.accelo.com/api/v0")
+            .authorizations(
+                authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                    .title("OAuth2 Authorization Code")
+                    .properties(
+                        string(DEPLOYMENT)
+                            .label("Deployment")
+                            .description(
+                                "Actual deployment identifier or name to target a specific deployment within the " +
+                                    "Accelo platform.")
+                            .required(true),
+                        string(CLIENT_ID)
+                            .label("Client Id")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .required(true))
+                    .authorizationUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                        ".api.accelo.com/oauth2/v0/authorize")
+                    .scopes((connection, context) -> List.of("write(all)"))
+                    .tokenUrl((connection, context) -> "https://" + connection.getRequiredString(DEPLOYMENT) +
+                        ".api.accelo.com/oauth2/v0/token"));
+    }
+
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(modifiableProperty.getName(), "__item")) {
+            Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
+                ((ModifiableObjectProperty) modifiableProperty).getProperties();
+
+            for (BaseProperty baseProperty : propertiesOptional.get()) {
+                if (Objects.equals(baseProperty.getName(), "company_id")) {
+                    ((ModifiableStringProperty) baseProperty)
+                        .options((ActionOptionsFunction<String>) AcceloUtils::getCompanyIdOptions);
+                }
+            }
+        }
+
+        return modifiableProperty;
     }
 }

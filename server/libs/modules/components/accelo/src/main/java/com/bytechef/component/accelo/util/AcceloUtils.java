@@ -17,6 +17,8 @@
 package com.bytechef.component.accelo.util;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
+import static com.bytechef.component.accelo.constant.AcceloConstants.ID;
+import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
@@ -30,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class AcceloUtils {
 
@@ -57,7 +59,7 @@ public class AcceloUtils {
             if (body.get("response") instanceof List<?> list) {
                 for (Object item : list) {
                     if (item instanceof Map<?, ?> map) {
-                        options.add(option((String) map.get("title"), (String) map.get("id")));
+                        options.add(option((String) map.get(TITLE), (String) map.get(ID)));
                     }
                 }
             }
@@ -81,7 +83,7 @@ public class AcceloUtils {
         if (body.get("response") instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get("name"), (String) map.get(ID)));
                 }
             }
         }

@@ -16,16 +16,8 @@
 
 package com.bytechef.component.accelo;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
-
 /**
- * @author Monika Domiter
+ * @generated
  */
-class AcceloComponentHandlerTest {
-
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/accelo_v1.json", new AcceloComponentHandler().getDefinition());
-    }
+public class AcceloComponentHandlerTest extends AbstractAcceloComponentHandlerTest {
 }

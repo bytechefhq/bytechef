@@ -18,7 +18,6 @@ package com.bytechef.component.accelo.action;
 
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_ID;
 import static com.bytechef.component.accelo.constant.AcceloConstants.AGAINST_TYPE;
-import static com.bytechef.component.accelo.constant.AcceloConstants.CREATE_TASK;
 import static com.bytechef.component.accelo.constant.AcceloConstants.DATE_STARTED;
 import static com.bytechef.component.accelo.constant.AcceloConstants.TITLE;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -32,18 +31,18 @@ import com.bytechef.component.accelo.util.AcceloUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class AcceloCreateTaskAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TASK)
-        .title("Create task")
-        .description("Creates a new task")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
+        .title("Create Task")
+        .description("Creates a new task.")
         .properties(
             string(TITLE)
                 .label("Title")
@@ -59,7 +58,7 @@ public class AcceloCreateTaskAction {
                 .label("Against object")
                 .description("Object the task is against.")
                 .optionsLookupDependsOn(AGAINST_TYPE)
-                .options((OptionsDataSource.ActionOptionsFunction<String>) AcceloUtils::getAgainstIdOptions)
+                .options((ActionOptionsFunction<String>) AcceloUtils::getAgainstIdOptions)
                 .required(true),
             date(DATE_STARTED)
                 .label("Start date")
