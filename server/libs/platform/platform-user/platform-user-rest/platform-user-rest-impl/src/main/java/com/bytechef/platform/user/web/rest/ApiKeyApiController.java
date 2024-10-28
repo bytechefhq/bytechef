@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.user.web.rest;
+package com.bytechef.platform.user.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.embedded.user.web.rest.model.CreateApiKey200ResponseModel;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.facade.ApiKeyFacade;
 import com.bytechef.platform.user.service.ApiKeyService;
-import com.bytechef.platform.user.web.rest.AbstractApiKeyApiController;
 import com.bytechef.platform.user.web.rest.model.ApiKeyModel;
+import com.bytechef.platform.user.web.rest.model.CreateApiKey200ResponseModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -34,51 +34,68 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController("com.bytechef.embedded.user.web.rest.ApiKeyApiController")
-@RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/internal")
+@RestController
+@RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
-public class ApiKeyApiController extends AbstractApiKeyApiController implements ApiKeyApi {
+public class ApiKeyApiController implements ApiKeyApi {
 
     private final ApiKeyFacade apiKeyFacade;
+    private final ApiKeyService apiKeyService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ApiKeyApiController(
         ApiKeyFacade apiKeyFacade, ApiKeyService apiKeyService, ConversionService conversionService) {
 
-        super(apiKeyService, conversionService);
-
         this.apiKeyFacade = apiKeyFacade;
+        this.apiKeyService = apiKeyService;
         this.conversionService = conversionService;
     }
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel appEventModel) {
+    public ResponseEntity<CreateApiKey200ResponseModel> createApiKey(ApiKeyModel apiKeyModel) {
         return ResponseEntity.ok(
             new CreateApiKey200ResponseModel().secretKey(
-                apiKeyFacade.create(conversionService.convert(appEventModel, ApiKey.class), AppType.EMBEDDED)));
+                apiKeyFacade.create(conversionService.convert(apiKeyModel, ApiKey.class), null)));
     }
 
     @Override
     public ResponseEntity<Void> deleteApiKey(Long id) {
-        return super.doDeleteApiKey(id);
+        apiKeyService.delete(id);
+
+        return ResponseEntity.ok()
+            .build();
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<ApiKeyModel> getApiKey(Long id) {
-        return super.doGetApiKey(id);
+        ApiKeyModel adminApiKeyModel = conversionService.convert(
+            apiKeyService.getApiKey(id), ApiKeyModel.class);
+
+        return ResponseEntity.ok(adminApiKeyModel.secretKey(obfuscate(adminApiKeyModel.getSecretKey())));
     }
 
     @Override
     public ResponseEntity<List<ApiKeyModel>> getApiKeys() {
-        return super.doGetApiKeys(AppType.EMBEDDED);
+        return ResponseEntity.ok(
+            CollectionUtils.map(
+                apiKeyService.getApiKeys(),
+                apiKey -> conversionService.convert(apiKey, ApiKeyModel.class)
+                    .secretKey(obfuscate(apiKey.getSecretKey()))));
     }
 
     @Override
-    public ResponseEntity<ApiKeyModel> updateApiKey(
-        Long id, ApiKeyModel comBytechefPlatformUserWebRestModelApiKeyModel) {
+    @SuppressFBWarnings("NP")
+    public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class)),
+                ApiKeyModel.class));
+    }
 
-        return super.doUpdateApiKey(id, comBytechefPlatformUserWebRestModelApiKeyModel);
+    private static String obfuscate(String secretKey) {
+        return StringUtils.obfuscate(secretKey, 26, 6);
     }
 }

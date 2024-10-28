@@ -20,6 +20,7 @@ import com.bytechef.platform.security.web.filter.FilterBeforeContributor;
 import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@Order(1)
 public class ConnectedUserFilterBeforeContributor implements FilterBeforeContributor {
 
     private final SigningKeyService signingKeyService;
