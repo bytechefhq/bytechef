@@ -23,7 +23,6 @@ import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
-import {twMerge} from 'tailwind-merge';
 
 interface ApiCollectionListItemProps {
     apiCollection: ApiCollection;
@@ -139,14 +138,7 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
 
                     <div className="flex items-center justify-end gap-x-6">
                         <div className="flex flex-col items-end gap-y-4">
-                            <Badge
-                                className={twMerge(
-                                    apiCollection.enabled && 'bg-success text-success-foreground hover:bg-success'
-                                )}
-                                variant="secondary"
-                            >
-                                {apiCollection.enabled ? 'Enabled' : 'Disabled'}
-                            </Badge>
+                            <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -169,8 +161,6 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                                 <TooltipContent>Last Updated Date</TooltipContent>
                             </Tooltip>
                         </div>
-
-                        <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
 
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
