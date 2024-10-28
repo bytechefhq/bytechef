@@ -29,47 +29,50 @@ import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class ZohoCrmUtils {
 
     private ZohoCrmUtils() {
     }
 
-    public static List<Option<String>> getRoleOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
-
-        List<Map<String, Object>> body = context
-            .http(http -> http.get("/settings/roles"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        return getOptions(body);
-    }
-
     public static List<Option<String>> getProfileOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        ActionContext actionContext) {
 
-        List<Map<String, Object>> body = context
+        Map<String, Object> body = actionContext
             .http(http -> http.get("/settings/profiles"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(body);
-    }
-
-    private static List<Option<String>> getOptions(List<Map<String, Object>> body) {
         List<Option<String>> options = new ArrayList<>();
 
-        for (Object item : body) {
-            if (item instanceof Map<?, ?> map) {
-                String name = (String) map.get("name");
-
-                options.add(option(name, name));
+        if (body.get("profiles") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                }
             }
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getRoleOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        ActionContext actionContext) {
+
+        Map<String, List<Map<String, Object>>> body = actionContext
+            .http(http -> http.get("/settings/roles"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        for (Map<String, Object> item : body.get("roles")) {
+            options.add(option((String) item.get("name"), (String) item.get("id")));
         }
 
         return options;
