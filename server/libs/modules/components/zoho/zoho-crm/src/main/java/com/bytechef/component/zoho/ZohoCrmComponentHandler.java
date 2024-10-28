@@ -18,32 +18,33 @@ package com.bytechef.component.zoho;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.zoho.connection.ZohoCrmConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.zoho.constant.ZohoCrmConstants.ZOHO_CRM;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.zoho.action.ZohoCrmCreateUserAction;
-import com.bytechef.component.zoho.action.ZohoCrmGetAllUsersAction;
-import com.bytechef.component.zoho.action.ZohoCrmGetOrganizationData;
+import com.bytechef.component.zoho.action.ZohoCrmAddUserAction;
+import com.bytechef.component.zoho.action.ZohoCrmGetOrganizationAction;
+import com.bytechef.component.zoho.action.ZohoCrmListUsersAction;
 import com.google.auto.service.AutoService;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class ZohoCrmComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ZOHO_CRM)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("zohoCrm")
         .title("Zoho CRM")
         .description(
-            "Zoho CRM acts as a single repository to bring your sales, marketing, and customer support activities together, and streamline your process, policy, and people ...")
+            "Zoho CRM is a cloud-based customer relationship management platform that integrates sales, marketing, " +
+                "and customer support activities to streamline business processes and enhance team.")
         .categories(ComponentCategory.CRM)
         .connection(CONNECTION_DEFINITION)
         .actions(
-            ZohoCrmGetAllUsersAction.ACTION_DEFINITION,
-            ZohoCrmCreateUserAction.ACTION_DEFINITION,
-            ZohoCrmGetOrganizationData.ACTION_DEFINITION)
+            ZohoCrmAddUserAction.ACTION_DEFINITION,
+            ZohoCrmGetOrganizationAction.ACTION_DEFINITION,
+            ZohoCrmListUsersAction.ACTION_DEFINITION)
         .icon("path:assets/zoho-crm.svg");
 
     @Override
