@@ -38,7 +38,6 @@ dependencies {
     implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
     implementation(project(":server:libs:automation:automation-security-web:automation-security-web-impl"))
     implementation(project(":server:libs:automation:automation-swagger"))
-    implementation(project(":server:libs:automation:automation-user:automation-user-rest"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service"))

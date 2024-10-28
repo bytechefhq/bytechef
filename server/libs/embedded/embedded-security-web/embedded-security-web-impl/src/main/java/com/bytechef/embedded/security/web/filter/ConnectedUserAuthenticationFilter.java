@@ -17,6 +17,7 @@
 package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import com.bytechef.platform.tenant.util.TenantUtils;
 import com.bytechef.platform.user.domain.TenantKey;
@@ -30,6 +31,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 
@@ -64,6 +66,16 @@ public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenti
         TenantKey tenantKey = TenantKey.parse(header.getKeyId());
 
         return new ConnectedUserAuthenticationToken(externalUserId, getEnvironment(request), tenantKey.getTenantId());
+    }
+
+    private Environment getEnvironment(HttpServletRequest request) {
+        String environment = request.getHeader("x-environment");
+
+        if (StringUtils.isNotBlank(environment)) {
+            return Environment.valueOf(environment.toUpperCase());
+        }
+
+        return Environment.PRODUCTION;
     }
 
     private Jws<Claims> getJws(String secretKey) {

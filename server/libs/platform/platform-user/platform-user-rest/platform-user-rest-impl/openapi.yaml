@@ -6,60 +6,60 @@ info:
 servers:
 - url: "/api/platform/internal"
 tags:
-  - name: "admin-api-key"
-    description: "The Platform User Admin API Key Internal API"
+  - name: "api-key"
+    description: "The Platform User API Key Internal API"
   - name: "authority"
     description: "The Platform User Authority Internal API"
 paths:
-  /admin-api-keys:
+  /api-keys:
     get:
-      description: "Get admin API keys."
-      summary: "Get admin api keys"
+      description: "Get API keys."
+      summary: "Get api keys"
       tags:
-        - "admin-api-key"
-      operationId: "getAdminApiKeys"
+        - "api-key"
+      operationId: "getApiKeys"
       responses:
         "200":
-          description: "The list of admin API keys."
+          description: "The list of API keys."
           content:
             application/json:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/AdminApiKey"
+                  $ref: "#/components/schemas/ApiKey"
     post:
-      description: "Create a new admin API key."
-      summary: "Create a new admin API key"
+      description: "Create a new API key."
+      summary: "Create a new API key"
       tags:
-        - "admin-api-key"
-      operationId: "createAdminApiKey"
+        - "api-key"
+      operationId: "createApiKey"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AdminApiKey"
+              $ref: "#/components/schemas/ApiKey"
         required: true
       responses:
         "200":
-          description: "The secret admin API key object."
+          description: "The secret API key object."
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
                   secretKey:
-                    description: "The secret admin API key."
+                    description: "The secret API key."
                     type: "string"
-  /admin-api-keys/{id}:
+  /api-keys/{id}:
     delete:
-      description: "Delete an admin API key."
-      summary: "Delete an admin API key"
+      description: "Delete an API key."
+      summary: "Delete an API key"
       tags:
-        - "admin-api-key"
-      operationId: "deleteAdminApiKey"
+        - "api-key"
+      operationId: "deleteApiKey"
       parameters:
         - name: "id"
-          description: "The id of an admin API key."
+          description: "The id of an API key."
           in: "path"
           required: true
           schema:
@@ -69,14 +69,14 @@ paths:
         "200":
           description: "Successful operation."
     get:
-      description: "Get an admin API key by id."
-      summary: "Get an admin API key by id"
+      description: "Get an API key by id."
+      summary: "Get an API key by id"
       tags:
-        - "admin-api-key"
-      operationId: "getAdminApiKey"
+        - "api-key"
+      operationId: "getApiKey"
       parameters:
         - name: "id"
-          description: "The id of an admin API key."
+          description: "The id of an API key."
           in: "path"
           required: true
           schema:
@@ -84,20 +84,20 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The admin API key object."
+          description: "The API key object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminApiKey"
+                $ref: "#/components/schemas/ApiKey"
     put:
-      description: "Update an existing admin API key."
-      summary: "Update an existing admin API key"
+      description: "Update an existing API key."
+      summary: "Update an existing API key"
       tags:
-        - "admin-api-key"
-      operationId: "updateAdminApiKey"
+        - "api-key"
+      operationId: "updateApiKey"
       parameters:
         - name: "id"
-          description: "The id of an admin API key."
+          description: "The id of an API key."
           in: "path"
           required: true
           schema:
@@ -107,15 +107,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AdminApiKey"
+              $ref: "#/components/schemas/ApiKey"
         required: true
       responses:
         "200":
-          description: "The updated admin API key object."
+          description: "The updated API key object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdminApiKey"
+                $ref: "#/components/schemas/ApiKey"
   /authorities:
     get:
       description: "Get all authorities."
@@ -134,48 +134,6 @@ paths:
                   $ref: "#/components/schemas/Authority"
 components:
   schemas:
-    AdminApiKey:
-      description: "Contains generated key required for calling public Platform API."
-      type: "object"
-      required:
-        - name
-        - secretKey
-      properties:
-        createdBy:
-          description: "The created by."
-          type: "string"
-          readOnly: true
-        createdDate:
-          description: "The created date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        id:
-          description: "The id of an admin api key."
-          type: "integer"
-          format: "int64"
-          readOnly: true
-        lastModifiedBy:
-          description: "The last modified by."
-          type: "string"
-          readOnly: true
-        lastModifiedDate:
-          description: "The last modified date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        lastUsedDate:
-          description: "The last used date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
-        name:
-          description: "The name of an admin api key."
-          type: "string"
-        secretKey:
-          description: "The preview of secret admin api key."
-          type: "string"
-          readOnly: true
     ApiKey:
       description: "Contains generated key required for calling API."
       type: "object"

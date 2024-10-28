@@ -17,7 +17,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     inputSpec.set( "$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
     modelPackage.set("com.bytechef.embedded.configuration.public_.web.rest.model")
-    outputDir.set("$projectDir/embedded-configuration-public-rest-api/generated")
+    outputDir.set("$projectDir/generated")
 }
 
 sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")

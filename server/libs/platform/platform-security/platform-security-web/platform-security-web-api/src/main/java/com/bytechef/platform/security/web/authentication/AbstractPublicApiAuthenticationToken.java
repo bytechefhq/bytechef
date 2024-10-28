@@ -16,8 +16,6 @@
 
 package com.bytechef.platform.security.web.authentication;
 
-import com.bytechef.platform.constant.AppType;
-import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -28,17 +26,13 @@ import org.springframework.security.core.userdetails.User;
  */
 public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthenticationToken {
 
-    private Environment environment;
     private String tenantId;
-    private AppType type;
     private User user;
 
-    public AbstractPublicApiAuthenticationToken(Environment environment, String tenantId, AppType type) {
+    public AbstractPublicApiAuthenticationToken(String tenantId) {
         super(List.of());
 
-        this.environment = environment;
         this.tenantId = tenantId;
-        this.type = type;
     }
 
     @SuppressFBWarnings("EI")
@@ -56,10 +50,6 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
         return null;
     }
 
-    public Environment getEnvironment() {
-        return environment;
-    }
-
     @Override
     @SuppressFBWarnings("EI")
     public Object getPrincipal() {
@@ -68,9 +58,5 @@ public abstract class AbstractPublicApiAuthenticationToken extends AbstractAuthe
 
     public String getTenantId() {
         return tenantId;
-    }
-
-    public AppType getType() {
-        return type;
     }
 }

@@ -16,7 +16,6 @@
 
 package com.bytechef.embedded.security.web.authentication;
 
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -27,17 +26,23 @@ import org.springframework.security.core.userdetails.User;
  */
 public class ConnectedUserAuthenticationToken extends AbstractPublicApiAuthenticationToken {
 
+    private Environment environment;
     private String externalUserId;
 
     public ConnectedUserAuthenticationToken(String externalUserId, Environment environment, String tenantId) {
-        super(environment, tenantId, AppType.EMBEDDED);
+        super(tenantId);
 
+        this.environment = environment;
         this.externalUserId = externalUserId;
     }
 
     @SuppressFBWarnings("EI")
     public ConnectedUserAuthenticationToken(User user) {
         super(user);
+    }
+
+    public Environment getEnvironment() {
+        return environment;
     }
 
     public String getExternalUserId() {
