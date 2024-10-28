@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
-
 /**
  * Contains generated key required for calling API.
  * @export
@@ -39,12 +31,6 @@ export interface ApiKey {
      * @memberof ApiKey
      */
     readonly createdDate?: Date;
-    /**
-     * 
-     * @type {Environment}
-     * @memberof ApiKey
-     */
-    environment?: Environment;
     /**
      * The id of an API key.
      * @type {number}
@@ -83,8 +69,6 @@ export interface ApiKey {
     readonly secretKey: string;
 }
 
-
-
 /**
  * Check if a given object implements the ApiKey interface.
  */
@@ -106,7 +90,6 @@ export function ApiKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ap
         
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -127,7 +110,6 @@ export function ApiKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ap
 
     return {
         
-        'environment': EnvironmentToJSON(value['environment']),
         'name': value['name'],
     };
 }
