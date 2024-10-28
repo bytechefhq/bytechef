@@ -1,10 +1,9 @@
 README.md
 pom.xml
-src/main/java/com/bytechef/platform/user/web/rest/AdminApiKeyApi.java
+src/main/java/com/bytechef/platform/user/web/rest/ApiKeyApi.java
 src/main/java/com/bytechef/platform/user/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/user/web/rest/AuthorityApi.java
-src/main/java/com/bytechef/platform/user/web/rest/model/AdminApiKeyModel.java
 src/main/java/com/bytechef/platform/user/web/rest/model/ApiKeyModel.java
 src/main/java/com/bytechef/platform/user/web/rest/model/AuthorityModel.java
-src/main/java/com/bytechef/platform/user/web/rest/model/CreateAdminApiKey200ResponseModel.java
+src/main/java/com/bytechef/platform/user/web/rest/model/CreateApiKey200ResponseModel.java
 src/main/java/com/bytechef/platform/user/web/rest/model/SigningKeyModel.java
