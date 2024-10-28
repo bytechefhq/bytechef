@@ -27,8 +27,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,16 +37,15 @@ import org.junit.jupiter.api.Test;
  */
 class ZohoCrmUtilTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final List<Option<String>> expectedOptions = List.of(option("option", "123"));
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
     public void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -57,44 +54,22 @@ class ZohoCrmUtilTest {
     }
 
     @Test
-    void testGetRoleOptions() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        Map<String, Object> items = new LinkedHashMap<>();
-
-        items.put("name", "taskName");
-        items.put("id", "123");
-
-        body.add(items);
-
+    void testGetProfileOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("taskName", "taskName"));
+            .thenReturn(Map.of("profiles", List.of(Map.of("name", "option", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            ZohoCrmUtils.getRoleOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            ZohoCrmUtils.getProfileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     @Test
-    void testGetProfileOptions() {
-        List<Map<String, Object>> body = new ArrayList<>();
-        Map<String, Object> items = new LinkedHashMap<>();
-        items.put("name", "taskName");
-        items.put("id", "123");
-        body.add(items);
-
+    void testGetRoleOptions() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("taskName", "taskName"));
+            .thenReturn(Map.of("roles", List.of(Map.of("name", "option", "id", "123"))));
 
         assertEquals(
             expectedOptions,
-            ZohoCrmUtils.getProfileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+            ZohoCrmUtils.getRoleOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 }
