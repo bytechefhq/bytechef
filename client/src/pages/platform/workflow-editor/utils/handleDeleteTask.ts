@@ -12,6 +12,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {Node, NodeProps} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
     componentNames: Array<string>;
@@ -48,10 +49,6 @@ export default function handleDeleteTask({
         return;
     }
 
-    if (!workflow?.definition) {
-        return;
-    }
-
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow?.definition);
 
     const {tasks: workflowTasks} = workflowDefinition;
@@ -63,30 +60,47 @@ export default function handleDeleteTask({
     let updatedTasks = workflowTasks;
 
     if (data.conditionData) {
-        updatedTasks = workflowTasks.map((task: WorkflowTaskType) => {
-            if (task.name !== data.conditionData.conditionId) {
-                return task;
-            }
+        const parentConditionTask = getParentConditionTask(workflowTasks, data.conditionData.conditionId);
+        const taskConditionCase = data.conditionData.conditionCase;
 
-            const {conditionCase} = data.conditionData;
+        if (parentConditionTask?.parameters) {
+            parentConditionTask.parameters[taskConditionCase as string] = (
+                parentConditionTask.parameters[taskConditionCase] as Array<WorkflowTask>
+            ).filter((childTask) => childTask.name !== data.name);
 
-            let {caseFalse, caseTrue} = (task as ConditionTaskDispatcherType).parameters;
+            updatedTasks = workflowTasks.map((task) => {
+                if (task.name !== parentConditionTask.name) {
+                    return task;
+                }
 
-            if (conditionCase === CONDITION_CASE_TRUE) {
-                caseTrue = caseTrue.filter((childTask) => childTask.name !== data.name);
-            } else if (conditionCase === CONDITION_CASE_FALSE) {
-                caseFalse = caseFalse.filter((childTask) => childTask.name !== data.name);
-            }
+                return parentConditionTask;
+            }) as Array<WorkflowTaskType>;
+        } else {
+            updatedTasks = workflowTasks.map((task) => {
+                if (task.name !== data.conditionData.conditionId) {
+                    return task;
+                }
 
-            return {
-                ...task,
-                parameters: {
-                    ...task.parameters,
-                    caseFalse,
-                    caseTrue,
-                },
-            };
-        });
+                const {conditionCase} = data.conditionData;
+
+                let {caseFalse, caseTrue} = (task as ConditionTaskDispatcherType).parameters;
+
+                if (conditionCase === CONDITION_CASE_TRUE) {
+                    caseTrue = caseTrue.filter((childTask) => childTask.name !== data.name);
+                } else if (conditionCase === CONDITION_CASE_FALSE) {
+                    caseFalse = caseFalse.filter((childTask) => childTask.name !== data.name);
+                }
+
+                return {
+                    ...task,
+                    parameters: {
+                        ...task.parameters,
+                        caseFalse,
+                        caseTrue,
+                    },
+                };
+            });
+        }
     } else {
         updatedTasks = workflowTasks.filter((task: WorkflowTask) => task.name !== data.name);
     }

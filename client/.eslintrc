@@ -79,6 +79,7 @@
                     "min-w-select-trigger-width",
                     "max-w-tooltip-lg",
                     "max-w-tooltip-sm",
+                    "nodrag",
                     "nowheel",
                     "text-destructive",
                     "text-muted-foreground",

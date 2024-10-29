@@ -16,7 +16,6 @@ interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
     currentNode?: NodeType;
     edge?: boolean;
-    getNode: (id: string) => Node | undefined;
     getNodes: () => Array<Node>;
     queryClient: QueryClient;
     setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
@@ -29,7 +28,6 @@ export default async function handleConditionClick({
     clickedItem,
     currentNode,
     edge,
-    getNode,
     getNodes,
     queryClient,
     setWorkflow,
@@ -52,66 +50,86 @@ export default async function handleConditionClick({
         return;
     }
 
-    const {componentNames} = workflow;
+    const nodes = getNodes();
+
+    const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
+
+    const newConditionNodeData = {
+        ...clickedTaskDispatcherDefinition,
+        componentName: clickedItem.name,
+        icon: (
+            <>
+                {clickedItem.icon ? (
+                    <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
+                ) : (
+                    <Component1Icon className="size-9 text-gray-700" />
+                )}
+            </>
+        ),
+        label: clickedItem?.title,
+        name: workflowNodeName,
+        taskDispatcher: true,
+        type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
+    };
+
+    const {componentNames, tasks} = workflow;
+
+    let nodeIndex = getNodes().length;
 
     if (edge) {
-        // TODO
-    } else {
-        const sourceNode = getNode(sourceNodeId);
-        const nodes = getNodes();
+        sourceNodeId = sourceNodeId.split('=')[0];
 
-        if (!sourceNode) {
+        nodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId);
+    }
+
+    let conditionId: string | undefined;
+
+    if (sourceNodeId.includes('condition') && sourceNodeId.includes('placeholder')) {
+        conditionId = sourceNodeId.split('-')[0];
+
+        if (!conditionId || !tasks) {
             return;
         }
 
-        const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
+        nodeIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
 
-        setWorkflow({
-            ...workflow,
-            componentNames: [...componentNames, clickedItem.name],
-            nodeNames: [...workflow.nodeNames, workflowNodeName],
-        });
-
-        const newConditionNodeData = {
-            ...clickedTaskDispatcherDefinition,
-            componentName: clickedItem.name,
-            icon: (
-                <>
-                    {clickedItem.icon ? (
-                        <InlineSVG className="size-9 text-gray-700" src={clickedItem.icon} />
-                    ) : (
-                        <Component1Icon className="size-9 text-gray-700" />
-                    )}
-                </>
-            ),
-            label: clickedItem?.title,
-            name: workflowNodeName,
-            taskDispatcher: true,
-            type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
-        };
-
-        saveWorkflowDefinition({
-            nodeData: {
-                ...newConditionNodeData,
-                parameters: {
-                    ...getParametersWithDefaultValues({
-                        properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
-                    }),
-                    caseFalse: [],
-                    caseTrue: [],
-                },
-            },
-            onSuccess: () => {
-                queryClient.invalidateQueries({
-                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                        id: workflow.id!,
-                        lastWorkflowNodeName: currentNode?.name,
-                    }),
-                });
-            },
-            queryClient,
-            updateWorkflowMutation,
-            workflow,
-        });
+        if (sourceNodeId.includes('left') || sourceNodeId.includes('right')) {
+            nodeIndex = parseInt(sourceNodeId.split('-')[3]);
+        } else {
+            conditionId = undefined;
+        }
     }
+
+    setWorkflow({
+        ...workflow,
+        componentNames: [...componentNames, clickedItem.name],
+        nodeNames: [...workflow.nodeNames, workflowNodeName],
+    });
+
+    saveWorkflowDefinition({
+        conditionId,
+        nodeData: {
+            ...newConditionNodeData,
+            parameters: {
+                ...getParametersWithDefaultValues({
+                    properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                }),
+                caseFalse: [],
+                caseTrue: [],
+            },
+        },
+        nodeIndex,
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                    id: workflow.id!,
+                    lastWorkflowNodeName: currentNode?.name,
+                }),
+            });
+        },
+        placeholderId: sourceNodeId,
+        queryClient,
+        updateWorkflowMutation,
+        workflow,
+    });
 }

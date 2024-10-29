@@ -41,7 +41,7 @@ const WorkflowNodesPopoverMenu = ({
 
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    const {getNode, getNodes} = useReactFlow();
+    const {getNodes} = useReactFlow();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -59,7 +59,6 @@ const WorkflowNodesPopoverMenu = ({
                 clickedItem,
                 currentNode,
                 edge,
-                getNode,
                 getNodes,
                 queryClient,
                 setWorkflow,
