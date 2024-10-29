@@ -26,7 +26,6 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.UPLOAD_FILE;
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,7 +42,7 @@ import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtil
  */
 public class MicrosoftSharePointUploadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload file")
         .description("Upload file to Microsoft SharePoint folder.")
         .properties(

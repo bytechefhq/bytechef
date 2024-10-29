@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
@@ -43,7 +42,7 @@ import java.util.Map;
  */
 public class MicrosoftSharePointCreateFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_FOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
         .title("Create folder")
         .description("Creates a new folder at path you specify.")
         .properties(

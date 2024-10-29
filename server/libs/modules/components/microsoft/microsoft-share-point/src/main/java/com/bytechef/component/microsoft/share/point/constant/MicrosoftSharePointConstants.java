@@ -28,9 +28,6 @@ import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtil
 public class MicrosoftSharePointConstants {
 
     public static final String COLUMNS = "columns";
-    public static final String CREATE_FOLDER = "createFolder";
-    public static final String CREATE_LIST = "createList";
-    public static final String CREATE_LIST_ITEM = "createListItem";
     public static final String DESCRIPTION = "description";
     public static final String DISPLAY_NAME = "displayName";
     public static final String FIELDS = "fields";
@@ -38,13 +35,11 @@ public class MicrosoftSharePointConstants {
     public static final String FOLDER = "folder";
     public static final String ID = "id";
     public static final String LIST_ID = "listId";
-    public static final String MICROSOFT_SHARE_POINT = "microsoftSharePoint";
     public static final String NAME = "name";
     public static final String PARENT_FOLDER = "parentFolder";
     public static final String READ_ONLY = "readOnly";
     public static final String REQUIRED = "required";
     public static final String SITE_ID = "siteId";
-    public static final String UPLOAD_FILE = "uploadFile";
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
