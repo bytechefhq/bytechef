@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.one.drive;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.MICROSOFT_ONEDRIVE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -36,7 +35,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MicrosoftOneDriveComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MICROSOFT_ONEDRIVE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("microsoftOneDrive")
         .title("Microsoft OneDrive")
         .description(
             "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing " +
