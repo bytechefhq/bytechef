@@ -32,13 +32,13 @@ public abstract class AbstractEncryptionKey implements EncryptionKey {
     @Override
     public String getKey() {
         if (key == null) {
-            key = fetchKey();
+            key = doGetKey();
         }
 
         return key;
     }
 
-    protected abstract String fetchKey();
+    protected abstract String doGetKey();
 
     protected String generateKey() throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");

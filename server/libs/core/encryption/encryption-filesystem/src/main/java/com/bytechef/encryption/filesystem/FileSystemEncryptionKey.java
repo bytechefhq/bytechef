@@ -50,7 +50,7 @@ public class FileSystemEncryptionKey extends AbstractEncryptionKey {
     }
 
     @Override
-    protected String fetchKey() {
+    protected String doGetKey() {
         return key;
     }
 }
