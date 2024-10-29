@@ -31,6 +31,7 @@ public class CopperConstants {
     public static final String COMPANY_ID = "company_id";
     public static final String CONTACT_TYPE_ID = "contact_type_id";
     public static final String COUNTRY = "country";
+    public static final String CREATE_TASK = "createTask";
     public static final String DETAILS = "details";
     public static final String EMAIL = "email";
     public static final String EMAILS = "emails";
@@ -52,6 +53,12 @@ public class CopperConstants {
     public static final String TYPE = "type";
     public static final String URL = "url";
     public static final String WEBSITES = "websites";
+    public static final String RELATED_RESOURCE = "related_resource";
+    public static final String DUE_DATE = "due_date";
+    public static final String REMINDER_DATE = "reminder_date";
+    public static final String PRIORITY = "priority";
+    public static final String STATUS = "status";
+    public static final String CUSTOM_FIELDS = "custom_fields";
 
     private CopperConstants() {
     }

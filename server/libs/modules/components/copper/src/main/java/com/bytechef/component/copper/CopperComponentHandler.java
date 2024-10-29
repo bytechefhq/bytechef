@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.copper.action.CopperCreateActivityAction;
 import com.bytechef.component.copper.action.CopperCreateCompanyAction;
 import com.bytechef.component.copper.action.CopperCreatePersonAction;
+import com.bytechef.component.copper.action.CopperCreateTaskAction;
 import com.bytechef.component.copper.connection.CopperConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -46,7 +47,8 @@ public class CopperComponentHandler implements ComponentHandler {
         .actions(
             CopperCreateActivityAction.ACTION_DEFINITION,
             CopperCreateCompanyAction.ACTION_DEFINITION,
-            CopperCreatePersonAction.ACTION_DEFINITION);
+            CopperCreatePersonAction.ACTION_DEFINITION,
+            CopperCreateTaskAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
