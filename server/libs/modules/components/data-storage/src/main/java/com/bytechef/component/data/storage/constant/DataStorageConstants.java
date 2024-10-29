@@ -19,7 +19,6 @@ package com.bytechef.component.data.storage.constant;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.Option;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 
 /**
@@ -28,17 +27,15 @@ import java.util.List;
 public class DataStorageConstants {
 
     public static final String APPEND_LIST_AS_SINGLE_ITEM = "appendListAsSingleItem";
-    public static final String DATA_STORAGE = "dataStorage";
     public static final String DEFAULT_VALUE = "defaultValue";
     public static final String INDEX = "index";
     public static final String KEY = "key";
     public static final String SCOPE = "scope";
-    public static final String VALUE = "value";
-    public static final String VALUE_TO_ADD = "valueToAdd";
     public static final String TIMEOUT = "timeout";
     public static final String TYPE = "type";
+    public static final String VALUE = "value";
+    public static final String VALUE_TO_ADD = "valueToAdd";
 
-    @SuppressFBWarnings("MS")
     public static final List<Option<String>> SCOPE_OPTIONS = List.of(
         option("Current Execution", "CURRENT_EXECUTION"),
         option("Workflow", "WORKFLOW"),

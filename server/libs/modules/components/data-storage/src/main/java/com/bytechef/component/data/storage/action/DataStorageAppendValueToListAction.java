@@ -19,6 +19,7 @@ package com.bytechef.component.data.storage.action;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.APPEND_LIST_AS_SINGLE_ITEM;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.TYPE_OPTIONS;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE;
@@ -34,7 +35,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
-import com.bytechef.component.data.storage.constant.DataStorageConstants;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
@@ -57,12 +57,13 @@ public class DataStorageAppendValueToListAction {
             string(SCOPE)
                 .label("Scope")
                 .description("The namespace for appending a value.")
-                .options(DataStorageConstants.SCOPE_OPTIONS)
+                .options(SCOPE_OPTIONS)
                 .required(true),
             string(KEY)
                 .label("Key")
                 .description(
-                    "The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.")
+                    "The identifier of a list must be unique within the chosen scope, or a new value will " +
+                        "overwrite the existing one.")
                 .required(true),
             integer(TYPE)
                 .label("Type")
@@ -121,7 +122,8 @@ public class DataStorageAppendValueToListAction {
             bool(APPEND_LIST_AS_SINGLE_ITEM)
                 .label("Append a list as a single item")
                 .description(
-                    "When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists."))
+                    "When set to true, and the value is a list, it will be added as a single value rather than " +
+                        "concatenating the lists."))
         .perform(DataStorageAppendValueToListAction::perform);
 
     protected static Object perform(

@@ -118,7 +118,8 @@ public class DataStorageAwaitGetValueAction {
             integer(TIMEOUT)
                 .label("Timeout (1 to 300 sec)")
                 .description(
-                    "If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.")
+                    "If a value is not found within the specified time, the action returns a null value. Therefore, " +
+                        "the maximum wait time should be set accordingly.")
                 .minValue(1)
                 .maxValue(300)
                 .required(true))
