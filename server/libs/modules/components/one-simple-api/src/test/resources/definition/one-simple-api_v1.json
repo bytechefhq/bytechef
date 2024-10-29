@@ -6,66 +6,17 @@
   "customAction" : null,
   "customActionHelp" : null,
   "description" : "A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!",
-  "icon" : "path:assets/osa_v1.svg",
+  "icon" : "path:assets/one-simple-api.svg",
   "tags" : null,
   "metadata" : null,
   "name" : "oneSimpleAPI",
   "resources" : null,
   "version" : 1,
   "title" : "One Simple API",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Access Token that is given to you when you create a API Token in OneSimpleApi",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Access Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "One Simple API Connection",
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : { },
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Convert your currency into any other",
+    "description" : "Convert currency from one to another.",
     "help" : null,
     "metadata" : null,
     "name" : "currencyConverter",
@@ -117,7 +68,7 @@
             "hidden" : null,
             "metadata" : { },
             "required" : null,
-            "name" : "to_currency",
+            "name" : "from_value",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -158,6 +109,28 @@
             "metadata" : { },
             "required" : null,
             "name" : "to_value",
+            "type" : "NUMBER",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "maxNumberPrecision" : null,
+            "maxValue" : null,
+            "minNumberPrecision" : null,
+            "minValue" : null,
+            "numberPrecision" : null,
+            "options" : null,
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "to_exchange_rate",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -220,7 +193,7 @@
           "hidden" : null,
           "metadata" : { },
           "required" : null,
-          "name" : "to_currency",
+          "name" : "from_value",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
@@ -261,6 +234,28 @@
           "metadata" : { },
           "required" : null,
           "name" : "to_value",
+          "type" : "NUMBER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxNumberPrecision" : null,
+          "maxValue" : null,
+          "minNumberPrecision" : null,
+          "minValue" : null,
+          "numberPrecision" : null,
+          "options" : null,
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "to_exchange_rate",
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
@@ -280,7 +275,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Select a currency from which you want to convert",
+      "description" : "Currency from which you want to convert.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -296,14 +291,651 @@
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
+      "options" : [ {
+        "description" : null,
+        "label" : "UAE Dirham",
+        "value" : "AED"
+      }, {
+        "description" : null,
+        "label" : "Afghan Afghani",
+        "value" : "AFN"
+      }, {
+        "description" : null,
+        "label" : "Albanian Lek",
+        "value" : "ALL"
+      }, {
+        "description" : null,
+        "label" : "Armenian Dram",
+        "value" : "AMD"
+      }, {
+        "description" : null,
+        "label" : "Netherlands Antillean Guilder",
+        "value" : "ANG"
+      }, {
+        "description" : null,
+        "label" : "Angolan Kwanza",
+        "value" : "AOA"
+      }, {
+        "description" : null,
+        "label" : "Argentine Peso",
+        "value" : "ARS"
+      }, {
+        "description" : null,
+        "label" : "Australian Dollar",
+        "value" : "AUD"
+      }, {
+        "description" : null,
+        "label" : "Aruban Florin",
+        "value" : "AWG"
+      }, {
+        "description" : null,
+        "label" : "Azerbaijani Manat",
+        "value" : "AZN"
+      }, {
+        "description" : null,
+        "label" : "Bosnia and Herzegovina Mark",
+        "value" : "BAM"
+      }, {
+        "description" : null,
+        "label" : "Barbados Dollar",
+        "value" : "BBD"
+      }, {
+        "description" : null,
+        "label" : "Bangladeshi Taka",
+        "value" : "BDT"
+      }, {
+        "description" : null,
+        "label" : "Bulgarian Lev",
+        "value" : "BGN"
+      }, {
+        "description" : null,
+        "label" : "Bahraini Dinar",
+        "value" : "BHD"
+      }, {
+        "description" : null,
+        "label" : "Burundian Franc",
+        "value" : "BIF"
+      }, {
+        "description" : null,
+        "label" : "Bermudian Dollar",
+        "value" : "BMD"
+      }, {
+        "description" : null,
+        "label" : "Brunei Dollar",
+        "value" : "BND"
+      }, {
+        "description" : null,
+        "label" : "Bolivian Boliviano",
+        "value" : "BOB"
+      }, {
+        "description" : null,
+        "label" : "Brazilian Real",
+        "value" : "BRL"
+      }, {
+        "description" : null,
+        "label" : "Bahamian Dollar",
+        "value" : "BSD"
+      }, {
+        "description" : null,
+        "label" : "Bhutanese Ngultrum",
+        "value" : "BTN"
+      }, {
+        "description" : null,
+        "label" : "Botswana Pula",
+        "value" : "BWP"
+      }, {
+        "description" : null,
+        "label" : "Belarusian Ruble",
+        "value" : "BYN"
+      }, {
+        "description" : null,
+        "label" : "Belize Dollar",
+        "value" : "BZD"
+      }, {
+        "description" : null,
+        "label" : "Canadian Dollar",
+        "value" : "CAD"
+      }, {
+        "description" : null,
+        "label" : "Congolese Franc",
+        "value" : "CDF"
+      }, {
+        "description" : null,
+        "label" : "Swiss Franc",
+        "value" : "CHF"
+      }, {
+        "description" : null,
+        "label" : "Chilean Peso",
+        "value" : "CLP"
+      }, {
+        "description" : null,
+        "label" : "Chinese Renminbi",
+        "value" : "CNY"
+      }, {
+        "description" : null,
+        "label" : "Colombian Peso",
+        "value" : "COP"
+      }, {
+        "description" : null,
+        "label" : "Costa Rican Colon",
+        "value" : "CRC"
+      }, {
+        "description" : null,
+        "label" : "Cuban Convertible Peso",
+        "value" : "CUC"
+      }, {
+        "description" : null,
+        "label" : "Cuban Peso",
+        "value" : "CUP"
+      }, {
+        "description" : null,
+        "label" : "Cape Verdean Escudo",
+        "value" : "CVE"
+      }, {
+        "description" : null,
+        "label" : "Czech Koruna",
+        "value" : "CZK"
+      }, {
+        "description" : null,
+        "label" : "Djiboutian Franc",
+        "value" : "DJF"
+      }, {
+        "description" : null,
+        "label" : "Danish Krone",
+        "value" : "DKK"
+      }, {
+        "description" : null,
+        "label" : "Dominican Peso",
+        "value" : "DOP"
+      }, {
+        "description" : null,
+        "label" : "Algerian Dinar",
+        "value" : "DZD"
+      }, {
+        "description" : null,
+        "label" : "Egyptian Pound",
+        "value" : "EGP"
+      }, {
+        "description" : null,
+        "label" : "Eritrean Nakfa",
+        "value" : "ERN"
+      }, {
+        "description" : null,
+        "label" : "Ethiopian Birr",
+        "value" : "ETB"
+      }, {
+        "description" : null,
+        "label" : "Euro",
+        "value" : "EUR"
+      }, {
+        "description" : null,
+        "label" : "Fiji Dollar",
+        "value" : "FJD"
+      }, {
+        "description" : null,
+        "label" : "Falkland Islands Pound",
+        "value" : "FKP"
+      }, {
+        "description" : null,
+        "label" : "Faroese Króna",
+        "value" : "FOK"
+      }, {
+        "description" : null,
+        "label" : "Pound Sterling",
+        "value" : "GBP"
+      }, {
+        "description" : null,
+        "label" : "Georgian Lari",
+        "value" : "GEL"
+      }, {
+        "description" : null,
+        "label" : "Guernsey Pound",
+        "value" : "GGP"
+      }, {
+        "description" : null,
+        "label" : "Ghanaian Cedi",
+        "value" : "GHS"
+      }, {
+        "description" : null,
+        "label" : "Gibraltar Pound",
+        "value" : "GIP"
+      }, {
+        "description" : null,
+        "label" : "Gambian Dalasi",
+        "value" : "GMD"
+      }, {
+        "description" : null,
+        "label" : "Guinean Franc",
+        "value" : "GNF"
+      }, {
+        "description" : null,
+        "label" : "Guatemalan Quetzal",
+        "value" : "GTQ"
+      }, {
+        "description" : null,
+        "label" : "Guyanese Dollar",
+        "value" : "GYD"
+      }, {
+        "description" : null,
+        "label" : "Hong Kong Dollar",
+        "value" : "HKD"
+      }, {
+        "description" : null,
+        "label" : "Honduran Lempira",
+        "value" : "HNL"
+      }, {
+        "description" : null,
+        "label" : "Croatin Kuna",
+        "value" : "HRK"
+      }, {
+        "description" : null,
+        "label" : "Haitian Gourde",
+        "value" : "HTG"
+      }, {
+        "description" : null,
+        "label" : "Hungarian Forint",
+        "value" : "HUF"
+      }, {
+        "description" : null,
+        "label" : "Indonesian Rupiah",
+        "value" : "IDR"
+      }, {
+        "description" : null,
+        "label" : "Israeli New Shekel",
+        "value" : "ILS"
+      }, {
+        "description" : null,
+        "label" : "Manx Pound",
+        "value" : "IMP"
+      }, {
+        "description" : null,
+        "label" : "Indian Rupee",
+        "value" : "INR"
+      }, {
+        "description" : null,
+        "label" : "Iraqi Dinar",
+        "value" : "IQD"
+      }, {
+        "description" : null,
+        "label" : "Iranian Rial",
+        "value" : "IRR"
+      }, {
+        "description" : null,
+        "label" : "Icelandic Króna",
+        "value" : "ISK"
+      }, {
+        "description" : null,
+        "label" : "Jamaican Dollar",
+        "value" : "JMD"
+      }, {
+        "description" : null,
+        "label" : "Jordanian Dinar",
+        "value" : "JOD"
+      }, {
+        "description" : null,
+        "label" : "Japanese Yen",
+        "value" : "JPY"
+      }, {
+        "description" : null,
+        "label" : "Kenyan Shilling",
+        "value" : "KES"
+      }, {
+        "description" : null,
+        "label" : "Kyrgyzstani Som",
+        "value" : "KGS"
+      }, {
+        "description" : null,
+        "label" : "Cambodian Riel",
+        "value" : "KHR"
+      }, {
+        "description" : null,
+        "label" : "Kiribati Dollar",
+        "value" : "KID"
+      }, {
+        "description" : null,
+        "label" : "Comorian Franc",
+        "value" : "KMF"
+      }, {
+        "description" : null,
+        "label" : "South Korean Won",
+        "value" : "KRW"
+      }, {
+        "description" : null,
+        "label" : "Kuwaiti Dinar",
+        "value" : "KWD"
+      }, {
+        "description" : null,
+        "label" : "Cayman Islands Dollar",
+        "value" : "KYD"
+      }, {
+        "description" : null,
+        "label" : "Kazakhstani Tenge",
+        "value" : "KZT"
+      }, {
+        "description" : null,
+        "label" : "Lao Kip",
+        "value" : "LAK"
+      }, {
+        "description" : null,
+        "label" : "Lebanese Pound",
+        "value" : "LBP"
+      }, {
+        "description" : null,
+        "label" : "Sri Lanka Rupee",
+        "value" : "LKR"
+      }, {
+        "description" : null,
+        "label" : "Liberian Dollar",
+        "value" : "LRD"
+      }, {
+        "description" : null,
+        "label" : "Lesotho Loti",
+        "value" : "LSL"
+      }, {
+        "description" : null,
+        "label" : "Libyan Dinar",
+        "value" : "LYD"
+      }, {
+        "description" : null,
+        "label" : "Moroccan Dirham",
+        "value" : "MAD"
+      }, {
+        "description" : null,
+        "label" : "Moldovan Leu",
+        "value" : "MDL"
+      }, {
+        "description" : null,
+        "label" : "Malagasy Ariary",
+        "value" : "MGA"
+      }, {
+        "description" : null,
+        "label" : "Macedonian Denar",
+        "value" : "MKD"
+      }, {
+        "description" : null,
+        "label" : "Burmese Kyat",
+        "value" : "MMK"
+      }, {
+        "description" : null,
+        "label" : "Mongolian Tögrög",
+        "value" : "MNT"
+      }, {
+        "description" : null,
+        "label" : "Macanese Pataca",
+        "value" : "MOP"
+      }, {
+        "description" : null,
+        "label" : "Mauritanian Ouguiya",
+        "value" : "MRU"
+      }, {
+        "description" : null,
+        "label" : "Mauritian Rupee",
+        "value" : "MUR"
+      }, {
+        "description" : null,
+        "label" : "Maldivian Rufiyaa",
+        "value" : "MVR"
+      }, {
+        "description" : null,
+        "label" : "Malawian Kwacha",
+        "value" : "MWK"
+      }, {
+        "description" : null,
+        "label" : "Mexican Peso",
+        "value" : "MXN"
+      }, {
+        "description" : null,
+        "label" : "Malaysian Ringgit",
+        "value" : "MYR"
+      }, {
+        "description" : null,
+        "label" : "Mozambican Metical",
+        "value" : "MZN"
+      }, {
+        "description" : null,
+        "label" : "Namibian Dollar",
+        "value" : "NAD"
+      }, {
+        "description" : null,
+        "label" : "Nigerian Naira",
+        "value" : "NGN"
+      }, {
+        "description" : null,
+        "label" : "Nicaraguan Córdoba",
+        "value" : "NIO"
+      }, {
+        "description" : null,
+        "label" : "Norwegian Krone",
+        "value" : "NOK"
+      }, {
+        "description" : null,
+        "label" : "Nepalese Rupee",
+        "value" : "NPR"
+      }, {
+        "description" : null,
+        "label" : "New Zealand Dollar",
+        "value" : "NZD"
+      }, {
+        "description" : null,
+        "label" : "Omani Rial",
+        "value" : "OMR"
+      }, {
+        "description" : null,
+        "label" : "Panamanian Balboa",
+        "value" : "PAB"
+      }, {
+        "description" : null,
+        "label" : "Peruvian Sol",
+        "value" : "PEN"
+      }, {
+        "description" : null,
+        "label" : "Papua New Guinean Kina",
+        "value" : "PGK"
+      }, {
+        "description" : null,
+        "label" : "Philippine Peso",
+        "value" : "PHP"
+      }, {
+        "description" : null,
+        "label" : "Pakistani Rupee",
+        "value" : "PKR"
+      }, {
+        "description" : null,
+        "label" : "Polish Zloty",
+        "value" : "PLN"
+      }, {
+        "description" : null,
+        "label" : "Paraguayan Guaraní",
+        "value" : "PYG"
+      }, {
+        "description" : null,
+        "label" : "Qatari Riyal",
+        "value" : "QAR"
+      }, {
+        "description" : null,
+        "label" : "Romanian Leu",
+        "value" : "RON"
+      }, {
+        "description" : null,
+        "label" : "Serbian Dinar",
+        "value" : "RSD"
+      }, {
+        "description" : null,
+        "label" : "Russian Ruble",
+        "value" : "RUB"
+      }, {
+        "description" : null,
+        "label" : "Rwandan Franc",
+        "value" : "RWF"
+      }, {
+        "description" : null,
+        "label" : "Saudi Riyal",
+        "value" : "SAR"
+      }, {
+        "description" : null,
+        "label" : "Solomon Islands Dollar",
+        "value" : "SBD"
+      }, {
+        "description" : null,
+        "label" : "Seychellois Rupee",
+        "value" : "SCR"
+      }, {
+        "description" : null,
+        "label" : "Sudanese Pound",
+        "value" : "SDG"
+      }, {
+        "description" : null,
+        "label" : "Swedish Krona",
+        "value" : "SEK"
+      }, {
+        "description" : null,
+        "label" : "Singapore Dollar",
+        "value" : "SGD"
+      }, {
+        "description" : null,
+        "label" : "Saint Helena Pound",
+        "value" : "SHP"
+      }, {
+        "description" : null,
+        "label" : "Sierra Leonean Leone",
+        "value" : "SLL"
+      }, {
+        "description" : null,
+        "label" : "Somali Shilling",
+        "value" : "SOS"
+      }, {
+        "description" : null,
+        "label" : "Surinamese Dollar",
+        "value" : "SRD"
+      }, {
+        "description" : null,
+        "label" : "South Sudanese Pound",
+        "value" : "SSP"
+      }, {
+        "description" : null,
+        "label" : "São Tomé and Príncipe Dobra",
+        "value" : "STN"
+      }, {
+        "description" : null,
+        "label" : "Syrian Pound",
+        "value" : "SYP"
+      }, {
+        "description" : null,
+        "label" : "Eswatini Lilangeni",
+        "value" : "SZL"
+      }, {
+        "description" : null,
+        "label" : "Thai Baht",
+        "value" : "THB"
+      }, {
+        "description" : null,
+        "label" : "Tajikistani Somoni",
+        "value" : "TJS"
+      }, {
+        "description" : null,
+        "label" : "Turkmenistan Manat",
+        "value" : "TMT"
+      }, {
+        "description" : null,
+        "label" : "Tunisian Dinar",
+        "value" : "TND"
+      }, {
+        "description" : null,
+        "label" : "Tongan Paʻanga",
+        "value" : "TOP"
+      }, {
+        "description" : null,
+        "label" : "Turkish Lira",
+        "value" : "TRY"
+      }, {
+        "description" : null,
+        "label" : "Trinidad and Tobago Dollar",
+        "value" : "TTD"
+      }, {
+        "description" : null,
+        "label" : "Tuvaluan Dollar",
+        "value" : "TVD"
+      }, {
+        "description" : null,
+        "label" : "New Taiwan Dollar",
+        "value" : "TWD"
+      }, {
+        "description" : null,
+        "label" : "Tanzanian Shilling",
+        "value" : "TZS"
+      }, {
+        "description" : null,
+        "label" : "Ukrainian Hryvnia",
+        "value" : "UAH"
+      }, {
+        "description" : null,
+        "label" : "Ugandan Shilling",
+        "value" : "UGX"
+      }, {
+        "description" : null,
+        "label" : "United States Dollar",
+        "value" : "USD"
+      }, {
+        "description" : null,
+        "label" : "Uruguayan Peso",
+        "value" : "UYU"
+      }, {
+        "description" : null,
+        "label" : "Uzbekistani So'm",
+        "value" : "UZS"
+      }, {
+        "description" : null,
+        "label" : "Venezuelan Bolívar Soberano",
+        "value" : "VES"
+      }, {
+        "description" : null,
+        "label" : "Vietnamese Đồng",
+        "value" : "VND"
+      }, {
+        "description" : null,
+        "label" : "Vanuatu Vatu",
+        "value" : "VUV"
+      }, {
+        "description" : null,
+        "label" : "Samoan Tālā",
+        "value" : "WST"
+      }, {
+        "description" : null,
+        "label" : "Central African CFA Franc",
+        "value" : "XAF"
+      }, {
+        "description" : null,
+        "label" : "East Caribbean Dollar",
+        "value" : "XCD"
+      }, {
+        "description" : null,
+        "label" : "Special Drawing Rights",
+        "value" : "XDR"
+      }, {
+        "description" : null,
+        "label" : "West African CFA Franc",
+        "value" : "XOF"
+      }, {
+        "description" : null,
+        "label" : "CFP Franc",
+        "value" : "XPF"
+      }, {
+        "description" : null,
+        "label" : "Yemeni Rial",
+        "value" : "YER"
+      }, {
+        "description" : null,
+        "label" : "South African Rand",
+        "value" : "ZAR"
+      }, {
+        "description" : null,
+        "label" : "Zambian Kwacha",
+        "value" : "ZMW"
+      } ],
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Select a currency to which you want to convert",
+      "description" : "Currency to which you want to convert.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -319,14 +951,651 @@
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
+      "options" : [ {
+        "description" : null,
+        "label" : "UAE Dirham",
+        "value" : "AED"
+      }, {
+        "description" : null,
+        "label" : "Afghan Afghani",
+        "value" : "AFN"
+      }, {
+        "description" : null,
+        "label" : "Albanian Lek",
+        "value" : "ALL"
+      }, {
+        "description" : null,
+        "label" : "Armenian Dram",
+        "value" : "AMD"
+      }, {
+        "description" : null,
+        "label" : "Netherlands Antillean Guilder",
+        "value" : "ANG"
+      }, {
+        "description" : null,
+        "label" : "Angolan Kwanza",
+        "value" : "AOA"
+      }, {
+        "description" : null,
+        "label" : "Argentine Peso",
+        "value" : "ARS"
+      }, {
+        "description" : null,
+        "label" : "Australian Dollar",
+        "value" : "AUD"
+      }, {
+        "description" : null,
+        "label" : "Aruban Florin",
+        "value" : "AWG"
+      }, {
+        "description" : null,
+        "label" : "Azerbaijani Manat",
+        "value" : "AZN"
+      }, {
+        "description" : null,
+        "label" : "Bosnia and Herzegovina Mark",
+        "value" : "BAM"
+      }, {
+        "description" : null,
+        "label" : "Barbados Dollar",
+        "value" : "BBD"
+      }, {
+        "description" : null,
+        "label" : "Bangladeshi Taka",
+        "value" : "BDT"
+      }, {
+        "description" : null,
+        "label" : "Bulgarian Lev",
+        "value" : "BGN"
+      }, {
+        "description" : null,
+        "label" : "Bahraini Dinar",
+        "value" : "BHD"
+      }, {
+        "description" : null,
+        "label" : "Burundian Franc",
+        "value" : "BIF"
+      }, {
+        "description" : null,
+        "label" : "Bermudian Dollar",
+        "value" : "BMD"
+      }, {
+        "description" : null,
+        "label" : "Brunei Dollar",
+        "value" : "BND"
+      }, {
+        "description" : null,
+        "label" : "Bolivian Boliviano",
+        "value" : "BOB"
+      }, {
+        "description" : null,
+        "label" : "Brazilian Real",
+        "value" : "BRL"
+      }, {
+        "description" : null,
+        "label" : "Bahamian Dollar",
+        "value" : "BSD"
+      }, {
+        "description" : null,
+        "label" : "Bhutanese Ngultrum",
+        "value" : "BTN"
+      }, {
+        "description" : null,
+        "label" : "Botswana Pula",
+        "value" : "BWP"
+      }, {
+        "description" : null,
+        "label" : "Belarusian Ruble",
+        "value" : "BYN"
+      }, {
+        "description" : null,
+        "label" : "Belize Dollar",
+        "value" : "BZD"
+      }, {
+        "description" : null,
+        "label" : "Canadian Dollar",
+        "value" : "CAD"
+      }, {
+        "description" : null,
+        "label" : "Congolese Franc",
+        "value" : "CDF"
+      }, {
+        "description" : null,
+        "label" : "Swiss Franc",
+        "value" : "CHF"
+      }, {
+        "description" : null,
+        "label" : "Chilean Peso",
+        "value" : "CLP"
+      }, {
+        "description" : null,
+        "label" : "Chinese Renminbi",
+        "value" : "CNY"
+      }, {
+        "description" : null,
+        "label" : "Colombian Peso",
+        "value" : "COP"
+      }, {
+        "description" : null,
+        "label" : "Costa Rican Colon",
+        "value" : "CRC"
+      }, {
+        "description" : null,
+        "label" : "Cuban Convertible Peso",
+        "value" : "CUC"
+      }, {
+        "description" : null,
+        "label" : "Cuban Peso",
+        "value" : "CUP"
+      }, {
+        "description" : null,
+        "label" : "Cape Verdean Escudo",
+        "value" : "CVE"
+      }, {
+        "description" : null,
+        "label" : "Czech Koruna",
+        "value" : "CZK"
+      }, {
+        "description" : null,
+        "label" : "Djiboutian Franc",
+        "value" : "DJF"
+      }, {
+        "description" : null,
+        "label" : "Danish Krone",
+        "value" : "DKK"
+      }, {
+        "description" : null,
+        "label" : "Dominican Peso",
+        "value" : "DOP"
+      }, {
+        "description" : null,
+        "label" : "Algerian Dinar",
+        "value" : "DZD"
+      }, {
+        "description" : null,
+        "label" : "Egyptian Pound",
+        "value" : "EGP"
+      }, {
+        "description" : null,
+        "label" : "Eritrean Nakfa",
+        "value" : "ERN"
+      }, {
+        "description" : null,
+        "label" : "Ethiopian Birr",
+        "value" : "ETB"
+      }, {
+        "description" : null,
+        "label" : "Euro",
+        "value" : "EUR"
+      }, {
+        "description" : null,
+        "label" : "Fiji Dollar",
+        "value" : "FJD"
+      }, {
+        "description" : null,
+        "label" : "Falkland Islands Pound",
+        "value" : "FKP"
+      }, {
+        "description" : null,
+        "label" : "Faroese Króna",
+        "value" : "FOK"
+      }, {
+        "description" : null,
+        "label" : "Pound Sterling",
+        "value" : "GBP"
+      }, {
+        "description" : null,
+        "label" : "Georgian Lari",
+        "value" : "GEL"
+      }, {
+        "description" : null,
+        "label" : "Guernsey Pound",
+        "value" : "GGP"
+      }, {
+        "description" : null,
+        "label" : "Ghanaian Cedi",
+        "value" : "GHS"
+      }, {
+        "description" : null,
+        "label" : "Gibraltar Pound",
+        "value" : "GIP"
+      }, {
+        "description" : null,
+        "label" : "Gambian Dalasi",
+        "value" : "GMD"
+      }, {
+        "description" : null,
+        "label" : "Guinean Franc",
+        "value" : "GNF"
+      }, {
+        "description" : null,
+        "label" : "Guatemalan Quetzal",
+        "value" : "GTQ"
+      }, {
+        "description" : null,
+        "label" : "Guyanese Dollar",
+        "value" : "GYD"
+      }, {
+        "description" : null,
+        "label" : "Hong Kong Dollar",
+        "value" : "HKD"
+      }, {
+        "description" : null,
+        "label" : "Honduran Lempira",
+        "value" : "HNL"
+      }, {
+        "description" : null,
+        "label" : "Croatin Kuna",
+        "value" : "HRK"
+      }, {
+        "description" : null,
+        "label" : "Haitian Gourde",
+        "value" : "HTG"
+      }, {
+        "description" : null,
+        "label" : "Hungarian Forint",
+        "value" : "HUF"
+      }, {
+        "description" : null,
+        "label" : "Indonesian Rupiah",
+        "value" : "IDR"
+      }, {
+        "description" : null,
+        "label" : "Israeli New Shekel",
+        "value" : "ILS"
+      }, {
+        "description" : null,
+        "label" : "Manx Pound",
+        "value" : "IMP"
+      }, {
+        "description" : null,
+        "label" : "Indian Rupee",
+        "value" : "INR"
+      }, {
+        "description" : null,
+        "label" : "Iraqi Dinar",
+        "value" : "IQD"
+      }, {
+        "description" : null,
+        "label" : "Iranian Rial",
+        "value" : "IRR"
+      }, {
+        "description" : null,
+        "label" : "Icelandic Króna",
+        "value" : "ISK"
+      }, {
+        "description" : null,
+        "label" : "Jamaican Dollar",
+        "value" : "JMD"
+      }, {
+        "description" : null,
+        "label" : "Jordanian Dinar",
+        "value" : "JOD"
+      }, {
+        "description" : null,
+        "label" : "Japanese Yen",
+        "value" : "JPY"
+      }, {
+        "description" : null,
+        "label" : "Kenyan Shilling",
+        "value" : "KES"
+      }, {
+        "description" : null,
+        "label" : "Kyrgyzstani Som",
+        "value" : "KGS"
+      }, {
+        "description" : null,
+        "label" : "Cambodian Riel",
+        "value" : "KHR"
+      }, {
+        "description" : null,
+        "label" : "Kiribati Dollar",
+        "value" : "KID"
+      }, {
+        "description" : null,
+        "label" : "Comorian Franc",
+        "value" : "KMF"
+      }, {
+        "description" : null,
+        "label" : "South Korean Won",
+        "value" : "KRW"
+      }, {
+        "description" : null,
+        "label" : "Kuwaiti Dinar",
+        "value" : "KWD"
+      }, {
+        "description" : null,
+        "label" : "Cayman Islands Dollar",
+        "value" : "KYD"
+      }, {
+        "description" : null,
+        "label" : "Kazakhstani Tenge",
+        "value" : "KZT"
+      }, {
+        "description" : null,
+        "label" : "Lao Kip",
+        "value" : "LAK"
+      }, {
+        "description" : null,
+        "label" : "Lebanese Pound",
+        "value" : "LBP"
+      }, {
+        "description" : null,
+        "label" : "Sri Lanka Rupee",
+        "value" : "LKR"
+      }, {
+        "description" : null,
+        "label" : "Liberian Dollar",
+        "value" : "LRD"
+      }, {
+        "description" : null,
+        "label" : "Lesotho Loti",
+        "value" : "LSL"
+      }, {
+        "description" : null,
+        "label" : "Libyan Dinar",
+        "value" : "LYD"
+      }, {
+        "description" : null,
+        "label" : "Moroccan Dirham",
+        "value" : "MAD"
+      }, {
+        "description" : null,
+        "label" : "Moldovan Leu",
+        "value" : "MDL"
+      }, {
+        "description" : null,
+        "label" : "Malagasy Ariary",
+        "value" : "MGA"
+      }, {
+        "description" : null,
+        "label" : "Macedonian Denar",
+        "value" : "MKD"
+      }, {
+        "description" : null,
+        "label" : "Burmese Kyat",
+        "value" : "MMK"
+      }, {
+        "description" : null,
+        "label" : "Mongolian Tögrög",
+        "value" : "MNT"
+      }, {
+        "description" : null,
+        "label" : "Macanese Pataca",
+        "value" : "MOP"
+      }, {
+        "description" : null,
+        "label" : "Mauritanian Ouguiya",
+        "value" : "MRU"
+      }, {
+        "description" : null,
+        "label" : "Mauritian Rupee",
+        "value" : "MUR"
+      }, {
+        "description" : null,
+        "label" : "Maldivian Rufiyaa",
+        "value" : "MVR"
+      }, {
+        "description" : null,
+        "label" : "Malawian Kwacha",
+        "value" : "MWK"
+      }, {
+        "description" : null,
+        "label" : "Mexican Peso",
+        "value" : "MXN"
+      }, {
+        "description" : null,
+        "label" : "Malaysian Ringgit",
+        "value" : "MYR"
+      }, {
+        "description" : null,
+        "label" : "Mozambican Metical",
+        "value" : "MZN"
+      }, {
+        "description" : null,
+        "label" : "Namibian Dollar",
+        "value" : "NAD"
+      }, {
+        "description" : null,
+        "label" : "Nigerian Naira",
+        "value" : "NGN"
+      }, {
+        "description" : null,
+        "label" : "Nicaraguan Córdoba",
+        "value" : "NIO"
+      }, {
+        "description" : null,
+        "label" : "Norwegian Krone",
+        "value" : "NOK"
+      }, {
+        "description" : null,
+        "label" : "Nepalese Rupee",
+        "value" : "NPR"
+      }, {
+        "description" : null,
+        "label" : "New Zealand Dollar",
+        "value" : "NZD"
+      }, {
+        "description" : null,
+        "label" : "Omani Rial",
+        "value" : "OMR"
+      }, {
+        "description" : null,
+        "label" : "Panamanian Balboa",
+        "value" : "PAB"
+      }, {
+        "description" : null,
+        "label" : "Peruvian Sol",
+        "value" : "PEN"
+      }, {
+        "description" : null,
+        "label" : "Papua New Guinean Kina",
+        "value" : "PGK"
+      }, {
+        "description" : null,
+        "label" : "Philippine Peso",
+        "value" : "PHP"
+      }, {
+        "description" : null,
+        "label" : "Pakistani Rupee",
+        "value" : "PKR"
+      }, {
+        "description" : null,
+        "label" : "Polish Zloty",
+        "value" : "PLN"
+      }, {
+        "description" : null,
+        "label" : "Paraguayan Guaraní",
+        "value" : "PYG"
+      }, {
+        "description" : null,
+        "label" : "Qatari Riyal",
+        "value" : "QAR"
+      }, {
+        "description" : null,
+        "label" : "Romanian Leu",
+        "value" : "RON"
+      }, {
+        "description" : null,
+        "label" : "Serbian Dinar",
+        "value" : "RSD"
+      }, {
+        "description" : null,
+        "label" : "Russian Ruble",
+        "value" : "RUB"
+      }, {
+        "description" : null,
+        "label" : "Rwandan Franc",
+        "value" : "RWF"
+      }, {
+        "description" : null,
+        "label" : "Saudi Riyal",
+        "value" : "SAR"
+      }, {
+        "description" : null,
+        "label" : "Solomon Islands Dollar",
+        "value" : "SBD"
+      }, {
+        "description" : null,
+        "label" : "Seychellois Rupee",
+        "value" : "SCR"
+      }, {
+        "description" : null,
+        "label" : "Sudanese Pound",
+        "value" : "SDG"
+      }, {
+        "description" : null,
+        "label" : "Swedish Krona",
+        "value" : "SEK"
+      }, {
+        "description" : null,
+        "label" : "Singapore Dollar",
+        "value" : "SGD"
+      }, {
+        "description" : null,
+        "label" : "Saint Helena Pound",
+        "value" : "SHP"
+      }, {
+        "description" : null,
+        "label" : "Sierra Leonean Leone",
+        "value" : "SLL"
+      }, {
+        "description" : null,
+        "label" : "Somali Shilling",
+        "value" : "SOS"
+      }, {
+        "description" : null,
+        "label" : "Surinamese Dollar",
+        "value" : "SRD"
+      }, {
+        "description" : null,
+        "label" : "South Sudanese Pound",
+        "value" : "SSP"
+      }, {
+        "description" : null,
+        "label" : "São Tomé and Príncipe Dobra",
+        "value" : "STN"
+      }, {
+        "description" : null,
+        "label" : "Syrian Pound",
+        "value" : "SYP"
+      }, {
+        "description" : null,
+        "label" : "Eswatini Lilangeni",
+        "value" : "SZL"
+      }, {
+        "description" : null,
+        "label" : "Thai Baht",
+        "value" : "THB"
+      }, {
+        "description" : null,
+        "label" : "Tajikistani Somoni",
+        "value" : "TJS"
+      }, {
+        "description" : null,
+        "label" : "Turkmenistan Manat",
+        "value" : "TMT"
+      }, {
+        "description" : null,
+        "label" : "Tunisian Dinar",
+        "value" : "TND"
+      }, {
+        "description" : null,
+        "label" : "Tongan Paʻanga",
+        "value" : "TOP"
+      }, {
+        "description" : null,
+        "label" : "Turkish Lira",
+        "value" : "TRY"
+      }, {
+        "description" : null,
+        "label" : "Trinidad and Tobago Dollar",
+        "value" : "TTD"
+      }, {
+        "description" : null,
+        "label" : "Tuvaluan Dollar",
+        "value" : "TVD"
+      }, {
+        "description" : null,
+        "label" : "New Taiwan Dollar",
+        "value" : "TWD"
+      }, {
+        "description" : null,
+        "label" : "Tanzanian Shilling",
+        "value" : "TZS"
+      }, {
+        "description" : null,
+        "label" : "Ukrainian Hryvnia",
+        "value" : "UAH"
+      }, {
+        "description" : null,
+        "label" : "Ugandan Shilling",
+        "value" : "UGX"
+      }, {
+        "description" : null,
+        "label" : "United States Dollar",
+        "value" : "USD"
+      }, {
+        "description" : null,
+        "label" : "Uruguayan Peso",
+        "value" : "UYU"
+      }, {
+        "description" : null,
+        "label" : "Uzbekistani So'm",
+        "value" : "UZS"
+      }, {
+        "description" : null,
+        "label" : "Venezuelan Bolívar Soberano",
+        "value" : "VES"
+      }, {
+        "description" : null,
+        "label" : "Vietnamese Đồng",
+        "value" : "VND"
+      }, {
+        "description" : null,
+        "label" : "Vanuatu Vatu",
+        "value" : "VUV"
+      }, {
+        "description" : null,
+        "label" : "Samoan Tālā",
+        "value" : "WST"
+      }, {
+        "description" : null,
+        "label" : "Central African CFA Franc",
+        "value" : "XAF"
+      }, {
+        "description" : null,
+        "label" : "East Caribbean Dollar",
+        "value" : "XCD"
+      }, {
+        "description" : null,
+        "label" : "Special Drawing Rights",
+        "value" : "XDR"
+      }, {
+        "description" : null,
+        "label" : "West African CFA Franc",
+        "value" : "XOF"
+      }, {
+        "description" : null,
+        "label" : "CFP Franc",
+        "value" : "XPF"
+      }, {
+        "description" : null,
+        "label" : "Yemeni Rial",
+        "value" : "YER"
+      }, {
+        "description" : null,
+        "label" : "South African Rand",
+        "value" : "ZAR"
+      }, {
+        "description" : null,
+        "label" : "Zambian Kwacha",
+        "value" : "ZMW"
+      } ],
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Input the number for conversion",
+      "description" : "Value to convert.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -334,7 +1603,7 @@
       "required" : true,
       "name" : "from_value",
       "type" : "NUMBER",
-      "defaultValue" : 0.0,
+      "defaultValue" : 1.0,
       "exampleValue" : null,
       "label" : "Value",
       "placeholder" : null,
@@ -348,9 +1617,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Currency Converter",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -387,6 +1656,66 @@
             "metadata" : { },
             "required" : null,
             "name" : "url",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "single_use",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "temporary_redirect",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "forward_params",
             "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
@@ -469,6 +1798,66 @@
           "hidden" : null,
           "metadata" : { },
           "required" : null,
+          "name" : "single_use",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "temporary_redirect",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "forward_params",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
           "name" : "short_url",
           "type" : "STRING",
           "defaultValue" : null,
@@ -509,16 +1898,16 @@
       "optionsDataSource" : null
     } ],
     "title" : "URL Shortener",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
     "description" : "Get information about a certain webpage",
     "help" : null,
     "metadata" : null,
-    "name" : "url",
+    "name" : "webInformation",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : {
@@ -1150,11 +2539,60 @@
       "optionsDataSource" : null
     } ],
     "title" : "Web Page Information",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
