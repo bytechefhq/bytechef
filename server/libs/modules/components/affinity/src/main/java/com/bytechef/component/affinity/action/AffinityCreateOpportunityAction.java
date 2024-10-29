@@ -16,56 +16,46 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_OPPORTUNITY;
-import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.ComponentDsl;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class AffinityCreateOpportunityAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createOpportunity")
+        .title("Create Opportunity")
+        .description("Creates a new opportunity.")
+        .metadata(
+            Map.of(
+                "method", "POST",
+                "path", "/opportunities", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_OPPORTUNITY)
-        .title("Create opportunity")
-        .description("Creates a new opportunity")
-        .properties(
-            string(NAME)
-                .label("Name")
-                .description("The name of the opportunity.")
-                .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        integer("id"),
-                        string(NAME))))
-        .perform(AffinityCreateOpportunityAction::perform);
-
-    protected static final ContextFunction<Http, Http.Executor> POST_OPPORTUNITIES_CONTEXT_FUNCTION =
-        http -> http.post("/opportunities");
+            ))
+        .properties(object("__item").properties(string("name").label("Name")
+            .description("The name of the opportunity.")
+            .required(true))
+            .label("Opportunity")
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
+        .output(outputSchema(object()
+            .properties(object("body").properties(string("id").required(false), string("name").required(false))
+                .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON))));
 
     private AffinityCreateOpportunityAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_OPPORTUNITIES_CONTEXT_FUNCTION)
-            .body(Http.Body.of(Map.of(NAME, inputParameters.getRequiredString(NAME))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
     }
 }
