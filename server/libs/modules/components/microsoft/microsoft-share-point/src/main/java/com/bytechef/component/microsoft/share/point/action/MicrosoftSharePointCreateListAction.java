@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_LIST;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
@@ -38,7 +37,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class MicrosoftSharePointCreateListAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_LIST)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createList")
         .title("Create list")
         .description("Creates a new list")
         .properties(

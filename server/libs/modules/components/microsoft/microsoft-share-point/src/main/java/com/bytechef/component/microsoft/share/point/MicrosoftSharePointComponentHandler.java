@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.share.point;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.MICROSOFT_SHARE_POINT;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -35,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MicrosoftSharePointComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MICROSOFT_SHARE_POINT)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("microsoftSharePoint")
         .title("Microsoft SharePoint")
         .description(
             "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, " +

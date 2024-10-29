@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.COLUMNS;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.CREATE_LIST_ITEM;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FIELDS;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
@@ -45,7 +44,7 @@ import java.util.Map;
  */
 public class MicrosoftSharePointCreateListItemAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_LIST_ITEM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createListItem")
         .title("Create list item")
         .description("Creates a new item in a list.")
         .properties(
