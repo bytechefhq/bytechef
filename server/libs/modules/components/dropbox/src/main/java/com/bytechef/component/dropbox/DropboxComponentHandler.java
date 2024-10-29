@@ -17,7 +17,6 @@
 package com.bytechef.component.dropbox;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DROPBOX;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -40,7 +39,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class DropboxComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(DROPBOX)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("dropbox")
         .title("Dropbox")
         .description(
             "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, " +

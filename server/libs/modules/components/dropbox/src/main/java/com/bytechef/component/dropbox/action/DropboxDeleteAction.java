@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.DELETE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public class DropboxDeleteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("delete")
         .title("Delete")
         .description(
             "Delete the file or folder at a given path. If the path is a folder, all its contents will be deleted too.")

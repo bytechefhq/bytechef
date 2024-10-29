@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.LIST_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 
 import com.bytechef.component.definition.ActionContext;
@@ -38,7 +37,7 @@ import java.util.Map;
  */
 public class DropboxListFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_FOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolder")
         .title("List folder")
         .description("List the contents of a folder.")
         .properties(
