@@ -40,7 +40,7 @@ import java.io.IOException;
 /**
  * @author J. Iamsamang
  */
-public class GoogleMailAddLabelAction {
+public class GoogleMailAddLabelsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabels")
         .title("Add labels")
@@ -69,9 +69,9 @@ public class GoogleMailAddLabelAction {
                         array(LABEL_IDS)
                             .items(string()),
                         string(THREAD_ID))))
-        .perform(GoogleMailAddLabelAction::perform);
+        .perform(GoogleMailAddLabelsAction::perform);
 
-    private GoogleMailAddLabelAction() {
+    private GoogleMailAddLabelsAction() {
     }
 
     public static Message perform(

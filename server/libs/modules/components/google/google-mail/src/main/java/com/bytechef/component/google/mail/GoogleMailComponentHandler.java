@@ -22,7 +22,7 @@ import static com.bytechef.component.google.mail.connection.GoogleMailConnection
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.google.mail.action.GoogleMailAddLabelAction;
+import com.bytechef.component.google.mail.action.GoogleMailAddLabelsAction;
 import com.bytechef.component.google.mail.action.GoogleMailDeleteMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetMailAction;
 import com.bytechef.component.google.mail.action.GoogleMailGetThreadAction;
@@ -48,7 +48,7 @@ public class GoogleMailComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
         .actions(
-            GoogleMailAddLabelAction.ACTION_DEFINITION,
+            GoogleMailAddLabelsAction.ACTION_DEFINITION,
             GoogleMailDeleteMailAction.ACTION_DEFINITION,
             GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
