@@ -73,8 +73,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -483,6 +483,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -793,7 +794,7 @@
     "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
@@ -802,6 +803,5 @@
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

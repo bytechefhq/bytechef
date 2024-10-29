@@ -472,9 +472,9 @@
       "controlType" : "TIME"
     } ],
     "title" : "Set value",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,

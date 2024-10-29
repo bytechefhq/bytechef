@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -366,9 +366,9 @@
       }
     } ],
     "title" : "Copy file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -462,8 +462,8 @@
         },
         "sampleOutput" : {
           "name" : "new-file.txt",
-          "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -549,8 +549,8 @@
       },
       "sampleOutput" : {
         "name" : "new-file.txt",
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -598,9 +598,9 @@
       }
     } ],
     "title" : "Create new folder",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -694,8 +694,8 @@
         },
         "sampleOutput" : {
           "name" : "new-file.txt",
-          "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -781,8 +781,8 @@
       },
       "sampleOutput" : {
         "name" : "new-file.txt",
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -882,9 +882,9 @@
       }
     } ],
     "title" : "Create new text file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -918,9 +918,9 @@
       }
     } ],
     "title" : "Delete file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1154,9 +1154,9 @@
       }
     } ],
     "title" : "Read file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1250,8 +1250,8 @@
         },
         "sampleOutput" : {
           "name" : "new-file.txt",
-          "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+          "mimeType" : "plain/text"
         }
       },
       "outputSchema" : {
@@ -1337,8 +1337,8 @@
       },
       "sampleOutput" : {
         "name" : "new-file.txt",
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
+        "mimeType" : "plain/text"
       }
     },
     "properties" : [ {
@@ -1462,11 +1462,10 @@
       }
     } ],
     "title" : "Upload file",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1712,18 +1711,18 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dwebhookRequest" : null,
+    "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1969,18 +1968,19 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dwebhookRequest" : null,
+    "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : { }
+    "poll" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

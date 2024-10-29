@@ -35,7 +35,6 @@ import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.embedded.configuration.domain.AppEvent;
 import com.bytechef.embedded.configuration.service.AppEventService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import java.util.List;
 import java.util.Map;
 

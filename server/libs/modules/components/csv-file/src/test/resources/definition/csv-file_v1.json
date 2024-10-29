@@ -68,7 +68,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -110,7 +109,8 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -472,7 +472,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -569,7 +568,8 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -721,8 +721,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
-  "unifiedApi" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -733,5 +731,7 @@
       "streamTypes" : null,
       "dataStreamItemWriter" : { }
     }
-  }
+  },
+  "triggers" : null,
+  "unifiedApi" : null
 }
