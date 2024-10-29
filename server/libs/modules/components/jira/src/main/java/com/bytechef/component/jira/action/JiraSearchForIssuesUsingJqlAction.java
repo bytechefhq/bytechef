@@ -25,7 +25,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUES;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
-import static com.bytechef.component.jira.constant.JiraConstants.SEARCH_FOR_ISSUES_USING_JQL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class JiraSearchForIssuesUsingJqlAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH_FOR_ISSUES_USING_JQL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchForIssuesUsingJql")
         .title("Search issues")
         .description("Search for issues using JQL")
         .properties(

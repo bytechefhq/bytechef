@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.ASSIGNEE;
 import static com.bytechef.component.jira.constant.JiraConstants.CONTENT;
-import static com.bytechef.component.jira.constant.JiraConstants.CREATE_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.DESCRIPTION;
 import static com.bytechef.component.jira.constant.JiraConstants.FIELDS;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
@@ -51,7 +50,7 @@ import java.util.Map;
  */
 public class JiraCreateIssueAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ISSUE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
         .title("Create issue")
         .description("Creates a new issue.")
         .properties(

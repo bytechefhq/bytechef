@@ -17,7 +17,6 @@
 package com.bytechef.component.jira;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.jira.constant.JiraConstants.JIRA;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -37,7 +36,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class JiraComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(JIRA)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("jira")
         .title("Jira")
         .description(
             "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and " +
