@@ -1,6 +1,8 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/automation/configuration';
 
+import getParentConditionTask from './getParentConditionTask';
+
 interface AddConditionChildNodeProps {
     conditionId: string;
     tasks: Array<WorkflowTask>;
@@ -14,7 +16,11 @@ export default function getTasksWithConditionChildNode({
     placeholderId,
     tasks,
 }: AddConditionChildNodeProps): Array<WorkflowTask> {
-    const conditionTask = tasks.find((task) => task.name === conditionId);
+    let conditionTask = tasks.find((task) => task.name === conditionId);
+
+    if (!conditionTask) {
+        conditionTask = getParentConditionTask(tasks, conditionId);
+    }
 
     if (!conditionTask) {
         return tasks;

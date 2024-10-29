@@ -194,7 +194,7 @@ export type WorkflowTaskType = {
     label?: string;
     name: string;
     node?: string;
-    parameters?: {[key: string]: object};
+    parameters?: {[key: string]: object | []};
     post?: Array<WorkflowTaskType>;
     pre?: Array<WorkflowTaskType>;
     timeout?: string;

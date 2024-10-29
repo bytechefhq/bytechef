@@ -53,6 +53,7 @@ export default function handleConditionChildOperationClick({
         type: type,
         workflowNodeName,
     };
+
     const taskAfterCurrentIndex = workflow.tasks?.length;
 
     saveWorkflowDefinition({

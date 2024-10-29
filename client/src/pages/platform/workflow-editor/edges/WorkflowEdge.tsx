@@ -29,7 +29,7 @@ export default function WorkflowEdge({
     return (
         <>
             <path
-                className="fill-none stroke-gray-400 stroke-1"
+                className="fill-none stroke-gray-300 stroke-2"
                 d={edgePath}
                 id={id}
                 markerEnd={markerEnd}

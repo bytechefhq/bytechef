@@ -62,7 +62,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     return (
         <div
-            className="relative flex min-w-[240px] cursor-pointer items-center justify-center"
+            className="nodrag relative flex min-w-[240px] cursor-pointer items-center justify-center"
             data-nodeType={data.trigger ? 'trigger' : 'task'}
             onMouseOut={() => setIsHovered(false)}
             onMouseOver={() => setIsHovered(true)}

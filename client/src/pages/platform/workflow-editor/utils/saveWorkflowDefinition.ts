@@ -166,6 +166,7 @@ export default async function saveWorkflowDefinition({
         tasks[existingTaskIndex] = combinedTask;
     } else {
         tasks = [...(workflowDefinition.tasks || [])];
+
         if (conditionId && placeholderId) {
             tasks = getTasksWithConditionChildNode({conditionId, newTask, placeholderId, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {

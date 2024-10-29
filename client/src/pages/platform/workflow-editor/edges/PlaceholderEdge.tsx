@@ -1,10 +1,7 @@
 import {EdgeProps, getBezierPath} from 'reactflow';
 
-import styles from './PlaceholderEdge.module.css';
-
 export default function PlaceholderEdge({
     id,
-    markerEnd,
     sourcePosition,
     sourceX,
     sourceY,
@@ -22,5 +19,12 @@ export default function PlaceholderEdge({
         targetY,
     });
 
-    return <path className={styles.placeholderPath} d={edgePath} id={id} markerEnd={markerEnd} style={style} />;
+    return (
+        <path
+            className="fill-none stroke-gray-300 stroke-2 [stroke-dasharray:3,5]"
+            d={edgePath}
+            id={id}
+            style={style}
+        />
+    );
 }
