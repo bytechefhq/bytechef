@@ -16,8 +16,17 @@
 
 package com.bytechef.component.affinity;
 
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
+
 /**
+ * Provides the base test implementation for the REST based component.
+ *
  * @generated
  */
-public class AffinityComponentHandlerTest extends AbstractAffinityComponentHandlerTest {
+public abstract class AbstractAffinityComponentHandlerTest {
+    @Test
+    public void testGetDefinition() {
+        JsonFileAssert.assertEquals("definition/affinity_v1.json", new AffinityComponentHandler().getDefinition());
+    }
 }

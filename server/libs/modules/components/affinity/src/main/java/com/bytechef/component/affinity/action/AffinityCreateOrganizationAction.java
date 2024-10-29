@@ -16,64 +16,51 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_ORGANIZATION;
-import static com.bytechef.component.affinity.constant.AffinityConstants.DOMAIN;
-import static com.bytechef.component.affinity.constant.AffinityConstants.NAME;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.ComponentDsl;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class AffinityCreateOrganizationAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createOrganization")
+        .title("Create Organization")
+        .description("Creates a new organization.")
+        .metadata(
+            Map.of(
+                "method", "POST",
+                "path", "/organizations", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ORGANIZATION)
-        .title("Create organization")
-        .description("Creates a new organization")
-        .properties(
-            string(NAME)
-                .label("Name")
-                .description("The name of the organization.")
-                .required(true),
-            string(DOMAIN)
-                .label("Domain")
+            ))
+        .properties(object("__item").properties(string("name").label("Name")
+            .description("The name of the organization.")
+            .required(true),
+            string("domain").label("Domain")
                 .description("The domain name of the organization.")
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        integer("id"),
-                        string(NAME),
-                        string(DOMAIN))))
-        .perform(AffinityCreateOrganizationAction::perform);
-
-    protected static final ContextFunction<Http, Http.Executor> POST_ORGANIZATIONS_CONTEXT_FUNCTION =
-        http -> http.post("/organizations");
+            .label("Organization")
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
+        .output(outputSchema(object()
+            .properties(object("body")
+                .properties(string("id").required(false), string("name").required(false),
+                    string("domain").required(false))
+                .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON))));
 
     private AffinityCreateOrganizationAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_ORGANIZATIONS_CONTEXT_FUNCTION)
-            .body(
-                Http.Body.of(
-                    NAME, inputParameters.getRequiredString(NAME),
-                    DOMAIN, inputParameters.getString(DOMAIN)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
     }
 }

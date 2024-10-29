@@ -1,0 +1,136 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Affinity"
+  description: "Affinity is a customer relationship management (CRM) platform that leverages relationship intelligence to help businesses strengthen connections and drive engagement with client and prospects."
+  version: "v1"
+servers:
+  - url: "https://api.affinity.co"
+paths:
+  /opportunities:
+    post:
+      summary: "Create Opportunity"
+      description: "Creates a new opportunity."
+      operationId: "createOpportunity"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Opportunity"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "The name of the opportunity."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+  /organizations:
+    post:
+      summary: "Create Organization"
+      description: "Creates a new organization."
+      operationId: "createOrganization"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Organization"
+              type: "object"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  title: "Name"
+                  description: "The name of the organization."
+                domain:
+                  type: "string"
+                  title: "Domain"
+                  description: "The domain name of the organization."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      domain:
+                        type: "string"
+  /persons:
+    post:
+      summary: "Create Person"
+      description: "Creates a new person."
+      operationId: "createPerson"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              title: "Person"
+              type: "object"
+              required:
+                - "first_name"
+                - "last_name"
+              properties:
+                first_name:
+                  type: "string"
+                  title: "First name"
+                  description: "The first name of the person."
+                last_name:
+                  type: "string"
+                  title: "Last name"
+                  description: "The last name of the person."
+                emails:
+                  title: "Emails"
+                  type: "array"
+                  description: "The email addresses of the person."
+                  items:
+                    type: "string"
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      first_name:
+                        type: "string"
+                      last_name:
+                        type: "string"
+                      emails:
+                        type: "array"
+                        items:
+                          type: "string"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: "http"
+      scheme: "bearer"

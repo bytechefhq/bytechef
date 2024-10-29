@@ -16,74 +16,58 @@
 
 package com.bytechef.component.affinity.action;
 
-import static com.bytechef.component.affinity.constant.AffinityConstants.CREATE_PERSON;
-import static com.bytechef.component.affinity.constant.AffinityConstants.EMAILS;
-import static com.bytechef.component.affinity.constant.AffinityConstants.FIRST_NAME;
-import static com.bytechef.component.affinity.constant.AffinityConstants.LAST_NAME;
+import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Context.Http.BodyContentType;
+import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
-import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.definition.ComponentDsl;
+import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * Provides a list of the component actions.
+ *
+ * @generated
  */
 public class AffinityCreatePersonAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createPerson")
+        .title("Create Person")
+        .description("Creates a new person.")
+        .metadata(
+            Map.of(
+                "method", "POST",
+                "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_PERSON)
-        .title("Create person")
-        .description("Creates a new person")
-        .properties(
-            string(FIRST_NAME)
-                .label("First name")
-                .description("The first name of the person.")
-                .required(true),
-            string(LAST_NAME)
-                .label("Last name")
+            ))
+        .properties(object("__item").properties(string("first_name").label("First   Name")
+            .description("The first name of the person.")
+            .required(true),
+            string("last_name").label("Last   Name")
                 .description("The last name of the person.")
                 .required(true),
-            array(EMAILS)
+            array("emails").items(string().description("The email addresses of the person."))
+                .placeholder("Add to Emails")
                 .label("Emails")
                 .description("The email addresses of the person.")
-                .items(string())
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        integer("id"),
-                        string(FIRST_NAME),
-                        string(LAST_NAME),
-                        array(EMAILS)
-                            .items(string()))))
-        .perform(AffinityCreatePersonAction::perform);
-
-    protected static final ContextFunction<Http, Http.Executor> POST_PERSONS_CONTEXT_FUNCTION =
-        http -> http.post("/persons");
+            .label("Person")
+            .metadata(
+                Map.of(
+                    "type", PropertyType.BODY)))
+        .output(outputSchema(object()
+            .properties(object("body")
+                .properties(string("id").required(false), string("first_name").required(false),
+                    string("last_name").required(false), array("emails").items(string())
+                        .required(false))
+                .required(false))
+            .metadata(
+                Map.of(
+                    "responseType", ResponseType.JSON))));
 
     private AffinityCreatePersonAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return actionContext.http(POST_PERSONS_CONTEXT_FUNCTION)
-            .body(
-                Http.Body.of(
-                    FIRST_NAME, inputParameters.getRequiredString(FIRST_NAME),
-                    LAST_NAME, inputParameters.getRequiredString(LAST_NAME),
-                    EMAILS, inputParameters.getList(EMAILS, String.class)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
     }
 }
