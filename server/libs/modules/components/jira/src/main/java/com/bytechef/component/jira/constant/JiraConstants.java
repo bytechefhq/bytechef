@@ -29,16 +29,13 @@ public class JiraConstants {
 
     public static final String ASSIGNEE = "assignee";
     public static final String CONTENT = "content";
-    public static final String CREATE_ISSUE = "createIssue";
     public static final String DESCRIPTION = "description";
     public static final String FIELDS = "fields";
-    public static final String GET_ISSUE = "getIssue";
     public static final String ID = "id";
     public static final String ISSUE = "issue";
     public static final String ISSUES = "issues";
     public static final String ISSUE_ID = "issueId";
     public static final String ISSUETYPE = "issuetype";
-    public static final String JIRA = "jira";
     public static final String JQL = "jql";
     public static final String KEY = "key";
     public static final String MAX_RESULTS = "maxResults";
@@ -47,7 +44,6 @@ public class JiraConstants {
     public static final String PARENT = "parent";
     public static final String PRIORITY = "priority";
     public static final String PROJECT = "project";
-    public static final String SEARCH_FOR_ISSUES_USING_JQL = "searchForIssuesUsingJql";
     public static final String SUMMARY = "summary";
     public static final String TEXT = "text";
     public static final String TYPE = "type";
