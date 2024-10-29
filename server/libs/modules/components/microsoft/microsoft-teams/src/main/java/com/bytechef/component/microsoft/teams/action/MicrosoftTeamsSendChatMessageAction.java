@@ -27,7 +27,6 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.SEND_CHAT_MESSAGE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -42,7 +41,7 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
  */
 public class MicrosoftTeamsSendChatMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_CHAT_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChatMessage")
         .title("Send chat message")
         .description("Sends a message in an existing chat.")
         .properties(

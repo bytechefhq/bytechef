@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CREATE_CHANNEL;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
@@ -29,7 +28,7 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
@@ -39,14 +38,14 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
  */
 public class MicrosoftTeamsCreateChannelAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CHANNEL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createChannel")
         .title("Create channel")
         .description("Creates a new channel within a team.")
         .properties(
             string(TEAM_ID)
                 .label("Team")
                 .description("Team where the channel will be created.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
+                .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
                 .required(true),
             string(DISPLAY_NAME)
                 .label("Channel name")

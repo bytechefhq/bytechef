@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.teams;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.MICROSOFT_TEAMS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MicrosoftTeamsComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MICROSOFT_TEAMS)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("microsoftTeams")
         .title("Microsoft Teams")
         .description(
             "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, " +
