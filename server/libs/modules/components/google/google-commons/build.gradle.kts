@@ -8,5 +8,4 @@ dependencies {
     implementation("com.google.apis:google-api-services-gmail:v1-rev20220404-2.0.0")
     implementation ("com.google.apis:google-api-services-people:v1-rev20220531-2.0.0")
     implementation ("com.google.apis:google-api-services-sheets:v4-rev20220927-2.0.0")
-    implementation ("com.google.apis:google-api-services-forms:v1-rev20220908-2.0.0")
 }
