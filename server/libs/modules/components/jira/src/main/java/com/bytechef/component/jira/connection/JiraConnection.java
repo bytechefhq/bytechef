@@ -55,7 +55,8 @@ public class JiraConnection {
                 .authorizationUrl((parameters, context) -> "https://auth.atlassian.com/authorize")
                 .tokenUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
                 .refreshUrl((parameters, context) -> "https://auth.atlassian.com/oauth/token")
-                .scopes((connection, context) -> List.of("manage:jira-webhook", "read:jira-work", "offline_access")))
+                .scopes((connection, context) -> List.of("manage:jira-webhook", "read:jira-work", "write:jira-work",
+                    "offline_access")))
         .baseUri((connectionParameters, context) -> getBaseUrl(context));
 
     private JiraConnection() {
