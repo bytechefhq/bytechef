@@ -47,13 +47,16 @@ public class DataStorageDeleteValueFromListAction {
             string(SCOPE)
                 .label("Scope")
                 .description(
-                    "The namespace to delete a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
+                    "The namespace to delete a value from. The value should have been previously accessible, " +
+                        "either in the present workflow execution, or the workflow itself for all the executions, or " +
+                        "the user account for all the workflows the user has.")
                 .options(SCOPE_OPTIONS)
                 .required(true),
             integer(INDEX)
                 .label("Index")
                 .description(
-                    "The specified index in the list will be removed, and if it doesn't exist, the list will remain unaltered.")
+                    "The specified index in the list will be removed, and if it doesn't exist, the list will " +
+                        "remain unaltered.")
                 .required(true))
         .perform(DataStorageDeleteValueFromListAction::perform);
 

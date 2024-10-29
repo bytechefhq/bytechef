@@ -55,12 +55,16 @@ public class DataStorageSetValueInListAction {
             string(KEY)
                 .label("Key")
                 .description(
-                    "The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.")
+                    "The identifier of a list. Must be unique across all keys within the chosen scope to prevent " +
+                        "overwriting the existing value with a new one. Also, it must be less than 1024 bytes in " +
+                        "length.")
                 .required(true),
             string(SCOPE)
                 .label("Scope")
                 .description(
-                    "The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.")
+                    "The namespace to set a value in. The value should have been previously accessible, either in " +
+                        "the present workflow execution, or the workflow itself for all the executions, or the user " +
+                        "account for all the workflows the user has.")
                 .options(SCOPE_OPTIONS)
                 .required(true),
             integer(INDEX)

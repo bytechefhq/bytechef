@@ -16,7 +16,6 @@
 
 package com.bytechef.component.data.storage;
 
-import static com.bytechef.component.data.storage.constant.DataStorageConstants.DATA_STORAGE;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -39,10 +38,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class DataStorageComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(DATA_STORAGE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("dataStorage")
         .title("Data Storage")
         .description(
-            "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or retrieving any desired data. This process employs a key-value store mechanism, where the key represents the field's name and the value corresponds to the particular data's actual value.")
+            "Using the Data Storage component, you can easily manage and operate on lists and objects by setting or " +
+                "retrieving any desired data. This process employs a key-value store mechanism, where the key " +
+                "represents the field's name and the value corresponds to the particular data's actual value.")
         .icon("path:assets/data-storage.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
