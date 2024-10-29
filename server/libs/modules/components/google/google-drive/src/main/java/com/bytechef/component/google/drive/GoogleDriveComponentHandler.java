@@ -48,12 +48,12 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.FILE_STORAGE)
         .connection(CONNECTION_DEFINITION)
         .actions(
-            GoogleDriveUploadFileAction.ACTION_DEFINITION,
-            GoogleDriveReadFileAction.ACTION_DEFINITION,
+            GoogleDriveCopyFileAction.ACTION_DEFINITION,
             GoogleDriveCreateNewFolderAction.ACTION_DEFINITION,
             GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION,
             GoogleDriveDeleteFileAction.ACTION_DEFINITION,
-            GoogleDriveCopyFileAction.ACTION_DEFINITION)
+            GoogleDriveReadFileAction.ACTION_DEFINITION,
+            GoogleDriveUploadFileAction.ACTION_DEFINITION)
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
             GoogleDriveNewFolderTrigger.TRIGGER_DEFINITION);
