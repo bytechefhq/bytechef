@@ -43,13 +43,13 @@ public class DataMapperComponentHandler implements ComponentHandler {
         .icon("path:assets/data-mapper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
+            DataMapperMapObjectsToArrayAction.ACTION_DEFINITION,
+            DataMapperMapObjectsToObjectAction.ACTION_DEFINITION,
+            DataMapperMergeAndPivotByKeyAction.ACTION_DEFINITION,
             DataMapperRenameKeysAction.ACTION_DEFINITION,
-            DataMapperReplaceValueAction.ACTION_DEFINITION,
             DataMapperReplaceAllSpecifiedValuesAction.ACTION_DEFINITION,
             DataMapperReplaceMultipleValuesByKeyAction.ACTION_DEFINITION,
-            DataMapperMapObjectsToObjectAction.ACTION_DEFINITION,
-            DataMapperMapObjectsToArrayAction.ACTION_DEFINITION,
-            DataMapperMergeAndPivotByKeyAction.ACTION_DEFINITION);
+            DataMapperReplaceValueAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
