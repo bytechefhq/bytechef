@@ -18,7 +18,6 @@ package com.bytechef.component.aws.s3.action;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PRESIGN_GET_OBJECT;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.SIGNATURE_DURATION;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -38,7 +37,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequ
  */
 public class AwsS3PresignGetObjectAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(PRESIGN_GET_OBJECT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("presignGetObject")
         .title("Get Pre-signed Object")
         .description("You can share an object with a pre-signed URL for up to 12 hours or until your session expires.")
         .properties(

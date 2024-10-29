@@ -16,7 +16,6 @@
 
 package com.bytechef.component.aws.s3;
 
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.AWS_S3;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -36,15 +35,17 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AwsS3ComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(AWS_S3)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("awsS3")
         .title("AWS S3")
         .description("AWS S3 is a simple object storage service provided by Amazon Web Services.")
         .icon("path:assets/aws-s3.svg")
         .categories(ComponentCategory.DEVELOPER_TOOLS, ComponentCategory.FILE_STORAGE)
         .actions(
-            AwsS3GetObjectAction.ACTION_DEFINITION, AwsS3GetUrlAction.ACTION_DEFINITION,
+            AwsS3GetObjectAction.ACTION_DEFINITION,
+            AwsS3GetUrlAction.ACTION_DEFINITION,
             AwsS3ListObjectsAction.ACTION_DEFINITION,
-            AwsS3PresignGetObjectAction.ACTION_DEFINITION, AwsS3PutObjectAction.ACTION_DEFINITION)
+            AwsS3PresignGetObjectAction.ACTION_DEFINITION,
+            AwsS3PutObjectAction.ACTION_DEFINITION)
         .connection(AwsS3Connection.CONNECTION_DEFINITION);
 
     @Override
