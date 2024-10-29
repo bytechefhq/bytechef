@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.CLEAR_WORKSHEET;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
@@ -39,7 +38,7 @@ import java.util.List;
  */
 public class MicrosoftExcelClearWorksheetAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CLEAR_WORKSHEET)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("clearWorksheet")
         .title("Clear worksheet")
         .description("Clear a worksheet of all values.")
         .properties(

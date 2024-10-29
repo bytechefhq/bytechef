@@ -31,17 +31,11 @@ import com.bytechef.component.microsoft.excel.util.MicrosoftExcelUtils;
  */
 public class MicrosoftExcelConstants {
 
-    public static final String APPEND_ROW = "appendRow";
-    public static final String CLEAR_WORKSHEET = "clearWorksheet";
-    public static final String DELETE_ROW = "deleteRow";
     public static final String ID = "id";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
-    public static final String FIND_ROW_BY_NUM = "findRowByNum";
-    public static final String MICROSOFT_EXCEL = "microsoftExcel";
     public static final String NAME = "name";
     public static final String ROW = "row";
     public static final String ROW_NUMBER = "rowNumber";
-    public static final String UPDATE_ROW = "updateRow";
     public static final String VALUE = "value";
     public static final String VALUES = "values";
     public static final String WORKBOOK_ID = "workbookId";

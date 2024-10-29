@@ -26,7 +26,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.UPDATE_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKSHEET_NAME_PROPERTY;
 import static com.bytechef.component.microsoft.excel.util.MicrosoftExcelUpdateWorksheetUtils.updateRange;
@@ -41,7 +40,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class MicrosoftExcelUpdateRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPDATE_ROW)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update row")
         .description("Update a row in a worksheet")
         .properties(

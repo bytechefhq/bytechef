@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.excel;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.MICROSOFT_EXCEL;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -36,7 +35,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MicrosoftExcelComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MICROSOFT_EXCEL)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("microsoftExcel")
         .title("Microsoft Excel")
         .description(
             "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in " +

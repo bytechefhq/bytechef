@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.DELETE_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
@@ -38,7 +37,7 @@ import java.util.List;
  */
 public class MicrosoftExcelDeleteRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_ROW)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete row")
         .description("Delete row on an existing sheet")
         .properties(

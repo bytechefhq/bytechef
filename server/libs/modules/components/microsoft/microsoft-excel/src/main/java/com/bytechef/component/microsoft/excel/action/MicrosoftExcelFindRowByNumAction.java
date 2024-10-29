@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.FIND_ROW_BY_NUM;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class MicrosoftExcelFindRowByNumAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(FIND_ROW_BY_NUM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
         .title("Find row by number")
         .description("Get row values from the worksheet by the row number")
         .properties(

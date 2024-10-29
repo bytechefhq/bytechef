@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.APPEND_ROW;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.WORKBOOK_ID_PROPERTY;
@@ -40,7 +39,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class MicrosoftExcelAppendRowAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(APPEND_ROW)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("appendRow")
         .title("Append row")
         .description("Append a row of values to an existing worksheet")
         .properties(
