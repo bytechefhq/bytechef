@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ADDRESS;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CITY;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.COUNTRY;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_CONTACT;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FACEBOOK;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
@@ -50,7 +49,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class FreshsalesCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create contact")
         .description("Add new contact in Freshsales CRM")
         .properties(
