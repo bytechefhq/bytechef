@@ -16,7 +16,6 @@
 
 package com.bytechef.component.bash;
 
-import static com.bytechef.component.bash.constant.BashConstants.BASH;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class BashComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(BASH)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("bash")
         .title("Bash")
         .description("Allows you to run arbitrary Bash scripts.")
         .icon("path:assets/bash.svg")

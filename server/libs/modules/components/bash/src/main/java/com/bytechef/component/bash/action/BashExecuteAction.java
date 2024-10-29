@@ -16,7 +16,6 @@
 
 package com.bytechef.component.bash.action;
 
-import static com.bytechef.component.bash.constant.BashConstants.EXECUTE;
 import static com.bytechef.component.bash.constant.BashConstants.SCRIPT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -44,14 +43,15 @@ import org.zeroturnaround.exec.ProcessExecutor;
  */
 public class BashExecuteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(EXECUTE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("execute")
         .title("Execute")
         .description("Creates a temporary script that executes bash commands. The script is afterwards deleted.")
-        .properties(string(SCRIPT)
-            .label("Script")
-            .description("Script written in bash. Multiple commands are possible with the ';' separator.")
-            .placeholder("ls -la")
-            .required(true))
+        .properties(
+            string(SCRIPT)
+                .label("Script")
+                .description("Script written in bash. Multiple commands are possible with the ';' separator.")
+                .placeholder("ls -la")
+                .required(true))
         .output(outputSchema(string()), sampleOutput("Sample result"))
         .perform(BashExecuteAction::perform);
 
