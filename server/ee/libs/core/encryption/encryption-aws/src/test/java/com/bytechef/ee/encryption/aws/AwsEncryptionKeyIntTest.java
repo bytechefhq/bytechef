@@ -56,21 +56,21 @@ class AwsEncryptionKeyIntTest {
     }
 
     @Test
-    void canFetchKey() {
+    void canDoGetKey() {
         await()
             .pollInterval(Duration.ofSeconds(2))
             .atMost(Duration.ofSeconds(10))
             .ignoreExceptions()
             .untilAsserted(() -> {
-                String key = storageService.fetchKey();
+                String key = storageService.doGetKey();
 
-                assertEquals(30, key.length());
+                assertEquals(44, key.length());
                 assertFalse(key.contains(" "));
             });
     }
 
     @Test
-    void canFetchKeyIfAlreadyExists() {
+    void canDoGetKeyIfAlreadyExists() {
         SecretsManagerClient secretsManagerClient = SecretsManagerClient.builder()
             .credentialsProvider(() -> AwsBasicCredentials.create(localStack.getAccessKey(), localStack.getSecretKey()))
             .region(Region.US_EAST_1)
@@ -84,11 +84,11 @@ class AwsEncryptionKeyIntTest {
             .atMost(Duration.ofSeconds(10))
             .ignoreExceptions()
             .untilAsserted(() -> {
-                String key1 = storageService.fetchKey();
-                String key2 = awsEncryptionKey.fetchKey();
+                String key1 = storageService.doGetKey();
+                String key2 = awsEncryptionKey.doGetKey();
 
-                assertEquals(30, key1.length());
-                assertEquals(30, key2.length());
+                assertEquals(44, key1.length());
+                assertEquals(44, key2.length());
                 assertEquals(key1, key2);
             });
     }
