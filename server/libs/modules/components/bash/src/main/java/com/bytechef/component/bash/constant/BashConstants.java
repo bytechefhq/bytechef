@@ -18,7 +18,5 @@ package com.bytechef.component.bash.constant;
 
 public class BashConstants {
 
-    public static final String BASH = "bash";
-    public static final String EXECUTE = "execute";
     public static final String SCRIPT = "script";
 }
