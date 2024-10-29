@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.CREATE_LEAD;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMAIL;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
@@ -38,7 +37,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class FreshsalesCreateLeadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_LEAD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLead")
         .title("Create lead")
         .description("Creates a new lead")
         .properties(

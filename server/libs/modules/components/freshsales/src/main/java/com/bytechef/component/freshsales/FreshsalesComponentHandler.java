@@ -18,7 +18,6 @@ package com.bytechef.component.freshsales;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.freshsales.connection.FreshsalesConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FRESHSALES;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class FreshsalesComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(FRESHSALES)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("freshsales")
         .title("Freshsales")
         .description(
             "Freshsales is a customer relationship management (CRM) software designed to help businesses streamline " +

@@ -27,13 +27,9 @@ public class FreshsalesConstants {
     public static final String ADDRESS = "address";
     public static final String CITY = "city";
     public static final String COUNTRY = "country";
-    public static final String CREATE_ACCOUNT = "createAccount";
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_LEAD = "createLead";
     public static final String EMAIL = "email";
     public static final String FACEBOOK = "facebook";
     public static final String FIRST_NAME = "first_name";
-    public static final String FRESHSALES = "freshsales";
     public static final String JOB_TITLE = "job_title";
     public static final String LAST_NAME = "last_name";
     public static final String LINKEDIN = "linkedin";
