@@ -39,10 +39,10 @@ public class ImageHelperComponentHandler implements ComponentHandler {
         .icon("path:assets/image-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
+            ImageHelperCropImageAction.ACTION_DEFINITION,
             ImageHelperImageToBase64Action.ACTION_DEFINITION,
             ImageHelperResizeImageAction.ACTION_DEFINITION,
-            ImageHelperRotateImageAction.ACTION_DEFINITION,
-            ImageHelperCropImageAction.ACTION_DEFINITION);
+            ImageHelperRotateImageAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
