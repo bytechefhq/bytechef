@@ -2,6 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
+import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/queries/apiCollections.queries';
 import {Environment} from '@/middleware/automation/api-platform';
@@ -24,7 +25,7 @@ export enum Type {
 const ApiCollections = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number | undefined>(getEnvironment());
+    const [environment, setEnvironment] = useState<number>(getEnvironment());
     const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
 
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -50,14 +51,6 @@ const ApiCollections = () => {
     });
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
-
-    let pageTitle: string | undefined;
-
-    if (filterData.type === Type.Project) {
-        pageTitle = projects?.find((project) => project.id === filterData.id)?.name;
-    } else {
-        pageTitle = tags?.find((tag) => tag.id === filterData.id)?.name;
-    }
 
     function getEnvironment() {
         return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
@@ -91,9 +84,12 @@ const ApiCollections = () => {
                         position="main"
                         right={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}
                         title={
-                            !pageTitle
-                                ? 'All Instances'
-                                : `Filter by ${searchParams.get('tagId') ? 'tag' : 'project'}: ${pageTitle}`
+                            <ApiCollectionsFilterTitle
+                                environment={environment}
+                                filterData={filterData}
+                                projects={projects}
+                                tags={tags}
+                            />
                         }
                     />
                 )
