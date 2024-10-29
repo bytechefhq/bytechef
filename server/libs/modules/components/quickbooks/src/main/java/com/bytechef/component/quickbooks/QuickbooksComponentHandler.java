@@ -17,7 +17,6 @@
 package com.bytechef.component.quickbooks;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUICKBOOKS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -35,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class QuickbooksComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(QUICKBOOKS)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("quickbooks")
         .title("QuickBooks")
         .description(
             "QuickBooks is an accounting software package developed and marketed by Intuit. It is geared mainly " +

@@ -23,16 +23,12 @@ package com.bytechef.component.quickbooks.constant;
 public final class QuickbooksConstants {
 
     public static final String COMPANY_ID = "companyId";
-    public static final String CREATE_CATEGORY = "createCategory";
-    public static final String CREATE_CUSTOMER = "createCustomer";
-    public static final String CREATE_ITEM = "createItem";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String FAMILY_NAME = "FamilyName";
     public static final String GIVEN_NAME = "GivenName";
     public static final String MIDDLE_NAME = "MiddleName";
     public static final String NAME = "Name";
     public static final String QUANTITY = "QtyOnHand";
-    public static final String QUICKBOOKS = "quickbooks";
     public static final String SUFFIX = "Suffix";
     public static final String TITLE = "Title";
 
