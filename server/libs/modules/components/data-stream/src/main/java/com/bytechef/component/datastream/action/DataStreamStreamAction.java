@@ -23,6 +23,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.INS
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.SOURCE;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
@@ -30,7 +31,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.datastream.constant.DataStreamConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -59,7 +59,7 @@ public class DataStreamStreamAction {
 
     public DataStreamStreamAction(Job job, JobLauncher jobLauncher) {
         actionDefinition = new SyncActionDefinition(
-            action(DataStreamConstants.STREAM)
+            action(STREAM)
                 .title("Stream Data")
                 .description("Stream large volume of data between source and destination applications.")
                 .properties(
