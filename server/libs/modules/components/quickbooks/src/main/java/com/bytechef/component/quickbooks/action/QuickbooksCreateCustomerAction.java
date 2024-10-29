@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CREATE_CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIVEN_NAME;
@@ -44,7 +43,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public final class QuickbooksCreateCustomerAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CUSTOMER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCustomer")
         .title("Create customer")
         .description("Creates a new customer.")
         .properties(
