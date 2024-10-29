@@ -21,14 +21,17 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.forms.constant.GoogleFormsConstants;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.forms.v1.Forms;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
 /**
  * @author Monika Kušter
+ * @author Vihar Shah
  */
 public class GoogleFormsUtils {
 
@@ -48,6 +51,29 @@ public class GoogleFormsUtils {
             .getFiles()
             .stream()
             .map(file -> (Option<String>) option(file.getName(), file.getId()))
+            .toList();
+    }
+
+    public static List<Option<String>> getResponseOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) throws IOException {
+
+        String formId = inputParameters.getRequiredString(GoogleFormsConstants.FORM);
+        Forms forms;
+        try {
+            forms = GoogleServices.getForms(connectionParameters);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return forms.forms()
+            .responses()
+            .list(formId)
+            .execute()
+            .getResponses()
+            .stream()
+            .map(response -> (Option<String>) option(
+                response.getRespondentEmail() + "(" + response.getResponseId() + ")", response.getResponseId()))
             .toList();
     }
 }
