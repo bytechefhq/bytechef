@@ -1,6 +1,7 @@
 /* eslint-disable sort-keys */
 
 import {UserI} from '@/shared/models/user.model';
+import {getCookie} from '@/shared/util/cookie-utils';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -17,6 +18,7 @@ const fetchUpdateAccount = async (data: string): Promise<Response> => {
         body: data,
         headers: {
             'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
         },
         method: 'POST',
     }).then((response) => response);
