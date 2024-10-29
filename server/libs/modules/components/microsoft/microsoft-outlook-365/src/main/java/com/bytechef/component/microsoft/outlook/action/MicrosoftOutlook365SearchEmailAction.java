@@ -24,7 +24,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SEARCH_EMAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class MicrosoftOutlook365SearchEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH_EMAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchEmail")
         .title("Search Email")
         .description("Get the messages in the signed-in user's mailbox")
         .properties(
