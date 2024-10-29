@@ -41,7 +41,7 @@ public class BaserowCreateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRow")
         .title("Create Row")
-        .description("Creates a new Projects row.")
+        .description("Creates a new row.")
         .properties(
             integer(TABLE_ID)
                 .label("Table")
