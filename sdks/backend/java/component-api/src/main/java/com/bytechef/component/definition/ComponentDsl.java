@@ -3429,7 +3429,7 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<WebhookRequestFunction> getDWebhookRequest() {
+        public Optional<WebhookRequestFunction> getWebhookRequest() {
             return Optional.ofNullable(webhookRequestFunction);
         }
 
