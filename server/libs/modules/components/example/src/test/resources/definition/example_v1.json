@@ -13,14 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Example",
-  "connection" : {
-    "authorizations" : [ ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -80,10 +72,90 @@
     "properties" : [ ],
     "title" : "Title",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  "triggers" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Triggers when an issue is updated.",
+    "help" : null,
+    "name" : "dummyTrigger",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ ],
+    "title" : "Updated Issue",
+    "type" : "DYNAMIC_WEBHOOK",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "poll" : null,
+    "deduplicate" : null,
+    "webhookDisable" : { },
+    "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
+    "dwebhookRequest" : { },
+    "listenerDisable" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : { },
+    "webhookValidateOnEnable" : null
+  } ],
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
