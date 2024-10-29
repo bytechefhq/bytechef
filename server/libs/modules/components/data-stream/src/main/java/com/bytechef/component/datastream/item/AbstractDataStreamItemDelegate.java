@@ -21,12 +21,12 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.INP
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.JOB_ID;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.STREAM;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TENANT_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TEST_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.TYPE;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.datastream.constant.DataStreamConstants;
 import com.bytechef.component.definition.DataStreamContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ContextFactory;
@@ -123,7 +123,7 @@ public abstract class AbstractDataStreamItemDelegate {
 
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
-                componentName, componentVersion, DataStreamConstants.STREAM, type, instanceId, instanceWorkflowId,
+                componentName, componentVersion, STREAM, type, instanceId, instanceWorkflowId,
                 null, jobId, null, testEnvironment));
 
         doBeforeStep(stepExecution);
