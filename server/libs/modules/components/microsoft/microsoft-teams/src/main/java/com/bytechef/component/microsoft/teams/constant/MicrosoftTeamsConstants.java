@@ -32,13 +32,9 @@ public class MicrosoftTeamsConstants {
     public static final String CHANNEL_ID = "channelId";
     public static final String CONTENT = "content";
     public static final String CONTENT_TYPE = "contentType";
-    public static final String CREATE_CHANNEL = "createChannel";
     public static final String DISPLAY_NAME = "displayName";
     public static final String DESCRIPTION = "description";
     public static final String ID = "id";
-    public static final String MICROSOFT_TEAMS = "microsoftTeams";
-    public static final String SEND_CHANNEL_MESSAGE = "sendChannelMessage";
-    public static final String SEND_CHAT_MESSAGE = "sendChatMessage";
     public static final String TEAM_ID = "teamId";
     public static final String VALUE = "value";
 

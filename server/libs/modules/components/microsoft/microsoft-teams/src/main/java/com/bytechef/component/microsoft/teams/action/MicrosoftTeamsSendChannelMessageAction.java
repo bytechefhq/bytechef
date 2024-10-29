@@ -27,7 +27,6 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CONTENT_TYPE_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.ID;
-import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.SEND_CHANNEL_MESSAGE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,7 +42,7 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
  */
 public class MicrosoftTeamsSendChannelMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_CHANNEL_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
         .title("Send channel message")
         .description("Sends a message to a channel.")
         .properties(
