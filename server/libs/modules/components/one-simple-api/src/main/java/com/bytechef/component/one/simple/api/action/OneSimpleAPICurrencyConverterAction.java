@@ -23,18 +23,15 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.CURRENCY_OPTIONS;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_CURRENCY;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_VALUE;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TO_CURRENCY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.one.simple.api.util.OneSimpleAPIUtils;
 
 /**
  * @author Luka Ljubić
@@ -44,31 +41,32 @@ public class OneSimpleAPICurrencyConverterAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("currencyConverter")
         .title("Currency Converter")
-        .description("Convert your currency into any other")
+        .description("Convert currency from one to another.")
         .properties(
             string(FROM_CURRENCY)
-                .options((ActionOptionsFunction<String>) OneSimpleAPIUtils::getCurrencyOptions)
                 .label("From Currency")
-                .description("Select a currency from which you want to convert")
+                .description("Currency from which you want to convert.")
+                .options(CURRENCY_OPTIONS)
                 .required(true),
             string(TO_CURRENCY)
-                .options((ActionOptionsFunction<String>) OneSimpleAPIUtils::getCurrencyOptions)
                 .label("To Currency")
-                .description("Select a currency to which you want to convert")
+                .description("Currency to which you want to convert.")
+                .options(CURRENCY_OPTIONS)
                 .required(true),
             number(FROM_VALUE)
-                .defaultValue(0)
                 .label("Value")
-                .description("Input the number for conversion")
+                .description("Value to convert.")
+                .defaultValue(1)
                 .required(true))
         .output(
             outputSchema(
                 object()
                     .properties(
                         string(FROM_CURRENCY),
+                        string(FROM_VALUE),
                         string(TO_CURRENCY),
-                        string(TO_CURRENCY),
-                        string("to_value"))))
+                        number("to_value"),
+                        string("to_exchange_rate"))))
         .perform(OneSimpleAPICurrencyConverterAction::perform);
 
     private OneSimpleAPICurrencyConverterAction() {
@@ -78,13 +76,10 @@ public class OneSimpleAPICurrencyConverterAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.get("/exchange_rate"))
-            .body(
-                Body.of(
-                    TOKEN, connectionParameters.getRequiredString(TOKEN),
-                    FROM_CURRENCY, inputParameters.getRequiredString(FROM_CURRENCY),
-                    TO_CURRENCY, inputParameters.getRequiredString(TO_CURRENCY),
-                    FROM_VALUE, inputParameters.getRequiredString(FROM_VALUE),
-                    "output", "json"))
+            .queryParameters(
+                FROM_CURRENCY, inputParameters.getRequiredString(FROM_CURRENCY),
+                TO_CURRENCY, inputParameters.getRequiredString(TO_CURRENCY),
+                FROM_VALUE, inputParameters.getRequiredDouble(FROM_VALUE))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
