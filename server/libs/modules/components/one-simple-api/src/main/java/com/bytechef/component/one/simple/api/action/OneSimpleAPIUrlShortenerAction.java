@@ -22,22 +22,22 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL_SHORTENER;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class OneSimpleAPIUrlShortenerAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(URL_SHORTENER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("urlShortener")
         .title("URL Shortener")
         .description("Shorten your desired URL")
         .properties(
@@ -56,11 +56,13 @@ public class OneSimpleAPIUrlShortenerAction {
     private OneSimpleAPIUrlShortenerAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context.http(http -> http.get("/shortener/new"))
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext.http(http -> http.get("/shortener/new"))
             .body(
                 Body.of(
-                    ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),
+                    TOKEN, connectionParameters.getRequiredString(TOKEN),
                     URL, inputParameters.getRequiredString(URL),
                     "output", "json"))
             .configuration(responseType(ResponseType.JSON))
