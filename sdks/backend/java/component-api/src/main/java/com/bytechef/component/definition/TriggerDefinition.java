@@ -151,7 +151,7 @@ public interface TriggerDefinition {
      *
      * @return
      */
-    Optional<WebhookRequestFunction> getDWebhookRequest();
+    Optional<WebhookRequestFunction> getWebhookRequest();
 
     /**
      *

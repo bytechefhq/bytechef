@@ -234,7 +234,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
 
         if (TriggerType.DYNAMIC_WEBHOOK == triggerType || TriggerType.STATIC_WEBHOOK == triggerType) {
-            triggerOutput = triggerDefinition.getDWebhookRequest()
+            triggerOutput = triggerDefinition.getWebhookRequest()
                 .map(webhookRequestFunction -> executeWebhookTrigger(
                     triggerDefinition, inputParameters, toDynamicWebhookEnableOutput((Map<?, ?>) triggerState),
                     webhookRequest, connection, context, webhookRequestFunction))
