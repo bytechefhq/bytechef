@@ -79,9 +79,9 @@
     },
     "properties" : [ ],
     "title" : "Title",
-    "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
   "triggers" : [ {
@@ -144,18 +144,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "webhookValidate" : { },
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null
 }

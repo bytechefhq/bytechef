@@ -35,45 +35,16 @@
     "workflowSyncExecution" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
     "poll" : null,
+    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
-  }, {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Upon receiving a workflow request request, it goes through a validation process. Once validated, the request trigger responds to the sender with an appropriate HTTP status code.",
-    "help" : null,
-    "name" : "validateAndRespond",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : null,
-    "title" : "Validate and respond",
-    "type" : "STATIC_WEBHOOK",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "webhookDisable" : null,
-    "webhookEnable" : null,
-    "dwebhookRequest" : { },
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -112,16 +83,16 @@
     "workflowSyncExecution" : true,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
     "poll" : null,
+    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null
 }

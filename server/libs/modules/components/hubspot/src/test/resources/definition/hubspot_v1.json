@@ -3258,7 +3258,7 @@
     "webhookEnable" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
     "poll" : null,

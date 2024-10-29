@@ -39,7 +39,7 @@
     "deprecated" : null,
     "description" : ".",
     "help" : null,
-    "name" : "newAPIRequest",
+    "name" : "newApiRequest",
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
@@ -72,7 +72,7 @@
     "workflowSyncExecution" : true,
     "webhookDisable" : null,
     "webhookEnable" : null,
-    "dwebhookRequest" : { },
+    "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
