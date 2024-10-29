@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.AUTORENAME;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_TEXT_FILE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
@@ -43,7 +42,7 @@ import com.bytechef.component.definition.Property.ControlType;
  */
 public class DropboxCreateNewTextFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TEXT_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTextFile")
         .title("Create a new paper file")
         .description("Create a new .paper file on which you can write at a given path")
         .properties(

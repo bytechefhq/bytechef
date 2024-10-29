@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.MOVE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
 import static com.bytechef.component.dropbox.util.DropboxUtils.getFullPath;
 
@@ -39,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class DropboxMoveAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(MOVE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("move")
         .title("Move")
         .description(
             "Move a file or folder to a different location in the user's Dropbox. If the source path is a folder all " +

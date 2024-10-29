@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.QUERY;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.SEARCH;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -37,7 +36,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class DropboxSearchAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEARCH)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("search")
         .title("Search")
         .description(
             "Searches for files and folders. Can only be used to retrieve a maximum of 10,000 matches. Recent " +

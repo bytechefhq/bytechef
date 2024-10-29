@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.CREATE_FOLDER;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 
 import com.bytechef.component.definition.ActionContext;
@@ -36,7 +35,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class DropboxCreateNewFolderAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_FOLDER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
         .title("Create new folder")
         .description("Create a folder at a given path.")
         .properties(

@@ -31,7 +31,6 @@ import static com.bytechef.component.dropbox.constant.DropboxConstants.FILE_ENTR
 import static com.bytechef.component.dropbox.constant.DropboxConstants.MUTE;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.STRICT_CONFLICT;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.UPLOAD_FILE;
 import static com.bytechef.component.dropbox.util.DropboxUtils.uploadFile;
 
 import com.bytechef.component.definition.ActionContext;
@@ -44,7 +43,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class DropboxUploadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload file")
         .description("Create a new file up to a size of 150MB with the contents provided in the request.")
         .properties(

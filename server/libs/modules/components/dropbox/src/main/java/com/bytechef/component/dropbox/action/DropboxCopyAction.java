@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.dropbox.constant.DropboxConstants.COPY;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FILENAME;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.FROM_PATH;
 import static com.bytechef.component.dropbox.constant.DropboxConstants.TO_PATH;
@@ -39,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class DropboxCopyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(COPY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("copy")
         .title("Copy")
         .description(
             "Copy a file or folder to a different location in the user's Dropbox. If the source path is a folder " +
