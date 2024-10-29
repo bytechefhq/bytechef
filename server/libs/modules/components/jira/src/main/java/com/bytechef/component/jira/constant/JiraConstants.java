@@ -30,6 +30,7 @@ public class JiraConstants {
     public static final String ASSIGNEE = "assignee";
     public static final String CONTENT = "content";
     public static final String CREATE_ISSUE = "createIssue";
+    public static final String CREATE_ISSUE_COMMENT = "createIssueComment";
     public static final String DESCRIPTION = "description";
     public static final String FIELDS = "fields";
     public static final String GET_ISSUE = "getIssue";
