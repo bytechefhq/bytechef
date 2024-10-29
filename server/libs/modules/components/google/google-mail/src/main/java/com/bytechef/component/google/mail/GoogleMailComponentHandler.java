@@ -47,13 +47,14 @@ public class GoogleMailComponentHandler implements ComponentHandler {
         .icon("path:assets/google-mail.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CONNECTION_DEFINITION)
-        .actions(GoogleMailGetMailAction.ACTION_DEFINITION,
+        .actions(
+            GoogleMailAddLabelAction.ACTION_DEFINITION,
+            GoogleMailDeleteMailAction.ACTION_DEFINITION,
+            GoogleMailGetMailAction.ACTION_DEFINITION,
             GoogleMailGetThreadAction.ACTION_DEFINITION,
             GoogleMailReplyToEmailAction.ACTION_DEFINITION,
             GoogleMailSearchEmailAction.ACTION_DEFINITION,
-            GoogleMailSendEmailAction.ACTION_DEFINITION,
-            GoogleMailDeleteMailAction.ACTION_DEFINITION,
-            GoogleMailAddLabelAction.ACTION_DEFINITION)
+            GoogleMailSendEmailAction.ACTION_DEFINITION)
         .triggers(
             GoogleMailNewEmailTrigger.TRIGGER_DEFINITION,
             GoogleMailNewEmailPollingTrigger.TRIGGER_DEFINITION);
