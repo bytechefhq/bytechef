@@ -896,17 +896,39 @@ public class ApplicationProperties {
          * Encryption provider.
          */
         public enum Provider {
-            AWS, FILESYSTEM;
+            AWS, FILESYSTEM, PROPERTY;
         }
 
         private Provider provider = Provider.FILESYSTEM;
+        private Property property = new Property();
 
         public Provider getProvider() {
             return provider;
         }
 
+        public Property getProperty() {
+            return property;
+        }
+
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+
+        public void setProperty(Property property) {
+            this.property = property;
+        }
+
+        public static class Property {
+
+            private String key;
+
+            public String getKey() {
+                return key;
+            }
+
+            public void setKey(String key) {
+                this.key = key;
+            }
         }
     }
 
