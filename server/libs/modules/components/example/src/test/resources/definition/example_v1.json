@@ -13,6 +13,14 @@
   "resources" : null,
   "version" : 1,
   "title" : "Example",
+  "connection" : {
+    "authorizations" : [ ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -71,9 +79,9 @@
     },
     "properties" : [ ],
     "title" : "Title",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : [ {
@@ -136,26 +144,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
     "dwebhookRequest" : { },
     "listenerDisable" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "webhookValidateOnEnable" : null
+    "deduplicate" : null,
+    "poll" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

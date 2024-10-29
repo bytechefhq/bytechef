@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -677,9 +677,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create project",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1555,9 +1555,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create a task",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
   "dataStream" : null,

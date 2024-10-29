@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Object Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -48,9 +49,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON string",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -134,9 +135,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to JSON string",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -443,9 +444,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add value to the object by key",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1111,12 +1112,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Key-Value pairs to object or array",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

@@ -84,8 +84,8 @@
         "label" : "Time",
         "value" : 10
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -105,8 +105,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -146,8 +146,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -163,8 +163,8 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -182,8 +182,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -219,8 +219,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -254,8 +254,8 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -295,8 +295,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -312,8 +312,8 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "DATE_TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "DATE_TIME"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -331,8 +331,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "controlType" : "INTEGER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "INTEGER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -368,8 +368,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -388,8 +388,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -425,14 +425,14 @@
         "label" : null,
         "placeholder" : null,
         "options" : null,
-        "controlType" : "TIME",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "TIME"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
@@ -468,15 +468,15 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "TIME"
     } ],
     "title" : "Set value",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

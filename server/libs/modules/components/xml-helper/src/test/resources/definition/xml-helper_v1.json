@@ -92,9 +92,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from XML string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -221,11 +221,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to XML string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

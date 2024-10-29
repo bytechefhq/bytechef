@@ -63,8 +63,6 @@
       "title" : "WhatsApp Custom Authorization",
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -74,7 +72,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -420,11 +420,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Message",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1265,10 +1264,6 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },
@@ -1276,7 +1271,12 @@
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

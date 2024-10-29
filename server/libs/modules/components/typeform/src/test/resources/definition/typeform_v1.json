@@ -63,6 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -72,9 +74,7 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -227,10 +227,11 @@
       }
     } ],
     "title" : "Create Form",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -314,6 +315,10 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "deduplicate" : null,
     "poll" : null,
     "webhookDisable" : { },
@@ -321,12 +326,7 @@
     "dwebhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

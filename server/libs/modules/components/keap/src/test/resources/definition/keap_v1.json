@@ -63,8 +63,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -7622,7 +7622,7 @@
     "workflowNodeDescription" : null,
     "perform" : null
   } ],
-  "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }
