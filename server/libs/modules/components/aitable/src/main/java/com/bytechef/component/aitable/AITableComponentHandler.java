@@ -42,9 +42,9 @@ public class AITableComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(AITableConnection.CONNECTION_DEFINITION)
         .actions(
+            AITableCreateRecordAction.ACTION_DEFINITION,
             AITableFindRecordsAction.ACTION_DEFINITION,
-            AITableUpdateRecordAction.ACTION_DEFINITION,
-            AITableCreateRecordAction.ACTION_DEFINITION);
+            AITableUpdateRecordAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
