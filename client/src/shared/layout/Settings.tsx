@@ -55,7 +55,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                         navItem.href ? (
                             <LeftSidebarNavItem
                                 item={{
-                                    current: location.pathname === navItem.href,
+                                    current: location.pathname.includes(navItem.href),
                                     name: navItem.title,
                                 }}
                                 key={navItem.href}
