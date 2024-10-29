@@ -21,15 +21,10 @@ package com.bytechef.component.microsoft.one.drive.constant;
  */
 public class MicrosoftOneDriveConstants {
 
-    public static final String DOWNLOAD_FILE = "downloadFile";
     public static final String FILE = "file";
     public static final String ID = "id";
-    public static final String LIST_FILES = "listFiles";
-    public static final String LIST_FOLDERS = "listFolders";
-    public static final String MICROSOFT_ONEDRIVE = "microsoftOneDrive";
     public static final String NAME = "name";
     public static final String PARENT_ID = "parentId";
-    public static final String UPLOAD_FILE = "uploadFile";
     public static final String VALUE = "value";
 
     private MicrosoftOneDriveConstants() {

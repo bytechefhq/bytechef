@@ -25,7 +25,6 @@ import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDr
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.UPLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
 
 import com.bytechef.component.definition.ActionContext;
@@ -42,7 +41,7 @@ import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
  */
 public class MicrosoftOneDriveUploadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(UPLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload file")
         .description("Upload a file to your Microsoft OneDrive")
         .properties(

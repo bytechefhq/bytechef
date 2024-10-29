@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.DOWNLOAD_FILE;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 
@@ -36,7 +35,7 @@ import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
  */
 public class MicrosoftOneDriveDownloadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD_FILE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download file")
         .description("Download a file from your Microsoft OneDrive")
         .properties(

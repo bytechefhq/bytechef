@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.ID;
-import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.LIST_FOLDERS;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.NAME;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.VALUE;
@@ -42,7 +41,7 @@ import java.util.Map;
  */
 public class MicrosoftOneDriveListFoldersAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_FOLDERS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolders")
         .title("List Folders")
         .description("List folders in a OneDrive folder")
         .properties(
