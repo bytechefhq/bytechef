@@ -28,57 +28,47 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 class OneSimpleAPICurrencyConverterActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FROM_CURRENCY, "EUR", TO_CURRENCY, "USD", FROM_VALUE, 1));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responeseMap = Map.of("key", "value");
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.headers(any()))
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
-        when(mockedExecutor.body(any()))
-            .thenReturn(mockedExecutor);
+            .thenReturn(mockedObject);
 
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+        Object result =
+            OneSimpleAPICurrencyConverterAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        when(mockedParameters.getRequiredString(FROM_CURRENCY))
-            .thenReturn((String) propertyStubsMap.get(FROM_CURRENCY));
-        when(mockedParameters.getRequiredString(TO_CURRENCY))
-            .thenReturn((String) propertyStubsMap.get(TO_CURRENCY));
-        when(mockedParameters.getRequiredString(FROM_VALUE))
-            .thenReturn((String) propertyStubsMap.get(FROM_VALUE));
+        assertEquals(mockedObject, result);
 
-        Object result = OneSimpleAPICurrencyConverterAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object[] query = queryArgumentCaptor.getValue();
 
-        assertEquals(responeseMap, result);
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(FROM_CURRENCY, FROM_CURRENCY);
-        propertyStubsMap.put(TO_CURRENCY, TO_CURRENCY);
-        propertyStubsMap.put(FROM_VALUE, FROM_VALUE);
-
-        return propertyStubsMap;
+        assertEquals(List.of(FROM_CURRENCY, "EUR", TO_CURRENCY, "USD", FROM_VALUE, 1.0), Arrays.asList(query));
     }
 }
