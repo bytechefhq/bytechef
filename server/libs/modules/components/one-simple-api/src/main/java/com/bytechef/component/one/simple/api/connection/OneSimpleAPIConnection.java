@@ -20,7 +20,7 @@ import static com.bytechef.component.definition.Authorization.AuthorizationType.
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
@@ -36,7 +36,7 @@ public class OneSimpleAPIConnection {
             authorization(CUSTOM)
                 .title("One Simple API Connection")
                 .properties(
-                    string(ACCESS_TOKEN)
+                    string(TOKEN)
                         .label("Access Token")
                         .description("Access Token that is given to you when you create a API Token in OneSimpleApi")
                         .required(true))

@@ -17,7 +17,6 @@
 package com.bytechef.component.one.simple.api;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ONE_SIMPLE_API;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -30,11 +29,12 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class OneSimpleAPIComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ONE_SIMPLE_API)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("oneSimpleAPI")
         .title("One Simple API")
         .description("A toolbox with all the things you need to get your project to success: " +
             " Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, " +
@@ -45,7 +45,7 @@ public class OneSimpleAPIComponentHandler implements ComponentHandler {
             OneSimpleAPICurrencyConverterAction.ACTION_DEFINITION,
             OneSimpleAPIUrlShortenerAction.ACTION_DEFINITION,
             OneSimpleAPIWebPageInformationAction.ACTION_DEFINITION)
-        .icon("path:assets/osa_v1.svg");
+        .icon("path:assets/one-simple-api.svg");
 
     @Override
     public ComponentDefinition getDefinition() {

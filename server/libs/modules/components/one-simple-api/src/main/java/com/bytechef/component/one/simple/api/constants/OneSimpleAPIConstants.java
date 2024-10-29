@@ -18,20 +18,17 @@ package com.bytechef.component.one.simple.api.constants;
 
 /**
  * @author Luka Ljubic
+ * @author Monika Kušter
  */
 public class OneSimpleAPIConstants {
 
-    public static final String ACCESS_TOKEN = "token";
-    public static final String CURRENCY_CONVERTER = "currencyConverter";
-    public static final String DESC = "description";
+    public static final String TOKEN = "token";
+    public static final String DESCRIPTION = "description";
     public static final String FROM_CURRENCY = "from_currency";
     public static final String FROM_VALUE = "from_value";
-    public static final String ONE_SIMPLE_API = "oneSimpleAPI";
     public static final String TITLE = "title";
     public static final String TO_CURRENCY = "to_currency";
     public static final String URL = "url";
-    public static final String URL_SHORTENER = "urlShortener";
-    public static final String WEB_INFORMATION = "url";
 
     private OneSimpleAPIConstants() {
     }

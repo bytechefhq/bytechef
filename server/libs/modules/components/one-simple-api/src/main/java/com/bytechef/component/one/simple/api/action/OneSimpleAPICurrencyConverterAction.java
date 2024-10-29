@@ -23,8 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.CURRENCY_CONVERTER;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_CURRENCY;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.FROM_VALUE;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TO_CURRENCY;
@@ -39,10 +38,11 @@ import com.bytechef.component.one.simple.api.util.OneSimpleAPIUtils;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class OneSimpleAPICurrencyConverterAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CURRENCY_CONVERTER)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("currencyConverter")
         .title("Currency Converter")
         .description("Convert your currency into any other")
         .properties(
@@ -74,11 +74,13 @@ public class OneSimpleAPICurrencyConverterAction {
     private OneSimpleAPICurrencyConverterAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context.http(http -> http.get("/exchange_rate"))
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext.http(http -> http.get("/exchange_rate"))
             .body(
                 Body.of(
-                    ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),
+                    TOKEN, connectionParameters.getRequiredString(TOKEN),
                     FROM_CURRENCY, inputParameters.getRequiredString(FROM_CURRENCY),
                     TO_CURRENCY, inputParameters.getRequiredString(TO_CURRENCY),
                     FROM_VALUE, inputParameters.getRequiredString(FROM_VALUE),

@@ -23,11 +23,10 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.ACCESS_TOKEN;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.DESC;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
+import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.DESCRIPTION;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TITLE;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.WEB_INFORMATION;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -36,10 +35,11 @@ import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class OneSimpleAPIWebPageInformationAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WEB_INFORMATION)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("webInformation")
         .title("Web Page Information")
         .description("Get information about a certain webpage")
         .properties(
@@ -54,30 +54,32 @@ public class OneSimpleAPIWebPageInformationAction {
                         object("general")
                             .properties(
                                 string(TITLE),
-                                string(DESC),
+                                string(DESCRIPTION),
                                 string("canonical")),
                         object("twitter")
                             .properties(
                                 string("site"),
                                 string(TITLE),
-                                string(DESC)),
+                                string(DESCRIPTION)),
                         object("og")
                             .properties(
                                 string(TITLE),
                                 string("url"),
                                 string("image"),
-                                string(DESC),
+                                string(DESCRIPTION),
                                 string("type")))))
         .perform(OneSimpleAPIWebPageInformationAction::perform);
 
     private OneSimpleAPIWebPageInformationAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context.http(http -> http.get("/page_info"))
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext.http(http -> http.get("/page_info"))
             .body(
                 Http.Body.of(
-                    ACCESS_TOKEN, connectionParameters.getRequiredString(ACCESS_TOKEN),
+                    TOKEN, connectionParameters.getRequiredString(TOKEN),
                     URL, inputParameters.getRequiredString(URL),
                     "output", "json"))
             .configuration(responseType(ResponseType.JSON))
