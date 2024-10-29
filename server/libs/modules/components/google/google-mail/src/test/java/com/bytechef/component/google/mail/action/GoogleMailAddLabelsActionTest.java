@@ -38,7 +38,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author J. Iamsamang
  */
-class GoogleMailAddLabelActionTest extends AbstractGoogleMailActionTest {
+class GoogleMailAddLabelsActionTest extends AbstractGoogleMailActionTest {
 
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
@@ -66,7 +66,7 @@ class GoogleMailAddLabelActionTest extends AbstractGoogleMailActionTest {
         when(mockedModify.execute())
             .thenReturn(mockedMessage);
 
-        Message message = GoogleMailAddLabelAction.perform(parameters, parameters, mockedActionContext);
+        Message message = GoogleMailAddLabelsAction.perform(parameters, parameters, mockedActionContext);
         assertEquals(mockedMessage, message);
         assertEquals(ME, userIdArgumentCaptor.getValue());
         assertEquals("1", messageIdArgumentCaptor.getValue());
