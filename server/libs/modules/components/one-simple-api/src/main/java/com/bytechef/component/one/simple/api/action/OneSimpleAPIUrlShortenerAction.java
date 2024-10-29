@@ -22,12 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.URL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -50,6 +48,9 @@ public class OneSimpleAPIUrlShortenerAction {
                 object()
                     .properties(
                         string(URL),
+                        string("single_use"),
+                        string("temporary_redirect"),
+                        string("forward_params"),
                         string("short_url"))))
         .perform(OneSimpleAPIUrlShortenerAction::perform);
 
@@ -60,11 +61,7 @@ public class OneSimpleAPIUrlShortenerAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext.http(http -> http.get("/shortener/new"))
-            .body(
-                Body.of(
-                    TOKEN, connectionParameters.getRequiredString(TOKEN),
-                    URL, inputParameters.getRequiredString(URL),
-                    "output", "json"))
+            .queryParameters(URL, inputParameters.getRequiredString(URL))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
