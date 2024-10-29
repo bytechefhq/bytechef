@@ -3,7 +3,7 @@
     "key" : "communication",
     "label" : "communication"
   } ],
-  "customAction" : null,
+  "customAction" : true,
   "customActionHelp" : null,
   "description" : "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.",
   "icon" : "path:assets/infobip.svg",
@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Infobip",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Personalized base URL for API requests.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "baseUrl",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : "xxxxx.api.infobip.com",
-        "label" : "Base URL",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -197,8 +128,8 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "INTEGER"
+                "controlType" : "INTEGER",
+                "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -236,8 +167,8 @@
                 "maxValue" : null,
                 "minValue" : null,
                 "options" : null,
-                "optionsDataSource" : null,
-                "controlType" : "INTEGER"
+                "controlType" : "INTEGER",
+                "optionsDataSource" : null
               }, {
                 "advancedOption" : null,
                 "description" : null,
@@ -279,8 +210,8 @@
                 "options" : null,
                 "optionsDataSource" : null
               } ],
-              "optionsDataSource" : null,
-              "controlType" : "OBJECT_BUILDER"
+              "controlType" : "OBJECT_BUILDER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -318,18 +249,18 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             } ],
             "maxItems" : null,
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -438,8 +369,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -477,8 +408,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -520,8 +451,8 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -559,18 +490,18 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -633,8 +564,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Content of the message being sent.",
@@ -657,9 +588,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send SMS",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -724,8 +655,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -780,8 +711,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -819,8 +750,8 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "INTEGER"
+              "controlType" : "INTEGER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -862,11 +793,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -924,8 +855,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -980,8 +911,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1019,8 +950,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1062,11 +993,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1132,11 +1063,80 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Whatsapp Text Message",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Personalized base URL for API requests.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "baseUrl",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : "xxxxx.api.infobip.com",
+        "label" : "Base URL",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
