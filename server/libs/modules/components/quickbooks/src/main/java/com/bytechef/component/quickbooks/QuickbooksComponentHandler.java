@@ -45,9 +45,9 @@ public class QuickbooksComponentHandler implements ComponentHandler {
         .connection(QuickbooksConnection.CONNECTION_DEFINITION)
         .categories(ComponentCategory.ACCOUNTING)
         .actions(
+            QuickbooksCreateCategoryAction.ACTION_DEFINITION,
             QuickbooksCreateCustomerAction.ACTION_DEFINITION,
-            QuickbooksCreateItemAction.ACTION_DEFINITION,
-            QuickbooksCreateCategoryAction.ACTION_DEFINITION);
+            QuickbooksCreateItemAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
