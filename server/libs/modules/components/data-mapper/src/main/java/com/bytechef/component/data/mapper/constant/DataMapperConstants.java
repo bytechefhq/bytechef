@@ -21,21 +21,20 @@ package com.bytechef.component.data.mapper.constant;
  */
 public class DataMapperConstants {
 
-    public static final String INPUT = "input";
-    public static final String OUTPUT = "output";
-    public static final String MAPPINGS = "mappings";
+    public static final String DEFAULT_VALUE = "defaultValue";
     public static final String FIELD_KEY = "fieldKey";
     public static final String FIELD_VALUE = "fieldValue";
-    public static final String VALUE = "value";
     public static final String FROM = "from";
-    public static final String TO = "to";
-    public static final String INCLUDE_UNMAPPED = "includeUnmapped";
-    public static final String INCLUDE_NULLS = "includeNulls";
     public static final String INCLUDE_EMPTY_STRINGS = "includeEmptyStrings";
-    public static final String REQUIRED_FIELD = "requiredField";
-    public static final String VALUE_KEY = "valueKey";
-    public static final String DATA_MAPPER = "dataMapper";
-    public static final String DEFAULT_VALUE = "defaultValue";
-    public static final String TYPE = "type";
+    public static final String INCLUDE_NULLS = "includeNulls";
+    public static final String INCLUDE_UNMAPPED = "includeUnmapped";
+    public static final String INPUT = "input";
     public static final String INPUT_TYPE = "inputType";
+    public static final String MAPPINGS = "mappings";
+    public static final String OUTPUT = "output";
+    public static final String REQUIRED_FIELD = "requiredField";
+    public static final String TO = "to";
+    public static final String TYPE = "type";
+    public static final String VALUE = "value";
+    public static final String VALUE_KEY = "valueKey";
 }

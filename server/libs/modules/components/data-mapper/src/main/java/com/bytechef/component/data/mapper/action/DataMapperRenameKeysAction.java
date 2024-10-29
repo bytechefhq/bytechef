@@ -45,8 +45,7 @@ public class DataMapperRenameKeysAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("renameKeys")
         .title("Rename keys")
-        .description(
-            "The action renames keys of an input object defined by mappings.")
+        .description("The action renames keys of an input object defined by mappings.")
         .properties(
             object(INPUT)
                 .label("Input")
@@ -62,7 +61,8 @@ public class DataMapperRenameKeysAction {
                             string(FROM)
                                 .label("From Path")
                                 .description(
-                                    "Defines the path of the input property key you want to change the name of, using dot notation."),
+                                    "Defines the path of the input property key you want to change the name of, " +
+                                        "using dot notation."),
                             string(TO)
                                 .label("To")
                                 .description("Defines what you want to change the name of the input property key to.")))
