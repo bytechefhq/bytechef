@@ -21,11 +21,12 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.constant.GoogleFormsConstants;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
-import com.google.api.services.forms.v1.Forms;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -59,21 +60,31 @@ public class GoogleFormsUtils {
         String searchText, Context context) throws IOException {
 
         String formId = inputParameters.getRequiredString(GoogleFormsConstants.FORM);
-        Forms forms;
-        try {
-            forms = GoogleServices.getForms(connectionParameters);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
-        return forms.forms()
-            .responses()
-            .list(formId)
-            .execute()
-            .getResponses()
-            .stream()
-            .map(response -> (Option<String>) option(
-                response.getRespondentEmail() + "(" + response.getResponseId() + ")", response.getResponseId()))
-            .toList();
+        List<Option<String>> formResponses = new ArrayList<>();
+        Map<String, Object> response;
+        String nextToken = null;
+        do {
+            Context.Http.Executor executor = context
+                .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses"))
+                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON));
+
+            if (nextToken != null) {
+                executor.queryParameter("nextPageToken", nextToken);
+            }
+            response = executor.execute()
+                .getBody(new TypeReference<>() {});
+
+            nextToken = (String) response.getOrDefault("nextPageToken", null);
+            List<Map<String, Object>> items = (List<Map<String, Object>>) response.get("responses");
+            items.stream()
+                .map(item -> {
+                    String respondentEmail = (String) item.get("respondentEmail");
+                    String responseId = (String) item.get("responseId");
+                    return (Option<String>) option(respondentEmail + "(" + responseId + ")", responseId);
+                })
+                .forEach(formResponses::add);
+        } while (nextToken != null);
+        return formResponses;
     }
 }
