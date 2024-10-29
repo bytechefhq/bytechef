@@ -22,11 +22,14 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.one.simple.api.constants.OneSimpleAPIConstants.TOKEN;
 
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class OneSimpleAPIConnection {
 
@@ -34,16 +37,14 @@ public class OneSimpleAPIConnection {
         .baseUri((connectionParameters, context) -> "https://onesimpleapi.com/api")
         .authorizations(
             authorization(CUSTOM)
-                .title("One Simple API Connection")
                 .properties(
                     string(TOKEN)
-                        .label("Access Token")
-                        .description("Access Token that is given to you when you create a API Token in OneSimpleApi")
+                        .label("API Token")
                         .required(true))
-                .scopes((connection, context) -> List.of(
-                    "shortener",
-                    "exchange_rate",
-                    "page_info")));
+                .apply((connectionParameters, context) -> ApplyResponse.ofQueryParameters(
+                    Map.of(
+                        TOKEN, List.of(connectionParameters.getRequiredString(TOKEN)),
+                        "output", List.of("json")))));
 
     private OneSimpleAPIConnection() {
     }
