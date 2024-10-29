@@ -16,13 +16,17 @@
 
 package com.bytechef.component.csv.file;
 
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.DELIMITER;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.ENCLOSING_CHARACTER;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILE_ENTRY;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.HEADER_ROW;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.INCLUDE_EMPTY_CELLS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
 import com.bytechef.platform.component.test.annotation.ComponentIntTest;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -61,11 +65,11 @@ class CsvFileComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                CsvFileConstants.FILE_ENTRY,
+                FILE_ENTRY,
                 filesFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-                CsvFileConstants.DELIMITER, ",", CsvFileConstants.HEADER_ROW, false,
-                CsvFileConstants.INCLUDE_EMPTY_CELLS, true));
+                DELIMITER, ",", HEADER_ROW, false,
+                INCLUDE_EMPTY_CELLS, true));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -87,12 +91,12 @@ class CsvFileComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                CsvFileConstants.FILE_ENTRY,
+                FILE_ENTRY,
                 filesFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-                CsvFileConstants.DELIMITER, ",",
-                CsvFileConstants.HEADER_ROW, true,
-                CsvFileConstants.INCLUDE_EMPTY_CELLS, true));
+                DELIMITER, ",",
+                HEADER_ROW, true,
+                INCLUDE_EMPTY_CELLS, true));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -111,13 +115,13 @@ class CsvFileComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                CsvFileConstants.FILE_ENTRY,
+                FILE_ENTRY,
                 filesFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-                CsvFileConstants.DELIMITER, ",",
-                CsvFileConstants.HEADER_ROW, true,
-                CsvFileConstants.INCLUDE_EMPTY_CELLS, true,
-                CsvFileConstants.ENCLOSING_CHARACTER, "'"));
+                DELIMITER, ",",
+                HEADER_ROW, true,
+                INCLUDE_EMPTY_CELLS, true,
+                ENCLOSING_CHARACTER, "'"));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -136,11 +140,11 @@ class CsvFileComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                CsvFileConstants.FILE_ENTRY,
+                FILE_ENTRY,
                 filesFileStorage.storeFileContent(
                     sampleFile.getAbsolutePath(), Files.contentOf(sampleFile, StandardCharsets.UTF_8)),
-                CsvFileConstants.INCLUDE_EMPTY_CELLS, true, CsvFileConstants.DELIMITER, "|",
-                CsvFileConstants.HEADER_ROW, true));
+                INCLUDE_EMPTY_CELLS, true, DELIMITER, "|",
+                HEADER_ROW, true));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -172,7 +176,7 @@ class CsvFileComponentHandlerIntTest {
         job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("csv-file_v1_read".getBytes(StandardCharsets.UTF_8)),
             Map.of(
-                CsvFileConstants.FILE_ENTRY,
+                FILE_ENTRY,
                 filesFileStorage.storeFileContent(
                     sampleFile.getName(), Files.contentOf(sampleFile, StandardCharsets.UTF_8))));
 

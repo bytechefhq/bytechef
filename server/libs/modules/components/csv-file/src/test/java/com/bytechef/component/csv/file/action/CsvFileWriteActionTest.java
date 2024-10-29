@@ -16,10 +16,10 @@
 
 package com.bytechef.component.csv.file.action;
 
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 import com.bytechef.component.csv.file.CsvFileComponentHandlerTest;
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
@@ -83,7 +83,7 @@ class CsvFileWriteActionTest {
 
     private Parameters getWriteParameters(List<Map<?, ?>> items, Parameters parameters) {
         Mockito.when(
-            parameters.getList(Mockito.eq(CsvFileConstants.ROWS), Mockito.any(TypeReference.class),
+            parameters.getList(Mockito.eq(ROWS), Mockito.any(TypeReference.class),
                 Mockito.eq(List.of())))
             .thenReturn(items);
 
