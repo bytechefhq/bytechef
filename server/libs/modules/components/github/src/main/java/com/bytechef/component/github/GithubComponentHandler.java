@@ -43,11 +43,11 @@ public class GithubComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.DEVELOPER_TOOLS)
         .connection(CONNECTION_DEFINITION)
         .actions(
-            GithubCreateIssueAction.ACTION_DEFINITION,
-            GithubGetIssueAction.ACTION_DEFINITION,
-            GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
             GithubAddAssigneesToIssueAction.ACTION_DEFINITION,
-            GithubAddLabelsToIssueAction.ACTION_DEFINITION)
+            GithubAddLabelsToIssueAction.ACTION_DEFINITION,
+            GithubCreateCommentOnIssueAction.ACTION_DEFINITION,
+            GithubCreateIssueAction.ACTION_DEFINITION,
+            GithubGetIssueAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .triggers(
             GithubNewIssueTrigger.TRIGGER_DEFINITION,
