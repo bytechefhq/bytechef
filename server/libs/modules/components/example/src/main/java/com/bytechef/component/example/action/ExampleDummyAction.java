@@ -19,7 +19,6 @@ package com.bytechef.component.example.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.example.constant.ExampleConstants.DUMMY_ACTION;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -28,9 +27,9 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Mario Cvjetojevic
  */
-public final class ExampleDummyAction {
+public class ExampleDummyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DUMMY_ACTION)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummyAction")
         .title("Title")
         .description("Description")
         .properties()
@@ -40,7 +39,7 @@ public final class ExampleDummyAction {
     private ExampleDummyAction() {
     }
 
-    public static String perform(
+    protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
         // TODO
 

@@ -19,33 +19,39 @@ package com.bytechef.component.example.trigger;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.example.constant.ExampleConstants.DUMMY_TRIGGER;
 import static com.bytechef.component.example.constant.ExampleConstants.ID;
 
-import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import java.util.List;
 import java.util.Objects;
 
 public class ExampleDummyTrigger {
-    public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(DUMMY_TRIGGER)
+
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("dummyTrigger")
         .title("Updated Issue")
         .description("Triggers when an issue is updated.")
-        .type(TriggerDefinition.TriggerType.DYNAMIC_WEBHOOK)
+        .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties()
         .output(outputSchema(string()))
-        .webhookEnable(ExampleDummyTrigger::webhookEnable) // TriggerType.DYNAMIC_WEBHOOK
-        .webhookDisable(ExampleDummyTrigger::webhookDisable) // TriggerType.DYNAMIC_WEBHOOK
-        .webhookRequest(ExampleDummyTrigger::webhookRequest) // every type
-        .webhookValidate(ExampleDummyTrigger::webhookValidate); // TriggerType.STATIC_WEBHOOK
+        .webhookEnable(ExampleDummyTrigger::webhookEnable)
+        .webhookDisable(ExampleDummyTrigger::webhookDisable)
+        .webhookRequest(ExampleDummyTrigger::webhookRequest)
+        .webhookValidate(ExampleDummyTrigger::webhookValidate);
 
     private ExampleDummyTrigger() {
     }
 
-    protected static TriggerDefinition.WebhookEnableOutput webhookEnable(
+    protected static WebhookEnableOutput webhookEnable(
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl,
         String workflowExecutionId, TriggerContext context) {
         // TODO
@@ -59,29 +65,27 @@ public class ExampleDummyTrigger {
 
         context
             .http(http -> http.delete("/webhook"))
-            .body(Context.Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .body(Http.Body.of("webhookIds", List.of(outputParameters.getInteger(ID))))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 
     protected static Object webhookRequest(
-        Parameters inputParameters, Parameters connectionParameters, TriggerDefinition.HttpHeaders headers,
-        TriggerDefinition.HttpParameters parameters, TriggerDefinition.WebhookBody body,
-        TriggerDefinition.WebhookMethod method, TriggerDefinition.WebhookEnableOutput output,
-        TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
+        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
         // TODO
 
         return null;
     }
 
-    protected static TriggerDefinition.WebhookValidateResponse webhookValidate(
-        Parameters parameters, TriggerDefinition.HttpHeaders httpHeaders,
-        TriggerDefinition.HttpParameters httpParameters, TriggerDefinition.WebhookBody webhookBody,
-        TriggerDefinition.WebhookMethod webhookMethod, TriggerContext triggerContext) {
+    protected static WebhookValidateResponse webhookValidate(
+        Parameters parameters, HttpHeaders httpHeaders, HttpParameters httpParameters, WebhookBody webhookBody,
+        WebhookMethod webhookMethod, TriggerContext triggerContext) {
+
         if (Objects.equals("uselessCode", "betterExamplesInActualComponents")) {
-            return TriggerDefinition.WebhookValidateResponse.ok(); // OK
+            return WebhookValidateResponse.ok(); // OK
         } else {
-            return TriggerDefinition.WebhookValidateResponse.badRequest(); // Bad Request
+            return WebhookValidateResponse.badRequest(); // Bad Request
         }
     }
 }
