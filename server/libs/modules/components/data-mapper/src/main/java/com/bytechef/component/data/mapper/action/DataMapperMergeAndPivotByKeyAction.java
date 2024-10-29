@@ -40,7 +40,9 @@ public class DataMapperMergeAndPivotByKeyAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("mergeAndPivotPropertiesByKey")
         .title("Merge and pivot properties by key")
         .description(
-            "Creates a new object out of all objects that have the same key as the specified field kay and an object as value. That value of the new object contains values of all properties that share the specified field key as keys and the they all have the specified field value as a value.")
+            "Creates a new object out of all objects that have the same key as the specified field kay and an object " +
+                "as value. That value of the new object contains values of all properties that share the specified " +
+                "field key as keys and the they all have the specified field value as a value.")
         .properties(
             array(INPUT)
                 .label("Input")

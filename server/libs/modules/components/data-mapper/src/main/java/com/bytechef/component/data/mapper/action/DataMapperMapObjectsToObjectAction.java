@@ -81,18 +81,21 @@ public class DataMapperMapObjectsToObjectAction {
             array(MAPPINGS)
                 .label("Mapping")
                 .description(
-                    "An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.")
+                    "An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, " +
+                        "it supports dot notation, where the new mapped path can be used for nested mapping.")
                 .items(
                     object()
                         .properties(
                             string(FROM)
                                 .label("Path From")
                                 .description(
-                                    "Path to the input property key that you want to put in the newly created object, written in dot notation."),
+                                    "Path to the input property key that you want to put in the newly created " +
+                                        "object, written in dot notation."),
                             string(TO)
                                 .label("To")
                                 .description(
-                                    "Name of the key you want to assign to the input property value in the newly created object."),
+                                    "Name of the key you want to assign to the input property value in the newly " +
+                                        "created object."),
                             bool(REQUIRED_FIELD)
                                 .label("Required field")
                                 .description("Does the property require a value?")

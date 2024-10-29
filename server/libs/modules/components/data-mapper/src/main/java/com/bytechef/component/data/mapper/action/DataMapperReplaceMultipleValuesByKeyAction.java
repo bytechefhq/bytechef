@@ -46,7 +46,8 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceMultipleValuesByKey")
         .title("Replace multiple values by key")
         .description(
-            "Replaces all values specified by the keys in the input object with the values specified by keys in the output object.")
+            "Replaces all values specified by the keys in the input object with the values specified by keys in the " +
+                "output object.")
         .properties(
             object(INPUT)
                 .label("Input")
@@ -66,11 +67,13 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                             string(FROM)
                                 .label("From Path")
                                 .description(
-                                    "Defines the input path of property key of the value you want to change. Dot notation."),
+                                    "Defines the input path of property key of the value you want to change. Dot " +
+                                        "notation."),
                             string(TO)
                                 .label("To Path")
                                 .description(
-                                    "Defines the output path of property key of the value you want to change the input value to. Dot notation.")))
+                                    "Defines the output path of property key of the value you want to change the " +
+                                        "input value to. Dot notation.")))
                 .required(true))
         .output()
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
