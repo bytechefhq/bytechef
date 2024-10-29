@@ -19,7 +19,6 @@ package com.bytechef.component.microsoft.outlook.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.GET_MAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MESSAGE_OUTPUT_PROPERTY;
 
@@ -36,7 +35,7 @@ import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUt
  */
 public class MicrosoftOutlook365GetMailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_MAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMail")
         .title("Get Mail")
         .description("Get a specific message")
         .properties(

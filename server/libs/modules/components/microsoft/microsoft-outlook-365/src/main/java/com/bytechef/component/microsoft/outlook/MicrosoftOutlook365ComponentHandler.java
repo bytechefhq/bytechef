@@ -17,7 +17,6 @@
 package com.bytechef.component.microsoft.outlook;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.MICROSOFT_OUTLOOK_365;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -35,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MICROSOFT_OUTLOOK_365)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("microsoftOutlook365")
         .title("Microsoft Outlook 365")
         .description(
             "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, " +

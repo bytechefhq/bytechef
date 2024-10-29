@@ -37,15 +37,11 @@ public class MicrosoftOutlook365Constants {
     public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String FROM = "from";
-    public static final String GET_MAIL = "getMail";
     public static final String ID = "id";
-    public static final String MICROSOFT_OUTLOOK_365 = "microsoftOutlook365";
     public static final String NAME = "name";
     public static final String ODATA_NEXT_LINK = "@odata.nextLink";
     public static final String RECIPIENT = "recipient";
     public static final String REPLY_TO = "replyTo";
-    public static final String SEARCH_EMAIL = "searchEmail";
-    public static final String SEND_EMAIL = "sendEmail";
     public static final String SUBJECT = "subject";
     public static final String TO = "to";
     public static final String TO_RECIPIENTS = "toRecipients";

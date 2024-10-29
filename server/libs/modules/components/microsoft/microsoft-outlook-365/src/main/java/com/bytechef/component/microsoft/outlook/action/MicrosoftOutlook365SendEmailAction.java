@@ -28,7 +28,6 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.REPLY_TO;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SEND_EMAIL;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 
@@ -42,7 +41,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class MicrosoftOutlook365SendEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Send the message.")
         .properties(
