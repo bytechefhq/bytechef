@@ -37,7 +37,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -55,7 +54,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class OdsFileWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(OdsFileConstants.WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to file")
         .description("Writes the data to a ODS file.")
         .properties(

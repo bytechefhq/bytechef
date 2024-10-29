@@ -21,11 +21,17 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.FILE_ENTRY;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.HEADER_ROW;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.INCLUDE_EMPTY_CELLS;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.PAGE_NUMBER;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.PAGE_SIZE;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.READ_AS_STRING;
+import static com.bytechef.component.ods.file.constant.OdsFileConstants.SHEET_NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.github.miachm.sods.Range;
 import com.github.miachm.sods.Sheet;
 import com.github.miachm.sods.SpreadSheet;
@@ -43,44 +49,43 @@ import java.util.Map;
  */
 public class OdsFileReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(OdsFileConstants.READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from file")
         .description("Reads data from a ODS file.")
         .properties(
-            fileEntry(OdsFileConstants.FILE_ENTRY)
+            fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "The object property which contains a reference to the ODS file to read from.")
+                .description("The object property which contains a reference to the ODS file to read from.")
                 .required(true),
-            string(OdsFileConstants.SHEET_NAME)
+            string(SHEET_NAME)
                 .label("Sheet Name")
                 .description(
                     "The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.")
                 .defaultValue("Sheet")
                 .advancedOption(true),
-            bool(OdsFileConstants.HEADER_ROW)
+            bool(HEADER_ROW)
                 .label("Header Row")
                 .description("The first row of the file contains the header names.")
                 .defaultValue(true)
                 .advancedOption(true),
-            bool(OdsFileConstants.INCLUDE_EMPTY_CELLS)
+            bool(INCLUDE_EMPTY_CELLS)
                 .label("Include Empty Cells")
-                .description(
-                    "When reading from file the empty cells will be filled with an empty string.")
+                .description("When reading from file the empty cells will be filled with an empty string.")
                 .defaultValue(false)
                 .advancedOption(true),
-            integer(OdsFileConstants.PAGE_SIZE)
+            integer(PAGE_SIZE)
                 .label("Page Size")
                 .description("The amount of child elements to return in a page.")
                 .advancedOption(true),
-            integer(OdsFileConstants.PAGE_NUMBER)
+            integer(PAGE_NUMBER)
                 .label("Page Number")
                 .description("The page number to get.")
                 .advancedOption(true),
-            bool(OdsFileConstants.READ_AS_STRING)
+            bool(READ_AS_STRING)
                 .label("Read As String")
                 .description(
-                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise " +
+                        "some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
         .output()
@@ -89,15 +94,15 @@ public class OdsFileReadAction {
     protected static List<Map<String, ?>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        boolean headerRow = inputParameters.getBoolean(OdsFileConstants.HEADER_ROW, true);
-        boolean includeEmptyCells = inputParameters.getBoolean(OdsFileConstants.INCLUDE_EMPTY_CELLS, false);
-        Integer pageSize = inputParameters.getInteger(OdsFileConstants.PAGE_SIZE);
-        Integer pageNumber = inputParameters.getInteger(OdsFileConstants.PAGE_NUMBER);
-        boolean readAsString = inputParameters.getBoolean(OdsFileConstants.READ_AS_STRING, false);
-        String sheetName = inputParameters.getString(OdsFileConstants.SHEET_NAME);
+        boolean headerRow = inputParameters.getBoolean(HEADER_ROW, true);
+        boolean includeEmptyCells = inputParameters.getBoolean(INCLUDE_EMPTY_CELLS, false);
+        Integer pageSize = inputParameters.getInteger(PAGE_SIZE);
+        Integer pageNumber = inputParameters.getInteger(PAGE_NUMBER);
+        boolean readAsString = inputParameters.getBoolean(READ_AS_STRING, false);
+        String sheetName = inputParameters.getString(SHEET_NAME);
 
         try (InputStream inputStream = context.file(
-            file -> file.getStream(inputParameters.getRequiredFileEntry(OdsFileConstants.FILE_ENTRY)))) {
+            file -> file.getStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
             if (inputStream == null) {
                 throw new IllegalArgumentException("Unable to get file content from task " + inputParameters);

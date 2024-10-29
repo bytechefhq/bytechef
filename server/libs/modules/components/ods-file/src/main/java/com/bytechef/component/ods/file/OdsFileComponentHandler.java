@@ -23,7 +23,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.ods.file.action.OdsFileReadAction;
 import com.bytechef.component.ods.file.action.OdsFileWriteAction;
-import com.bytechef.component.ods.file.constant.OdsFileConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class OdsFileComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(OdsFileConstants.ODS_FILE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("odsFile")
         .title("ODS File")
         .description("Reads and writes data from a ODS file.")
         .icon("path:assets/ods-file.svg")
