@@ -17,13 +17,13 @@
 package com.bytechef.component.example;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.example.constant.ExampleConstants.EXAMPLE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.example.action.ExampleDummyAction;
 import com.bytechef.component.example.connection.ExampleConnection;
+import com.bytechef.component.example.trigger.ExampleDummyTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,13 +32,14 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class ExampleComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(EXAMPLE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("example")
         .title("Example")
         .description("Component description.")
         .icon("path:assets/example.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(ExampleConnection.CONNECTION_DEFINITION)
-        .actions(ExampleDummyAction.ACTION_DEFINITION);
+        .actions(ExampleDummyAction.ACTION_DEFINITION)
+        .triggers(ExampleDummyTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
