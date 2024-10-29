@@ -17,7 +17,6 @@
 package com.bytechef.component.aws.s3.action;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.GET_URL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -35,7 +34,7 @@ import software.amazon.awssdk.services.s3.model.GetUrlRequest;
  */
 public class AwsS3GetUrlAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_URL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getUrl")
         .title("Get URL")
         .description("Get the url of an AWS S3 object.")
         .properties(

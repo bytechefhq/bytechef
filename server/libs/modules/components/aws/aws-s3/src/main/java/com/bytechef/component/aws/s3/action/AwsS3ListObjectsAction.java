@@ -17,7 +17,6 @@
 package com.bytechef.component.aws.s3.action;
 
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.LIST_OBJECTS;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PREFIX;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -45,7 +44,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
  */
 public class AwsS3ListObjectsAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(LIST_OBJECTS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listObjects")
         .title("List Objects")
         .description("Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.")
         .properties(

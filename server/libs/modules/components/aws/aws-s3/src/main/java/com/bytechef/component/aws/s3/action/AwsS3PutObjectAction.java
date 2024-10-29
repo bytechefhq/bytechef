@@ -20,7 +20,6 @@ import static com.bytechef.component.aws.s3.constant.AwsS3Constants.ACL;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.BUCKET_NAME;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.FILE_ENTRY;
 import static com.bytechef.component.aws.s3.constant.AwsS3Constants.KEY;
-import static com.bytechef.component.aws.s3.constant.AwsS3Constants.PUT_OBJECT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -49,7 +48,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
  */
 public class AwsS3PutObjectAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(PUT_OBJECT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("putObject")
         .title("Put Object")
         .description("Store an object to AWS S3.")
         .properties(
