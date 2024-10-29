@@ -14,17 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.forms.constant;
+package com.bytechef.component.google.forms.action;
 
 /**
- * @author Monika Kušter
  * @author Vihar Shah
  */
-public class GoogleFormsConstants {
-
-    private GoogleFormsConstants() {
-    }
-
-    public static final String FORM = "form";
-    public static final String RESPONSE = "response";
+public class GoogleFormsGetAllResponsesAction {
 }

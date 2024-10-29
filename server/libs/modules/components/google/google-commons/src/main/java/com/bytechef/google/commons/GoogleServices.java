@@ -29,6 +29,7 @@ import com.google.api.client.util.Preconditions;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.forms.v1.Forms;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.sheets.v4.Sheets;
@@ -38,6 +39,7 @@ import com.google.api.services.sheets.v4.Sheets;
  * @author Ivica Cardic
  * @author Monika Domiter
  * @author Igor Beslic
+ * @author Vihar Shah
  */
 public class GoogleServices {
 
@@ -94,6 +96,14 @@ public class GoogleServices {
             new NetHttpTransport(),
             GsonFactory.getDefaultInstance(), new OAuthAuthentication(connectionParameters))
                 .setApplicationName("Google Sheets Component")
+                .build();
+    }
+
+    public static Forms getForms(Parameters connectionParameters) throws Exception {
+        return new Forms.Builder(
+            new NetHttpTransport(),
+            GsonFactory.getDefaultInstance(), new OAuthAuthentication(connectionParameters))
+                .setApplicationName("Google Forms Component")
                 .build();
     }
 
