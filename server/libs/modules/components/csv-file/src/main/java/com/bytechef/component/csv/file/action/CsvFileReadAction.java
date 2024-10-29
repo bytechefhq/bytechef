@@ -33,7 +33,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.csv.file.util.CsvFileReadUtils;
 import com.bytechef.component.csv.file.util.ReadConfiguration;
 import com.bytechef.component.definition.ActionContext;
@@ -56,14 +55,13 @@ import java.util.Map;
  */
 public class CsvFileReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CsvFileConstants.READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from file")
         .description("Reads data from a csv file.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "The object property which contains a reference to the csv file to read from.")
+                .description("The object property which contains a reference to the csv file to read from.")
                 .required(true),
             string(DELIMITER)
                 .label("Delimiter")
@@ -86,8 +84,7 @@ public class CsvFileReadAction {
                 .advancedOption(true),
             bool(INCLUDE_EMPTY_CELLS)
                 .label("Include Empty Cells")
-                .description(
-                    "When reading from file the empty cells will be filled with an empty string.")
+                .description("When reading from file the empty cells will be filled with an empty string.")
                 .defaultValue(false)
                 .advancedOption(true),
             integer(PAGE_SIZE)
@@ -101,7 +98,8 @@ public class CsvFileReadAction {
             bool(READ_AS_STRING)
                 .label("Read As String")
                 .description(
-                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                    "In some cases and file formats, it is necessary to read data specifically as string, " +
+                        "otherwise some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
         .output(outputSchema(array().items(object())))

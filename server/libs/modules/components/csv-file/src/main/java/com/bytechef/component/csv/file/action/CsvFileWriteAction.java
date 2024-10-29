@@ -16,19 +16,20 @@
 
 package com.bytechef.component.csv.file.action;
 
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPPER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.FILENAME;
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.ROWS;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
@@ -48,16 +49,17 @@ import java.util.Map;
  */
 public class CsvFileWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CsvFileConstants.WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to file")
         .description("Writes the data to a csv file.")
         .properties(
-            array(CsvFileConstants.ROWS)
+            array(ROWS)
                 .label("Rows")
                 .description("The array of objects to write to the file.")
                 .required(true)
-                .items(ComponentDsl.object()
-                    .additionalProperties(bool(), dateTime(), number(), string())),
+                .items(
+                    object()
+                        .additionalProperties(bool(), dateTime(), number(), string())),
             string(FILENAME)
                 .label("Filename")
                 .description(
@@ -71,7 +73,7 @@ public class CsvFileWriteAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
         List<Map<String, ?>> rows = inputParameters.getList(
-            CsvFileConstants.ROWS, new TypeReference<>() {}, List.of());
+            ROWS, new TypeReference<>() {}, List.of());
 
         try (InputStream inputStream = new ByteArrayInputStream(write(rows))) {
             return context.file(
@@ -84,7 +86,7 @@ public class CsvFileWriteAction {
         boolean headerRow = false;
 
         try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8);
-            SequenceWriter sequenceWriter = CsvFileConstants.CSV_MAPPER.writer()
+            SequenceWriter sequenceWriter = CSV_MAPPER.writer()
                 .writeValues(printWriter)) {
 
             for (Map<String, ?> row : rows) {

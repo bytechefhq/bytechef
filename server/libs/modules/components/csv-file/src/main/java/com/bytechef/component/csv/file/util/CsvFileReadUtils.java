@@ -16,6 +16,7 @@
 
 package com.bytechef.component.csv.file.util;
 
+import static com.bytechef.component.csv.file.constant.CsvFileConstants.CSV_MAPPER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.DELIMITER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.ENCLOSING_CHARACTER;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.HEADER_ROW;
@@ -24,7 +25,6 @@ import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_NUM
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.PAGE_SIZE;
 import static com.bytechef.component.csv.file.constant.CsvFileConstants.READ_AS_STRING;
 
-import com.bytechef.component.csv.file.constant.CsvFileConstants;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.fasterxml.jackson.databind.MappingIterator;
@@ -100,12 +100,12 @@ public class CsvFileReadUtils {
                 .withHeader()
                 .withColumnSeparator(delimiter.charAt(0));
 
-            iterator = CsvFileConstants.CSV_MAPPER
+            iterator = CSV_MAPPER
                 .readerForMapOf(String.class)
                 .with(headerSchema)
                 .readValues(bufferedReader);
         } else {
-            iterator = CsvFileConstants.CSV_MAPPER
+            iterator = CSV_MAPPER
                 .readerForListOf(String.class)
                 .with(CsvParser.Feature.WRAP_AS_ARRAY)
                 .readValues(bufferedReader);
