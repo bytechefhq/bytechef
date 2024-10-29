@@ -33,7 +33,6 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGES;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
 import static com.bytechef.component.infobip.constant.InfobipConstants.SENDER;
-import static com.bytechef.component.infobip.constant.InfobipConstants.SEND_SMS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.SMS_COUNT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.STATUS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
@@ -52,7 +51,7 @@ import java.util.Map;
  */
 public class InfobipSendSMSAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_SMS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendSMS")
         .title("Send SMS")
         .description("Send a new SMS message")
         .properties(

@@ -30,7 +30,6 @@ import static com.bytechef.component.infobip.constant.InfobipConstants.ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_COUNT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.MESSAGE_ID;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NAME;
-import static com.bytechef.component.infobip.constant.InfobipConstants.SEND_WHATSAPP_TEXT_MESSAGE;
 import static com.bytechef.component.infobip.constant.InfobipConstants.STATUS;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TEXT;
 import static com.bytechef.component.infobip.constant.InfobipConstants.TO;
@@ -47,7 +46,7 @@ import java.util.Map;
  */
 public class InfobipSendWhatsappTextMesageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_WHATSAPP_TEXT_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendWhatsappTextMessage")
         .title("Send Whatsapp Text Message")
         .description("Send a new SMS message")
         .properties(

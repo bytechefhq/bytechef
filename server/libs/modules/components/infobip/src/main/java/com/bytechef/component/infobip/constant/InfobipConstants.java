@@ -33,14 +33,10 @@ public class InfobipConstants {
     public static final String GROUP_ID = "groupId";
     public static final String GROUP_NAME = "groupName";
     public static final String ID = "id";
-    public static final String INFOBIP = "infobip";
     public static final String MESSAGES = "messages";
     public static final String MESSAGE_COUNT = "messageCount";
     public static final String MESSAGE_ID = "messageId";
     public static final String NAME = "name";
-    public static final String NEW_SMS_MESSAGE = "newSMSMessage";
-    public static final String SEND_SMS = "sendSMS";
-    public static final String SEND_WHATSAPP_TEXT_MESSAGE = "sendWhatsappTextMessage";
     public static final String SENDER = "sender";
     public static final String SMS_COUNT = "smsCount";
     public static final String STATUS = "status";
