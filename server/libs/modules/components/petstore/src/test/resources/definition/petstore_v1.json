@@ -60,8 +60,6 @@
       "title" : "OAuth2 Implicit",
       "type" : "OAUTH2_IMPLICIT_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -71,7 +69,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : { },
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -121,8 +121,6 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -132,7 +130,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -982,9 +982,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Add a new pet to the store",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1827,9 +1827,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Update an existing pet",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2473,9 +2473,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Finds Pets by status",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3128,9 +3128,9 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Finds Pets by tags",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3187,9 +3187,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Deletes a pet",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3778,9 +3778,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Find pet by ID",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3859,9 +3859,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Updates a pet in the store with form data",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4188,9 +4188,9 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "uploads an image",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4294,9 +4294,9 @@
     },
     "properties" : [ ],
     "title" : "Returns pet inventories by status",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4776,9 +4776,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Place an order for a pet",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -4813,9 +4813,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Delete purchase order by ID",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5162,9 +5162,9 @@
       "controlType" : "INTEGER"
     } ],
     "title" : "Find purchase order by ID",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5728,9 +5728,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create user",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6357,9 +6357,9 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Creates list of users with given input array",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6395,9 +6395,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete user",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -6801,9 +6801,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get user by user name",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -7389,9 +7389,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Update user",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
   "triggers" : [ ],
   "dataStream" : null,

@@ -43,8 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -54,7 +52,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -240,9 +240,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create account",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -654,9 +654,9 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create contacts",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -924,11 +924,11 @@
       "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create tasks",
+    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
+  "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null,
-  "triggers" : [ ]
+  "unifiedApi" : null
 }
