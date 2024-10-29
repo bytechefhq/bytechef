@@ -19,7 +19,6 @@ package com.bytechef.component.delay.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.delay.constant.DelayConstants.MILLIS;
-import static com.bytechef.component.delay.constant.DelayConstants.SLEEP;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -32,14 +31,15 @@ import java.util.concurrent.TimeUnit;
  */
 public class DelaySleepAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SLEEP)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sleep")
         .title("Sleep")
         .description("Delay action execution.")
-        .properties(integer(MILLIS)
-            .label("Millis")
-            .description("Time in milliseconds.")
-            .required(true)
-            .defaultValue(1))
+        .properties(
+            integer(MILLIS)
+                .label("Millis")
+                .description("Time in milliseconds.")
+                .required(true)
+                .defaultValue(1))
         .perform(DelaySleepAction::perform);
 
     protected static Object perform(
