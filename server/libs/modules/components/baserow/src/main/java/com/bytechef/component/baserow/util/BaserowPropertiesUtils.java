@@ -17,6 +17,7 @@
 package com.bytechef.component.baserow.util;
 
 import static com.bytechef.component.baserow.constant.BaserowConstants.NAME;
+import static com.bytechef.component.baserow.constant.BaserowConstants.READ_ONLY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -45,12 +46,10 @@ import java.util.Objects;
  */
 public class BaserowPropertiesUtils {
 
-    public static final String READ_ONLY = "read_only";
-
     private BaserowPropertiesUtils() {
     }
 
-    public static List<ValueProperty<?>> createPropertiesForNewRow(
+    public static List<ValueProperty<?>> createPropertiesForRow(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext context) {
 

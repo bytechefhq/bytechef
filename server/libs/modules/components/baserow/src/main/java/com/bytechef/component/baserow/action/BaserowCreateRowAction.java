@@ -17,17 +17,16 @@
 package com.bytechef.component.baserow.action;
 
 import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS;
+import static com.bytechef.component.baserow.constant.BaserowConstants.FIELDS_DYNAMIC_PROPERTY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES;
+import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.baserow.util.BaserowPropertiesUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
@@ -44,18 +43,11 @@ public class BaserowCreateRowAction {
         .description("Creates a new Projects row.")
         .properties(
             integer(TABLE_ID)
-                .label("Table")
-                .description("Table where the row must be created in.")
+                .label("Table ID")
+                .description("ID of the table where the row must be created in.")
                 .required(true),
-            bool(USER_FIELD_NAMES)
-                .label("User Field Names")
-                .description("The field names returned by this endpoint will be the actual names of the fields.")
-                .defaultValue(true)
-                .required(false),
-            dynamicProperties(FIELDS)
-                .propertiesLookupDependsOn(TABLE_ID)
-                .properties(BaserowPropertiesUtils::createPropertiesForNewRow)
-                .required(true))
+            USER_FIELD_NAMES_PROPERTY,
+            FIELDS_DYNAMIC_PROPERTY)
         .output(
             outputSchema(
                 object()
@@ -67,7 +59,7 @@ public class BaserowCreateRowAction {
     private BaserowCreateRowAction() {
     }
 
-    public static Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
