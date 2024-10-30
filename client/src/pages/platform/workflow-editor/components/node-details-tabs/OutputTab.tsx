@@ -215,6 +215,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                 onClose={() => setShowUploadDialog(false)}
                 onUpload={handleSampleDataDialogUpload}
                 open={showUploadDialog}
+                sampleOutput={sampleOutput}
             />
         </div>
     );
