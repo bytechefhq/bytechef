@@ -48,9 +48,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from JSON string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -134,9 +134,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to JSON string",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -146,51 +146,8 @@
     "name" : "addValueByKey",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : {
-        "outputSchema" : {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : null,
-          "name" : null,
-          "type" : "OBJECT",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : null,
-          "placeholder" : null,
-          "additionalProperties" : null,
-          "multipleValues" : null,
-          "options" : null,
-          "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
-        },
-        "sampleOutput" : null
-      },
-      "outputSchema" : {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "OBJECT",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "additionalProperties" : null,
-        "multipleValues" : null,
-        "options" : null,
-        "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
-      },
+      "outputResponse" : null,
+      "outputSchema" : null,
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -486,9 +443,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add value to the object by key",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -497,7 +454,7 @@
     "metadata" : null,
     "name" : "addKeyValuePairs",
     "outputDefinition" : {
-      "output" : { },
+      "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -976,7 +933,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Array of Key-Value pairs to be added or updated.",
+      "description" : "Key-Value pairs to be added or updated.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -986,7 +943,7 @@
       "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Array of Key-Value pairs",
+      "label" : "Key-Value pairs",
       "placeholder" : null,
       "additionalProperties" : [ {
         "advancedOption" : null,
@@ -1154,9 +1111,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Key-Value pairs to object or array",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1212,12 +1169,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Key-Value Pair",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "connection" : null,
+  "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null,
-  "dataStream" : null
+  "connection" : null
 }
