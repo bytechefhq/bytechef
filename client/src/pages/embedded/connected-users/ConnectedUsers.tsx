@@ -20,7 +20,7 @@ import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUser
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {addDays, format} from 'date-fns';
+import {format} from 'date-fns';
 import {CalendarIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useState} from 'react';
 import {DateRange} from 'react-day-picker';
@@ -110,14 +110,15 @@ const ConnectedUsers = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             createDateRange: {
-                from: searchParams.get('createDateFrom')
-                    ? new Date(+searchParams.get('createDateFrom')!)
-                    : addDays(new Date(), -20),
-                to: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : new Date(),
+                from: searchParams.get('createDateFrom') ? new Date(+searchParams.get('createDateFrom')!) : undefined,
+                to: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : undefined,
             },
             credentialStatus: searchParams.get('credentialStatus')
                 ? (searchParams.get('credentialStatus')! as CredentialStatus)
                 : undefined,
+            environment: searchParams.get('environment')
+                ? (searchParams.get('environment') as Environment)
+                : Environment.Test,
             integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
             search: searchParams.get('search') ? searchParams.get('search')! : '',
         },
@@ -134,7 +135,9 @@ const ConnectedUsers = () => {
         credentialStatus: searchParams.get('credentialStatus')
             ? (searchParams.get('credentialStatus')! as CredentialStatus)
             : undefined,
-        environment: searchParams.get('environment') ? (searchParams.get('environment') as Environment) : undefined,
+        environment: searchParams.get('environment')
+            ? (searchParams.get('environment') as Environment)
+            : Environment.Test,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
@@ -222,7 +225,7 @@ const ConnectedUsers = () => {
                                             }}
                                             value={field.value}
                                         >
-                                            <SelectTrigger className="w-full">
+                                            <SelectTrigger className="w-full bg-background">
                                                 <SelectValue placeholder="Select environment" />
                                             </SelectTrigger>
 
@@ -247,7 +250,11 @@ const ConnectedUsers = () => {
                                     <FormLabel>Search</FormLabel>
 
                                     <FormControl>
-                                        <Input placeholder="Name, Email or User ERC" {...field} />
+                                        <Input
+                                            className="bg-background"
+                                            placeholder="Name, Email or User ERC"
+                                            {...field}
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
@@ -271,7 +278,7 @@ const ConnectedUsers = () => {
                                             }}
                                             value={field.value}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className="bg-background">
                                                 <SelectValue placeholder="Choose Status..." />
                                             </SelectTrigger>
 
