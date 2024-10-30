@@ -15,7 +15,6 @@ import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/tas
 import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
-import {useGetWorkflowNodeOutputQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     ComponentPropertiesType,
@@ -180,15 +179,6 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const hasOutputData = currentNodeDefinition?.outputDefined;
-
-    const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
-        {
-            id: workflow.id!,
-            workflowNodeName: currentNode?.name as string,
-        },
-        !!currentNode?.name && !!workflow.id && hasOutputData && activeTab === 'output'
-    );
-
     const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
 
@@ -272,8 +262,6 @@ const WorkflowNodeDetailsPanel = ({
                 });
 
                 setComponentActions(formattedComponentActions);
-
-                refetchWorkflowNodeOutput();
             },
             queryClient,
             updateWorkflowMutation,
@@ -562,13 +550,11 @@ const WorkflowNodeDetailsPanel = ({
                                         </div>
                                     ))}
 
-                                {activeTab === 'output' && workflowNodeOutput && currentNode && (
+                                {activeTab === 'output' && currentNode && (
                                     <OutputTab
                                         currentNode={currentNode}
                                         key={`${currentNode?.name}_output`}
                                         outputDefined={currentActionDefinition?.outputDefined ?? false}
-                                        outputSchema={workflowNodeOutput.outputSchema}
-                                        sampleOutput={workflowNodeOutput.sampleOutput!}
                                         workflowId={workflow.id!}
                                     />
                                 )}
