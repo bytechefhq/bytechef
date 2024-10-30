@@ -3189,6 +3189,14 @@ public final class ComponentDsl {
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
+            SampleOutput sampleOutput) {
+
+            this.outputDefinition = new OutputDefinition(sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
             this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());
