@@ -26,8 +26,8 @@ import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
@@ -44,12 +44,12 @@ public class GoogleFormsGetResponseAction {
             string(FORM)
                 .label("Form")
                 .description("Form to retrieve.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
                 .required(true),
             string(RESPONSE)
                 .label("Response")
                 .description("Response to retrieve.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
                 .required(true))
         .output(
             outputSchema(
@@ -60,21 +60,22 @@ public class GoogleFormsGetResponseAction {
                         string("createTime"),
                         string("lastSubmittedTime"),
                         string("respondentEmail"),
-                        object("answers"), // map of question - answer - dynamic schema so cannot be defined here
+                        object("answers"),
                         number("totalScore"))))
         .perform(GoogleFormsGetResponseAction::perform);
 
     private GoogleFormsGetResponseAction() {
     }
 
-    public static Object perform(
+    protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         String formId = inputParameters.getRequiredString(FORM);
         String responseId = inputParameters.getRequiredString(RESPONSE);
 
         return actionContext
             .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses/" + responseId))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
