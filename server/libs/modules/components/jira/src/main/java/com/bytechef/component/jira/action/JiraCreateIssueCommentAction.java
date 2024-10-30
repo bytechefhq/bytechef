@@ -22,12 +22,17 @@ import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.jira.constant.JiraConstants.COMMENT;
 import static com.bytechef.component.jira.constant.JiraConstants.CREATE_ISSUE_COMMENT;
+import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
+import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.jira.util.JiraOptionsUtils;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,12 +46,17 @@ public class JiraCreateIssueCommentAction {
         .title("Create issue comment")
         .description("Adds a comment to an issue.")
         .properties(
-            string("issueIdOrKey")
-                .label("Issue ID or Issue Key")
-                .description(
-                    "Issue ID or key of issue to add comment to, e.g. 10105 (issue ID) or ABC-123 (issue key). Use issue ID if your issue moves between projects.")
+            string(PROJECT)
+                .label("Project Name")
+                .description("Project where the issue is located.")
+                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
-            string("comment")
+            string(ISSUE_ID)
+                .label("Issue name")
+                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .optionsLookupDependsOn(PROJECT)
+                .required(true),
+            string(COMMENT)
                 .label("Comment")
                 .description("The text of the comment.")
                 .required(true))
@@ -79,8 +89,8 @@ public class JiraCreateIssueCommentAction {
         .perform(JiraCreateIssueCommentAction::perform);
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String issueId = inputParameters.getRequiredString("issueIdOrKey");
-        String comment = inputParameters.getRequiredString("comment");
+        String issueId = inputParameters.getRequiredString(ISSUE_ID);
+        String comment = inputParameters.getRequiredString(COMMENT);
 
         Map<String, Object> inputs = new HashMap<>();
         inputs.put(
