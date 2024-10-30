@@ -70,8 +70,11 @@ public class AppEventTrigger {
 
         return appEventService.getAppEvents()
             .stream()
-            .map(appEvent -> option(appEvent.getName(), appEvent.getId()
-                .longValue()))
+            .map(appEvent -> {
+                Long id = appEvent.getId();
+
+                return option(appEvent.getName(), id.longValue());
+            })
             .toList();
     }
 
