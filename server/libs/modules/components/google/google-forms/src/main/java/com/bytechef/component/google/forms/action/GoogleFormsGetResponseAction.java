@@ -50,6 +50,7 @@ public class GoogleFormsGetResponseAction {
                 .label("Response")
                 .description("Response to retrieve.")
                 .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
+                .optionsLookupDependsOn(FORM)
                 .required(true))
         .output(
             outputSchema(
