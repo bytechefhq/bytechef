@@ -21,10 +21,8 @@ import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
 import static com.bytechef.component.copper.constant.CopperConstants.CITY;
-import static com.bytechef.component.copper.constant.CopperConstants.COMPANY_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CONTACT_TYPE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
-import static com.bytechef.component.copper.constant.CopperConstants.EMAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.NUMBER;
 import static com.bytechef.component.copper.constant.CopperConstants.PHONE_NUMBERS;
@@ -37,16 +35,15 @@ import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class CopperCreatePersonActionTest extends AbstractCopperActionTest {
 
@@ -56,59 +53,21 @@ class CopperCreatePersonActionTest extends AbstractCopperActionTest {
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+        Map<String, Object> bodyMap = Map.of(
+            NAME, "name", ASSIGNEE_ID, "assigneeId", TITLE, "title", DETAILS, "details", CONTACT_TYPE_ID, "contactType",
+            PHONE_NUMBERS, phoneNumbers, SOCIALS, socials, WEBSITES, websites,
+            ADDRESS, Map.of(STREET, "street", CITY, "city"), TAGS, List.of("tag1", "tag2"));
 
-        when(mockedParameters.getString(NAME))
-            .thenReturn((String) propertyStubsMap.get(NAME));
-        when(mockedParameters.getList(EMAILS))
-            .thenReturn(null);
-        when(mockedParameters.getString(ASSIGNEE_ID))
-            .thenReturn((String) propertyStubsMap.get(ASSIGNEE_ID));
-        when(mockedParameters.getString(TITLE))
-            .thenReturn((String) propertyStubsMap.get(TITLE));
-        when(mockedParameters.getString(COMPANY_ID))
-            .thenReturn((String) propertyStubsMap.get(COMPANY_ID));
-        when(mockedParameters.getString(CONTACT_TYPE_ID))
-            .thenReturn((String) propertyStubsMap.get(CONTACT_TYPE_ID));
-        when(mockedParameters.getString(DETAILS))
-            .thenReturn((String) propertyStubsMap.get(DETAILS));
-        when((List<Map<String, String>>) mockedParameters.getList(PHONE_NUMBERS))
-            .thenReturn(phoneNumbers);
-        when((List<Map<String, String>>) mockedParameters.getList(SOCIALS))
-            .thenReturn(socials);
-        when((List<Map<String, String>>) mockedParameters.getList(WEBSITES))
-            .thenReturn(websites);
-        when(mockedParameters.get(ADDRESS))
-            .thenReturn(propertyStubsMap.get(ADDRESS));
-        when(mockedParameters.getList(TAGS, String.class))
-            .thenReturn((List<String>) propertyStubsMap.get(TAGS));
+        mockedParameters = MockParametersFactory.create(bodyMap);
 
         Object result = CopperCreatePersonAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(mockedObject, result);
 
         verify(mockedContext, times(1)).http(POST_PEOPLE_CONTEXT_FUNCTION);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(NAME, "name");
-        propertyStubsMap.put(ASSIGNEE_ID, "assigneId");
-        propertyStubsMap.put(TITLE, "title");
-        propertyStubsMap.put(COMPANY_ID, "companyId");
-        propertyStubsMap.put(CONTACT_TYPE_ID, "contactType");
-        propertyStubsMap.put(DETAILS, "details");
-        propertyStubsMap.put(PHONE_NUMBERS, phoneNumbers);
-        propertyStubsMap.put(SOCIALS, socials);
-        propertyStubsMap.put(WEBSITES, websites);
-        propertyStubsMap.put(ADDRESS, Map.of(STREET, "street", CITY, "city"));
-        propertyStubsMap.put(TAGS, List.of("tag1", "tag2"));
-
-        return propertyStubsMap;
+        assertEquals(bodyMap, body.getContent());
     }
 }

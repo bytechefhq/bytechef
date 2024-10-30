@@ -24,24 +24,23 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractCopperActionTest {
+abstract class AbstractCopperActionTest {
 
     protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Object mockedObject = mock(Object.class);
+    protected Parameters mockedParameters;
     protected Http.Response mockedResponse = mock(Http.Response.class);
-    protected Map<String, Object> responeseMap = Map.of("key", "value");
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -51,7 +50,7 @@ public abstract class AbstractCopperActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
+            .thenReturn(mockedObject);
     }
 
 }

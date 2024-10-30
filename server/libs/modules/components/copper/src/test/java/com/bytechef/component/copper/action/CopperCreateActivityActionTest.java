@@ -25,49 +25,35 @@ import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class CopperCreateActivityActionTest extends AbstractCopperActionTest {
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getRequiredString(ACTIVITY_TYPE))
-            .thenReturn("activityType");
-        when(mockedParameters.getRequiredString(DETAILS))
-            .thenReturn((String) propertyStubsMap.get(DETAILS));
-        when(mockedParameters.getRequiredString(TYPE))
-            .thenReturn("lead");
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("id");
+        mockedParameters = MockParametersFactory.create(
+            Map.of(ACTIVITY_TYPE, "activityType", DETAILS, "details", TYPE, "lead", ID, "id"));
 
         Object result = CopperCreateActivityAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(mockedObject, result);
 
         verify(mockedContext, times(1)).http(POST_ACTIVITIES_CONTEXT_FUNCTION);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
+        Map<String, Object> expectedBody = Map.of(
+            TYPE, Map.of("category", "user", ID, "activityType"),
+            DETAILS, "details",
+            PARENT, Map.of(ID, "id", TYPE, "lead"));
 
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(TYPE, Map.of("category", "user", ID, "activityType"));
-        propertyStubsMap.put(DETAILS, "details");
-        propertyStubsMap.put(PARENT, Map.of(ID, "id", TYPE, "lead"));
-
-        return propertyStubsMap;
+        assertEquals(expectedBody, body.getContent());
     }
 }
