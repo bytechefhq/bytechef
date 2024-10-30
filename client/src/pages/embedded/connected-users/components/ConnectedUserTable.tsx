@@ -63,6 +63,10 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 header: 'Status',
                 id: 'status',
             }),
+            columnHelper.accessor('externalId', {
+                cell: (info) => info.getValue() ?? '',
+                header: 'External Id',
+            }),
             columnHelper.accessor('name', {
                 cell: (info) => info.getValue() ?? '',
                 header: 'Name',
