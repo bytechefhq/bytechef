@@ -47,7 +47,6 @@ public class CopperConstants {
     public static final String PHONE_NUMBERS = "phone_numbers";
     public static final String POSTAL_CODE = "postal_code";
     public static final String PRIORITY = "priority";
-    public static final String RELATED_RESOURCE = "related_resource";
     public static final String REMINDER_DATE = "reminder_date";
     public static final String SOCIALS = "socials";
     public static final String STATE = "state";

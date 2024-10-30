@@ -23,128 +23,104 @@ import static com.bytechef.component.copper.constant.CopperConstants.DUE_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.PRIORITY;
-import static com.bytechef.component.copper.constant.CopperConstants.RELATED_RESOURCE;
 import static com.bytechef.component.copper.constant.CopperConstants.REMINDER_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.STATUS;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.Date;
 
 /**
  * @author Vihar Shah
+ * @author Monika Kušter
  */
 public class CopperCreateTaskAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Create a new task in Copper")
+        .description("Creates a new task in Copper.")
         .properties(
             string(NAME)
                 .label("Name")
-                .description("The name of the task")
+                .description("The name of the task.")
                 .required(true),
-            object(RELATED_RESOURCE)
-                .label("Related Resource")
-                .properties(
-                    string("id")
-                        .label("ID")
-                        .description("The ID of the related resource")
-                        .required(true),
-                    string("type")
-                        .label("Type")
-                        .description("The type of the related resource")
-                        .required(true))
-                .required(false),
             string(ASSIGNEE_ID)
-                .label("Assignee ID")
-                .description("The ID of the user to assign the task to")
+                .label("Assignee")
+                .description("User to assign the task to.")
+                .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
-            string(DUE_DATE)
+            date(DUE_DATE)
                 .label("Due Date")
-                .description("The due date of the task")
+                .description("The due date of the task.")
                 .required(false),
-            string(REMINDER_DATE)
+            date(REMINDER_DATE)
                 .label("Reminder Date")
-                .description("The reminder date of the task")
+                .description("The reminder date of the task.")
+                .required(false),
+            string(DETAILS)
+                .label("Description")
+                .description("Description of the task.")
                 .required(false),
             string(PRIORITY)
                 .label("Priority")
-                .description("The priority of the task")
+                .description("The priority of the task.")
+                .options(
+                    option("None", "None"),
+                    option("Low", "Low"),
+                    option("Medium", "Medium"),
+                    option("High", "High"))
+                .defaultValue("None")
+                .required(true),
+            array(TAGS)
+                .label("Tags")
+                .items(
+                    string()
+                        .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))
                 .required(false),
             string(STATUS)
                 .label("Status")
-                .description("The status of the task")
-                .required(false),
-            string(DETAILS)
-                .label("Details")
-                .description("The details of the task")
-                .required(false),
-            array(TAGS)
-                .label("Tags")
-                .required(false),
-            array(CUSTOM_FIELDS)
-                .label("Custom Fields")
-                .required(false))
+                .description("The status of the task.")
+                .options(
+                    option("Open", "Open"),
+                    option("Completed", "Completed"))
+                .defaultValue("Open")
+                .required(true))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string(ID)
-                            .label("ID")
-                            .description("The ID of the task"),
-                        string(NAME)
-                            .label("Name")
-                            .description("The name of the task"),
-                        object(RELATED_RESOURCE)
+                        string(ID),
+                        string(NAME),
+                        object("related_resource")
                             .label("Related Resource")
                             .properties(
-                                string("id")
-                                    .label("ID")
-                                    .description("The ID of the related resource"),
-                                string("type")
-                                    .label("Type")
-                                    .description("The type of the related resource")),
-                        string(ASSIGNEE_ID)
-                            .label("Assignee ID")
-                            .description("The ID of the user to assign the task to"),
-                        string(DUE_DATE)
-                            .label("Due Date")
-                            .description("The due date of the task"),
-                        string(REMINDER_DATE)
-                            .label("Reminder Date")
-                            .description("The reminder date of the task"),
-                        string("completed_date")
-                            .label("Completed Date")
-                            .description("The date of completion of the task"),
-                        string(PRIORITY)
-                            .label("Priority")
-                            .description("The priority of the task"),
-                        string(STATUS)
-                            .label("Status")
-                            .description("The status of the task"),
-                        string(DETAILS)
-                            .label("Details")
-                            .description("The details of the task"),
-                        array(TAGS)
-                            .label("Tags"),
-                        array(CUSTOM_FIELDS)
-                            .label("Custom Fields"),
-                        string("date_created")
-                            .label("Date Created")
-                            .description("The date and time the task was created"),
-                        string("date_modified")
-                            .label("Date Modified")
-                            .description("The date and time the task was last updated"))))
+                                string("id"),
+                                string("type")),
+                        string(ASSIGNEE_ID),
+                        string(DUE_DATE),
+                        string(REMINDER_DATE),
+                        string("completed_date"),
+                        string(PRIORITY),
+                        string(STATUS),
+                        string(DETAILS),
+                        array(TAGS),
+                        array(CUSTOM_FIELDS),
+                        string("date_created"),
+                        string("date_modified"))))
         .perform(CopperCreateTaskAction::perform);
 
     protected static final ContextFunction<Http, Http.Executor> POST_CREATE_TASK_FUNCTION =
@@ -156,19 +132,22 @@ public class CopperCreateTaskAction {
     protected static Object perform(
         Parameters inputParameters, Parameters outputParameters, ActionContext actionContext) {
 
+        Date dueDate = inputParameters.getDate(DUE_DATE);
+        Date reminderDate = inputParameters.getDate(REMINDER_DATE);
+
         return actionContext.http(POST_CREATE_TASK_FUNCTION)
             .body(
                 Http.Body.of(
-                    NAME, inputParameters.getString(NAME),
-                    RELATED_RESOURCE, inputParameters.get(RELATED_RESOURCE),
+                    NAME, inputParameters.getRequiredString(NAME),
                     ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
-                    DUE_DATE, inputParameters.getString(DUE_DATE),
-                    REMINDER_DATE, inputParameters.getString(REMINDER_DATE),
-                    PRIORITY, inputParameters.getString(PRIORITY),
-                    STATUS, inputParameters.getString(STATUS),
+                    DUE_DATE, dueDate == null ? null : dueDate.toInstant()
+                        .getEpochSecond(),
+                    REMINDER_DATE, reminderDate == null ? null : reminderDate.toInstant()
+                        .getEpochSecond(),
+                    PRIORITY, inputParameters.getRequiredString(PRIORITY),
+                    STATUS, inputParameters.getRequiredString(STATUS),
                     DETAILS, inputParameters.getString(DETAILS),
-                    TAGS, inputParameters.getList(TAGS),
-                    CUSTOM_FIELDS, inputParameters.getList(CUSTOM_FIELDS)))
+                    TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
