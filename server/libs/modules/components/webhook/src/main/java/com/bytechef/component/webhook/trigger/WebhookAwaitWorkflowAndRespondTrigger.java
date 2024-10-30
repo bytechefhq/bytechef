@@ -17,13 +17,18 @@
 package com.bytechef.component.webhook.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.webhook.constant.WebhookConstants.CSRF_TOKEN;
+import static com.bytechef.component.webhook.constant.WebhookConstants.HEADERS;
+import static com.bytechef.component.webhook.constant.WebhookConstants.METHOD;
+import static com.bytechef.component.webhook.constant.WebhookConstants.PARAMETERS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.webhook.util.WebhookUtils;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +51,9 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
                 .label("Timeout (ms)")
                 .description(
                     "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
-        .output()
+        .output(
+            sampleOutput(
+                Map.of(METHOD, "POST", HEADERS, Map.of("Header1", "value"), PARAMETERS, Map.of("parameter1", "value"))))
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 }
