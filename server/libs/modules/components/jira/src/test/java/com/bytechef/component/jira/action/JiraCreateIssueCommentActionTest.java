@@ -20,13 +20,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Vihar Shah
  */
 class JiraCreateIssueCommentActionTest extends AbstractJiraActionTest {
+
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
 
     @Test
     void testPerform() {
@@ -34,19 +40,28 @@ class JiraCreateIssueCommentActionTest extends AbstractJiraActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.body(any()))
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
-        when(mockedParameters.getRequiredString("issueIdOrKey"))
-            .thenReturn("123");
+
         when(mockedParameters.getRequiredString("comment"))
             .thenReturn("This is a comment");
 
         Object result = JiraCreateIssueCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        Map<String, Object> expectedBody = Map.of("body", Map.of(
+            "content", List.of(
+                Map.of(
+                    "content", List.of("text", "This is a comment", "type", "text"),
+                    "type", "paragraph"))));
+
+        assertEquals(expectedBody, body.getContent());
     }
 }
