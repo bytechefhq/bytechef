@@ -16,6 +16,17 @@
 
 package com.bytechef.component.copper.action;
 
+import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
+import static com.bytechef.component.copper.constant.CopperConstants.CUSTOM_FIELDS;
+import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
+import static com.bytechef.component.copper.constant.CopperConstants.DUE_DATE;
+import static com.bytechef.component.copper.constant.CopperConstants.ID;
+import static com.bytechef.component.copper.constant.CopperConstants.NAME;
+import static com.bytechef.component.copper.constant.CopperConstants.PRIORITY;
+import static com.bytechef.component.copper.constant.CopperConstants.RELATED_RESOURCE;
+import static com.bytechef.component.copper.constant.CopperConstants.REMINDER_DATE;
+import static com.bytechef.component.copper.constant.CopperConstants.STATUS;
+import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -23,9 +34,9 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.copper.constant.CopperConstants;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 
@@ -33,15 +44,16 @@ import com.bytechef.component.definition.TypeReference;
  * @author Vihar Shah
  */
 public class CopperCreateTaskAction {
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CopperConstants.CREATE_TASK)
+
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
         .description("Create a new task in Copper")
         .properties(
-            string("name")
+            string(NAME)
                 .label("Name")
                 .description("The name of the task")
                 .required(true),
-            object("related_resource")
+            object(RELATED_RESOURCE)
                 .label("Related Resource")
                 .properties(
                     string("id")
@@ -53,47 +65,47 @@ public class CopperCreateTaskAction {
                         .description("The type of the related resource")
                         .required(true))
                 .required(false),
-            string("assignee_id")
+            string(ASSIGNEE_ID)
                 .label("Assignee ID")
                 .description("The ID of the user to assign the task to")
                 .required(false),
-            string("due_date")
+            string(DUE_DATE)
                 .label("Due Date")
                 .description("The due date of the task")
                 .required(false),
-            string("reminder_date")
+            string(REMINDER_DATE)
                 .label("Reminder Date")
                 .description("The reminder date of the task")
                 .required(false),
-            string("priority")
+            string(PRIORITY)
                 .label("Priority")
                 .description("The priority of the task")
                 .required(false),
-            string("status")
+            string(STATUS)
                 .label("Status")
                 .description("The status of the task")
                 .required(false),
-            string("details")
+            string(DETAILS)
                 .label("Details")
                 .description("The details of the task")
                 .required(false),
-            array("tags")
+            array(TAGS)
                 .label("Tags")
                 .required(false),
-            array("custom_fields")
+            array(CUSTOM_FIELDS)
                 .label("Custom Fields")
                 .required(false))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string("id")
+                        string(ID)
                             .label("ID")
                             .description("The ID of the task"),
-                        string("name")
+                        string(NAME)
                             .label("Name")
                             .description("The name of the task"),
-                        object("related_resource")
+                        object(RELATED_RESOURCE)
                             .label("Related Resource")
                             .properties(
                                 string("id")
@@ -102,30 +114,30 @@ public class CopperCreateTaskAction {
                                 string("type")
                                     .label("Type")
                                     .description("The type of the related resource")),
-                        string("assignee_id")
+                        string(ASSIGNEE_ID)
                             .label("Assignee ID")
                             .description("The ID of the user to assign the task to"),
-                        string("due_date")
+                        string(DUE_DATE)
                             .label("Due Date")
                             .description("The due date of the task"),
-                        string("reminder_date")
+                        string(REMINDER_DATE)
                             .label("Reminder Date")
                             .description("The reminder date of the task"),
                         string("completed_date")
                             .label("Completed Date")
                             .description("The date of completion of the task"),
-                        string("priority")
+                        string(PRIORITY)
                             .label("Priority")
                             .description("The priority of the task"),
-                        string("status")
+                        string(STATUS)
                             .label("Status")
                             .description("The status of the task"),
-                        string("details")
+                        string(DETAILS)
                             .label("Details")
                             .description("The details of the task"),
-                        array("tags")
+                        array(TAGS)
                             .label("Tags"),
-                        array("custom_fields")
+                        array(CUSTOM_FIELDS)
                             .label("Custom Fields"),
                         string("date_created")
                             .label("Date Created")
@@ -135,27 +147,29 @@ public class CopperCreateTaskAction {
                             .description("The date and time the task was last updated"))))
         .perform(CopperCreateTaskAction::perform);
 
-    protected static final Context.ContextFunction<Context.Http, Context.Http.Executor> POST_CREATE_TASK_FUNCTION =
+    protected static final ContextFunction<Http, Http.Executor> POST_CREATE_TASK_FUNCTION =
         http -> http.post("/tasks");
 
     private CopperCreateTaskAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters outputParameters, ActionContext actionContext) {
+    protected static Object perform(
+        Parameters inputParameters, Parameters outputParameters, ActionContext actionContext) {
+
         return actionContext.http(POST_CREATE_TASK_FUNCTION)
             .body(
-                Context.Http.Body.of(
-                    CopperConstants.NAME, inputParameters.getString(CopperConstants.NAME),
-                    CopperConstants.RELATED_RESOURCE, inputParameters.get(CopperConstants.RELATED_RESOURCE),
-                    CopperConstants.ASSIGNEE_ID, inputParameters.getString(CopperConstants.ASSIGNEE_ID),
-                    CopperConstants.DUE_DATE, inputParameters.getString(CopperConstants.DUE_DATE),
-                    CopperConstants.REMINDER_DATE, inputParameters.getString(CopperConstants.REMINDER_DATE),
-                    CopperConstants.PRIORITY, inputParameters.getString(CopperConstants.PRIORITY),
-                    CopperConstants.STATUS, inputParameters.getString(CopperConstants.STATUS),
-                    CopperConstants.DETAILS, inputParameters.getString(CopperConstants.DETAILS),
-                    CopperConstants.TAGS, inputParameters.getList(CopperConstants.TAGS),
-                    CopperConstants.CUSTOM_FIELDS, inputParameters.getList(CopperConstants.CUSTOM_FIELDS)))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                Http.Body.of(
+                    NAME, inputParameters.getString(NAME),
+                    RELATED_RESOURCE, inputParameters.get(RELATED_RESOURCE),
+                    ASSIGNEE_ID, inputParameters.getString(ASSIGNEE_ID),
+                    DUE_DATE, inputParameters.getString(DUE_DATE),
+                    REMINDER_DATE, inputParameters.getString(REMINDER_DATE),
+                    PRIORITY, inputParameters.getString(PRIORITY),
+                    STATUS, inputParameters.getString(STATUS),
+                    DETAILS, inputParameters.getString(DETAILS),
+                    TAGS, inputParameters.getList(TAGS),
+                    CUSTOM_FIELDS, inputParameters.getList(CUSTOM_FIELDS)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
