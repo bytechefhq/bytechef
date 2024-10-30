@@ -16,6 +16,13 @@
 
 package com.bytechef.component.baserow.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
+
+import com.bytechef.component.baserow.util.BaserowPropertiesUtils;
+import com.bytechef.component.definition.ComponentDsl.ModifiableBooleanProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
+
 /**
  * @author Monika Kušter
  */
@@ -23,10 +30,22 @@ public class BaserowConstants {
 
     public static final String FIELDS = "fields";
     public static final String NAME = "name";
+    public static final String READ_ONLY = "read_only";
     public static final String ROW_ID = "rowId";
     public static final String TABLE_ID = "tableId";
     public static final String TYPE = "type";
     public static final String USER_FIELD_NAMES = "user_field_names";
+
+    public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
+        .propertiesLookupDependsOn(TABLE_ID)
+        .properties(BaserowPropertiesUtils::createPropertiesForRow)
+        .required(true);
+
+    public static final ModifiableBooleanProperty USER_FIELD_NAMES_PROPERTY = bool(USER_FIELD_NAMES)
+        .label("User Field Names")
+        .description("The field names returned by this endpoint will be the actual names of the fields.")
+        .defaultValue(true)
+        .required(false);
 
     private BaserowConstants() {
     }

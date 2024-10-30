@@ -32,7 +32,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-public class BaserowUpdateRowActionTest {
+class BaserowUpdateRowActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final Map<String, Object> bodyMap = Map.of("Name", "name", "Boolean", true);
@@ -51,7 +51,6 @@ public class BaserowUpdateRowActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))

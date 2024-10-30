@@ -54,7 +54,6 @@ class BaserowCreateRowActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
