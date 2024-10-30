@@ -36,8 +36,8 @@ import org.junit.jupiter.api.Test;
  */
 class GoogleFormsGetResponseActionTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(FORM, "formId", RESPONSE, "responseId"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FORM, "formId", RESPONSE, "responseId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
@@ -58,5 +58,4 @@ class GoogleFormsGetResponseActionTest {
 
         Assertions.assertEquals(mockedObject, result);
     }
-
 }

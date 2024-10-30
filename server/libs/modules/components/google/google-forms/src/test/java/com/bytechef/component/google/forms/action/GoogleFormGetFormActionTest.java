@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.action;
+package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,7 +26,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.google.forms.action.GoogleFormsGetFormAction;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
