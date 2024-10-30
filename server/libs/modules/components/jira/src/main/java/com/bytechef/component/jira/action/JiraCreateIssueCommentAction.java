@@ -23,17 +23,15 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.jira.constant.JiraConstants.COMMENT;
-import static com.bytechef.component.jira.constant.JiraConstants.CREATE_ISSUE_COMMENT;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_ID;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraOptionsUtils;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,18 +40,19 @@ import java.util.Map;
  */
 public class JiraCreateIssueCommentAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ISSUE_COMMENT)
-        .title("Create issue comment")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssueComment")
+        .title("Create Issue Comment")
         .description("Adds a comment to an issue.")
         .properties(
             string(PROJECT)
                 .label("Project Name")
                 .description("Project where the issue is located.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
+                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUE_ID)
                 .label("Issue name")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
+                .description("Issue where the comment will be added.")
+                .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(COMMENT)
@@ -88,24 +87,18 @@ public class JiraCreateIssueCommentAction {
                                 string("value")))))
         .perform(JiraCreateIssueCommentAction::perform);
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String issueId = inputParameters.getRequiredString(ISSUE_ID);
-        String comment = inputParameters.getRequiredString(COMMENT);
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> inputs = new HashMap<>();
-        inputs.put(
-            "body", Map.of(
-                "content", List.of(
-                    Map.of(
-                        "content", List.of(
-                            "text", comment,
-                            "type", "text"),
-                        "type", "paragraph"))));
-
-        return context
-            .http(http -> http.post("/issue/" + issueId + "/comment"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(inputs, Context.Http.BodyContentType.JSON))
+        return actionContext
+            .http(http -> http.post("/issue/" + inputParameters.getRequiredString(ISSUE_ID) + "/comment"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(
+                "body", Map.of(
+                    "content", List.of(
+                        Map.of(
+                            "content", List.of("text", inputParameters.getRequiredString(COMMENT), "type", "text"),
+                            "type", "paragraph")))))
             .execute()
             .getBody(new TypeReference<>() {});
     }
