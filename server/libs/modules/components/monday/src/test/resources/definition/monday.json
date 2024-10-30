@@ -10,75 +10,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "monday.com",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -499,9 +430,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create column",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -746,9 +677,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Group",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1031,9 +962,9 @@
       }
     } ],
     "title" : "Create Item",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1284,9 +1215,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create board",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1296,6 +1227,52 @@
     "name" : "deleteItem",
     "outputDefinition" : null,
     "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "workspace_id",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Workspace",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "The board where the item is located.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "board_id",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Board",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "workspace_id" ],
+        "options" : { }
+      }
+    }, {
       "advancedOption" : null,
       "description" : "Item to delete",
       "displayCondition" : null,
@@ -1309,17 +1286,20 @@
       "exampleValue" : null,
       "label" : "Item",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "SELECT",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "board_id", "workspace_id" ],
+        "options" : { }
+      }
     } ],
     "title" : "Delete Item",
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
   "triggers" : [ {
@@ -2098,18 +2078,87 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dwebhookRequest" : { },
+    "dynamicWebhookRefresh" : null,
+    "webhookRequest" : { },
     "listenerDisable" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : { }
   } ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }
