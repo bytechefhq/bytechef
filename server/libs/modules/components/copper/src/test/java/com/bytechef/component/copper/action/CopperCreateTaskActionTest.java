@@ -18,72 +18,57 @@ package com.bytechef.component.copper.action;
 
 import static com.bytechef.component.copper.action.CopperCreateTaskAction.POST_CREATE_TASK_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
-import static com.bytechef.component.copper.constant.CopperConstants.CUSTOM_FIELDS;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.DUE_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.NAME;
 import static com.bytechef.component.copper.constant.CopperConstants.PRIORITY;
-import static com.bytechef.component.copper.constant.CopperConstants.RELATED_RESOURCE;
 import static com.bytechef.component.copper.constant.CopperConstants.REMINDER_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.STATUS;
-import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
-import java.util.List;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.Date;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Vihar Shah
+ * @author Monika Kušter
  */
 class CopperCreateTaskActionTest extends AbstractCopperActionTest {
 
     @Test
     void testPerform() {
-        when(mockedParameters.getString(NAME))
-            .thenReturn("name");
-        when(mockedParameters.get(RELATED_RESOURCE))
-            .thenReturn(Map.of());
-        when(mockedParameters.getString(ASSIGNEE_ID))
-            .thenReturn("assigneeId");
-        when(mockedParameters.getString(DUE_DATE))
-            .thenReturn("dueDate");
-        when(mockedParameters.getString(REMINDER_DATE))
-            .thenReturn("reminderDate");
-        when(mockedParameters.getString(PRIORITY))
-            .thenReturn("priority");
-        when(mockedParameters.getString(STATUS))
-            .thenReturn("status");
-        when(mockedParameters.getString(DETAILS))
-            .thenReturn("details");
-        when(mockedParameters.getList(TAGS))
-            .thenReturn(List.of());
-        when(mockedParameters.getList(CUSTOM_FIELDS))
-            .thenReturn(List.of());
+        Date date = new Date();
+
+        long epochSecond = date.toInstant()
+            .getEpochSecond();
+
+        mockedParameters = MockParametersFactory.create(
+            Map.of(
+                NAME, "name", ASSIGNEE_ID, "assigneeId", DUE_DATE, date, REMINDER_DATE, date,
+                PRIORITY, "priority", STATUS, "status", DETAILS, "details"));
 
         Object result = CopperCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
-        assertEquals(responeseMap, result);
+
+        assertEquals(mockedObject, result);
+
         verify(mockedContext, times(1)).http(POST_CREATE_TASK_FUNCTION);
 
-        Context.Http.Body body = bodyArgumentCaptor.getValue();
-        assertEquals(propertyStubsMap(), body.getContent());
-    }
+        Http.Body body = bodyArgumentCaptor.getValue();
 
-    private Map<String, Object> propertyStubsMap() {
-        return Map.of(
+        Map<String, Object> expectedBody = Map.of(
             NAME, "name",
-            RELATED_RESOURCE, Map.of(),
             ASSIGNEE_ID, "assigneeId",
-            DUE_DATE, "dueDate",
-            REMINDER_DATE, "reminderDate",
+            DUE_DATE, epochSecond,
+            REMINDER_DATE, epochSecond,
             PRIORITY, "priority",
             STATUS, "status",
-            DETAILS, "details",
-            TAGS, List.of(),
-            CUSTOM_FIELDS, List.of());
+            DETAILS, "details");
+
+        assertEquals(expectedBody, body.getContent());
     }
 }
