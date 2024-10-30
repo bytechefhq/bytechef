@@ -49,9 +49,9 @@ public class JiraComponentHandler implements ComponentHandler {
         .connection(JiraConnection.CONNECTION_DEFINITION)
         .actions(
             JiraCreateIssueAction.ACTION_DEFINITION,
+            JiraCreateIssueCommentAction.ACTION_DEFINITION,
             JiraGetIssueAction.ACTION_DEFINITION,
-            JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION,
-            JiraCreateIssueCommentAction.ACTION_DEFINITION)
+            JiraSearchForIssuesUsingJqlAction.ACTION_DEFINITION)
         .triggers(
             JiraNewIssueTrigger.TRIGGER_DEFINITION,
             JiraUpdatedIssueTrigger.TRIGGER_DEFINITION)

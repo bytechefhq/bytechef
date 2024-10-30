@@ -28,8 +28,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class JiraConstants {
 
     public static final String ASSIGNEE = "assignee";
+    public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
-    public static final String CREATE_ISSUE_COMMENT = "createIssueComment";
     public static final String DESCRIPTION = "description";
     public static final String FIELDS = "fields";
     public static final String ID = "id";
@@ -50,7 +50,6 @@ public class JiraConstants {
     public static final String TYPE = "type";
     public static final String UPDATED_ISSUE = "updatedIssue";
     public static final String YOUR_DOMAIN = "yourDomain";
-    public static final String COMMENT = "comment";
 
     public static final ModifiableObjectProperty ISSUE_OUTPUT_PROPERTY = object()
         .properties(
