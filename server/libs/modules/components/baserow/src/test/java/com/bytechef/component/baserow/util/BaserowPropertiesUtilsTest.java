@@ -17,9 +17,9 @@
 package com.bytechef.component.baserow.util;
 
 import static com.bytechef.component.baserow.constant.BaserowConstants.NAME;
+import static com.bytechef.component.baserow.constant.BaserowConstants.READ_ONLY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TABLE_ID;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TYPE;
-import static com.bytechef.component.baserow.util.BaserowPropertiesUtils.READ_ONLY;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -53,7 +53,7 @@ class BaserowPropertiesUtilsTest {
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TABLE_ID, "table"));
 
     @Test
-    void testCreatePropertiesForNewRow() {
+    void testCreatePropertiesForRow() {
         try (MockedStatic<BaserowUtils> baserowUtilsMockedStatic = mockStatic(BaserowUtils.class)) {
             baserowUtilsMockedStatic.when(() -> BaserowUtils.getTableFields(mockedActionContext, "table"))
                 .thenReturn(List.of(
@@ -75,7 +75,7 @@ class BaserowPropertiesUtilsTest {
                     Map.of(TYPE, BaserowFieldType.MULTI_SELECT.getName(), NAME, NAME, READ_ONLY, false,
                         "select_options", List.of(Map.of("value", "option1")))));
 
-            List<ValueProperty<?>> propertiesForItem = BaserowPropertiesUtils.createPropertiesForNewRow(
+            List<ValueProperty<?>> propertiesForItem = BaserowPropertiesUtils.createPropertiesForRow(
                 mockedParameters, mockedParameters, Map.of(), mockedActionContext);
 
             assertEquals(getExpectedProperties(), propertiesForItem);

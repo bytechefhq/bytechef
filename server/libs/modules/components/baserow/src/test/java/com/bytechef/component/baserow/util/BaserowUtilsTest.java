@@ -17,8 +17,8 @@
 package com.bytechef.component.baserow.util;
 
 import static com.bytechef.component.baserow.constant.BaserowConstants.NAME;
+import static com.bytechef.component.baserow.constant.BaserowConstants.READ_ONLY;
 import static com.bytechef.component.baserow.constant.BaserowConstants.TYPE;
-import static com.bytechef.component.baserow.util.BaserowPropertiesUtils.READ_ONLY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
