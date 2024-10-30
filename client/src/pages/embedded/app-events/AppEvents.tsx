@@ -3,6 +3,7 @@ import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import AppEventDialog from '@/pages/embedded/app-events/components/AppEventDialog';
 import AppEventList from '@/pages/embedded/app-events/components/AppEventList';
+import AppEventsFilterTitle from '@/pages/embedded/app-events/components/AppEventsFilterTitle';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -25,7 +26,7 @@ const AppEvents = () => {
                                 appEvents &&
                                 appEvents.length > 0 && <AppEventDialog triggerNode={<Button>New App Event</Button>} />
                             }
-                            title="All App Events"
+                            title={<AppEventsFilterTitle filterData={{}} workflows={[]} />}
                         />
                     )
                 }
