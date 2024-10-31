@@ -11,20 +11,22 @@ const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
 
     return (
         <div className="flex items-center space-x-2">
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        className="hover:bg-background/70"
-                        onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <PanelLeftIcon className="size-5" />
-                    </Button>
-                </TooltipTrigger>
+            {!leftSidebarOpen && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            className="hover:bg-background/70"
+                            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <PanelLeftIcon className="size-5" />
+                        </Button>
+                    </TooltipTrigger>
 
-                <TooltipContent>See integrations</TooltipContent>
-            </Tooltip>
+                    <TooltipContent>See integrations</TooltipContent>
+                </Tooltip>
+            )}
 
             <h1>{integration?.componentName}</h1>
 

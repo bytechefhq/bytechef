@@ -3,7 +3,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import IntegrationVersionHistorySheet from '@/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeader from '@/pages/embedded/integration/components/integration-header/IntegrationHeader';
 import IntegrationsSidebar from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
-import IntegrationsSidebarFilterPopover from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarFilterPopover';
+import IntegrationsSidebarHeader from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
 import useIntegrationsLeftSidebarStore from '@/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
 import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
@@ -254,7 +254,7 @@ const Integration = () => {
                 className="bg-muted/50"
                 leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
                 leftSidebarClass="bg-muted"
-                leftSidebarHeader={<Header right={<IntegrationsSidebarFilterPopover />} title="Integrations" />}
+                leftSidebarHeader={<Header right={<IntegrationsSidebarHeader />} title="Integrations" />}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 rightSidebarBody={
