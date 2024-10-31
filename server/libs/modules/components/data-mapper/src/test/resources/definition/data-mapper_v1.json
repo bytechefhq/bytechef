@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Data Mapper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -156,7 +155,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Map objects to array",
+    "title" : "Map Objects to Array",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -439,7 +438,7 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Map objects to object",
+    "title" : "Map Objects to Object",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -538,7 +537,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Merge and pivot properties by key",
+    "title" : "Merge and Pivot Properties by Key",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -657,7 +656,7 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Rename keys",
+    "title" : "Rename Keys",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1541,7 +1540,7 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace all specified values",
+    "title" : "Replace All Specified Values",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1680,7 +1679,7 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace multiple values by key",
+    "title" : "Replace Multiple Values by Key",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -3037,12 +3036,13 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace value",
+    "title" : "Replace Value",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

@@ -47,7 +47,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Convert from JSON string",
+    "title" : "Convert from JSON String",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -133,7 +133,7 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Convert to JSON string",
+    "title" : "Convert to JSON String",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -442,7 +442,7 @@
       "controlType" : "TIME",
       "optionsDataSource" : null
     } ],
-    "title" : "Add value to the object by key",
+    "title" : "Add Value to the Object by Key",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1110,7 +1110,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Add Key-Value pairs to object or array",
+    "title" : "Add Key-Value Pairs to Object or Array",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null

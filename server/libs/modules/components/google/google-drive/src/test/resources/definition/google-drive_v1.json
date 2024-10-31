@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Google Drive",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -190,8 +121,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -293,8 +224,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -365,10 +296,10 @@
         "options" : { }
       }
     } ],
-    "title" : "Copy file",
-    "perform" : { },
+    "title" : "Copy File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -457,13 +388,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "name" : "new-file.txt",
+          "mimeType" : "plain/text",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "name" : "new-file.txt"
         }
       },
       "outputSchema" : {
@@ -544,13 +475,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "name" : "new-file.txt"
       }
     },
     "properties" : [ {
@@ -597,10 +528,10 @@
         "options" : { }
       }
     } ],
-    "title" : "Create new folder",
-    "perform" : { },
+    "title" : "Create New Folder",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -689,13 +620,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "name" : "new-file.txt",
+          "mimeType" : "plain/text",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "name" : "new-file.txt"
         }
       },
       "outputSchema" : {
@@ -776,13 +707,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "name" : "new-file.txt"
       }
     },
     "properties" : [ {
@@ -881,10 +812,10 @@
         "options" : { }
       }
     } ],
-    "title" : "Create new text file",
-    "perform" : { },
+    "title" : "Create New Text File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -917,10 +848,10 @@
         "options" : { }
       }
     } ],
-    "title" : "Delete file",
-    "perform" : { },
+    "title" : "Delete File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1153,10 +1084,10 @@
         "options" : { }
       }
     } ],
-    "title" : "Read file",
-    "perform" : { },
+    "title" : "Read File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1245,13 +1176,13 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
-          "name" : "new-file.txt",
+          "mimeType" : "plain/text",
           "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType" : "plain/text"
+          "name" : "new-file.txt"
         }
       },
       "outputSchema" : {
@@ -1332,13 +1263,13 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : {
-        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
         "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType" : "plain/text"
+        "name" : "new-file.txt"
       }
     },
     "properties" : [ {
@@ -1461,11 +1392,12 @@
         "options" : { }
       }
     } ],
-    "title" : "Upload file",
-    "perform" : { },
+    "title" : "Upload File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1567,15 +1499,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1671,15 +1603,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1711,17 +1643,17 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -1824,15 +1756,15 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1928,15 +1860,15 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -1968,19 +1900,87 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "pkce" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  }
 }

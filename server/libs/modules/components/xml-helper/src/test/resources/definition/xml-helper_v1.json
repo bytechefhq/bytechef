@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -42,8 +41,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -65,8 +64,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -91,7 +90,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Convert from XML string",
+    "title" : "Convert from XML String",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -176,8 +175,8 @@
         "label" : "Array",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The object to convert to XML string.",
@@ -196,8 +195,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The array to convert to XML string.",
@@ -217,15 +216,16 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
-    "title" : "Convert to XML string",
+    "title" : "Convert to XML String",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

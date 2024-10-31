@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Pipedrive",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -996,7 +927,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Get deals",
+    "title" : "Get Deals",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -2028,7 +1959,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Add deal",
+    "title" : "Add Deal",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -3082,7 +3013,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Search deals",
+    "title" : "Search Deals",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -3292,7 +3223,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Delete deal",
+    "title" : "Delete Deal",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -4056,7 +3987,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Get details of a deal",
+    "title" : "Get Details of Deal",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -4742,7 +4673,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Get leads",
+    "title" : "Get Leads",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -5431,7 +5362,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Add lead",
+    "title" : "Add Lead",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -5644,7 +5575,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Delete lead",
+    "title" : "Delete Lead",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -6125,7 +6056,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Get lead details",
+    "title" : "Get Lead Details",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -6819,7 +6750,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Search leads",
+    "title" : "Search Leads",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -7375,7 +7306,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Get all organizations",
+    "title" : "Get All Organizations",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -7863,7 +7794,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Add an organization",
+    "title" : "Add Organization",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -8453,7 +8384,7 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Search organizations",
+    "title" : "Search Organizations",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -8663,7 +8594,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Delete an organization",
+    "title" : "Delete Organization",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -9109,7 +9040,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Get details of an organization",
+    "title" : "Get Details of Organization",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -10243,7 +10174,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Get persons",
+    "title" : "Get Persons",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -11569,7 +11500,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Add person",
+    "title" : "Add Person",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -12765,7 +12696,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Search persons",
+    "title" : "Search Persons",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -12975,7 +12906,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Delete person",
+    "title" : "Delete Person",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -13999,7 +13930,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Get details of a person",
+    "title" : "Get Details of Person",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -14378,18 +14309,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -14802,18 +14733,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -15146,18 +15077,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -15830,18 +15761,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -16254,18 +16185,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -16598,18 +16529,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -17282,18 +17213,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "webhookValidateOnEnable" : null
   } ],
   "dataStream" : null,
   "unifiedApi" : {
@@ -17308,5 +17239,74 @@
     }, {
       "modelType" : "CONTACT"
     } ]
+  },
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
   }
 }
