@@ -160,21 +160,23 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
         if (workflowTask == null) {
-            String workflowNodeName = workflowTrigger.getName();
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
             Map<String, ?> inputParameters = workflowTrigger.evaluateParameters(inputs);
 
             Long connectionId = workflowTestConfigurationService
-                .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowNodeName)
+                .fetchWorkflowTestConfigurationConnectionId(workflowId, workflowTrigger.getName())
                 .orElse(null);
 
             outputResponse = triggerDefinitionFacade.executeOutput(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion(),
                 workflowNodeType.componentOperationName(), inputParameters, connectionId);
         } else {
-            String workflowNodeName = workflowTask.getName();
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
+            if (workflowNodeType.componentOperationName() == null) {
+                return null;
+            }
 
             Map<String, ?> outputs = getWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
@@ -183,7 +185,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
             Map<String, Long> connectionIds = MapUtils.toMap(
                 workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
-                    workflowId, workflowNodeName),
+                    workflowId, workflowTask.getName()),
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                 WorkflowTestConfigurationConnection::getConnectionId);
 
