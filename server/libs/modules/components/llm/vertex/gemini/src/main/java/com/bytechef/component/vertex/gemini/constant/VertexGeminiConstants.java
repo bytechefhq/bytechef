@@ -22,9 +22,8 @@ package com.bytechef.component.vertex.gemini.constant;
  */
 public final class VertexGeminiConstants {
 
-    public static final String VERTEX_GEMINI = "vertexGemini";
-    public static final String PROJECT_ID = "projectId";
     public static final String LOCATION = "location";
+    public static final String PROJECT_ID = "projectId";
 
     private VertexGeminiConstants() {
     }

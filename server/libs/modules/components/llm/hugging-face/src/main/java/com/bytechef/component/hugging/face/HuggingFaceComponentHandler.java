@@ -17,7 +17,6 @@
 package com.bytechef.component.hugging.face;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.HUGGING_FACE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,10 +32,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class HuggingFaceComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(HUGGING_FACE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("hugging-face")
         .title("Hugging Face")
         .description(
-            "Hugging Face is on a journey to advance and democratize artificial intelligence through open source and open science.")
+            "Hugging Face is on a journey to advance and democratize artificial intelligence through open source " +
+                "and open science.")
         .icon("path:assets/hugging-face.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(HuggingFaceConnection.CONNECTION_DEFINITION)

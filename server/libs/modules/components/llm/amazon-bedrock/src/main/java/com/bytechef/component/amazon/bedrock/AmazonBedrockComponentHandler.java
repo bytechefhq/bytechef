@@ -26,7 +26,6 @@ import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAc
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.amazon.bedrock.connection.AmazonBedrockConnection;
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -37,14 +36,16 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AmazonBedrockComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(AmazonBedrockConstants.AMAZON_BEDROCK)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("amazonBedrock")
         .title("Amazon Bedrock")
         .description(
-            "Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies.")
+            "Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models " +
+                "(FMs) from leading AI companies.")
         .icon("path:assets/amazon-bedrock.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AmazonBedrockConnection.CONNECTION_DEFINITION)
-        .actions(AmazonBedrockAnthropic3ChatAction.ACTION_DEFINITION,
+        .actions(
+            AmazonBedrockAnthropic3ChatAction.ACTION_DEFINITION,
             AmazonBedrockAnthropic2ChatAction.ACTION_DEFINITION,
             AmazonBedrockCohereChatAction.ACTION_DEFINITION,
             AmazonBedrockJurassic2ChatAction.ACTION_DEFINITION,

@@ -19,7 +19,10 @@ package com.bytechef.component.amazon.bedrock.action;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_TOKEN;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.BIAS_VALUE;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.RETURN_LIKELIHOODS;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.TRUNCATE;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -41,7 +44,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -63,7 +65,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  */
 public class AmazonBedrockCohereChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_COHERE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("askCohere")
         .title("Ask Cohere")
         .description("Ask anything you want.")
         .properties(
@@ -96,7 +98,7 @@ public class AmazonBedrockCohereChatAction {
                     number(BIAS_VALUE)
                         .label("Logic Bias"))
                 .advancedOption(true),
-            object(AmazonBedrockConstants.RETURN_LIKELIHOODS)
+            object(RETURN_LIKELIHOODS)
                 .label("Return Likelihoods")
                 .description("The token likelihoods are returned with the response.")
                 .advancedOption(true)
@@ -108,7 +110,7 @@ public class AmazonBedrockCohereChatAction {
                                 Collectors.toMap(
                                     CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods::name, clazz -> clazz,
                                     (f, s) -> f)))),
-            object(AmazonBedrockConstants.TRUNCATE)
+            object(TRUNCATE)
                 .label("Truncate")
                 .description("Specifies how the API handles inputs longer than the maximum token length")
                 .advancedOption(true)
@@ -143,9 +145,9 @@ public class AmazonBedrockCohereChatAction {
                 .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(
                     inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
                 .withNumGenerations(inputParameters.getInteger(N))
-                .withReturnLikelihoods(inputParameters.get(AmazonBedrockConstants.RETURN_LIKELIHOODS,
+                .withReturnLikelihoods(inputParameters.get(RETURN_LIKELIHOODS,
                     CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-                .withTruncate(inputParameters.get(AmazonBedrockConstants.TRUNCATE,
+                .withTruncate(inputParameters.get(TRUNCATE,
                     CohereChatBedrockApi.CohereChatRequest.Truncate.class))
                 .build();
         }
@@ -158,7 +160,7 @@ public class AmazonBedrockCohereChatAction {
                     () -> AwsBasicCredentials.create(
                         connectionParameters.getRequiredString(ACCESS_KEY_ID),
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (BedrockCohereChatOptions) createChatOptions(inputParameters));
         }
     };

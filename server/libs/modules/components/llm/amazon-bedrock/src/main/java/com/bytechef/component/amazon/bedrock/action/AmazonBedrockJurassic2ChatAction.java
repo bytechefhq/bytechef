@@ -18,6 +18,8 @@ package com.bytechef.component.amazon.bedrock.action;
 
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.COUNT_PENALTY;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.MIN_TOKENS;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -44,7 +46,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -63,7 +64,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 public class AmazonBedrockJurassic2ChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_JURASSIC2)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("askJurassic2")
         .title("Ask Jurassic2")
         .description("Ask anything you want.")
         .properties(
@@ -80,7 +81,7 @@ public class AmazonBedrockJurassic2ChatAction {
                                     Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
-            integer(AmazonBedrockConstants.MIN_TOKENS)
+            integer(MIN_TOKENS)
                 .label("Min tokens")
                 .description("The minimum number of tokens to generate in the chat completion.")
                 .advancedOption(true),
@@ -121,7 +122,7 @@ public class AmazonBedrockJurassic2ChatAction {
                 .withTopP(inputParameters.getDouble(TOP_P))
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getInteger(TOP_K))
-                .withMinTokens(inputParameters.getInteger(AmazonBedrockConstants.MIN_TOKENS))
+                .withMinTokens(inputParameters.getInteger(MIN_TOKENS))
                 .withNumResults(inputParameters.getInteger(N))
                 .withPrompt(inputParameters.getString(PROMPT))
                 .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
@@ -144,7 +145,7 @@ public class AmazonBedrockJurassic2ChatAction {
                     () -> AwsBasicCredentials.create(
                         connectionParameters.getRequiredString(ACCESS_KEY_ID),
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (BedrockAi21Jurassic2ChatOptions) createChatOptions(inputParameters));
         }
     };

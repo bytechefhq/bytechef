@@ -22,13 +22,12 @@ package com.bytechef.component.watsonx.constant;
  */
 public final class WatsonxConstants {
 
-    public static final String WATSONX = "watsonx";
-    public static final String STREAM_ENDPOINT = "streamEndpoint";
-    public static final String TEXT_ENDPOINT = "textEndpoint";
+    public static final String DECODING_METHOD = "decodingMethod";
+    public static final String MIN_TOKENS = "minTokens";
     public static final String PROJECT_ID = "projectId";
     public static final String REPETITION_PENALTY = "repetitionPenalty";
-    public static final String MIN_TOKENS = "minTokens";
-    public static final String DECODING_METHOD = "decodingMethod";
+    public static final String STREAM_ENDPOINT = "streamEndpoint";
+    public static final String TEXT_ENDPOINT = "textEndpoint";
 
     private WatsonxConstants() {
     }
