@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.keap.util.KeapUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -53,7 +54,8 @@ public class KeapComponentHandler extends AbstractKeapComponentHandler {
                     for (BaseProperty baseProperty1 : ((ModifiableObjectProperty) baseProperty).getProperties()
                         .get()) {
                         if (Objects.equals(baseProperty1.getName(), "id")) {
-                            ((ModifiableIntegerProperty) baseProperty1).options(KeapUtils.getCompanyIdOptions());
+                            ((ModifiableIntegerProperty) baseProperty1).options(
+                                (ActionOptionsFunction<Long>) KeapUtils::getCompanyIdOptions);
                         }
                     }
                 }
