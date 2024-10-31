@@ -18,57 +18,64 @@ const IntegrationsSidebar = ({integrationId}: {integrationId: number}) => {
     return (
         <div className="space-y-0.5 overflow-y-scroll px-2">
             {integrations &&
-                integrations.map((curIntegration) => (
-                    <div
-                        className={twMerge(
-                            'py-3 px-2 flex cursor-pointer items-center justify-between hover:bg-background/50 rounded-lg',
-                            curIntegration.id === integrationId && 'bg-background/50'
-                        )}
-                        key={curIntegration.id}
-                        onClick={() =>
-                            navigate(
-                                `/embedded/integrations/${curIntegration?.id}/integration-workflows/${curIntegration?.integrationWorkflowIds![0]}`
-                            )
-                        }
-                    >
+                integrations
+                    .filter(
+                        (curIntegration) =>
+                            curIntegration.integrationWorkflowIds && curIntegration.integrationWorkflowIds.length > 0
+                    )
+                    .map((curIntegration) => (
                         <div
                             className={twMerge(
-                                'flex flex-col gap-1',
-                                curIntegration.id === integrationId && 'font-semibold'
+                                'py-3 px-2 flex cursor-pointer items-center justify-between hover:bg-background/50 rounded-lg',
+                                curIntegration.id === integrationId && 'bg-background/50'
                             )}
+                            key={curIntegration.id}
+                            onClick={() =>
+                                navigate(
+                                    `/embedded/integrations/${curIntegration?.id}/integration-workflows/${curIntegration?.integrationWorkflowIds![0]}`
+                                )
+                            }
                         >
-                            <div className="flex">
-                                <Tooltip>
-                                    <TooltipTrigger>
-                                        <div className="max-w-56 overflow-hidden truncate">{curIntegration.name}</div>
-                                    </TooltipTrigger>
+                            <div
+                                className={twMerge(
+                                    'flex flex-col gap-1',
+                                    curIntegration.id === integrationId && 'font-semibold'
+                                )}
+                            >
+                                <div className="flex">
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <div className="max-w-56 overflow-hidden truncate">
+                                                {curIntegration.name}
+                                            </div>
+                                        </TooltipTrigger>
 
-                                    <TooltipContent>{curIntegration.name}</TooltipContent>
-                                </Tooltip>
+                                        <TooltipContent>{curIntegration.name}</TooltipContent>
+                                    </Tooltip>
+                                </div>
+
+                                <div className="mr-1 text-xs">
+                                    {curIntegration.integrationWorkflowIds?.length === 1
+                                        ? `${curIntegration.integrationWorkflowIds?.length} workflow`
+                                        : `${curIntegration.integrationWorkflowIds?.length} workflows`}
+                                </div>
                             </div>
 
-                            <div className="mr-1 text-xs">
-                                {curIntegration.integrationWorkflowIds?.length === 1
-                                    ? `${curIntegration.integrationWorkflowIds?.length} workflow`
-                                    : `${curIntegration.integrationWorkflowIds?.length} workflows`}
-                            </div>
+                            {curIntegration.lastPublishedDate && curIntegration.lastIntegrationVersion ? (
+                                <Badge className="flex space-x-1" variant="success">
+                                    <span>V{curIntegration.lastIntegrationVersion - 1}</span>
+
+                                    <span>PUBLISHED</span>
+                                </Badge>
+                            ) : (
+                                <Badge className="flex space-x-1" variant="outline">
+                                    <span>V{curIntegration.lastIntegrationVersion}</span>
+
+                                    <span>{curIntegration.lastStatus}</span>
+                                </Badge>
+                            )}
                         </div>
-
-                        {curIntegration.lastPublishedDate && curIntegration.lastIntegrationVersion ? (
-                            <Badge className="flex space-x-1" variant="success">
-                                <span>V{curIntegration.lastIntegrationVersion - 1}</span>
-
-                                <span>PUBLISHED</span>
-                            </Badge>
-                        ) : (
-                            <Badge className="flex space-x-1" variant="outline">
-                                <span>V{curIntegration.lastIntegrationVersion}</span>
-
-                                <span>{curIntegration.lastStatus}</span>
-                            </Badge>
-                        )}
-                    </div>
-                ))}
+                    ))}
         </div>
     );
 };
