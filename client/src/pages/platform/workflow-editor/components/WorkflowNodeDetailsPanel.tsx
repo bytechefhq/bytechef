@@ -565,8 +565,12 @@ const WorkflowNodeDetailsPanel = ({
                                         </div>
                                     ))}
 
-                                {activeTab === 'output' && currentNode && (
+                                {activeTab === 'output' && currentNode && currentComponentDefinition && (
                                     <OutputTab
+                                        connectionMissing={
+                                            currentComponentDefinition.connectionRequired &&
+                                            !workflowTestConfigurationConnections?.length
+                                        }
                                         currentNode={currentNode}
                                         key={`${currentNode?.name}_output`}
                                         outputDefined={currentActionDefinition?.outputDefined ?? false}
