@@ -24,27 +24,46 @@
     "name" : "autoRespondWithHTTP200",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
+      "outputResponse" : {
+        "outputSchema" : null,
+        "sampleOutput" : {
+          "parameters" : {
+            "parameter1" : "value"
+          },
+          "headers" : {
+            "Header1" : "value"
+          },
+          "method" : "POST"
+        }
+      },
       "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : {
+        "parameters" : {
+          "parameter1" : "value"
+        },
+        "headers" : {
+          "Header1" : "value"
+        },
+        "method" : "POST"
+      }
     },
     "properties" : null,
     "title" : "Auto Respond with HTTP 200 status",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -53,9 +72,28 @@
     "name" : "validateAndRespond",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
+      "outputResponse" : {
+        "outputSchema" : null,
+        "sampleOutput" : {
+          "parameters" : {
+            "parameter1" : "value"
+          },
+          "headers" : {
+            "Header1" : "value"
+          },
+          "method" : "POST"
+        }
+      },
       "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : {
+        "parameters" : {
+          "parameter1" : "value"
+        },
+        "headers" : {
+          "Header1" : "value"
+        },
+        "method" : "POST"
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -82,18 +120,18 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -102,9 +140,28 @@
     "name" : "awaitWorkflowAndRespond",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
+      "outputResponse" : {
+        "outputSchema" : null,
+        "sampleOutput" : {
+          "parameters" : {
+            "parameter1" : "value"
+          },
+          "headers" : {
+            "Header1" : "value"
+          },
+          "method" : "POST"
+        }
+      },
       "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : {
+        "parameters" : {
+          "parameter1" : "value"
+        },
+        "headers" : {
+          "Header1" : "value"
+        },
+        "method" : "POST"
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -143,25 +200,25 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Await workflow and respond",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null
+    "webhookValidate" : { }
   } ],
   "unifiedApi" : null
 }
