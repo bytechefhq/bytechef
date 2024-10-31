@@ -37,8 +37,8 @@ import java.util.Map;
  */
 public class KeapCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Create a Task")
-        .description("Creates a new task")
+        .title("Create Task")
+        .description("Creates a new task.")
         .metadata(
             Map.of(
                 "method", "POST",

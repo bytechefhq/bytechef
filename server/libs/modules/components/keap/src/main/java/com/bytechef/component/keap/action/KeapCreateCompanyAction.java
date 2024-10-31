@@ -38,8 +38,8 @@ import java.util.Map;
  */
 public class KeapCreateCompanyAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
-        .title("Create a Company")
-        .description("Creates a new company")
+        .title("Create Company")
+        .description("Creates a new company.")
         .metadata(
             Map.of(
                 "method", "POST",
