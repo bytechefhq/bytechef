@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class EnchargeAddTagAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addTag")
-        .title("Add tag")
+        .title("Add Tag")
         .description("Add tag(s) to an existing user.")
         .metadata(
             Map.of(

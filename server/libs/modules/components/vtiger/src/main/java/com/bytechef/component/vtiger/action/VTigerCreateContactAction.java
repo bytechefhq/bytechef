@@ -41,7 +41,7 @@ import java.util.Map;
 public class VTigerCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
-        .title("Create a contact")
+        .title("Create Contact")
         .description("Create a new contact")
         .properties(
             string(FIRSTNAME)

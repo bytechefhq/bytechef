@@ -44,7 +44,7 @@ import java.util.Map;
 public class AITableUpdateRecordAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRecord")
-        .title("Update record")
+        .title("Update Record")
         .description("Update record in datasheet")
         .properties(
             SPACE_ID_PROPERTY,

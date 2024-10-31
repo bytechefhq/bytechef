@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class DataMapperReplaceMultipleValuesByKeyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceMultipleValuesByKey")
-        .title("Replace multiple values by key")
+        .title("Replace Multiple Values by Key")
         .description(
             "Replaces all values specified by the keys in the input object with the values specified by keys in the " +
                 "output object.")

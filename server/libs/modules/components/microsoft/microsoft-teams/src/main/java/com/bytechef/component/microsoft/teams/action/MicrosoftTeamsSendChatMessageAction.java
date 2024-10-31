@@ -42,7 +42,7 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 public class MicrosoftTeamsSendChatMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChatMessage")
-        .title("Send chat message")
+        .title("Send Chat Message")
         .description("Sends a message in an existing chat.")
         .properties(
             string(CHAT_ID)

@@ -44,7 +44,7 @@ import java.util.List;
 public class GoogleDriveCreateNewFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewFolder")
-        .title("Create new folder")
+        .title("Create New Folder")
         .description("Creates a new empty folder in Google Drive.")
         .properties(
             string(FOLDER_NAME)

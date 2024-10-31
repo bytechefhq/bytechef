@@ -43,7 +43,7 @@ import java.util.Map;
 public class FilesystemWriteFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE_FILE)
-        .title("Write to file")
+        .title("Write to File")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")

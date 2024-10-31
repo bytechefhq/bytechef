@@ -42,7 +42,7 @@ import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 public class MicrosoftOneDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload file")
+        .title("Upload File")
         .description("Upload a file to your Microsoft OneDrive")
         .properties(
             string(PARENT_ID)

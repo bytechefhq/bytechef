@@ -42,7 +42,7 @@ import java.util.Map;
 public class DataMapperMapObjectsToArrayAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("mapObjectsToArray")
-        .title("Map objects to array")
+        .title("Map Objects to Array")
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
             integer(INPUT_TYPE)

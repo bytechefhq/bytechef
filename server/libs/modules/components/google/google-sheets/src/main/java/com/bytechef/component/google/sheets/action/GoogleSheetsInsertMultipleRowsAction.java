@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
 public class GoogleSheetsInsertMultipleRowsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertMultipleRows")
-        .title("Insert multiple rows")
+        .title("Insert Multiple Rows")
         .description("Append rows to the end of the spreadsheet.")
         .properties(
             SPREADSHEET_ID_PROPERTY,

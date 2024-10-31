@@ -43,7 +43,7 @@ import com.bytechef.component.definition.Property.ControlType;
 public class DropboxCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTextFile")
-        .title("Create a new paper file")
+        .title("Create New Paper File")
         .description("Create a new .paper file on which you can write at a given path")
         .properties(
             string(PATH)

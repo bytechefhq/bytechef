@@ -38,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
 public class ZendeskSellCreateTaskAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Create task")
+        .title("Create Task")
         .description("Creates new Task")
         .properties(
             string(CONTENT)

@@ -37,7 +37,7 @@ import com.bytechef.component.slack.util.SlackUtils;
 public class SlackSendDirectMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_DIRECT_MESSAGE)
-        .title("Send direct message")
+        .title("Send Direct Message")
         .description(
             "Sends a direct message to another user in a workspace. If it hasn't already, a direct message " +
                 "conversation will be created.")

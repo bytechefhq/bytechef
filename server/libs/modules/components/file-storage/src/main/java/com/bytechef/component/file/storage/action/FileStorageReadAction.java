@@ -34,7 +34,7 @@ import com.bytechef.component.definition.Parameters;
 public class FileStorageReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
-        .title("Read from file as string")
+        .title("Read from File as String")
         .description("Reads data from the file as string.")
         .properties(fileEntry(FILE_ENTRY)
             .label("File")

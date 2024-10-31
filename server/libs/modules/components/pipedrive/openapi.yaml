@@ -8,7 +8,7 @@ servers:
 paths:
   /deals:
     get:
-      summary: "Get deals"
+      summary: "Get Deals"
       description: "Returns all deals."
       operationId: "getDeals"
       tags:
@@ -100,7 +100,7 @@ paths:
                             status:
                               type: "string"
     post:
-      summary: "Add deal"
+      summary: "Add Deal"
       description: "Adds a new deal."
       operationId: "addDeal"
       tags:
@@ -217,7 +217,7 @@ paths:
                             type: "string"
   /deals/search:
     get:
-      summary: "Search deals"
+      summary: "Search Deals"
       description: "Searches all deals by title, notes and/or custom fields."
       operationId: "searchDeals"
       tags:
@@ -327,7 +327,7 @@ paths:
                                   type: "string"
   /deals/{id}:
     delete:
-      summary: "Delete deal"
+      summary: "Delete Deal"
       description: "Marks a deal as deleted. After 30 days, the deal will be permanently deleted."
       operationId: "deleteDeal"
       tags:
@@ -357,7 +357,7 @@ paths:
                           id:
                             type: "integer"
     get:
-      summary: "Get details of a deal"
+      summary: "Get Details of Deal"
       description: "Returns the details of a specific deal."
       operationId: "getDealDetails"
       tags:
@@ -420,7 +420,7 @@ paths:
     get:
       tags:
         - "Leads"
-      summary: "Get leads"
+      summary: "Get Leads"
       description: "Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest."
       operationId: "getLeads"
       parameters:
@@ -514,7 +514,7 @@ paths:
     post:
       tags:
         - "Leads"
-      summary: "Add lead"
+      summary: "Add Lead"
       description: "Creates a lead. A lead always has to be linked to a person or an organization or both."
       operationId: "addLead"
       requestBody:
@@ -599,7 +599,7 @@ paths:
     get:
       tags:
         - "Leads"
-      summary: "Get lead details"
+      summary: "Get Lead Details"
       description: "Returns details of a specific lead. "
       operationId: "getLeadDetails"
       parameters:
@@ -645,7 +645,7 @@ paths:
     delete:
       tags:
         - "Leads"
-      summary: "Delete lead"
+      summary: "Delete Lead"
       description: "Deletes a specific lead."
       operationId: "deleteLead"
       parameters:
@@ -675,7 +675,7 @@ paths:
                             type: "string"
   /leads/search:
     get:
-      summary: "Search leads"
+      summary: "Search Leads"
       description: "Searches all leads by title, notes and/or custom fields."
       operationId: "searchLeads"
       tags:
@@ -761,7 +761,7 @@ paths:
                                   type: "integer"
   /organizations:
     get:
-      summary: "Get all organizations"
+      summary: "Get All Organizations"
       description: "Returns all organizations."
       operationId: "getOrganizations"
       tags:
@@ -822,7 +822,7 @@ paths:
                             name:
                               type: "string"
     post:
-      summary: "Add an organization"
+      summary: "Add Organization"
       description: "Adds a new organization."
       operationId: "addOrganization"
       tags:
@@ -873,7 +873,7 @@ paths:
                             type: "string"
   /organizations/search:
     get:
-      summary: "Search organizations"
+      summary: "Search Organizations"
       description: "Searches all organizations by name, address, notes and/or custom\
         \ fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\"\
         >/v1/itemSearch</a> with a narrower OAuth scope."
@@ -940,7 +940,7 @@ paths:
                                   type: "string"
   /organizations/{id}:
     delete:
-      summary: "Delete an organization"
+      summary: "Delete Organization"
       description: "Marks an organization as deleted. After 30 days, the organization will be permanently deleted."
       operationId: "deleteOrganization"
       tags:
@@ -970,7 +970,7 @@ paths:
                           id:
                             type: "integer"
     get:
-      summary: "Get details of an organization"
+      summary: "Get Details of Organization"
       description: "Returns the details of an organization."
       operationId: "getOrganizationDetails"
       tags:
@@ -1014,7 +1014,7 @@ paths:
                             type: "string"
   /persons:
     get:
-      summary: "Get persons"
+      summary: "Get Persons"
       description: "Returns all persons."
       operationId: "getPersons"
       tags:
@@ -1107,7 +1107,7 @@ paths:
                                   label:
                                     type: "string"
     post:
-      summary: "Add person"
+      summary: "Add Person"
       description: "Adds a new person."
       operationId: "addPerson"
       tags:
@@ -1240,7 +1240,7 @@ paths:
                                   type: "string"
   /persons/search:
     get:
-      summary: "Search persons"
+      summary: "Search Persons"
       description: "Searches all persons by name, email, phone, notes and/or custom fields."
       operationId: "searchPersons"
       tags:
@@ -1342,7 +1342,7 @@ paths:
                                         type: "string"
   /persons/{id}:
     delete:
-      summary: "Delete person"
+      summary: "Delete Person"
       description: "Marks a person as deleted. After 30 days, the person will be permanently deleted."
       operationId: "deletePerson"
       tags:
@@ -1372,7 +1372,7 @@ paths:
                           id:
                             type: "integer"
     get:
-      summary: "Get details of a person"
+      summary: "Get Details of Person"
       description: "Returns the details of a person. This also returns some additional fields which are not present when asking for all persons."
       operationId: "getPersonDetails"
       tags:

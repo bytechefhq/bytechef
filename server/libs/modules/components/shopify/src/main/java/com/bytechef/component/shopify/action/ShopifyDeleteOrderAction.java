@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class ShopifyDeleteOrderAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrder")
-        .title("Delete an order")
+        .title("Delete Order")
         .description("Deletes an order. Orders that interact with an online gateway can't be deleted.")
         .metadata(
             Map.of(

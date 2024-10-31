@@ -12,7 +12,7 @@ paths:
     post:
       tags:
         - "Account"
-      summary: "Create account"
+      summary: "Create Account"
       description: "Creates new account"
       operationId: "createAccount"
       requestBody:
@@ -60,7 +60,7 @@ paths:
     post:
       tags:
         - "Contact"
-      summary: "Create contact"
+      summary: "Create Contact"
       description: "Creates new Contact"
       operationId: "createContact"
       requestBody:
@@ -113,7 +113,7 @@ paths:
     post:
       tags:
         - "Tasks"
-      summary: "Create task"
+      summary: "Create Task"
       description: "Creates new Task"
       operationId: "createTask"
       requestBody:

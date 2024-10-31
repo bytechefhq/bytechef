@@ -72,7 +72,7 @@ import java.util.List;
 public class GoogleCalendarCreateEventAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEvent")
-        .title("Create event")
+        .title("Create Event")
         .description("Creates an event")
         .properties(
             CALENDAR_ID_PROPERTY,

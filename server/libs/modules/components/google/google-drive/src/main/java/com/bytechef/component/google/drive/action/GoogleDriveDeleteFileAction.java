@@ -35,7 +35,7 @@ import java.io.IOException;
 public class GoogleDriveDeleteFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFile")
-        .title("Delete file")
+        .title("Delete File")
         .description("Delete a selected file from Google Drive.")
         .properties(
             string(FILE_ID)

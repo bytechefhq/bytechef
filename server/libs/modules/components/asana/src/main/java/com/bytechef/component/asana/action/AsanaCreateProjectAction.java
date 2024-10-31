@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class AsanaCreateProjectAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createProject")
-        .title("Create project")
+        .title("Create Project")
         .description("Creates a new project in a workspace or team.")
         .metadata(
             Map.of(

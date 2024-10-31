@@ -39,7 +39,7 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 public class MicrosoftTeamsCreateChannelAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createChannel")
-        .title("Create channel")
+        .title("Create Channel")
         .description("Creates a new channel within a team.")
         .properties(
             string(TEAM_ID)

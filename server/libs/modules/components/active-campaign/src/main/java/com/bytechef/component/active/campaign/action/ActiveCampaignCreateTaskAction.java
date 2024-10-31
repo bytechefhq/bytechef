@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class ActiveCampaignCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Creates a task")
+        .title("Create Task")
         .description("Creates a new task")
         .metadata(
             Map.of(

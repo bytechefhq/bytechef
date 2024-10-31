@@ -50,7 +50,7 @@ import java.util.Map;
 public class OdsFileReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
-        .title("Read from file")
+        .title("Read from File")
         .description("Reads data from a ODS file.")
         .properties(
             fileEntry(FILE_ENTRY)

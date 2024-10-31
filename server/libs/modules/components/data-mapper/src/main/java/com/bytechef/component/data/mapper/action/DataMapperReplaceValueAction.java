@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
 public class DataMapperReplaceValueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceValue")
-        .title("Replace value")
+        .title("Replace Value")
         .description(
             "Replaces a given value with the specified value defined in mappings. In case there is no mapping " +
                 "specified for the value, it returns the default value, and if there is no default defined, it " +

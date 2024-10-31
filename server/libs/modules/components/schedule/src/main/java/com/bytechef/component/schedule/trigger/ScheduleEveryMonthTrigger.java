@@ -43,7 +43,7 @@ import java.util.Map;
 public class ScheduleEveryMonthTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyMonth")
-        .title("Every month")
+        .title("Every Month")
         .description(
             "Trigger off at a specific time in month.")
         .type(TriggerDefinition.TriggerType.LISTENER)

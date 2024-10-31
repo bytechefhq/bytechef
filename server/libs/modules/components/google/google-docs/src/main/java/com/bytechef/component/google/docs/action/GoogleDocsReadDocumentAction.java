@@ -34,7 +34,7 @@ import java.io.IOException;
 public class GoogleDocsReadDocumentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_DOCUMENT)
-        .title("Read document")
+        .title("Read Document")
         .description("Read a document from Google Docs")
         .properties(
             string(DOCUMENT_ID)

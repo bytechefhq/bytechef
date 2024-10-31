@@ -63,7 +63,7 @@ import java.util.Map;
 public class XeroCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create contact")
+        .title("Create Contact")
         .description("Creates a new contact.")
         .properties(
             string(NAME)

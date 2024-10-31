@@ -35,7 +35,7 @@ import java.nio.file.NoSuchFileException;
 public class FilesystemGetParentFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_PARENT_FOLDER)
-        .title("Get parent folder")
+        .title("Get Parent Folder")
         .description(
             "Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.")
         .properties(string(FILENAME)

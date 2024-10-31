@@ -47,7 +47,7 @@ import java.util.Map;
 public class GoogleSheetsFindRowByNumAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
-        .title("Find row by number")
+        .title("Find Row by Number")
         .description("Get a row in a Google Sheet by row number")
         .properties(
             SPREADSHEET_ID_PROPERTY,

@@ -44,7 +44,7 @@ import java.util.Map;
 public class GithubAddLabelsToIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabelsToIssue")
-        .title("Add labels to an issue")
+        .title("Add Labels to Issue")
         .description("Adds labels to the specified issue.")
         .properties(
             string(REPOSITORY)

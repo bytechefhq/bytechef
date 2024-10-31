@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class InsightlyCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Create task")
+        .title("Create Task")
         .description("Creates new Task")
         .metadata(
             Map.of(

@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class ActiveCampaignCreateContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create contact")
+        .title("Create Contact")
         .description("Creates a new contact")
         .metadata(
             Map.of(

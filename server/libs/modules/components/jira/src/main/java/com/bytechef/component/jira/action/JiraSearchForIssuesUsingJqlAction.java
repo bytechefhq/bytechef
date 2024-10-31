@@ -41,7 +41,7 @@ import java.util.Map;
 public class JiraSearchForIssuesUsingJqlAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchForIssuesUsingJql")
-        .title("Search issues")
+        .title("Search Issues")
         .description("Search for issues using JQL")
         .properties(
             string(JQL)

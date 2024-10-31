@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class PipedriveSearchDealsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("searchDeals")
-        .title("Search deals")
+        .title("Search Deals")
         .description("Searches all deals by title, notes and/or custom fields.")
         .metadata(
             Map.of(

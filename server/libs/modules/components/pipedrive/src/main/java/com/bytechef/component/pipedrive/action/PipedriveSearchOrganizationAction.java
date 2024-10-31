@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class PipedriveSearchOrganizationAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("searchOrganization")
-        .title("Search organizations")
+        .title("Search Organizations")
         .description(
             "Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href=\"https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem\">/v1/itemSearch</a> with a narrower OAuth scope.")
         .metadata(

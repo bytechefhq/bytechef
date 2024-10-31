@@ -44,7 +44,7 @@ import java.util.Map;
 public class ScheduleEveryWeekTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyWeek")
-        .title("Every week")
+        .title("Every Week")
         .description(
             "Trigger off at a specific day of the week.")
         .type(TriggerDefinition.TriggerType.LISTENER)

@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class DiscordSendChannelMessageAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
-        .title("Send channel message")
+        .title("Send Channel Message")
         .description("Post a new message to a specific #channel you choose.")
         .metadata(
             Map.of(

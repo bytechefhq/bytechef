@@ -43,7 +43,7 @@ import java.util.Map;
 public class MondayCreateColumnAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_COLUMN)
-        .title("Create column")
+        .title("Create Column")
         .description("Create a new column in board.")
         .properties(
             string(WORKSPACE_ID)

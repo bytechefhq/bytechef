@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class PipedriveGetLeadDetailsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getLeadDetails")
-        .title("Get lead details")
+        .title("Get Lead Details")
         .description("Returns details of a specific lead. ")
         .metadata(
             Map.of(

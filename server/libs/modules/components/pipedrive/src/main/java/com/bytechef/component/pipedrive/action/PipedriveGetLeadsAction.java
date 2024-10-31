@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class PipedriveGetLeadsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getLeads")
-        .title("Get leads")
+        .title("Get Leads")
         .description("Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.")
         .metadata(
             Map.of(

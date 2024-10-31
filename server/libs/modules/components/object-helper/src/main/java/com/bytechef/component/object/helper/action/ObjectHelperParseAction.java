@@ -30,7 +30,7 @@ import com.bytechef.component.definition.Parameters;
 public class ObjectHelperParseAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("parse")
-        .title("Convert from JSON string")
+        .title("Convert from JSON String")
         .description("Converts the JSON string to object/array.")
         .properties(
             string(SOURCE)

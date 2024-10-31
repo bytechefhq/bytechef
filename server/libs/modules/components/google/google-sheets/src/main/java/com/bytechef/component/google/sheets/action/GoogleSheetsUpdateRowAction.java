@@ -50,7 +50,7 @@ import java.util.Map;
 public class GoogleSheetsUpdateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
-        .title("Update row")
+        .title("Update Row")
         .description("Overwrite values in an existing row")
         .properties(
             SPREADSHEET_ID_PROPERTY,

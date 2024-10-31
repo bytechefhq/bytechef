@@ -45,7 +45,7 @@ import java.util.Map;
 public class ObjectHelperAddValueByKeyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addValueByKey")
-        .title("Add value to the object by key")
+        .title("Add Value to the Object by Key")
         .description("Add value to the object by key if it exists. Otherwise, update the value")
         .properties(
             object(SOURCE)

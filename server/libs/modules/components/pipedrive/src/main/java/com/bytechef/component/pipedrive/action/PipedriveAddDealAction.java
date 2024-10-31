@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class PipedriveAddDealAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addDeal")
-        .title("Add deal")
+        .title("Add Deal")
         .description("Adds a new deal.")
         .metadata(
             Map.of(

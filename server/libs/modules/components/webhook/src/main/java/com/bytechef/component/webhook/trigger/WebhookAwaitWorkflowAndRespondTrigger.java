@@ -36,7 +36,7 @@ import java.util.Map;
 public class WebhookAwaitWorkflowAndRespondTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("awaitWorkflowAndRespond")
-        .title("Await workflow and respond")
+        .title("Await Workflow and Respond")
         .description(
             "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.")
         .type(TriggerType.STATIC_WEBHOOK)

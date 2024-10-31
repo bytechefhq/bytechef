@@ -37,7 +37,7 @@ import com.bytechef.component.definition.Parameters;
 public class BoxDownloadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
-        .title("Download file")
+        .title("Download File")
         .description("Download a selected file.")
         .properties(
             string(ID)

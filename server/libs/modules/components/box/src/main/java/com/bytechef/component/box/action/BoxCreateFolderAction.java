@@ -39,7 +39,7 @@ import java.util.Map;
 public class BoxCreateFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
-        .title("Create folder")
+        .title("Create Folder")
         .description("Creates a new empty folder within the specified parent folder.")
         .properties(
             string(NAME)
