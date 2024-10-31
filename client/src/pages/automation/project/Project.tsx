@@ -3,7 +3,7 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import ProjectsSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebar';
-import ProjectsSidebarFilterPopover from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebarFilterPopover';
+import ProjectsSidebarHeader from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebarHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
@@ -249,7 +249,7 @@ const Project = () => {
                 className="bg-muted/50"
                 leftSidebarBody={<ProjectsSidebar projectId={+projectId!} />}
                 leftSidebarClass="bg-muted"
-                leftSidebarHeader={<Header right={<ProjectsSidebarFilterPopover />} title="Projects" />}
+                leftSidebarHeader={<Header right={<ProjectsSidebarHeader />} title="Projects" />}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 rightSidebarBody={
