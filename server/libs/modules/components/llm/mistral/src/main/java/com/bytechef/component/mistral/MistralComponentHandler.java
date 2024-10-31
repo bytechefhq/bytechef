@@ -23,7 +23,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.mistral.action.MistralChatAction;
 import com.bytechef.component.mistral.connection.MistralConnection;
-import com.bytechef.component.mistral.constant.MistralConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,10 +32,9 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MistralComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MistralConstants.MISTRAL)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("mistral")
         .title("MistralAI")
-        .description(
-            "Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.")
+        .description("Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.")
         .icon("path:assets/mistral.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(MistralConnection.CONNECTION_DEFINITION)

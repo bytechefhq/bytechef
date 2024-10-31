@@ -23,7 +23,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.nvidia.action.NVIDIAChatAction;
 import com.bytechef.component.nvidia.connection.NVIDIAConnection;
-import com.bytechef.component.nvidia.constant.NVDIAConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,10 +32,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class NVIDIAComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(NVDIAConstants.NVIDIA)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("nvidia")
         .title("NVIDIA LLM")
         .description(
-            "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the epicenter of this industrial transformation.")
+            "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and " +
+                "engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the " +
+                "epicenter of this industrial transformation.")
         .icon("path:assets/nvidia.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(NVIDIAConnection.CONNECTION_DEFINITION)

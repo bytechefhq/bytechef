@@ -17,6 +17,7 @@
 package com.bytechef.component.amazon.bedrock.action;
 
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -34,7 +35,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -56,7 +56,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  */
 public class AmazonBedrockAnthropic2ChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_ANTHROPIC2)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("askAnthropic2")
         .title("Ask Anthropic2")
         .description("Ask anything you want.")
         .properties(
@@ -113,7 +113,7 @@ public class AmazonBedrockAnthropic2ChatAction {
                     () -> AwsBasicCredentials.create(
                         connectionParameters.getRequiredString(ACCESS_KEY_ID),
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };

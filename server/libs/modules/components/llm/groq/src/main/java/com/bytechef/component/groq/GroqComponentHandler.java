@@ -17,7 +17,6 @@
 package com.bytechef.component.groq;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.groq.constant.GroqConstants.GROQ;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,10 +32,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GroqComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GROQ)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("groq")
         .title("Groq")
         .description(
-            "The LPU Inference Engine by Groq is a hardware and software platform that delivers exceptional compute speed, quality, and energy efficiency.")
+            "The LPU Inference Engine by Groq is a hardware and software platform that delivers exceptional compute " +
+                "speed, quality, and energy efficiency.")
         .icon("path:assets/groq.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(GroqConnection.CONNECTION_DEFINITION)
