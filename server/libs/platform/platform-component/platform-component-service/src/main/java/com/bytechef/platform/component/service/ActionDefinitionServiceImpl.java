@@ -19,9 +19,8 @@ package com.bytechef.platform.component.service;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.ActionDefinition.ProcessErrorResponseFunction;
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
 import com.bytechef.component.definition.ActionDefinition.SingleConnectionPerformFunction;
 import com.bytechef.component.definition.ActionWorkflowNodeDescriptionFunction;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -35,8 +34,6 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
-import com.bytechef.definition.BaseOutputFunction;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
@@ -106,26 +103,25 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, ComponentConnection> connections,
         @NonNull Map<String, ?> extensions, @NonNull ActionContext context) {
 
-        MultipleConnectionsOutputFunction multipleConnectionsOutputFunction =
-            (MultipleConnectionsOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        try {
-            BaseOutputDefinition.OutputResponse outputDefinition = multipleConnectionsOutputFunction.apply(
-                ParametersFactory.createParameters(inputParameters), connections,
-                ParametersFactory.createParameters(extensions), context);
+        return actionDefinition.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
+            .map(f -> (MultipleConnectionsOutputFunction) f)
+            .map(multipleConnectionsOutputFunction -> {
+                try {
+                    BaseOutputDefinition.OutputResponse outputResponse = multipleConnectionsOutputFunction.apply(
+                        ParametersFactory.createParameters(inputParameters), connections,
+                        ParametersFactory.createParameters(extensions), context);
 
-            if (outputDefinition == null) {
-                return null;
-            }
-
-            return SchemaUtils.toOutput(
-                outputDefinition,
-                (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
-                PropertyFactory.PROPERTY_FACTORY);
-        } catch (Exception e) {
-            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
-        }
+                    return toOutputResponse(outputResponse);
+                } catch (Exception e) {
+                    throw new ComponentConfigurationException(
+                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+                }
+            })
+            .orElse(null);
     }
 
     @Override
@@ -203,32 +199,31 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull ActionContext context) {
 
-        SingleConnectionOutputFunction singleConnectionOutputFunction =
-            (SingleConnectionOutputFunction) getOutputFunction(componentName, componentVersion, actionName);
+        com.bytechef.component.definition.ActionDefinition actionDefinition =
+            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
-        try {
-            BaseOutputDefinition.OutputResponse outputResponse = singleConnectionOutputFunction.apply(
-                ParametersFactory.createParameters(inputParameters),
-                ParametersFactory
-                    .createParameters(connection == null ? Map.of() : connection.getConnectionParameters()),
-                context);
+        return actionDefinition.getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
+            .map(f -> (OutputFunction) f)
+            .map(outputFunction -> {
+                try {
+                    BaseOutputDefinition.OutputResponse outputResponse = outputFunction.apply(
+                        ParametersFactory.createParameters(inputParameters),
+                        ParametersFactory.createParameters(
+                            connection == null ? Map.of() : connection.getConnectionParameters()),
+                        context);
 
-            if (outputResponse == null) {
-                return null;
-            }
+                    return toOutputResponse(outputResponse);
+                } catch (Exception e) {
+                    if (e instanceof ProviderException) {
+                        throw (ProviderException) e;
+                    }
 
-            return SchemaUtils.toOutput(
-                outputResponse,
-                (property, sampleOutput) -> new OutputResponse(
-                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
-                PropertyFactory.PROPERTY_FACTORY);
-        } catch (Exception e) {
-            if (e instanceof ProviderException) {
-                throw (ProviderException) e;
-            }
-
-            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
-        }
+                    throw new ComponentConfigurationException(
+                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+                }
+            })
+            .orElse(null);
     }
 
     @Override
@@ -365,44 +360,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
-    private BaseOutputFunction getOutputFunction(String componentName, int componentVersion, String actionName) {
-        com.bytechef.component.definition.ActionDefinition actionDefinition =
-            componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+    private static OutputResponse toOutputResponse(BaseOutputDefinition.OutputResponse outputResponse) {
+        if (outputResponse == null) {
+            return null;
+        }
 
-        Optional<OutputDefinition> outputDefinition = actionDefinition.getOutputDefinition();
-
-        return outputDefinition
-            .map(OutputDefinition::getOutput)
-            .map(outputFunction -> outputFunction.orElseGet(() -> {
-                PerformFunction performFunction = OptionalUtils.get(actionDefinition.getPerform());
-
-                return switch (performFunction) {
-                    case SingleConnectionPerformFunction singleConnectionPerformFunction ->
-                        (SingleConnectionOutputFunction) (inputParameters, connectionParameters, context) -> {
-
-                            Object value = singleConnectionPerformFunction.apply(
-                                inputParameters, connectionParameters, context);
-
-                            return new BaseOutputDefinition.OutputResponse(
-                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                                    value, PropertyFactory.PROPERTY_FACTORY),
-                                value);
-
-                        };
-                    case MultipleConnectionsPerformFunction multipleConnectionsPerformFunction ->
-                        (MultipleConnectionsOutputFunction) (
-                            inputParameters, connectionParameters, extension, context) -> {
-                            Object value = multipleConnectionsPerformFunction.apply(
-                                inputParameters, connectionParameters, extension, context);
-
-                            return new BaseOutputDefinition.OutputResponse(
-                                (BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                                    value, PropertyFactory.PROPERTY_FACTORY),
-                                value);
-                        };
-                    default -> throw new IllegalStateException();
-                };
-            }))
-            .orElseThrow(() -> new IllegalStateException("Output function not found"));
+        return SchemaUtils.toOutput(
+            outputResponse,
+            (property, sampleOutput) -> new OutputResponse(
+                Property.toProperty(
+                    (com.bytechef.component.definition.Property) property),
+                sampleOutput),
+            PropertyFactory.PROPERTY_FACTORY);
     }
 }

@@ -414,7 +414,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
+        public ModifiableActionDefinition output(OutputFunction output) {
             this.outputDefinition = new OutputDefinition(output);
 
             return this;
@@ -3204,19 +3204,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition output(WebhookTriggerOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition output(ListenerTriggerOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition output(PollTriggerOutputFunction output) {
+        public ModifiableTriggerDefinition output(TriggerOutputFunction output) {
             this.outputDefinition = new OutputDefinition(output);
 
             return this;

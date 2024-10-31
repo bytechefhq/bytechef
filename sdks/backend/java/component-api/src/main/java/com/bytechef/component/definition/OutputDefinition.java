@@ -16,7 +16,7 @@
 
 package com.bytechef.component.definition;
 
-import com.bytechef.component.definition.ActionDefinition.SingleConnectionOutputFunction;
+import com.bytechef.component.definition.ActionDefinition.OutputFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseOutputFunction;
@@ -61,7 +61,7 @@ public final class OutputDefinition implements BaseOutputDefinition {
         this.output = output;
     }
 
-    public OutputDefinition(SingleConnectionOutputFunction output) {
+    public OutputDefinition(OutputFunction output) {
         Objects.requireNonNull(output, "'output' mut not be null");
 
         this.output = output;

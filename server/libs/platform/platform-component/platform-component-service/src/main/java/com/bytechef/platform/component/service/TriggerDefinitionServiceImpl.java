@@ -24,6 +24,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
@@ -41,10 +42,12 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookRequestFunctio
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TriggerWorkflowNodeDescriptionFunction;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.definition.HttpHeadersImpl;
 import com.bytechef.platform.component.definition.HttpParametersImpl;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
@@ -58,6 +61,7 @@ import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -206,9 +210,40 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         @NonNull Map<String, ?> inputParameters, ComponentConnection connection, @NonNull TriggerContext context) {
 
-        // TODO
+        com.bytechef.component.definition.TriggerDefinition triggerDefinition =
+            componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return null;
+        return triggerDefinition
+            .getOutputDefinition()
+            .flatMap(OutputDefinition::getOutput)
+            .map(f -> (com.bytechef.component.definition.TriggerDefinition.TriggerOutputFunction) f)
+            .map(triggerOutputFunction -> {
+                try {
+                    BaseOutputDefinition.OutputResponse outputResponse = triggerOutputFunction.apply(
+                        ParametersFactory.createParameters(inputParameters),
+                        ParametersFactory.createParameters(
+                            connection == null ? Map.of() : connection.getConnectionParameters()),
+                        context);
+
+                    if (outputResponse == null) {
+                        return null;
+                    }
+
+                    return SchemaUtils.toOutput(
+                        outputResponse,
+                        (property, sampleOutput) -> new OutputResponse(
+                            Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                        PropertyFactory.PROPERTY_FACTORY);
+                } catch (Exception e) {
+                    if (e instanceof ProviderException) {
+                        throw (ProviderException) e;
+                    }
+
+                    throw new ComponentConfigurationException(
+                        e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
+                }
+            })
+            .orElse(null);
     }
 
     @Override
