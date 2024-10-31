@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.GET_ME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -31,12 +30,13 @@ import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class VTigerGetMeAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(GET_ME)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMe")
         .title("Get Me")
-        .description("Get more information about yourself")
+        .description("Get more information about yourself.")
         .output(
             outputSchema(
                 object()
@@ -65,8 +65,10 @@ public class VTigerGetMeAction {
     private VTigerGetMeAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext
             .http(http -> http.get("/me"))
             .configuration(responseType(ResponseType.JSON))
             .execute()

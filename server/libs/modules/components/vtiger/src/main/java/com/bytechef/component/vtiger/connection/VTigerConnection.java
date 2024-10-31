@@ -17,12 +17,12 @@
 package com.bytechef.component.vtiger.connection;
 
 import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.INSTANCE_URL;
 
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
@@ -38,17 +38,17 @@ public class VTigerConnection {
             authorization(AuthorizationType.BASIC_AUTH)
                 .title("Basic Auth")
                 .properties(
-                    string(Authorization.USERNAME)
-                        .label("VTiger Username of email")
+                    string(USERNAME)
+                        .label("Username")
+                        .description("Enter your username/email.")
                         .required(true),
                     string(PASSWORD)
-                        .label("VTiger Access Key")
+                        .label("Access Key")
                         .required(true),
                     string(INSTANCE_URL)
                         .label("VTiger Instance URL")
-                        .description("For the instance URL, add the url without the endpoint. For example enter" +
-                            " https://<instance>.od2.vtiger.com instead of" +
-                            " https://<instance>.od2.vtiger.com/restapi/v1/vtiger/default")
+                        .description("For the instance URL, add the url without the endpoint.")
+                        .exampleValue("https://<instance>.od2.vtiger.com")
                         .required(true)));
 
     private VTigerConnection() {
