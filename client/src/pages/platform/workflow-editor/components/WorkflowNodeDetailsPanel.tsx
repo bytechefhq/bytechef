@@ -41,6 +41,7 @@ import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
+import getAllTaskNames from '../utils/getAllTaskNames';
 
 const TABS = [
     {
@@ -389,8 +390,12 @@ const WorkflowNodeDetailsPanel = ({
 
             return;
         }
+        
+        if (!workflowDefinition.tasks) {
+            return;
+        }
 
-        const taskNames = workflowDefinition.tasks?.map((task) => task.name);
+        const taskNames = getAllTaskNames(workflowDefinition.tasks);
 
         if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
             useWorkflowNodeDetailsPanelStore.getState().reset();
