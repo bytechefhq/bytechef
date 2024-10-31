@@ -9,12 +9,14 @@ import {
     WorkflowConnection,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
+import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     ComponentPropertiesType,
@@ -207,6 +209,14 @@ const WorkflowNodeDetailsPanel = ({
         return true;
     });
 
+    const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
+            });
+        },
+    });
+
     const queryClient = useQueryClient();
 
     const handleOperationSelectChange = (newOperationName: string) => {
@@ -372,6 +382,11 @@ const WorkflowNodeDetailsPanel = ({
     // Close the panel if the current node is deleted from the workflow definition
     useEffect(() => {
         if (currentNode?.trigger) {
+            deleteWorkflowNodeTestOutputMutation.mutate({
+                id: workflow.id!,
+                workflowNodeName: currentNode.name,
+            });
+
             return;
         }
 
