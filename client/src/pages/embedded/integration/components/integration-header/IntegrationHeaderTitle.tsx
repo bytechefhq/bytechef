@@ -28,7 +28,7 @@ const IntegrationHeaderTitle = ({integration}: {integration: Integration}) => {
                 </Tooltip>
             )}
 
-            <h1>{integration?.componentName}</h1>
+            <h1>{integration?.name}</h1>
 
             {integration && (
                 <Badge className="flex space-x-1" variant="secondary">
