@@ -76,8 +76,8 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
         Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
 
         return ResponseEntity.ok(
-            componentDefinitionService.getComponentDefinitions(
-                actionDefinitions, connectionDefinitions, triggerDefinitions, include)
+            componentDefinitionService
+                .getComponentDefinitions(actionDefinitions, connectionDefinitions, triggerDefinitions, include)
                 .stream()
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))
