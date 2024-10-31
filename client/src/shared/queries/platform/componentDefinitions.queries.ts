@@ -1,13 +1,22 @@
+import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
+
 /* eslint-disable sort-keys */
 import {
     ComponentDefinition,
     ComponentDefinitionApi,
     ComponentDefinitionBasic,
     GetComponentDefinitionRequest,
-    GetComponentDefinitionsRequest,
+    GetComponentDefinitionsAppTypeEnum,
     GetDataStreamComponentDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
+
+export interface GetComponentDefinitionsRequestI {
+    actionDefinitions?: boolean;
+    connectionDefinitions?: boolean;
+    triggerDefinitions?: boolean;
+    include?: Array<string>;
+}
 
 export const ComponentDefinitionKeys = {
     componentDefinition: (request: GetComponentDefinitionRequest) => [
@@ -16,7 +25,7 @@ export const ComponentDefinitionKeys = {
         request.componentVersion,
     ],
     componentDefinitions: ['componentDefinitions'] as const,
-    filteredComponentDefinitions: (request?: GetComponentDefinitionsRequest) => [
+    filteredComponentDefinitions: (request?: GetComponentDefinitionsRequestI) => [
         ...ComponentDefinitionKeys.componentDefinitions,
         request,
     ],
@@ -33,12 +42,22 @@ export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRe
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetComponentDefinitionsQuery = (request?: GetComponentDefinitionsRequest, enabled?: boolean) =>
-    useQuery<ComponentDefinitionBasic[], Error>({
+export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
+    const {currentType} = useAppTypeStore();
+
+    return useQuery<ComponentDefinitionBasic[], Error>({
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
-        queryFn: () => new ComponentDefinitionApi().getComponentDefinitions(request),
+        queryFn: () =>
+            new ComponentDefinitionApi().getComponentDefinitions({
+                ...request,
+                appType:
+                    currentType === AppType.AUTOMATION
+                        ? GetComponentDefinitionsAppTypeEnum.Automation
+                        : GetComponentDefinitionsAppTypeEnum.Embedded,
+            }),
         enabled: enabled === undefined ? true : enabled,
     });
+};
 
 export const useGetDataStreamComponentDefinitions = (
     request: GetDataStreamComponentDefinitionsRequest,
