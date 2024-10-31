@@ -126,6 +126,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 workflow,
             });
 
+            setPopoverOpen(false);
+
             return;
         }
 
