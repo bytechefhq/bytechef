@@ -23,12 +23,13 @@ import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
+    connectionMissing: boolean;
     currentNode: NodeType;
     outputDefined: boolean;
     workflowId: string;
 }
 
-const OutputTab = ({currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
+const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
@@ -128,7 +129,11 @@ const OutputTab = ({currentNode, outputDefined = false, workflowId}: OutputTabPr
                                 )}
 
                                 {!currentNode.trigger && (
-                                    <DropdownMenuItem className="cursor-pointer" onClick={handleTestComponentClick}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        disabled={connectionMissing}
+                                        onClick={handleTestComponentClick}
+                                    >
                                         Test Component
                                     </DropdownMenuItem>
                                 )}
