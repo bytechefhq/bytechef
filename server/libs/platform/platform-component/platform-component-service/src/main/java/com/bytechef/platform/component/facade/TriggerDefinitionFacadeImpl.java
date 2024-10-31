@@ -153,7 +153,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
     @Override
     public TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        @NonNull AppType type, Long instanceId, String workflowReferenceCode,
+        AppType type, Long instanceId, String workflowReferenceCode,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
         Long connectionId, boolean devEnvironment) {
 

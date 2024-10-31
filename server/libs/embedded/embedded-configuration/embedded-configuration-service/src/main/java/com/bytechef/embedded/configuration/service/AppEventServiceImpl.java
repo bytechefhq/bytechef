@@ -21,6 +21,7 @@ import com.bytechef.embedded.configuration.domain.AppEvent;
 import com.bytechef.embedded.configuration.repository.AppEventRepository;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
+import org.springframework.data.domain.Sort;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,7 +63,7 @@ public class AppEventServiceImpl implements AppEventService {
     @Override
     @Transactional(readOnly = true)
     public List<AppEvent> getAppEvents() {
-        return appEventRepository.findAll();
+        return appEventRepository.findAll(Sort.by(Sort.Order.asc("name")));
     }
 
     @Override
