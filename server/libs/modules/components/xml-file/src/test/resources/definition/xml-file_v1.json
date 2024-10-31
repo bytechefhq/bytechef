@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML File",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -206,7 +205,7 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Read from file",
+    "title" : "Read from File",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -507,11 +506,12 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Write to file",
+    "title" : "Write to File",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

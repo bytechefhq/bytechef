@@ -16,7 +16,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "File Storage",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -170,10 +169,10 @@
       } ],
       "controlType" : "FILE_ENTRY"
     } ],
-    "title" : "Read from file as string",
+    "title" : "Read from File as String",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -423,10 +422,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Write to file",
+    "title" : "Write to File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -676,11 +675,12 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Download file",
+    "title" : "Download File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

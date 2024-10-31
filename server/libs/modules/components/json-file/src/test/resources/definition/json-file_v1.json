@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON File",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -234,10 +233,10 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Read from file",
+    "title" : "Read from File",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -563,12 +562,13 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Write to file",
+    "title" : "Write to File",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }
