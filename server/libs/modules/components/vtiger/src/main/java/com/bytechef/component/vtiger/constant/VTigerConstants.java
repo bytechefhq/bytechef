@@ -21,16 +21,12 @@ package com.bytechef.component.vtiger.constant;
  */
 public class VTigerConstants {
 
-    public static final String CREATE_CONTACT = "createContact";
-    public static final String CREATE_PRODUCT = "createProduct";
     public static final String EMAIL = "email";
     public static final String FIRSTNAME = "firstname";
-    public static final String GET_ME = "getMe";
     public static final String INSTANCE_URL = "instance_url";
     public static final String LASTNAME = "lastname";
     public static final String PRODUCT_NAME = "productname";
     public static final String PRODUCT_TYPE = "product_type";
-    public static final String VTIGER = "vtiger";
 
     private VTigerConstants() {
     }

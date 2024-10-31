@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_CONTACT;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.EMAIL;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.FIRSTNAME;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.LASTNAME;
@@ -32,29 +31,29 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class VTigerCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Create a new contact")
+        .description("Creates a new contact.")
         .properties(
             string(FIRSTNAME)
                 .label("First Name")
-                .description("First name of the contact")
+                .description("First name of the contact.")
                 .required(true),
             string(LASTNAME)
                 .label("Last Name")
-                .description("Last name of the contact")
+                .description("Last name of the contact.")
                 .required(true),
             string(EMAIL)
-                .label("Contact email")
-                .description("email for your new contact")
+                .label("Email")
+                .description("Email address of the contact.")
                 .required(true))
         .output(
             outputSchema(
@@ -65,25 +64,26 @@ public class VTigerCreateContactAction {
                                 string(FIRSTNAME),
                                 string(LASTNAME),
                                 string(EMAIL),
-                                string("phone")))))
+                                string("phone"),
+                                string("assigned_user_id"),
+                                string("id")))))
         .perform(VTigerCreateContactAction::perform);
 
     private VTigerCreateContactAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        Map<String, String> paramMap = new LinkedHashMap<>();
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        paramMap.put(FIRSTNAME, inputParameters.getRequiredString(FIRSTNAME));
-        paramMap.put(LASTNAME, inputParameters.getRequiredString(LASTNAME));
-        paramMap.put(EMAIL, inputParameters.getRequiredString(EMAIL));
-
-        return context
+        return actionContext
             .http(http -> http.post("/create"))
             .body(
                 Body.of(
                     "elementType", "Contacts",
-                    "element", paramMap))
+                    "element",
+                    Map.of(FIRSTNAME, inputParameters.getRequiredString(FIRSTNAME),
+                        LASTNAME, inputParameters.getRequiredString(LASTNAME),
+                        EMAIL, inputParameters.getRequiredString(EMAIL))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
