@@ -14,19 +14,19 @@ import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 const placeholder = (
     <>
-        <div>{'//'}Write sample output value, for example:</div>
-        <div>{'{'}</div>
-        <div className="pl-4">{'"country": "USA"'}</div>
-        <div className="pl-4">{'"people": ['}</div>
-        <div className="pl-8">{'{'}</div>
-        <div className="pl-12">{'"firstName": Joe'}</div>
-        <div className="pl-12">{'"lastName": Jackson'}</div>
-        <div className="pl-12">{'"gender": Male'}</div>
-        <div className="pl-12">{'"age": 28'}</div>
-        <div className="pl-12">{'"number": 7349282382'}</div>
-        <div className="pl-8">{'}'}</div>
-        <div className="pl-4">{']'}</div>
-        <div>{'}'}</div>
+        <pre>{'//'}Write sample output value, for example:</pre>
+        <pre>{'{'}</pre>
+        <pre className="pl-4">{'"country": "USA"'}</pre>
+        <pre className="pl-4">{'"people": ['}</pre>
+        <pre className="pl-8">{'{'}</pre>
+        <pre className="pl-12">{'"firstName": Joe'}</pre>
+        <pre className="pl-12">{'"lastName": Jackson'}</pre>
+        <pre className="pl-12">{'"gender": Male'}</pre>
+        <pre className="pl-12">{'"age": 28'}</pre>
+        <pre className="pl-12">{'"number": 7349282382'}</pre>
+        <pre className="pl-8">{'}'}</pre>
+        <pre className="pl-4">{']'}</pre>
+        <pre>{'}'}</pre>
     </>
 );
 
@@ -46,11 +46,11 @@ const OutputTabSampleDataDialog = ({
     const handleEditorOnChange = (value: string | undefined) => {
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
-        if (value) {
-            placeholder!.style.display = 'none';
-        } else {
-            placeholder!.style.display = 'block';
+        if (!placeholder) {
+            return;
         }
+
+        placeholder.style.display = value ? 'none' : 'block';
 
         if (value != null) {
             try {
@@ -58,7 +58,7 @@ const OutputTabSampleDataDialog = ({
 
                 /* eslint-disable @typescript-eslint/no-unused-vars */
             } catch (e) {
-                // Do nothing
+                // thrown if value is not valid JSON
             }
         }
     };
@@ -66,11 +66,11 @@ const OutputTabSampleDataDialog = ({
     const handleEditorOnMount = (editor: IStandaloneCodeEditor) => {
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
 
-        if (value) {
-            placeholder!.style.display = 'none';
-        } else {
-            placeholder!.style.display = 'block';
+        if (!placeholder) {
+            return;
         }
+
+        placeholder.style.display = value ? 'none' : 'block';
 
         editor.focus();
     };
