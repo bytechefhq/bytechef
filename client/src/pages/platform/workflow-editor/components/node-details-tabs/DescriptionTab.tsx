@@ -35,12 +35,11 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
 
         saveWorkflowDefinition({
             nodeData: {...componentData, label: event.target.value},
-            onSuccess: () => {
+            onSuccess: () =>
                 setCurrentComponent({
                     ...currentComponent,
                     title: event.target.value,
-                });
-            },
+                }),
             queryClient,
             updateWorkflowMutation,
             workflow,
@@ -54,12 +53,11 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
 
         saveWorkflowDefinition({
             nodeData: {...componentData, description: event.target.value},
-            onSuccess: () => {
+            onSuccess: () =>
                 setCurrentComponent({
                     ...currentComponent,
                     notes: event.target.value,
-                });
-            },
+                }),
             queryClient,
             updateWorkflowMutation,
             workflow,
