@@ -55,7 +55,7 @@ import java.util.Map;
 public class GoogleSheetsCreateSheetAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSheet")
-        .title("Create sheet")
+        .title("Create Sheet")
         .description("Create a blank sheet with title. Optionally, provide headers.")
         .properties(
             SPREADSHEET_ID_PROPERTY,

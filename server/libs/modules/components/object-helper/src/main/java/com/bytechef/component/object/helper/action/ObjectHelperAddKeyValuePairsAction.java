@@ -50,7 +50,7 @@ public class ObjectHelperAddKeyValuePairsAction {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addKeyValuePairs")
-        .title("Add Key-Value pairs to object or array")
+        .title("Add Key-Value Pairs to Object or Array")
         .description(
             "Add values from list to object or array. If the source is object, the items in the list will be " +
                 "treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to " +

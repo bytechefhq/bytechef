@@ -41,7 +41,7 @@ import com.bytechef.component.definition.Parameters;
 public class MicrosoftExcelUpdateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
-        .title("Update row")
+        .title("Update Row")
         .description("Update a row in a worksheet")
         .properties(
             WORKBOOK_ID_PROPERTY,

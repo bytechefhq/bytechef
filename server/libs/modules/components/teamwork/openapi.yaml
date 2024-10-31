@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Companies"
-      summary: "Creates a company"
+      summary: "Create Company"
       description: "Create a new company"
       operationId: "createCompany"
       requestBody:
@@ -59,7 +59,7 @@ paths:
     post:
       tags:
         - "Tasks"
-      summary: "Creates a task"
+      summary: "Create Task"
       description: "Create a new task"
       operationId: "createTask"
       parameters:

@@ -47,7 +47,7 @@ import com.bytechef.component.xero.util.XeroUtils;
 public class XeroCreateInvoiceAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSalesInvoice")
-        .title("Create invoice")
+        .title("Create Invoice")
         .description("Creates draft invoice (Acount Receivable).")
         .properties(
             string(CONTACT_ID)

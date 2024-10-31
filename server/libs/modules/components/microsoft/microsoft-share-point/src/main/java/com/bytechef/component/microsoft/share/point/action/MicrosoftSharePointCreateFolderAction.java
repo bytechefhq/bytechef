@@ -43,7 +43,7 @@ import java.util.Map;
 public class MicrosoftSharePointCreateFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
-        .title("Create folder")
+        .title("Create Folder")
         .description("Creates a new folder at path you specify.")
         .properties(
             SITE_ID_PROPERTY,

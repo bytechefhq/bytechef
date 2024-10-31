@@ -52,7 +52,7 @@ import java.util.List;
 public class GoogleDriveCreateNewTextFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createNewTextFile")
-        .title("Create new text file")
+        .title("Create New Text File")
         .description("Creates a new text file in Google Drive.")
         .properties(
             string(FILE_NAME)

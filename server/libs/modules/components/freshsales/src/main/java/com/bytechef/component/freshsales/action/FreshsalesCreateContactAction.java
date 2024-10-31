@@ -50,7 +50,7 @@ import com.bytechef.component.definition.TypeReference;
 public class FreshsalesCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create contact")
+        .title("Create Contact")
         .description("Add new contact in Freshsales CRM")
         .properties(
             string(FIRST_NAME)

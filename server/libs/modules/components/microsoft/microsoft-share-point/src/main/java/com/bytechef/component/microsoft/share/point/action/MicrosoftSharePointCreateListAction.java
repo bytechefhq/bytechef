@@ -38,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
 public class MicrosoftSharePointCreateListAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createList")
-        .title("Create list")
+        .title("Create List")
         .description("Creates a new list")
         .properties(
             SITE_ID_PROPERTY,

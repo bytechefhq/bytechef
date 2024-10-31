@@ -40,7 +40,7 @@ import java.util.Map;
 public class MondayCreateBoardAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_BOARD)
-        .title("Create board")
+        .title("Create Board")
         .description("Create a new board.")
         .properties(
             string(BOARD_NAME)

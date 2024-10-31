@@ -39,7 +39,7 @@ import java.util.Map;
 public class GithubCreateIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
-        .title("Create issue")
+        .title("Create Issue")
         .description("Create Issue in GitHub Repository")
         .properties(
             string(REPOSITORY)

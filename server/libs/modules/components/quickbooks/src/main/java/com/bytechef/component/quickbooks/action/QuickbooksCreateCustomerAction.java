@@ -44,7 +44,7 @@ import com.bytechef.component.definition.TypeReference;
 public final class QuickbooksCreateCustomerAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCustomer")
-        .title("Create customer")
+        .title("Create Customer")
         .description("Creates a new customer.")
         .properties(
             string(DISPLAY_NAME)

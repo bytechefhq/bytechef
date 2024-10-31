@@ -55,7 +55,7 @@ import org.apache.commons.lang3.Validate;
 public class OdsFileWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
-        .title("Write to file")
+        .title("Write to File")
         .description("Writes the data to a ODS file.")
         .properties(
             string(SHEET_NAME)

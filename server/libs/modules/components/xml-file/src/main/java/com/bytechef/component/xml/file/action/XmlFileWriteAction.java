@@ -43,7 +43,7 @@ import java.nio.charset.StandardCharsets;
 public class XmlFileWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(XmlFileConstants.WRITE)
-        .title("Write to file")
+        .title("Write to File")
         .description("Writes the data to a XML file.")
         .properties(
             integer(XmlFileConstants.TYPE)

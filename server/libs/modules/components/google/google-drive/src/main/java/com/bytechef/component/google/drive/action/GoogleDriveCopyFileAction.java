@@ -44,7 +44,7 @@ import java.util.Collections;
 public class GoogleDriveCopyFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("copyFile")
-        .title("Copy file")
+        .title("Copy File")
         .description("Copy a selected file to a different location within Google Drive.")
         .properties(
             string(FILE_ID)

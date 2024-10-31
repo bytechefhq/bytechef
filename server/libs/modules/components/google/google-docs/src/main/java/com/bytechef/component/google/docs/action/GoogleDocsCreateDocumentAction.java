@@ -42,8 +42,8 @@ import java.util.List;
 public class GoogleDocsCreateDocumentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT)
-        .title("Create document")
-        .description("Create a document on Google Docs")
+        .title("Create Document")
+        .description("Create a document on Google Docs.")
         .properties(
             string(TITLE)
                 .label("Title")

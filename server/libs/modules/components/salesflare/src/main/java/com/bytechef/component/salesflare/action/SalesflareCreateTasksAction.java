@@ -37,7 +37,7 @@ import java.util.Map;
  */
 public class SalesflareCreateTasksAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTasks")
-        .title("Create tasks")
+        .title("Create Tasks")
         .description("Creates new tasks")
         .metadata(
             Map.of(

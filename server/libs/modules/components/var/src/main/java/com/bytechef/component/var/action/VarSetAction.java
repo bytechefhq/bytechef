@@ -42,7 +42,7 @@ import com.bytechef.component.definition.Parameters;
 public class VarSetAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(SET)
-        .title("Set value")
+        .title("Set Value")
         .description("Assign value to a variable that can be used in the following steps.")
         .properties(
             integer(TYPE)

@@ -60,7 +60,7 @@ import java.util.regex.Pattern;
 public class DataMapperReplaceAllSpecifiedValuesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceAllSpecifiedValues")
-        .title("Replace all specified values")
+        .title("Replace All Specified Values")
         .description("Goes through all object parameters and replaces all specified input parameter values.")
         .properties(
             integer(INPUT_TYPE)

@@ -44,7 +44,7 @@ import com.bytechef.component.definition.Parameters;
 public class DropboxUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload file")
+        .title("Upload File")
         .description("Create a new file up to a size of 150MB with the contents provided in the request.")
         .properties(
             fileEntry(FILE_ENTRY)

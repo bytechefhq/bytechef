@@ -35,7 +35,7 @@ import java.util.Map;
 public class WebhookValidateAndRespondTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("validateAndRespond")
-        .title("Validate and respond")
+        .title("Validate and Respond")
         .description(
             "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.")
         .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)

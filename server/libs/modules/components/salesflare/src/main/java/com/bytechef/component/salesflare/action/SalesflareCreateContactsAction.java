@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class SalesflareCreateContactsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContacts")
-        .title("Create contacts")
+        .title("Create Contacts")
         .description("Creates new contacts")
         .metadata(
             Map.of(

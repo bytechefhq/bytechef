@@ -43,7 +43,7 @@ import java.util.Map;
  */
 public class AirtableCreateRecordAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createRecord")
-        .title("Creates a record")
+        .title("Create Record")
         .description("Adds a record into an Airtable table.")
         .metadata(
             Map.of(

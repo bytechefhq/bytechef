@@ -46,7 +46,7 @@ import java.util.Map;
 public class BoxUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload file")
+        .title("Upload File")
         .description("Uploads a small file to Box.")
         .properties(
             string(ID)

@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class PipedriveDeletePersonAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deletePerson")
-        .title("Delete person")
+        .title("Delete Person")
         .description("Marks a person as deleted. After 30 days, the person will be permanently deleted.")
         .metadata(
             Map.of(

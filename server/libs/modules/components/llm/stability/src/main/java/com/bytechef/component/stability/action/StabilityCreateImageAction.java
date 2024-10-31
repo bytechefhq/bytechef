@@ -62,7 +62,7 @@ import org.springframework.ai.stabilityai.api.StabilityAiImageOptions;
 public class StabilityCreateImageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
-        .title("Create image")
+        .title("Create Image")
         .description("Create an image using text-to-image models")
         .properties(
             string(MODEL)

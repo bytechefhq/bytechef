@@ -41,7 +41,7 @@ import java.util.List;
 public class MicrosoftExcelFindRowByNumAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
-        .title("Find row by number")
+        .title("Find Row by Number")
         .description("Get row values from the worksheet by the row number")
         .properties(
             WORKBOOK_ID_PROPERTY,

@@ -38,7 +38,7 @@ import java.util.List;
 public class MicrosoftExcelDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
-        .title("Delete row")
+        .title("Delete Row")
         .description("Delete row on an existing sheet")
         .properties(
             WORKBOOK_ID_PROPERTY,

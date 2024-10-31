@@ -57,7 +57,7 @@ import org.springframework.retry.support.RetryTemplate;
 public class OpenAICreateImageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
-        .title("Create image")
+        .title("Create Image")
         .description("Create an image using text-to-image models")
         .properties(
             string(MODEL)

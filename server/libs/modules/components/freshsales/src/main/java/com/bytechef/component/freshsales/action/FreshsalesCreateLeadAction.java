@@ -38,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
 public class FreshsalesCreateLeadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLead")
-        .title("Create lead")
+        .title("Create Lead")
         .description("Creates a new lead")
         .properties(
             string(FIRST_NAME)

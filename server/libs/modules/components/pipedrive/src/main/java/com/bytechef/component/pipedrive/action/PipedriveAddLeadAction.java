@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class PipedriveAddLeadAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addLead")
-        .title("Add lead")
+        .title("Add Lead")
         .description("Creates a lead. A lead always has to be linked to a person or an organization or both.")
         .metadata(
             Map.of(

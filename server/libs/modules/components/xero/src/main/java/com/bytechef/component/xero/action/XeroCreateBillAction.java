@@ -50,7 +50,7 @@ import com.bytechef.component.xero.util.XeroUtils;
 public class XeroCreateBillAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBill")
-        .title("Create bill")
+        .title("Create Bill")
         .description("Creates draft bill (Accounts Payable).")
         .properties(
             string(CONTACT_ID)

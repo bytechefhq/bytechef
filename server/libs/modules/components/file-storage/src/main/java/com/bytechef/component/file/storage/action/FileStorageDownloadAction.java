@@ -49,7 +49,7 @@ import java.util.function.Consumer;
 public class FileStorageDownloadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD)
-        .title("Download file")
+        .title("Download File")
         .description("Download a file from the URL.")
         .properties(
             string(FileStorageConstants.URL)

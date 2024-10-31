@@ -35,7 +35,7 @@ import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
 public class XmlHelperStringifyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(XmlHelperConstants.STRINGIFY)
-        .title("Convert to XML string")
+        .title("Convert to XML String")
         .description("Writes the object/array to a XML string.")
         .properties(
             integer(XmlHelperConstants.TYPE)

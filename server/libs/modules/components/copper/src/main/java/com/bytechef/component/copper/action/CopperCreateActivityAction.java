@@ -47,7 +47,7 @@ import java.util.Map;
 public class CopperCreateActivityAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createActivity")
-        .title("Create activity")
+        .title("Create Activity")
         .description("Creates a new Activity")
         .properties(
             string(ACTIVITY_TYPE)

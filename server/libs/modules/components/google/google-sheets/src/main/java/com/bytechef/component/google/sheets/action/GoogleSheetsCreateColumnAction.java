@@ -51,7 +51,7 @@ public class GoogleSheetsCreateColumnAction {
 
     protected static final String COLUMN_NAME = "columnName";
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createColumn")
-        .title("Create column")
+        .title("Create Column")
         .description("Append a new column to the end of the sheet.")
         .properties(
             SPREADSHEET_ID_PROPERTY,

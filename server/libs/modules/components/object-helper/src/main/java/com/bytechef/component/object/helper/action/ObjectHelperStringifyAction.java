@@ -34,7 +34,7 @@ import com.bytechef.component.definition.Parameters;
 public class ObjectHelperStringifyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("stringify")
-        .title("Convert to JSON string")
+        .title("Convert to JSON String")
         .description("Writes the object/array to a JSON string.")
         .properties(
             integer(TYPE)

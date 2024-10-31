@@ -38,7 +38,7 @@ import com.bytechef.component.definition.TypeReference;
 public class FreshsalesCreateAccountAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
-        .title("Create account")
+        .title("Create Account")
         .description("Creates a new account")
         .properties(
             string(NAME)

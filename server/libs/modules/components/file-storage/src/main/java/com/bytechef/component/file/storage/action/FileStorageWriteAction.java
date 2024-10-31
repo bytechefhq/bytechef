@@ -35,7 +35,7 @@ import com.bytechef.component.definition.Parameters;
 public class FileStorageWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE)
-        .title("Write to file")
+        .title("Write to File")
         .description("Writes the data to the file.")
         .properties(
             string(CONTENT)

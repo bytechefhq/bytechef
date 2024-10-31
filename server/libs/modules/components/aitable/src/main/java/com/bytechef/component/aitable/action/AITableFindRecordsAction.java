@@ -44,7 +44,7 @@ import com.bytechef.component.definition.TypeReference;
 public class AITableFindRecordsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRecords")
-        .title("Find records")
+        .title("Find Records")
         .description("Find records in datasheet")
         .properties(
             SPACE_ID_PROPERTY,

@@ -57,7 +57,7 @@ import org.apache.commons.lang3.Validate;
 public class DataMapperMapObjectsToObjectAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("mapObjectsToObject")
-        .title("Map objects to object")
+        .title("Map Objects to Object")
         .description("Creates a new object with the chosen input properties. You can also rename the property keys.")
         .properties(
             integer(INPUT_TYPE)

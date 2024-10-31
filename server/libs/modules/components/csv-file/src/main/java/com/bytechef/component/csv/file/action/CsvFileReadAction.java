@@ -56,7 +56,7 @@ import java.util.Map;
 public class CsvFileReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
-        .title("Read from file")
+        .title("Read from File")
         .description("Reads data from a csv file.")
         .properties(
             fileEntry(FILE_ENTRY)

@@ -47,7 +47,7 @@ import java.util.List;
 public class GoogleDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload file")
+        .title("Upload File")
         .description("Uploads a file in your Google Drive")
         .properties(
             fileEntry(FILE_ENTRY)

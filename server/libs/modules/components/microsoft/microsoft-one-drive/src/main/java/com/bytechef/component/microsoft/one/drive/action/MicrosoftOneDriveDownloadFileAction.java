@@ -36,7 +36,7 @@ import com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils;
 public class MicrosoftOneDriveDownloadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
-        .title("Download file")
+        .title("Download File")
         .description("Download a file from your Microsoft OneDrive")
         .properties(
             string(PARENT_ID)

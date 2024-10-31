@@ -41,7 +41,7 @@ import java.util.Map;
 public class VTigerCreateProductAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_PRODUCT)
-        .title("Create a Product")
+        .title("Create Product")
         .description("Create a new Product for your CRM")
         .properties(
             string(PRODUCT_NAME)

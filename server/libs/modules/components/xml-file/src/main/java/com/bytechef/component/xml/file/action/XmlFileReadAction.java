@@ -44,7 +44,7 @@ import java.util.stream.Stream;
 public class XmlFileReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
-        .title("Read from file")
+        .title("Read from File")
         .description("Reads data from a XML file.")
         .properties(
             fileEntry(FILE_ENTRY)

@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Projects"
-      summary: "Create project"
+      summary: "Create Project"
       description: "Creates a new project in a workspace or team."
       operationId: "createProject"
       requestBody:
@@ -76,7 +76,7 @@ paths:
     post:
       tags:
         - "Tasks"
-      summary: "Create a task"
+      summary: "Create Task"
       description: "Creates a new task"
       operationId: "createTask"
       requestBody:
@@ -98,8 +98,8 @@ paths:
                       type: "string"
                       description: "The workspace to create the task in."
                     project:
-                       type: "string"
-                       description: "Asana project to create the task in."
+                      type: "string"
+                      description: "Asana project to create the task in."
                     name:
                       type: "string"
                       description: "Name of the task."

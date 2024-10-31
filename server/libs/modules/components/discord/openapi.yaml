@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Channel"
-      summary: "Send channel message"
+      summary: "Send Channel Message"
       description: "Post a new message to a specific #channel you choose."
       operationId: "sendChannelMessage"
       parameters:
@@ -61,7 +61,7 @@ paths:
     post:
       tags:
         - "Guild"
-      summary: "Create channel"
+      summary: "Create Channel"
       description: "Create a new channel"
       operationId: "createChannel"
       parameters:

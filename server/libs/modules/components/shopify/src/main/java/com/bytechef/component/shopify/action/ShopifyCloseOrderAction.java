@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class ShopifyCloseOrderAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("closeOrder")
-        .title("Close an order")
+        .title("Close Order")
         .description(
             "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.")
         .metadata(

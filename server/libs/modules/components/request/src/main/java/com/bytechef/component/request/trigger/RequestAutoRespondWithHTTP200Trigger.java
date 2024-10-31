@@ -28,7 +28,7 @@ import com.bytechef.component.request.util.RequestUtils;
 public class RequestAutoRespondWithHTTP200Trigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("autoRespondWithHTTP200")
-        .title("Auto Respond with HTTP 200 status")
+        .title("Auto Respond with HTTP 200 Status")
         .description(
             "The request trigger always replies immediately with an HTTP 200 status code in response to any incoming workflow request request. This guarantees execution of the request trigger, but does not involve any validation of the received request.")
         .type(TriggerType.STATIC_WEBHOOK)

@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class DataMapperRenameKeysAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("renameKeys")
-        .title("Rename keys")
+        .title("Rename Keys")
         .description("The action renames keys of an input object defined by mappings.")
         .properties(
             object(INPUT)

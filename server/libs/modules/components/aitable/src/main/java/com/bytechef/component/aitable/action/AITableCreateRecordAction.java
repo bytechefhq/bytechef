@@ -40,7 +40,7 @@ import java.util.Map;
 public class AITableCreateRecordAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRecord")
-        .title("Create record")
+        .title("Create Record")
         .description("Creates a new record in datasheet.")
         .properties(
             SPACE_ID_PROPERTY,

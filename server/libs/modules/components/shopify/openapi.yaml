@@ -9,7 +9,7 @@ servers:
 paths:
   /orders.json:
     post:
-      summary: "Create an order"
+      summary: "Create Order"
       description: "Adds an order into a Shopify store."
       operationId: "createOrder"
       requestBody:
@@ -71,7 +71,7 @@ paths:
                   $ref: "#/components/schemas/Order"
   /orders/{orderId}.json:
     delete:
-      summary: "Delete an order"
+      summary: "Delete Order"
       description: "Deletes an order. Orders that interact with an online gateway can't be deleted."
       operationId: "deleteOrder"
       parameters:
@@ -103,7 +103,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Order"
     put:
-      summary: "Update an order"
+      summary: "Update Order"
       description: "Update an existing order."
       operationId: "updateOrder"
       parameters:
@@ -145,7 +145,7 @@ paths:
                   $ref: "#/components/schemas/Order"
   /orders/{orderId}/close.json:
     post:
-      summary: "Close an order"
+      summary: "Close Order"
       description: "Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded."
       operationId: "closeOrder"
       parameters:

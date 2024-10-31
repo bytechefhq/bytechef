@@ -37,7 +37,7 @@ import java.io.IOException;
 public class GoogleContactsCreateGroupAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
-        .title("Create groups")
+        .title("Create Group")
         .description("Creates a new group")
         .properties(
             string(NAME)
