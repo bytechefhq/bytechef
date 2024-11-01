@@ -1,4 +1,4 @@
-import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 
 /* eslint-disable sort-keys */
 import {
@@ -6,7 +6,7 @@ import {
     ComponentDefinitionApi,
     ComponentDefinitionBasic,
     GetComponentDefinitionRequest,
-    GetComponentDefinitionsAppTypeEnum,
+    GetComponentDefinitionsModeTypeEnum,
     GetDataStreamComponentDefinitionsRequest,
 } from '@/shared/middleware/platform/configuration';
 import {useQuery} from '@tanstack/react-query';
@@ -43,17 +43,17 @@ export const useGetComponentDefinitionQuery = (request: GetComponentDefinitionRe
     });
 
 export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
-    const {currentType} = useAppTypeStore();
+    const {currentType} = useModeTypeStore();
 
     return useQuery<ComponentDefinitionBasic[], Error>({
         queryKey: ComponentDefinitionKeys.filteredComponentDefinitions(request),
         queryFn: () =>
             new ComponentDefinitionApi().getComponentDefinitions({
                 ...request,
-                appType:
-                    currentType === AppType.AUTOMATION
-                        ? GetComponentDefinitionsAppTypeEnum.Automation
-                        : GetComponentDefinitionsAppTypeEnum.Embedded,
+                modeType:
+                    currentType === ModeType.AUTOMATION
+                        ? GetComponentDefinitionsModeTypeEnum.Automation
+                        : GetComponentDefinitionsModeTypeEnum.Embedded,
             }),
         enabled: enabled === undefined ? true : enabled,
     });
