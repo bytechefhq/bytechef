@@ -19,7 +19,7 @@ package com.bytechef.platform.constant;
 /**
  * @author Ivica Cardic
  */
-public enum AppType {
+public enum ModeType {
 
     AUTOMATION, EMBEDDED
 }

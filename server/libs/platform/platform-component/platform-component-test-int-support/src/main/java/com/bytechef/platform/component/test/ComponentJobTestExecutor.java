@@ -29,7 +29,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -79,7 +79,7 @@ public class ComponentJobTestExecutor {
 
         @Override
         public TaskExecution process(TaskExecution taskExecution) {
-            taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
+            taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
 
             return taskExecution;
         }

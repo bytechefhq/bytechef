@@ -43,7 +43,7 @@ paths:
       - "component-definition"
       operationId: "getComponentDefinitions"
       parameters:
-      - name: "appType"
+      - name: "modeType"
         description: "The application mode."
         in: "query"
         required: true

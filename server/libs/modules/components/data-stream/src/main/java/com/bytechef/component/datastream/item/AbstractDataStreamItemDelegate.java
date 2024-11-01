@@ -31,7 +31,7 @@ import com.bytechef.component.definition.DataStreamContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -115,10 +115,10 @@ public abstract class AbstractDataStreamItemDelegate {
 
         jobParameter = jobParameters.getParameter(TYPE);
 
-        AppType type = null;
+        ModeType type = null;
 
         if (jobParameter != null) {
-            type = AppType.valueOf((String) jobParameter.getValue());
+            type = ModeType.valueOf((String) jobParameter.getValue());
         }
 
         context = new DataStreamContextImpl(

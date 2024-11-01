@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.filter;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 
 /**
  * @author Ivica Cardic
@@ -26,5 +26,5 @@ public interface ComponentDefinitionFilter {
 
     boolean filter(ComponentDefinition componentDefinition);
 
-    boolean supports(AppType appType);
+    boolean supports(ModeType type);
 }

@@ -22,7 +22,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +73,7 @@ public interface TriggerDefinitionFacade extends OperationDefinitionFacade {
 
     TriggerOutput executeTrigger(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
-        AppType type, Long instanceId, String workflowReferenceCode, @NonNull Map<String, ?> inputParameters,
+        ModeType type, Long instanceId, String workflowReferenceCode, @NonNull Map<String, ?> inputParameters,
         Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean devEnvironment);
 
     void executeWebhookDisable(

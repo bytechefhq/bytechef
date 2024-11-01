@@ -29,7 +29,7 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParameterConnection;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 import java.util.Optional;
 
@@ -75,7 +75,7 @@ public class CodeWorkflowPerformAction {
             return codeWorkflowTaskExecutor.executePerform(
                 inputParameters.getRequiredString("codeWorkflowContainerReference"),
                 inputParameters.getRequiredString("workflowName"), inputParameters.getRequiredString("taskName"),
-                inputParameters.getRequired(MetadataConstants.TYPE, AppType.class));
+                inputParameters.getRequired(MetadataConstants.TYPE, ModeType.class));
         }
     }
 }

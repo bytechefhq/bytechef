@@ -17,7 +17,7 @@
 package com.bytechef.platform.connection.web.rest;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
@@ -33,11 +33,11 @@ public abstract class AbstractConnectionTagApiController {
 
     private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
-    private final AppType type;
+    private final ModeType type;
 
     @SuppressFBWarnings("EI")
     public AbstractConnectionTagApiController(
-        ConnectionFacade connectionFacade, ConversionService conversionService, AppType type) {
+        ConnectionFacade connectionFacade, ConversionService conversionService, ModeType type) {
 
         this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;

@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tenant.TenantContext;
 import java.io.Serializable;
 import org.apache.commons.lang3.Validate;
@@ -28,7 +28,7 @@ import org.apache.commons.lang3.Validate;
 public class WorkflowExecutionId implements Serializable {
 
     private long instanceId;
-    private AppType type;
+    private ModeType type;
     private String workflowReferenceCode;
     private String tenantId;
     private String triggerName;
@@ -37,7 +37,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     private WorkflowExecutionId(
-        String tenantId, AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
+        String tenantId, ModeType type, long instanceId, String workflowReferenceCode, String triggerName) {
 
         this.instanceId = instanceId;
         this.tenantId = tenantId;
@@ -47,7 +47,7 @@ public class WorkflowExecutionId implements Serializable {
     }
 
     public static WorkflowExecutionId of(
-        AppType type, long instanceId, String workflowReferenceCode, String triggerName) {
+        ModeType type, long instanceId, String workflowReferenceCode, String triggerName) {
 
         Validate.notBlank(workflowReferenceCode, "'workflowReferenceCode' must not be null");
         Validate.notBlank(triggerName, "'workflowTriggerName' must not be null");
@@ -62,14 +62,14 @@ public class WorkflowExecutionId implements Serializable {
         String[] items = id.split(":");
 
         return new WorkflowExecutionId(
-            items[0], AppType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
+            items[0], ModeType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
     }
 
     public long getInstanceId() {
         return instanceId;
     }
 
-    public AppType getType() {
+    public ModeType getType() {
         return type;
     }
 

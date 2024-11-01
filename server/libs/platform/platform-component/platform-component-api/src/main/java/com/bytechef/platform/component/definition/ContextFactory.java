@@ -20,7 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import org.springframework.lang.NonNull;
 
 /**
@@ -29,7 +29,7 @@ import org.springframework.lang.NonNull;
 public interface ContextFactory {
 
     ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
         Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean devEnvironment);
 
@@ -37,6 +37,6 @@ public interface ContextFactory {
         @NonNull String componentName, ComponentConnection connection);
 
     TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
         String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment);
 }

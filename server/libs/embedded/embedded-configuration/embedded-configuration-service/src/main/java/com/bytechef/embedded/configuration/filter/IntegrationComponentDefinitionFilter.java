@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.filter;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +36,7 @@ public class IntegrationComponentDefinitionFilter implements ComponentDefinition
     }
 
     @Override
-    public boolean supports(AppType appType) {
-        return AppType.EMBEDDED.equals(appType);
+    public boolean supports(ModeType type) {
+        return ModeType.EMBEDDED.equals(type);
     }
 }

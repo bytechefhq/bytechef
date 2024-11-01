@@ -17,7 +17,7 @@
 package com.bytechef.embedded.connectivity.facade;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class ActionFacadeImpl implements ActionFacade {
         // TODO connection
 
         return actionDefinitionFacade.executePerform(
-            componentName, componentVersion, actionName, AppType.EMBEDDED, null, null, null, null, input,
+            componentName, componentVersion, actionName, ModeType.EMBEDDED, null, null, null, null, input,
             connectionId == null ? Map.of() : Map.of(componentName, connectionId), Map.of(), false);
     }
 }

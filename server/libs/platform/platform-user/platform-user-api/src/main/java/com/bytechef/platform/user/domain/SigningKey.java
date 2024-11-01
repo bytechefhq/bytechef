@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.domain;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -128,8 +128,8 @@ public class SigningKey {
         return publicKey;
     }
 
-    public AppType getType() {
-        return AppType.values()[type];
+    public ModeType getType() {
+        return ModeType.values()[type];
     }
 
     public Long getUserId() {
@@ -168,7 +168,7 @@ public class SigningKey {
         this.publicKey = publicKey;
     }
 
-    public void setType(AppType type) {
+    public void setType(ModeType type) {
         this.type = type.ordinal();
     }
 

@@ -27,7 +27,7 @@ import com.bytechef.embedded.connection.web.rest.model.ConnectionModel;
 import com.bytechef.embedded.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import java.util.Iterator;
@@ -119,7 +119,7 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     public void testGetConnectionTags() {
-        when(connectionFacade.getConnectionTags(AppType.EMBEDDED))
+        when(connectionFacade.getConnectionTags(ModeType.EMBEDDED))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
@@ -147,7 +147,7 @@ public class ConnectionApiControllerIntTest {
     public void testGetConnections() {
         ConnectionDTO connectionDTO = getConnection();
 
-        when(connectionFacade.getConnections((String) null, null, null, null, AppType.EMBEDDED))
+        when(connectionFacade.getConnections((String) null, null, null, null, ModeType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -162,7 +162,7 @@ public class ConnectionApiControllerIntTest {
                 .parameters(null))
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", null, null, null, AppType.EMBEDDED))
+        when(connectionFacade.getConnections("component1", null, null, null, ModeType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -175,7 +175,8 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections(null, 1, null, null, AppType.EMBEDDED)).thenReturn(List.of(connectionDTO));
+        when(connectionFacade.getConnections(null, 1, null, null, ModeType.EMBEDDED))
+            .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
             .get()
@@ -187,7 +188,7 @@ public class ConnectionApiControllerIntTest {
             .expectBodyList(ConnectionModel.class)
             .hasSize(1);
 
-        when(connectionFacade.getConnections("component1", 1, null, null, AppType.EMBEDDED))
+        when(connectionFacade.getConnections("component1", 1, null, null, ModeType.EMBEDDED))
             .thenReturn(List.of(connectionDTO));
 
         this.webTestClient
@@ -206,7 +207,7 @@ public class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any(), AppType.EMBEDDED)).thenReturn(getConnection());
+        when(connectionFacade.create(any(), ModeType.EMBEDDED)).thenReturn(getConnection());
 
         try {
             assert connectionDTO.id() != null;
@@ -234,7 +235,7 @@ public class ConnectionApiControllerIntTest {
 
         ArgumentCaptor<ConnectionDTO> connectionArgumentCaptor = ArgumentCaptor.forClass(ConnectionDTO.class);
 
-        verify(connectionFacade).create(connectionArgumentCaptor.capture(), AppType.EMBEDDED);
+        verify(connectionFacade).create(connectionArgumentCaptor.capture(), ModeType.EMBEDDED);
 
         assertThat(connectionArgumentCaptor.getValue())
             .hasFieldOrPropertyWithValue("componentName", "componentName")

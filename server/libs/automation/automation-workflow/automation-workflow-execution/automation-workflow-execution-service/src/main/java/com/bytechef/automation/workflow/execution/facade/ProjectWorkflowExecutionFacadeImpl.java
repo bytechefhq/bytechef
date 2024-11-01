@@ -40,8 +40,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -121,7 +121,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 : taskFileStorage.readJobOutputs(job.getOutputs()),
             getJobTaskExecutions(id));
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
-            Validate.notNull(job.getId(), ""), AppType.AUTOMATION);
+            Validate.notNull(job.getId(), ""), ModeType.AUTOMATION);
 
         return new WorkflowExecution(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
@@ -173,7 +173,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
             } else {
                 Page<Job> jobsPage = instanceJobService
                     .getJobIds(
-                        jobStatus, jobStartDate, jobEndDate, projectInstanceIds, AppType.AUTOMATION, workflowIds,
+                        jobStatus, jobStartDate, jobEndDate, projectInstanceIds, ModeType.AUTOMATION, workflowIds,
                         pageNumber)
                     .map(jobService::getJob);
 
@@ -195,7 +195,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                         project -> CollectionUtils.contains(
                             projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
                     OptionalUtils.map(
-                        instanceJobService.fetchJobInstanceId(job.getId(), AppType.AUTOMATION),
+                        instanceJobService.fetchJobInstanceId(job.getId(), ModeType.AUTOMATION),
                         projectInstanceService::getProjectInstance),
                     new JobDTO(job),
                     CollectionUtils.getFirst(workflows,

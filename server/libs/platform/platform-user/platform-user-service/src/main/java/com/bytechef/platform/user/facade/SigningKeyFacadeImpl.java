@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.facade;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.SigningKeyService;
@@ -43,7 +43,7 @@ public class SigningKeyFacadeImpl implements SigningKeyFacade {
     }
 
     @Override
-    public String create(@NonNull SigningKey signingKey, @NonNull AppType type) {
+    public String create(@NonNull SigningKey signingKey, @NonNull ModeType type) {
         User user = userService.getCurrentUser();
 
         signingKey.setType(type);

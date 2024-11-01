@@ -17,7 +17,7 @@
 package com.bytechef.platform.data.storage.jdbc.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.domain.DataEntry;
 import com.bytechef.platform.data.storage.jdbc.repository.DataStorageRepository;
@@ -44,7 +44,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     public void delete(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(componentName, scope.ordinal(), scopeId, key,
@@ -58,7 +58,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Transactional
     public <T> Optional<T> fetch(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         return dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(
@@ -70,7 +70,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     public <T> T get(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
@@ -80,7 +80,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @SuppressWarnings("unchecked")
     public <T> Map<String, T> getAll(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         return OptionalUtils
             .get(
@@ -94,7 +94,7 @@ public class JdbcDataStorageServiceImpl implements JdbcDataStorageService {
     @Override
     public void put(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type, @NonNull Object value) {
+        @NonNull ModeType type, @NonNull Object value) {
 
         dataStorageRepository
             .findByComponentNameAndScopeAndScopeIdAndKeyAndType(

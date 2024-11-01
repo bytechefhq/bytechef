@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.workflow.execution.remote.web.rest.service;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
@@ -43,7 +43,7 @@ public class RemoteInstanceJobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable AppType type) {
+    public ResponseEntity<Long> fetchLastJobId(@PathVariable long instanceId, @PathVariable ModeType type) {
         return instanceJobService.fetchLastJobId(instanceId, type)
             .map(ResponseEntity::ok)
             .orElse(
@@ -60,7 +60,7 @@ public class RemoteInstanceJobServiceController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable AppType type) {
+    public ResponseEntity<Long> fetchJobInstanceId(@PathVariable long jobId, @PathVariable ModeType type) {
         return instanceJobService.fetchJobInstanceId(jobId, type)
             .map(ResponseEntity::ok)
             .orElse(

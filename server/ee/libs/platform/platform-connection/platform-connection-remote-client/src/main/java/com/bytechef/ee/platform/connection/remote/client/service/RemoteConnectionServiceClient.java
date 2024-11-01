@@ -11,7 +11,7 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +54,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(AppType type) {
+    public List<Connection> getConnections(ModeType type) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host("connection-app")
@@ -64,14 +64,14 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public List<Connection> getConnections(String componentName, int version, AppType type) {
+    public List<Connection> getConnections(String componentName, int version, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public List<Connection> getConnections(
         String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
-        AppType type) {
+        ModeType type) {
 
         throw new UnsupportedOperationException();
     }

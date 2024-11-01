@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.data.storage.db.remote.client.config;
 
 import com.bytechef.ee.platform.data.storage.db.remote.client.service.RemoteJdbcDataStorageServiceClient;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderJdbc;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
@@ -56,7 +56,7 @@ public class RemoteJdbcDataStorageClientConfiguration {
         @Override
         public <T> Optional<T> fetch(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             return jdbcDataStorageService.fetch(componentName, scope, scopeId, key, type);
         }
@@ -65,7 +65,7 @@ public class RemoteJdbcDataStorageClientConfiguration {
         @Override
         public <T> T get(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             return jdbcDataStorageService.get(componentName, scope, scopeId, key, type);
         }
@@ -74,7 +74,7 @@ public class RemoteJdbcDataStorageClientConfiguration {
         @Override
         public <T> Map<String, T> getAll(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull AppType type) {
+            @NonNull ModeType type) {
 
             return jdbcDataStorageService.getAll(componentName, scope, scopeId, type);
         }
@@ -82,7 +82,7 @@ public class RemoteJdbcDataStorageClientConfiguration {
         @Override
         public void put(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type, @NonNull Object value) {
+            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
             jdbcDataStorageService.put(componentName, scope, scopeId, key, type, value);
         }
@@ -90,7 +90,7 @@ public class RemoteJdbcDataStorageClientConfiguration {
         @Override
         public void delete(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             jdbcDataStorageService.delete(componentName, scope, scopeId, key, type);
         }

@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.domain;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Objects;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
@@ -45,7 +45,7 @@ public class InstanceJob {
     public InstanceJob() {
     }
 
-    public InstanceJob(long instanceId, long jobId, AppType type) {
+    public InstanceJob(long instanceId, long jobId, ModeType type) {
         this.jobId = AggregateReference.to(jobId);
         this.instanceId = instanceId;
         this.type = type.ordinal();
@@ -83,8 +83,8 @@ public class InstanceJob {
         return jobId.getId();
     }
 
-    public AppType getType() {
-        return AppType.values()[type];
+    public ModeType getType() {
+        return ModeType.values()[type];
     }
 
     @Override

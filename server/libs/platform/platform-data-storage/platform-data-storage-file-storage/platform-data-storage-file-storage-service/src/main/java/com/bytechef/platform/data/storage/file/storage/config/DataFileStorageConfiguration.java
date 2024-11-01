@@ -19,7 +19,7 @@ package com.bytechef.platform.data.storage.file.storage.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderFilesystem;
@@ -86,7 +86,7 @@ public class DataFileStorageConfiguration {
         @Override
         public <T> Optional<T> fetch(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             return dataFileStorageService.fetch(componentName, scope, scopeId, key, type);
         }
@@ -95,7 +95,7 @@ public class DataFileStorageConfiguration {
         @Override
         public <T> T get(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             return dataFileStorageService.get(componentName, scope, scopeId, key, type);
         }
@@ -104,7 +104,7 @@ public class DataFileStorageConfiguration {
         @Override
         public <T> Map<String, T> getAll(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull AppType type) {
+            @NonNull ModeType type) {
 
             return dataFileStorageService.getAll(componentName, scope, scopeId, type);
         }
@@ -112,7 +112,7 @@ public class DataFileStorageConfiguration {
         @Override
         public void put(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type, @NonNull Object value) {
+            @NonNull String key, @NonNull ModeType type, @NonNull Object value) {
 
             dataFileStorageService.put(componentName, scope, scopeId, key, type, value);
         }
@@ -120,7 +120,7 @@ public class DataFileStorageConfiguration {
         @Override
         public void delete(
             @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-            @NonNull String key, @NonNull AppType type) {
+            @NonNull String key, @NonNull ModeType type) {
 
             dataFileStorageService.delete(componentName, scope, scopeId, key, type);
         }

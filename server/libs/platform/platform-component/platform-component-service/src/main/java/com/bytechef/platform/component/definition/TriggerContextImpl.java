@@ -18,7 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -35,7 +35,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext {
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, AppType type, String workflowReferenceCode,
+        String componentName, int componentVersion, String triggerName, ModeType type, String workflowReferenceCode,
         ComponentConnection connection, DataStorage dataStorage, FilesFileStorage filesFileStorage,
         HttpClientExecutor httpClientExecutor) {
 
@@ -55,7 +55,7 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext {
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String triggerName, AppType type,
+        String componentName, Integer componentVersion, String triggerName, ModeType type,
         String workflowReferenceCode, DataStorage dataStorage) implements Data {
 
         @Override
