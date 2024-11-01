@@ -147,9 +147,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Send Message",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : [ {
     "batch" : null,
@@ -188,6 +188,10 @@
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : null,
@@ -195,12 +199,8 @@
     "listenerEnable" : { },
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "poll" : null
   } ],
-  "unifiedApi" : null,
-  "dataStream" : null
+  "dataStream" : null,
+  "unifiedApi" : null
 }

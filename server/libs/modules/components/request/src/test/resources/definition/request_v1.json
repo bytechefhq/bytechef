@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Request",
+  "connection" : null,
   "actions" : null,
   "dataStream" : null,
   "triggers" : [ {
@@ -33,15 +34,15 @@
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
     "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
+    "webhookValidate" : null,
     "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
-    "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   }, {
@@ -81,18 +82,17 @@
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
     "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "poll" : null,
+    "webhookValidate" : null,
     "dynamicWebhookRefresh" : null,
     "processErrorResponse" : null,
-    "webhookValidate" : null,
     "webhookValidateOnEnable" : null,
     "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }
