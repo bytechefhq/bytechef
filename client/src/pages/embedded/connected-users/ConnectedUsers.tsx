@@ -10,6 +10,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectedUserSheet from '@/pages/embedded/connected-users/components/ConnectedUserSheet';
 import ConnectedUserTable from '@/pages/embedded/connected-users/components/ConnectedUserTable';
+import ConnectedUsersFilterTitle from '@/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -162,7 +163,7 @@ const ConnectedUsers = () => {
         );
     }
 
-    function filterConnectedUsers(values: z.infer<typeof formSchema>) {
+    const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
         filter(
             values.environment,
             values.search,
@@ -171,7 +172,7 @@ const ConnectedUsers = () => {
             values.createDateRange,
             pageNumber
         );
-    }
+    };
 
     const handlePaginationClick = (pageNumber: number) => {
         setPageNumber(pageNumber);
@@ -203,12 +204,22 @@ const ConnectedUsers = () => {
                 )
             }
             header={
-                connectedUsers &&
-                connectedUsers?.length > 0 && <Header centerTitle={true} position="main" title="All Users" />
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    title={
+                        <ConnectedUsersFilterTitle
+                            filterData={{
+                                environment: form.getValues('environment')!,
+                                status: form.getValues('credentialStatus')!,
+                            }}
+                        />
+                    }
+                />
             }
             leftSidebarBody={
                 <Form {...form}>
-                    <form className="space-y-4 px-4" onSubmit={form.handleSubmit(filterConnectedUsers)}>
+                    <form className="space-y-4 px-4" onSubmit={form.handleSubmit(handleFilterConnectedUsers)}>
                         <FormField
                             control={form.control}
                             name="environment"
@@ -221,7 +232,7 @@ const ConnectedUsers = () => {
                                             onValueChange={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         >
@@ -274,7 +285,7 @@ const ConnectedUsers = () => {
                                             onValueChange={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         >
@@ -315,7 +326,7 @@ const ConnectedUsers = () => {
                                             onChange={(item) => {
                                                 field.onChange(item?.value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />
@@ -338,7 +349,7 @@ const ConnectedUsers = () => {
                                             onSelect={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />
