@@ -13,6 +13,95 @@
   "resources" : null,
   "version" : 1,
   "title" : "VTiger",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "basic_auth",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Enter your username/email.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "username",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Username",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "password",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Access Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "For the instance URL, add the url without the endpoint.",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "instance_url",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : "https://<instance>.od2.vtiger.com",
+        "label" : "VTiger Instance URL",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Basic Auth",
+      "type" : "BASIC_AUTH",
+      "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -178,11 +267,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -341,11 +430,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -539,11 +628,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -662,11 +751,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1108,11 +1197,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -1491,11 +1580,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1507,94 +1596,5 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "basic_auth",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Enter your username/email.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "username",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Username",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "password",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Access Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "For the instance URL, add the url without the endpoint.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "instance_url",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : "https://<instance>.od2.vtiger.com",
-        "label" : "VTiger Instance URL",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Basic Auth",
-      "type" : "BASIC_AUTH",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

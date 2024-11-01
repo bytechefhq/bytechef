@@ -16,6 +16,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Sendgrid",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -287,7 +336,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -546,7 +594,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -837,60 +886,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "dataStream" : null,
+  "unifiedApi" : null
 }

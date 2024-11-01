@@ -73,8 +73,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -2201,10 +2201,10 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2816,10 +2816,10 @@
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null
+    "webhookValidateOnEnable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "unifiedApi" : null

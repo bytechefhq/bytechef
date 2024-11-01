@@ -63,9 +63,9 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "refreshToken" : null,
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -2384,6 +2384,20 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : {
+    "category" : "CRM",
+    "providerAdapters" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ],
+    "providerMappers" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ]
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3266,19 +3280,5 @@
     "workflowNodeDescription" : null,
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
-  } ],
-  "dataStream" : null,
-  "unifiedApi" : {
-    "category" : "CRM",
-    "providerAdapters" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ],
-    "providerMappers" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ]
-  }
+  } ]
 }

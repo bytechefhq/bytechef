@@ -13,6 +13,75 @@
   "resources" : null,
   "version" : 1,
   "title" : "Google Sheets",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -85,11 +154,11 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spreadsheetId" ],
         "options" : { }
-      }
+      },
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "If the first row is header",
@@ -244,8 +313,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -271,11 +340,11 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -394,8 +463,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -421,11 +490,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -585,8 +654,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -645,8 +714,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -672,14 +741,14 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -734,8 +803,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "controlType" : "INTEGER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "INTEGER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -794,8 +863,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -821,14 +890,14 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -933,8 +1002,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -960,8 +1029,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Create Sheet",
     "perform" : { },
@@ -1039,11 +1108,11 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spreadsheetId" ],
         "options" : { }
-      }
+      },
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "The row number to delete",
@@ -1061,8 +1130,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Delete Row",
     "perform" : { },
@@ -1136,8 +1205,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1162,8 +1231,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -1225,8 +1294,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1251,8 +1320,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1367,8 +1436,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     } ],
     "title" : "Find Row by Number",
     "perform" : { },
@@ -1456,8 +1525,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "controlType" : "NUMBER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "NUMBER"
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1482,15 +1551,15 @@
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -1566,8 +1635,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1592,15 +1661,15 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1814,8 +1883,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1840,8 +1909,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -1903,8 +1972,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1929,8 +1998,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2144,8 +2213,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "controlType" : "NUMBER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "NUMBER"
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2170,8 +2239,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -2233,8 +2302,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2259,8 +2328,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2351,8 +2420,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "If the first row is header",
@@ -2398,75 +2467,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "pkce" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -2564,21 +2564,21 @@
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "controlType" : "ARRAY_BUILDER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "ARRAY_BUILDER"
             } ],
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -2669,21 +2669,21 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "ARRAY_BUILDER"
           } ],
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -2762,17 +2762,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null

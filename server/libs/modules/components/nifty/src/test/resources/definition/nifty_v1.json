@@ -66,9 +66,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -76,8 +75,9 @@
       "refreshUrl" : { },
       "scopes" : null,
       "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -231,14 +231,14 @@
               "label" : null,
               "placeholder" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "DATE_TIME"
+              "controlType" : "DATE_TIME",
+              "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -373,14 +373,14 @@
             "label" : null,
             "placeholder" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "DATE_TIME"
+            "controlType" : "DATE_TIME",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -504,18 +504,18 @@
         "label" : "Due Date",
         "placeholder" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "DATE_TIME"
+        "controlType" : "DATE_TIME",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Task",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
-  "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }

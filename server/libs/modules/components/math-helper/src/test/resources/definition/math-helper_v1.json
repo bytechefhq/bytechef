@@ -49,7 +49,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -72,7 +71,8 @@
         "options" : null,
         "controlType" : "NUMBER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -158,7 +158,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -181,7 +180,8 @@
         "options" : null,
         "controlType" : "NUMBER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -267,7 +267,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -290,7 +289,8 @@
         "options" : null,
         "controlType" : "NUMBER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -376,7 +376,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -399,7 +398,8 @@
         "options" : null,
         "controlType" : "NUMBER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -485,7 +485,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -508,7 +507,8 @@
         "options" : null,
         "controlType" : "NUMBER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,

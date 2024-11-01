@@ -63,18 +63,18 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -230,14 +230,14 @@
               "maxValue" : null,
               "minValue" : null,
               "options" : null,
-              "controlType" : "INTEGER",
-              "optionsDataSource" : null
+              "optionsDataSource" : null,
+              "controlType" : "INTEGER"
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -374,14 +374,14 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "controlType" : "INTEGER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "INTEGER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -500,16 +500,16 @@
           "label" : "4",
           "value" : 4
         } ],
-        "controlType" : "SELECT",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "SELECT"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Task",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -548,9 +548,9 @@
       }
     } ],
     "title" : "Mark Task as Completed",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -703,11 +703,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -848,11 +848,11 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -1020,13 +1020,13 @@
         } ],
         "controlType" : "SELECT"
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Project",
-    "perform" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
   "triggers" : [ ],
   "dataStream" : null,
