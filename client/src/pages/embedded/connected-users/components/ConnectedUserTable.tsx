@@ -7,6 +7,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
 import useConnectedUserSheetStore from '@/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {ConnectedUser, CredentialStatus} from '@/shared/middleware/embedded/connected-user';
@@ -26,6 +27,20 @@ interface ConnectedUserTableProps {
     connectedUsers: ConnectedUser[];
 }
 
+const StatusTooltip = ({message, svgClassname}: {message: string; svgClassname: string}) => {
+    return (
+        <Tooltip>
+            <TooltipTrigger>
+                <svg aria-hidden="true" className={twMerge('h-3 w-3', svgClassname)} viewBox="0 0 6 6">
+                    <circle cx={3} cy={3} r={3} />
+                </svg>
+            </TooltipTrigger>
+
+            <TooltipContent>{message}</TooltipContent>
+        </Tooltip>
+    );
+};
+
 const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     const [currentConnectedUserId, setCurrentConnectedUserId] = useState(0);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -40,9 +55,20 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
         () => [
             columnHelper.accessor((row) => row.integrationInstances, {
                 cell: (info) => {
+                    const integrationInstances = info.getValue() ?? [];
+
+                    if (integrationInstances.length === 0) {
+                        return (
+                            <StatusTooltip
+                                message="The connected user does not yet have any used integrations"
+                                svgClassname="fill-secondary"
+                            />
+                        );
+                    }
+
                     let enabled = true;
 
-                    for (const integrationInstance of info.getValue()!) {
+                    for (const integrationInstance of integrationInstances) {
                         if (integrationInstance.credentialStatus === CredentialStatus.Invalid) {
                             enabled = false;
 
@@ -51,13 +77,10 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                     }
 
                     return (
-                        <svg
-                            aria-hidden="true"
-                            className={twMerge('h-3 w-3', twMerge(enabled ? 'fill-success' : 'fill-destructive'))}
-                            viewBox="0 0 6 6"
-                        >
-                            <circle cx={3} cy={3} r={3} />
-                        </svg>
+                        <StatusTooltip
+                            message={enabled ? 'All used connections are valid' : 'Some used connections are invalid'}
+                            svgClassname={enabled ? 'fill-success' : 'fill-destructive'}
+                        />
                     );
                 },
                 header: 'Status',
@@ -197,51 +220,65 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                 <TableBody className="divide-y divide-gray-200 bg-white">
                     {rows.map((row) => (
                         <TableRow className="cursor-pointer" key={row.id}>
-                            {row.getVisibleCells().map((cell) => (
-                                <TableCell
-                                    className={twMerge(
-                                        'whitespace-nowrap',
-                                        !connectedUsers[row.index].enabled && 'text-muted-foreground',
-                                        cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('enabled') && 'flex justify-center w-20',
-                                        cell.id.endsWith('status') && 'pl-8'
-                                    )}
-                                    key={cell.id}
-                                    onClick={(event) => {
-                                        if (cell.id.endsWith('actions')) {
-                                            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                                            const target = event.target as any;
+                            {row.getVisibleCells().map((cell) => {
+                                let width = '';
+                                if (cell.id.endsWith('integrationInstances')) {
+                                    width = '30%';
+                                } else if (cell.id.endsWith('name')) {
+                                    width = '15%';
+                                } else if (cell.id.endsWith('email')) {
+                                    width = '15%';
+                                } else if (cell.id.endsWith('externalId')) {
+                                    width = '15%';
+                                }
 
-                                            if (target.getAttribute('data-action') === 'delete') {
-                                                setCurrentConnectedUserId(
-                                                    connectedUsers[target.getAttribute('data-index')].id!
-                                                );
+                                return (
+                                    <TableCell
+                                        className={twMerge(
+                                            'whitespace-nowrap',
+                                            !connectedUsers[row.index].enabled && 'text-muted-foreground',
+                                            cell.id.endsWith('actions') && 'flex justify-end',
+                                            cell.id.endsWith('enabled') && 'flex justify-center',
+                                            cell.id.endsWith('status') && 'pl-8 '
+                                        )}
+                                        key={cell.id}
+                                        onClick={(event) => {
+                                            if (cell.id.endsWith('actions')) {
+                                                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+                                                const target = event.target as any;
 
-                                                setShowDeleteDialog(true);
-                                            } else if (target.getAttribute('data-action') === 'disable') {
-                                                enableConnectedUserMutation.mutate({
-                                                    enable: false,
-                                                    id: connectedUsers[target.getAttribute('data-index')].id!,
-                                                });
-                                            } else if (target.getAttribute('data-action') === 'enable') {
-                                                enableConnectedUserMutation.mutate({
-                                                    enable: true,
-                                                    id: connectedUsers[target.getAttribute('data-index')].id!,
-                                                });
-                                            } else if (target.getAttribute('data-action') === 'open-sheet') {
-                                                setConnectedUserId(
-                                                    connectedUsers[target.getAttribute('data-index')].id!
-                                                );
-                                                setConnectedUserSheetOpen(true);
+                                                if (target.getAttribute('data-action') === 'delete') {
+                                                    setCurrentConnectedUserId(
+                                                        connectedUsers[target.getAttribute('data-index')].id!
+                                                    );
+
+                                                    setShowDeleteDialog(true);
+                                                } else if (target.getAttribute('data-action') === 'disable') {
+                                                    enableConnectedUserMutation.mutate({
+                                                        enable: false,
+                                                        id: connectedUsers[target.getAttribute('data-index')].id!,
+                                                    });
+                                                } else if (target.getAttribute('data-action') === 'enable') {
+                                                    enableConnectedUserMutation.mutate({
+                                                        enable: true,
+                                                        id: connectedUsers[target.getAttribute('data-index')].id!,
+                                                    });
+                                                } else if (target.getAttribute('data-action') === 'open-sheet') {
+                                                    setConnectedUserId(
+                                                        connectedUsers[target.getAttribute('data-index')].id!
+                                                    );
+                                                    setConnectedUserSheetOpen(true);
+                                                }
+                                            } else {
+                                                handleRowClick(row.index);
                                             }
-                                        } else {
-                                            handleRowClick(row.index);
-                                        }
-                                    }}
-                                >
-                                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                </TableCell>
-                            ))}
+                                        }}
+                                        width={width}
+                                    >
+                                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                    </TableCell>
+                                );
+                            })}
                         </TableRow>
                     ))}
                 </TableBody>
