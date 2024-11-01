@@ -1,17 +1,17 @@
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
-export const enum AppType {
+export const enum ModeType {
     AUTOMATION,
     EMBEDDED,
 }
 
-interface AppTypeI {
-    currentType: AppType | undefined;
-    setCurrentType: (currentType: AppType) => void;
+interface ModeTypeI {
+    currentType: ModeType | undefined;
+    setCurrentType: (currentType: ModeType) => void;
 }
 
-export const useAppTypeStore = create<AppTypeI>()(
+export const useModeTypeStore = create<ModeTypeI>()(
     devtools(
         persist(
             (set) => ({
@@ -22,7 +22,7 @@ export const useAppTypeStore = create<AppTypeI>()(
                     })),
             }),
             {
-                name: 'bytechef.app-type',
+                name: 'bytechef.mode-type',
             }
         )
     )
