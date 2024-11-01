@@ -1,4 +1,4 @@
 README.md
 pom.xml
-src/main/java/com/bytechef/platform/codeworkflow/configuration/automation/public_/web/rest/ApiUtil.java
-src/main/java/com/bytechef/platform/codeworkflow/configuration/automation/public_/web/rest/ProjectCodeWorkflowApi.java
+src/main/java/com/bytechef/automation/configuration/public_/web/rest/ApiUtil.java
+src/main/java/com/bytechef/automation/configuration/public_/web/rest/ProjectApi.java
