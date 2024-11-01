@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.facade;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.ApiKeyService;
@@ -43,7 +43,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    public String create(@NonNull ApiKey apiKey, AppType type) {
+    public String create(@NonNull ApiKey apiKey, ModeType type) {
         User user = userService.getCurrentUser();
 
         apiKey.setType(type);

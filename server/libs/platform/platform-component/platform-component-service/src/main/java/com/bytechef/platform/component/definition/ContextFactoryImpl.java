@@ -21,7 +21,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -56,7 +56,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public ActionContext createActionContext(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type,
         Long instanceId, Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean devEnvironment) {
 
@@ -74,7 +74,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     @Override
     public TriggerContext createTriggerContext(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
         String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment) {
 
         return new TriggerContextImpl(

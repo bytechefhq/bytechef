@@ -19,7 +19,7 @@ package com.bytechef.embedded.user.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.user.web.rest.model.CreateSigningKey200ResponseModel;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.facade.SigningKeyFacade;
 import com.bytechef.platform.user.service.SigningKeyService;
@@ -58,7 +58,7 @@ public class SigningKeyApiController implements SigningKeyApi {
         return ResponseEntity.ok(
             new CreateSigningKey200ResponseModel().privateKey(
                 signingKeyFacade.create(
-                    conversionService.convert(signingKeyModel, SigningKey.class), AppType.EMBEDDED)));
+                    conversionService.convert(signingKeyModel, SigningKey.class), ModeType.EMBEDDED)));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SigningKeyApiController implements SigningKeyApi {
     @Override
     public ResponseEntity<List<SigningKeyModel>> getSigningKeys() {
         return ResponseEntity.ok(
-            CollectionUtils.map(signingKeyService.getSigningKeys(AppType.EMBEDDED), this::getSigningKeyModel));
+            CollectionUtils.map(signingKeyService.getSigningKeys(ModeType.EMBEDDED), this::getSigningKeyModel));
     }
 
     @Override

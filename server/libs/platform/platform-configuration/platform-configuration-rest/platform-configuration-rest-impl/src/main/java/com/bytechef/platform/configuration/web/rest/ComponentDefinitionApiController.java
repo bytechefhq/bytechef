@@ -24,7 +24,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -78,13 +78,13 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
 
     @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        String appType, Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        String modeType, Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
         List<String> include) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(AppType.valueOf(appType)))
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(ModeType.valueOf(modeType)))
             .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unsupported app type: " + appType));
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
 
         return ResponseEntity.ok(
             componentDefinitionService

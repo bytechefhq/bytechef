@@ -18,7 +18,7 @@ package com.bytechef.platform.codeworkflow.configuration.facade;
 
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.util.List;
 
@@ -29,5 +29,5 @@ public interface CodeWorkflowContainerFacade {
 
     CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
-        byte[] bytes, AppType type);
+        byte[] bytes, ModeType type);
 }

@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -44,7 +44,7 @@ class InMemoryDataStorage implements DataStorage {
     }
 
     @Override
-    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.remove(key);
@@ -52,7 +52,7 @@ class InMemoryDataStorage implements DataStorage {
 
     @Override
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
@@ -60,7 +60,7 @@ class InMemoryDataStorage implements DataStorage {
     }
 
     @Override
-    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         return (T) map.get(key);
@@ -68,25 +68,25 @@ class InMemoryDataStorage implements DataStorage {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type) {
+    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
         return (Map<String, T>) getValueMap(componentName, scope, scopeId, type);
     }
 
     @Override
     public void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, AppType type, Object value) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.put(key, value);
     }
 
-    private String getValueKey(String componentName, DataStorageScope scope, String scopeId, AppType type) {
+    private String getValueKey(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
         return workflowReference + "_" + componentName + "_" + scope + "_" + scopeId + "_" + type;
     }
 
     private Map<String, Object> getValueMap(
-        String componentName, DataStorageScope scope, String scopeId, AppType type) {
+        String componentName, DataStorageScope scope, String scopeId, ModeType type) {
 
         return VALUES.get(getValueKey(componentName, scope, scopeId, type), s -> new HashMap<>());
     }

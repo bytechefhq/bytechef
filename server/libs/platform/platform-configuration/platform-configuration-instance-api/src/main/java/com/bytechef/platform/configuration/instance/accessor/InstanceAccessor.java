@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.instance.accessor;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.Map;
 
 /**
@@ -30,7 +30,7 @@ public interface InstanceAccessor {
 
     Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode);
 
-    AppType getType();
+    ModeType getType();
 
     String getWorkflowId(long instanceId, String workflowReferenceCode);
 }

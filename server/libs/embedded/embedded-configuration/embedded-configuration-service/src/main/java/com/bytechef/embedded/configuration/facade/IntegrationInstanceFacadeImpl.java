@@ -35,7 +35,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowSe
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
@@ -168,7 +168,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -196,7 +196,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(

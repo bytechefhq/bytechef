@@ -22,7 +22,7 @@ import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowConta
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -59,7 +59,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     @Override
     public CodeWorkflowContainer create(
         String name, String externalVersion, List<WorkflowDefinition> workflowDefinitions, Language language,
-        byte[] bytes, AppType type) {
+        byte[] bytes, ModeType type) {
 
         try {
             CodeWorkflowContainer codeWorkflowContainer = new CodeWorkflowContainer();
@@ -95,7 +95,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
 
     private ArrayNode toArrayNode(
         String codeWorkflowContainerReference, WorkflowDefinition workflowDefinition,
-        List<? extends TaskDefinition> tasks, AppType type) {
+        List<? extends TaskDefinition> tasks, ModeType type) {
 
         ArrayNode arrayNode = objectMapper.createArrayNode();
 
@@ -120,7 +120,7 @@ public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFac
     }
 
     private String getDefinition(
-        String codeWorkflowContainerReference, WorkflowDefinition workflowDefinition, AppType type) {
+        String codeWorkflowContainerReference, WorkflowDefinition workflowDefinition, ModeType type) {
 
         ObjectNode objectNode = objectMapper.createObjectNode();
 

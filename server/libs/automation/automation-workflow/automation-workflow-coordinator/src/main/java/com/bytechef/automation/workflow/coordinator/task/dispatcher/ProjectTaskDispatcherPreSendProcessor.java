@@ -25,7 +25,7 @@ import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowServ
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -58,7 +58,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectInstanceId = instanceJobService.getJobInstanceId(
-            Validate.notNull(job.getId(), "id"), AppType.AUTOMATION);
+            Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION);
 
         taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId);
 
@@ -74,7 +74,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
 
         taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, projectInstanceWorkflow.getId());
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, AppType.AUTOMATION);
+        taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;
@@ -85,7 +85,7 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long projectInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.AUTOMATION),
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
             null);
 
         return projectInstanceId != null;

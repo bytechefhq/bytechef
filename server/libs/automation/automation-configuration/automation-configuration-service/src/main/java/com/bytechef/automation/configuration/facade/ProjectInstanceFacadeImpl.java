@@ -45,8 +45,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.tag.domain.Tag;
@@ -178,7 +178,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             id, workflowId);
 
         return instanceJobFacade.createJob(
-            new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, AppType.AUTOMATION);
+            new JobParameters(workflowId, projectInstanceWorkflow.getInputs()), id, ModeType.AUTOMATION);
     }
 
     @Override
@@ -192,12 +192,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstanceWorkflow> projectInstanceWorkflows =
             projectInstanceWorkflowService.getProjectInstanceWorkflows(id);
 
-        List<Long> jobIds = instanceJobService.getJobIds(id, AppType.AUTOMATION);
+        List<Long> jobIds = instanceJobService.getJobIds(id, ModeType.AUTOMATION);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            instanceJobService.deleteInstanceJobs(jobId, AppType.AUTOMATION);
+            instanceJobService.deleteInstanceJobs(jobId, ModeType.AUTOMATION);
 
             jobFacade.deleteJob(jobId);
         }
@@ -421,7 +421,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
+                ModeType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
                 projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -447,7 +447,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             }
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
+                ModeType.AUTOMATION, projectInstanceWorkflow.getProjectInstanceId(),
                 projectWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -489,7 +489,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
         return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(projectInstanceId, AppType.AUTOMATION), this::getJobEndDate, null);
+            instanceJobService.fetchLastJobId(projectInstanceId, ModeType.AUTOMATION), this::getJobEndDate, null);
     }
 
     private List<ProjectInstanceDTO> getProjectInstances(
@@ -565,7 +565,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
                 return getWebhookUrl(
                     WorkflowExecutionId.of(
-                        AppType.AUTOMATION, projectInstanceId, projectWorkflow.getWorkflowReferenceCode(),
+                        ModeType.AUTOMATION, projectInstanceId, projectWorkflow.getWorkflowReferenceCode(),
                         workflowTrigger.getName()));
             }
         }

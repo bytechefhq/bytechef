@@ -37,8 +37,8 @@ import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -126,7 +126,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
                     workflowId);
 
                 WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                    AppType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getWorkflowReferenceCode(),
+                    ModeType.EMBEDDED, integrationInstance.getId(), integrationWorkflow.getWorkflowReferenceCode(),
                     appEventTriggerName);
 
                 try {

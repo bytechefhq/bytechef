@@ -44,8 +44,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.exception.PlatformException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.registry.domain.BaseProperty;
@@ -192,7 +192,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
 
         return instanceJobFacade.createJob(
-            new JobParameters(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, AppType.EMBEDDED);
+            new JobParameters(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, ModeType.EMBEDDED);
     }
 
     @Override
@@ -207,12 +207,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(id);
 
-        List<Long> jobIds = instanceJobService.getJobIds(id, AppType.EMBEDDED);
+        List<Long> jobIds = instanceJobService.getJobIds(id, ModeType.EMBEDDED);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            instanceJobService.deleteInstanceJobs(jobId, AppType.EMBEDDED);
+            instanceJobService.deleteInstanceJobs(jobId, ModeType.EMBEDDED);
 
             jobFacade.deleteJob(jobId);
         }
@@ -451,7 +451,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         long integrationInstanceConfigurationId) {
 
         return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(integrationInstanceConfigurationId, AppType.EMBEDDED),
+            instanceJobService.fetchLastJobId(integrationInstanceConfigurationId, ModeType.EMBEDDED),
             this::getJobEndDate, null);
     }
 

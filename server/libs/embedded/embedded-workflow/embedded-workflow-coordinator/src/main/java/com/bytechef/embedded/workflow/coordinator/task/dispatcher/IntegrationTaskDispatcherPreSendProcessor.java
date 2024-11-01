@@ -33,7 +33,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowSe
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -77,7 +77,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = instanceJobService.getJobInstanceId(
-            Validate.notNull(job.getId(), "id"), AppType.EMBEDDED);
+            Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED);
 
         taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, integrationInstanceId);
 
@@ -124,7 +124,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
 
         taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, integrationInstanceWorkflow.getId());
 
-        taskExecution.putMetadata(MetadataConstants.TYPE, AppType.EMBEDDED);
+        taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.EMBEDDED);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
         return taskExecution;
@@ -135,7 +135,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), AppType.EMBEDDED), null);
+            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED), null);
 
         return integrationInstanceId != null;
     }

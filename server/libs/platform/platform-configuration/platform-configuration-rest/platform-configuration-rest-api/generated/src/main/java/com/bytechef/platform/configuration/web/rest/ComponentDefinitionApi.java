@@ -67,7 +67,7 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions/{componentName}",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<ComponentDefinitionModel> getComponentDefinition(
         @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component to get. If not set, teh latest version is returned.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentVersion", required = false) Integer componentVersion
@@ -109,7 +109,7 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions/{componentName}/versions",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitionVersions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName
     ) {
@@ -131,7 +131,7 @@ public interface ComponentDefinitionApi {
      * GET /component-definitions : Get all component definitions
      * Get all component definitions.
      *
-     * @param appType The application mode. (required)
+     * @param modeType The application mode. (required)
      * @param actionDefinitions Use for filtering components which define action definitions. (optional)
      * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
      * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
@@ -154,9 +154,9 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        @NotNull @Parameter(name = "appType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "appType", required = true) String appType,
+        @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) String modeType,
         @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,
@@ -199,7 +199,7 @@ public interface ComponentDefinitionApi {
         value = "/data-streams/{componentType}/component-definitions",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(
         @Parameter(name = "componentType", description = "The name of a component type.", required = true, in = ParameterIn.PATH) @PathVariable("componentType") String componentType
     ) {
@@ -240,7 +240,7 @@ public interface ComponentDefinitionApi {
         value = "/unified-api/{category}/component-definitions",
         produces = { "application/json" }
     )
-    
+
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getUnifiedApiComponentDefinitions(
         @Parameter(name = "category", description = "The name of a unified API category.", required = true, in = ParameterIn.PATH) @PathVariable("category") UnifiedApiCategoryModel category
     ) {

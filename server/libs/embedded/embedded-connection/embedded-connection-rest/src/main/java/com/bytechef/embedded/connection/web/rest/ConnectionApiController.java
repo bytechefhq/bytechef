@@ -24,7 +24,7 @@ import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -56,7 +56,7 @@ public class ConnectionApiController implements ConnectionApi {
         return ResponseEntity.ok(
             toConnectionModel(
                 connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class), AppType.EMBEDDED)));
+                    conversionService.convert(connectionModel, ConnectionDTO.class), ModeType.EMBEDDED)));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class ConnectionApiController implements ConnectionApi {
                 .getConnections(
                     componentName, connectionVersion,
                     environment == null ? null : ConnectionEnvironment.valueOf(environment.name()),
-                    tagId, AppType.EMBEDDED)
+                    tagId, ModeType.EMBEDDED)
                 .stream()
                 .map(this::toConnectionModel)
                 .toList());

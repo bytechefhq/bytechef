@@ -25,7 +25,7 @@ import com.bytechef.platform.component.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.util.List;
 import java.util.Map;
@@ -64,7 +64,7 @@ public class ActionDefinitionFacadeIntTest {
             contextFactory, actionDefinitionService, tokenRefreshHelper);
 
         Object result = actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), ModeType.AUTOMATION, 1000L, 1000L, 1000L,
             "123456789", Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v3"), Map.of(), Map.of(), false);
 
         Assertions.assertNotNull(result);
@@ -75,7 +75,7 @@ public class ActionDefinitionFacadeIntTest {
         Assertions.assertFalse(results.isEmpty());
 
         Http.Response response = (Http.Response) actionDefinitionFacade.executePerform(
-            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), AppType.AUTOMATION, 1000L, 1000L, 1000L,
+            "httpClient", 1, HttpClientGetAction.ACTION_DEFINITION.getName(), ModeType.AUTOMATION, 1000L, 1000L, 1000L,
             "123456789", Map.of("uri", "https://api.hnb.hr/o/tecajn-eur/v2", "fullResponse", "true"), Map.of(),
             Map.of(), false);
 

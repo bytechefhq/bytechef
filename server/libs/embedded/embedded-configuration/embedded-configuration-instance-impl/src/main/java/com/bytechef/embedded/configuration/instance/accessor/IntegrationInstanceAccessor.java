@@ -21,7 +21,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Component;
@@ -76,8 +76,8 @@ public class IntegrationInstanceAccessor implements InstanceAccessor {
     }
 
     @Override
-    public AppType getType() {
-        return AppType.EMBEDDED;
+    public ModeType getType() {
+        return ModeType.EMBEDDED;
     }
 
     @Override

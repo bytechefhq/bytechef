@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.data.storage.db.remote.client.service;
 
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.jdbc.service.JdbcDataStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +34,7 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     }
 
     @Override
-    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         loadBalancedRestClient.delete(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -45,26 +45,26 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
 
     @Override
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
 
         return fetchValue(componentName, scope, scopeId, key, type);
     }
 
     @Override
-    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         Optional<T> valueOptional = fetchValue(componentName, scope, scopeId, key, type);
 
         return valueOptional.orElseThrow();
     }
 
     @Override
-    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, AppType type) {
+    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void
-        put(String componentName, DataStorageScope scope, String scopeId, String key, AppType type, Object value) {
+        put(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
         loadBalancedRestClient.put(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
@@ -75,7 +75,7 @@ public class RemoteJdbcDataStorageServiceClient implements JdbcDataStorageServic
     }
 
     private <T> Optional<T>
-        fetchValue(String componentName, DataStorageScope scope, String scopeId, String key, AppType type) {
+        fetchValue(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
         return Optional.ofNullable(loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
