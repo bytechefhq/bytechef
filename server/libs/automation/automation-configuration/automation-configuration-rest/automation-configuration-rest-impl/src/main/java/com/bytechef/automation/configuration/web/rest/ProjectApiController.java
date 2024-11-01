@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.automation.configuration.web.rest.ProjectApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
 @ConditionalOnCoordinator
 public class ProjectApiController implements ProjectApi {

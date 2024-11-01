@@ -1,20 +1,20 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Automation Public API"
+  title: "The Automation Configuration Public V1 API"
   version: "1"
 servers:
 - url: "/api/automation/v1"
 tags:
-  - name: "project-code-workflow"
-    description: "The Automation Project Code-Based Public API"
+  - name: "project"
+    description: "The Automation Project Public API"
 paths:
   /projects/deploy:
     post:
       description: "Deploy a new code based project."
       summary: "Deploy a new code based project"
       tags:
-        - "project-code-workflow"
+        - "project"
       operationId: "deployProject"
       requestBody:
         content:

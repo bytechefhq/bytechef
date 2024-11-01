@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.codeworkflow.public_.web.rest;
+package com.bytechef.automation.configuration.public_.web.rest;
 
 import com.bytechef.automation.configuration.codeworkflow.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
@@ -29,14 +29,14 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * @author Ivica Cardic
  */
-@RestController
+@RestController("com.bytechef.automation.configuration.public_.web.rest.ProjectApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/v1")
-public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi {
+public class ProjectApiController implements ProjectApi {
 
     private final ProjectCodeWorkflowFacade projectCodeWorkflowFacade;
 
     @SuppressFBWarnings("EI")
-    public ProjectCodeWorkflowApiController(ProjectCodeWorkflowFacade projectCodeWorkflowFacade) {
+    public ProjectApiController(ProjectCodeWorkflowFacade projectCodeWorkflowFacade) {
 
         this.projectCodeWorkflowFacade = projectCodeWorkflowFacade;
     }
