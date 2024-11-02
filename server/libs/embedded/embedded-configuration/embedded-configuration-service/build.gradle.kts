@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))

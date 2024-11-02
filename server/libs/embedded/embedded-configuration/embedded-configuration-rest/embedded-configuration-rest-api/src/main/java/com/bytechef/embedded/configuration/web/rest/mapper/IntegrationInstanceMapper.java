@@ -37,7 +37,6 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceBasicModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         IntegrationInstanceBasicModel convert(IntegrationInstance integrationInstanc);
     }
@@ -47,9 +46,9 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "integrationInstanceConfiguration", ignore = true)
+        @Mapping(target = "integrationInstanceWorkflows", ignore = true)
         IntegrationInstanceModel convert(IntegrationInstance integrationInstance);
 
         @InheritInverseConfiguration
@@ -62,8 +61,6 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceBasicModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
-        @Mapping(target = "lastExecutionDate", ignore = true)
         IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstance);
     }
 
@@ -72,9 +69,6 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstanceDTO, IntegrationInstanceModel> {
 
         @Override
-        @Mapping(target = "environment", ignore = true)
-        @Mapping(target = "lastExecutionDate", ignore = true)
-        @Mapping(target = "integrationInstanceConfiguration", ignore = true)
         IntegrationInstanceModel convert(IntegrationInstanceDTO integrationInstance);
     }
 }

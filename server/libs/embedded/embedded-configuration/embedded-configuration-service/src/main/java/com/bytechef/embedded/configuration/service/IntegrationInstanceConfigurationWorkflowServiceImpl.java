@@ -70,10 +70,19 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
     }
 
     @Override
-    public void deleteIntegrationInstanceConfigurationWorkflows(long integrationInstanceConfigurationId) {
-        integrationInstanceConfigurationWorkflowRepository.deleteAll(
+    public void deleteIntegrationInstanceConfigurationWorkflows(
+        long integrationInstanceConfigurationId, List<Long> exclude) {
+
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowRepository.findAllByIntegrationInstanceConfigurationId(
-                integrationInstanceConfigurationId));
+                integrationInstanceConfigurationId);
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
+
+            if (!exclude.contains(integrationInstanceConfigurationWorkflow.getId())) {
+                delete(integrationInstanceConfigurationWorkflow.getId());
+            }
+        }
     }
 
     @Override

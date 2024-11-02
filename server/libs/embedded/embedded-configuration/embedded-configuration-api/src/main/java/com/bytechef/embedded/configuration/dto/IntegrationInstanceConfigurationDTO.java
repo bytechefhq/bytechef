@@ -33,24 +33,23 @@ import java.util.Map;
 public record IntegrationInstanceConfigurationDTO(
     Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
     Map<String, ?> connectionParameters, String createdBy, LocalDateTime createdDate, String description,
-    boolean enabled, Environment environment, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Integration integration, long integrationId, Integer integrationVersion,
-    String name, List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows,
-    List<Tag> tags, int version) {
+    boolean enabled, Environment environment, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    Integration integration, long integrationId, Integer integrationVersion, String name,
+    List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
+    int version) {
 
     public IntegrationInstanceConfigurationDTO(
         Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
         IntegrationInstanceConfiguration integrationInstanceConfiguration,
         List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceWorkflows, Integration integration,
-        LocalDateTime lastExecutionDate, List<Tag> tags) {
+        List<Tag> tags) {
 
         this(
             connectionAuthorizationParameters, connectionConnectionParameters,
             integrationInstanceConfiguration.getConnectionParameters(), integrationInstanceConfiguration.getCreatedBy(),
             integrationInstanceConfiguration.getCreatedDate(), integrationInstanceConfiguration.getDescription(),
             integrationInstanceConfiguration.isEnabled(), integrationInstanceConfiguration.getEnvironment(),
-            integrationInstanceConfiguration.getId(), lastExecutionDate,
-            integrationInstanceConfiguration.getLastModifiedBy(),
+            integrationInstanceConfiguration.getId(), integrationInstanceConfiguration.getLastModifiedBy(),
             integrationInstanceConfiguration.getLastModifiedDate(), integration,
             integrationInstanceConfiguration.getIntegrationId(),
             integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
@@ -86,7 +85,6 @@ public record IntegrationInstanceConfigurationDTO(
         private boolean enabled;
         private Environment environment;
         private Long id;
-        private LocalDateTime lastExecutionDate;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
         private Integration integration;
@@ -138,12 +136,6 @@ public record IntegrationInstanceConfigurationDTO(
 
         public Builder id(Long id) {
             this.id = id;
-
-            return this;
-        }
-
-        public Builder lastExecutionDate(LocalDateTime lastExecutionDate) {
-            this.lastExecutionDate = lastExecutionDate;
 
             return this;
         }
@@ -207,7 +199,7 @@ public record IntegrationInstanceConfigurationDTO(
         public IntegrationInstanceConfigurationDTO build() {
             return new IntegrationInstanceConfigurationDTO(
                 Map.of(), Map.of(), connectionParameters, createdBy, createdDate, description, enabled, environment, id,
-                lastExecutionDate, lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion,
+                lastModifiedBy, lastModifiedDate, integration, integrationId, integrationVersion,
                 name, integrationInstanceConfigurationWorkflows, tags, version);
         }
     }

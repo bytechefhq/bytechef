@@ -27,5 +27,10 @@ public interface IntegrationInstanceFacade {
 
     void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable);
 
+    void enableIntegrationInstanceWorkflowTriggers(long integrationInstanceId, boolean enable);
+
+    long enableIntegrationInstanceWorkflowTriggers(
+        long integrationInstanceId, String workflowId, boolean enable);
+
     IntegrationInstanceDTO getIntegrationInstance(long id);
 }

@@ -26,17 +26,23 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
+import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
@@ -74,6 +80,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationInstanceConfigurationFacade {
 
+    private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final InstanceJobFacade instanceJobFacade;
@@ -82,6 +89,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final JobService jobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
+    private final IntegrationInstanceFacade integrationInstanceFacade;
+    private final IntegrationInstanceService integrationInstanceService;
+    private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final OAuth2Service oAuth2Service;
@@ -92,13 +102,17 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
-        ConnectionService connectionService, ConnectionDefinitionService connectionDefinitionService,
-        InstanceJobFacade instanceJobFacade, InstanceJobService instanceJobService, JobFacade jobFacade,
+        ConnectedUserService connectedUserService, ConnectionService connectionService,
+        ConnectionDefinitionService connectionDefinitionService, InstanceJobFacade instanceJobFacade,
+        InstanceJobService instanceJobService, JobFacade jobFacade,
         JobService jobService, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        OAuth2Service oAuth2Service, TagService tagService, TriggerExecutionService triggerExecutionService,
-        WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
+        IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
+        IntegrationWorkflowService integrationWorkflowService, OAuth2Service oAuth2Service, TagService tagService,
+        TriggerExecutionService triggerExecutionService, WorkflowConnectionFacade workflowConnectionFacade,
+        WorkflowService workflowService) {
+        this.connectedUserService = connectedUserService;
 
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
@@ -108,6 +122,9 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.jobService = jobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
+        this.integrationInstanceFacade = integrationInstanceFacade;
+        this.integrationInstanceService = integrationInstanceService;
+        this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationService = integrationService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.oAuth2Service = oAuth2Service;
@@ -231,6 +248,23 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     public void enableIntegrationInstanceConfiguration(long integrationInstanceConfigurationId, boolean enable) {
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
+            integrationInstanceConfigurationId);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            if (integrationInstance.isEnabled()) {
+                ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                    integrationInstance.getConnectedUserId());
+
+                if (!connectedUser.isEnabled()) {
+                    continue;
+                }
+
+                integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(
+                    integrationInstance.getId(), enable);
+            }
+        }
+
         integrationInstanceConfigurationService.updateEnabled(integrationInstanceConfigurationId, enable);
     }
 
@@ -243,6 +277,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationId, workflowId);
 
         if (enable) {
+            Integration integration = integrationService.getIntegrationInstanceConfigurationIntegration(
+                integrationInstanceConfigurationId);
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
             List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
@@ -259,12 +295,39 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                     .filter(WorkflowConnection::required)
                     .toList());
 
-            if ((requiredWorkflowConnections.size() - 1) != integrationInstanceConfigurationWorkflow
-                .getConnectionsCount()) {
+            requiredWorkflowConnections = requiredWorkflowConnections.stream()
+                .filter(workflowConnection -> !Objects.equals(workflowConnection.componentName(),
+                    integration.getComponentName()))
+                .toList();
 
+            int connectionsCount = integrationInstanceConfigurationWorkflow.getConnectionsCount();
+
+            if (!requiredWorkflowConnections.isEmpty() && requiredWorkflowConnections.size() != connectionsCount) {
                 throw new PlatformException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+            }
+        }
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
+            integrationInstanceConfigurationId);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+                integrationInstance.getConnectedUserId());
+
+            if (!connectedUser.isEnabled()) {
+                continue;
+            }
+
+            boolean enabled = integrationInstanceWorkflowService
+                .fetchIntegrationInstanceWorkflow(integrationInstance.getId(), workflowId)
+                .map(IntegrationInstanceWorkflow::isEnabled)
+                .orElse(false);
+
+            if (enabled) {
+                integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(
+                    integrationInstance.getId(), workflowId, enable);
             }
         }
 
@@ -358,14 +421,19 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         integrationInstanceConfiguration = integrationInstanceConfigurationService.update(
             integrationInstanceConfiguration);
 
-        integrationInstanceConfigurationWorkflowService.deleteIntegrationInstanceConfigurationWorkflows(
-            integrationInstanceConfiguration.getId());
-
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             createIntegrationInstanceConfigurationWorkflows(
                 integrationInstanceConfiguration, CollectionUtils.map(
                     integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
                     IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
+
+        updateIntegrationInstanceWorkflows(integrationInstanceConfiguration, integrationInstanceConfigurationWorkflows);
+
+        integrationInstanceConfigurationWorkflowService.deleteIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceConfiguration.getId(),
+            integrationInstanceConfigurationWorkflows.stream()
+                .map(IntegrationInstanceConfigurationWorkflow::getId)
+                .toList());
 
         List<IntegrationWorkflow> integrationWorkflows = getIntegrationWorkflows(integrationInstanceConfigurationDTO);
 
@@ -447,14 +515,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private LocalDateTime getIntegrationInstanceConfigurationLastExecutionDate(
-        long integrationInstanceConfigurationId) {
-
-        return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(integrationInstanceConfigurationId, ModeType.EMBEDDED),
-            this::getJobEndDate, null);
-    }
-
     @SuppressFBWarnings("NP")
     private List<IntegrationWorkflow> getIntegrationWorkflows(
         IntegrationInstanceConfiguration integrationInstanceConfiguration) {
@@ -485,12 +545,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 .map(IntegrationInstanceConfiguration::getIntegrationId)
                 .filter(Objects::nonNull)
                 .toList());
-    }
-
-    private LocalDateTime getJobEndDate(Long jobId) {
-        Job job = jobService.getJob(jobId);
-
-        return job.getEndDate();
     }
 
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
@@ -581,9 +635,57 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         integrationInstanceConfigurationWorkflow.getWorkflowId(),
                         integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),
             integration,
-            getIntegrationInstanceConfigurationLastExecutionDate(
-                Validate.notNull(integrationInstanceConfiguration.getId(), "id")),
             tags);
+    }
+
+    private void updateIntegrationInstanceWorkflows(
+        IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
+            integrationInstanceConfiguration.getId());
+
+        List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService
+                .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfiguration.getId());
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
+                .getIntegrationInstanceWorkflows(integrationInstance.getId());
+
+            for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflows) {
+                IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow =
+                    oldIntegrationInstanceConfigurationWorkflows.stream()
+                        .filter(curIntegrationInstanceConfigurationWorkflow -> Objects.equals(
+                            curIntegrationInstanceConfigurationWorkflow.getId(),
+                            integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(
+                            "IntegrationInstanceConfigurationWorkflow not found"));
+
+                IntegrationWorkflow oldIntegrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
+                    oldIntegrationInstanceConfigurationWorkflow.getWorkflowId());
+
+                IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                    integrationInstanceConfigurationWorkflows.stream()
+                        .filter(curIntegrationInstanceConfigurationWorkflow -> {
+                            IntegrationWorkflow integrationWorkflow = integrationWorkflowService
+                                .getWorkflowIntegrationWorkflow(
+                                    curIntegrationInstanceConfigurationWorkflow.getWorkflowId());
+                            return Objects.equals(
+                                integrationWorkflow.getWorkflowReferenceCode(),
+                                oldIntegrationWorkflow.getWorkflowReferenceCode());
+                        })
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(
+                            "IntegrationInstanceConfigurationWorkflow not found"));
+
+                integrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
+                    integrationInstanceConfigurationWorkflow.getId());
+
+                integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
+            }
+        }
     }
 
     private void validateConnections(
