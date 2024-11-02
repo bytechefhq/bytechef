@@ -84,22 +84,12 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <span className="mr-2 text-base font-semibold">{apiCollection.name}</span>
-
-                                            <Badge className="flex space-x-1" variant="secondary">
-                                                <span>V{apiCollection.collectionVersion}</span>
-                                            </Badge>
                                         </TooltipTrigger>
 
                                         <TooltipContent>{apiCollection.description}</TooltipContent>
                                     </Tooltip>
                                 ) : (
-                                    <div className="flex">
-                                        <span className="mr-2 text-base font-semibold">{apiCollection.name}</span>
-
-                                        <Badge className="flex space-x-1" variant="secondary">
-                                            <span>V{apiCollection.collectionVersion}</span>
-                                        </Badge>
-                                    </div>
+                                    <span className="mr-2 text-base font-semibold">{apiCollection.name}</span>
                                 )}
                             </div>
                         </div>
@@ -137,7 +127,13 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
+                        <Badge className="flex space-x-1" variant="secondary">
+                            <span>V{apiCollection.collectionVersion}</span>
+                        </Badge>
+
+                        <Badge variant="secondary">{apiCollection.projectInstance?.environment}</Badge>
+
+                        <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />
 
                             <Tooltip>

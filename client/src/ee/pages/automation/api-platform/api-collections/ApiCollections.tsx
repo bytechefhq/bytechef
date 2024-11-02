@@ -12,7 +12,7 @@ import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ApiCollectionList from './components/ApiCollectionList';
@@ -25,10 +25,21 @@ export enum Type {
 const ApiCollections = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(getEnvironment());
-    const [filterData, setFilterData] = useState<{id?: number; type: Type}>(getFilterData());
+    const [environment, setEnvironment] = useState<number | undefined>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
+    );
 
     const {currentWorkspaceId} = useWorkspaceStore();
+
+    const filterData =
+        searchParams.get('projectId') || searchParams.get('tagId')
+            ? {
+                  id: searchParams.get('projectId')
+                      ? parseInt(searchParams.get('projectId')!)
+                      : parseInt(searchParams.get('tagId')!),
+                  type: searchParams.get('tagId') ? Type.Tag : Type.Project,
+              }
+            : {type: Type.Project};
 
     const {
         data: projects,
@@ -44,35 +55,14 @@ const ApiCollections = () => {
         error: apiCollectionsError,
         isLoading: apiCollectionsIsLoading,
     } = useGetApiCollectionsQuery({
-        environment: environment === 1 ? Environment.Test : Environment.Production,
+        environment:
+            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
-
-    function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
-    }
-
-    function getFilterData() {
-        return searchParams.get('projectId') || searchParams.get('tagId')
-            ? {
-                  id: searchParams.get('projectId')
-                      ? parseInt(searchParams.get('projectId')!)
-                      : parseInt(searchParams.get('tagId')!),
-                  type: searchParams.get('tagId') ? Type.Tag : Type.Project,
-              }
-            : {type: Type.Project};
-    }
-
-    useEffect(() => {
-        setEnvironment(getEnvironment());
-        setFilterData(getFilterData());
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchParams]);
 
     return (
         <LayoutContainer
@@ -100,6 +90,7 @@ const ApiCollections = () => {
                         body={
                             <>
                                 {[
+                                    {label: 'All Environments'},
                                     {label: 'Test', value: 1},
                                     {label: 'Production', value: 2},
                                 ]?.map((item) => (
@@ -128,12 +119,6 @@ const ApiCollections = () => {
                                     item={{
                                         current: !filterData?.id && filterData.type === Type.Project,
                                         name: 'All Projects',
-                                        onItemClick: (id?: number | string) => {
-                                            setFilterData({
-                                                id: id as number,
-                                                type: Type.Project,
-                                            });
-                                        },
                                     }}
                                     toLink={`?environment=${environment ?? ''}`}
                                 />
@@ -145,12 +130,6 @@ const ApiCollections = () => {
                                                 current: filterData?.id === item.id && filterData.type === Type.Project,
                                                 id: item.id,
                                                 name: item.name,
-                                                onItemClick: (id?: number | string) => {
-                                                    setFilterData({
-                                                        id: id as number,
-                                                        type: Type.Project,
-                                                    });
-                                                },
                                             }}
                                             key={item.name}
                                             toLink={`?projectId=${item.id}&environment=${environment ?? ''}`}
@@ -173,12 +152,6 @@ const ApiCollections = () => {
                                                     current: filterData?.id === item.id && filterData.type === Type.Tag,
                                                     id: item.id!,
                                                     name: item.name,
-                                                    onItemClick: (id?: number | string) => {
-                                                        setFilterData({
-                                                            id: id as number,
-                                                            type: Type.Tag,
-                                                        });
-                                                    },
                                                 }}
                                                 key={item.id}
                                                 toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
