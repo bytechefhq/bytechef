@@ -19,6 +19,7 @@ package com.bytechef.embedded.configuration.config;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -73,6 +74,9 @@ public class IntegrationIntTestConfiguration {
 
     @MockBean
     private ConnectionService connectionService;
+
+    @MockBean
+    private ConnectedUserService connectedUserService;
 
     @MockBean
     private InstanceJobFacade instanceJobFacade;
