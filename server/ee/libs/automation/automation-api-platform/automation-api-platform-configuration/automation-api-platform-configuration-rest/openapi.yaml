@@ -276,6 +276,7 @@ components:
       description: "An API collection."
       required:
         - "enabled"
+        - "environment"
         - "name"
         - "projectId"
         - "projectVersion"
@@ -326,11 +327,15 @@ components:
           description: "The id of a project the API collection is connected to."
           type: "integer"
           format: "int64"
+        project:
+          $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
         projectInstanceId:
           description: "The id of an project instance the API collection is connected to."
           type: "integer"
           format: "int64"
           readOnly: true
+        projectInstance:
+          $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
         projectVersion:
           description: "The version of a project the API collection is connected to."
           type: "integer"
