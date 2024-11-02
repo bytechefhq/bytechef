@@ -8,9 +8,9 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectedUserSheet from '@/pages/embedded/connected-users/components/ConnectedUserSheet';
 import ConnectedUserTable from '@/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
+import ConnectedUserSheet from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
