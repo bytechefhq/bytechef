@@ -395,6 +395,7 @@ include("server:ee:libs:core:remote:remote-rest")
 
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client")
 include("server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest")
+include("server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client")
 
 include("server:ee:libs:platform:platform-component:platform-component-remote-client")
 include("server:ee:libs:platform:platform-component:platform-component-remote-rest")

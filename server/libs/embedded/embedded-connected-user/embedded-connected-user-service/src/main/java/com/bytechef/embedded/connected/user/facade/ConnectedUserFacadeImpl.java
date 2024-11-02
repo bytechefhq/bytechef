@@ -20,6 +20,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
@@ -49,6 +50,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     private final ConnectionService connectionService;
     private final ConnectedUserService connectedUserService;
+    private final IntegrationInstanceFacade integrationInstanceFacade;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationService integrationService;
@@ -56,15 +58,31 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     @SuppressFBWarnings("EI")
     public ConnectedUserFacadeImpl(
         ConnectionService connectionService, ConnectedUserService connectedUserService,
-        IntegrationInstanceService integrationInstanceService,
+        IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationService integrationService) {
 
         this.connectionService = connectionService;
         this.connectedUserService = connectedUserService;
+        this.integrationInstanceFacade = integrationInstanceFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
+    }
+
+    @Override
+    public void enableConnectedUser(long id, boolean enable) {
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(id);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            if (integrationInstance.isEnabled()) {
+                integrationInstanceFacade.enableIntegrationInstanceWorkflowTriggers(
+                    integrationInstance.getId(), enable);
+            }
+        }
+
+        connectedUserService.enableConnectedUser(id, enable);
     }
 
     @Override
@@ -133,10 +151,11 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
                     return new ConnectedUserDTO.IntegrationInstance(
                         getComponentName(integrationInstance, integrationInstanceConfigurations, integrations),
+                        connection.getCredentialStatus(), integrationInstance.isEnabled(),
                         Validate.notNull(integrationInstance.getId(), "id"),
-                        integrationInstanceConfiguration.getIntegrationId(),
-                        integrationInstanceConfiguration.getIntegrationVersion(), integrationInstance.getConnectionId(),
-                        connection.getCredentialStatus(), integrationInstance.isEnabled());
+                        integrationInstanceConfiguration.getIntegrationId(), integrationInstanceConfiguration.getId(),
+                        integrationInstanceConfiguration.getIntegrationVersion(),
+                        integrationInstance.getConnectionId());
                 }));
     }
 

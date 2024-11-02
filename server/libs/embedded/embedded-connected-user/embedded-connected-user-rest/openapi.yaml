@@ -156,6 +156,8 @@ components:
         enabled:
           description: "If a connected user is enabled or not"
           type: "boolean"
+        environment:
+          $ref: "#/components/schemas/Environment"
         externalId:
           description: "The connected user external id."
           type: "string"
@@ -204,6 +206,11 @@ components:
           readOnly: true
         integrationId:
           description: "The id of an integration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        integrationInstanceConfigurationId:
+          description: "The id of an integration instance configuration."
           type: "integer"
           format: "int64"
           readOnly: true
