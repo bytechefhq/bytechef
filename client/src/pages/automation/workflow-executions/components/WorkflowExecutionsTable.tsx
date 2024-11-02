@@ -32,8 +32,12 @@ const columns = [
         header: 'Project',
     }),
     columnHelper.accessor('projectInstance', {
-        cell: (info) => `${info.getValue()?.name} V${info.getValue()?.projectVersion}`,
+        cell: (info) => `${info.getValue()?.name}`,
         header: 'Instance',
+    }),
+    columnHelper.accessor('projectInstance', {
+        cell: (info) => `V${info.getValue()?.projectVersion}`,
+        header: 'Version',
     }),
     columnHelper.accessor('projectInstance', {
         cell: (info) => info.getValue()?.environment,
