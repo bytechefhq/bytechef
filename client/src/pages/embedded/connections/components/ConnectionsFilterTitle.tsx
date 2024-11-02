@@ -12,7 +12,7 @@ const ConnectionsFilterTitle = ({
     tags,
 }: {
     componentDefinitions: ComponentDefinitionBasic[] | undefined;
-    environment: number;
+    environment?: number;
     filterData: {id: string | number | null | undefined; type: Type};
     tags: Tag[] | undefined;
 }) => {
@@ -34,7 +34,13 @@ const ConnectionsFilterTitle = ({
 
             <Badge variant="secondary">
                 <span className="text-sm">
-                    {environment === 1 ? 'Development' : environment === 2 ? 'Test' : 'Production'}
+                    {environment === undefined
+                        ? 'All Environments'
+                        : environment === 1
+                          ? 'Development'
+                          : environment === 2
+                            ? 'Test'
+                            : 'Production'}
                 </span>
             </Badge>
 

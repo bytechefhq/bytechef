@@ -28,8 +28,8 @@ export enum Type {
 export const Connections = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1
+    const [environment, setEnvironment] = useState<number | undefined>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
     );
 
     const componentName = searchParams.get('componentName');
@@ -60,11 +60,13 @@ export const Connections = () => {
     } = useGetConnectionsQuery({
         componentName: searchParams.get('componentName') ? searchParams.get('componentName')! : undefined,
         environment:
-            environment === 1
-                ? ConnectionEnvironment.Development
-                : environment === 2
-                  ? ConnectionEnvironment.Test
-                  : ConnectionEnvironment.Production,
+            environment === undefined
+                ? undefined
+                : environment === 1
+                  ? ConnectionEnvironment.Development
+                  : environment === 2
+                    ? ConnectionEnvironment.Test
+                    : ConnectionEnvironment.Production,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
@@ -83,11 +85,13 @@ export const Connections = () => {
                                 connection={
                                     {
                                         environment:
-                                            environment === 1
-                                                ? ConnectionEnvironment.Development
-                                                : environment === 2
-                                                  ? ConnectionEnvironment.Test
-                                                  : ConnectionEnvironment.Production,
+                                            environment === undefined
+                                                ? undefined
+                                                : environment === 1
+                                                  ? ConnectionEnvironment.Development
+                                                  : environment === 2
+                                                    ? ConnectionEnvironment.Test
+                                                    : ConnectionEnvironment.Production,
                                     } as Connection
                                 }
                                 connectionTagsQueryKey={ConnectionKeys.connectionTags}
@@ -114,6 +118,7 @@ export const Connections = () => {
                         body={
                             <>
                                 {[
+                                    {label: 'All Environments'},
                                     {label: 'Development', value: 1},
                                     {label: 'Test', value: 2},
                                     {label: 'Production', value: 3},

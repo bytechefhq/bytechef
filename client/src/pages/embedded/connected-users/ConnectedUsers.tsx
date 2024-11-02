@@ -117,9 +117,7 @@ const ConnectedUsers = () => {
             credentialStatus: searchParams.get('credentialStatus')
                 ? (searchParams.get('credentialStatus')! as CredentialStatus)
                 : undefined,
-            environment: searchParams.get('environment')
-                ? (searchParams.get('environment') as Environment)
-                : Environment.Test,
+            environment: searchParams.get('environment') ? searchParams.get('environment')! : '0',
             integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
             search: searchParams.get('search') ? searchParams.get('search')! : '',
         },
@@ -137,8 +135,10 @@ const ConnectedUsers = () => {
             ? (searchParams.get('credentialStatus')! as CredentialStatus)
             : undefined,
         environment: searchParams.get('environment')
-            ? (searchParams.get('environment') as Environment)
-            : Environment.Test,
+            ? +searchParams.get('environment')! === 1
+                ? Environment.Test
+                : Environment.Production
+            : undefined,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
@@ -151,7 +151,7 @@ const ConnectedUsers = () => {
     const {data: integrations} = useGetIntegrationsQuery({});
 
     function filter(
-        environment?: string,
+        environment?: number,
         search?: string,
         credentialStatus?: string,
         integrationIdId?: number,
@@ -165,7 +165,7 @@ const ConnectedUsers = () => {
 
     const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
         filter(
-            values.environment,
+            Number(values.environment),
             values.search,
             values.credentialStatus,
             values.integrationId,
@@ -178,7 +178,7 @@ const ConnectedUsers = () => {
         setPageNumber(pageNumber);
 
         filter(
-            form.getValues().environment,
+            Number(form.getValues().environment),
             form.getValues().search,
             form.getValues().credentialStatus,
             form.getValues().integrationId,
@@ -210,7 +210,7 @@ const ConnectedUsers = () => {
                     title={
                         <ConnectedUsersFilterTitle
                             filterData={{
-                                environment: form.getValues('environment')!,
+                                environment: +form.getValues('environment')!,
                                 status: form.getValues('credentialStatus')!,
                             }}
                         />
@@ -234,16 +234,18 @@ const ConnectedUsers = () => {
 
                                                 form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
-                                            value={field.value}
+                                            value={String(field.value)}
                                         >
                                             <SelectTrigger className="w-full bg-background">
                                                 <SelectValue placeholder="Select environment" />
                                             </SelectTrigger>
 
                                             <SelectContent>
-                                                <SelectItem value="TEST">Test</SelectItem>
+                                                <SelectItem value="0">All Environments</SelectItem>
 
-                                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                <SelectItem value="1">Test</SelectItem>
+
+                                                <SelectItem value="2">Production</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </FormControl>

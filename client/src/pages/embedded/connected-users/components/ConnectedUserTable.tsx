@@ -7,8 +7,8 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserDeleteDialog from '@/pages/embedded/connected-users/components/ConnectedUserDeleteDialog';
+import CredentialsStatus from '@/pages/embedded/connected-users/components/CredentialsStatus';
 import useConnectedUserSheetStore from '@/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {ConnectedUser, CredentialStatus} from '@/shared/middleware/embedded/connected-user';
 import {useEnableConnectedUserMutation} from '@/shared/mutations/embedded/connectedUsers.mutations';
@@ -27,20 +27,6 @@ interface ConnectedUserTableProps {
     connectedUsers: ConnectedUser[];
 }
 
-const StatusTooltip = ({message, svgClassname}: {message: string; svgClassname: string}) => {
-    return (
-        <Tooltip>
-            <TooltipTrigger>
-                <svg aria-hidden="true" className={twMerge('h-3 w-3', svgClassname)} viewBox="0 0 6 6">
-                    <circle cx={3} cy={3} r={3} />
-                </svg>
-            </TooltipTrigger>
-
-            <TooltipContent>{message}</TooltipContent>
-        </Tooltip>
-    );
-};
-
 const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
     const [currentConnectedUserId, setCurrentConnectedUserId] = useState(0);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -58,12 +44,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                     const integrationInstances = info.getValue() ?? [];
 
                     if (integrationInstances.length === 0) {
-                        return (
-                            <StatusTooltip
-                                message="The connected user does not yet have any used integrations"
-                                svgClassname="fill-secondary"
-                            />
-                        );
+                        return <CredentialsStatus />;
                     }
 
                     let enabled = true;
@@ -76,12 +57,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                         }
                     }
 
-                    return (
-                        <StatusTooltip
-                            message={enabled ? 'All used connections are valid' : 'Some used connections are invalid'}
-                            svgClassname={enabled ? 'fill-success' : 'fill-destructive'}
-                        />
-                    );
+                    return <CredentialsStatus enabled={enabled} />;
                 },
                 header: 'Status',
                 id: 'status',
@@ -126,6 +102,10 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                     );
                 },
                 header: 'Integrations',
+            }),
+            columnHelper.accessor('environment', {
+                cell: (info) => info.getValue() ?? '',
+                header: 'Environment',
             }),
             columnHelper.accessor('createdDate', {
                 cell: (info) => `${info?.getValue()?.toLocaleDateString()} ${info?.getValue()?.toLocaleTimeString()}`,

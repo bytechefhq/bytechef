@@ -65,8 +65,8 @@ export const WorkflowExecutions = () => {
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
-    const [filterEnvironment, setFilterEnvironment] = useState<string>(
-        searchParams.get('environment') ? searchParams.get('environment')! : Environment.Test
+    const [filterEnvironment, setFilterEnvironment] = useState<number>(
+        searchParams.get('environment') ? +searchParams.get('environment')! : 0
     );
     const [filterIntegrationId, setFilterIntegrationId] = useState<number | undefined>(
         searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined
@@ -97,7 +97,8 @@ export const WorkflowExecutions = () => {
     );
 
     const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({
-        environment: filterEnvironment as Environment,
+        environment:
+            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         integrationId: filterIntegrationId,
     });
 
@@ -108,7 +109,8 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
-        environment: filterEnvironment as Environment,
+        environment:
+            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         integrationId: filterIntegrationId,
         integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
         jobEndDate: filterEndDate,
@@ -141,7 +143,7 @@ export const WorkflowExecutions = () => {
     );
 
     function filter(
-        environment?: string,
+        environment?: number,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -171,10 +173,10 @@ export const WorkflowExecutions = () => {
     };
 
     const handleEnvironmentChange = (environment: string) => {
-        setFilterEnvironment(environment);
+        setFilterEnvironment(Number(environment));
 
         filter(
-            environment,
+            Number(environment),
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -340,9 +342,11 @@ export const WorkflowExecutions = () => {
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="TEST">TEST</SelectItem>
+                                <SelectItem value="0">All Environments</SelectItem>
 
-                                <SelectItem value="PRODUCTION">PRODUCTION</SelectItem>
+                                <SelectItem value="1">Test</SelectItem>
+
+                                <SelectItem value="2">Production</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
