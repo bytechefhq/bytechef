@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:34.462618+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:14:13.791686+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class ConnectedUserIntegrationInstanceModel {
 
   private String componentName;
@@ -31,6 +31,8 @@ public class ConnectedUserIntegrationInstanceModel {
   private Long id;
 
   private Long integrationId;
+
+  private Long integrationInstanceConfigurationId;
 
   private Integer integrationVersion;
 
@@ -118,6 +120,26 @@ public class ConnectedUserIntegrationInstanceModel {
     this.integrationId = integrationId;
   }
 
+  public ConnectedUserIntegrationInstanceModel integrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+    return this;
+  }
+
+  /**
+   * The id of an integration instance configuration.
+   * @return integrationInstanceConfigurationId
+   */
+  
+  @Schema(name = "integrationInstanceConfigurationId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an integration instance configuration.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("integrationInstanceConfigurationId")
+  public Long getIntegrationInstanceConfigurationId() {
+    return integrationInstanceConfigurationId;
+  }
+
+  public void setIntegrationInstanceConfigurationId(Long integrationInstanceConfigurationId) {
+    this.integrationInstanceConfigurationId = integrationInstanceConfigurationId;
+  }
+
   public ConnectedUserIntegrationInstanceModel integrationVersion(Integer integrationVersion) {
     this.integrationVersion = integrationVersion;
     return this;
@@ -191,6 +213,7 @@ public class ConnectedUserIntegrationInstanceModel {
         Objects.equals(this.enabled, connectedUserIntegrationInstance.enabled) &&
         Objects.equals(this.id, connectedUserIntegrationInstance.id) &&
         Objects.equals(this.integrationId, connectedUserIntegrationInstance.integrationId) &&
+        Objects.equals(this.integrationInstanceConfigurationId, connectedUserIntegrationInstance.integrationInstanceConfigurationId) &&
         Objects.equals(this.integrationVersion, connectedUserIntegrationInstance.integrationVersion) &&
         Objects.equals(this.connectionId, connectedUserIntegrationInstance.connectionId) &&
         Objects.equals(this.credentialStatus, connectedUserIntegrationInstance.credentialStatus);
@@ -198,7 +221,7 @@ public class ConnectedUserIntegrationInstanceModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, enabled, id, integrationId, integrationVersion, connectionId, credentialStatus);
+    return Objects.hash(componentName, enabled, id, integrationId, integrationInstanceConfigurationId, integrationVersion, connectionId, credentialStatus);
   }
 
   @Override
@@ -209,6 +232,7 @@ public class ConnectedUserIntegrationInstanceModel {
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
+    sb.append("    integrationInstanceConfigurationId: ").append(toIndentedString(integrationInstanceConfigurationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    credentialStatus: ").append(toIndentedString(credentialStatus)).append("\n");

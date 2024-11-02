@@ -3,9 +3,11 @@ package com.bytechef.embedded.connected.user.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserIntegrationInstanceModel;
+import com.bytechef.embedded.connected.user.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +30,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUser")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:34.462618+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:14:13.791686+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class ConnectedUserModel {
 
   private String createdBy;
@@ -39,6 +41,8 @@ public class ConnectedUserModel {
   private String email;
 
   private Boolean enabled;
+
+  private EnvironmentModel environment;
 
   private String externalId;
 
@@ -148,6 +152,26 @@ public class ConnectedUserModel {
 
   public void setEnabled(Boolean enabled) {
     this.enabled = enabled;
+  }
+
+  public ConnectedUserModel environment(EnvironmentModel environment) {
+    this.environment = environment;
+    return this;
+  }
+
+  /**
+   * Get environment
+   * @return environment
+   */
+  @Valid 
+  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("environment")
+  public EnvironmentModel getEnvironment() {
+    return environment;
+  }
+
+  public void setEnvironment(EnvironmentModel environment) {
+    this.environment = environment;
   }
 
   public ConnectedUserModel externalId(String externalId) {
@@ -339,6 +363,7 @@ public class ConnectedUserModel {
         Objects.equals(this.createdDate, connectedUser.createdDate) &&
         Objects.equals(this.email, connectedUser.email) &&
         Objects.equals(this.enabled, connectedUser.enabled) &&
+        Objects.equals(this.environment, connectedUser.environment) &&
         Objects.equals(this.externalId, connectedUser.externalId) &&
         Objects.equals(this.id, connectedUser.id) &&
         Objects.equals(this.integrationInstances, connectedUser.integrationInstances) &&
@@ -351,7 +376,7 @@ public class ConnectedUserModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, email, enabled, externalId, id, integrationInstances, metadata, name, lastModifiedBy, lastModifiedDate, version);
+    return Objects.hash(createdBy, createdDate, email, enabled, environment, externalId, id, integrationInstances, metadata, name, lastModifiedBy, lastModifiedDate, version);
   }
 
   @Override
@@ -362,6 +387,7 @@ public class ConnectedUserModel {
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    email: ").append(toIndentedString(email)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    externalId: ").append(toIndentedString(externalId)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationInstances: ").append(toIndentedString(integrationInstances)).append("\n");
