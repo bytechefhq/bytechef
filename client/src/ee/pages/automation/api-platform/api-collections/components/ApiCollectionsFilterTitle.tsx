@@ -10,7 +10,7 @@ const ApiCollectionsFilterTitle = ({
     projects,
     tags,
 }: {
-    environment: number;
+    environment?: number;
     filterData: {id?: number; type: Type};
     projects: Project[] | undefined;
     tags: Tag[] | undefined;
@@ -30,7 +30,9 @@ const ApiCollectionsFilterTitle = ({
             <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
 
             <Badge variant="secondary">
-                <span className="text-sm">{environment === 1 ? 'Test' : 'Production'}</span>
+                <span className="text-sm">
+                    {environment === undefined ? 'All environments' : environment === 1 ? 'Test' : 'Production'}
+                </span>
             </Badge>
 
             <span className="text-sm uppercase text-muted-foreground">
