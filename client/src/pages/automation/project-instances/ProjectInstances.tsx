@@ -26,8 +26,8 @@ export enum Type {
 const ProjectInstances = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1
+    const [environment, setEnvironment] = useState<number | undefined>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
     );
 
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -54,7 +54,8 @@ const ProjectInstances = () => {
         error: projectInstancesError,
         isLoading: projectInstancesIsLoading,
     } = useGetWorkspaceProjectInstancesQuery({
-        environment: environment === 1 ? Environment.Test : Environment.Production,
+        environment:
+            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
         projectId: searchParams.get('projectId') ? parseInt(searchParams.get('projectId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
@@ -94,7 +95,12 @@ const ProjectInstances = () => {
                             <ProjectInstanceDialog
                                 projectInstance={
                                     {
-                                        environment: environment === 1 ? Environment.Test : Environment.Production,
+                                        environment:
+                                            environment === undefined
+                                                ? undefined
+                                                : environment === 1
+                                                  ? Environment.Test
+                                                  : Environment.Production,
                                     } as ProjectInstance
                                 }
                                 triggerNode={<Button>New Instance</Button>}
@@ -117,6 +123,7 @@ const ProjectInstances = () => {
                         body={
                             <>
                                 {[
+                                    {label: 'All Environments'},
                                     {label: 'Test', value: 1},
                                     {label: 'Production', value: 2},
                                 ]?.map((item) => (

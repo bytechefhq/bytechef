@@ -93,8 +93,6 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
-                                <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
-
                                 {projectInstance.description ? (
                                     <Tooltip>
                                         <TooltipTrigger>
@@ -111,7 +109,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-muted-foreground">
                                     <span className="mr-1">
                                         {projectInstance.projectInstanceWorkflows?.length === 1
                                             ? `1 workflow`
@@ -142,7 +140,11 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
+                        <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
+
+                        <Badge variant="secondary">{projectInstance.environment}</Badge>
+
+                        <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
 
                             <Tooltip>
