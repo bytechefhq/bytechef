@@ -64,7 +64,7 @@ public class IntegrationInstanceMapper {
         @Override
         @Mapping(target = "environment", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
-        IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstanc);
+        IntegrationInstanceBasicModel convert(IntegrationInstanceDTO integrationInstance);
     }
 
     @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
