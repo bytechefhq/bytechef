@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { IntegrationBasic } from './IntegrationBasic';
+import {
+    IntegrationBasicFromJSON,
+    IntegrationBasicFromJSONTyped,
+    IntegrationBasicToJSON,
+    IntegrationBasicToJSONTyped,
+} from './IntegrationBasic';
 import type { IntegrationInstanceConfigurationWorkflow } from './IntegrationInstanceConfigurationWorkflow';
 import {
     IntegrationInstanceConfigurationWorkflowFromJSON,
@@ -90,12 +97,6 @@ export interface IntegrationInstanceConfiguration {
      */
     integrationVersion?: number;
     /**
-     * The last execution date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfiguration
-     */
-    readonly lastExecutionDate?: Date;
-    /**
      * The last modified by.
      * @type {string}
      * @memberof IntegrationInstanceConfiguration
@@ -133,10 +134,10 @@ export interface IntegrationInstanceConfiguration {
     connectionParameters?: { [key: string]: any; };
     /**
      * 
-     * @type {object}
+     * @type {IntegrationBasic}
      * @memberof IntegrationInstanceConfiguration
      */
-    readonly integration?: object;
+    integration?: IntegrationBasic;
     /**
      * The array of integration instance configuration workflows.
      * @type {Array<IntegrationInstanceConfigurationWorkflow>}
@@ -185,14 +186,13 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
         'id': json['id'] == null ? undefined : json['id'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'connectionAuthorizationParameters': json['connectionAuthorizationParameters'] == null ? undefined : json['connectionAuthorizationParameters'],
         'connectionConnectionParameters': json['connectionConnectionParameters'] == null ? undefined : json['connectionConnectionParameters'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
-        'integration': json['integration'] == null ? undefined : json['integration'],
+        'integration': json['integration'] == null ? undefined : IntegrationBasicFromJSON(json['integration']),
         'integrationInstanceConfigurationWorkflows': json['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((json['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowFromJSON)),
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
@@ -203,7 +203,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
       return IntegrationInstanceConfigurationToJSONTyped(json, false);
   }
 
-  export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'|'integration'> | null, ignoreDiscriminator: boolean = false): any {
+  export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -217,6 +217,7 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
         'integrationVersion': value['integrationVersion'],
         'name': value['name'],
         'connectionParameters': value['connectionParameters'],
+        'integration': IntegrationBasicToJSON(value['integration']),
         'integrationInstanceConfigurationWorkflows': value['integrationInstanceConfigurationWorkflows'] == null ? undefined : ((value['integrationInstanceConfigurationWorkflows'] as Array<any>).map(IntegrationInstanceConfigurationWorkflowToJSON)),
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
         '__version': value['version'],

@@ -13,14 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { Environment } from './Environment';
-import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
-
 /**
  * Contains configurations and connections required for the execution of integration workflows for a connected user.
  * @export
@@ -58,12 +50,6 @@ export interface IntegrationInstanceBasic {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
-     * @memberof IntegrationInstanceBasic
-     */
-    environment?: Environment;
-    /**
      * The id of an integration instance.
      * @type {number}
      * @memberof IntegrationInstanceBasic
@@ -95,8 +81,6 @@ export interface IntegrationInstanceBasic {
     integrationInstanceConfigurationId?: number;
 }
 
-
-
 /**
  * Check if a given object implements the IntegrationInstanceBasic interface.
  */
@@ -120,7 +104,6 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -141,7 +124,6 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
     return {
         
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
     };
 }

@@ -20,13 +20,13 @@ import {
     IntegrationInstanceWorkflowToJSON,
     IntegrationInstanceWorkflowToJSONTyped,
 } from './IntegrationInstanceWorkflow';
-import type { Environment } from './Environment';
+import type { IntegrationInstanceConfigurationBasic } from './IntegrationInstanceConfigurationBasic';
 import {
-    EnvironmentFromJSON,
-    EnvironmentFromJSONTyped,
-    EnvironmentToJSON,
-    EnvironmentToJSONTyped,
-} from './Environment';
+    IntegrationInstanceConfigurationBasicFromJSON,
+    IntegrationInstanceConfigurationBasicFromJSONTyped,
+    IntegrationInstanceConfigurationBasicToJSON,
+    IntegrationInstanceConfigurationBasicToJSONTyped,
+} from './IntegrationInstanceConfigurationBasic';
 
 /**
  * Contains configurations and connections required for the execution of integration workflows for a connected user.
@@ -65,12 +65,6 @@ export interface IntegrationInstance {
      */
     enabled?: boolean;
     /**
-     * 
-     * @type {Environment}
-     * @memberof IntegrationInstance
-     */
-    environment?: Environment;
-    /**
      * The id of an integration instance.
      * @type {number}
      * @memberof IntegrationInstance
@@ -102,10 +96,10 @@ export interface IntegrationInstance {
     integrationInstanceConfigurationId?: number;
     /**
      * 
-     * @type {object}
+     * @type {IntegrationInstanceConfigurationBasic}
      * @memberof IntegrationInstance
      */
-    readonly integrationInstanceConfiguration?: object;
+    integrationInstanceConfiguration?: IntegrationInstanceConfigurationBasic;
     /**
      * The array of integration instance workflows.
      * @type {Array<IntegrationInstanceWorkflow>}
@@ -119,8 +113,6 @@ export interface IntegrationInstance {
      */
     version?: number;
 }
-
-
 
 /**
  * Check if a given object implements the IntegrationInstance interface.
@@ -145,13 +137,12 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
-        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
-        'integrationInstanceConfiguration': json['integrationInstanceConfiguration'] == null ? undefined : json['integrationInstanceConfiguration'],
+        'integrationInstanceConfiguration': json['integrationInstanceConfiguration'] == null ? undefined : IntegrationInstanceConfigurationBasicFromJSON(json['integrationInstanceConfiguration']),
         'integrationInstanceWorkflows': json['integrationInstanceWorkflows'] == null ? undefined : ((json['integrationInstanceWorkflows'] as Array<any>).map(IntegrationInstanceWorkflowFromJSON)),
         'version': json['__version'] == null ? undefined : json['__version'],
     };
@@ -161,7 +152,7 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
       return IntegrationInstanceToJSONTyped(json, false);
   }
 
-  export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceConfiguration'|'integrationInstanceWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
+  export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -169,8 +160,8 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'enabled': value['enabled'],
-        'environment': EnvironmentToJSON(value['environment']),
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
+        'integrationInstanceConfiguration': IntegrationInstanceConfigurationBasicToJSON(value['integrationInstanceConfiguration']),
         '__version': value['version'],
     };
 }
