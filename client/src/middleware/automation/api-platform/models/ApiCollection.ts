@@ -20,6 +20,13 @@ import {
     ApiCollectionEndpointToJSON,
     ApiCollectionEndpointToJSONTyped,
 } from './ApiCollectionEndpoint';
+import type { ProjectInstanceBasic } from './ProjectInstanceBasic';
+import {
+    ProjectInstanceBasicFromJSON,
+    ProjectInstanceBasicFromJSONTyped,
+    ProjectInstanceBasicToJSON,
+    ProjectInstanceBasicToJSONTyped,
+} from './ProjectInstanceBasic';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -27,6 +34,13 @@ import {
     TagToJSON,
     TagToJSONTyped,
 } from './Tag';
+import type { ProjectBasic } from './ProjectBasic';
+import {
+    ProjectBasicFromJSON,
+    ProjectBasicFromJSONTyped,
+    ProjectBasicToJSON,
+    ProjectBasicToJSONTyped,
+} from './ProjectBasic';
 
 /**
  * An API collection.
@@ -101,11 +115,23 @@ export interface ApiCollection {
      */
     projectId: number;
     /**
+     * 
+     * @type {ProjectBasic}
+     * @memberof ApiCollection
+     */
+    project?: ProjectBasic;
+    /**
      * The id of an project instance the API collection is connected to.
      * @type {number}
      * @memberof ApiCollection
      */
     readonly projectInstanceId?: number;
+    /**
+     * 
+     * @type {ProjectInstanceBasic}
+     * @memberof ApiCollection
+     */
+    projectInstance?: ProjectInstanceBasic;
     /**
      * The version of a project the API collection is connected to.
      * @type {number}
@@ -165,7 +191,9 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'projectId': json['projectId'],
+        'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
         'projectInstanceId': json['projectInstanceId'] == null ? undefined : json['projectInstanceId'],
+        'projectInstance': json['projectInstance'] == null ? undefined : ProjectInstanceBasicFromJSON(json['projectInstance']),
         'projectVersion': json['projectVersion'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'workspaceId': json['workspaceId'],
@@ -190,6 +218,8 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'endpoints': value['endpoints'] == null ? undefined : ((value['endpoints'] as Array<any>).map(ApiCollectionEndpointToJSON)),
         'name': value['name'],
         'projectId': value['projectId'],
+        'project': ProjectBasicToJSON(value['project']),
+        'projectInstance': ProjectInstanceBasicToJSON(value['projectInstance']),
         'projectVersion': value['projectVersion'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
         'workspaceId': value['workspaceId'],
