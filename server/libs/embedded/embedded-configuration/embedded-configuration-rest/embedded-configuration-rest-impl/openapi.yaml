@@ -1062,10 +1062,7 @@ components:
             - "name"
           properties:
             integrationInstanceConfiguration:
-              type: "object"
-              allOf:
-                - $ref: "#/components/schemas/IntegrationInstanceConfigurationBasic"
-              readOnly: true
+              $ref: "#/components/schemas/IntegrationInstanceConfigurationBasic"
             integrationInstanceWorkflows:
               description: "The array of integration instance workflows."
               type: "array"
@@ -1104,8 +1101,6 @@ components:
         enabled:
           description: "If an integration instance is enabled or not."
           type: "boolean"
-        environment:
-          $ref: '#/components/schemas/Environment'
         id:
           description: "The id of an integration instance."
           type: "integer"
@@ -1154,10 +1149,7 @@ components:
               additionalProperties: true
               writeOnly: true
             integration:
-              type: "object"
-              allOf:
-                - $ref: "#/components/schemas/IntegrationBasic"
-              readOnly: true
+              $ref: "#/components/schemas/IntegrationBasic"
             integrationInstanceConfigurationWorkflows:
               description: "The array of integration instance configuration workflows."
               type: "array"
@@ -1206,11 +1198,6 @@ components:
         integrationVersion:
           description: "The version of an integration."
           type: "integer"
-        lastExecutionDate:
-          description: "The last execution date."
-          type: "string"
-          format: "date-time"
-          readOnly: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"

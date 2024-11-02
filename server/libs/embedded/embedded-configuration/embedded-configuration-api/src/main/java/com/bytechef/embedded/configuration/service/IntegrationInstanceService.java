@@ -29,11 +29,13 @@ public interface IntegrationInstanceService {
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
 
-    List<IntegrationInstance> getEnabledIntegrationInstances(long connectedUserId);
+    List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId);
 
     IntegrationInstance getIntegrationInstance(long id);
 
     IntegrationInstance getIntegrationInstance(long connectedUserId, String workflowId, Environment environment);
+
+    List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId);
 
     void updateEnabled(long id, boolean enable);
 

@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.dto;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -25,11 +26,15 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceWorkflowDTO(
-    long integrationInstanceConfigurationWorkflowId, Map<String, ?> inputs, boolean enabled, String workflowId) {
-
+    String createdBy, LocalDateTime createdDate, Long id, long integrationInstanceConfigurationWorkflowId,
+    Map<String, ?> inputs, String lastModifiedBy,
+    LocalDateTime lastModifiedDate, boolean enabled, String workflowId) {
     public IntegrationInstanceWorkflowDTO(IntegrationInstanceWorkflow integrationInstanceWorkflow, String workflowId) {
         this(
+            integrationInstanceWorkflow.getCreatedBy(), integrationInstanceWorkflow.getCreatedDate(),
+            integrationInstanceWorkflow.getId(),
             integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId(),
-            integrationInstanceWorkflow.getInputs(), integrationInstanceWorkflow.isEnabled(), workflowId);
+            integrationInstanceWorkflow.getInputs(), integrationInstanceWorkflow.getLastModifiedBy(),
+            integrationInstanceWorkflow.getLastModifiedDate(), integrationInstanceWorkflow.isEnabled(), workflowId);
     }
 }

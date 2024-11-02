@@ -12,6 +12,8 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,7 +35,23 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
-    public IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId) {
+    public IntegrationInstanceWorkflow createIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, @NonNull String workflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(
+        long integrationInstanceId, @NonNull String workflowId) {
+
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
@@ -44,6 +62,11 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
 
     @Override
     public List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         throw new UnsupportedOperationException();
     }
 

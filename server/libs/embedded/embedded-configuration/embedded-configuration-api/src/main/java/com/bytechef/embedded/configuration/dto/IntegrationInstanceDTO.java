@@ -17,6 +17,7 @@
 package com.bytechef.embedded.configuration.dto;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -26,18 +27,22 @@ import java.util.Set;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceDTO(
-    long connectedUserId, long connectionId, String createdBy, LocalDateTime createdDate, boolean enabled, Long id,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, long integrationInstanceConfigurationId,
-    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, int version) {
+    long connectedUserId, long connectionId, String createdBy, LocalDateTime createdDate, boolean enabled,
+    Long id, long integrationInstanceConfigurationId,
+    IntegrationInstanceConfiguration integrationInstanceConfiguration,
+    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, LocalDateTime lastExecutionDate,
+    String lastModifiedBy, LocalDateTime lastModifiedDate, int version) {
 
     public IntegrationInstanceDTO(
-        IntegrationInstance integrationInstance, Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows) {
+        IntegrationInstance integrationInstance, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, LocalDateTime lastExecutionDate) {
 
         this(
             integrationInstance.getConnectedUserId(), integrationInstance.getConnectionId(),
             integrationInstance.getCreatedBy(), integrationInstance.getCreatedDate(), integrationInstance.isEnabled(),
-            integrationInstance.getId(), integrationInstance.getLastModifiedBy(),
-            integrationInstance.getLastModifiedDate(), integrationInstance.getIntegrationInstanceConfigurationId(),
-            integrationInstanceWorkflows, integrationInstance.getVersion());
+            integrationInstance.getId(), integrationInstance.getIntegrationInstanceConfigurationId(),
+            integrationInstanceConfiguration, integrationInstanceWorkflows, lastExecutionDate,
+            integrationInstance.getLastModifiedBy(), integrationInstance.getLastModifiedDate(),
+            integrationInstance.getVersion());
     }
 }

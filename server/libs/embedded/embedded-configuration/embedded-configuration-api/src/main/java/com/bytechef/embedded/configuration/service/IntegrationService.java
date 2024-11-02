@@ -20,26 +20,21 @@ import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationService {
 
-    long countIntegrations();
-
     Integration create(Integration integration);
 
     void delete(long id);
 
-    Optional<Integration> fetchWorkflowIntegration(String workflowId);
-
     Integration getIntegration(long id);
 
-    Optional<Integration> fetchIntegration(String name);
-
     Integration getIntegrationInstanceIntegration(long integrationInstanceId);
+
+    Integration getIntegrationInstanceConfigurationIntegration(long integrationInstanceConfigurationId);
 
     List<Integration> getIntegrations();
 

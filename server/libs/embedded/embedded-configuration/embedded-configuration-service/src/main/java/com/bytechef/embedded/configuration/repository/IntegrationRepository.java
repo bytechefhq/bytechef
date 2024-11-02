@@ -17,7 +17,6 @@
 package com.bytechef.embedded.configuration.repository;
 
 import com.bytechef.embedded.configuration.domain.Integration;
-import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -35,30 +34,19 @@ public interface IntegrationRepository
 
     @Query("""
         SELECT integration.* FROM integration
-        JOIN integration_tag ON integration.id = integration_tag.integration_id
-        WHERE integration.category_id = :categoryId
-        AND integration_tag.tag_id = :tagId
-        ORDER BY component_name
-        """)
-    List<Integration> findAllByCategoryIdAndTagIdOrderByComponentName(
-        @Param("categoryId") long categoryId, @Param("tagId") long tagId);
-
-    @Query("""
-        SELECT integration.* FROM integration
-        JOIN integration_tag ON integration.id = integration_tag.integration_id
-        WHERE integration_tag.tag_id = :tagId
-        ORDER BY component_name
-        """)
-    List<Integration> findAllByTagIdOrderByName(@Param("tagId") long tagId);
-
-    @Query("""
-        SELECT integration.* FROM integration
-        JOIN integration_instance ON integration.id = integration_instance.integration_id
+        JOIN integration_instance_configuration ON integration.id = integration_instance_configuration.integration_id
+        JOIN integration_instance ON integration_instance_configuration.id = integration_instance.integration_instance_configuration_id
         WHERE integration_instance.id = :integrationInstanceId
         """)
-    Integration findByIntegrationInstanceId(long integrationInstanceId);
+    Optional<Integration> findByIntegrationInstanceId(@Param("integrationInstanceId") long integrationInstanceId);
 
-    Optional<Integration> findByComponentNameIgnoreCase(String name);
+    @Query("""
+        SELECT integration.* FROM integration
+        JOIN integration_instance_configuration ON integration.id = integration_instance_configuration.integration_id
+        WHERE integration_instance_configuration.id = :integrationInstanceConfigurationId
+        """)
+    Optional<Integration> findByIntegrationInstanceConfigurationId(
+        @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId);
 
     @Query("""
         SELECT integration.* FROM integration
