@@ -3,7 +3,7 @@ const ConnectedUsersFilterTitle = ({
     filterData,
 }: {
     filterData: {
-        environment: string;
+        environment?: number;
         status?: string;
     };
 }) => {
@@ -12,7 +12,13 @@ const ConnectedUsersFilterTitle = ({
             <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
 
             <Badge variant="secondary">
-                <span className="text-sm">{filterData.environment}</span>
+                <span className="text-sm">
+                    {!filterData.environment
+                        ? 'All Environments'
+                        : filterData.environment === 1
+                          ? 'Test'
+                          : 'Production'}
+                </span>
             </Badge>
 
             {filterData.status && (
