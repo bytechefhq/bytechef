@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfigurationBasic", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfigurationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T12:15:45.835503+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class IntegrationInstanceConfigurationBasicModel {
 
   private String createdBy;
@@ -44,9 +44,6 @@ public class IntegrationInstanceConfigurationBasicModel {
   private Long integrationId;
 
   private Integer integrationVersion;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
@@ -226,26 +223,6 @@ public class IntegrationInstanceConfigurationBasicModel {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationInstanceConfigurationBasicModel lastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
-    return this;
-  }
-
-  /**
-   * The last execution date.
-   * @return lastExecutionDate
-   */
-  @Valid 
-  @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
-    return lastExecutionDate;
-  }
-
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
-  }
-
   public IntegrationInstanceConfigurationBasicModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -323,7 +300,6 @@ public class IntegrationInstanceConfigurationBasicModel {
         Objects.equals(this.id, integrationInstanceConfigurationBasic.id) &&
         Objects.equals(this.integrationId, integrationInstanceConfigurationBasic.integrationId) &&
         Objects.equals(this.integrationVersion, integrationInstanceConfigurationBasic.integrationVersion) &&
-        Objects.equals(this.lastExecutionDate, integrationInstanceConfigurationBasic.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceConfigurationBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfigurationBasic.lastModifiedDate) &&
         Objects.equals(this.name, integrationInstanceConfigurationBasic.name);
@@ -331,7 +307,7 @@ public class IntegrationInstanceConfigurationBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name);
   }
 
   @Override
@@ -346,7 +322,6 @@ public class IntegrationInstanceConfigurationBasicModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
-    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
