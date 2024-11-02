@@ -167,7 +167,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
             if (integrationInstanceConfigurationId != null) {
                 integrationInstanceConfigurationIds.add(integrationInstanceConfigurationId);
-            } else if (environment != null) {
+            } else {
                 integrationInstanceConfigurationIds.addAll(
                     integrationInstanceConfigurationService
                         .getIntegrationInstanceConfigurations(environment, null, null)
