@@ -160,7 +160,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
             if (projectInstanceId != null) {
                 projectInstanceIds.add(projectInstanceId);
-            } else if (environment != null) {
+            } else {
                 projectInstanceIds.addAll(
                     projectInstanceService.getProjectInstances(null, environment, null, null)
                         .stream()
