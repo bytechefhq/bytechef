@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:38.179121+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:30:01.517773+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class ApiCollectionModel {
 
   private Integer collectionVersion;
@@ -56,7 +56,11 @@ public class ApiCollectionModel {
 
   private Long projectId;
 
+  private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
+
   private Long projectInstanceId;
+
+  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
 
   private Integer projectVersion;
 
@@ -310,6 +314,26 @@ public class ApiCollectionModel {
     this.projectId = projectId;
   }
 
+  public ApiCollectionModel project(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
+    this.project = project;
+    return this;
+  }
+
+  /**
+   * Get project
+   * @return project
+   */
+  @Valid 
+  @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("project")
+  public com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
+    return project;
+  }
+
+  public void setProject(com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project) {
+    this.project = project;
+  }
+
   public ApiCollectionModel projectInstanceId(Long projectInstanceId) {
     this.projectInstanceId = projectInstanceId;
     return this;
@@ -328,6 +352,26 @@ public class ApiCollectionModel {
 
   public void setProjectInstanceId(Long projectInstanceId) {
     this.projectInstanceId = projectInstanceId;
+  }
+
+  public ApiCollectionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+    this.projectInstance = projectInstance;
+    return this;
+  }
+
+  /**
+   * Get projectInstance
+   * @return projectInstance
+   */
+  @Valid 
+  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectInstance")
+  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
+    return projectInstance;
+  }
+
+  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+    this.projectInstance = projectInstance;
   }
 
   public ApiCollectionModel projectVersion(Integer projectVersion) {
@@ -438,7 +482,9 @@ public class ApiCollectionModel {
         Objects.equals(this.lastModifiedBy, apiCollection.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, apiCollection.lastModifiedDate) &&
         Objects.equals(this.projectId, apiCollection.projectId) &&
+        Objects.equals(this.project, apiCollection.project) &&
         Objects.equals(this.projectInstanceId, apiCollection.projectInstanceId) &&
+        Objects.equals(this.projectInstance, apiCollection.projectInstance) &&
         Objects.equals(this.projectVersion, apiCollection.projectVersion) &&
         Objects.equals(this.tags, apiCollection.tags) &&
         Objects.equals(this.workspaceId, apiCollection.workspaceId) &&
@@ -447,7 +493,7 @@ public class ApiCollectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, projectInstanceId, projectVersion, tags, workspaceId, version);
+    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectInstanceId, projectInstance, projectVersion, tags, workspaceId, version);
   }
 
   @Override
@@ -465,7 +511,9 @@ public class ApiCollectionModel {
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
+    sb.append("    project: ").append(toIndentedString(project)).append("\n");
     sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
+    sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");
