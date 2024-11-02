@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-31T18:29:59.023043+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:04:08.835662+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -67,7 +67,7 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions/{componentName}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<ComponentDefinitionModel> getComponentDefinition(
         @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The version of a component to get. If not set, teh latest version is returned.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentVersion", required = false) Integer componentVersion
@@ -109,7 +109,7 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions/{componentName}/versions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitionVersions(
         @Parameter(name = "componentName", description = "The name of a component.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName
     ) {
@@ -154,7 +154,7 @@ public interface ComponentDefinitionApi {
         value = "/component-definitions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
         @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) String modeType,
         @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
@@ -199,7 +199,7 @@ public interface ComponentDefinitionApi {
         value = "/data-streams/{componentType}/component-definitions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getDataStreamComponentDefinitions(
         @Parameter(name = "componentType", description = "The name of a component type.", required = true, in = ParameterIn.PATH) @PathVariable("componentType") String componentType
     ) {
@@ -240,7 +240,7 @@ public interface ComponentDefinitionApi {
         value = "/unified-api/{category}/component-definitions",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getUnifiedApiComponentDefinitions(
         @Parameter(name = "category", description = "The name of a unified API category.", required = true, in = ParameterIn.PATH) @PathVariable("category") UnifiedApiCategoryModel category
     ) {

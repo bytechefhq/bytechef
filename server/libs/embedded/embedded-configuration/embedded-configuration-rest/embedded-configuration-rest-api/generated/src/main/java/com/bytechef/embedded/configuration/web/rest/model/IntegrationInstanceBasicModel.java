@@ -2,11 +2,9 @@ package com.bytechef.embedded.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.embedded.configuration.web.rest.model.EnvironmentModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -25,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T12:15:45.835503+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class IntegrationInstanceBasicModel {
 
   private Long connectionId;
@@ -38,8 +36,6 @@ public class IntegrationInstanceBasicModel {
   private LocalDateTime createdDate;
 
   private Boolean enabled;
-
-  private EnvironmentModel environment;
 
   private Long id;
 
@@ -164,26 +160,6 @@ public class IntegrationInstanceBasicModel {
     this.enabled = enabled;
   }
 
-  public IntegrationInstanceBasicModel environment(EnvironmentModel environment) {
-    this.environment = environment;
-    return this;
-  }
-
-  /**
-   * Get environment
-   * @return environment
-   */
-  @Valid 
-  @Schema(name = "environment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("environment")
-  public EnvironmentModel getEnvironment() {
-    return environment;
-  }
-
-  public void setEnvironment(EnvironmentModel environment) {
-    this.environment = environment;
-  }
-
   public IntegrationInstanceBasicModel id(Long id) {
     this.id = id;
     return this;
@@ -298,7 +274,6 @@ public class IntegrationInstanceBasicModel {
         Objects.equals(this.createdBy, integrationInstanceBasic.createdBy) &&
         Objects.equals(this.createdDate, integrationInstanceBasic.createdDate) &&
         Objects.equals(this.enabled, integrationInstanceBasic.enabled) &&
-        Objects.equals(this.environment, integrationInstanceBasic.environment) &&
         Objects.equals(this.id, integrationInstanceBasic.id) &&
         Objects.equals(this.lastExecutionDate, integrationInstanceBasic.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceBasic.lastModifiedBy) &&
@@ -308,7 +283,7 @@ public class IntegrationInstanceBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, integrationInstanceConfigurationId);
+    return Objects.hash(connectionId, connectedUserId, createdBy, createdDate, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, integrationInstanceConfigurationId);
   }
 
   @Override
@@ -320,7 +295,6 @@ public class IntegrationInstanceBasicModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
-    sb.append("    environment: ").append(toIndentedString(environment)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
