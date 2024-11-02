@@ -1,5 +1,4 @@
 import {Accordion} from '@/components/ui/accordion';
-import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
 import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
 import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
@@ -26,14 +25,10 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
         <>
             <div className="px-3 py-4">
                 <div className="mb-3 flex items-center gap-x-2">
-                    <WorkflowExecutionBadge
-                        status={taskExecutionsCompleted && triggerExecutionCompleted ? 'COMPLETED' : 'FAILED'}
-                    />
-
                     <span
                         className={twMerge(
                             (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
-                            'font-semibold uppercase text-sm'
+                            'font-semibold uppercase text-base'
                         )}
                     >
                         {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}
