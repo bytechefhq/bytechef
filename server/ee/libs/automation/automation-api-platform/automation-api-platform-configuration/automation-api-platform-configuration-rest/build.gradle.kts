@@ -21,6 +21,9 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
         mapOf(
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
             "Page" to "org.springframework.data.domain.Page",
+            "ProjectBasic" to "com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel",
+            "ProjectInstanceBasic" to  "com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel",
+            "ProjectStatus" to "com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel",
             "Tag" to "TagModel",
             "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
         )
