@@ -171,9 +171,9 @@ const IntegrationInstanceConfigurationListItem = ({
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                    {integrationInstanceConfiguration.lastExecutionDate ? (
+                                    {integrationInstanceConfiguration.lastModifiedDate ? (
                                         <span className="text-xs">
-                                            {`Executed at ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleTimeString()}`}
+                                            {`Updated at ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
                                         <span className="text-xs">No executions</span>

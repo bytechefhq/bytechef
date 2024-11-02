@@ -187,7 +187,7 @@ const IntegrationInstanceConfigurations = () => {
                                                             componentDefinition.name === item.componentName!
                                                     )?.title ?? '',
                                             }}
-                                            key={item.componentName}
+                                            key={item.id}
                                             toLink={`?integrationId=${item.id}&environment=${environment ?? ''}`}
                                         />
                                     ))}
