@@ -260,7 +260,9 @@ class HttpClientExecutor {
         ResponseType responseType = configuration.getResponseType();
         int statusCode = httpResponse.statusCode();
 
-        if ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type"))) {
+        if (statusCode != 204 &&
+            ((responseType == null) || !matches(responseType, httpHeaders.firstValue("content-type")))) {
+
             logger.warn(
                 "Unexpected response body content-type type: {} can not be converted to {}",
                 httpHeaders.firstValue("content-type"), responseType);
