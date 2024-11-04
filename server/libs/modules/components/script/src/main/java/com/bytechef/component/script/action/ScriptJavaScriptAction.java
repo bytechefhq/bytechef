@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
-import static com.bytechef.component.script.constant.ScriptConstants.JAVASCRIPT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.definition.Property;
@@ -45,7 +44,7 @@ public class ScriptJavaScriptAction {
 
     public ScriptJavaScriptAction(PolyglotEngine polyglotEngine) {
         this.actionDefinition = new ScriptActionDefinition(
-            action(JAVASCRIPT)
+            action("javascript")
                 .title("JavaScript")
                 .description("Executes custom JavaScript code.")
                 .properties(

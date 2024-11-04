@@ -16,12 +16,11 @@
 
 package com.bytechef.component.email;
 
-import static com.bytechef.component.email.constant.EmailConstants.EMAIL;
+import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.email.action.SendEmailAction;
 import com.bytechef.component.email.connection.EmailConnection;
 import com.google.auto.service.AutoService;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class EmailComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = ComponentDsl.component(EMAIL)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("email")
         .title("Email")
         .description("The Email connector sends emails using an SMTP email server.")
         .connection(EmailConnection.CONNECTION_DEFINITION)

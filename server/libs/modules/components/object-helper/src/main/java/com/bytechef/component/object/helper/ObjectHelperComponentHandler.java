@@ -26,7 +26,6 @@ import com.bytechef.component.object.helper.action.ObjectHelperAddValueByKeyActi
 import com.bytechef.component.object.helper.action.ObjectHelperDeleteKeyValuePairAction;
 import com.bytechef.component.object.helper.action.ObjectHelperParseAction;
 import com.bytechef.component.object.helper.action.ObjectHelperStringifyAction;
-import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -35,7 +34,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class ObjectHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ObjectHelperConstants.OBJECT_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("objectHelper")
         .title("Object Helper")
         .description("Object Helper allows you to do various operations on objects.")
         .icon("path:assets/object-helper.svg")

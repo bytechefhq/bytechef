@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
-import static com.bytechef.component.script.constant.ScriptConstants.R;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.definition.Property;
@@ -45,7 +44,7 @@ public class ScriptRAction {
 
     public ScriptRAction(PolyglotEngine polyglotEngine) {
         actionDefinition = new ScriptActionDefinition(
-            action(R)
+            action("r")
                 .title("R")
                 .description("Executes custom R code.")
                 .properties(

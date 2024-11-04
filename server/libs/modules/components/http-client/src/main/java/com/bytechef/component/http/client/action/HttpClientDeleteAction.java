@@ -28,7 +28,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientDeleteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.DELETE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("delete")
         .title("DELETE")
         .description("The request method to use.")
         .properties(

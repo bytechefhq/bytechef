@@ -16,9 +16,11 @@
 
 package com.bytechef.component.xml.file.action;
 
+import static com.bytechef.component.xml.file.constant.XmlFileConstants.FILENAME;
+import static com.bytechef.component.xml.file.constant.XmlFileConstants.SOURCE;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,9 +65,9 @@ public class XmlFileWriteActionTest {
             });
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.xml")))
             .thenReturn("file.xml");
-        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
@@ -92,9 +94,9 @@ public class XmlFileWriteActionTest {
         Mockito.reset(context);
         Mockito.reset(parameters);
 
-        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.xml")))
             .thenReturn(TEST_XML);
-        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
@@ -128,9 +130,9 @@ public class XmlFileWriteActionTest {
             });
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.xml")))
             .thenReturn("file.xml");
-        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(
@@ -158,9 +160,9 @@ public class XmlFileWriteActionTest {
         Mockito.reset(context);
         Mockito.reset(parameters);
 
-        Mockito.when(parameters.getString(Mockito.eq(XmlFileConstants.FILENAME), Mockito.eq("file.xml")))
+        Mockito.when(parameters.getString(Mockito.eq(FILENAME), Mockito.eq("file.xml")))
             .thenReturn(TEST_XML);
-        Mockito.when(parameters.getRequired(Mockito.eq(XmlFileConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(source);
         Mockito.when(context.xml(Mockito.any()))
             .thenReturn(

@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.AVATAR;
-import static com.bytechef.component.intercom.constant.IntercomConstants.CREATE_CONTACT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.LEAD;
@@ -47,7 +46,7 @@ import com.bytechef.component.definition.TypeReference;
  */
 public class IntercomCreateContactAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Create new contact")
         .properties(

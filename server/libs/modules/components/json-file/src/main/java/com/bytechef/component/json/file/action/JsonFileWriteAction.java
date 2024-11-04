@@ -28,7 +28,6 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.FILENA
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_TYPE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.SOURCE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.TYPE;
-import static com.bytechef.component.json.file.constant.JsonFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -49,7 +48,7 @@ import java.util.Map;
  */
 public class JsonFileWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to a JSON file.")
         .properties(

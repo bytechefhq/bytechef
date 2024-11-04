@@ -29,7 +29,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientPostAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.POST)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("post")
         .title("POST")
         .description("The request method to use.")
         .properties(

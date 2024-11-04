@@ -22,7 +22,6 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.var.action.VarSetAction;
-import com.bytechef.component.var.constant.VarConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -31,7 +30,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class VarComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(VarConstants.VAR)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("var")
         .title("Var")
         .description("Sets a value which can then be referenced in other tasks.")
         .icon("path:assets/var.svg")

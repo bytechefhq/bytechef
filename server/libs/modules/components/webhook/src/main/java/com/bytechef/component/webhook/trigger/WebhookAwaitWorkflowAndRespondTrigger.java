@@ -38,22 +38,28 @@ public class WebhookAwaitWorkflowAndRespondTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("awaitWorkflowAndRespond")
         .title("Await Workflow and Respond")
         .description(
-            "You have the flexibility to set up your preferred response. After a webhook request is received, the webhook trigger enters a waiting state for the workflow's response.")
+            "You have the flexibility to set up your preferred response. After a webhook request is received, the " +
+                "webhook trigger enters a waiting state for the workflow's response.")
         .type(TriggerType.STATIC_WEBHOOK)
         .workflowSyncExecution(true)
         .properties(
             string(CSRF_TOKEN)
                 .label("CSRF Token")
                 .description(
-                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.")
+                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP " +
+                        "header value passed by the client.")
                 .required(true),
             integer("timeout")
                 .label("Timeout (ms)")
                 .description(
-                    "The incoming request will time out after the specified number of milliseconds. The max wait time before a timeout is 5 minutes."))
+                    "The incoming request will time out after the specified number of milliseconds. The max wait " +
+                        "time before a timeout is 5 minutes."))
         .output(
             sampleOutput(
-                Map.of(METHOD, "POST", HEADERS, Map.of("Header1", "value"), PARAMETERS, Map.of("parameter1", "value"))))
+                Map.of(
+                    METHOD, "POST",
+                    HEADERS, Map.of("Header1", "value"),
+                    PARAMETERS, Map.of("parameter1", "value"))))
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 }

@@ -23,7 +23,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.xlsx.file.action.XlsxFileReadAction;
 import com.bytechef.component.xlsx.file.action.XlsxFileWriteAction;
-import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class XlsxFileComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(XlsxFileConstants.XLSX_FILE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("xlsxFile")
         .title("XLSX File")
         .description("Reads and writes data from a XLS/XLSX file.")
         .icon("path:assets/xlsx-file.svg")

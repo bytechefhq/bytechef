@@ -16,11 +16,11 @@
 
 package com.bytechef.component.xml.helper.action;
 
+import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ public class XmlHelperParseActionTest {
         Parameters parameters = Mockito.mock(Parameters.class);
 
         Mockito.when(parameters.getRequiredString(
-            Mockito.eq(XmlHelperConstants.SOURCE)))
+            Mockito.eq(SOURCE)))
             .thenReturn("""
                 <Flower id="45">
                     <name>Poppy</name>
@@ -50,7 +50,7 @@ public class XmlHelperParseActionTest {
             .isEqualTo(Map.of("id", "45", "name", "Poppy"));
 
         Mockito.when(parameters.getRequiredString(
-            Mockito.eq(XmlHelperConstants.SOURCE)))
+            Mockito.eq(SOURCE)))
             .thenReturn("""
                 <Flowers>
                     <Flower id="45">

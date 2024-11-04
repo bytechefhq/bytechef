@@ -20,8 +20,10 @@ package com.bytechef.component.var.constant;
  * @author Ivica Cardic
  */
 public class VarConstants {
-    public static final String VAR = "var";
-    public static final String SET = "set";
+
+    private VarConstants() {
+    }
+
     public static final String VALUE = "value";
     public static final String TYPE = "type";
 }

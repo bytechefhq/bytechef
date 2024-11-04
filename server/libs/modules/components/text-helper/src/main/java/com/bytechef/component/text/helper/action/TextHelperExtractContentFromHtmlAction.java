@@ -20,12 +20,16 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.ATTRIBUTE;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.CONTENT;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.QUERY_SELECTOR;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_ARRAY;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_VALUE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.text.helper.constant.TextHelperConstants;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -38,54 +42,53 @@ import org.jsoup.select.Elements;
  */
 public class TextHelperExtractContentFromHtmlAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION =
-        action(TextHelperConstants.EXTRACT_CONTENT_FROM_HTML)
-            .title("Extract Content from HTML")
-            .description("Extract content from the HTML content.")
-            .properties(
-                string(TextHelperConstants.CONTENT)
-                    .label("HTML Content")
-                    .description("HTML content to extract content from.")
-                    .controlType(Property.ControlType.TEXT_AREA)
-                    .required(true),
-                string(TextHelperConstants.QUERY_SELECTOR)
-                    .label("CSS Selector")
-                    .description("The CSS selector to search for.")
-                    .required(true),
-                string(TextHelperConstants.RETURN_VALUE)
-                    .label("Return Value")
-                    .description("The data to return.")
-                    .options(
-                        option("Attribute", "attribute", "Get the attribute value like 'class' from an element."),
-                        option("HTML", "html", "Get the HTML content that the element contains."),
-                        option("Text", "text", "Get the text content of the element."))
-                    .required(true)
-                    .defaultValue("html"),
-                string(TextHelperConstants.ATTRIBUTE)
-                    .label("Attribute")
-                    .description("The name of the attribute to return the value of")
-                    .required(true)
-                    .displayCondition("%s == 'attribute'".formatted(TextHelperConstants.RETURN_VALUE)),
-                bool(TextHelperConstants.RETURN_ARRAY)
-                    .label("Return Array")
-                    .description(
-                        "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
-            .output()
-            .perform(TextHelperExtractContentFromHtmlAction::perform);
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractContentFromHtml")
+        .title("Extract Content from HTML")
+        .description("Extract content from the HTML content.")
+        .properties(
+            string(CONTENT)
+                .label("HTML Content")
+                .description("HTML content to extract content from.")
+                .controlType(Property.ControlType.TEXT_AREA)
+                .required(true),
+            string(QUERY_SELECTOR)
+                .label("CSS Selector")
+                .description("The CSS selector to search for.")
+                .required(true),
+            string(RETURN_VALUE)
+                .label("Return Value")
+                .description("The data to return.")
+                .options(
+                    option("Attribute", "attribute", "Get the attribute value like 'class' from an element."),
+                    option("HTML", "html", "Get the HTML content that the element contains."),
+                    option("Text", "text", "Get the text content of the element."))
+                .required(true)
+                .defaultValue("html"),
+            string(ATTRIBUTE)
+                .label("Attribute")
+                .description("The name of the attribute to return the value of")
+                .required(true)
+                .displayCondition("%s == 'attribute'".formatted(RETURN_VALUE)),
+            bool(RETURN_ARRAY)
+                .label("Return Array")
+                .description(
+                    "If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string."))
+        .output()
+        .perform(TextHelperExtractContentFromHtmlAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Object result;
 
-        Document document = Jsoup.parse(inputParameters.getRequiredString(TextHelperConstants.CONTENT));
+        Document document = Jsoup.parse(inputParameters.getRequiredString(CONTENT));
 
-        Elements elements = document.select(inputParameters.getRequiredString(TextHelperConstants.QUERY_SELECTOR));
+        Elements elements = document.select(inputParameters.getRequiredString(QUERY_SELECTOR));
 
         Stream<String> items = elements.stream()
             .map(element -> getValue(element, inputParameters));
 
-        if (inputParameters.getBoolean(TextHelperConstants.RETURN_ARRAY, false)) {
+        if (inputParameters.getBoolean(RETURN_ARRAY, false)) {
             result = items.toList();
         } else {
             result = items.collect(Collectors.joining(" "));
@@ -95,10 +98,10 @@ public class TextHelperExtractContentFromHtmlAction {
     }
 
     private static String getValue(Element element, Parameters inputParameters) {
-        String returnValue = inputParameters.getRequiredString(TextHelperConstants.RETURN_VALUE);
+        String returnValue = inputParameters.getRequiredString(RETURN_VALUE);
 
         return switch (returnValue) {
-            case "attribute" -> element.attr(inputParameters.getRequiredString(TextHelperConstants.ATTRIBUTE));
+            case "attribute" -> element.attr(inputParameters.getRequiredString(ATTRIBUTE));
             case "html" -> element.html();
             case "text" -> element.text();
             default -> throw new IllegalArgumentException("Unknown return value: %s".formatted(returnValue));

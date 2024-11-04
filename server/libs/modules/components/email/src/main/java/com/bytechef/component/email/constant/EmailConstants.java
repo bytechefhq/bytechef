@@ -24,6 +24,5 @@ public class EmailConstants {
     public static final String EMAIL = "email";
     public static final String HOST = "host";
     public static final String PORT = "port";
-    public static final String SEND = "send";
     public static final String TLS = "tls";
 }

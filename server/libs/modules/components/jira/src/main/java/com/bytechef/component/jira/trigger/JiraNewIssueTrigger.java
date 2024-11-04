@@ -24,7 +24,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
-import static com.bytechef.component.jira.constant.JiraConstants.NEW_ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class JiraNewIssueTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_ISSUE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newIssue")
         .title("New Issue")
         .description("Triggers when a new issue is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

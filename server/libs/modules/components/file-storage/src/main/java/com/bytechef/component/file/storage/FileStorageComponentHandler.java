@@ -24,7 +24,6 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.file.storage.action.FileStorageDownloadAction;
 import com.bytechef.component.file.storage.action.FileStorageReadAction;
 import com.bytechef.component.file.storage.action.FileStorageWriteAction;
-import com.bytechef.component.file.storage.constant.FileStorageConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class FileStorageComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(FileStorageConstants.FILE_STORAGE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("fileStorage")
         .title("File Storage")
         .description("Reads and writes data from a file stored inside the file storage.")
         .icon("path:assets/file-storage.svg")

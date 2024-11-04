@@ -25,11 +25,10 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
-import static com.bytechef.component.email.constant.EmailConstants.SEND;
 import static com.bytechef.component.email.constant.EmailConstants.TLS;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import jakarta.activation.DataHandler;
@@ -66,7 +65,7 @@ public class SendEmailAction {
     private static final String CONTENT = "content";
     private static final String ATTACHMENTS = "attachments";
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(SEND)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("send")
         .title("Send")
         .description("Send an email to any address.")
         .properties(

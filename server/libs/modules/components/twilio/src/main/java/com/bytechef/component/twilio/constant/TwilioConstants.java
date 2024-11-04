@@ -25,8 +25,6 @@ public class TwilioConstants {
     }
 
     public static final String AUTH_TOKEN = "authToken";
-    public static final String TWILIO = "twilio";
-    public static final String SEND_SMS = "sendSMS";
     public static final String ACCOUNT_SID = "accountSid";
     public static final String ADDRESS_RETENTION = "addressRetention";
     public static final String APPLICATION_SID = "applicationSid";

@@ -29,7 +29,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientGetAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.GET)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("get")
         .title("GET")
         .description("The request method to use.")
         .properties(

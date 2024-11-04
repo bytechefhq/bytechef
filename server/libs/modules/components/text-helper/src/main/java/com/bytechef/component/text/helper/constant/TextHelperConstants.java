@@ -27,16 +27,12 @@ import com.bytechef.component.definition.Property.ControlType;
 public class TextHelperConstants {
 
     public static final String ATTRIBUTE = "attribute";
-    public static final String BASE_64_DECODE = "base64Decode";
     public static final String CONTENT = "content";
     public static final String DELIMITER = "delimiter";
     public static final String ENCODING_SCHEMA = "encodingSchema";
     public static final String ENCODING_SCHEMA_BASE64 = "base64";
     public static final String ENCODING_SCHEMA_BASE64URL = "base64Url";
-    public static final String EXTRACT_CONTENT_FROM_HTML = "extractContentFromHtml";
-    public static final String HTML = "html";
-    public static final String MARKDOWN = "markdown";
-    public static final String TEXT_HELPER = "textHelper";
+    public static final String EXPRESSION = "expression";
     public static final String QUERY_SELECTOR = "querySelector";
     public static final String REPLACE_ONLY_FIRST = "replaceOnlyFirst";
     public static final String REPLACE_VALUE = "replaceValue";
@@ -51,5 +47,5 @@ public class TextHelperConstants {
         .label("Text")
         .controlType(ControlType.TEXT_AREA)
         .required(true);
-    public static final String EXPRESSION = "expression";
+
 }

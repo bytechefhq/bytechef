@@ -19,7 +19,7 @@ package com.bytechef.component.resend.constant;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 
 /**
  * @author Monika Domiter
@@ -39,8 +39,6 @@ public final class ResendConstants {
     public static final String HTML = "html";
     public static final String NAME = "name";
     public static final String REPLY_TO = "reply_to";
-    public static final String RESEND = "resend";
-    public static final String SEND_EMAIL = "sendEmail";
     public static final String SUBJECT = "subject";
     public static final String TAGS = "tags";
     public static final String TEXT = "text";
@@ -49,5 +47,5 @@ public final class ResendConstants {
 
     public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
         .label("Email Address")
-        .controlType(Property.ControlType.EMAIL);
+        .controlType(ControlType.EMAIL);
 }

@@ -19,11 +19,14 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA_BASE64;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA_BASE64URL;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.text.helper.constant.TextHelperConstants;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -34,24 +37,24 @@ import java.util.Objects;
  */
 public class TextHelperBase64DecodeAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION =
-        action(TextHelperConstants.BASE_64_DECODE)
-            .title("Base64 Decode")
-            .description("Decodes base64 encoded text into human readable plain text.")
-            .properties(
-                string(TextHelperConstants.ENCODING_SCHEMA)
-                    .label("Encoding Scheme")
-                    .options(option("Base64", TextHelperConstants.ENCODING_SCHEMA_BASE64),
-                        option("Base64 URL", TextHelperConstants.ENCODING_SCHEMA_BASE64URL))
-                    .controlType(Property.ControlType.SELECT)
-                    .defaultValue(TextHelperConstants.ENCODING_SCHEMA_BASE64),
-                string(TextHelperConstants.CONTENT)
-                    .label("Base64 Content")
-                    .description("The Base64 encoded content that needs to be decoded.")
-                    .controlType(Property.ControlType.TEXT_AREA)
-                    .required(true))
-            .output()
-            .perform(TextHelperBase64DecodeAction::perform);
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("base64Decode")
+        .title("Base64 Decode")
+        .description("Decodes base64 encoded text into human readable plain text.")
+        .properties(
+            string(ENCODING_SCHEMA)
+                .label("Encoding Scheme")
+                .options(
+                    option("Base64", ENCODING_SCHEMA_BASE64),
+                    option("Base64 URL", ENCODING_SCHEMA_BASE64URL))
+                .controlType(ControlType.SELECT)
+                .defaultValue(ENCODING_SCHEMA_BASE64),
+            string(TextHelperConstants.CONTENT)
+                .label("Base64 Content")
+                .description("The Base64 encoded content that needs to be decoded.")
+                .controlType(ControlType.TEXT_AREA)
+                .required(true))
+        .output()
+        .perform(TextHelperBase64DecodeAction::perform);
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
@@ -62,15 +65,15 @@ public class TextHelperBase64DecodeAction {
             return base64Content;
         }
 
-        Base64.Decoder decoder = of(inputParameters.getRequiredString(TextHelperConstants.ENCODING_SCHEMA));
+        Base64.Decoder decoder = of(inputParameters.getRequiredString(ENCODING_SCHEMA));
 
         return new String(decoder.decode(base64Content), StandardCharsets.UTF_8);
     }
 
     private static Base64.Decoder of(String schema) {
-        if (Objects.equals(TextHelperConstants.ENCODING_SCHEMA_BASE64, schema)) {
+        if (Objects.equals(ENCODING_SCHEMA_BASE64, schema)) {
             return Base64.getDecoder();
-        } else if (Objects.equals(TextHelperConstants.ENCODING_SCHEMA_BASE64URL, schema)) {
+        } else if (Objects.equals(ENCODING_SCHEMA_BASE64URL, schema)) {
             return Base64.getUrlDecoder();
         }
 

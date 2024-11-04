@@ -27,9 +27,6 @@ public class JsonFileConstants {
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_NUMBER = "pageNumber";
     public static final String SOURCE = "source";
-    public static final String JSON_FILE = "jsonFile";
-    public static final String READ = "read";
-    public static final String WRITE = "write";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
     public static final String TYPE = "type";

@@ -17,7 +17,6 @@
 package com.bytechef.component.xml.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.XML_HELPER;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class XmlHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(XML_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("xmlHelper")
         .title("XML Helper")
         .description("Converts between XML string and object/array.")
         .icon("path:assets/xml-helper.svg")

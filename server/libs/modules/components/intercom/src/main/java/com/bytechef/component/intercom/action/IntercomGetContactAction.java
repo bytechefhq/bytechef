@@ -23,14 +23,13 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
-import static com.bytechef.component.intercom.constant.IntercomConstants.GET_CONTACT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -42,7 +41,7 @@ import com.bytechef.component.intercom.util.IntercomUtils;
  */
 public class IntercomGetContactAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action(GET_CONTACT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getContact")
         .title("Get Contact")
         .description("Get a single Contact")
         .properties(

@@ -25,7 +25,6 @@ import static com.bytechef.component.jira.constant.JiraConstants.ISSUE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUETYPE;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.jira.constant.JiraConstants.PROJECT;
-import static com.bytechef.component.jira.constant.JiraConstants.UPDATED_ISSUE;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -46,7 +45,7 @@ import java.util.Map;
  */
 public class JiraUpdatedIssueTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(UPDATED_ISSUE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("updatedIssue")
         .title("Updated Issue")
         .description("Triggers when an issue is updated.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

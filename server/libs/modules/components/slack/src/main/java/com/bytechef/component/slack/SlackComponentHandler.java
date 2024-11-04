@@ -17,7 +17,6 @@
 package com.bytechef.component.slack;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.slack.constant.SlackConstants.SLACK;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public final class SlackComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(SLACK)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("slack")
         .title("Slack")
         .description("Slack is a messaging platform for teams to communicate and collaborate.")
         .customAction(true)

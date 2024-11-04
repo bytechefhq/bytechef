@@ -22,9 +22,4 @@ package com.bytechef.component.script.constant;
 public class ScriptConstants {
 
     public static final String INPUT = "input";
-    public static final String JAVA = "java";
-    public static final String JAVASCRIPT = "javascript";
-    public static final String PYTHON = "python";
-    public static final String RUBY = "ruby";
-    public static final String R = "r";
 }

@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.END_INCLUSIVE;
+import static com.bytechef.component.random.helper.constant.RandomHelperConstants.START_INCLUSIVE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -31,16 +33,16 @@ import com.bytechef.component.random.helper.constant.RandomHelperConstants;
  */
 public class RandomHelperRandomFloatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(RandomHelperConstants.RANDOM_FLOAT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("randomFloat")
         .title("Float")
         .description("Generates a random float value.")
         .properties(
-            integer(RandomHelperConstants.START_INCLUSIVE)
+            integer(START_INCLUSIVE)
                 .label("Start Inclusive")
                 .description("The minimum possible generated value.")
                 .required(true)
                 .defaultValue(0),
-            integer(RandomHelperConstants.END_INCLUSIVE)
+            integer(END_INCLUSIVE)
                 .label("End Inclusive")
                 .description("The maximum possible generated value.")
                 .required(true)
@@ -54,8 +56,8 @@ public class RandomHelperRandomFloatAction {
     protected static Float perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        int startInclusive = inputParameters.getInteger(RandomHelperConstants.START_INCLUSIVE, 0);
-        int endInclusive = inputParameters.getInteger(RandomHelperConstants.END_INCLUSIVE, 100);
+        int startInclusive = inputParameters.getInteger(START_INCLUSIVE, 0);
+        int endInclusive = inputParameters.getInteger(END_INCLUSIVE, 100);
 
         return nextFloat(startInclusive, endInclusive);
     }

@@ -37,17 +37,22 @@ public class WebhookValidateAndRespondTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("validateAndRespond")
         .title("Validate and Respond")
         .description(
-            "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook trigger responds to the sender with an appropriate HTTP status code.")
+            "Upon receiving a webhook request, it goes through a validation process. Once validated, the webhook " +
+                "trigger responds to the sender with an appropriate HTTP status code.")
         .type(TriggerDefinition.TriggerType.STATIC_WEBHOOK)
         .properties(
             string(CSRF_TOKEN)
                 .label("CSRF Token")
                 .description(
-                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP header value passed by the client.")
+                    "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP " +
+                        "header value passed by the client.")
                 .required(true))
         .output(
             sampleOutput(
-                Map.of(METHOD, "POST", HEADERS, Map.of("Header1", "value"), PARAMETERS, Map.of("parameter1", "value"))))
+                Map.of(
+                    METHOD, "POST",
+                    HEADERS, Map.of("Header1", "value"),
+                    PARAMETERS, Map.of("parameter1", "value"))))
         .webhookRequest(WebhookUtils::getWebhookResult)
         .webhookValidate(WebhookUtils.getWebhookValidateFunction());
 }
