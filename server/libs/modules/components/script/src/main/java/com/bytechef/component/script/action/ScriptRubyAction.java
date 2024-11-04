@@ -57,7 +57,7 @@ public class ScriptRubyAction {
                             time())
                         .expressionEnabled(false),
                     string(SCRIPT)
-                        .label("Ruby code")
+                        .label("Ruby Code")
                         .description("Add your Ruby custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("ruby")

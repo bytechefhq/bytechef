@@ -85,12 +85,12 @@ public final class ResendSendEmailAction {
                 .items(EMAIL_PROPERTY)
                 .required(false),
             array(REPLY_TO)
-                .label("Reply to")
+                .label("Reply To")
                 .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
             integer(CONTENT_TYPE)
-                .label("Content type")
+                .label("Content Type")
                 .options(
                     option("HTML", 1),
                     option("Plain text", 2))

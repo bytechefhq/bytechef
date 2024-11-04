@@ -151,7 +151,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             string(STATUS_CALLBACK)
-                .label("Status callback")
+                .label("Status Callback")
                 .description(
                     "The URL of the endpoint to which Twilio sends Message status callback requests. URL must " +
                         "contain a valid hostname and underscores are not allowed. If you include this parameter " +
@@ -169,7 +169,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             number(MAX_PRICE)
-                .label("Maximum price")
+                .label("Maximum Price")
                 .description(
                     "The maximum price in US dollars that you are willing to pay for this Message's delivery. When " +
                         "the max_price parameter is provided, the cost of a message is checked before it is sent. If " +
@@ -178,7 +178,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             bool(PROVIDE_FEEDBACK)
-                .label("Provide feedback")
+                .label("Provide Feedback")
                 .description(
                     "Boolean indicating whether or not you intend to provide delivery confirmation feedback to Twilio" +
                         " (used in conjunction with the Message Feedback subresource). Boolean indicating whether or " +
@@ -195,7 +195,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             integer(VALIDITY_PERIOD)
-                .label("Validity period")
+                .label("Validity Period")
                 .description(
                     "The maximum length in seconds that the Message can remain in Twilio's outgoing message queue. " +
                         "If a queued Message exceeds the validity_period, the Message is not sent. A validity_period " +
@@ -206,12 +206,12 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             bool(FORCE_DELIVERY)
-                .label("Force delivery")
+                .label("Force Delivery")
                 .description("Reserved")
                 .required(false)
                 .advancedOption(true),
             string(CONTENT_RETENTION)
-                .label("Content retention")
+                .label("Content Retention")
                 .description("Determines if the message content can be stored or redacted based on privacy settings.")
                 .options(
                     option("Retain", "retain"),
@@ -219,7 +219,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             string(ADDRESS_RETENTION)
-                .label("Address retention")
+                .label("Address Retention")
                 .description("Determines if the address can be stored or obfuscated based on privacy settings.")
                 .options(
                     option("Retain", "retain"),
@@ -227,13 +227,13 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             bool(SMART_ENCODED)
-                .label("Smart encoded")
+                .label("Smart Encoded")
                 .description(
                     "Whether to detect Unicode characters that have a similar GSM-7 character and replace them.")
                 .required(false)
                 .advancedOption(true),
             array(PERSISTENT_ACTION)
-                .label("Persistent action")
+                .label("Persistent Action")
                 .description("Rich actions for non-SMS/MMS channels. Used for sending location in WhatsApp messages.")
                 .items(
                     string())
@@ -248,7 +248,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             string(SCHEDULE_TYPE)
-                .label("Schedule type")
+                .label("Schedule Type")
                 .description(
                     "For Messaging Services only: Include this parameter with a value of fixed in conjuction with " +
                         "the send_time parameter in order to schedule a Message.")
@@ -257,11 +257,11 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             object(SEND_AT)
-                .label("Send at")
+                .label("Send At")
                 .description("The time that Twilio will send the message. Must be in ISO 8601 format.")
                 .properties(
                     dateTime(DATE_TIME)
-                        .label("Date time")
+                        .label("Date Time")
                         .required(true),
                     string(ZONE_ID)
                         .label("Zone ID")
@@ -277,7 +277,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             string(CONTENT_VARIABLES)
-                .label("Content variables")
+                .label("Content Variables")
                 .description(
                     "For Content Editor/API only: Key-value pairs of Template variables and their substitution " +
                         "values. content_sid parameter must also be provided. If values are not defined in the " +
@@ -285,7 +285,7 @@ public class TwilioSendSMSAction {
                 .required(false)
                 .advancedOption(true),
             string(RISK_CHECK)
-                .label("Risk check")
+                .label("Risk Check")
                 .description(
                     "For SMS pumping protection feature only: Include this parameter with a value of disable to skip " +
                         "any kind of risk check on the respective message request.")

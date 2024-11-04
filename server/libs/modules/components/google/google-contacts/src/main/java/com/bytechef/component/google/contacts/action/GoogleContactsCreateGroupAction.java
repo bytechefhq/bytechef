@@ -38,11 +38,11 @@ public class GoogleContactsCreateGroupAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
         .title("Create Group")
-        .description("Creates a new group")
+        .description("Creates a new group.")
         .properties(
             string(NAME)
-                .label("Group name")
-                .description("The name of the group")
+                .label("Group Name")
+                .description("The name of the group.")
                 .required(true))
         .output(
             outputSchema(

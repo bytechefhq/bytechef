@@ -71,7 +71,7 @@ public class LLMConstants {
     public static final String FUNCTIONS = "functions";
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
-        .label("Frequency penalty")
+        .label("Frequency Penalty")
         .description(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in " +
                 "the text so far, decreasing the model's likelihood to repeat the same line verbatim.")
@@ -87,7 +87,7 @@ public class LLMConstants {
         .advancedOption(true);
 
     public static final ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
-        .label("Response format")
+        .label("Response Format")
         .description("In which format do you want the response to be in?")
         .options(option("Text", 0),
             option("Object", 1, "JSON response with key-value pairs."),
@@ -96,18 +96,18 @@ public class LLMConstants {
         .required(false);
 
     public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
-        .label("Logit bias")
+        .label("Logit Bias")
         .description("Modify the likelihood of specified tokens appearing in the completion.")
         .additionalProperties(number())
         .advancedOption(true);
 
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
-        .label("Max tokens")
+        .label("Max Tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
         .advancedOption(true);
 
     public static final ModifiableIntegerProperty N_PROPERTY = integer(N)
-        .label("Number of chat completion choices")
+        .label("Number of Chat Completion Choices")
         .description("How many chat completion choices to generate for each input message.")
         .defaultValue(1)
         .advancedOption(true);
@@ -119,7 +119,7 @@ public class LLMConstants {
         .advancedOption(true);
 
     public static final ComponentDsl.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
-        .label("Presence penalty")
+        .label("Presence Penalty")
         .description(
             "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the " +
                 "text so far, increasing the model's likelihood to talk about new topics.")

@@ -49,10 +49,10 @@ public class DateHelperDateDifferenceAction {
         .description("Get the difference between two dates.")
         .properties(
             dateTime(START_DATE)
-                .label("Start date")
+                .label("Start Date")
                 .required(true),
             dateTime(END_DATE)
-                .label("End date")
+                .label("End Date")
                 .required(true),
             string(UNIT)
                 .label("Unit")

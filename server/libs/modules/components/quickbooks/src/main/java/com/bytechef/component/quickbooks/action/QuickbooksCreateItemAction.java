@@ -48,7 +48,7 @@ public final class QuickbooksCreateItemAction {
                 .maxLength(100)
                 .required(true),
             number(QUANTITY)
-                .label("Quantity on hand")
+                .label("Quantity on Hand")
                 .description(
                     "Current quantity of the Inventory items available for sale. Not used for Service or " +
                         "NonInventory type items.Required for Inventory type items."))

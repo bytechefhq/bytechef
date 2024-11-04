@@ -60,7 +60,7 @@ public class GoogleSheetsCreateSheetAction {
         .properties(
             SPREADSHEET_ID_PROPERTY,
             string(SHEET_NAME)
-                .label("Sheet name")
+                .label("Sheet Name")
                 .description("The name of the new sheet.")
                 .required(true),
             array(HEADERS)

@@ -57,7 +57,7 @@ public class ObjectHelperAddValueByKeyAction {
                 .description("Key of the value to be added or updated.")
                 .required(true),
             integer(VALUE_TYPE)
-                .label("Value type")
+                .label("Value Type")
                 .options(TYPE_OPTIONS)
                 .description("Type of value to be added or updated.")
                 .required(true),

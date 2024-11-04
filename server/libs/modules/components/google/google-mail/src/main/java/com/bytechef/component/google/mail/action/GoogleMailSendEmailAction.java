@@ -74,7 +74,7 @@ public class GoogleMailSendEmailAction {
                 .items(EMAIL_PROPERTY)
                 .required(false),
             array(REPLY_TO)
-                .label("Reply to")
+                .label("Reply To")
                 .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),

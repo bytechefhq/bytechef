@@ -48,7 +48,7 @@ public class ZendeskSellCreateContactAction {
         .description("Creates new contact. A contact may represent a single individual or an organization.")
         .properties(
             bool(IS_ORGANIZATION)
-                .label("Is contact represent an organization?")
+                .label("Is Contact Represent an Organization?")
                 .description("Is contact represent an organization or a single individual?")
                 .required(true),
             string(NAME)
@@ -57,12 +57,12 @@ public class ZendeskSellCreateContactAction {
                 .displayCondition("%s == true".formatted(IS_ORGANIZATION))
                 .required(false),
             string(FIRST_NAME)
-                .label("First name")
+                .label("First Name")
                 .description("The first name of the person.")
                 .displayCondition("%s == false".formatted(IS_ORGANIZATION))
                 .required(false),
             string(LAST_NAME)
-                .label("Last name")
+                .label("Last Name")
                 .description("The last name of the person.")
                 .displayCondition("%s == false".formatted(IS_ORGANIZATION))
                 .required(true),

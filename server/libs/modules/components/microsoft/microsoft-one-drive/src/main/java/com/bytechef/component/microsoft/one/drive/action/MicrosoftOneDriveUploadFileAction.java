@@ -43,10 +43,10 @@ public class MicrosoftOneDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload File")
-        .description("Upload a file to your Microsoft OneDrive")
+        .description("Upload a file to your Microsoft OneDrive.")
         .properties(
             string(PARENT_ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the file should be uploaded; if no folder is selected, the file will be " +
                         "uploaded in the root folder.")
@@ -54,7 +54,7 @@ public class MicrosoftOneDriveUploadFileAction {
                 .required(false),
             fileEntry(FILE)
                 .label("File")
-                .description("File to upload")
+                .description("File to upload.")
                 .required(true))
         .output(
             outputSchema(

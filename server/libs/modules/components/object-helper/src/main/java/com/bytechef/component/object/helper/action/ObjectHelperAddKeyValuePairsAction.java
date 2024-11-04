@@ -57,7 +57,7 @@ public class ObjectHelperAddKeyValuePairsAction {
                 "every object in the array.")
         .properties(
             integer(SOURCE_TYPE)
-                .label("Type of initial object")
+                .label("Type of Initial Object")
                 .options(
                     option("Array", 1),
                     option("Object", 2))
@@ -81,7 +81,7 @@ public class ObjectHelperAddKeyValuePairsAction {
                     array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(), time())
                 .required(true),
             object(VALUE)
-                .label("Key-Value pairs")
+                .label("Key-Value Pairs")
                 .description("Key-Value pairs to be added or updated.")
                 .additionalProperties(bool(), string(), number(), object(), array(), dateTime(), date(), time())
                 .required(true))

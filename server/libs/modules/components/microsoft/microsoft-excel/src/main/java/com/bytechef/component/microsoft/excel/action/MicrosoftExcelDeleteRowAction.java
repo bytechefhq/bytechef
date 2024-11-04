@@ -39,13 +39,13 @@ public class MicrosoftExcelDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
-        .description("Delete row on an existing sheet")
+        .description("Delete row on an existing sheet.")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             integer(ROW_NUMBER)
-                .label("Row number")
-                .description("The row number to delete")
+                .label("Row Number")
+                .description("The row number to delete.")
                 .required(true))
         .perform(MicrosoftExcelDeleteRowAction::perform);
 

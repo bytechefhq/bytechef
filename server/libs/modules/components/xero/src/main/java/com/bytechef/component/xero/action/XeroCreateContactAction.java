@@ -77,12 +77,12 @@ public class XeroCreateContactAction {
                 .maxLength(50)
                 .required(false),
             string(ACCOUNT_NUMBER)
-                .label("Account number")
+                .label("Account Number")
                 .description("Unique account number to identify, reference and search for the contact.")
                 .maxLength(50)
                 .required(false),
             string(CONTACT_STATUS)
-                .label("Contact status")
+                .label("Contact Status")
                 .description("Current status of a contact.")
                 .options(
                     option("Active", "ACTIVE", "The Contact is active and can be used in transactions."),
@@ -92,27 +92,27 @@ public class XeroCreateContactAction {
                         "The Contact is the subject of a GDPR erasure request and can no longer be used in transctions."))
                 .required(false),
             string(FIRST_NAME)
-                .label("First name")
+                .label("First Name")
                 .description("First name of primary person.")
                 .maxLength(255)
                 .required(false),
             string(LAST_NAME)
-                .label("Last name")
+                .label("Last Name")
                 .description("Last name of primary person.")
                 .maxLength(255)
                 .required(false),
             string(EMAIL_ADDRESS)
-                .label("Email address")
+                .label("Email Address")
                 .description("Email address of contact person.")
                 .controlType(ControlType.EMAIL)
                 .maxLength(255)
                 .required(false),
             string(BANK_ACCOUNT_DETAILS)
-                .label("Bank account number")
+                .label("Bank Account Number")
                 .description("Bank account number of contact.")
                 .required(false),
             string(TAX_NUMBER)
-                .label("Tax number")
+                .label("Tax Number")
                 .description(
                     "Tax number of contact – this is also known as the ABN (Australia), GST Number (New Zealand), " +
                         "VAT Number (UK) or Tax ID Number (US and global) in the Xero UI depending on which " +
@@ -125,6 +125,7 @@ public class XeroCreateContactAction {
                     object()
                         .properties(
                             string(PHONE_TYPE)
+                                .label("Phone Type")
                                 .options(
                                     option("Default", "DEFAULT"),
                                     option("Fax", "FAX"),
@@ -151,7 +152,7 @@ public class XeroCreateContactAction {
                     object()
                         .properties(
                             string(ADDRESS_TYPE)
-                                .label("Address type")
+                                .label("Address Type")
                                 .options(
                                     option("POBOX", "POBOX"),
                                     option("STREET", "STREET"))
@@ -165,7 +166,7 @@ public class XeroCreateContactAction {
                                 .maxLength(255)
                                 .required(false),
                             string(POSTAL_CODE)
-                                .label("Postal/Zip code")
+                                .label("Postal/Zip Code")
                                 .maxLength(50)
                                 .required(false),
                             string(COUNTRY)

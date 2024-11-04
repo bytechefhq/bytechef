@@ -58,7 +58,7 @@ public class GoogleSheetsCreateColumnAction {
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
             SHEET_NAME_PROPERTY,
             string(COLUMN_NAME)
-                .label("Column name")
+                .label("Column Name")
                 .description("Name of the new column.")
                 .required(true))
         .output(

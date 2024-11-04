@@ -40,7 +40,7 @@ public class DropboxCreateNewFolderAction {
         .description("Create a folder at a given path.")
         .properties(
             string(PATH)
-                .label("Folder path/name")
+                .label("Folder Path/Name")
                 .description("The path of the new folder. Root is /.")
                 .required(true))
         .output(

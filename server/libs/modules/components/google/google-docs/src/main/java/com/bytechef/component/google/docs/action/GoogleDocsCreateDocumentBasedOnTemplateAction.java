@@ -46,20 +46,20 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT_BASED_ON_TEMPLATE)
         .title("Edit Template File")
-        .description("Edit a template file and replace the values with the ones provided")
+        .description("Edit a template file and replace the values with the ones provided.")
         .properties(
             string(DESTINATION_FILE)
-                .label("Destination file")
-                .description("The ID of the file to replace the values")
+                .label("Destination File")
+                .description("The ID of the file to replace the values.")
                 .required(true),
             object(VALUES)
                 .label("Variables")
-                .description("Don't include the \"[[]]\", only the key name and its value")
+                .description("Don't include the \"[[]]\", only the key name and its value.")
                 .additionalProperties(string())
                 .required(false),
             object(IMAGES)
                 .label("Images")
-                .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL")
+                .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
                 .additionalProperties(string())
                 .required(false))
         .perform(GoogleDocsCreateDocumentBasedOnTemplateAction::perform);

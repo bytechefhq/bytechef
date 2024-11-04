@@ -81,28 +81,28 @@ public class GoogleCalendarCreateEventAction {
                 .description("Title of the event.")
                 .required(false),
             bool(ALL_DAY)
-                .label("All day event?")
+                .label("All Day Event?")
                 .defaultValue(false)
                 .required(true),
             date(START)
-                .label("Start date")
+                .label("Start Date")
                 .description("The start date of the event.")
                 .displayCondition("%s == true".formatted(ALL_DAY))
                 .required(true),
             date(END)
-                .label("End date")
+                .label("End Date")
                 .description("The end date of the event.")
                 .displayCondition("%s == true".formatted(ALL_DAY))
                 .required(true),
             dateTime(START)
-                .label("Start date time")
+                .label("Start Date Time")
                 .description(
                     "The (inclusive) start time of the event. For a recurring event, this is the start time of the " +
                         "first instance.")
                 .displayCondition("%s == false".formatted(ALL_DAY))
                 .required(true),
             dateTime(END)
-                .label("End date time")
+                .label("End Date Time")
                 .description(
                     "The (exclusive) end time of the event. For a recurring event, this is the end time of the " +
                         "first instance.")
@@ -129,23 +129,23 @@ public class GoogleCalendarCreateEventAction {
                         .description("The attendee's email address."))
                 .required(false),
             bool(GUEST_CAN_INVITE_OTHERS)
-                .label("Guest can invite others")
+                .label("Guest Can Invite Others")
                 .description("Whether attendees other than the organizer can invite others to the event.")
                 .defaultValue(true)
                 .required(false),
             bool(GUEST_CAN_MODIFY)
-                .label("Guest can modify")
+                .label("Guest Can Modify")
                 .description("Whether attendees other than the organizer can modify the event.")
                 .defaultValue(false)
                 .required(false),
             bool(GUEST_CAN_SEE_OTHER_GUESTS)
-                .label("Guest can see other guests")
+                .label("Guest Can See Other Guests")
                 .description("Whether attendees other than the organizer can see who the event's attendees are.")
                 .defaultValue(true)
                 .required(false),
             SEND_UPDATES_PROPERTY,
             bool(USE_DEFAULT)
-                .label("Use default reminders")
+                .label("Use Default Reminders")
                 .description("Whether the default reminders of the calendar apply to the event.")
                 .defaultValue(true)
                 .required(true),
@@ -156,7 +156,7 @@ public class GoogleCalendarCreateEventAction {
                     object()
                         .properties(
                             string(METHOD)
-                                .label("How is reminder sent?")
+                                .label("How Is Reminder Sent?")
                                 .options(
                                     option("Email", "email", "Reminders are sent via email."),
                                     option("Popup", "popup", "Reminders are sent via a UI popup."))

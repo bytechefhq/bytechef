@@ -42,14 +42,14 @@ public class MicrosoftExcelFindRowByNumAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
         .title("Find Row by Number")
-        .description("Get row values from the worksheet by the row number")
+        .description("Get row values from the worksheet by the row number.")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             integer(ROW_NUMBER)
-                .label("Row number")
-                .description("The row number to get the values from")
+                .label("Row Number")
+                .description("The row number to get the values from.")
                 .required(true))
         .output(outputSchema(
             object()

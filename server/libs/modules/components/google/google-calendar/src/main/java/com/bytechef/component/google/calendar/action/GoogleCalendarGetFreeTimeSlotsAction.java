@@ -49,7 +49,7 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             object(DATE_RANGE)
-                .label("Date range")
+                .label("Date Range")
                 .description("Date range to find free time.")
                 .properties(
                     dateTime(FROM)

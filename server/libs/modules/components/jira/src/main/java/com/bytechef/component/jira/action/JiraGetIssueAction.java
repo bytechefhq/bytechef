@@ -46,7 +46,7 @@ public class JiraGetIssueAction {
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUE_ID)
-                .label("Issue name")
+                .label("Issue Name")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true))

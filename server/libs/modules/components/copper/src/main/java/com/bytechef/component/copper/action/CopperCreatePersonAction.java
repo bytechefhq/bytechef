@@ -54,7 +54,7 @@ import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 
 /**
@@ -64,22 +64,22 @@ public class CopperCreatePersonAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPerson")
         .title("Create Person")
-        .description("Creates a new Person")
+        .description("Creates a new person.")
         .properties(
             string(NAME)
                 .label("Name")
-                .description("The first and last name of the Person.")
+                .description("The first and last name of the person.")
                 .required(true),
             array(EMAILS)
                 .label("Emails")
-                .description("Email addresses belonging to the Person.")
+                .description("Email addresses belonging to the person.")
                 .items(
                     object("Email")
                         .properties(
                             string(EMAIL)
                                 .label("Email")
                                 .description("An email address.")
-                                .controlType(Property.ControlType.EMAIL)
+                                .controlType(ControlType.EMAIL)
                                 .required(false),
                             string(CATEGORY)
                                 .label("Category")
@@ -92,21 +92,21 @@ public class CopperCreatePersonAction {
                 .required(false),
             string(ASSIGNEE_ID)
                 .label("Assignee")
-                .description("User that will be the owner of the Person.")
+                .description("User that will be the owner of the person.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(TITLE)
                 .label("Title")
-                .description("The professional title of the Person.")
+                .description("The professional title of the person.")
                 .required(false),
             string(COMPANY_ID)
                 .label("Company")
-                .description("Primary Company with which the Person is associated.")
+                .description("Primary company with which the person is associated.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
                 .required(false),
             string(CONTACT_TYPE_ID)
                 .label("Contact type")
-                .description("The unique identifier of the Contact Type of the Person.")
+                .description("The unique identifier of the contact type of the person.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),
             string(DETAILS)
@@ -114,7 +114,7 @@ public class CopperCreatePersonAction {
                 .description("Description of the person.")
                 .required(false),
             array(PHONE_NUMBERS)
-                .label("Phone numbers")
+                .label("Phone Numbers")
                 .description("Phone numbers belonging to the person.")
                 .items(
                     object()
@@ -135,7 +135,7 @@ public class CopperCreatePersonAction {
                 .required(false),
             array(SOCIALS)
                 .label("Socials")
-                .description("Social profiles belonging to the Person.")
+                .description("Social profiles belonging to the person.")
                 .items(
                     object()
                         .properties(
@@ -159,7 +159,7 @@ public class CopperCreatePersonAction {
                 .required(false),
             array(WEBSITES)
                 .label("Websites")
-                .description("Websites belonging to the Person.")
+                .description("Websites belonging to the person.")
                 .items(
                     object()
                         .properties(
@@ -198,7 +198,7 @@ public class CopperCreatePersonAction {
                 .required(false),
             array(TAGS)
                 .label("Tags")
-                .description("Tags associated with the Person.")
+                .description("Tags associated with the person.")
                 .items(
                     string()
                         .options((ActionOptionsFunction<String>) CopperOptionUtils::getTagsOptions))

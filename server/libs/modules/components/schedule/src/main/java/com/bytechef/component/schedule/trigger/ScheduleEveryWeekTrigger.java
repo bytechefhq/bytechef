@@ -64,7 +64,7 @@ public class ScheduleEveryWeekTrigger {
                 .minValue(0)
                 .maxValue(59),
             integer(DAY_OF_WEEK)
-                .label("Day of week")
+                .label("Day of Week")
                 .description("Days at which a workflow will be triggered.")
                 .options(
                     option("Monday", 1),

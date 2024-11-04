@@ -94,7 +94,7 @@ public class AzureOpenAICreateImageAction {
                     }))
                 .required(true),
             integer(N)
-                .label("Number of responses")
+                .label("Number of Responses")
                 .description(
                     "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
                 .defaultValue(1)
@@ -102,7 +102,7 @@ public class AzureOpenAICreateImageAction {
                 .maxValue(10)
                 .advancedOption(true),
             string(RESPONSE_FORMAT)
-                .label("Response format")
+                .label("Response Format")
                 .description("The format in which the generated images are returned.")
                 .options(
                     option("url", "url"),

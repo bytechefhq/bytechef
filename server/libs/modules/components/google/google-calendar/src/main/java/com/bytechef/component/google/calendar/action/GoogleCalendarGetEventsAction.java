@@ -52,7 +52,7 @@ public class GoogleCalendarGetEventsAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             array(EVENT_TYPE)
-                .label("Event type")
+                .label("Event Type")
                 .description("Event types to return.")
                 .items(
                     string()
@@ -62,7 +62,7 @@ public class GoogleCalendarGetEventsAction {
                             option("Focus time", "focusTime")))
                 .required(false),
             integer(MAX_RESULTS)
-                .label("Max results")
+                .label("Max Results")
                 .description(
                     "Maximum number of events returned on one result page. The number of events in the resulting " +
                         "page may be less than this value, or none at all, even if there are more events matching " +
@@ -72,7 +72,7 @@ public class GoogleCalendarGetEventsAction {
                 .maxValue(2500)
                 .required(false),
             string(Q)
-                .label("Search terms")
+                .label("Search Terms")
                 .description(
                     "Free text search terms to find events that match these terms in the following fields: summary, " +
                         "description, location, attendee's displayName, attendee's email, " +
@@ -82,7 +82,7 @@ public class GoogleCalendarGetEventsAction {
                         "workingLocationProperties.customLocation.label")
                 .required(false),
             object(DATE_RANGE)
-                .label("Date range")
+                .label("Date Range")
                 .description("Date range to find events that exist in this range.")
                 .properties(
                     dateTime(FROM)

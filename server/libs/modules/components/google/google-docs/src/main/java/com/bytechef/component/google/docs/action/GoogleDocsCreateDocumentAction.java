@@ -47,11 +47,11 @@ public class GoogleDocsCreateDocumentAction {
         .properties(
             string(TITLE)
                 .label("Title")
-                .description("Document title")
+                .description("Document title.")
                 .required(true),
             string(BODY)
                 .label("Content")
-                .description("Document content")
+                .description("Document content.")
                 .required(true))
         .perform(GoogleDocsCreateDocumentAction::perform);
 

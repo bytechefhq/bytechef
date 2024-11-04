@@ -39,20 +39,20 @@ public class FreshsalesCreateAccountAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
         .title("Create Account")
-        .description("Creates a new account")
+        .description("Creates a new account.")
         .properties(
             string(NAME)
                 .label("Name")
-                .description("Name of the account")
+                .description("Name of the account.")
                 .required(true),
             string(WEBSITE)
                 .label("Website")
-                .description("Website of the account")
+                .description("Website of the account.")
                 .controlType(Property.ControlType.URL)
                 .required(false),
             string(PHONE)
                 .label("Phone")
-                .description("Phone number of the account")
+                .description("Phone number of the account.")
                 .required(false))
         .output(
             outputSchema(

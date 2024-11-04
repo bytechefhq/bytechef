@@ -36,10 +36,12 @@ public class RandomHelperRandomFloatAction {
         .description("Generates a random float value.")
         .properties(
             integer(RandomHelperConstants.START_INCLUSIVE)
+                .label("Start Inclusive")
                 .description("The minimum possible generated value.")
                 .required(true)
                 .defaultValue(0),
             integer(RandomHelperConstants.END_INCLUSIVE)
+                .label("End Inclusive")
                 .description("The maximum possible generated value.")
                 .required(true)
                 .defaultValue(100))

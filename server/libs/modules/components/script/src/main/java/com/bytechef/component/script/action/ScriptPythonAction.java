@@ -57,7 +57,7 @@ public class ScriptPythonAction {
                             time())
                         .expressionEnabled(false),
                     string(SCRIPT)
-                        .label("Python code")
+                        .label("Python Code")
                         .description("Add your Python custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("python")

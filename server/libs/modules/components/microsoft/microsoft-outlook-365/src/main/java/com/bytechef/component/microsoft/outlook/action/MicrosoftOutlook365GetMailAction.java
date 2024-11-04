@@ -40,7 +40,7 @@ public class MicrosoftOutlook365GetMailAction {
         .description("Get a specific message")
         .properties(
             string(ID)
-                .label("Message id")
+                .label("Message Id")
                 .description("Id of the message")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getMessageIdOptions)
                 .required(true))

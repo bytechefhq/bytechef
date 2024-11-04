@@ -52,7 +52,7 @@ public class WhatsAppNewIncomingMessageTrigger {
             .type(TriggerType.DYNAMIC_WEBHOOK)
             .properties(
                 string(SENDER_NUMBER)
-                    .label("Sender number")
+                    .label("Sender Number")
                     .description("Type in the number from whom you want to trigger")
                     .required(true))
             .output(

@@ -36,10 +36,10 @@ public class MathHelperAdditionAction {
         .description("Add two numbers.")
         .properties(
             number(FIRST_NUMBER)
-                .label("First number")
+                .label("First Number")
                 .required(true),
             number(SECOND_NUMBER)
-                .label("Second number")
+                .label("Second Number")
                 .required(true))
         .output(outputSchema(number()))
         .perform(MathHelperAdditionAction::perform);

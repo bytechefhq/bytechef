@@ -50,7 +50,7 @@ public class BoxUploadFileAction {
         .description("Uploads a small file to Box.")
         .properties(
             string(ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the file should be uploaded; if no folder is selected, the file will be " +
                         "uploaded in the root folder.")

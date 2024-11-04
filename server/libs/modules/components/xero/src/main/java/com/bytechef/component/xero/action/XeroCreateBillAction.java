@@ -65,12 +65,12 @@ public class XeroCreateBillAction {
                 .required(true),
             date(DUE_DATE)
                 .label("Due Date")
-                .description("Date bill is due.If no date is specified, the current date will be used. ")
+                .description("Date bill is due. If no date is specified, the current date will be used.")
 //                .defaultValue(LocalDate.now())
                 .required(false),
             LINE_AMOUNT_TYPE_PROPERTY,
             array(LINE_ITEMS)
-                .label("Line items")
+                .label("Line Items")
                 .description("Line items on the bill.")
                 .minItems(1)
                 .items(

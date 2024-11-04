@@ -120,7 +120,7 @@ public class DataStorageAppendValueToListAction {
                 .displayCondition("type == 10")
                 .required(true),
             bool(APPEND_LIST_AS_SINGLE_ITEM)
-                .label("Append a list as a single item")
+                .label("Append a List as a Single Item")
                 .description(
                     "When set to true, and the value is a list, it will be added as a single value rather than " +
                         "concatenating the lists."))

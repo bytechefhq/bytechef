@@ -58,17 +58,17 @@ public final class SendgridSendEmailAction {
         .description("Sends an email.")
         .properties(
             string(FROM)
-                .label("From:")
+                .label("From")
                 .description("Email address from which you want to send.")
                 .maxLength(320)
                 .required(true),
             array(TO)
-                .label("To:")
+                .label("To")
                 .items(string().controlType(ControlType.EMAIL))
                 .description("Email addresses which you want to send to.")
                 .required(true),
             array(CC)
-                .label("CC:")
+                .label("CC")
                 .description("Email address which receives a copy.")
                 .items(string().controlType(ControlType.EMAIL))
                 .maxItems(1000)
@@ -86,7 +86,7 @@ public final class SendgridSendEmailAction {
                 .minLength(1)
                 .required(true),
             string(TYPE)
-                .label("Message type")
+                .label("Message Type")
                 .description("Message type for your content")
                 .options(
                     option("Plain text", "text/plain"),

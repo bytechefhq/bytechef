@@ -43,12 +43,15 @@ public class CodeWorkflowPerformAction {
     public CodeWorkflowPerformAction(CodeWorkflowTaskExecutor codeWorkflowTaskExecutor) {
         actionDefinition = new CodeWorkflowPerformActionDefinition(
             action(PERFORM)
-                .title("Perform code workflow task")
+                .title("Perform Code Workflow Task")
                 .description("Perform code workflow task.")
                 .properties(
-                    string("workflowName"),
-                    integer("workflowVersion"),
-                    string("taskName")),
+                    string("workflowName")
+                        .label("Workflow Name"),
+                    integer("workflowVersion")
+                        .label("Workflow Version"),
+                    string("taskName")
+                        .label("Task Name")),
             codeWorkflowTaskExecutor);
     }
 

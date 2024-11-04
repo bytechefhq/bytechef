@@ -48,14 +48,14 @@ public class GoogleDriveUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
         .title("Upload File")
-        .description("Uploads a file in your Google Drive")
+        .description("Uploads a file in your Google Drive.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
                 .description("The object property which contains a reference to the file to upload.")
                 .required(true),
             string(PARENT_FOLDER)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to " +
                         "the root folder.")

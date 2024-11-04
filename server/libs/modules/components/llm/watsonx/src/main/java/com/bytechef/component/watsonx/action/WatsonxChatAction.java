@@ -74,17 +74,17 @@ public class WatsonxChatAction {
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             string(DECODING_METHOD)
-                .label("Decoding method")
+                .label("Decoding Method")
                 .description("Decoding is the process that a model uses to choose the tokens in the generated output.")
                 .exampleValue("greedy")
                 .advancedOption(true),
             number(REPETITION_PENALTY)
-                .label("Repetition penalty")
+                .label("Repetition Penalty")
                 .description(
                     "Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.")
                 .advancedOption(true),
             integer(MIN_TOKENS)
-                .label("Min tokens")
+                .label("Min Tokens")
                 .description("Sets how many tokens must the LLM generate.")
                 .advancedOption(true),
             MAX_TOKENS_PROPERTY,

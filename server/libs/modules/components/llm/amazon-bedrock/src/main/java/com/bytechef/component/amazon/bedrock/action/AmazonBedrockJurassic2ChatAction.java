@@ -82,7 +82,7 @@ public class AmazonBedrockJurassic2ChatAction {
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             integer(MIN_TOKENS)
-                .label("Min tokens")
+                .label("Min Tokens")
                 .description("The minimum number of tokens to generate in the chat completion.")
                 .advancedOption(true),
             MAX_TOKENS_PROPERTY,
@@ -98,7 +98,7 @@ public class AmazonBedrockJurassic2ChatAction {
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
             number(COUNT_PENALTY)
-                .label("Count penalty")
+                .label("Count Penalty")
                 .description("Penalty object for count.")
                 .advancedOption(true))
         .output()

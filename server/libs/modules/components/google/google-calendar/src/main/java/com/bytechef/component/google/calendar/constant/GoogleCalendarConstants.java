@@ -73,7 +73,7 @@ public class GoogleCalendarConstants {
     public static final String USE_DEFAULT = "useDefault";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR_ID)
-        .label("Calendar identifier")
+        .label("Calendar Identifier")
         .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getCalendarIdOptions)
         .required(true);
 
@@ -124,7 +124,7 @@ public class GoogleCalendarConstants {
 
     public static final ModifiableStringProperty SEND_UPDATES_PROPERTY =
         string(SEND_UPDATES)
-            .label("Send updates")
+            .label("Send Updates")
             .description(
                 "Whether to send notifications about the creation of the new event. Note that some emails might " +
                     "still be sent.")

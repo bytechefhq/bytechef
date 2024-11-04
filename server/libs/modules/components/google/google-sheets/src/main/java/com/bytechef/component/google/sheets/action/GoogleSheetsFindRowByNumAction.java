@@ -48,14 +48,14 @@ public class GoogleSheetsFindRowByNumAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRowByNum")
         .title("Find Row by Number")
-        .description("Get a row in a Google Sheet by row number")
+        .description("Get a row in a Google Sheet by row number.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
             SHEET_NAME_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             integer(ROW_NUMBER)
-                .label("Row number")
+                .label("Row Number")
                 .required(true)
                 .description("The row number to get from the sheet."))
         .output(

@@ -61,7 +61,7 @@ public class DataMapperMapObjectsToObjectAction {
         .description("Creates a new object with the chosen input properties. You can also rename the property keys.")
         .properties(
             integer(INPUT_TYPE)
-                .label("Input type")
+                .label("Input Type")
                 .description("The input type.")
                 .options(
                     option("Object", 1),

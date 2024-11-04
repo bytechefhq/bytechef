@@ -57,7 +57,7 @@ public class JiraNewIssueTrigger {
                 .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUETYPE)
-                .label("Issue type")
+                .label("Issue Type")
                 .description("The type of issue.")
                 .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)

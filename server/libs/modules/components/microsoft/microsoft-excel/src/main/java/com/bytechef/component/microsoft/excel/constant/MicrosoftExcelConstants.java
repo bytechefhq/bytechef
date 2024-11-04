@@ -43,8 +43,8 @@ public class MicrosoftExcelConstants {
     public static final String WORKBOOK_WORKSHEETS_PATH = "/workbook/worksheets/";
 
     public static final ModifiableBooleanProperty IS_THE_FIRST_ROW_HEADER_PROPERTY = bool(IS_THE_FIRST_ROW_HEADER)
-        .label("Is the first row header?")
-        .description("If the first row is header")
+        .label("Is the First Row Header?")
+        .description("If the first row is header.")
         .defaultValue(false)
         .required(true);
 

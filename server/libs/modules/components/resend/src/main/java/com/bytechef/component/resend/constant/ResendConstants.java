@@ -34,7 +34,6 @@ public final class ResendConstants {
     public static final String CC = "cc";
     public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL = "email";
-    public static final String EMAIL_ADDRESS = "Email address";
     public static final String FROM = "from";
     public static final String HEADERS = "headers";
     public static final String HTML = "html";
@@ -49,6 +48,6 @@ public final class ResendConstants {
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty EMAIL_PROPERTY = string(EMAIL)
-        .label(EMAIL_ADDRESS)
+        .label("Email Address")
         .controlType(Property.ControlType.EMAIL);
 }

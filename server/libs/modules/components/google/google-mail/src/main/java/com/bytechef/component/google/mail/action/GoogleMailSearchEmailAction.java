@@ -60,13 +60,13 @@ public class GoogleMailSearchEmailAction {
         .description("Lists the messages in the user's mailbox.")
         .properties(
             number(MAX_RESULTS)
-                .label("Max results")
+                .label("Max Results")
                 .description("Maximum number of messages to return.")
                 .defaultValue(100)
                 .maxValue(500)
                 .required(false),
             string(PAGE_TOKEN)
-                .label("Page token")
+                .label("Page Token")
                 .description("Page token to retrieve a specific page of results in the list.")
                 .required(false),
             string(FROM)
@@ -103,7 +103,7 @@ public class GoogleMailSearchEmailAction {
                         .options((ActionOptionsFunction<String>) GoogleMailUtils::getLabelOptions))
                 .required(false),
             bool(INCLUDE_SPAM_TRASH)
-                .label("Include spam trash")
+                .label("Include Spam Trash")
                 .description("Include messages from SPAM and TRASH in the results.")
                 .required(false))
         .output(

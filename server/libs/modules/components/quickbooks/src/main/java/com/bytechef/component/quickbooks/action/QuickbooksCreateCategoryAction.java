@@ -37,7 +37,7 @@ public class QuickbooksCreateCategoryAction {
         .description("Creates a new category.")
         .properties(
             string(NAME)
-                .label("Nane")
+                .label("Name")
                 .description("Name of the category")
                 .maxLength(100)
                 .required(true))

@@ -37,16 +37,16 @@ public class MicrosoftOneDriveDownloadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
         .title("Download File")
-        .description("Download a file from your Microsoft OneDrive")
+        .description("Download a file from your Microsoft OneDrive.")
         .properties(
             string(PARENT_ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description("Folder from which you want to download the file.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false),
             string(ID)
                 .label("File")
-                .description("File to download")
+                .description("File to download.")
                 .optionsLookupDependsOn(PARENT_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFileIdOptions)
                 .required(true))

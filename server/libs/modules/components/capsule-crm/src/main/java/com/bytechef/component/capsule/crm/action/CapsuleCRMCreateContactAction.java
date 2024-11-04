@@ -62,12 +62,12 @@ public class CapsuleCRMCreateContactAction {
                     option("Organization", "organization"))
                 .required(true),
             string(FIRST_NAME)
-                .label("First name")
+                .label("First Name")
                 .description("The first name of the person.")
                 .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
                 .required(true),
             string(LAST_NAME)
-                .label("Last name")
+                .label("Last Name")
                 .description("The last name of the person.")
                 .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
                 .required(true),
@@ -81,13 +81,13 @@ public class CapsuleCRMCreateContactAction {
                 .description("A short description of the party.")
                 .required(false),
             array(EMAIL_ADDRESSES)
-                .label("Email addresses")
+                .label("Email Addresses")
                 .description("An array of all the email addresses associated with this party.")
                 .items(
                     object()
                         .properties(
                             string(ADDRESS)
-                                .label("Email address")
+                                .label("Email Address")
                                 .description("The email address string.")
                                 .required(true),
                             string(TYPE)
@@ -137,7 +137,7 @@ public class CapsuleCRMCreateContactAction {
                                 .required(false)))
                 .required(false),
             array(PHONE_NUMBERS)
-                .label("Phone numbers")
+                .label("Phone Numbers")
                 .description("An array of all the phone numbers associated with this party.")
                 .items(
                     object()

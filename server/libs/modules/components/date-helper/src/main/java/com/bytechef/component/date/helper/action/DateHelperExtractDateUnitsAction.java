@@ -47,14 +47,14 @@ import java.util.Locale;
 public class DateHelperExtractDateUnitsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractDateUnits")
-        .title("Extract Date units")
+        .title("Extract Date Units")
         .description("Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.")
         .properties(
             dateTime(INPUT_DATE)
                 .label("Date")
                 .required(true),
             string(DateHelperConstants.UNIT)
-                .label("Unit to extract")
+                .label("Unit to Extract")
                 .description("Unit to extract from date.")
                 .options(
                     option("Year", YEAR),

@@ -64,7 +64,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         .description("Goes through all object parameters and replaces all specified input parameter values.")
         .properties(
             integer(INPUT_TYPE)
-                .label("Input type")
+                .label("Input Type")
                 .description("The input type.")
                 .options(
                     option("Object", 1),
@@ -82,7 +82,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                 .items(object())
                 .required(true),
             integer(TYPE)
-                .label("Value type")
+                .label("Value Type")
                 .description("The value type of 'from' and 'to' property values.")
                 .required(true)
                 .options(

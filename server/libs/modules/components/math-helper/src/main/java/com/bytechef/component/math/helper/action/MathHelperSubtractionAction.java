@@ -36,11 +36,11 @@ public class MathHelperSubtractionAction {
         .description("Subtract two numbers.")
         .properties(
             number(FIRST_NUMBER)
-                .label("First number")
+                .label("First Number")
                 .description("Number to subtract from.")
                 .required(true),
             number(SECOND_NUMBER)
-                .label("Second number")
+                .label("Second Number")
                 .description("Number to subtract.")
                 .required(true))
         .output(outputSchema(number()))

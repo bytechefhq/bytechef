@@ -49,11 +49,11 @@ public class DropboxMoveAction {
                 .description("Name of the file with the extension. Don't fill in if you want a folder.")
                 .required(false),
             string(FROM_PATH)
-                .label("Source path")
+                .label("Source Path")
                 .description("Path in the user's Dropbox to be moved.  Root is /.")
                 .required(true),
             string(TO_PATH)
-                .label("Destination path")
+                .label("Destination Path")
                 .description("Path in the user's Dropbox that is the destination. Root is /.")
                 .required(true))
         .output(

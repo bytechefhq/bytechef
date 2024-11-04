@@ -39,10 +39,10 @@ public class ZendeskSellCreateTaskAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Creates new Task")
+        .description("Creates new task.")
         .properties(
             string(CONTENT)
-                .label("Task name")
+                .label("Task Name")
                 .required(true),
             date(DUE_DATE)
                 .label("Due Date")

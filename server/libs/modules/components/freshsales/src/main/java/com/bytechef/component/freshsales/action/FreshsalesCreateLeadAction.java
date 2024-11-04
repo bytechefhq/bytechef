@@ -39,19 +39,19 @@ public class FreshsalesCreateLeadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLead")
         .title("Create Lead")
-        .description("Creates a new lead")
+        .description("Creates a new lead.")
         .properties(
             string(FIRST_NAME)
-                .label("First name")
-                .description("First name of the lead")
+                .label("First Name")
+                .description("First name of the lead.")
                 .required(false),
             string(LAST_NAME)
-                .label("Last name")
-                .description("Last name of the lead")
+                .label("Last Name")
+                .description("Last name of the lead.")
                 .required(false),
             string(EMAIL)
                 .label("Email")
-                .description("Primary email address of the lead")
+                .description("Primary email address of the lead.")
                 .controlType(ControlType.EMAIL)
                 .required(true))
         .output(

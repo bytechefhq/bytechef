@@ -53,7 +53,7 @@ public class MicrosoftOutlook365SendEmailAction {
                         "value must correspond to the actual mailbox used.")
                 .properties(RECIPIENT_PROPERTY),
             array(TO_RECIPIENTS)
-                .label("To recipients")
+                .label("To Recipients")
                 .description("The To: recipients for the message.")
                 .items(RECIPIENT_PROPERTY)
                 .required(true),
@@ -62,17 +62,17 @@ public class MicrosoftOutlook365SendEmailAction {
                 .description("The subject of the message.")
                 .required(true),
             array(BCC_RECIPIENTS)
-                .label("Bcc recipients")
+                .label("Bcc Recipients")
                 .description("The Bcc recipients for the message.")
                 .items(RECIPIENT_PROPERTY)
                 .required(false),
             array(CC_RECIPIENTS)
-                .label("Cc recipients")
+                .label("Cc Recipients")
                 .description("The Cc recipients for the message.")
                 .items(RECIPIENT_PROPERTY)
                 .required(false),
             array(REPLY_TO)
-                .label("Reply to")
+                .label("Reply To")
                 .description("The email addresses to use when replying.")
                 .items(RECIPIENT_PROPERTY)
                 .required(false),

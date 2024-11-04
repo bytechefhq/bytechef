@@ -46,10 +46,10 @@ public class MicrosoftOneDriveListFilesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFiles")
         .title("List Files")
-        .description("List files in a OneDrive folder")
+        .description("List files in a OneDrive folder.")
         .properties(
             string(PARENT_ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder from which you want to list files. If no folder is specified, the root folder will " +
                         "be used.")

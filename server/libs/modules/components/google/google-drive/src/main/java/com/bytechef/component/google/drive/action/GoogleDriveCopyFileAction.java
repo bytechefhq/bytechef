@@ -53,14 +53,13 @@ public class GoogleDriveCopyFileAction {
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
                 .required(true),
             string(FILE_NAME)
-                .label("New file name")
+                .label("New File Name")
                 .description("The name of the new file created as a result of the copy operation.")
                 .required(true),
             string(PARENT_FOLDER)
-                .label("Destination folder")
+                .label("Destination Folder")
                 .required(true)
-                .description(
-                    "The ID of the folder where the copied file will be stored.")
+                .description("The ID of the folder where the copied file will be stored.")
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFolderOptions))
         .output(
             outputSchema(

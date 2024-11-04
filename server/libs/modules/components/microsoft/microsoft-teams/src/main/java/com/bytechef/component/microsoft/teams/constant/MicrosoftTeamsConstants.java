@@ -39,7 +39,7 @@ public class MicrosoftTeamsConstants {
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
-        .label("Message text format")
+        .label("Message Text Format")
         .options(
             option("Text", "text"),
             option("HTML", "html"))
@@ -47,7 +47,7 @@ public class MicrosoftTeamsConstants {
         .required(true);
 
     public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
-        .label("Message text")
+        .label("Message Text")
         .controlType(ControlType.TEXT_AREA)
         .required(true);
 
