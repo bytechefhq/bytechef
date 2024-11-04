@@ -16,16 +16,18 @@ paths:
       operationId: "createRecord"
       parameters:
       - name: "baseId"
-        description: "The base id."
+        description: "The base where table is located."
         in: "path"
         required: true
         schema:
+          title: "Base"
           type: "string"
       - name: "tableId"
-        description: "The table id."
+        description: "The table where the record will be created."
         in: "path"
         required: true
         schema:
+          title: "Table"
           type: "string"
       requestBody:
         content:
@@ -51,8 +53,6 @@ paths:
                   fields:
                     type: "object"
                     additionalProperties: true
-        "400":
-          description: "Invalid status value"
 components:
   securitySchemes:
     api_key:

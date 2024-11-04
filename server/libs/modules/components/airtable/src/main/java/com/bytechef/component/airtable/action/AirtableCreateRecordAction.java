@@ -51,14 +51,14 @@ public class AirtableCreateRecordAction {
                 "path", "/{baseId}/{tableId}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("baseId").label("Base Id")
-            .description("The base id.")
+        .properties(string("baseId").label("Base")
+            .description("The base where table is located.")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            string("tableId").label("Table Id")
-                .description("The table id.")
+            string("tableId").label("Table")
+                .description("The table where the record will be created.")
                 .required(true)
                 .metadata(
                     Map.of(
