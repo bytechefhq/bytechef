@@ -1,3 +1,4 @@
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -114,6 +115,8 @@ const WorkflowTestConfigurationFormField = ({
                                                 <SelectItem key={connection.id} value={connection.id!.toString()}>
                                                     <div className="flex items-center">
                                                         <span className="mr-1 ">{connection.name}</span>
+
+                                                        <Badge variant="outline">{connection.environment}</Badge>
 
                                                         <span className="text-xs text-gray-500">
                                                             {connection?.tags?.map((tag) => tag.name).join(', ')}

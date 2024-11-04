@@ -9,6 +9,7 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 const ConnectedUserSheetPanelIntegrationWorkflows = ({
     componentDefinitions,
     integrationInstance,
+    integrationInstanceConfiguration,
     workflows,
 }: {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -27,11 +28,19 @@ const ConnectedUserSheetPanelIntegrationWorkflows = ({
                             (integrationInstanceWorkflow) => integrationInstanceWorkflow.workflowId === workflow.id
                         );
 
+                        const integrationInstanceConfigurationWorkflow =
+                            integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.find(
+                                (integrationInstanceConfigurationWorkflow) =>
+                                    integrationInstanceConfigurationWorkflow.workflowId === workflow.id
+                            );
+
                         return (
-                            integrationInstance && (
+                            integrationInstance &&
+                            integrationInstanceConfigurationWorkflow && (
                                 <ConnectedUserSheetPanelIntegrationWorkflow
                                     componentDefinitions={componentDefinitions}
                                     integrationInstance={integrationInstance}
+                                    integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                     integrationInstanceWorkflow={integrationInstanceWorkflow}
                                     key={workflow.id}
                                     workflow={workflow}

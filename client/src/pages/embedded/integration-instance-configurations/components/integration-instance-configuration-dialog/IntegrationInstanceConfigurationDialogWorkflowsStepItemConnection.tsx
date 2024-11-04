@@ -1,3 +1,4 @@
+import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
@@ -93,7 +94,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                                             <div className="flex items-center space-x-1">
                                                 <span>{connection.name}</span>
 
-                                                <span className="text-xs text-gray-500">{connection.environment}</span>
+                                                <Badge variant="outline">{connection.environment}</Badge>
 
                                                 <span className="text-xs text-gray-500">
                                                     {connection?.tags?.map((tag) => tag.name).join(', ')}
