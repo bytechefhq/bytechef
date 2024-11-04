@@ -1,7 +1,12 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
-import {IntegrationInstance, IntegrationInstanceWorkflow, Workflow} from '@/shared/middleware/embedded/configuration';
+import {
+    IntegrationInstance,
+    IntegrationInstanceConfigurationWorkflow,
+    IntegrationInstanceWorkflow,
+    Workflow,
+} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableIntegrationInstanceWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceWorkflows.mutations';
 import {ConnectedUserKeys} from '@/shared/queries/embedded/connectedUsers.queries';
@@ -13,11 +18,13 @@ import InlineSVG from 'react-inlinesvg';
 const ConnectedUserSheetPanelIntegrationWorkflow = ({
     componentDefinitions,
     integrationInstance,
+    integrationInstanceConfigurationWorkflow,
     integrationInstanceWorkflow,
     workflow,
 }: {
     componentDefinitions: ComponentDefinitionBasic[];
     integrationInstance: IntegrationInstance;
+    integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     integrationInstanceWorkflow?: IntegrationInstanceWorkflow;
     workflow: Workflow;
 }) => {
@@ -62,7 +69,7 @@ const ConnectedUserSheetPanelIntegrationWorkflow = ({
             <div className="flex items-center space-x-1">
                 <Switch
                     checked={integrationInstanceWorkflow?.enabled}
-                    disabled={integrationInstance.enabled}
+                    disabled={integrationInstance.enabled || !integrationInstanceConfigurationWorkflow?.enabled}
                     onCheckedChange={(value) => {
                         enableIntegrationInstanceWorkflowMutation.mutate({
                             enable: value,
