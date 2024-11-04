@@ -48,7 +48,7 @@ public final class QuickbooksCreateCustomerAction {
         .description("Creates a new customer.")
         .properties(
             string(DISPLAY_NAME)
-                .label("Display name")
+                .label("Display Name")
                 .description(
                     "The name of the person or organization as displayed. Must be unique across all Customer, " +
                         "Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, " +
@@ -70,20 +70,20 @@ public final class QuickbooksCreateCustomerAction {
                         "are required during create.")
                 .maxLength(16),
             string(MIDDLE_NAME)
-                .label("Middle name")
+                .label("Middle Name")
                 .description(
                     "Middle name of the person. The person can have zero or more middle names. The DisplayName " +
                         "attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes " +
                         "is required for object create.")
                 .maxLength(100),
             string(FAMILY_NAME)
-                .label("Last/Family name")
+                .label("Last/Family Name")
                 .description(
                     "Family name or the last name of the person. The DisplayName attribute or at least one of Title, " +
                         "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
                 .maxLength(100),
             string(GIVEN_NAME)
-                .label("First/Given name")
+                .label("First/Given Name")
                 .description(
                     "Given name or first name of a person. The DisplayName attribute or at least one of Title, " +
                         "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")

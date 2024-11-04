@@ -51,7 +51,7 @@ public class JiraSearchForIssuesUsingJqlAction {
                 .exampleValue("project = HSP")
                 .required(false),
             integer(MAX_RESULTS)
-                .label("Max results")
+                .label("Max Results")
                 .description("The maximum number of items to return per page.")
                 .defaultValue(50)
                 .minValue(1)

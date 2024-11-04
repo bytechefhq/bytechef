@@ -42,13 +42,13 @@ public class MicrosoftExcelUpdateRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRow")
         .title("Update Row")
-        .description("Update a row in a worksheet")
+        .description("Update a row in a worksheet.")
         .properties(
             WORKBOOK_ID_PROPERTY,
             WORKSHEET_NAME_PROPERTY,
             integer(ROW_NUMBER)
-                .label("Row number")
-                .description("The row number to update")
+                .label("Row Number")
+                .description("The row number to update.")
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             ROW_DYNAMIC_PROPERTY)

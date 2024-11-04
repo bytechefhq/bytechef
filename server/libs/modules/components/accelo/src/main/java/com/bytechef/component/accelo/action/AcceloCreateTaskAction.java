@@ -48,20 +48,20 @@ public class AcceloCreateTaskAction {
                 .label("Title")
                 .required(true),
             string(AGAINST_TYPE)
-                .label("Against type")
+                .label("Against Type")
                 .description("The type of object the task is against.")
                 .options(
                     option("Company", "company"),
                     option("Prospect", "prospect"))
                 .required(true),
             string(AGAINST_ID)
-                .label("Against object")
+                .label("Against Object")
                 .description("Object the task is against.")
                 .optionsLookupDependsOn(AGAINST_TYPE)
                 .options((ActionOptionsFunction<String>) AcceloUtils::getAgainstIdOptions)
                 .required(true),
             date(DATE_STARTED)
-                .label("Start date")
+                .label("Start Date")
                 .description("The date the task is is scheduled to start.")
                 .required(true))
         .output(

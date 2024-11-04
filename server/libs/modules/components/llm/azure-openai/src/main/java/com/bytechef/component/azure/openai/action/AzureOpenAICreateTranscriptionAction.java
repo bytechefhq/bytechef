@@ -84,7 +84,7 @@ public class AzureOpenAICreateTranscriptionAction {
                         "should match the audio language.")
                 .required(false),
             object(RESPONSE_FORMAT)
-                .label("Response format")
+                .label("Response Format")
                 .description("The format of the transcript output")
                 .options(
                     LLMUtils.getEnumOptions(

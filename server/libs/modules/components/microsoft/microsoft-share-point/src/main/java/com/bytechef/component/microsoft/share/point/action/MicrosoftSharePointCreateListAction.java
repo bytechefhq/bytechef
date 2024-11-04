@@ -43,10 +43,10 @@ public class MicrosoftSharePointCreateListAction {
         .properties(
             SITE_ID_PROPERTY,
             string(DISPLAY_NAME)
-                .label("List name")
+                .label("List Name")
                 .required(true),
             string(DESCRIPTION)
-                .label("List description")
+                .label("List Description")
                 .required(true))
         .output(
             outputSchema(

@@ -51,69 +51,69 @@ public class FreshsalesCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Add new contact in Freshsales CRM")
+        .description("Add new contact in Freshsales CRM.")
         .properties(
             string(FIRST_NAME)
-                .label("First name")
-                .description("First name of the contact")
+                .label("First Name")
+                .description("First name of the contact.")
                 .required(false),
             string(LAST_NAME)
-                .label("Last name")
-                .description("Last name of the contact")
+                .label("Last Name")
+                .description("Last name of the contact.")
                 .required(false),
             string(JOB_TITLE)
-                .label("Job title")
-                .description("Designation of the contact in the account they belong to")
+                .label("Job Title")
+                .description("Designation of the contact in the account they belong to.")
                 .required(false),
             string(EMAIL)
                 .label("Email")
-                .description("Primary email address of the contact")
+                .description("Primary email address of the contact.")
                 .controlType(ControlType.EMAIL)
                 .required(true),
             string(WORK_NUMBER)
-                .label("Work number")
-                .description("Work phone number of the contact")
+                .label("Work Number")
+                .description("Work phone number of the contact.")
                 .controlType(ControlType.PHONE)
                 .required(false),
             string(MOBILE_NUMBER)
-                .label("Mobile number")
-                .description("Mobile phone number of the contact")
+                .label("Mobile Number")
+                .description("Mobile phone number of the contact.")
                 .required(false),
             string(ADDRESS)
                 .label("Address")
-                .description("Address of the contact")
+                .description("Address of the contact.")
                 .required(false),
             string(CITY)
                 .label("City")
-                .description("City that the contact belongs to")
+                .description("City that the contact belongs to.")
                 .required(false),
             string(STATE)
                 .label("State")
-                .description("State that the contact belongs to")
+                .description("State that the contact belongs to.")
                 .required(false),
             string(ZIPCODE)
-                .label("Zip code")
-                .description("Zipcode of the region that the contact belongs to")
+                .label("Zip Code")
+                .description("Zipcode of the region that the contact belongs to.")
                 .required(false),
             string(COUNTRY)
                 .label("Country")
-                .description("Country that the contact belongs to")
+                .description("Country that the contact belongs to.")
                 .required(false),
             string(MEDIUM)
                 .label("Medium")
-                .description("The medium that led your contact to your website/web app")
+                .description("The medium that led your contact to your website/web ap.p")
                 .required(false),
             string(FACEBOOK)
                 .label("Facebook")
-                .description("Facebook username of the contact")
+                .description("Facebook username of the contact.")
                 .required(false),
             string(TWITTER)
                 .label("Twitter")
-                .description("Twitter username of the contact")
+                .description("Twitter username of the contact.")
                 .required(false),
             string(LINKEDIN)
                 .label("LinkedIn")
-                .description("LinkedIn account of the contact")
+                .description("LinkedIn account of the contact.")
                 .required(false))
         .output(
             outputSchema(

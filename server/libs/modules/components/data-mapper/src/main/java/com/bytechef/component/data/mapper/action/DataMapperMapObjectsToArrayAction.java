@@ -46,7 +46,7 @@ public class DataMapperMapObjectsToArrayAction {
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
             integer(INPUT_TYPE)
-                .label("Input type")
+                .label("Input Type")
                 .description("Type of the input. Cam be an object or an array of objects.")
                 .options(
                     option("Object", 1),
@@ -64,12 +64,12 @@ public class DataMapperMapObjectsToArrayAction {
                 .items(object())
                 .required(true),
             string(FIELD_KEY)
-                .label("Field key")
+                .label("Field Key")
                 .description(
                     "Property key of each newly created object in the array. Its property value will be a property key from the input.")
                 .required(true),
             string(VALUE_KEY)
-                .label("Value key")
+                .label("Value Key")
                 .description(
                     "Property key of each newly created object in the array. Its property value will be a property value from the input.")
                 .required(true))

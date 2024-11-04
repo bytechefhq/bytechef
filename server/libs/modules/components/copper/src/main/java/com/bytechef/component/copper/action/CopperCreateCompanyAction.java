@@ -60,33 +60,33 @@ public class CopperCreateCompanyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create Company")
-        .description("Creates a new Company")
+        .description("Creates a new company.")
         .properties(
             string(NAME)
                 .label("Name")
-                .description("The name of the Company.")
+                .description("The name of the company.")
                 .required(true),
             string(ASSIGNEE_ID)
                 .label("Assignee")
-                .description("User that will be the owner of the Company.")
+                .description("User that will be the owner of the company.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(EMAIL_DOMAIN)
-                .label("Email domain")
-                .description("The domain to which email addresses for the Company belong.")
+                .label("Email Domain")
+                .description("The domain to which email addresses for the company belong.")
                 .required(false),
             string(CONTACT_TYPE_ID)
-                .label("Contact type")
-                .description("Contact Type of the Company.")
+                .label("Contact Type")
+                .description("Contact type of the company.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),
             string(DETAILS)
                 .label("Details")
-                .description("Description of the Company.")
+                .description("Description of the company.")
                 .required(false),
             array(PHONE_NUMBERS)
-                .label("Phone numbers")
-                .description("Phone numbers belonging to the Company.")
+                .label("Phone Numbers")
+                .description("Phone numbers belonging to the company.")
                 .items(
                     object()
                         .properties(
@@ -106,7 +106,7 @@ public class CopperCreateCompanyAction {
                 .required(false),
             array(SOCIALS)
                 .label("Socials")
-                .description("Social profiles belonging to the Company.")
+                .description("Social profiles belonging to the company.")
                 .items(
                     object()
                         .properties(
@@ -130,7 +130,7 @@ public class CopperCreateCompanyAction {
                 .required(false),
             array(WEBSITES)
                 .label("Websites")
-                .description("Websites belonging to the Company.")
+                .description("Websites belonging to the company.")
                 .items(
                     object()
                         .properties(
@@ -161,14 +161,14 @@ public class CopperCreateCompanyAction {
                         .label("State")
                         .required(false),
                     string(POSTAL_CODE)
-                        .label("Postal code")
+                        .label("Postal Code")
                         .required(false),
                     string(COUNTRY)
                         .label("Country")
                         .required(false))
                 .required(false),
             array(TAGS)
-                .description("Tags associated with the Company")
+                .description("Tags associated with the company")
                 .label("Tags")
                 .items(
                     string()

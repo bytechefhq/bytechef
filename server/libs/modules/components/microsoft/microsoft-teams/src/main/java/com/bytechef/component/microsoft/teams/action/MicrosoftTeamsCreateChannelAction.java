@@ -48,7 +48,7 @@ public class MicrosoftTeamsCreateChannelAction {
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
                 .required(true),
             string(DISPLAY_NAME)
-                .label("Channel name")
+                .label("Channel Name")
                 .maxLength(50)
                 .required(true),
             string(DESCRIPTION)

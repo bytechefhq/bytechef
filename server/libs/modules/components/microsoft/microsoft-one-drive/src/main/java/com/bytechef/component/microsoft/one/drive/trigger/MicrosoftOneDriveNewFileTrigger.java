@@ -54,7 +54,7 @@ public class MicrosoftOneDriveNewFileTrigger {
         .type(TriggerType.POLLING)
         .properties(
             string(PARENT_ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description("If no folder is specified, the root folder will be used.")
                 .options((TriggerOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))

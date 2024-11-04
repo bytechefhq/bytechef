@@ -73,7 +73,7 @@ public class AnthropicChatAction {
                                     AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             integer(MAX_TOKENS)
-                .label("Max tokens")
+                .label("Max Tokens")
                 .description("The maximum number of tokens to generate in the chat completion.")
                 .required(true),
             RESPONSE_FORMAT_PROPERTY,

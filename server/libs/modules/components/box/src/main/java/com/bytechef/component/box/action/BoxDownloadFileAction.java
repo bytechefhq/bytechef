@@ -41,7 +41,7 @@ public class BoxDownloadFileAction {
         .description("Download a selected file.")
         .properties(
             string(ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description("Folder from which you want to download the file.")
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")

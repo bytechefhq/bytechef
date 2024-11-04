@@ -51,11 +51,11 @@ public class ZohoCrmAddUserAction {
         .description("Add user to your organization.")
         .properties(
             string(FIRST_NAME)
-                .label("First name")
+                .label("First Name")
                 .description("First name of the user.")
                 .required(true),
             string(LAST_NAME)
-                .label("Last name")
+                .label("Last Name")
                 .description("Last name of the user.")
                 .required(false),
             string(EMAIL)
@@ -70,7 +70,7 @@ public class ZohoCrmAddUserAction {
                 .required(true),
             string(PROFILE)
                 .label("Profile")
-                .description("Profile you want to assign the user with..")
+                .description("Profile you want to assign the user with.")
                 .options((ActionOptionsFunction<String>) ZohoCrmUtils::getProfileOptions)
                 .required(true))
         .output(

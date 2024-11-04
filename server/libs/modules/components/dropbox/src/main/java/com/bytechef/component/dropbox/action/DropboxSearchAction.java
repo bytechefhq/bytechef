@@ -44,7 +44,7 @@ public class DropboxSearchAction {
                 "Duplicate results may be returned across pages. Some results may not be returned.")
         .properties(
             string(QUERY)
-                .label("Search string")
+                .label("Search String")
                 .description(
                     "The string to search for. May match across multiple fields based on the request arguments.")
                 .minLength(3)

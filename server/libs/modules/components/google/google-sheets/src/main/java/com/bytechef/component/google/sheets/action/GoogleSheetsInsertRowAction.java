@@ -52,7 +52,7 @@ public class GoogleSheetsInsertRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
         .title("Insert Row")
-        .description("Append a row of values to an existing sheet")
+        .description("Append a row of values to an existing sheet.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,

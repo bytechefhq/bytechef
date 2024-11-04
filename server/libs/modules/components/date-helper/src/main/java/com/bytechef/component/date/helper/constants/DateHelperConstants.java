@@ -43,7 +43,7 @@ public class DateHelperConstants {
     public static final String YEAR = "year";
 
     public static final ModifiableStringProperty DATE_FORMAT_PROPERTY = string(DATE_FORMAT)
-        .label("Date format")
+        .label("Date Format")
         .description("Here's what each part of the format (eg. YYYY) means: " +
             "yyyy : Year (4 digits) " +
             "yy : Year (2 digits) " +

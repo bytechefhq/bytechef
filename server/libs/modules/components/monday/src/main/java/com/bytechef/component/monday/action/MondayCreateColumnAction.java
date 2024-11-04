@@ -61,7 +61,7 @@ public class MondayCreateColumnAction {
                 .description("The new column's title.")
                 .required(true),
             string(COLUMN_TYPE)
-                .label("Column type")
+                .label("Column Type")
                 .description("The type of column to create.")
                 .options(getColumnTypeOptions())
                 .required(true))

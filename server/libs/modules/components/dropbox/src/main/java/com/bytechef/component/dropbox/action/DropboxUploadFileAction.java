@@ -52,7 +52,7 @@ public class DropboxUploadFileAction {
                 .description("The object property which contains a reference to the file to be written.")
                 .required(true),
             string(PATH)
-                .label("Destination path")
+                .label("Destination Path")
                 .description("The path to which the file should be written.")
                 .placeholder("/directory/")
                 .required(true),
@@ -77,7 +77,7 @@ public class DropboxUploadFileAction {
                 .defaultValue(false)
                 .required(false),
             bool(STRICT_CONFLICT)
-                .label("Strict conflict")
+                .label("Strict Conflict")
                 .description(
                     "Be more strict about how each WriteMode detects conflict. For example, always return a " +
                         "conflict error when mode = WriteMode.update and the given \"rev\" doesn't match the " +

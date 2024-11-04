@@ -57,7 +57,7 @@ public class DataStorageAtomicIncrementAction {
                 .options(SCOPE_OPTIONS)
                 .required(true),
             integer(VALUE_TO_ADD)
-                .label("Value to add")
+                .label("Value to Add")
                 .description(
                     "The value that can be added to the existing numeric value, which may have a negative value.")
                 .defaultValue(1))

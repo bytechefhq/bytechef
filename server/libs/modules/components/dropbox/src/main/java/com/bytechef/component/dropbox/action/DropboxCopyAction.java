@@ -49,11 +49,11 @@ public class DropboxCopyAction {
                 .description("Name of the file with the extension. Don't fill in if you want a folder.")
                 .required(false),
             string(FROM_PATH)
-                .label("Source path")
+                .label("Source Path")
                 .description("The path which the file or folder should be copyed from.  Root is /.")
                 .required(true),
             string(TO_PATH)
-                .label("Destination path")
+                .label("Destination Path")
                 .description("The path which the file or folder should be copyed to.  Root is /.")
                 .required(true))
         .output(

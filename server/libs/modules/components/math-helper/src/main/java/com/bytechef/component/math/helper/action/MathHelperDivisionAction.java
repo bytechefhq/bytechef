@@ -36,11 +36,11 @@ public class MathHelperDivisionAction {
         .description("Divide two numbers.")
         .properties(
             number(FIRST_NUMBER)
-                .label("First number")
+                .label("First Number")
                 .description("Number to be divided.")
                 .required(true),
             number(SECOND_NUMBER)
-                .label("Second number")
+                .label("Second Number")
                 .description("Number to divide by.")
                 .required(true))
         .output(outputSchema(number()))

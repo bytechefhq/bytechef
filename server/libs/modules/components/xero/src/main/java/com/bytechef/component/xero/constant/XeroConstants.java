@@ -135,7 +135,7 @@ public final class XeroConstants {
             string(CURRENCY_CODE));
 
     public static final ModifiableStringProperty LINE_AMOUNT_TYPE_PROPERTY = string(LINE_AMOUNT_TYPES)
-        .label("Line amount type")
+        .label("Line Amount Type")
         .options(
             option("Exclusive", "Exclusive"),
             option("Inclusive", "Inclusive"),
@@ -143,7 +143,7 @@ public final class XeroConstants {
         .required(false);
 
     public static final ModifiableArrayProperty LINE_ITEMS_ACCREC_PROPERTY = array(LINE_ITEMS)
-        .label("Line items")
+        .label("Line Items")
         .description("Line items on the invoice.")
         .required(true)
         .minItems(1)
@@ -167,7 +167,7 @@ public final class XeroConstants {
                         .required(false)));
 
     public static final ModifiableStringProperty WEBHOOK_KEY_PROPERTY = string(WEBHOOK_KEY)
-        .label("Webhook key")
+        .label("Webhook Key")
         .description("The key used to sign the webhook request.")
         .required(true);
 

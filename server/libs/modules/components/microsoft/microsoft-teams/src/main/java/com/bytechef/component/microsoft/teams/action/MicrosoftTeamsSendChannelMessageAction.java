@@ -52,7 +52,8 @@ public class MicrosoftTeamsSendChannelMessageAction {
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
                 .required(true),
             string(CHANNEL_ID)
-                .label("Channel to send message to.")
+                .label("Channel")
+                .description("Channel to send message to.")
                 .optionsLookupDependsOn(TEAM_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)
                 .required(true),

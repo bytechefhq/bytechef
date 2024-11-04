@@ -53,7 +53,7 @@ public class ScheduleIntervalTrigger {
                 .required(true)
                 .minValue(1),
             integer(TIME_UNIT)
-                .label("Day of week")
+                .label("Day of Week")
                 .description("Days at which a workflow will be triggered.")
                 .options(
                     option("Minute", 1),

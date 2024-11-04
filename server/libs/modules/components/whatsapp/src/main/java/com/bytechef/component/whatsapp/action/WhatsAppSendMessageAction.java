@@ -57,7 +57,7 @@ public class WhatsAppSendMessageAction {
                 .maxLength(4096)
                 .required(true),
             string(RECEIVE_USER)
-                .label("Send message to")
+                .label("Send Message To")
                 .description("Phone number to send the message. It must start with \"+\" sign")
                 .required(true))
         .output(

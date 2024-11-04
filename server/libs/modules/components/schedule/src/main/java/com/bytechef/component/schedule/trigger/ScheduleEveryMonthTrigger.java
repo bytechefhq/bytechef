@@ -44,8 +44,7 @@ public class ScheduleEveryMonthTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyMonth")
         .title("Every Month")
-        .description(
-            "Trigger off at a specific time in month.")
+        .description("Trigger off at a specific time in month.")
         .type(TriggerDefinition.TriggerType.LISTENER)
         .properties(
             integer(HOUR)
@@ -63,7 +62,7 @@ public class ScheduleEveryMonthTrigger {
                 .minValue(0)
                 .maxValue(59),
             integer(DAY_OF_MONTH)
-                .label("Day of month")
+                .label("Day of Month")
                 .description("The day of the month  at which a workflow will be triggered.")
                 .required(true)
                 .minValue(1)

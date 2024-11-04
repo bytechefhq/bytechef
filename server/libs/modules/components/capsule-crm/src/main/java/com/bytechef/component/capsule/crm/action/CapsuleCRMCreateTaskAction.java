@@ -50,7 +50,7 @@ public class CapsuleCRMCreateTaskAction {
                 .description("A short description of the task.")
                 .required(true),
             date(DUE_ON)
-                .label("Due date")
+                .label("Due Date")
                 .description("The date when this task is due.")
                 .required(true),
             string(DETAIL)

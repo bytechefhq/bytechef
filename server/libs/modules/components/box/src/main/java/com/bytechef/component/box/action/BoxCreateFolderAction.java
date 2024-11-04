@@ -43,13 +43,13 @@ public class BoxCreateFolderAction {
         .description("Creates a new empty folder within the specified parent folder.")
         .properties(
             string(NAME)
-                .label("Folder name")
+                .label("Folder Name")
                 .description("The name for the new folder.")
                 .minLength(1)
                 .maxLength(255)
                 .required(true),
             string(ID)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the new folder will be created; if no folder is selected, the folder will be " +
                         "created in the root folder.")

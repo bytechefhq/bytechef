@@ -34,11 +34,11 @@ public class DataMapperUtils {
     public static final String VALUE_LABEL = "Value";
     public static final String DEFAULT_VALUE_DESCRIPTION =
         "If there is no existing mapping, assign this value as default.";
-    public static final String DEFAULT_VALUE_LABEL = "Default value";
+    public static final String DEFAULT_VALUE_LABEL = "Default Value";
     public static final String MAPPINGS_DESCRIPTION = "An array of objects that contains properties 'from' and 'to'.";
     public static final String MAPPINGS_LABEL = "Mappings";
-    public static final String LABEL_TO = "Value to";
-    public static final String LABEL_FROM = "Value from";
+    public static final String LABEL_TO = "Value To";
+    public static final String LABEL_FROM = "Value From";
     public static final String FROM_DESCRIPTION = "Defines the property value you want to change.";
     public static final String TO_DESCRIPTION = "Defines what you want to change the property value to.";
 

@@ -71,7 +71,7 @@ public class DataMapperReplaceValueAction {
                 "returns null. You can also change a string value with regex.")
         .properties(
             integer(TYPE)
-                .label("Value type")
+                .label("Value Type")
                 .description("The value type.")
                 .required(true)
                 .options(

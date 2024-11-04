@@ -43,14 +43,14 @@ public class GoogleSheetsDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
         .title("Delete Row")
-        .description("Delete row on an existing sheet")
+        .description("Delete row on an existing sheet.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
             INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
             SHEET_ID_PROPERTY,
             integer(ROW_NUMBER)
-                .label("Row number")
-                .description("The row number to delete")
+                .label("Row Number")
+                .description("The row number to delete.")
                 .required(true))
         .perform(GoogleSheetsDeleteRowAction::perform);
 

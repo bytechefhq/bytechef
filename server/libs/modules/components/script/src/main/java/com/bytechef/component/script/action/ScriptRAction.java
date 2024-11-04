@@ -57,7 +57,7 @@ public class ScriptRAction {
                             time())
                         .expressionEnabled(false),
                     string(SCRIPT)
-                        .label("R code")
+                        .label("R Code")
                         .description("Add your R custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("R")

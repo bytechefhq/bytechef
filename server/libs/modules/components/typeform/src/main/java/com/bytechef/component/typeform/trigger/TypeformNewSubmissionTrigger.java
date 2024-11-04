@@ -49,7 +49,7 @@ public class TypeformNewSubmissionTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string("form")
-                .label("Form name")
+                .label("Form Name")
                 .options((TriggerOptionsFunction<String>) TypeformUtils::getFormOptions)
                 .required(true))
         .output(

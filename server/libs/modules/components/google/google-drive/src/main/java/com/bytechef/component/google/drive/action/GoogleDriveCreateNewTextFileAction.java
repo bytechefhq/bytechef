@@ -56,7 +56,7 @@ public class GoogleDriveCreateNewTextFileAction {
         .description("Creates a new text file in Google Drive.")
         .properties(
             string(FILE_NAME)
-                .label("File name")
+                .label("File Name")
                 .description("The name of the new text file.")
                 .required(true),
             string(TEXT)
@@ -65,7 +65,7 @@ public class GoogleDriveCreateNewTextFileAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true),
             string(MIME_TYPE)
-                .label("File type")
+                .label("File Type")
                 .description("Select file type.")
                 .options(
                     option("Text", "plain/text"),
@@ -74,7 +74,7 @@ public class GoogleDriveCreateNewTextFileAction {
                 .defaultValue("plain/text")
                 .required(true),
             string(PARENT_FOLDER)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the file should be created; if no folder is selected, the file will be created " +
                         "in the root folder.")

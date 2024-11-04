@@ -260,10 +260,10 @@ public class MondayPropertiesUtils {
                 "Enter the start and end date. The dates must be 7 days apart (inclusive of the first and last date).")
             .properties(
                 date(START_DATE)
-                    .label("Start date")
+                    .label("Start Date")
                     .required(true),
                 date(END_DATE)
-                    .label("End date")
+                    .label("End Date")
                     .required(true))
             .required(false);
     }

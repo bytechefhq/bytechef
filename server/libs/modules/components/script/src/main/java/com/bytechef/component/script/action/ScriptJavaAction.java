@@ -56,7 +56,7 @@ public class ScriptJavaAction {
                             array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
                             time()),
                     string(SCRIPT)
-                        .label("Java code")
+                        .label("Java Code")
                         .description("Add your Java custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .defaultValue(

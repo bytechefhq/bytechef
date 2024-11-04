@@ -82,7 +82,7 @@ public class OdsFileReadAction {
                 .description("The page number to get.")
                 .advancedOption(true),
             bool(READ_AS_STRING)
-                .label("Read As String")
+                .label("Read as String")
                 .description(
                     "In some cases and file formats, it is necessary to read data specifically as string, otherwise " +
                         "some special characters are interpreted the wrong way.")

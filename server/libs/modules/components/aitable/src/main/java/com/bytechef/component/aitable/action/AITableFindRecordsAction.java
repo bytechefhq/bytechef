@@ -66,7 +66,7 @@ public class AITableFindRecordsAction {
                         .optionsLookupDependsOn(DATASHEET_ID))
                 .required(false),
             integer(MAX_RECORDS)
-                .label("Max records")
+                .label("Max Records")
                 .description("How many records are returned in total")
                 .required(false))
         .output(outputSchema(OUTPUT_PROPERTY))

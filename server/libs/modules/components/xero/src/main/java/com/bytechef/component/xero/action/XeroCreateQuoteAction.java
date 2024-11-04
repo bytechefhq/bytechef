@@ -80,7 +80,7 @@ public class XeroCreateQuoteAction {
             LINE_ITEMS_ACCREC_PROPERTY,
             LINE_AMOUNT_TYPE_PROPERTY,
             date(EXPIRY_DATE)
-                .label("Expiry date")
+                .label("Expiry Date")
                 .description("Date quote expires")
                 .required(false),
             string(CURRENCY_CODE)
@@ -89,7 +89,7 @@ public class XeroCreateQuoteAction {
                 .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(QUOTE_NUMBER)
-                .label("Quote number")
+                .label("Quote Number")
                 .description("Unique alpha numeric code identifying a quote.")
                 .maxLength(255)
                 .required(false),
@@ -98,7 +98,7 @@ public class XeroCreateQuoteAction {
                 .description("Additional reference number")
                 .required(false),
             string(BRANDING_THEME_ID)
-                .label("Branding theme")
+                .label("Branding Theme")
                 .description("The branding theme to be applied to this quote.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getBrandingThemeIdOptions)
                 .required(false),

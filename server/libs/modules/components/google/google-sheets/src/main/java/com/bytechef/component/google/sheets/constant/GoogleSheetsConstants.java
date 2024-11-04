@@ -48,14 +48,14 @@ public class GoogleSheetsConstants {
 
     public static final ModifiableBooleanProperty INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY =
         bool(INCLUDE_ITEMS_FROM_ALL_DRIVES)
-            .label("Include sheets from all drives")
+            .label("Include Sheets from All Drives")
             .description("Whether both My Drive and shared drive sheets should be included in results.")
             .defaultValue(false)
             .required(false);
 
     public static final ModifiableBooleanProperty IS_THE_FIRST_ROW_HEADER_PROPERTY = bool(IS_THE_FIRST_ROW_HEADER)
-        .label("Is the first row headers?")
-        .description("If the first row is header")
+        .label("Is the First Row Headers?")
+        .description("If the first row is header.")
         .defaultValue(false)
         .required(true);
 
@@ -67,14 +67,14 @@ public class GoogleSheetsConstants {
 
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
         .label("Sheet")
-        .description("The name of the sheet")
+        .description("The name of the sheet.")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
         .label("Sheet")
-        .description("The name of the sheet")
+        .description("The name of the sheet.")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
@@ -85,7 +85,7 @@ public class GoogleSheetsConstants {
         .required(true);
 
     public static final ModifiableStringProperty VALUE_INPUT_PROPERTY = string(VALUE_INPUT_OPTION)
-        .label("Value input option")
+        .label("Value Input Option")
         .description("How the input data should be interpreted.")
         .options(
             option("Raw", "RAW",

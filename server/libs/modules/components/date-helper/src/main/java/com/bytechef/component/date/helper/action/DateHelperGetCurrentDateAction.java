@@ -44,7 +44,7 @@ public class DateHelperGetCurrentDateAction {
         .description("Get current date in the specified format.")
         .properties(
             string(TIME_ZONE)
-                .label("Time zone")
+                .label("Time Zone")
                 .description("Time zone to use when formatting date.")
                 .options((ActionOptionsFunction<String>) DateHelperUtils::getZoneOptions)
                 .required(true),

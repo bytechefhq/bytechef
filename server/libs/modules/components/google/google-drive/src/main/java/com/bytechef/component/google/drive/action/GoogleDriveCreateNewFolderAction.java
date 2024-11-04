@@ -48,11 +48,11 @@ public class GoogleDriveCreateNewFolderAction {
         .description("Creates a new empty folder in Google Drive.")
         .properties(
             string(FOLDER_NAME)
-                .label("Folder name")
+                .label("Folder Name")
                 .description("The name of the new folder.")
                 .required(true),
             string(PARENT_FOLDER)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .description(
                     "Folder where the new folder will be created; if no folder is selected, the folder will be " +
                         "created in the root folder.")

@@ -48,20 +48,20 @@ public class CopperCreateActivityAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createActivity")
         .title("Create Activity")
-        .description("Creates a new Activity")
+        .description("Creates a new activity.")
         .properties(
             string(ACTIVITY_TYPE)
-                .label("Activity type")
-                .description("The Activity Type of this Activity.")
+                .label("Activity Type")
+                .description("The activity type of this activity.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
                 .required(true),
             string(DETAILS)
                 .label("Details")
-                .description("Text body of this Activity.")
+                .description("Text body of this activity.")
                 .required(true),
             string(TYPE)
-                .label("Parent type")
-                .description("Parent type to associate this Activity with.")
+                .label("Parent Type")
+                .description("Parent type to associate this activity with.")
                 .options(
                     option("Lead", LEAD),
                     option("Person", PERSON),
@@ -70,8 +70,8 @@ public class CopperCreateActivityAction {
                 .defaultValue(PERSON)
                 .required(true),
             string(ID)
-                .label("Parent name")
-                .description("Parent this Activity will be associated with.")
+                .label("Parent Name")
+                .description("Parent this activity will be associated with.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getParentOptions)
                 .optionsLookupDependsOn(TYPE)
                 .required(true))

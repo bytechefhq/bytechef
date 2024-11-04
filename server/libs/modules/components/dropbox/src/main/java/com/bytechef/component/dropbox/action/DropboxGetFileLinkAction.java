@@ -46,9 +46,8 @@ public class DropboxGetFileLinkAction {
                 "The Content-Type of the link is determined automatically by the file's mime type.")
         .properties(
             string(PATH)
-                .label("Path to the file")
-                .description(
-                    "The path to the file you want a temporary link to.  Root is /.")
+                .label("Namepath to the File")
+                .description("The path to the file you want a temporary link to.  Root is /.")
                 .required(true),
             string(FILENAME)
                 .label("Filename")

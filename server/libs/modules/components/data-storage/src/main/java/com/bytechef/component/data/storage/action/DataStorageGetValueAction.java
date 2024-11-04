@@ -17,6 +17,7 @@
 package com.bytechef.component.data.storage.action;
 
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE;
+import static com.bytechef.component.data.storage.constant.DataStorageConstants.DEFAULT_VALUE_LABEL;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.KEY;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE;
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.SCOPE_OPTIONS;
@@ -68,52 +69,52 @@ public class DataStorageGetValueAction {
                 .description("The value type.")
                 .options(TYPE_OPTIONS),
             array(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 1")
                 .required(true),
             bool(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 2")
                 .required(true),
             date(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 3")
                 .required(true),
             dateTime(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 4")
                 .required(true),
             integer(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 5")
                 .required(true),
             nullable(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 6")
                 .required(true),
             number(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 7")
                 .required(true),
             object(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 8")
                 .required(true),
             string(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 9")
                 .required(true),
             time(DEFAULT_VALUE)
-                .label("Default value")
+                .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
                 .displayCondition("type == 10")
                 .required(true))

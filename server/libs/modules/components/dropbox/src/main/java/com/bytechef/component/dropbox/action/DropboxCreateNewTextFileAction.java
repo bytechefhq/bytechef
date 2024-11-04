@@ -75,7 +75,7 @@ public class DropboxCreateNewTextFileAction {
                 .defaultValue(false)
                 .required(false),
             bool(STRICT_CONFLICT)
-                .label("Strict conflict")
+                .label("Strict Conflict")
                 .description(
                     "Be more strict about how each WriteMode detects conflict. For example, always return a " +
                         "conflict error when mode = WriteMode.update and the given \"rev\" doesn't match the " +

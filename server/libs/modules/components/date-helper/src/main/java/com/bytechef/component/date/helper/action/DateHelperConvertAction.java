@@ -46,7 +46,7 @@ public class DateHelperConvertAction {
         .description("Converts UNIX timestamp to ISO8601 format.")
         .properties(
             number(DATE_TIMESTAMP)
-                .label("UNIX Timestamp.")
+                .label("UNIX Timestamp")
                 .description("UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)")
                 .maxNumberPrecision(0)
                 .required(true),

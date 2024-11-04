@@ -50,7 +50,7 @@ public class JiraCreateIssueCommentAction {
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUE_ID)
-                .label("Issue name")
+                .label("Issue Name")
                 .description("Issue where the comment will be added.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)

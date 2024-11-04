@@ -52,7 +52,7 @@ public class MicrosoftOutlook365Constants {
         .required(false);
 
     public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
-        .label("Content type")
+        .label("Content Type")
         .description("The type of the content.")
         .options(
             option("Text", "text"),

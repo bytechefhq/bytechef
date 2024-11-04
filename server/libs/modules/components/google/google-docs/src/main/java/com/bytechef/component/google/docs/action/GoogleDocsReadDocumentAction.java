@@ -35,11 +35,11 @@ public class GoogleDocsReadDocumentAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ_DOCUMENT)
         .title("Read Document")
-        .description("Read a document from Google Docs")
+        .description("Read a document from Google Docs.")
         .properties(
             string(DOCUMENT_ID)
-                .label("Document id")
-                .description("The ID of the document to read")
+                .label("Document Id")
+                .description("The ID of the document to read.")
                 .required(true))
         .perform(GoogleDocsReadDocumentAction::perform);
 

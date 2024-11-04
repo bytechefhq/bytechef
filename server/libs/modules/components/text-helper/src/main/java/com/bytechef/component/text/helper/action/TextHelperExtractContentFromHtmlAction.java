@@ -44,8 +44,8 @@ public class TextHelperExtractContentFromHtmlAction {
             .description("Extract content from the HTML content.")
             .properties(
                 string(TextHelperConstants.CONTENT)
-                    .label("HTML content to extract content from.")
-                    .description("The HTML content.")
+                    .label("HTML Content")
+                    .description("HTML content to extract content from.")
                     .controlType(Property.ControlType.TEXT_AREA)
                     .required(true),
                 string(TextHelperConstants.QUERY_SELECTOR)

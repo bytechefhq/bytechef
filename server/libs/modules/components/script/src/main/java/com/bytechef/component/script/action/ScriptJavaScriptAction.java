@@ -57,7 +57,7 @@ public class ScriptJavaScriptAction {
                             time())
                         .expressionEnabled(false),
                     string(SCRIPT)
-                        .label("JavaScript code")
+                        .label("JavaScript Code")
                         .description("Add your JavaScript custom logic here.")
                         .controlType(Property.ControlType.CODE_EDITOR)
                         .languageId("javascript")
