@@ -34,7 +34,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
 import java.util.ArrayList;
@@ -49,10 +49,9 @@ public class AirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    @SuppressWarnings("unchecked")
     public static List<Option<String>> getBaseIdOptions(Context context) {
         Map<String, ?> body = context
-            .http(http -> http.get("https://api.airtable.com/v0/meta/bases"))
+            .http(http -> http.get("/meta/bases"))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -64,14 +63,14 @@ public class AirtableUtils {
             throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
         }
 
-        return getOptions((Map<String, List<Map<?, ?>>>) body, "bases");
+        return getOptions(body, "bases");
     }
 
     public static ActionPropertiesFunction getFieldsProperties() {
         return (inputParameters, connection, dependencyPaths, context) -> {
             List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
-            String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
+            String url = "/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
 
             Http.Response response = context.http(http -> http.get(url)
@@ -103,26 +102,27 @@ public class AirtableUtils {
                     continue;
                 }
 
+                String name = field.name();
+
                 ModifiableValueProperty<?, ?> property = switch (field.type()) {
-                    case "autoNumber", "percent", "count" -> integer(field.name());
+                    case "autoNumber", "percent", "count" -> integer(name);
                     case "barcode", "button", "createdBy", "createdTime", "currency", "externalSyncSource", "formula",
                         "lastModifiedBy", "lastModifiedTime", "lookup", "multipleAttachments", "multipleLookupValues",
                         "multipleRecordLinks", "rating", "richText", "rollup", "singleLineText", "date", "dateTime",
-                        "duration" -> string(field.name());
-                    case "checkbox" -> bool(field.name());
-                    case "email" -> string(field.name())
-                        .controlType(Property.ControlType.EMAIL);
-                    case "multilineText" -> string(field.name())
-                        .controlType(Property.ControlType.TEXT_AREA);
-                    case "multipleSelects" -> array(field.name())
+                        "duration" -> string(name);
+                    case "checkbox" -> bool(name);
+                    case "email" -> string(name)
+                        .controlType(ControlType.EMAIL);
+                    case "multilineText" -> string(name)
+                        .controlType(ControlType.TEXT_AREA);
+                    case "multipleSelects" -> array(name)
                         .items(string())
                         .options(getOptions(field));
-                    case "number" -> number(field.name());
-                    case "phoneNumber" -> string(field.name())
-                        .controlType(Property.ControlType.PHONE);
-                    case "singleSelect" -> string(field.name()).options(
-                        getOptions(field));
-                    case "url" -> string(field.name()).controlType(Property.ControlType.URL);
+                    case "number" -> number(name);
+                    case "phoneNumber" -> string(name)
+                        .controlType(ControlType.PHONE);
+                    case "singleSelect" -> string(name).options(getOptions(field));
+                    case "url" -> string(name).controlType(ControlType.URL);
                     default -> throw new IllegalArgumentException(
                         "Unknown Airtable field type='%s'".formatted(field.type()));
                 };
@@ -143,10 +143,8 @@ public class AirtableUtils {
         };
     }
 
-    @SuppressWarnings("unchecked")
     public static List<Option<String>> getTableIdOptions(Parameters inputParameters, Context context) {
-        String url = "https://api.airtable.com/v0/meta/bases/%s/tables".formatted(
-            inputParameters.getRequiredString(BASE_ID));
+        String url = "/meta/bases/%s/tables".formatted(inputParameters.getRequiredString(BASE_ID));
 
         Map<String, ?> body = context.http(http -> http.get(url)
             .configuration(Http.responseType(ResponseType.JSON))
@@ -159,15 +157,20 @@ public class AirtableUtils {
 
         context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
 
-        return getOptions((Map<String, List<Map<?, ?>>>) body, "tables");
+        return getOptions(body, "tables");
 
     }
 
-    private static List<Option<String>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
+    private static List<Option<String>> getOptions(Map<String, ?> response, String name) {
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<?, ?> list : response.get(name)) {
-            options.add(option((String) list.get("name"), (String) list.get("id")));
+        if (response.get(name) instanceof List<?> list) {
+
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                }
+            }
         }
 
         return options;
