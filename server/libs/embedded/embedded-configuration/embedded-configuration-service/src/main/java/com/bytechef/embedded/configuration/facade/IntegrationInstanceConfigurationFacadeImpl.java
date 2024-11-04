@@ -313,6 +313,14 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationId);
 
         for (IntegrationInstance integrationInstance : integrationInstances) {
+            IntegrationInstanceConfiguration integrationInstanceConfiguration =
+                integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                    integrationInstance.getIntegrationInstanceConfigurationId());
+
+            if (!integrationInstanceConfiguration.isEnabled()) {
+                continue;
+            }
+
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
                 integrationInstance.getConnectedUserId());
 
