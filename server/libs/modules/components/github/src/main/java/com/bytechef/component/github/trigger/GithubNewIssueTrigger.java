@@ -25,7 +25,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
-import static com.bytechef.component.github.constant.GithubConstants.NEW_ISSUE;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static com.bytechef.component.github.util.GithubUtils.getContent;
@@ -48,7 +47,7 @@ import java.util.Map;
  */
 public class GithubNewIssueTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_ISSUE)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newIssue")
         .title("New Issue")
         .description("Triggers when a new issue is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

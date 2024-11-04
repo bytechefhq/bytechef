@@ -22,8 +22,5 @@ package com.bytechef.component.xml.helper.constant;
 public class XmlHelperConstants {
 
     public static final String SOURCE = "source";
-    public static final String XML_HELPER = "xmlHelper";
-    public static final String PARSE = "parse";
-    public static final String STRINGIFY = "stringify";
     public static final String TYPE = "type";
 }

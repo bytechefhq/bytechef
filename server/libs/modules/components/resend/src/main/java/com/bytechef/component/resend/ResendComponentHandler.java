@@ -17,7 +17,6 @@
 package com.bytechef.component.resend;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.resend.constant.ResendConstants.RESEND;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class ResendComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(RESEND)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("resend")
         .title("Resend")
         .description("Resend is the email API for developers.")
         .customAction(true)

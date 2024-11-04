@@ -50,7 +50,6 @@ import static com.bytechef.component.twilio.constant.TwilioConstants.RISK_CHECK;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SCHEDULE_TYPE;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_AS_MMS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_AT;
-import static com.bytechef.component.twilio.constant.TwilioConstants.SEND_SMS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SHORTEN_URLS;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SMART_ENCODED;
 import static com.bytechef.component.twilio.constant.TwilioConstants.SOURCE;
@@ -76,7 +75,7 @@ import java.util.Map;
  */
 public class TwilioSendSMSAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_SMS)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendSMS")
         .title("Send SMS")
         .description("Send a new SMS message")
         .properties(

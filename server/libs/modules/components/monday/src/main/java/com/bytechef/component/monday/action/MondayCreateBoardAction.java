@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_KIND;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_NAME;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_BOARD;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.DESCRIPTION;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -39,7 +38,7 @@ import java.util.Map;
  */
 public class MondayCreateBoardAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_BOARD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createBoard")
         .title("Create Board")
         .description("Create a new board.")
         .properties(

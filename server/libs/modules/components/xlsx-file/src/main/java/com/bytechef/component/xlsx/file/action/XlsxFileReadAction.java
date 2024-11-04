@@ -34,7 +34,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.xlsx.file.constant.XlsxFileConstants;
 import com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FileFormat;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,14 +58,13 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class XlsxFileReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(XlsxFileConstants.READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File")
         .description("Reads data from a XLS/XLSX file.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "The object property which contains a reference to the XLS/XLSX file to read from.")
+                .description("The object property which contains a reference to the XLS/XLSX file to read from.")
                 .required(true),
             string(SHEET_NAME)
                 .label("Sheet Name")
@@ -81,8 +79,7 @@ public class XlsxFileReadAction {
                 .advancedOption(true),
             bool(INCLUDE_EMPTY_CELLS)
                 .label("Include Empty Cells")
-                .description(
-                    "When reading from file the empty cells will be filled with an empty string.")
+                .description("When reading from file the empty cells will be filled with an empty string.")
                 .defaultValue(false)
                 .advancedOption(true),
             integer(PAGE_SIZE)
@@ -96,7 +93,8 @@ public class XlsxFileReadAction {
             bool(READ_AS_STRING)
                 .label("Read As String")
                 .description(
-                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.")
+                    "In some cases and file formats, it is necessary to read data specifically as string, otherwise " +
+                        "some special characters are interpreted the wrong way.")
                 .defaultValue(false)
                 .advancedOption(true))
         .output()

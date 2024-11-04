@@ -17,7 +17,6 @@
 package com.bytechef.component.intercom;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.intercom.constant.IntercomConstants.INTERCOM;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class IntercomComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(INTERCOM)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("intercom")
         .title("Intercom")
         .description(
             "Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...")

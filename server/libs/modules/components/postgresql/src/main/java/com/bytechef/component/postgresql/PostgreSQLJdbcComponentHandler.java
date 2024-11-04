@@ -16,7 +16,6 @@
 
 package com.bytechef.component.postgresql;
 
-import static com.bytechef.component.postgresql.constant.PostgreSQLConstants.POSTGRESQL;
 import static com.bytechef.platform.component.definition.JdbcComponentDsl.jdbcComponent;
 
 import com.bytechef.platform.component.JdbcComponentHandler;
@@ -29,7 +28,7 @@ import com.google.auto.service.AutoService;
 @AutoService(JdbcComponentHandler.class)
 public class PostgreSQLJdbcComponentHandler implements JdbcComponentHandler {
 
-    private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(POSTGRESQL)
+    private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent("postgresql")
         .title("PostgreSQL")
         .description("Query, insert and update data from PostgreSQL.")
         .icon("path:assets/postgresql.svg")

@@ -22,7 +22,6 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.rabbitmq.action.RabbitMqSendMessageAction;
 import com.bytechef.component.rabbitmq.connection.RabbitMqConnection;
-import com.bytechef.component.rabbitmq.constant.RabbitMqConstants;
 import com.bytechef.component.rabbitmq.trigger.RabbitMqNewMessageTrigger;
 import com.google.auto.service.AutoService;
 
@@ -32,10 +31,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class RabbitMqComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(RabbitMqConstants.RABBIT_MQ)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("rabbitMQ")
         .title("RabbitMQ")
         .description(
-            "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.")
+            "RabbitMQ is an open-source message broker software that enables efficient communication between " +
+                "different systems, applications, and services. It supports multiple messaging protocols and " +
+                "facilitates a reliable and flexible messaging system.")
         .icon("path:assets/rabbitmq.svg")
         .connection(RabbitMqConnection.CONNECTION_DEFINITION)
         .actions(RabbitMqSendMessageAction.ACTION_DEFINITION)

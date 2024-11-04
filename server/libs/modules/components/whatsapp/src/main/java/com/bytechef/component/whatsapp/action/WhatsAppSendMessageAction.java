@@ -31,7 +31,6 @@ import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.MESSAGI
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.PHONE_NUMBER_ID;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECEIVE_USER;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.RECIPIENT_TYPE;
-import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.SEND_MESSAGE;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TEXT;
 import static com.bytechef.component.whatsapp.constant.WhatsAppConstants.TYPE;
 
@@ -47,7 +46,7 @@ import java.util.Map;
  */
 public class WhatsAppSendMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
         .title("Send Message")
         .description("Send a message via WhatsApp")
         .properties(

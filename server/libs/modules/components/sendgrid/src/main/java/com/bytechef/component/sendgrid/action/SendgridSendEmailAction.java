@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.SEND_EMAIL;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.SUBJECT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
@@ -53,7 +52,7 @@ import java.util.Map;
  */
 public final class SendgridSendEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Sends an email.")
         .properties(

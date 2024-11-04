@@ -25,13 +25,9 @@ public class GoogleDocsConstants {
     }
 
     public static final String BODY = "body";
-    public static final String CREATE_DOCUMENT = "createDocument";
-    public static final String CREATE_DOCUMENT_BASED_ON_TEMPLATE = "createDocumentBasedOnTemplate";
     public static final String DESTINATION_FILE = "destinationFile";
     public static final String DOCUMENT_ID = "documentId";
-    public static final String GOOGLE_DOCS = "googleDocs";
     public static final String IMAGES = "images";
-    public static final String READ_DOCUMENT = "readDocument";
     public static final String TITLE = "title";
     public static final String VALUES = "values";
 }

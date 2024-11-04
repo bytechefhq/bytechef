@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_ITEM;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.GROUP_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -45,7 +44,7 @@ import java.util.Map;
  */
 public class MondayCreateItemAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_ITEM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
         .title("Create Item")
         .description("Create a new item in a board.")
         .properties(

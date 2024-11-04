@@ -19,7 +19,6 @@ package com.bytechef.component.monday.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
-import static com.bytechef.component.monday.constant.MondayConstants.DELETE_ITEM;
 import static com.bytechef.component.monday.constant.MondayConstants.ITEM_ID;
 import static com.bytechef.component.monday.constant.MondayConstants.WORKSPACE_ID;
 import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery;
@@ -35,7 +34,7 @@ import com.bytechef.component.monday.util.MondayOptionUtils;
  */
 public class MondayDeleteItemAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DELETE_ITEM)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteItem")
         .title("Delete Item")
         .description("Deletes an item from a board")
         .properties(

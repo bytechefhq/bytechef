@@ -17,7 +17,6 @@
 package com.bytechef.component.monday;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.monday.constant.MondayConstants.MONDAY;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -36,7 +35,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class MondayComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(MONDAY)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("monday")
         .title("monday.com")
         .description(
             "Monday.com is a work operating system that powers teams to run projects and workflows with confidence.")

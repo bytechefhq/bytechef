@@ -26,7 +26,6 @@ import static com.bytechef.component.xml.file.constant.XmlFileConstants.IS_ARRAY
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PAGE_NUMBER;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PAGE_SIZE;
 import static com.bytechef.component.xml.file.constant.XmlFileConstants.PATH;
-import static com.bytechef.component.xml.file.constant.XmlFileConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -43,14 +42,13 @@ import java.util.stream.Stream;
  */
 public class XmlFileReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File")
         .description("Reads data from a XML file.")
         .properties(
             fileEntry(FILE_ENTRY)
                 .label("File")
-                .description(
-                    "The object property which contains a reference to the XML file to read from.")
+                .description("The object property which contains a reference to the XML file to read from.")
                 .required(true),
             bool(IS_ARRAY)
                 .label("Is Array")
@@ -58,8 +56,7 @@ public class XmlFileReadAction {
                 .defaultValue(true),
             string(PATH)
                 .label("Path")
-                .description(
-                    "The path where the array is e.g 'data'. Leave blank to use the top level object.")
+                .description("The path where the array is e.g 'data'. Leave blank to use the top level object.")
                 .displayCondition("%s == true".formatted(IS_ARRAY))
                 .advancedOption(true),
             integer(PAGE_SIZE)

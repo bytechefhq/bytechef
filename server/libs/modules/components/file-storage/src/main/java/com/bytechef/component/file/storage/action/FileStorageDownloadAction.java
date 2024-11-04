@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.file.storage.constant.FileStorageConstants.DOWNLOAD;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
 
 import com.bytechef.component.definition.ActionContext;
@@ -48,7 +47,7 @@ import java.util.function.Consumer;
  */
 public class FileStorageDownloadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DOWNLOAD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("download")
         .title("Download File")
         .description("Download a file from the URL.")
         .properties(
@@ -58,8 +57,7 @@ public class FileStorageDownloadAction {
                 .required(true),
             string(FILENAME)
                 .label("Filename")
-                .description(
-                    "Filename to set for data. By default, \"file.txt\" will be used.")
+                .description("Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .output(outputSchema(fileEntry()))
         .perform(FileStorageDownloadAction::perform);

@@ -16,7 +16,6 @@
 
 package com.bytechef.component.mysql;
 
-import static com.bytechef.component.mysql.constant.MySQLConstants.MYSQL;
 import static com.bytechef.platform.component.definition.JdbcComponentDsl.jdbcComponent;
 
 import com.bytechef.platform.component.JdbcComponentHandler;
@@ -29,7 +28,7 @@ import com.google.auto.service.AutoService;
 @AutoService(JdbcComponentHandler.class)
 public class MySQLJdbcComponentHandler implements JdbcComponentHandler {
 
-    private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent(MYSQL)
+    private static final JdbcComponentDefinition COMPONENT_DEFINITION = jdbcComponent("mysql")
         .title("MySQL")
         .description("Query, insert and update data from MySQL.")
         .icon("path:assets/mysql.svg")

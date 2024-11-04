@@ -30,8 +30,7 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
-import com.bytechef.component.definition.Property;
-import com.bytechef.component.script.constant.ScriptConstants;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.script.definition.ScriptActionDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
@@ -45,7 +44,7 @@ public class ScriptRubyAction {
 
     public ScriptRubyAction(PolyglotEngine polyglotEngine) {
         actionDefinition = new ScriptActionDefinition(
-            action(ScriptConstants.RUBY)
+            action("ruby")
                 .title("Ruby")
                 .description("Executes custom Ruby code.")
                 .properties(
@@ -59,7 +58,7 @@ public class ScriptRubyAction {
                     string(SCRIPT)
                         .label("Ruby Code")
                         .description("Add your Ruby custom logic here.")
-                        .controlType(Property.ControlType.CODE_EDITOR)
+                        .controlType(ControlType.CODE_EDITOR)
                         .languageId("ruby")
                         .defaultValue("def perform(input, context)\n\treturn null;\nend")
                         .required(true))

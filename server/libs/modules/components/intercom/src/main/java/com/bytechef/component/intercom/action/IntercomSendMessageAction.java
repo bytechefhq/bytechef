@@ -26,7 +26,6 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.intercom.constant.IntercomConstants.BODY;
 import static com.bytechef.component.intercom.constant.IntercomConstants.FROM;
 import static com.bytechef.component.intercom.constant.IntercomConstants.MESSAGE_TYPE;
-import static com.bytechef.component.intercom.constant.IntercomConstants.SEND_MESSAGE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.SUBJECT;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TEMPLATE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.TO;
@@ -36,7 +35,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.intercom.util.IntercomUtils;
@@ -48,7 +47,7 @@ import java.util.Map;
  */
 public class IntercomSendMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
         .title("Send Message")
         .description("Send a new message")
         .properties(
@@ -76,8 +75,7 @@ public class IntercomSendMessageAction {
                 .label("To")
                 .description("Receiver of the message")
                 .required(true)
-                .options(
-                    (OptionsDataSource.ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
+                .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(outputSchema(object()))
         .perform(IntercomSendMessageAction::perform);
 

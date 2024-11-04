@@ -17,7 +17,6 @@
 package com.bytechef.component.json.file;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.json.file.constant.JsonFileConstants.JSON_FILE;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class JsonFileComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(JSON_FILE)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("jsonFile")
         .title("JSON File")
         .description("Reads and writes data from a JSON file.")
         .icon("path:assets/jsonfile.svg")

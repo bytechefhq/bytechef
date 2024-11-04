@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARD_ID;
-import static com.bytechef.component.monday.constant.MondayConstants.CREATE_GROUP;
 import static com.bytechef.component.monday.constant.MondayConstants.DATA;
 import static com.bytechef.component.monday.constant.MondayConstants.GROUP_NAME;
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
@@ -41,7 +40,7 @@ import java.util.Map;
  */
 public class MondayCreateGroupAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_GROUP)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createGroup")
         .title("Create Group")
         .description("Creates a new group in board.")
         .properties(

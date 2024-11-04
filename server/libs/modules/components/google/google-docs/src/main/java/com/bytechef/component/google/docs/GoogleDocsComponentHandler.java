@@ -18,7 +18,6 @@ package com.bytechef.component.google.docs;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.google.docs.connection.GoogleDocsConnection.CONNECTION_DEFINITION;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.GOOGLE_DOCS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -34,7 +33,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class GoogleDocsComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(GOOGLE_DOCS)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("googleDocs")
         .title("Google Docs")
         .description(
             "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to " +

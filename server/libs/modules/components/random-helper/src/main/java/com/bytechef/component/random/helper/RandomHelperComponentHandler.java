@@ -17,7 +17,6 @@
 package com.bytechef.component.random.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.random.helper.constant.RandomHelperConstants.RANDOM_HELPER;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class RandomHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(RANDOM_HELPER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("randomHelper")
         .title("Random Helper")
         .description("The Random Helper allows you to generate random values.")
         .icon("path:assets/random-helper.svg")

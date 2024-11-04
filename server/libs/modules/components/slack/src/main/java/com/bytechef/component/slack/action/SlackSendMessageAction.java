@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 import static com.bytechef.component.slack.constant.SlackConstants.CHAT_POST_MESSAGE_RESPONSE_PROPERTY;
-import static com.bytechef.component.slack.constant.SlackConstants.SEND_MESSAGE;
 import static com.bytechef.component.slack.constant.SlackConstants.TEXT_PROPERTY;
 import static com.bytechef.component.slack.util.SlackUtils.sendMessage;
 
@@ -37,7 +36,7 @@ import com.bytechef.component.slack.util.SlackUtils;
  */
 public class SlackSendMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_MESSAGE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendMessage")
         .title("Send message")
         .description("Sends a message to a public channel, private channel, or existing direct message conversation.")
         .properties(

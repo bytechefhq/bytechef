@@ -19,7 +19,6 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.BODY;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TITLE;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.createDocument;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
@@ -41,7 +40,7 @@ import java.util.List;
  */
 public class GoogleDocsCreateDocumentAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocument")
         .title("Create Document")
         .description("Create a document on Google Docs.")
         .properties(

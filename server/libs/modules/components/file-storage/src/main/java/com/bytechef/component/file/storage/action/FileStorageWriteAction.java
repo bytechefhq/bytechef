@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.CONTENT;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILENAME;
-import static com.bytechef.component.file.storage.constant.FileStorageConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -34,7 +33,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class FileStorageWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to the file.")
         .properties(
@@ -44,8 +43,7 @@ public class FileStorageWriteAction {
                 .required(true),
             string(FILENAME)
                 .label("Filename")
-                .description(
-                    "Filename to set for data. By default, \"file.txt\" will be used.")
+                .description("Filename to set for data. By default, \"file.txt\" will be used.")
                 .defaultValue("file.txt"))
         .output(outputSchema(fileEntry()))
         .perform(FileStorageWriteAction::perform);

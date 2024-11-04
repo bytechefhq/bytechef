@@ -24,7 +24,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.BODY;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
-import static com.bytechef.component.github.constant.GithubConstants.NEW_PULL_REQUEST;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.constant.GithubConstants.TITLE;
 import static com.bytechef.component.github.util.GithubUtils.getContent;
@@ -47,7 +46,7 @@ import java.util.Map;
  */
 public class GithubNewPullRequestTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(NEW_PULL_REQUEST)
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newPullRequest")
         .title("New Pull Request")
         .description("Triggers when a new pull request is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)

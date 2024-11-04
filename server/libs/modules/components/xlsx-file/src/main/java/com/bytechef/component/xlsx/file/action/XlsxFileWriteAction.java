@@ -32,7 +32,6 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.FILENAME;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.ROWS;
 import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.SHEET_NAME;
-import static com.bytechef.component.xlsx.file.constant.XlsxFileConstants.WRITE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -56,7 +55,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class XlsxFileWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to a XLS/XLSX file.")
         .properties(
@@ -75,8 +74,7 @@ public class XlsxFileWriteAction {
                             bool(), date(), dateTime(), integer(), nullable(), number(), string(), time())),
             string(FILENAME)
                 .label("Filename")
-                .description(
-                    "Filename to set for binary data. By default, \"file.xlsx\" will be used.")
+                .description("Filename to set for binary data. By default, \"file.xlsx\" will be used.")
                 .required(true)
                 .defaultValue("file.xlsx")
                 .advancedOption(true))

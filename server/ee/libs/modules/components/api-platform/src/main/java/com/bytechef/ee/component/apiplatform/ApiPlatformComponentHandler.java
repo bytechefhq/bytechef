@@ -8,7 +8,6 @@
 package com.bytechef.ee.component.apiplatform;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstants.API_PLATFORM;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -26,7 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 @AutoService(ComponentHandler.class)
 public class ApiPlatformComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(API_PLATFORM)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("apiPlatform")
         .title("API Platform")
         .description("Actions and triggers for using with API platform.")
         .icon("path:assets/api-platform.svg")

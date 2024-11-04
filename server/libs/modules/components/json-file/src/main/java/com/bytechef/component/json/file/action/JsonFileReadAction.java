@@ -28,7 +28,6 @@ import static com.bytechef.component.json.file.constant.JsonFileConstants.IS_ARR
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_NUMBER;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PAGE_SIZE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.PATH;
-import static com.bytechef.component.json.file.constant.JsonFileConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -50,7 +49,7 @@ import java.util.stream.Stream;
  */
 public class JsonFileReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File")
         .description("Reads data from a JSON file.")
         .properties(

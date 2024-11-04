@@ -26,6 +26,5 @@ public class RabbitMqConstants {
     public static final String PASSWORD = "password";
     public static final String PORT = "port";
     public static final String QUEUE = "queue";
-    public static final String RABBIT_MQ = "rabbitMQ";
     public static final String USERNAME = "username";
 }

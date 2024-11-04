@@ -23,11 +23,8 @@ import java.util.Random;
  */
 public class RandomHelperConstants {
 
-    public static final String RANDOM_HELPER = "randomHelper";
-    public static final String RANDOM_INT = "randomInt";
-    public static final String RANDOM_FLOAT = "randomFloat";
-    public static final String START_INCLUSIVE = "startInclusive";
     public static final String END_INCLUSIVE = "endInclusive";
+    public static final String START_INCLUSIVE = "startInclusive";
 
     public static final Random RANDOM = new Random();
 }

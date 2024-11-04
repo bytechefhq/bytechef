@@ -34,7 +34,6 @@ import static com.bytechef.component.resend.constant.ResendConstants.HEADERS;
 import static com.bytechef.component.resend.constant.ResendConstants.HTML;
 import static com.bytechef.component.resend.constant.ResendConstants.NAME;
 import static com.bytechef.component.resend.constant.ResendConstants.REPLY_TO;
-import static com.bytechef.component.resend.constant.ResendConstants.SEND_EMAIL;
 import static com.bytechef.component.resend.constant.ResendConstants.SUBJECT;
 import static com.bytechef.component.resend.constant.ResendConstants.TAGS;
 import static com.bytechef.component.resend.constant.ResendConstants.TEXT;
@@ -45,7 +44,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.resend.util.ResendUtils;
 import java.util.List;
@@ -55,14 +54,14 @@ import java.util.List;
  */
 public final class ResendSendEmailAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_EMAIL)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Send an email")
         .properties(
             string(FROM)
                 .label("From")
                 .description("Sender email address.")
-                .controlType(Property.ControlType.EMAIL)
+                .controlType(ControlType.EMAIL)
                 .required(true),
             array(TO)
                 .label("To")

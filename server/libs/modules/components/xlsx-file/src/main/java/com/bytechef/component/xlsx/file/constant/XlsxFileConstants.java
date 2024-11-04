@@ -28,9 +28,6 @@ public class XlsxFileConstants {
     public static final String READ_AS_STRING = "readAsString";
     public static final String SHEET_NAME = "sheetName";
     public static final String INCLUDE_EMPTY_CELLS = "includeEmptyCells";
-    public static final String XLSX_FILE = "xlsxFile";
-    public static final String WRITE = "write";
-    public static final String READ = "read";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
 

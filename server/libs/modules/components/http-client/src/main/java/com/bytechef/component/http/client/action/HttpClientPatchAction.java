@@ -29,7 +29,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientPatchAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.PATCH)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("patch")
         .title("PATCH")
         .description("The request method to use.")
         .properties(

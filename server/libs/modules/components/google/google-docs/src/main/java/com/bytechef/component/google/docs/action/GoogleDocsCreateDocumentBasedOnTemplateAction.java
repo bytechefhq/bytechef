@@ -19,7 +19,6 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.CREATE_DOCUMENT_BASED_ON_TEMPLATE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DESTINATION_FILE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
@@ -44,7 +43,7 @@ import java.util.Map;
  */
 public class GoogleDocsCreateDocumentBasedOnTemplateAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT_BASED_ON_TEMPLATE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocumentBasedOnTemplate")
         .title("Edit Template File")
         .description("Edit a template file and replace the values with the ones provided.")
         .properties(

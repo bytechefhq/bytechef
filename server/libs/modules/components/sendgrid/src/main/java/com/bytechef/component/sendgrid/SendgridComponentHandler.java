@@ -17,7 +17,6 @@
 package com.bytechef.component.sendgrid;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.SENDGRID;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -32,7 +31,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class SendgridComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(SENDGRID)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("sendgrid")
         .title("Sendgrid")
         .description("Trusted for reliable email delivery at scale.")
         .customAction(true)

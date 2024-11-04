@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.PARSE;
 import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOURCE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -32,7 +31,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class XmlHelperParseAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(PARSE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("parse")
         .title("Convert from XML String")
         .description("Converts the XML string to object/array.")
         .properties(

@@ -24,12 +24,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.xml.file.constant.XmlFileConstants.FILENAME;
+import static com.bytechef.component.xml.file.constant.XmlFileConstants.SOURCE;
+import static com.bytechef.component.xml.file.constant.XmlFileConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.xml.file.constant.XmlFileConstants;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -42,27 +44,27 @@ import java.nio.charset.StandardCharsets;
  */
 public class XmlFileWriteAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(XmlFileConstants.WRITE)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to a XML file.")
         .properties(
-            integer(XmlFileConstants.TYPE)
+            integer(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(
                     option("Object", 1),
                     option("Array", 2)),
-            object(XmlFileConstants.SOURCE)
+            object(SOURCE)
                 .label("Source")
                 .description("The object to write to the file.")
                 .displayCondition("type == 1")
                 .required(true),
-            array(XmlFileConstants.SOURCE)
+            array(SOURCE)
                 .label("Source")
                 .description("The aray to write to the file.")
                 .displayCondition("type == 2")
                 .required(true),
-            string(XmlFileConstants.FILENAME)
+            string(FILENAME)
                 .label("Filename")
                 .description("Filename to set for binary data. By default, \"file.xml\" will be used.")
                 .required(true)
@@ -74,7 +76,7 @@ public class XmlFileWriteAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        Object source = inputParameters.getRequired(XmlFileConstants.SOURCE);
+        Object source = inputParameters.getRequired(SOURCE);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
         try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
@@ -83,7 +85,7 @@ public class XmlFileWriteAction {
 
         try (InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray())) {
             return context.file(file -> file.storeContent(
-                inputParameters.getString(XmlFileConstants.FILENAME, "file.xml"), inputStream));
+                inputParameters.getString(FILENAME, "file.xml"), inputStream));
         }
     }
 }

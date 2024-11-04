@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
-import static com.bytechef.component.var.constant.VarConstants.SET;
 import static com.bytechef.component.var.constant.VarConstants.TYPE;
 import static com.bytechef.component.var.constant.VarConstants.VALUE;
 
@@ -41,7 +40,7 @@ import com.bytechef.component.definition.Parameters;
  */
 public class VarSetAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SET)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("set")
         .title("Set Value")
         .description("Assign value to a variable that can be used in the following steps.")
         .properties(

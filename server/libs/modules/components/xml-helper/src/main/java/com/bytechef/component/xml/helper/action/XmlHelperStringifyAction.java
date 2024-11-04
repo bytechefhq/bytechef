@@ -23,33 +23,34 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.SOURCE;
+import static com.bytechef.component.xml.helper.constant.XmlHelperConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.xml.helper.constant.XmlHelperConstants;
 
 /**
  * @author Ivica Cardic
  */
 public class XmlHelperStringifyAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(XmlHelperConstants.STRINGIFY)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("stringify")
         .title("Convert to XML String")
         .description("Writes the object/array to a XML string.")
         .properties(
-            integer(XmlHelperConstants.TYPE)
+            integer(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(
                     option("Object", 1),
                     option("Array", 2)),
-            object(XmlHelperConstants.SOURCE)
+            object(SOURCE)
                 .label("Source")
                 .description("The object to convert to XML string.")
                 .displayCondition("type == 1")
                 .required(true),
-            array(XmlHelperConstants.SOURCE)
+            array(SOURCE)
                 .label("Source")
                 .description("The array to convert to XML string.")
                 .displayCondition("type == 2")
@@ -60,6 +61,6 @@ public class XmlHelperStringifyAction {
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context.xml(xml -> xml.write(inputParameters.getRequired(XmlHelperConstants.SOURCE)));
+        return context.xml(xml -> xml.write(inputParameters.getRequired(SOURCE)));
     }
 }

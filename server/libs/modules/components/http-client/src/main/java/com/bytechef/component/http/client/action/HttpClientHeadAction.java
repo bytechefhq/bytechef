@@ -29,7 +29,7 @@ import com.bytechef.component.http.client.util.HttpClientActionUtils;
  */
 public class HttpClientHeadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(HttpClientComponentConstants.HEAD)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("head")
         .title("HEAD")
         .description("The request method to use.")
         .properties(HttpClientActionUtils.toArray(

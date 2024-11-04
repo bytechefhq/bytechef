@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.file.storage.constant.FileStorageConstants.FILE_ENTRY;
-import static com.bytechef.component.file.storage.constant.FileStorageConstants.READ;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -33,14 +32,14 @@ import com.bytechef.component.definition.Parameters;
  */
 public class FileStorageReadAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File as String")
         .description("Reads data from the file as string.")
-        .properties(fileEntry(FILE_ENTRY)
-            .label("File")
-            .description(
-                "The object property which contains a reference to the file to read from.")
-            .required(true))
+        .properties(
+            fileEntry(FILE_ENTRY)
+                .label("File")
+                .description("The object property which contains a reference to the file to read from.")
+                .required(true))
         .output(outputSchema(string()), sampleOutput("Sample content"))
         .perform(FileStorageReadAction::perform);
 
