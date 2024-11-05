@@ -33,6 +33,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowSe
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -53,6 +54,8 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -140,6 +143,11 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
 
         return ResponseEntity.ok()
             .build();
+    }
+
+    @InitBinder
+    public void initBinder(WebDataBinder dataBinder) {
+        dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 
     private static String findAppEventTriggerName(Workflow workflow) {
