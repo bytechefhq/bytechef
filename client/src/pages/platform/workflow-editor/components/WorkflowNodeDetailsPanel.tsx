@@ -34,6 +34,7 @@ import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import getAllTaskNames from '../utils/getAllTaskNames';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
@@ -80,14 +81,8 @@ const WorkflowNodeDetailsPanel = ({
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
     const [workflowDefinition, setWorkflowDefinition] = useState<WorkflowDefinitionType>({});
 
-    const {
-        currentComponent,
-        currentNode,
-        setCurrentComponent,
-        setCurrentComponentDefinition,
-        setCurrentNode,
-        workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
 
     const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
 
@@ -357,8 +352,6 @@ const WorkflowNodeDetailsPanel = ({
             setActiveTab('connection');
         }
 
-        setCurrentComponentDefinition(currentComponentDefinition);
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponentDefinition]);
 
@@ -389,8 +382,12 @@ const WorkflowNodeDetailsPanel = ({
 
             return;
         }
+        
+        if (!workflowDefinition.tasks) {
+            return;
+        }
 
-        const taskNames = workflowDefinition.tasks?.map((task) => task.name);
+        const taskNames = getAllTaskNames(workflowDefinition.tasks);
 
         if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
             useWorkflowNodeDetailsPanelStore.getState().reset();

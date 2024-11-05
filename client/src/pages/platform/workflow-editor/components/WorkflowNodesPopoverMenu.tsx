@@ -67,6 +67,8 @@ const WorkflowNodesPopoverMenu = ({
                 workflow,
             });
 
+            setPopoverOpen(false);
+
             return;
         }
 
