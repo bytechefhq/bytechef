@@ -5,6 +5,7 @@
  */
 package com.bytechef.embedded.execution.public_.web.rest;
 
+import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteAction200ResponseModel;
 import com.bytechef.embedded.execution.public_.web.rest.model.ExecuteActionRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
@@ -33,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T13:08:41.101258+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-04T19:39:51.421432+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -50,6 +51,7 @@ public interface ActionApi {
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
      * @param xConnectionId The connection ID that uniquely identifies the customer in your application (optional)
+     * @param xEnvironment The environment. (optional)
      * @param executeActionRequestModel  (optional)
      * @return The list of component action objects. (status code 200)
      *         or Invalid Input (status code 400)
@@ -88,6 +90,7 @@ public interface ActionApi {
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
         @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = false) Long xConnectionId,
+        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "ExecuteActionRequestModel", description = "") @Valid @RequestBody(required = false) ExecuteActionRequestModel executeActionRequestModel
     ) {
         getRequest().ifPresent(request -> {
