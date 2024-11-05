@@ -32,7 +32,7 @@ public interface CodeWorkflowContainerRepository extends ListCrudRepository<Code
     Optional<CodeWorkflowContainer> findByCodeWorkflowContainerReference(String codeWorkflowContainerReference);
 
     @Query("""
-        SELECT * FROM code_workflow_container
+        SELECT code_workflow_container.* FROM code_workflow_container
         JOIN code_workflow ON code_workflow.code_workflow_container_id = code_workflow_container.id
         WHERE workflow_id = :workflowId
         """)

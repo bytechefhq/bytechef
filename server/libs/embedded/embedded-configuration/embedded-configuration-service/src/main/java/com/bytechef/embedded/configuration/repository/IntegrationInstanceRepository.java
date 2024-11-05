@@ -41,7 +41,7 @@ public interface IntegrationInstanceRepository
     List<IntegrationInstance> findAllByIntegrationInstanceConfigurationId(long integrationInstanceConfigurationId);
 
     @Query("""
-        SELECT DISTINCT * FROM integration_instance
+        SELECT DISTINCT integration_instance.* FROM integration_instance
         JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
         JOIN integration_instance_configuration_workflow on integration_instance_configuration.id = integration_instance_configuration_workflow.integration_instance_configuration_id
         WHERE integration_instance_configuration_workflow.workflow_id = :workflowId

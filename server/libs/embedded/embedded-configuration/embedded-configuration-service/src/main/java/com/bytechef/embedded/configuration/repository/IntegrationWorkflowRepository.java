@@ -39,7 +39,7 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
     Optional<IntegrationWorkflow> findByWorkflowId(String workflowId);
 
     @Query("""
-            SELECT * FROM integration_workflow
+            SELECT integration_workflow.* FROM integration_workflow
             JOIN integration_instance_configuration ON integration_instance_configuration.integration_id = integration_workflow.integration_id
             AND integration_instance_configuration.integration_version = integration_workflow.integration_version
             JOIN integration_instance ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
