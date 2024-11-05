@@ -128,7 +128,9 @@ module.exports = {
                 'output-tab-sample-data-dialog-height': '400px',
             },
             minWidth: {
+                'api-key-dialog-width': '550px',
                 'combo-box-popper-anchor-width': 'var(--radix-popper-anchor-width)',
+                'property-code-editor-sheet-connections-sheet-width': '400px',
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
                 'sub-property-popover-width': '400px',
                 'workflow-execution-sheet-width': '500px',
@@ -140,6 +142,8 @@ module.exports = {
                 '3xl': '1792px',
             },
             width: {
+                'appearance-theme-choice-skeleton-large-width': '100px',
+                'appearance-theme-choice-skeleton-small-width': '80px',
                 'sidebar-width': '56px',
                 'workflow-nodes-popover-actions-menu-width': '400px',
                 'workflow-nodes-popover-component-menu-width': '330px',
