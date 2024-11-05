@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Google Sheets",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -125,7 +56,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -139,7 +70,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -154,14 +85,14 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
+      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spreadsheetId" ],
         "options" : { }
-      },
-      "controlType" : "SELECT"
+      }
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -171,7 +102,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -313,8 +244,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -340,14 +271,15 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -463,8 +395,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -490,13 +422,12 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -533,7 +464,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -547,7 +478,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -580,7 +511,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Column name",
+      "label" : "Column Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -654,8 +585,8 @@
             "maxValue" : null,
             "minValue" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "INTEGER"
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -714,8 +645,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -741,17 +672,18 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -803,8 +735,8 @@
           "maxValue" : null,
           "minValue" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "INTEGER"
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -863,8 +795,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -890,16 +822,15 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -936,7 +867,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Sheet name",
+      "label" : "Sheet Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1002,8 +933,8 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : null,
@@ -1029,8 +960,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Create Sheet",
     "perform" : { },
@@ -1039,7 +970,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Delete row on an existing sheet",
+    "description" : "Delete row on an existing sheet.",
     "help" : null,
     "metadata" : null,
     "name" : "deleteRow",
@@ -1079,7 +1010,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1093,7 +1024,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1108,14 +1039,14 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
+      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : [ "spreadsheetId" ],
         "options" : { }
-      },
-      "controlType" : "SELECT"
+      }
     }, {
       "advancedOption" : null,
-      "description" : "The row number to delete",
+      "description" : "The row number to delete.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1125,13 +1056,13 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Row number",
+      "label" : "Row Number",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
     "perform" : { },
@@ -1140,7 +1071,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Get a row in a Google Sheet by row number",
+    "description" : "Get a row in a Google Sheet by row number.",
     "help" : null,
     "metadata" : null,
     "name" : "findRowByNum",
@@ -1205,8 +1136,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1231,11 +1162,12 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1294,8 +1226,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1320,10 +1252,9 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1360,7 +1291,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1374,7 +1305,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1397,7 +1328,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1407,7 +1338,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1431,13 +1362,13 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Row number",
+      "label" : "Row Number",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Find Row by Number",
     "perform" : { },
@@ -1525,8 +1456,8 @@
               "minValue" : null,
               "numberPrecision" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "NUMBER"
+              "controlType" : "NUMBER",
+              "optionsDataSource" : null
             }, {
               "advancedOption" : null,
               "description" : null,
@@ -1551,18 +1482,19 @@
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1635,8 +1567,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1661,17 +1593,16 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1708,7 +1639,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1722,7 +1653,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1755,7 +1686,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Value input option",
+      "label" : "Value Input Option",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1773,7 +1704,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1783,7 +1714,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1818,7 +1749,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Append a row of values to an existing sheet",
+    "description" : "Append a row of values to an existing sheet.",
     "help" : null,
     "metadata" : null,
     "name" : "insertRow",
@@ -1883,8 +1814,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1909,11 +1840,12 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1972,8 +1904,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1998,10 +1930,9 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2038,7 +1969,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -2052,7 +1983,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2085,7 +2016,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Value input option",
+      "label" : "Value Input Option",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -2103,7 +2034,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2113,7 +2044,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -2148,7 +2079,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Overwrite values in an existing row",
+    "description" : "Overwrite values in an existing row.",
     "help" : null,
     "metadata" : null,
     "name" : "updateRow",
@@ -2213,8 +2144,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -2239,11 +2170,12 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2302,8 +2234,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -2328,10 +2260,9 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2368,7 +2299,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Include sheets from all drives",
+      "label" : "Include Sheets from All Drives",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -2382,7 +2313,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "The name of the sheet",
+      "description" : "The name of the sheet.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2405,7 +2336,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The row number to update",
+      "description" : "The row number to update.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2415,16 +2346,16 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Row number",
+      "label" : "Row Number",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2434,7 +2365,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -2467,6 +2398,75 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -2564,24 +2564,25 @@
               "minItems" : null,
               "multipleValues" : null,
               "options" : null,
-              "optionsDataSource" : null,
-              "controlType" : "ARRAY_BUILDER"
+              "controlType" : "ARRAY_BUILDER",
+              "optionsDataSource" : null
             } ],
             "multipleValues" : null,
             "options" : null,
             "properties" : null,
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2669,23 +2670,22 @@
             "minItems" : null,
             "multipleValues" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "ARRAY_BUILDER"
+            "controlType" : "ARRAY_BUILDER",
+            "optionsDataSource" : null
           } ],
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2712,7 +2712,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "If the first row is header",
+      "description" : "If the first row is header.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2722,7 +2722,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Is the first row headers?",
+      "label" : "Is the First Row Headers?",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -2762,17 +2762,17 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
+    "deduplicate" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null

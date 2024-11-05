@@ -230,7 +230,7 @@
       "type" : "STRING",
       "defaultValue" : "function perform(input, context) {\n\treturn null;\n}",
       "exampleValue" : null,
-      "label" : "JavaScript code",
+      "label" : "JavaScript Code",
       "placeholder" : null,
       "controlType" : "CODE_EDITOR",
       "languageId" : "javascript",
@@ -242,13 +242,13 @@
     "title" : "JavaScript",
     "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -480,7 +480,7 @@
       "type" : "STRING",
       "defaultValue" : "def perform(input, context):\n\treturn null",
       "exampleValue" : null,
-      "label" : "Python code",
+      "label" : "Python Code",
       "placeholder" : null,
       "controlType" : "CODE_EDITOR",
       "languageId" : "python",
@@ -492,13 +492,13 @@
     "title" : "Python",
     "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -730,7 +730,7 @@
       "type" : "STRING",
       "defaultValue" : "def perform(input, context)\n\treturn null;\nend",
       "exampleValue" : null,
-      "label" : "Ruby code",
+      "label" : "Ruby Code",
       "placeholder" : null,
       "controlType" : "CODE_EDITOR",
       "languageId" : "ruby",
@@ -742,13 +742,13 @@
     "title" : "Ruby",
     "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
-    }
+    },
+    "workflowNodeDescription" : null
   } ],
   "categories" : [ {
     "key" : "helpers",

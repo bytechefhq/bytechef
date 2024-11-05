@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Google Drive",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -190,11 +121,12 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -293,10 +225,9 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -333,7 +264,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "New file name",
+      "label" : "New File Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -353,7 +284,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Destination folder",
+      "label" : "Destination Folder",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -457,14 +388,19 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name" : "new-file.txt"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
+      },
+      "sampleOutput" : {
+        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -544,13 +480,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : {
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name" : "new-file.txt"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }
     },
     "properties" : [ {
@@ -565,7 +496,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Folder name",
+      "label" : "Folder Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -585,7 +516,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent folder",
+      "label" : "Parent Folder",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -689,14 +620,19 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name" : "new-file.txt"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
+      },
+      "sampleOutput" : {
+        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -776,13 +712,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : {
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name" : "new-file.txt"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }
     },
     "properties" : [ {
@@ -797,7 +728,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "File name",
+      "label" : "File Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -837,7 +768,7 @@
       "type" : "STRING",
       "defaultValue" : "plain/text",
       "exampleValue" : null,
-      "label" : "File type",
+      "label" : "File Type",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -869,7 +800,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent folder",
+      "label" : "Parent Folder",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1030,6 +961,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1126,8 +1058,7 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1160,7 +1091,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Uploads a file in your Google Drive",
+    "description" : "Uploads a file in your Google Drive.",
     "help" : null,
     "metadata" : null,
     "name" : "uploadFile",
@@ -1245,14 +1176,19 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : {
+          "name" : "new-file.txt",
           "mimeType" : "plain/text",
-          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "name" : "new-file.txt"
+          "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
         }
+      },
+      "sampleOutput" : {
+        "name" : "new-file.txt",
+        "mimeType" : "plain/text",
+        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr"
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -1332,13 +1268,8 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : {
-        "mimeType" : "plain/text",
-        "id" : "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "name" : "new-file.txt"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       }
     },
     "properties" : [ {
@@ -1449,7 +1380,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent folder",
+      "label" : "Parent Folder",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1568,18 +1499,19 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1672,17 +1604,16 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1712,18 +1643,18 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { }
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1825,18 +1756,19 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "optionsDataSource" : null,
-            "controlType" : "OBJECT_BUILDER"
+            "controlType" : "OBJECT_BUILDER",
+            "optionsDataSource" : null
           } ],
           "maxItems" : null,
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1929,17 +1861,16 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         } ],
         "maxItems" : null,
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1969,18 +1900,87 @@
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { }
+    "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "refresh" : null,
+      "apply" : null,
+      "pkce" : null,
+      "scopes" : { },
+      "authorizationCallback" : null,
+      "clientId" : null,
+      "authorizationUrl" : { },
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "refreshUrl" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  }
 }

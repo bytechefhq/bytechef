@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Random Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -80,7 +79,7 @@
       "type" : "INTEGER",
       "defaultValue" : 0,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "Start Inclusive",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -99,7 +98,7 @@
       "type" : "INTEGER",
       "defaultValue" : 100,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "End Inclusive",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -108,8 +107,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Int",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -183,7 +182,7 @@
       "type" : "INTEGER",
       "defaultValue" : 0,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "Start Inclusive",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -202,7 +201,7 @@
       "type" : "INTEGER",
       "defaultValue" : 100,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "End Inclusive",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -211,11 +210,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Float",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : null
 }
