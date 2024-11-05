@@ -121,6 +121,12 @@ paths:
           example: 1234
           description: The connection ID that uniquely identifies the customer in your application
           required: false
+        - name: "x-environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
         - name: "componentName"
           description: "The component name."
           in: "path"
