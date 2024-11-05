@@ -13,79 +13,10 @@
   "resources" : null,
   "version" : 1,
   "title" : "Freshsales",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "username",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Bundle alias",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "The API Key supplied by Freshsales",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new account",
+    "description" : "Creates a new account.",
     "help" : null,
     "metadata" : null,
     "name" : "createAccount",
@@ -129,8 +60,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -192,8 +123,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -234,8 +165,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -297,14 +228,14 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Name of the account",
+      "description" : "Name of the account.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -324,7 +255,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Website of the account",
+      "description" : "Website of the account.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -344,7 +275,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Phone number of the account",
+      "description" : "Phone number of the account.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -364,13 +295,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Account",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Add new contact in Freshsales CRM",
+    "description" : "Add new contact in Freshsales CRM.",
     "help" : null,
     "metadata" : null,
     "name" : "createContact",
@@ -414,8 +345,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -717,8 +648,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -759,8 +690,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1062,14 +993,14 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "First name of the contact",
+      "description" : "First name of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1079,7 +1010,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "First name",
+      "label" : "First Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1089,7 +1020,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Last name of the contact",
+      "description" : "Last name of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1099,7 +1030,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Last name",
+      "label" : "Last Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1109,7 +1040,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Designation of the contact in the account they belong to",
+      "description" : "Designation of the contact in the account they belong to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1119,7 +1050,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Job title",
+      "label" : "Job Title",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1129,7 +1060,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Primary email address of the contact",
+      "description" : "Primary email address of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1149,7 +1080,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Work phone number of the contact",
+      "description" : "Work phone number of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1159,7 +1090,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Work number",
+      "label" : "Work Number",
       "placeholder" : null,
       "controlType" : "PHONE",
       "languageId" : null,
@@ -1169,7 +1100,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Mobile phone number of the contact",
+      "description" : "Mobile phone number of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1179,7 +1110,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Mobile number",
+      "label" : "Mobile Number",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1189,7 +1120,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Address of the contact",
+      "description" : "Address of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1209,7 +1140,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "City that the contact belongs to",
+      "description" : "City that the contact belongs to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1229,7 +1160,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "State that the contact belongs to",
+      "description" : "State that the contact belongs to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1249,7 +1180,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Zipcode of the region that the contact belongs to",
+      "description" : "Zipcode of the region that the contact belongs to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1259,7 +1190,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Zip code",
+      "label" : "Zip Code",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1269,7 +1200,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Country that the contact belongs to",
+      "description" : "Country that the contact belongs to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1289,7 +1220,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "The medium that led your contact to your website/web app",
+      "description" : "The medium that led your contact to your website/web ap.p",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1309,7 +1240,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Facebook username of the contact",
+      "description" : "Facebook username of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1329,7 +1260,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Twitter username of the contact",
+      "description" : "Twitter username of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1349,7 +1280,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "LinkedIn account of the contact",
+      "description" : "LinkedIn account of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1369,13 +1300,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new lead",
+    "description" : "Creates a new lead.",
     "help" : null,
     "metadata" : null,
     "name" : "createLead",
@@ -1419,8 +1350,8 @@
             "minValue" : null,
             "numberPrecision" : null,
             "options" : null,
-            "optionsDataSource" : null,
-            "controlType" : "NUMBER"
+            "controlType" : "NUMBER",
+            "optionsDataSource" : null
           }, {
             "advancedOption" : null,
             "description" : null,
@@ -1482,8 +1413,8 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -1524,8 +1455,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "NUMBER"
+          "controlType" : "NUMBER",
+          "optionsDataSource" : null
         }, {
           "advancedOption" : null,
           "description" : null,
@@ -1587,14 +1518,14 @@
           "options" : null,
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "First name of the lead",
+      "description" : "First name of the lead.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1604,7 +1535,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "First name",
+      "label" : "First Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1614,7 +1545,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Last name of the lead",
+      "description" : "Last name of the lead.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1624,7 +1555,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Last name",
+      "label" : "Last Name",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1634,7 +1565,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Primary email address of the lead",
+      "description" : "Primary email address of the lead.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1654,11 +1585,80 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Lead",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "username",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Bundle alias",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "The API Key supplied by Freshsales",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

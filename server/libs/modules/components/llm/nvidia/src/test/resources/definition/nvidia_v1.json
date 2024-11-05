@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "NVIDIA LLM",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -183,15 +134,15 @@
           } ],
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "In which format do you want the response to be in?",
@@ -204,7 +155,7 @@
       "type" : "INTEGER",
       "defaultValue" : 0,
       "exampleValue" : null,
-      "label" : "Response format",
+      "label" : "Response Format",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -221,8 +172,8 @@
         "label" : "List",
         "value" : 2
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -235,13 +186,13 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Max tokens",
+      "label" : "Max Tokens",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "How many chat completion choices to generate for each input message.",
@@ -254,13 +205,13 @@
       "type" : "INTEGER",
       "defaultValue" : 1,
       "exampleValue" : null,
-      "label" : "Number of chat completion choices",
+      "label" : "Number of Chat Completion Choices",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -281,8 +232,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -303,8 +254,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -317,7 +268,7 @@
       "type" : "NUMBER",
       "defaultValue" : 0.0,
       "exampleValue" : null,
-      "label" : "Frequency penalty",
+      "label" : "Frequency Penalty",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : 2.0,
@@ -325,8 +276,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -339,7 +290,7 @@
       "type" : "NUMBER",
       "defaultValue" : 0.0,
       "exampleValue" : null,
-      "label" : "Presence penalty",
+      "label" : "Presence Penalty",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : 2.0,
@@ -347,8 +298,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Modify the likelihood of specified tokens appearing in the completion.",
@@ -361,7 +312,7 @@
       "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Logit bias",
+      "label" : "Logit Bias",
       "placeholder" : null,
       "additionalProperties" : [ {
         "advancedOption" : null,
@@ -383,14 +334,14 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "NUMBER"
+        "controlType" : "NUMBER",
+        "optionsDataSource" : null
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -430,8 +381,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Enter the names of functions you want to use.",
@@ -471,8 +422,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
@@ -499,7 +450,56 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
-  "unifiedApi" : null
+  "triggers" : null,
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

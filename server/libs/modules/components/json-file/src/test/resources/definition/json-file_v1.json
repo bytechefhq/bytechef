@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "JSON File",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -570,5 +569,6 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

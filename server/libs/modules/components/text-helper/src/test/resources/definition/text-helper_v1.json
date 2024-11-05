@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Text Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -24,8 +23,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -113,6 +112,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -133,8 +133,7 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -175,8 +174,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The text that separates the texts you want to concatenate.",
@@ -212,12 +211,12 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The HTML content.",
+      "description" : "HTML content to extract content from.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -227,7 +226,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "HTML content to extract content from.",
+      "label" : "HTML Content",
       "placeholder" : null,
       "controlType" : "TEXT_AREA",
       "languageId" : null,
@@ -373,6 +372,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -397,8 +397,7 @@
           "value" : false
         } ],
         "controlType" : "SELECT"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -478,6 +477,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -498,8 +498,7 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -639,11 +638,12 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -683,10 +683,9 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "ARRAY_BUILDER"
-      },
-      "sampleOutput" : null
+        "controlType" : "ARRAY_BUILDER",
+        "optionsDataSource" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -736,5 +735,6 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

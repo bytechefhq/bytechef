@@ -13,79 +13,10 @@
   "resources" : null,
   "version" : 1,
   "title" : "Copper",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "api_key",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "username",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Email address",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "key",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "API Key",
-      "type" : "API_KEY",
-      "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
-      "apply" : { },
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new Activity",
+    "description" : "Creates a new activity.",
     "help" : null,
     "metadata" : null,
     "name" : "createActivity",
@@ -460,7 +391,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The Activity Type of this Activity.",
+      "description" : "The activity type of this activity.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -470,7 +401,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Activity type",
+      "label" : "Activity Type",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -483,7 +414,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Text body of this Activity.",
+      "description" : "Text body of this activity.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -503,7 +434,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Parent type to associate this Activity with.",
+      "description" : "Parent type to associate this activity with.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -513,7 +444,7 @@
       "type" : "STRING",
       "defaultValue" : "person",
       "exampleValue" : null,
-      "label" : "Parent type",
+      "label" : "Parent Type",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -539,7 +470,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Parent this Activity will be associated with.",
+      "description" : "Parent this activity will be associated with.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -549,7 +480,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent name",
+      "label" : "Parent Name",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -562,13 +493,13 @@
       }
     } ],
     "title" : "Create Activity",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new Company",
+    "description" : "Creates a new company.",
     "help" : null,
     "metadata" : null,
     "name" : "createCompany",
@@ -1671,7 +1602,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The name of the Company.",
+      "description" : "The name of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1691,7 +1622,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "User that will be the owner of the Company.",
+      "description" : "User that will be the owner of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1714,7 +1645,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The domain to which email addresses for the Company belong.",
+      "description" : "The domain to which email addresses for the company belong.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1724,7 +1655,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Email domain",
+      "label" : "Email Domain",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1734,7 +1665,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Contact Type of the Company.",
+      "description" : "Contact type of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1744,7 +1675,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Contact type",
+      "label" : "Contact Type",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1757,7 +1688,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Description of the Company.",
+      "description" : "Description of the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1777,7 +1708,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Phone numbers belonging to the Company.",
+      "description" : "Phone numbers belonging to the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1787,7 +1718,7 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Phone numbers",
+      "label" : "Phone Numbers",
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
@@ -1874,7 +1805,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Social profiles belonging to the Company.",
+      "description" : "Social profiles belonging to the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1987,7 +1918,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Websites belonging to the Company.",
+      "description" : "Websites belonging to the company.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2167,7 +2098,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Postal code",
+        "label" : "Postal Code",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -2200,7 +2131,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Tags associated with the Company",
+      "description" : "Tags associated with the company",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -2244,13 +2175,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Company",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new Person",
+    "description" : "Creates a new person.",
     "help" : null,
     "metadata" : null,
     "name" : "createPerson",
@@ -3555,7 +3486,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The first and last name of the Person.",
+      "description" : "The first and last name of the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3575,7 +3506,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Email addresses belonging to the Person.",
+      "description" : "Email addresses belonging to the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3668,7 +3599,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "User that will be the owner of the Person.",
+      "description" : "User that will be the owner of the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3691,7 +3622,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The professional title of the Person.",
+      "description" : "The professional title of the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3711,7 +3642,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Primary Company with which the Person is associated.",
+      "description" : "Primary company with which the person is associated.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3734,7 +3665,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The unique identifier of the Contact Type of the Person.",
+      "description" : "The unique identifier of the contact type of the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3787,7 +3718,7 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Phone numbers",
+      "label" : "Phone Numbers",
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
@@ -3874,7 +3805,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Social profiles belonging to the Person.",
+      "description" : "Social profiles belonging to the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -3987,7 +3918,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Websites belonging to the Person.",
+      "description" : "Websites belonging to the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -4200,7 +4131,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Tags associated with the Person.",
+      "description" : "Tags associated with the person.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -4244,9 +4175,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Person",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -5154,11 +5085,80 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Task",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "api_key",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "username",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Email address",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "key",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "API Key",
+      "type" : "API_KEY",
+      "acquire" : null,
+      "apply" : { },
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  }
 }

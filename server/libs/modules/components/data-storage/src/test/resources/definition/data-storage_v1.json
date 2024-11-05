@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Data Storage",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -337,7 +336,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Append a list as a single item",
+      "label" : "Append a List as a Single Item",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -351,8 +350,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Append Value to List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -472,7 +471,7 @@
       "type" : "INTEGER",
       "defaultValue" : 1,
       "exampleValue" : null,
-      "label" : "Value to add",
+      "label" : "Value to Add",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -481,8 +480,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Atomic Increment",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -620,7 +619,7 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "items" : null,
       "maxItems" : null,
@@ -641,7 +640,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -665,7 +664,7 @@
       "type" : "DATE",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "DATE",
@@ -682,7 +681,7 @@
       "type" : "DATE_TIME",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "DATE_TIME",
@@ -699,7 +698,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -718,7 +717,7 @@
       "type" : "NULL",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "controlType" : "NULL"
     }, {
@@ -733,7 +732,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -755,7 +754,7 @@
       "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "additionalProperties" : null,
       "multipleValues" : null,
@@ -775,7 +774,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -795,7 +794,7 @@
       "type" : "TIME",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "TIME",
@@ -812,7 +811,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Timeout (1 to 300 sec)",
+      "label" : "Timeout",
       "placeholder" : null,
       "maxValue" : 300,
       "minValue" : 1,
@@ -821,8 +820,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Await Get Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -886,8 +885,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -970,8 +969,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value from List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1105,8 +1104,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get All Entries(Keys and Values)",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1244,7 +1243,7 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "items" : null,
       "maxItems" : null,
@@ -1265,7 +1264,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -1289,7 +1288,7 @@
       "type" : "DATE",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "DATE",
@@ -1306,7 +1305,7 @@
       "type" : "DATE_TIME",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "DATE_TIME",
@@ -1323,7 +1322,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -1342,7 +1341,7 @@
       "type" : "NULL",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "controlType" : "NULL"
     }, {
@@ -1357,7 +1356,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1379,7 +1378,7 @@
       "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "additionalProperties" : null,
       "multipleValues" : null,
@@ -1399,7 +1398,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -1419,15 +1418,15 @@
       "type" : "TIME",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Default value",
+      "label" : "Default Value",
       "placeholder" : null,
       "options" : null,
       "controlType" : "TIME",
       "optionsDataSource" : null
     } ],
     "title" : "Get Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1742,8 +1741,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -2077,11 +2076,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value in List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
+  "connection" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

@@ -13,55 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Airtable",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -587,7 +538,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The base id.",
+      "description" : "The base where table is located.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -599,7 +550,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Base Id",
+      "label" : "Base",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -612,7 +563,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The table id.",
+      "description" : "The table where the record will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -624,7 +575,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Table Id",
+      "label" : "Table",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -654,10 +605,70 @@
       }
     } ],
     "title" : "Create Record",
+    "perform" : null,
     "processErrorResponse" : { },
-    "workflowNodeDescription" : null,
-    "perform" : null
+    "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
+  "dataStream" : {
+    "writer" : {
+      "properties" : null,
+      "streamTypes" : null,
+      "dataStreamItemWriter" : { }
+    },
+    "reader" : {
+      "properties" : null,
+      "dataStreamItemReader" : { }
+    }
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -743,27 +754,16 @@
     "workflowSyncExecution" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
+    "poll" : { },
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : { }
+    "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : {
-    "reader" : {
-      "properties" : null,
-      "dataStreamItemReader" : { }
-    },
-    "writer" : {
-      "properties" : null,
-      "streamTypes" : null,
-      "dataStreamItemWriter" : { }
-    }
-  },
   "unifiedApi" : null
 }
