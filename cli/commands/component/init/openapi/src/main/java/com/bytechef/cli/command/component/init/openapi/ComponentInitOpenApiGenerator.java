@@ -240,8 +240,8 @@ public class ComponentInitOpenApiGenerator {
         if (!StringUtils.isEmpty(propertyName) && !outputSchema) {
             builder.add(
                 ".label($S)",
-                buildPropertyLabel(
-                    StringUtils.isEmpty(schema.getTitle()) ? propertyName.replace("__", "") : schema.getTitle()));
+                StringUtils.isEmpty(schema.getTitle()) ? buildPropertyLabel(propertyName.replace("__", ""))
+                    : schema.getTitle());
         }
 
         if (propertyDescription != null) {
@@ -1124,8 +1124,8 @@ public class ComponentInitOpenApiGenerator {
 
             builder.add(
                 ".label($S)",
-                buildPropertyLabel(
-                    StringUtils.isEmpty(schema.getTitle()) ? propertyName.replace("__", "") : schema.getTitle()));
+                StringUtils.isEmpty(schema.getTitle()) ? buildPropertyLabel(propertyName.replace("__", ""))
+                    : schema.getTitle());
         }
 
         if (propertyDescription != null) {
