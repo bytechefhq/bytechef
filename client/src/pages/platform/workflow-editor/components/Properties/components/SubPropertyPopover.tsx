@@ -51,7 +51,7 @@ const SubPropertyPopover = ({
                 </Button>
             </PopoverTrigger>
 
-            <PopoverContent className="min-w-[400px] space-y-4 p-4">
+            <PopoverContent className="min-w-sub-property-popover-width space-y-4 p-4">
                 <header className="flex items-center justify-between">
                     <span className="font-semibold">Add {array ? 'array item' : 'object property'}</span>
 

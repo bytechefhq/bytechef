@@ -12,7 +12,7 @@ interface WorkflowOutputsSheetProps {
 const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) => (
     <Sheet onOpenChange={onClose} open>
         <SheetContent
-            className="flex flex-col p-4 sm:max-w-[700px]"
+            className="flex flex-col p-4 sm:max-w-workflow-outputs-sheet-width"
             onFocusOutside={(event) => event.preventDefault()}
             onPointerDownOutside={(event) => event.preventDefault()}
         >

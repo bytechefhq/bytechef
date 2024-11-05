@@ -16,7 +16,7 @@ export function RightSidebar({
 }) {
     return (
         <div className={twMerge('hidden lg:flex lg:shrink-0', className)}>
-            <div className="flex w-[56px]">
+            <div className="w-sidebar-width flex">
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
                     <div className="flex-1">
                         <nav aria-label="Sidebar" className="flex flex-col items-center py-3">

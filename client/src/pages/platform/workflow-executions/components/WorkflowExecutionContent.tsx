@@ -31,7 +31,7 @@ const WorkflowExecutionContent = ({
                                 <ExpandIcon className="h-4 cursor-pointer" />
                             </DialogTrigger>
 
-                            <DialogContent className="max-w-[1000px]">
+                            <DialogContent className="max-w-workflow-execution-content-width">
                                 <DialogHeader>
                                     <div className="mr-3 flex items-center justify-between uppercase">
                                         <DialogTitle>Input</DialogTitle>
@@ -40,7 +40,7 @@ const WorkflowExecutionContent = ({
                                     </div>
                                 </DialogHeader>
 
-                                <div className="max-h-[80vh] overflow-y-auto">
+                                <div className="max-h-workflow-execution-content-height overflow-y-auto">
                                     {input && (typeof input !== 'object' || Object.keys(input).length > 0) ? (
                                         typeof input === 'object' ? (
                                             <ReactJson
@@ -88,7 +88,7 @@ const WorkflowExecutionContent = ({
                                     <ExpandIcon className="h-4 cursor-pointer" />
                                 </DialogTrigger>
 
-                                <DialogContent className="max-w-[1000px]">
+                                <DialogContent className="max-w-workflow-execution-content-width">
                                     <DialogHeader>
                                         <div className="mr-3 flex items-center justify-between uppercase">
                                             <DialogTitle>Output</DialogTitle>
@@ -97,7 +97,7 @@ const WorkflowExecutionContent = ({
                                         </div>
                                     </DialogHeader>
 
-                                    <div className="max-h-[80vh] overflow-y-auto">
+                                    <div className="max-h-workflow-execution-content-height overflow-y-auto">
                                         {output !== undefined ? (
                                             typeof output === 'object' ? (
                                                 <ReactJson
@@ -152,12 +152,12 @@ const WorkflowExecutionContent = ({
                                     <ExpandIcon className="h-4 cursor-pointer" />
                                 </DialogTrigger>
 
-                                <DialogContent className="max-w-[1000px]">
+                                <DialogContent className="max-w-workflow-execution-content-width">
                                     <DialogHeader>
                                         <DialogTitle className="uppercase text-destructive">Error</DialogTitle>
                                     </DialogHeader>
 
-                                    <div className="max-h-[80vh] space-y-3 overflow-y-auto">
+                                    <div className="max-h-workflow-execution-content-height space-y-3 overflow-y-auto">
                                         <div className="flex flex-col space-y-1 text-sm">
                                             <div className="text-sm font-semibold">Message</div>
 

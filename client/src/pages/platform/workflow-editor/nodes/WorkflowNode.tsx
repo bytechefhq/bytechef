@@ -62,13 +62,13 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     return (
         <div
-            className="nodrag relative flex min-w-[240px] cursor-pointer items-center justify-center"
+            className="nodrag relative flex min-w-60 cursor-pointer items-center justify-center"
             data-nodeType={data.trigger ? 'trigger' : 'task'}
             onMouseOut={() => setIsHovered(false)}
             onMouseOver={() => setIsHovered(true)}
         >
             {isHovered && (
-                <div className="absolute left-[-40px] pr-4">
+                <div className="absolute left-workflow-node-popover-hover pr-4">
                     {data.trigger ? (
                         <WorkflowNodesPopoverMenu hideActionComponents hideTaskDispatchers sourceNodeId={id}>
                             <Button
@@ -127,14 +127,14 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             </div>
 
             <Handle
-                className={twMerge('left-[36px]', styles.handle)}
+                className={twMerge('left-node-handle-placement', styles.handle)}
                 isConnectable={false}
                 position={Position.Top}
                 type="target"
             />
 
             <Handle
-                className={twMerge('left-[36px]', styles.handle)}
+                className={twMerge('left-node-handle-placement', styles.handle)}
                 isConnectable={false}
                 position={Position.Bottom}
                 type="source"

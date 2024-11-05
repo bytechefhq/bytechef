@@ -61,7 +61,7 @@ const DataPillPanel = ({
     }
 
     return (
-        <div className="absolute inset-y-4 right-[485px] z-10 w-screen max-w-[400px] overflow-hidden rounded-xl border border-muted bg-white shadow-lg">
+        <div className="absolute inset-y-4 right-data-pill-panel-placement z-10 w-screen max-w-data-pill-panel-width overflow-hidden rounded-xl border border-muted bg-white shadow-lg">
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                 <header className="flex content-center items-center p-4 text-lg font-medium">
                     <span>Data Pill Panel</span>

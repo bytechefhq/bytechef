@@ -204,7 +204,7 @@ const WorkflowOutputsSheetDialog = ({
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="grid w-[440px] gap-4">
+            <DialogContent className="w-workflow-outputs-sheet-dialog-width grid gap-4">
                 <header className="space-y-2">
                     <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
 
