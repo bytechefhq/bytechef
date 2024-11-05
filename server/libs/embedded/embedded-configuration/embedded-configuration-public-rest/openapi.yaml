@@ -37,7 +37,7 @@ paths:
 components:
   schemas:
     Environment:
-      $ref: "../../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
+      $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
       description: "A group of workflows that make one logical integration."
       type: "object"
