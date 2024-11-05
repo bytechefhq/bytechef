@@ -5,7 +5,7 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "description" : "Vertex AI is a fully-managed, unified AI development platform for building and using generative AI. ",
+  "description" : "Vertex AI is a fully-managed, unified AI development platform for building and using generative AI.",
   "icon" : "path:assets/google-vertex.svg",
   "tags" : null,
   "metadata" : null,

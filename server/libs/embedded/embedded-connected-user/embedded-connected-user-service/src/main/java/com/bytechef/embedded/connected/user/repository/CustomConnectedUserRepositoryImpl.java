@@ -48,7 +48,7 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
 
         Page<ConnectedUser> page;
         JdbcClient.StatementSpec statementSpec = buildQuery(
-            environment, search, createDateFrom, createDateFrom, integrationId, pageable, true);
+            environment, search, createDateFrom, createDateTo, integrationId, pageable, true);
 
         long total = statementSpec.query(Long.class)
             .single();
@@ -57,7 +57,7 @@ public class CustomConnectedUserRepositoryImpl implements CustomConnectedUserRep
             page = Page.empty();
         } else {
             statementSpec =
-                buildQuery(environment, search, createDateFrom, createDateFrom, integrationId, pageable, false);
+                buildQuery(environment, search, createDateFrom, createDateTo, integrationId, pageable, false);
 
             List<ConnectedUser> connectedUsers = statementSpec
                 .query(ConnectedUser.class)

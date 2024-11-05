@@ -60,7 +60,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 public class XlsxFileReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(XlsxFileConstants.READ)
-        .title("Read from file")
+        .title("Read from File")
         .description("Reads data from a XLS/XLSX file.")
         .properties(
             fileEntry(FILE_ENTRY)

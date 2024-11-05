@@ -17,7 +17,6 @@
 package com.bytechef.component.stability;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.stability.constant.StabilityConstants.STABILITY;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,10 +32,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class StabilityComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(STABILITY)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("stability")
         .title("Stability AI")
         .description(
-            "Activating humanity's potential through generative AI. Open models in every modality, for everyone, everywhere.")
+            "Activating humanity's potential through generative AI. Open models in every modality, for everyone, " +
+                "everywhere.")
         .icon("path:assets/stability.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(StabilityConnection.CONNECTION_DEFINITION)

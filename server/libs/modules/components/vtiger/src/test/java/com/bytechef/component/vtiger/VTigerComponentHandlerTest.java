@@ -26,7 +26,6 @@ class VTigerComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-
         JsonFileAssert.assertEquals("definition/vtiger_v1.json", new VTigerComponentHandler().getDefinition());
     }
 }

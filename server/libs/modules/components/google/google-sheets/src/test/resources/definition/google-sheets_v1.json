@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { }
     } ],
     "properties" : null,
     "version" : 1,
@@ -184,10 +184,10 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Clear sheet",
+    "title" : "Clear Sheet",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -589,10 +589,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create column",
+    "title" : "Create Column",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1032,10 +1032,10 @@
       "optionsDataSource" : null,
       "controlType" : "ARRAY_BUILDER"
     } ],
-    "title" : "Create sheet",
+    "title" : "Create Sheet",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1133,10 +1133,10 @@
       "optionsDataSource" : null,
       "controlType" : "INTEGER"
     } ],
-    "title" : "Delete row",
+    "title" : "Delete Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1439,10 +1439,10 @@
       "optionsDataSource" : null,
       "controlType" : "INTEGER"
     } ],
-    "title" : "Find row by number",
+    "title" : "Find Row by Number",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1811,10 +1811,10 @@
         "properties" : { }
       }
     } ],
-    "title" : "Insert multiple rows",
+    "title" : "Insert Multiple Rows",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2141,10 +2141,10 @@
         "properties" : { }
       }
     } ],
-    "title" : "Insert row",
+    "title" : "Insert Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2462,10 +2462,10 @@
         "properties" : { }
       }
     } ],
-    "title" : "Update row",
+    "title" : "Update Row",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : [ {
@@ -2762,10 +2762,6 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "webhookRequest" : { },
@@ -2773,7 +2769,11 @@
     "listenerEnable" : null,
     "webhookValidate" : null,
     "deduplicate" : null,
-    "poll" : null
+    "poll" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "unifiedApi" : null
 }

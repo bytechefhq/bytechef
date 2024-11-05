@@ -47,7 +47,7 @@ public class WhatsAppNewIncomingMessageTrigger {
 
     public static final ComponentDsl.ModifiableTriggerDefinition TRIGGER_DEFINITION =
         ComponentDsl.trigger(MESSAGE_RECEIVED)
-            .title("Message received")
+            .title("Message Received")
             .description("Triggers when you get a new message from certain number.")
             .type(TriggerType.DYNAMIC_WEBHOOK)
             .properties(

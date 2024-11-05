@@ -19,7 +19,7 @@ package com.bytechef.platform.connection.domain;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
@@ -216,8 +216,8 @@ public final class Connection {
             .toList();
     }
 
-    public AppType getType() {
-        return AppType.values()[type];
+    public ModeType getType() {
+        return ModeType.values()[type];
     }
 
     public int getVersion() {
@@ -262,7 +262,7 @@ public final class Connection {
         }
     }
 
-    public void setType(AppType type) {
+    public void setType(ModeType type) {
         this.type = type.ordinal();
     }
 
@@ -316,7 +316,7 @@ public final class Connection {
         private String name;
         private Map<String, Object> parameters;
         private List<Long> tagIds;
-        private AppType type;
+        private ModeType type;
         private int version;
 
         private Builder() {
@@ -364,7 +364,7 @@ public final class Connection {
             return this;
         }
 
-        public Builder type(AppType type) {
+        public Builder type(ModeType type) {
             this.type = type;
 
             return this;

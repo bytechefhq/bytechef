@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class DiscordCreateChannelAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createChannel")
-        .title("Create channel")
+        .title("Create Channel")
         .description("Create a new channel")
         .metadata(
             Map.of(

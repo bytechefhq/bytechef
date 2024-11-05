@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
 /**
@@ -35,7 +35,7 @@ public final class AmazonBedrockConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .authorizations(
-            authorization(Authorization.AuthorizationType.CUSTOM)
+            authorization(AuthorizationType.CUSTOM)
                 .properties(
                     string(ACCESS_KEY_ID)
                         .label("Access Key ID")

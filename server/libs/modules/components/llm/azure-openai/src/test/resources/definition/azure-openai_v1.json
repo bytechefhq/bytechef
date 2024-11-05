@@ -1061,7 +1061,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create image",
+    "title" : "Create Image",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
@@ -1529,12 +1529,12 @@
       "optionsDataSource" : null,
       "controlType" : "NUMBER"
     } ],
-    "title" : "Create transcriptions",
+    "title" : "Create Transcriptions",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

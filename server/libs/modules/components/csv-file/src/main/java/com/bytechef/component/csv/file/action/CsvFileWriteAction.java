@@ -50,7 +50,7 @@ import java.util.Map;
 public class CsvFileWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
-        .title("Write to file")
+        .title("Write to File")
         .description("Writes the data to a csv file.")
         .properties(
             array(ROWS)

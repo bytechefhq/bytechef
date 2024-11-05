@@ -3,13 +3,15 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {Property} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteWorkflowNodeTestOutputMutation,
     useSaveWorkflowNodeTestOutputMutation,
     useUploadSampleOutputRequestMutation,
 } from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {
+    WorkflowNodeOutputKeys,
+    useGetWorkflowNodeOutputQuery,
+} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {NodeType, PropertyAllType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -21,17 +23,23 @@ import SchemaProperties from '../SchemaProperties';
 import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
+    connectionMissing: boolean;
     currentNode: NodeType;
     outputDefined: boolean;
-    outputSchema: Property;
-    sampleOutput: object;
     workflowId: string;
 }
 
-const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutput, workflowId}: OutputTabProps) => {
+const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
+
+    const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery({
+        id: workflowId!,
+        workflowNodeName: currentNode?.name as string,
+    });
+
+    const {outputSchema, sampleOutput} = workflowNodeOutput || {};
 
     const queryClient = useQueryClient();
 
@@ -121,7 +129,11 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                                 )}
 
                                 {!currentNode.trigger && (
-                                    <DropdownMenuItem className="cursor-pointer" onClick={handleTestComponentClick}>
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        disabled={connectionMissing}
+                                        onClick={handleTestComponentClick}
+                                    >
                                         Test Component
                                     </DropdownMenuItem>
                                 )}
@@ -143,7 +155,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                         workflowNodeName={currentNode.name}
                     />
 
-                    {(outputSchema as PropertyAllType)?.properties && (
+                    {(outputSchema as PropertyAllType)?.properties && sampleOutput && (
                         <SchemaProperties
                             copiedValue={copiedValue}
                             copyToClipboard={copyToClipboard}
@@ -153,7 +165,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                         />
                     )}
 
-                    {(outputSchema as PropertyAllType)?.items && (
+                    {(outputSchema as PropertyAllType)?.items && sampleOutput && (
                         <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1">
                             <SchemaProperties
                                 copiedValue={copiedValue}
@@ -215,6 +227,7 @@ const OutputTab = ({currentNode, outputDefined = false, outputSchema, sampleOutp
                 onClose={() => setShowUploadDialog(false)}
                 onUpload={handleSampleDataDialogUpload}
                 open={showUploadDialog}
+                sampleOutput={sampleOutput}
             />
         </div>
     );

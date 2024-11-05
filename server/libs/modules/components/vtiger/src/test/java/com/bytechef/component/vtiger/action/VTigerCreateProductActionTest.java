@@ -27,23 +27,24 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 class VTigerCreateProductActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Http.Body.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final Map<String, Object> elementMap = Map.of(PRODUCT_TYPE, "Solo", PRODUCT_NAME, "name");
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(elementMap);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
@@ -56,38 +57,14 @@ class VTigerCreateProductActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
-
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getString("elementType"))
-            .thenReturn((String) propertyStubsMap.get("elementType"));
-        when(mockedParameters.getRequired("element"))
-            .thenReturn(propertyStubsMap.get("element"));
-        when(mockedParameters.getRequiredString(PRODUCT_NAME))
-            .thenReturn((String) propertyStubsMap.get(PRODUCT_NAME));
-        when(mockedParameters.getRequiredString(PRODUCT_TYPE))
-            .thenReturn((String) propertyStubsMap.get(PRODUCT_TYPE));
+            .thenReturn(mockedObject);
 
         Object result = VTigerCreateProductAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new LinkedHashMap<>();
-        Map<String, String> bodyMap = new LinkedHashMap<>();
-
-        bodyMap.put(PRODUCT_TYPE, null);
-        bodyMap.put(PRODUCT_NAME, null);
-
-        propertyStubsMap.put("elementType", "Products");
-        propertyStubsMap.put("element", bodyMap);
-
-        return propertyStubsMap;
+        assertEquals(Map.of("elementType", "Products", "element", elementMap), body.getContent());
     }
 }

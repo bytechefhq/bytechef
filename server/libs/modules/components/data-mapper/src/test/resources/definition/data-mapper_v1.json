@@ -156,10 +156,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Map objects to array",
-    "perform" : { },
+    "title" : "Map Objects to Array",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -439,10 +439,10 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Map objects to object",
-    "perform" : { },
+    "title" : "Map Objects to Object",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -538,10 +538,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Merge and pivot properties by key",
-    "perform" : { },
+    "title" : "Merge and Pivot Properties by Key",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -657,10 +657,10 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Rename keys",
-    "perform" : { },
+    "title" : "Rename Keys",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1541,10 +1541,10 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace all specified values",
-    "perform" : { },
+    "title" : "Replace All Specified Values",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1680,10 +1680,10 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace multiple values by key",
-    "perform" : { },
+    "title" : "Replace Multiple Values by Key",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3037,12 +3037,12 @@
       "controlType" : "ARRAY_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Replace value",
-    "perform" : { },
+    "title" : "Replace Value",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

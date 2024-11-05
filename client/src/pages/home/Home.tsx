@@ -1,4 +1,4 @@
-import {AppType, useAppTypeStore} from '@/pages/home/stores/useAppTypeStore';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import * as Dialog from '@radix-ui/react-dialog';
 import {FolderIcon, SquareIcon} from 'lucide-react';
@@ -6,14 +6,14 @@ import {useEffect} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const Home = () => {
-    const {currentType, setCurrentType} = useAppTypeStore();
+    const {currentType, setCurrentType} = useModeTypeStore();
 
     const ff_520 = useFeatureFlagsStore()('ff-520');
 
     const navigate = useNavigate();
 
-    const handleClick = (appType: AppType) => {
-        setCurrentType(appType);
+    const handleClick = (modeType: ModeType) => {
+        setCurrentType(modeType);
     };
 
     useEffect(() => {
@@ -22,7 +22,7 @@ const Home = () => {
         }
 
         if (currentType !== undefined) {
-            if (currentType === AppType.AUTOMATION) {
+            if (currentType === ModeType.AUTOMATION) {
                 navigate('/automation');
             } else {
                 navigate('/embedded');
@@ -39,7 +39,7 @@ const Home = () => {
                     <div className="mx-auto flex h-full items-center">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <button onClick={() => handleClick(AppType.EMBEDDED)}>
+                                <button onClick={() => handleClick(ModeType.EMBEDDED)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-green-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Embedded</div>
 
@@ -55,7 +55,7 @@ const Home = () => {
                             </div>
 
                             <div>
-                                <button onClick={() => handleClick(AppType.AUTOMATION)}>
+                                <button onClick={() => handleClick(ModeType.AUTOMATION)}>
                                     <div className="flex size-80 flex-col items-center justify-between rounded-md p-4 hover:bg-blue-100 hover:text-accent-foreground">
                                         <div className="text-2xl font-semibold">Automation</div>
 

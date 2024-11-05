@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Emails"
-      summary: "Create email template"
+      summary: "Create Email Template"
       description: "Create email template"
       operationId: "createEmail"
       requestBody:
@@ -67,7 +67,7 @@ paths:
     post:
       tags:
         - "People"
-      summary: "Create people"
+      summary: "Create People"
       description: "Creates new People"
       operationId: "createPeople"
       requestBody:
@@ -135,7 +135,7 @@ paths:
     post:
       tags:
         - "Tags"
-      summary: "Add tag"
+      summary: "Add Tag"
       description: "Add tag(s) to an existing user."
       operationId: "addTag"
       requestBody:

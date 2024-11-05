@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:36.791210+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:04:08.835662+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -131,6 +131,7 @@ public interface ComponentDefinitionApi {
      * GET /component-definitions : Get all component definitions
      * Get all component definitions.
      *
+     * @param modeType The application mode. (required)
      * @param actionDefinitions Use for filtering components which define action definitions. (optional)
      * @param connectionDefinitions Use for filtering components which define connection definitions. (optional)
      * @param triggerDefinitions Use for filtering components which define trigger definitions. (optional)
@@ -155,6 +156,7 @@ public interface ComponentDefinitionApi {
     )
     
     default ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
+        @NotNull @Parameter(name = "modeType", description = "The application mode.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "modeType", required = true) String modeType,
         @Parameter(name = "actionDefinitions", description = "Use for filtering components which define action definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "actionDefinitions", required = false) Boolean actionDefinitions,
         @Parameter(name = "connectionDefinitions", description = "Use for filtering components which define connection definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "connectionDefinitions", required = false) Boolean connectionDefinitions,
         @Parameter(name = "triggerDefinitions", description = "Use for filtering components which define trigger definitions.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "triggerDefinitions", required = false) Boolean triggerDefinitions,

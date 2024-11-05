@@ -63,6 +63,8 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -72,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -434,10 +434,10 @@
       "optionsDataSource" : null,
       "controlType" : "OBJECT_BUILDER"
     } ],
-    "title" : "Create company",
-    "perform" : null,
+    "title" : "Create Company",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -850,10 +850,10 @@
       "optionsDataSource" : null,
       "controlType" : "OBJECT_BUILDER"
     } ],
-    "title" : "Create contact",
-    "perform" : null,
+    "title" : "Create Contact",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1308,10 +1308,10 @@
       "optionsDataSource" : null,
       "controlType" : "OBJECT_BUILDER"
     } ],
-    "title" : "Create ticket",
-    "perform" : null,
+    "title" : "Create Ticket",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : null
   } ],
   "triggers" : [ ],
   "dataStream" : null,

@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Contacts"
-      summary: "Create contact"
+      summary: "Create Contact"
       description: "Creates new Contact"
       operationId: "createContact"
       requestBody:
@@ -75,7 +75,7 @@ paths:
     post:
       tags:
         - "Organisations"
-      summary: "Create organization"
+      summary: "Create Organization"
       description: "Creates new Organization"
       operationId: "createOrganization"
       requestBody:
@@ -125,7 +125,7 @@ paths:
     post:
       tags:
         - "Tasks"
-      summary: "Create task"
+      summary: "Create Task"
       description: "Creates new Task"
       operationId: "createTask"
       requestBody:

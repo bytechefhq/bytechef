@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -42,12 +42,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final Long instanceWorkflowId;
     private final Long jobId;
     private final boolean devEnvironment;
-    private final AppType type;
+    private final ModeType type;
     private final String workflowId;
 
     @SuppressFBWarnings("EI")
     public ActionContextImpl(
-        String componentName, int componentVersion, String actionName, AppType type, Long instanceId,
+        String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
         boolean devEnvironment,
         DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
@@ -87,7 +87,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public AppType getType() {
+    public ModeType getType() {
         return type;
     }
 
@@ -117,7 +117,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     private record DataImpl(
-        String componentName, Integer componentVersion, String actionName, AppType type, Long instanceId,
+        String componentName, Integer componentVersion, String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, Long jobId, DataStorage dataStorage) implements Data {
 
         @Override

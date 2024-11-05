@@ -40,7 +40,7 @@ import com.bytechef.component.definition.Parameters;
 public class MicrosoftExcelAppendRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("appendRow")
-        .title("Append row")
+        .title("Append Row")
         .description("Append a row of values to an existing worksheet")
         .properties(
             WORKBOOK_ID_PROPERTY,

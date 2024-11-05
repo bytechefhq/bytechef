@@ -27,6 +27,8 @@ import org.springframework.data.domain.Page;
  */
 public interface ConnectedUserFacade {
 
+    void enableConnectedUser(long id, boolean enable);
+
     ConnectedUserDTO getConnectedUser(long id);
 
     Page<ConnectedUserDTO> getConnectedUsers(

@@ -17,6 +17,7 @@
 package com.bytechef.component.amazon.bedrock.action;
 
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
+import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -30,7 +31,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPE
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -51,7 +51,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  */
 public class AmazonBedrockLlamaChatAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(AmazonBedrockConstants.ASK_LLAMA)
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("askLlama")
         .title("Ask Llama")
         .description("Ask anything you want.")
         .properties(
@@ -102,7 +102,7 @@ public class AmazonBedrockLlamaChatAction {
                     () -> AwsBasicCredentials.create(
                         connectionParameters.getRequiredString(ACCESS_KEY_ID),
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(AmazonBedrockConstants.REGION), new ObjectMapper()),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (BedrockLlamaChatOptions) createChatOptions(inputParameters));
         }
     };

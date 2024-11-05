@@ -16,7 +16,6 @@
 
 package com.bytechef.component.anthropic;
 
-import static com.bytechef.component.anthropic.constant.AnthropicConstants.ANTHROPIC;
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
@@ -33,10 +32,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AnthropicComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(ANTHROPIC)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("anthropic")
         .title("Anthropic")
         .description(
-            "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.")
+            "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and " +
+                "steerable AI systems.")
         .icon("path:assets/anthropic.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AnthropicConnection.CONNECTION_DEFINITION)

@@ -43,7 +43,7 @@ import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtil
 public class MicrosoftSharePointUploadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("uploadFile")
-        .title("Upload file")
+        .title("Upload File")
         .description("Upload file to Microsoft SharePoint folder.")
         .properties(
             SITE_ID_PROPERTY,

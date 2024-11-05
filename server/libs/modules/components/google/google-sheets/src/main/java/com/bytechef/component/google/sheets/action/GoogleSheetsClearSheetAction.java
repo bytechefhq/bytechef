@@ -42,7 +42,7 @@ import java.util.List;
 public class GoogleSheetsClearSheetAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("clearSheet")
-        .title("Clear sheet")
+        .title("Clear Sheet")
         .description("Clear a sheet of all values while preserving formats.")
         .properties(
             SPREADSHEET_ID_PROPERTY,

@@ -23,7 +23,6 @@ package com.bytechef.component.hugging.face.constant;
 public final class HuggingFaceConstants {
 
     public static final String URL = "url";
-    public static final String HUGGING_FACE = "hugging-face";
 
     private HuggingFaceConstants() {
     }

@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.service;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
 import java.security.PublicKey;
 import java.util.List;
@@ -35,7 +35,7 @@ public interface SigningKeyService {
 
     SigningKey getSigningKey(long id);
 
-    List<SigningKey> getSigningKeys(@NonNull AppType type);
+    List<SigningKey> getSigningKeys(@NonNull ModeType type);
 
     SigningKey update(@NonNull SigningKey signingKey);
 }

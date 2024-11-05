@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class ShopifyCreateOrderAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createOrder")
-        .title("Create an order")
+        .title("Create Order")
         .description("Adds an order into a Shopify store.")
         .metadata(
             Map.of(

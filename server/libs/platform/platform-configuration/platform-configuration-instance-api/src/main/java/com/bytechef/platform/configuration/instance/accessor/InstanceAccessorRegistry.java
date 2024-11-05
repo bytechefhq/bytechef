@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.instance.accessor;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InstanceAccessorRegistry {
 
-    private final Map<AppType, InstanceAccessor> instanceAccessorMap;
+    private final Map<ModeType, InstanceAccessor> instanceAccessorMap;
 
     public InstanceAccessorRegistry(List<InstanceAccessor> instanceAccessors) {
         this.instanceAccessorMap = instanceAccessors
@@ -39,7 +39,7 @@ public class InstanceAccessorRegistry {
                     InstanceAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public InstanceAccessor getInstanceAccessor(AppType type) {
+    public InstanceAccessor getInstanceAccessor(ModeType type) {
         return Validate.notNull(instanceAccessorMap.get(type), "instanceAccessor");
     }
 }

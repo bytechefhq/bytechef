@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.workflow.execution.remote.client.service;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,17 +38,17 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
-    public InstanceJob create(long jobId, long instanceId, AppType type) {
+    public InstanceJob create(long jobId, long instanceId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deleteInstanceJobs(long jobId, AppType type) {
+    public void deleteInstanceJobs(long jobId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Long> fetchLastJobId(long instanceId, AppType type) {
+    public Optional<Long> fetchLastJobId(long instanceId, ModeType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
@@ -59,7 +59,7 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
-    public Optional<Long> fetchJobInstanceId(long jobId, AppType type) {
+    public Optional<Long> fetchJobInstanceId(long jobId, ModeType type) {
         return Optional.ofNullable(
             loadBalancedRestClient.get(
                 uriBuilder -> uriBuilder
@@ -70,18 +70,18 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
     }
 
     @Override
-    public long getJobInstanceId(long jobId, AppType type) {
+    public long getJobInstanceId(long jobId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Long> getJobIds(long instanceId, AppType type) {
+    public List<Long> getJobIds(long instanceId, ModeType type) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, AppType type,
+        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, ModeType type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

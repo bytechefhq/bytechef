@@ -37,7 +37,7 @@ import com.bytechef.component.jira.util.JiraOptionsUtils;
 public class JiraGetIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getIssue")
-        .title("Get issue")
+        .title("Get Issue")
         .description("Get issue details in selected project.")
         .properties(
             string(PROJECT)

@@ -43,7 +43,7 @@ import java.io.IOException;
 public class GoogleMailAddLabelsAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addLabels")
-        .title("Add labels")
+        .title("Add Labels")
         .description("Add labels to an email in your Gmail account")
         .properties(
             string(ID)

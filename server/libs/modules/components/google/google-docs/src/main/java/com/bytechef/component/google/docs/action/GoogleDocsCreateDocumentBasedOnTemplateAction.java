@@ -45,7 +45,7 @@ import java.util.Map;
 public class GoogleDocsCreateDocumentBasedOnTemplateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_DOCUMENT_BASED_ON_TEMPLATE)
-        .title("Edit template file")
+        .title("Edit Template File")
         .description("Edit a template file and replace the values with the ones provided")
         .properties(
             string(DESTINATION_FILE)

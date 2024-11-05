@@ -51,7 +51,7 @@ import java.util.Map;
 public class JiraCreateIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createIssue")
-        .title("Create issue")
+        .title("Create Issue")
         .description("Creates a new issue.")
         .properties(
             string(PROJECT)

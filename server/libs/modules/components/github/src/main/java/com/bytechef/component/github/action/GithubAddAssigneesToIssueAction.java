@@ -41,7 +41,7 @@ import java.util.Map;
 public class GithubAddAssigneesToIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("addAssigneesToIssue")
-        .title("Add assignee to an issue")
+        .title("Add Assignee to Issue")
         .description("Adds an assignees to the specified issue.")
         .properties(
             string(REPOSITORY)

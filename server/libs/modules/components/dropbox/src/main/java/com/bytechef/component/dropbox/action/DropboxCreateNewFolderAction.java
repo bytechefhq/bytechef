@@ -36,7 +36,7 @@ import com.bytechef.component.definition.TypeReference;
 public class DropboxCreateNewFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFolder")
-        .title("Create new folder")
+        .title("Create New Folder")
         .description("Create a folder at a given path.")
         .properties(
             string(PATH)

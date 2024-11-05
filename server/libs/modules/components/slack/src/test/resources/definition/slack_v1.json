@@ -1429,12 +1429,12 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Send direct message",
+    "title" : "Send Direct Message",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

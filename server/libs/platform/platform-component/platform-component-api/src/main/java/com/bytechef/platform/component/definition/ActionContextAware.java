@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 
 /**
  * @author Ivica Cardic
@@ -26,7 +26,7 @@ public interface ActionContextAware extends ActionContext {
 
     String getActionName();
 
-    AppType getType();
+    ModeType getType();
 
     Long getInstanceId();
 

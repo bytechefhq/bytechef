@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 public class ScheduleEveryDayTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger("everyDay")
-        .title("Every day")
+        .title("Every Day")
         .description(
             "Trigger off at a specific time either on a daily basis or selected days of the week.")
         .type(TriggerType.LISTENER)

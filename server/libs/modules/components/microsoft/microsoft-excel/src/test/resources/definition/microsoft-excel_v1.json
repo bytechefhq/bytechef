@@ -93,8 +93,8 @@
       "authorizationUrl" : { },
       "clientSecret" : null,
       "refreshToken" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -376,7 +376,7 @@
         "properties" : { }
       }
     } ],
-    "title" : "Append row",
+    "title" : "Append Row",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -459,7 +459,7 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Clear worksheet",
+    "title" : "Clear Worksheet",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -537,7 +537,7 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Delete row",
+    "title" : "Delete Row",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -819,7 +819,7 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Find row by number",
+    "title" : "Find Row by Number",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1116,12 +1116,12 @@
         "properties" : { }
       }
     } ],
-    "title" : "Update row",
+    "title" : "Update Row",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

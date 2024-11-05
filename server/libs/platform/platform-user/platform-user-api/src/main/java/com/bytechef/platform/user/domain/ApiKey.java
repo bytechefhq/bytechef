@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.domain;
 
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -121,12 +121,12 @@ public class ApiKey {
         return secretKey;
     }
 
-    public AppType getType() {
+    public ModeType getType() {
         if (type == null) {
             return null;
         }
 
-        return AppType.values()[type];
+        return ModeType.values()[type];
     }
 
     public Long getUserId() {
@@ -161,7 +161,7 @@ public class ApiKey {
         this.secretKey = tenantKey.toString();
     }
 
-    public void setType(AppType type) {
+    public void setType(ModeType type) {
         if (type != null) {
             this.type = type.ordinal();
         }

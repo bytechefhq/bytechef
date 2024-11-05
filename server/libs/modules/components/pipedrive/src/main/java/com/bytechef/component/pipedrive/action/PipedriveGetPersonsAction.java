@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class PipedriveGetPersonsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getPersons")
-        .title("Get persons")
+        .title("Get Persons")
         .description("Returns all persons.")
         .metadata(
             Map.of(

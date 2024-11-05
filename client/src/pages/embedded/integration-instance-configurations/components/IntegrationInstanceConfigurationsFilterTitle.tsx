@@ -10,7 +10,7 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
     integrations,
     tags,
 }: {
-    environment: number;
+    environment?: number;
     filterData: {id?: number | string; type: Type};
     integrations: Integration[] | undefined;
     tags: Tag[] | undefined;
@@ -30,7 +30,9 @@ const IntegrationInstanceConfigurationsFilterTitle = ({
             <span className="text-sm uppercase text-muted-foreground">Filter by environment:</span>
 
             <Badge variant="secondary">
-                <span className="text-sm">{environment === 1 ? 'Test' : 'Production'}</span>
+                <span className="text-sm">
+                    {environment === undefined ? 'All Environments' : environment === 1 ? 'Test' : 'Production'}
+                </span>
             </Badge>
 
             <span className="text-sm uppercase text-muted-foreground">

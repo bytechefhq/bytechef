@@ -17,7 +17,6 @@
 package com.bytechef.component.openai;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.openai.constant.OpenAIConstants.OPENAI;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -36,7 +35,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class OpenAIComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(OPENAI)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("openai")
         .title("OpenAI")
         .description(
             "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +

@@ -104,14 +104,17 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     if (currentNode?.trigger) {
                         setCurrentNode({
                             ...currentNode,
+                            ...newTriggerNodeData,
                         });
                     }
 
                     if (trigger) {
                         setCurrentComponent({
                             componentName: newTriggerNodeData.componentName,
+                            metadata: newTriggerNodeData.metadata,
                             notes: newTriggerNodeData.description,
                             operationName: newTriggerNodeData.operationName,
+                            parameters: newTriggerNodeData.parameters,
                             title: newTriggerNodeData.label,
                             type: newTriggerNodeData.type,
                             workflowNodeName: newTriggerNodeData.workflowNodeName ?? 'trigger_1',
@@ -122,6 +125,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 updateWorkflowMutation,
                 workflow,
             });
+
+            setPopoverOpen(false);
 
             return;
         }

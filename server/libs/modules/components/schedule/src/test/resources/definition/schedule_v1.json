@@ -956,7 +956,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Every day",
+    "title" : "Every Day",
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
@@ -1435,7 +1435,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Every week",
+    "title" : "Every Week",
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
@@ -1886,7 +1886,7 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Every month",
+    "title" : "Every Month",
     "type" : "LISTENER",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,

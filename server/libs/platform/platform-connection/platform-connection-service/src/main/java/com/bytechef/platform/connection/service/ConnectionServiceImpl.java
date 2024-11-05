@@ -22,7 +22,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -70,14 +70,14 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(AppType type) {
+    public List<Connection> getConnections(ModeType type) {
         return CollectionUtils.filter(
             connectionRepository.findAll(Sort.by("name")), connection -> connection.getType() == type);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<Connection> getConnections(String componentName, int version, AppType type) {
+    public List<Connection> getConnections(String componentName, int version, ModeType type) {
         return connectionRepository.findAllByComponentNameAndConnectionVersionAndTypeOrderByName(
             componentName, version, type.ordinal());
     }
@@ -86,7 +86,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public List<Connection> getConnections(
         String componentName, Integer connectionVersion, ConnectionEnvironment connectionEnvironment, Long tagId,
-        AppType type) {
+        ModeType type) {
 
         List<Connection> connections;
 

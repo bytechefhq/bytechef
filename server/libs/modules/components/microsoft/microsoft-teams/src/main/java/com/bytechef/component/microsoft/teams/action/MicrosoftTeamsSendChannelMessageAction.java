@@ -43,7 +43,7 @@ import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsOptionUtils;
 public class MicrosoftTeamsSendChannelMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendChannelMessage")
-        .title("Send channel message")
+        .title("Send Channel Message")
         .description("Sends a message to a channel.")
         .properties(
             string(TEAM_ID)

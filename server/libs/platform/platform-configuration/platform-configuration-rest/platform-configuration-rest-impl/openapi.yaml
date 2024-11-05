@@ -43,6 +43,15 @@ paths:
       - "component-definition"
       operationId: "getComponentDefinitions"
       parameters:
+      - name: "modeType"
+        description: "The application mode."
+        in: "query"
+        required: true
+        schema:
+          type: "string"
+          enum:
+            - "AUTOMATION"
+            - "EMBEDDED"
       - name: "actionDefinitions"
         description: "Use for filtering components which define action definitions."
         in: "query"

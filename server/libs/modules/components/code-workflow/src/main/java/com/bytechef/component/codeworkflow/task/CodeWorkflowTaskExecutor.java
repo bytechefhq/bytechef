@@ -21,7 +21,7 @@ import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowConta
 import com.bytechef.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.workflow.ProjectHandler;
 import com.bytechef.workflow.definition.TaskDefinition.PerformFunction;
 import com.bytechef.workflow.definition.WorkflowDefinition;
@@ -48,7 +48,7 @@ public class CodeWorkflowTaskExecutor {
     }
 
     public Object executePerform(
-        String codeWorkflowContainerReference, String workflowName, String taskName, AppType type) {
+        String codeWorkflowContainerReference, String workflowName, String taskName, ModeType type) {
 
         CodeWorkflowContainer codeWorkflowContainer = codeWorkflowContainerService.getCodeWorkflowContainer(
             codeWorkflowContainerReference);
@@ -71,10 +71,11 @@ public class CodeWorkflowTaskExecutor {
         return performFunction.apply();
     }
 
-    private List<WorkflowDefinition> getWorkflowDefinitions(CodeWorkflowContainer codeWorkflowContainer, AppType type) {
+    private List<WorkflowDefinition>
+        getWorkflowDefinitions(CodeWorkflowContainer codeWorkflowContainer, ModeType type) {
         List<WorkflowDefinition> workflows = List.of();
 
-        if (AppType.AUTOMATION.equals(type)) {
+        if (ModeType.AUTOMATION.equals(type)) {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
                 codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflowsFile()),
                 codeWorkflowContainer.getLanguage(),

@@ -23,7 +23,6 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.watsonx.action.WatsonxChatAction;
 import com.bytechef.component.watsonx.connection.WatsonxConnection;
-import com.bytechef.component.watsonx.constant.WatsonxConstants;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,10 +32,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class WatsonxComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(WatsonxConstants.WATSONX)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("watsonx")
         .title("Watsonx AI")
         .description(
-            "IBM watsonx.ai AI studio is part of the IBM watsonx AI and data platform, bringing together new generative AI (gen AI) capabilities powered by foundation models and traditional machine learning (ML) into a powerful studio spanning the AI lifecycle.")
+            "IBM watsonx.ai AI studio is part of the IBM watsonx AI and data platform, bringing together new " +
+                "generative AI (gen AI) capabilities powered by foundation models and traditional machine " +
+                "learning (ML) into a powerful studio spanning the AI lifecycle.")
         .icon("path:assets/watsonx.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(WatsonxConnection.CONNECTION_DEFINITION)

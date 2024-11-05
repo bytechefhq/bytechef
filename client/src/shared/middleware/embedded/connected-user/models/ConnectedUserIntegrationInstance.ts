@@ -52,6 +52,12 @@ export interface ConnectedUserIntegrationInstance {
      */
     readonly integrationId?: number;
     /**
+     * The id of an integration instance configuration.
+     * @type {number}
+     * @memberof ConnectedUserIntegrationInstance
+     */
+    readonly integrationInstanceConfigurationId?: number;
+    /**
      * The version of an integration.
      * @type {number}
      * @memberof ConnectedUserIntegrationInstance
@@ -94,6 +100,7 @@ export function ConnectedUserIntegrationInstanceFromJSONTyped(json: any, ignoreD
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
+        'integrationInstanceConfigurationId': json['integrationInstanceConfigurationId'] == null ? undefined : json['integrationInstanceConfigurationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
         'connectionId': json['connectionId'] == null ? undefined : json['connectionId'],
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
@@ -104,7 +111,7 @@ export function ConnectedUserIntegrationInstanceFromJSONTyped(json: any, ignoreD
       return ConnectedUserIntegrationInstanceToJSONTyped(json, false);
   }
 
-  export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationVersion'|'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
+  export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationInstanceConfigurationId'|'integrationVersion'|'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

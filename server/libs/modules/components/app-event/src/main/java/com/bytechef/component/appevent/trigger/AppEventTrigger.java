@@ -56,8 +56,8 @@ public class AppEventTrigger {
                 .label("App Event Id")
                 .description("The Id of an app event.")
                 .options((OptionsDataSource.TriggerOptionsFunction<Long>) this::getOptions))
-        .webhookRequest(this::webhookRequest)
-        .output(this::getOutput);
+        .output(this::getOutput)
+        .webhookRequest(this::webhookRequest);
 
     @SuppressFBWarnings("EI")
     public AppEventTrigger(AppEventService appEventService) {
@@ -70,14 +70,20 @@ public class AppEventTrigger {
 
         return appEventService.getAppEvents()
             .stream()
-            .map(appEvent -> option(appEvent.getName(), appEvent.getId()
-                .longValue()))
+            .map(appEvent -> {
+                Long id = appEvent.getId();
+
+                return option(appEvent.getName(), id.longValue());
+            })
             .toList();
     }
 
     protected OutputResponse getOutput(
-        Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers, HttpParameters parameters,
-        WebhookBody body, WebhookMethod method, WebhookEnableOutput output, TriggerContext context) {
+        Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
+
+        if (!inputParameters.containsKey(APP_EVENT_ID)) {
+            return null;
+        }
 
         AppEvent appEvent = appEventService.getAppEvent(inputParameters.getLong(APP_EVENT_ID));
 

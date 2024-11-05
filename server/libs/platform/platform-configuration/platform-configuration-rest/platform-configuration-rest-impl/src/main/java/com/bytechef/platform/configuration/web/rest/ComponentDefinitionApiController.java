@@ -19,10 +19,12 @@ package com.bytechef.platform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
+import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
 import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
+import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -39,14 +41,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class ComponentDefinitionApiController implements ComponentDefinitionApi {
 
     private final ConversionService conversionService;
+    private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final ComponentDefinitionService componentDefinitionService;
 
     @SuppressFBWarnings("EI")
     public ComponentDefinitionApiController(
-        ConversionService conversionService, ComponentDefinitionService componentDefinitionService) {
+        ConversionService conversionService, ComponentDefinitionService componentDefinitionService,
+        List<ComponentDefinitionFilter> componentDefinitionFilters) {
 
         this.conversionService = conversionService;
         this.componentDefinitionService = componentDefinitionService;
+        this.componentDefinitionFilters = componentDefinitionFilters;
     }
 
     @Override
@@ -73,12 +78,19 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
 
     @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions, List<String> include) {
+        String modeType, Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        List<String> include) {
+
+        ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(ModeType.valueOf(modeType)))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
 
         return ResponseEntity.ok(
-            componentDefinitionService.getComponentDefinitions(
-                actionDefinitions, connectionDefinitions, triggerDefinitions, include)
+            componentDefinitionService
+                .getComponentDefinitions(actionDefinitions, connectionDefinitions, triggerDefinitions, include)
                 .stream()
+                .filter(componentDefinitionFilter::filter)
                 .map(componentDefinition -> conversionService.convert(
                     componentDefinition, ComponentDefinitionBasicModel.class))
                 .toList());

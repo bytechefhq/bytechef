@@ -84,7 +84,7 @@ public class ConnectedUserApiController implements ConnectedUserApi {
 
     @Override
     public ResponseEntity<Void> enableConnectedUser(Long id, Boolean enable) {
-        connectedUserService.enableConnectedUser(id, enable);
+        connectedUserFacade.enableConnectedUser(id, enable);
 
         return ResponseEntity.noContent()
             .build();

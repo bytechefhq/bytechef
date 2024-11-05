@@ -23,7 +23,6 @@ import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.repository.IntegrationRepository;
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -43,11 +42,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public long countIntegrations() {
-        return integrationRepository.count();
-    }
-
-    @Override
     public Integration create(Integration integration) {
         Validate.notNull(integration, "'integration' must not be null");
         Validate.isTrue(integration.getId() == null, "'id' must be null");
@@ -62,11 +56,6 @@ public class IntegrationServiceImpl implements IntegrationService {
     }
 
     @Override
-    public Optional<Integration> fetchWorkflowIntegration(String workflowId) {
-        return integrationRepository.findByWorkflowId(workflowId);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Integration getIntegration(long id) {
         return OptionalUtils.get(integrationRepository.findById(id));
@@ -74,14 +63,17 @@ public class IntegrationServiceImpl implements IntegrationService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Integration> fetchIntegration(String name) {
-        return integrationRepository.findByComponentNameIgnoreCase(name);
+    public Integration getIntegrationInstanceIntegration(long integrationInstanceId) {
+        return integrationRepository.findByIntegrationInstanceId(integrationInstanceId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Integration not found for integrationInstanceId: " + integrationInstanceId));
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Integration getIntegrationInstanceIntegration(long integrationInstanceId) {
-        return integrationRepository.findByIntegrationInstanceId(integrationInstanceId);
+    public Integration getIntegrationInstanceConfigurationIntegration(long integrationInstanceConfigurationId) {
+        return integrationRepository.findByIntegrationInstanceConfigurationId(integrationInstanceConfigurationId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Integration not found for integrationInstanceConfigurationId: " + integrationInstanceConfigurationId));
     }
 
     @Override

@@ -22,13 +22,12 @@ package com.bytechef.component.stability.constant;
  */
 public final class StabilityConstants {
 
-    public static final String HEIGHT = "height";
-    public static final String WIDTH = "width";
-    public static final String STABILITY = "stability";
     public static final String CFG_SCALE = "cfgScale";
     public static final String CLIP_GUIDANCE_PRESET = "clipGuidancePreset";
+    public static final String HEIGHT = "height";
     public static final String SAMPLER = "sampler";
     public static final String STEPS = "steps";
+    public static final String WIDTH = "width";
 
     private StabilityConstants() {
     }

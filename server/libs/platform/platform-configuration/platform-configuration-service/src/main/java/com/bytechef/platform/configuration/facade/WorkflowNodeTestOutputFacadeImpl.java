@@ -20,11 +20,14 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.NullProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -36,6 +39,7 @@ import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
+import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 
 /**
@@ -79,7 +83,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
                     .orElse(null));
         } else {
             return saveActionWorkflowNodeTestOutput(
-                workflowId, workflowNodeName, workflow,
+                workflowNodeName, workflow,
                 MapUtils.toMap(
                     workflowTestConfigurationService.getWorkflowTestConfigurationConnections(
                         workflowId, workflowNodeName),
@@ -114,29 +118,40 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
     @SuppressWarnings("unchecked")
     private WorkflowNodeTestOutput saveActionWorkflowNodeTestOutput(
-        String workflowId, String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
+        String workflowNodeName, Workflow workflow, Map<String, Long> connectionIds) {
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
+        Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
         Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
-            workflowId, workflowTask.getName());
+            workflow.getId(), workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-        OutputResponse outputResponse = actionDefinitionFacade.executeOutput(
+        Object object = actionDefinitionFacade.executePerform(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), inputParameters, connectionIds);
+            workflowNodeType.componentOperationName(), null, null, null, null, null, inputParameters,
+            connectionIds, Map.of(), true);
+
+        OutputResponse outputResponse =
+            SchemaUtils.toOutput(
+                new BaseOutputDefinition.OutputResponse(
+                    (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                        object, PropertyFactory.PROPERTY_FACTORY),
+                    object),
+                (property, sampleOutput) -> new OutputResponse(
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null || outputResponse.outputSchema() instanceof NullProperty) {
-
             return null;
         }
 
-        return workflowNodeTestOutputService.save(workflowId, workflowNodeName, workflowNodeType, outputResponse);
+        return workflowNodeTestOutputService.save(
+            Validate.notNull(workflow.getId(), "id"), workflowNodeName, workflowNodeType, outputResponse);
     }
 
     @SuppressFBWarnings("NP")
@@ -147,9 +162,20 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
 
-        OutputResponse outputResponse = triggerDefinitionFacade.executeOutput(
+        TriggerOutput triggerOutput = triggerDefinitionFacade.executeTrigger(
             workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), workflowTrigger.evaluateParameters(inputs), connectionId);
+            workflowNodeType.componentOperationName(), null, null, null, workflowTrigger.evaluateParameters(inputs),
+            null, null, connectionId, true);
+
+        OutputResponse outputResponse =
+            SchemaUtils.toOutput(
+                new BaseOutputDefinition.OutputResponse(
+                    (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
+                        triggerOutput.value(), PropertyFactory.PROPERTY_FACTORY),
+                    triggerOutput.batch()),
+                (property, sampleOutput) -> new OutputResponse(
+                    Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                PropertyFactory.PROPERTY_FACTORY);
 
         if (outputResponse == null) {
             return null;

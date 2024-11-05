@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class InsightlyCreateOrganizationAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createOrganization")
-        .title("Create organization")
+        .title("Create Organization")
         .description("Creates new Organization")
         .metadata(
             Map.of(

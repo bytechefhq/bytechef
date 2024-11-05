@@ -29,7 +29,7 @@ import com.bytechef.platform.component.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -135,7 +135,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
 
     @Override
     public Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull ModeType type,
         Long instanceId, Long instanceWorkflowId, Long jobId, String workflowId,
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions,
         boolean devEnvironment) {

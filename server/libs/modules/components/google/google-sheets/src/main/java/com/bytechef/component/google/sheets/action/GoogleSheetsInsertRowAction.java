@@ -51,7 +51,7 @@ import java.util.Map;
 public class GoogleSheetsInsertRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertRow")
-        .title("Insert row")
+        .title("Insert Row")
         .description("Append a row of values to an existing sheet")
         .properties(
             SPREADSHEET_ID_PROPERTY,

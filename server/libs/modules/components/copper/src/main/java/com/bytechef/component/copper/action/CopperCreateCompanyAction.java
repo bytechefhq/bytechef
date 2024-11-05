@@ -59,7 +59,7 @@ import com.bytechef.component.definition.TypeReference;
 public class CopperCreateCompanyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
-        .title("Create company")
+        .title("Create Company")
         .description("Creates a new Company")
         .properties(
             string(NAME)

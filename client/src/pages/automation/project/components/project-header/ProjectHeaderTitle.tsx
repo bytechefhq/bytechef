@@ -11,20 +11,22 @@ const ProjectHeaderTitle = ({project}: {project: Project}) => {
 
     return (
         <div className="flex items-center space-x-2">
-            <Tooltip>
-                <TooltipTrigger asChild>
-                    <Button
-                        className="hover:bg-background/70"
-                        onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                        size="icon"
-                        variant="ghost"
-                    >
-                        <PanelLeftIcon className="size-5" />
-                    </Button>
-                </TooltipTrigger>
+            {!leftSidebarOpen && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            className="hover:bg-background/70"
+                            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                            size="icon"
+                            variant="ghost"
+                        >
+                            <PanelLeftIcon className="size-5" />
+                        </Button>
+                    </TooltipTrigger>
 
-                <TooltipContent>See projects</TooltipContent>
-            </Tooltip>
+                    <TooltipContent>See projects</TooltipContent>
+                </Tooltip>
+            )}
 
             <h1>{project?.name}</h1>
 

@@ -128,7 +128,7 @@ public interface ActionDefinition {
     /**
      *
      */
-    interface SingleConnectionOutputFunction extends BaseOutputFunction {
+    interface OutputFunction extends BaseOutputFunction {
 
         /**
          * @param inputParameters

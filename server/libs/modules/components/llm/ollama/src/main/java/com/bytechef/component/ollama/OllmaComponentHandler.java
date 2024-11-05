@@ -17,7 +17,6 @@
 package com.bytechef.component.ollama;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.ollama.constant.OllamaConstants.OLLAMA;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class OllmaComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(OLLAMA)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("ollama")
         .title("Ollama")
         .description(
             "Get up and running with large language models.")

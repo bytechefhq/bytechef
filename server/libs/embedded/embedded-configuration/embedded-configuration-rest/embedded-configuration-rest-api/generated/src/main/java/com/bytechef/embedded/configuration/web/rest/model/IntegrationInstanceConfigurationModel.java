@@ -3,6 +3,7 @@ package com.bytechef.embedded.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.embedded.configuration.web.rest.model.EnvironmentModel;
+import com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationWorkflowModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +33,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-27T12:15:45.835503+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class IntegrationInstanceConfigurationModel {
 
   private String createdBy;
@@ -52,9 +53,6 @@ public class IntegrationInstanceConfigurationModel {
 
   private Integer integrationVersion;
 
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
-
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
@@ -71,7 +69,7 @@ public class IntegrationInstanceConfigurationModel {
   @Valid
   private Map<String, Object> connectionParameters = new HashMap<>();
 
-  private Object integration;
+  private IntegrationBasicModel integration;
 
   @Valid
   private List<@Valid IntegrationInstanceConfigurationWorkflowModel> integrationInstanceConfigurationWorkflows = new ArrayList<>();
@@ -252,26 +250,6 @@ public class IntegrationInstanceConfigurationModel {
     this.integrationVersion = integrationVersion;
   }
 
-  public IntegrationInstanceConfigurationModel lastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
-    return this;
-  }
-
-  /**
-   * The last execution date.
-   * @return lastExecutionDate
-   */
-  @Valid 
-  @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
-    return lastExecutionDate;
-  }
-
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
-    this.lastExecutionDate = lastExecutionDate;
-  }
-
   public IntegrationInstanceConfigurationModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
@@ -416,7 +394,7 @@ public class IntegrationInstanceConfigurationModel {
     this.connectionParameters = connectionParameters;
   }
 
-  public IntegrationInstanceConfigurationModel integration(Object integration) {
+  public IntegrationInstanceConfigurationModel integration(IntegrationBasicModel integration) {
     this.integration = integration;
     return this;
   }
@@ -425,14 +403,14 @@ public class IntegrationInstanceConfigurationModel {
    * Get integration
    * @return integration
    */
-  
-  @Schema(name = "integration", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Valid 
+  @Schema(name = "integration", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("integration")
-  public Object getIntegration() {
+  public IntegrationBasicModel getIntegration() {
     return integration;
   }
 
-  public void setIntegration(Object integration) {
+  public void setIntegration(IntegrationBasicModel integration) {
     this.integration = integration;
   }
 
@@ -529,7 +507,6 @@ public class IntegrationInstanceConfigurationModel {
         Objects.equals(this.id, integrationInstanceConfiguration.id) &&
         Objects.equals(this.integrationId, integrationInstanceConfiguration.integrationId) &&
         Objects.equals(this.integrationVersion, integrationInstanceConfiguration.integrationVersion) &&
-        Objects.equals(this.lastExecutionDate, integrationInstanceConfiguration.lastExecutionDate) &&
         Objects.equals(this.lastModifiedBy, integrationInstanceConfiguration.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationInstanceConfiguration.lastModifiedDate) &&
         Objects.equals(this.name, integrationInstanceConfiguration.name) &&
@@ -544,7 +521,7 @@ public class IntegrationInstanceConfigurationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, integrationId, integrationVersion, lastModifiedBy, lastModifiedDate, name, connectionAuthorizationParameters, connectionConnectionParameters, connectionParameters, integration, integrationInstanceConfigurationWorkflows, tags, version);
   }
 
   @Override
@@ -559,7 +536,6 @@ public class IntegrationInstanceConfigurationModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    integrationId: ").append(toIndentedString(integrationId)).append("\n");
     sb.append("    integrationVersion: ").append(toIndentedString(integrationVersion)).append("\n");
-    sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

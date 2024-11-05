@@ -386,22 +386,6 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
-    interface ListenerTriggerOutputFunction extends TriggerOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param workflowExecutionId
-         */
-        OutputResponse accept(
-            Parameters inputParameters, Parameters connectionParameters, String workflowExecutionId,
-            TriggerContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
     interface PollFunction {
 
         /**
@@ -435,24 +419,6 @@ public interface TriggerDefinition {
      *
      */
     @FunctionalInterface
-    interface PollTriggerOutputFunction extends TriggerOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param closureParameters
-         * @param context
-         * @return
-         */
-        OutputResponse apply(
-            Parameters inputParameters, Parameters closureParameters, TriggerContext context)
-            throws Exception;
-
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
     interface ProcessErrorResponseFunction {
 
         /**
@@ -469,6 +435,15 @@ public interface TriggerDefinition {
      *
      */
     interface TriggerOutputFunction extends BaseOutputFunction {
+
+        /**
+         * @param inputParameters
+         * @param connectionParameters
+         * @param context
+         * @return
+         */
+        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, TriggerContext context)
+            throws Exception;
     }
 
     /**
@@ -536,29 +511,6 @@ public interface TriggerDefinition {
          * @return
          */
         Object apply(
-            Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
-            HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
-            TriggerContext context) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @FunctionalInterface
-    interface WebhookTriggerOutputFunction extends TriggerOutputFunction {
-
-        /**
-         * @param inputParameters
-         * @param connectionParameters
-         * @param headers
-         * @param parameters
-         * @param body
-         * @param method
-         * @param output
-         * @param context
-         * @return
-         */
-        OutputResponse apply(
             Parameters inputParameters, Parameters connectionParameters, HttpHeaders headers,
             HttpParameters parameters, WebhookBody body, WebhookMethod method, WebhookEnableOutput output,
             TriggerContext context) throws Exception;

@@ -18,45 +18,45 @@ package com.bytechef.component.keap.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class KeapUtils {
 
     private KeapUtils() {
     }
 
-    @SuppressWarnings("unchecked")
-    public static OptionsDataSource.ActionOptionsFunction<String> getCompanyIdOptions() {
-        return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> {
-            Map<String, ?> body = context
-                .http(http -> http.get("https://api.infusionsoft.com/crm/rest/v1/companies"))
-                .header("Content-Type", "application/json")
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+    public static List<Option<Long>> getCompanyIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
 
-            if (body.containsKey("error")) {
-                throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        Map<String, ?> body = context
+            .http(http -> http.get("/companies"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.containsKey("error")) {
+            throw new IllegalStateException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
+
+        List<Option<Long>> options = new ArrayList<>();
+
+        if (body.get("companies") instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get("company_name"), ((Long) map.get("id")).longValue()));
+                }
             }
-
-            return getOptions((Map<String, List<Map<?, ?>>>) body, "companies");
-        };
-    }
-
-    private static List<Option<String>> getOptions(Map<String, List<Map<?, ?>>> response, String name) {
-        List<Option<String>> options = new ArrayList<>();
-
-        for (Map<?, ?> list : response.get(name)) {
-            options.add(option((String) list.get("company_name"), (String) list.get("id")));
         }
 
         return options;

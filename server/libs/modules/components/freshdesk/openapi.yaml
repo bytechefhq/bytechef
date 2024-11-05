@@ -11,7 +11,7 @@ paths:
     post:
       tags:
         - "Companies"
-      summary: "Create company"
+      summary: "Create Company"
       description: "Creates a new company"
       operationId: "createCompany"
       requestBody:
@@ -55,7 +55,7 @@ paths:
     post:
       tags:
         - "Contacts"
-      summary: "Create contact"
+      summary: "Create Contact"
       description: "Creates a new contact"
       operationId: "createContact"
       requestBody:
@@ -112,7 +112,7 @@ paths:
     post:
       tags:
         - "Tickets"
-      summary: "Create ticket"
+      summary: "Create Ticket"
       description: "Creates a new ticket"
       operationId: "createTicket"
       requestBody:

@@ -18,15 +18,25 @@ package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import java.util.List;
+import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationInstanceWorkflowService {
 
-    IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId);
+    IntegrationInstanceWorkflow createIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId);
+
+    Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, @NonNull String workflowId);
+
+    IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId, @NonNull String workflowId);
 
     List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId);
+
+    void update(IntegrationInstanceWorkflow integrationInstanceWorkflow);
 
     void updateEnabled(Long id, boolean enabled);
 }

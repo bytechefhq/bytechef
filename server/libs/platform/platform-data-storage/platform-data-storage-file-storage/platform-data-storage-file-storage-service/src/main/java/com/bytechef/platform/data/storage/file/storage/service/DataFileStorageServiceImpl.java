@@ -19,7 +19,7 @@ package com.bytechef.platform.data.storage.file.storage.service;
 import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.file.storage.service.FileStorageService;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.domain.ValueWrapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -45,7 +45,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     public void delete(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -59,7 +59,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @SuppressWarnings("unchecked")
     public <T> Optional<T> fetch(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         String directoryPath = getDirectoryPath(type);
 
@@ -80,7 +80,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     public <T> T get(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         return OptionalUtils.get(fetch(componentName, scope, scopeId, key, type));
     }
@@ -89,7 +89,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     public <T> Map<String, T> getAll(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
-        @NonNull AppType type) {
+        @NonNull ModeType type) {
 
         return fileStorageService.getFileEntries(getDirectoryPath(type))
             .stream()
@@ -101,7 +101,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
     @Override
     public void put(
         @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
-        @NonNull AppType type, @NonNull Object value) {
+        @NonNull ModeType type, @NonNull Object value) {
 
         ValueWrapper valueWrapper = new ValueWrapper(value);
 
@@ -110,7 +110,7 @@ public class DataFileStorageServiceImpl implements DataFileStorageService {
             CompressionUtils.compress(valueWrapper.write()), false);
     }
 
-    private static String getDirectoryPath(AppType type) {
+    private static String getDirectoryPath(ModeType type) {
         return DATA_ENTRIES_ROOT_DIR + type.ordinal();
     }
 

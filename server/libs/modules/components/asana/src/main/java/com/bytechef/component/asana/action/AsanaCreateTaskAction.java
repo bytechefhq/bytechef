@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class AsanaCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Create a task")
+        .title("Create Task")
         .description("Creates a new task")
         .metadata(
             Map.of(

@@ -51,7 +51,7 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     }
 
     @Override
-    public List<IntegrationInstance> getEnabledIntegrationInstances(long connectedUserId) {
+    public List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId) {
         return integrationInstanceRepository.findAllByConnectedUserIdAndEnabled(connectedUserId, true);
     }
 
@@ -69,6 +69,12 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
         return integrationInstanceRepository
             .findByWorkflowIdAndEnvironment(connectedUserId, workflowId, environment.ordinal())
             .orElseThrow(() -> new IllegalArgumentException("Integration instance not found"));
+    }
+
+    @Override
+    public List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId) {
+        return integrationInstanceRepository.findAllByIntegrationInstanceConfigurationId(
+            integrationInstanceConfigurationId);
     }
 
     @Override

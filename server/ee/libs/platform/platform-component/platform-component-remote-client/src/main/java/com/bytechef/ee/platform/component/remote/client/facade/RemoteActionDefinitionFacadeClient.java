@@ -15,7 +15,7 @@ import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -81,7 +81,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
 
     @Override
     public Map<String, ?> executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type, Long instanceId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions, boolean devEnvironment) {
 
@@ -139,7 +139,7 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     }
 
     private record PerformRequest(
-        String componentName, int componentVersion, String actionName, AppType type, Long instanceId,
+        String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId,
         long jobId, Map<String, ?> inputParameters, Map<String, Long> connectionIds) {
     }

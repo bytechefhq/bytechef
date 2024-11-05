@@ -57,7 +57,7 @@ import org.springframework.ai.model.Model;
 public class AzureOpenAICreateTranscriptionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
-        .title("Create transcriptions")
+        .title("Create Transcriptions")
         .description("Transcribes audio into the input language.")
         .properties(
             fileEntry(FILE)

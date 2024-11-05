@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class EnchargeCreateEmailAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createEmail")
-        .title("Create email template")
+        .title("Create Email Template")
         .description("Create email template")
         .metadata(
             Map.of(

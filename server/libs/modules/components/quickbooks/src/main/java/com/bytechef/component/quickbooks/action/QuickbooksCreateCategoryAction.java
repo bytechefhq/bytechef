@@ -33,7 +33,7 @@ import com.bytechef.component.definition.TypeReference;
 public class QuickbooksCreateCategoryAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCategory")
-        .title("Create a category")
+        .title("Create Category")
         .description("Creates a new category.")
         .properties(
             string(NAME)

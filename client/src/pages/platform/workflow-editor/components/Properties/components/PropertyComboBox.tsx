@@ -191,7 +191,7 @@ const PropertyComboBox = ({
                             </span>
                         )}
 
-                        {!lookupDependsOnValues && !options.length && (
+                        {!lookupDependsOnValues && !options.length && !missingConnection && (
                             <span className="rounded-md border p-2 text-sm text-muted-foreground">
                                 No options available
                             </span>

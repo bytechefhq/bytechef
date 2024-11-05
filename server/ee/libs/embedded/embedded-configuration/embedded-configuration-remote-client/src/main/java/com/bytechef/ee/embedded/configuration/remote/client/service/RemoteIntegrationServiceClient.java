@@ -14,7 +14,6 @@ import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -37,27 +36,12 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     }
 
     @Override
-    public long countIntegrations() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Integration create(Integration integration) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public void delete(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<Integration> fetchWorkflowIntegration(String id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Optional<Integration> fetchIntegration(String name) {
         throw new UnsupportedOperationException();
     }
 
@@ -69,6 +53,11 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
                 .path(PROJECT_SERVICE + "/get-integration-instance-integration/{integrationInstanceId}")
                 .build(integrationInstanceId),
             Integration.class);
+    }
+
+    @Override
+    public Integration getIntegrationInstanceConfigurationIntegration(long integrationInstanceConfigurationId) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

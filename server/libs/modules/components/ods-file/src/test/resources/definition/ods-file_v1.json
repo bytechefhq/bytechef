@@ -254,10 +254,10 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Read from file",
-    "perform" : { },
+    "title" : "Read from File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -699,10 +699,10 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Write to file",
-    "perform" : { },
+    "title" : "Write to File",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : null,
   "dataStream" : null,

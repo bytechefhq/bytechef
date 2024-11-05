@@ -5,7 +5,7 @@
   } ],
   "customAction" : null,
   "customActionHelp" : null,
-  "description" : "CRM software for sales, marketing, and support teams",
+  "description" : "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business.",
   "icon" : "path:assets/vtiger.svg",
   "tags" : null,
   "metadata" : null,
@@ -20,7 +20,7 @@
       "name" : "basic_auth",
       "properties" : [ {
         "advancedOption" : null,
-        "description" : null,
+        "description" : "Enter your username/email.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -30,7 +30,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "VTiger Username of email",
+        "label" : "Username",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -50,7 +50,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "VTiger Access Key",
+        "label" : "Access Key",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -60,7 +60,7 @@
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
-        "description" : "For the instance URL, add the url without the endpoint. For example enter https://<instance>.od2.vtiger.com instead of https://<instance>.od2.vtiger.com/restapi/v1/vtiger/default",
+        "description" : "For the instance URL, add the url without the endpoint.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -69,7 +69,7 @@
         "name" : "instance_url",
         "type" : "STRING",
         "defaultValue" : null,
-        "exampleValue" : null,
+        "exampleValue" : "https://<instance>.od2.vtiger.com",
         "label" : "VTiger Instance URL",
         "placeholder" : null,
         "controlType" : "TEXT",
@@ -83,8 +83,9 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -92,9 +93,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -105,7 +105,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Create a new contact",
+    "description" : "Creates a new contact.",
     "help" : null,
     "metadata" : null,
     "name" : "createContact",
@@ -226,12 +226,52 @@
               "minLength" : null,
               "options" : null,
               "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "assigned_user_id",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "id",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -349,18 +389,58 @@
             "minLength" : null,
             "options" : null,
             "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "assigned_user_id",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "id",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "First name of the contact",
+      "description" : "First name of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -380,7 +460,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Last name of the contact",
+      "description" : "Last name of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -400,7 +480,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "email for your new contact",
+      "description" : "Email address of the contact.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -410,7 +490,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Contact email",
+      "label" : "Email",
       "placeholder" : null,
       "controlType" : "TEXT",
       "languageId" : null,
@@ -419,14 +499,14 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create a contact",
+    "title" : "Create Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Create a new Product for your CRM",
+    "description" : "Creates a new product for your CRM.",
     "help" : null,
     "metadata" : null,
     "name" : "createProduct",
@@ -475,26 +555,6 @@
               "hidden" : null,
               "metadata" : { },
               "required" : null,
-              "name" : "id",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
               "name" : "productname",
               "type" : "STRING",
               "defaultValue" : null,
@@ -535,46 +595,6 @@
               "hidden" : null,
               "metadata" : { },
               "required" : null,
-              "name" : "createdtime",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "source",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
               "name" : "assigned_user_id",
               "type" : "STRING",
               "defaultValue" : null,
@@ -587,12 +607,32 @@
               "minLength" : null,
               "options" : null,
               "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : null,
+              "name" : "id",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -631,26 +671,6 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "id",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
             "advancedOption" : null,
             "description" : null,
             "displayCondition" : null,
@@ -698,46 +718,6 @@
             "hidden" : null,
             "metadata" : { },
             "required" : null,
-            "name" : "createdtime",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : "source",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
             "name" : "assigned_user_id",
             "type" : "STRING",
             "defaultValue" : null,
@@ -750,18 +730,38 @@
             "minLength" : null,
             "options" : null,
             "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "id",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Name of the product",
+      "description" : "Name of the product.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -781,7 +781,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Type of the product",
+      "description" : "Type of the product.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -808,14 +808,14 @@
       } ],
       "optionsDataSource" : null
     } ],
-    "title" : "Create a Product",
+    "title" : "Create Product",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Get more information about yourself",
+    "description" : "Get more information about yourself.",
     "help" : null,
     "metadata" : null,
     "name" : "getMe",
@@ -1197,11 +1197,11 @@
               "options" : null,
               "optionsDataSource" : null
             } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
+            "optionsDataSource" : null,
+            "controlType" : "OBJECT_BUILDER"
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -1580,19 +1580,19 @@
             "options" : null,
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
     "properties" : null,
     "title" : "Get Me",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,

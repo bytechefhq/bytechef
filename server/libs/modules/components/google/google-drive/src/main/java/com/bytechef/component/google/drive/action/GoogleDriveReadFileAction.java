@@ -42,7 +42,7 @@ import java.io.InputStream;
 public class GoogleDriveReadFileAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("readFile")
-        .title("Read file")
+        .title("Read File")
         .description("Read a selected file from Google Drive file.")
         .properties(
             string(FILE_ID)

@@ -102,14 +102,6 @@ const IntegrationInstanceConfigurationListItem = ({
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
-                                {integrationInstanceConfiguration.integrationVersion ? (
-                                    <Badge variant="secondary">
-                                        V{integrationInstanceConfiguration.integrationVersion}
-                                    </Badge>
-                                ) : (
-                                    ''
-                                )}
-
                                 <div className="flex items-center gap-1">
                                     {componentDefinition?.icon && (
                                         <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
@@ -126,7 +118,7 @@ const IntegrationInstanceConfigurationListItem = ({
                             <div className="flex items-center">
                                 {integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows && (
                                     <CollapsibleTrigger
-                                        className="group mr-4 flex text-xs font-semibold text-gray-700"
+                                        className="group mr-4 flex text-xs font-semibold text-muted-foreground"
                                         disabled={
                                             integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows
                                                 .length === 0
@@ -167,7 +159,11 @@ const IntegrationInstanceConfigurationListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <div className="flex flex-col items-end gap-y-4">
+                        <Badge variant="secondary">V{integrationInstanceConfiguration.integrationVersion}</Badge>
+
+                        <Badge variant="secondary">{integrationInstanceConfiguration.environment}</Badge>
+
+                        <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <Switch
                                 checked={integrationInstanceConfiguration.enabled}
                                 onCheckedChange={handleOnCheckedChange}
@@ -175,9 +171,9 @@ const IntegrationInstanceConfigurationListItem = ({
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                                    {integrationInstanceConfiguration.lastExecutionDate ? (
+                                    {integrationInstanceConfiguration.lastModifiedDate ? (
                                         <span className="text-xs">
-                                            {`Executed at ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastExecutionDate?.toLocaleTimeString()}`}
+                                            {`Updated at ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleDateString()} ${integrationInstanceConfiguration.lastModifiedDate?.toLocaleTimeString()}`}
                                         </span>
                                     ) : (
                                         <span className="text-xs">No executions</span>

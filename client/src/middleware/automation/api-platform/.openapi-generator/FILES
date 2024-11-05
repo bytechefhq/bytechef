@@ -7,6 +7,9 @@ models/ApiCollection.ts
 models/ApiCollectionEndpoint.ts
 models/Environment.ts
 models/HttpMethod.ts
+models/ProjectBasic.ts
+models/ProjectInstanceBasic.ts
+models/ProjectStatus.ts
 models/Tag.ts
 models/UpdateTagsRequest.ts
 models/index.ts

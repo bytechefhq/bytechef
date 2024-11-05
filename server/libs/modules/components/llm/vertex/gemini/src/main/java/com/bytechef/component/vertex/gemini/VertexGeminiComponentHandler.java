@@ -17,7 +17,6 @@
 package com.bytechef.component.vertex.gemini;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants.VERTEX_GEMINI;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -33,10 +32,10 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class VertexGeminiComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(VERTEX_GEMINI)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("vertexGemini")
         .title("Vertex AI Gemini")
         .description(
-            "Vertex AI is a fully-managed, unified AI development platform for building and using generative AI. ")
+            "Vertex AI is a fully-managed, unified AI development platform for building and using generative AI.")
         .icon("path:assets/google-vertex.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(VertexGeminiConnection.CONNECTION_DEFINITION)

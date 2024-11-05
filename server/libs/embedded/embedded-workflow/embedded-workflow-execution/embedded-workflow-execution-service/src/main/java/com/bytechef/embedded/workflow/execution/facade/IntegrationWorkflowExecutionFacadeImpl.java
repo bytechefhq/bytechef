@@ -42,8 +42,8 @@ import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -122,7 +122,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
         long integrationInstanceId = instanceJobService.getJobInstanceId(
-            Validate.notNull(job.getId(), ""), AppType.EMBEDDED);
+            Validate.notNull(job.getId(), ""), ModeType.EMBEDDED);
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
@@ -167,7 +167,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
             if (integrationInstanceConfigurationId != null) {
                 integrationInstanceConfigurationIds.add(integrationInstanceConfigurationId);
-            } else if (environment != null) {
+            } else {
                 integrationInstanceConfigurationIds.addAll(
                     integrationInstanceConfigurationService
                         .getIntegrationInstanceConfigurations(environment, null, null)
@@ -176,46 +176,50 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
                         .toList());
             }
 
-            Page<Job> jobIdsPage = instanceJobService
-                .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, AppType.EMBEDDED,
-                    workflowIds, pageNumber)
-                .map(jobService::getJob);
-
-            List<Integration> integrations = new ArrayList<>();
-
-            if (integrationId == null) {
-                integrations.addAll(integrationService.getIntegrations());
+            if (integrationInstanceConfigurationIds.isEmpty()) {
+                return Page.empty();
             } else {
-                integrations.add(integrationService.getIntegration(integrationId));
+                Page<Job> jobsPage = instanceJobService
+                    .getJobIds(
+                        jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, ModeType.EMBEDDED,
+                        workflowIds, pageNumber)
+                    .map(jobService::getJob);
+
+                List<Integration> integrations = new ArrayList<>();
+
+                if (integrationId == null) {
+                    integrations.addAll(integrationService.getIntegrations());
+                } else {
+                    integrations.add(integrationService.getIntegration(integrationId));
+                }
+
+                List<Workflow> workflows = workflowService.getWorkflows(
+                    CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
+
+                return jobsPage.map(job -> {
+                    IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+                        instanceJobService.getJobInstanceId(Validate.notNull(job.getId(), ""), ModeType.EMBEDDED));
+
+                    return new WorkflowExecution(
+                        Validate.notNull(job.getId(), "id"),
+                        CollectionUtils.getFirst(
+                            integrations,
+                            integration -> CollectionUtils.contains(getWorkflowIds(integration), job.getWorkflowId())),
+                        integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
+                            integrationInstance.getIntegrationInstanceConfigurationId()),
+                        integrationInstance,
+                        new JobDTO(job),
+                        CollectionUtils.getFirst(
+                            workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
+                        getTriggerExecutionDTO(
+                            integrationInstanceConfigurationId,
+                            OptionalUtils.orElse(
+                                triggerExecutionService.fetchJobTriggerExecution(
+                                    Validate.notNull(job.getId(), "id")),
+                                null),
+                            job));
+                });
             }
-
-            List<Workflow> workflows = workflowService.getWorkflows(
-                CollectionUtils.map(jobIdsPage.toList(), Job::getWorkflowId));
-
-            return jobIdsPage.map(job -> {
-                IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-                    instanceJobService.getJobInstanceId(Validate.notNull(job.getId(), ""), AppType.EMBEDDED));
-
-                return new WorkflowExecution(
-                    Validate.notNull(job.getId(), "id"),
-                    CollectionUtils.getFirst(
-                        integrations,
-                        integration -> CollectionUtils.contains(getWorkflowIds(integration), job.getWorkflowId())),
-                    integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
-                        integrationInstance.getIntegrationInstanceConfigurationId()),
-                    integrationInstance,
-                    new JobDTO(job),
-                    CollectionUtils.getFirst(
-                        workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
-                    getTriggerExecutionDTO(
-                        integrationInstanceConfigurationId,
-                        OptionalUtils.orElse(
-                            triggerExecutionService.fetchJobTriggerExecution(
-                                Validate.notNull(job.getId(), "id")),
-                            null),
-                        job));
-            });
         }
     }
 

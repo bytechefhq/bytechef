@@ -129,14 +129,14 @@ const platformSettingsRoutes = {
 export const getRouter = (queryClient: QueryClient) =>
     createBrowserRouter([
         {
+            element: <OAuthPopup />,
+            path: '/callback',
+        },
+        {
             children: [
                 {
                     element: <Activate />,
                     path: 'activate',
-                },
-                {
-                    element: <OAuthPopup />,
-                    path: '/callback',
                 },
                 {
                     element: <Login />,

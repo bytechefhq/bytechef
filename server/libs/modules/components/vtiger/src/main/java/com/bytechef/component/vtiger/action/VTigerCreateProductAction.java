@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.CREATE_PRODUCT;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.PRODUCT_NAME;
 import static com.bytechef.component.vtiger.constant.VTigerConstants.PRODUCT_TYPE;
 
@@ -32,28 +31,28 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class VTigerCreateProductAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_PRODUCT)
-        .title("Create a Product")
-        .description("Create a new Product for your CRM")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createProduct")
+        .title("Create Product")
+        .description("Creates a new product for your CRM.")
         .properties(
             string(PRODUCT_NAME)
                 .label("Product Name")
-                .description("Name of the product")
+                .description("Name of the product.")
                 .required(true),
             string(PRODUCT_TYPE)
                 .options(
                     option("Solo", "Solo"),
                     option("Fixed Bundle", "Fixed Bundle"))
                 .label("Product Type")
-                .description("Type of the product")
+                .description("Type of the product.")
                 .required(true))
         .output(
             outputSchema(
@@ -61,37 +60,29 @@ public class VTigerCreateProductAction {
                     .properties(
                         object("results")
                             .properties(
-                                string("id"),
                                 string(PRODUCT_NAME),
                                 string(PRODUCT_TYPE),
-                                string("createdtime"),
-                                string("source"),
-                                string("assigned_user_id")))))
+                                string("assigned_user_id"),
+                                string("id")))))
         .perform(VTigerCreateProductAction::perform);
 
     private VTigerCreateProductAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        Map<String, String> paramMap = paramMapFill(inputParameters);
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
+        return actionContext
             .http(http -> http.post("/create"))
             .body(
                 Body.of(
                     "elementType", "Products",
-                    "element", paramMap))
+                    "element",
+                    Map.of(
+                        PRODUCT_NAME, inputParameters.getRequiredString(PRODUCT_NAME),
+                        PRODUCT_TYPE, inputParameters.getRequiredString(PRODUCT_TYPE))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    private static Map<String, String> paramMapFill(Parameters inputParameters) {
-        Map<String, String> paramMap = new HashMap<>();
-
-        paramMap.put(PRODUCT_NAME, inputParameters.getRequiredString(PRODUCT_NAME));
-        paramMap.put(PRODUCT_TYPE, inputParameters.getRequiredString(PRODUCT_TYPE));
-
-        return paramMap;
     }
 }

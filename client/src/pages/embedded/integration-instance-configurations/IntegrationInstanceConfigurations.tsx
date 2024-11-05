@@ -27,7 +27,9 @@ export enum Type {
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number>(getEnvironment());
+    const [environment, setEnvironment] = useState<number | undefined>(
+        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
+    );
 
     const integrationId = searchParams.get('integrationId');
     const tagId = searchParams.get('tagId');
@@ -60,7 +62,8 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationInstanceConfigurationsError,
         isLoading: integrationInstanceConfigurationsLoading,
     } = useGetIntegrationInstanceConfigurationsQuery({
-        environment: environment === 1 ? Environment.Test : Environment.Production,
+        environment:
+            environment === undefined ? undefined : environment === 1 ? Environment.Test : Environment.Production,
         integrationId: searchParams.get('integrationId') ? parseInt(searchParams.get('integrationId')!) : undefined,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
@@ -95,10 +98,6 @@ const IntegrationInstanceConfigurations = () => {
 
     const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetIntegrationInstanceConfigurationTagsQuery();
 
-    function getEnvironment() {
-        return searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : 1;
-    }
-
     return (
         <LayoutContainer
             header={
@@ -113,7 +112,12 @@ const IntegrationInstanceConfigurations = () => {
                                 <IntegrationInstanceConfigurationDialog
                                     integrationInstanceConfiguration={
                                         {
-                                            environment: environment === 1 ? Environment.Test : Environment.Production,
+                                            environment:
+                                                environment === undefined
+                                                    ? undefined
+                                                    : environment === 1
+                                                      ? Environment.Test
+                                                      : Environment.Production,
                                         } as IntegrationInstanceConfiguration
                                     }
                                     triggerNode={<Button>New Instance Configuration</Button>}
@@ -137,6 +141,7 @@ const IntegrationInstanceConfigurations = () => {
                         body={
                             <>
                                 {[
+                                    {label: 'All Environments'},
                                     {label: 'Test', value: 1},
                                     {label: 'Production', value: 2},
                                 ]?.map((item) => (
@@ -182,7 +187,7 @@ const IntegrationInstanceConfigurations = () => {
                                                             componentDefinition.name === item.componentName!
                                                     )?.title ?? '',
                                             }}
-                                            key={item.componentName}
+                                            key={item.id}
                                             toLink={`?integrationId=${item.id}&environment=${environment ?? ''}`}
                                         />
                                     ))}

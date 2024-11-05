@@ -36,7 +36,7 @@ import java.util.Map;
  */
 public class TeamworkCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
-        .title("Creates a task")
+        .title("Create Task")
         .description("Create a new task")
         .metadata(
             Map.of(

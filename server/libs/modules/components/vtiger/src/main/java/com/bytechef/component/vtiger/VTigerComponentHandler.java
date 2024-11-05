@@ -17,7 +17,6 @@
 package com.bytechef.component.vtiger;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.vtiger.constant.VTigerConstants.VTIGER;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -30,13 +29,16 @@ import com.google.auto.service.AutoService;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
 public class VTigerComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(VTIGER)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("vtiger")
         .title("VTiger")
-        .description("CRM software for sales, marketing, and support teams")
+        .description(
+            "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, " +
+                "and support solutions to streamline business.")
         .icon("path:assets/vtiger.svg")
         .categories(ComponentCategory.CRM)
         .connection(VTigerConnection.CONNECTION_DEFINITION)

@@ -9,13 +9,14 @@ import {
     WorkflowConnection,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
+import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
-import {useGetWorkflowNodeOutputQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
+import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     ComponentPropertiesType,
@@ -180,15 +181,6 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const hasOutputData = currentNodeDefinition?.outputDefined;
-
-    const {data: workflowNodeOutput, refetch: refetchWorkflowNodeOutput} = useGetWorkflowNodeOutputQuery(
-        {
-            id: workflow.id!,
-            workflowNodeName: currentNode?.name as string,
-        },
-        !!currentNode?.name && !!workflow.id && hasOutputData && activeTab === 'output'
-    );
-
     const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
 
@@ -215,6 +207,14 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         return true;
+    });
+
+    const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
+            });
+        },
     });
 
     const queryClient = useQueryClient();
@@ -272,8 +272,6 @@ const WorkflowNodeDetailsPanel = ({
                 });
 
                 setComponentActions(formattedComponentActions);
-
-                refetchWorkflowNodeOutput();
             },
             queryClient,
             updateWorkflowMutation,
@@ -384,6 +382,11 @@ const WorkflowNodeDetailsPanel = ({
     // Close the panel if the current node is deleted from the workflow definition
     useEffect(() => {
         if (currentNode?.trigger) {
+            deleteWorkflowNodeTestOutputMutation.mutate({
+                id: workflow.id!,
+                workflowNodeName: currentNode.name,
+            });
+
             return;
         }
 
@@ -562,13 +565,15 @@ const WorkflowNodeDetailsPanel = ({
                                         </div>
                                     ))}
 
-                                {activeTab === 'output' && workflowNodeOutput && currentNode && (
+                                {activeTab === 'output' && currentNode && currentComponentDefinition && (
                                     <OutputTab
+                                        connectionMissing={
+                                            currentComponentDefinition.connectionRequired &&
+                                            !workflowTestConfigurationConnections?.length
+                                        }
                                         currentNode={currentNode}
                                         key={`${currentNode?.name}_output`}
                                         outputDefined={currentActionDefinition?.outputDefined ?? false}
-                                        outputSchema={workflowNodeOutput.outputSchema}
-                                        sampleOutput={workflowNodeOutput.sampleOutput!}
                                         workflowId={workflow.id!}
                                     />
                                 )}

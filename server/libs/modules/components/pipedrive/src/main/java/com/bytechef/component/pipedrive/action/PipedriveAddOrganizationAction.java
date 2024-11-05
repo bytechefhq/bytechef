@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class PipedriveAddOrganizationAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("addOrganization")
-        .title("Add an organization")
+        .title("Add Organization")
         .description("Adds a new organization.")
         .metadata(
             Map.of(

@@ -40,8 +40,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -121,7 +121,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 : taskFileStorage.readJobOutputs(job.getOutputs()),
             getJobTaskExecutions(id));
         Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
-            Validate.notNull(job.getId(), ""), AppType.AUTOMATION);
+            Validate.notNull(job.getId(), ""), ModeType.AUTOMATION);
 
         return new WorkflowExecution(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
@@ -160,7 +160,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
             if (projectInstanceId != null) {
                 projectInstanceIds.add(projectInstanceId);
-            } else if (environment != null) {
+            } else {
                 projectInstanceIds.addAll(
                     projectInstanceService.getProjectInstances(null, environment, null, null)
                         .stream()
@@ -168,39 +168,45 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                         .toList());
             }
 
-            Page<Job> jobsPage = instanceJobService
-                .getJobIds(
-                    jobStatus, jobStartDate, jobEndDate, projectInstanceIds, AppType.AUTOMATION, workflowIds,
-                    pageNumber)
-                .map(jobService::getJob);
-
-            List<Project> projects = new ArrayList<>();
-
-            if (projectId == null) {
-                projects.addAll(projectService.getProjects());
+            if (projectInstanceIds.isEmpty()) {
+                workflowExecutionPage = Page.empty();
             } else {
-                projects.add(projectService.getProject(projectId));
+                Page<Job> jobsPage = instanceJobService
+                    .getJobIds(
+                        jobStatus, jobStartDate, jobEndDate, projectInstanceIds, ModeType.AUTOMATION, workflowIds,
+                        pageNumber)
+                    .map(jobService::getJob);
+
+                List<Project> projects = new ArrayList<>();
+
+                if (projectId == null) {
+                    projects.addAll(projectService.getProjects());
+                } else {
+                    projects.add(projectService.getProject(projectId));
+                }
+
+                List<Workflow> workflows = workflowService.getWorkflows(
+                    CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
+
+                workflowExecutionPage = jobsPage.map(job -> new WorkflowExecution(
+                    Validate.notNull(job.getId(), "id"),
+                    CollectionUtils.getFirst(
+                        projects,
+                        project -> CollectionUtils.contains(
+                            projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
+                    OptionalUtils.map(
+                        instanceJobService.fetchJobInstanceId(job.getId(), ModeType.AUTOMATION),
+                        projectInstanceService::getProjectInstance),
+                    new JobDTO(job),
+                    CollectionUtils.getFirst(workflows,
+                        workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
+                    getTriggerExecutionDTO(
+                        projectInstanceId,
+                        OptionalUtils.orElse(
+                            triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")),
+                            null),
+                        job)));
             }
-
-            List<Workflow> workflows = workflowService.getWorkflows(
-                CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
-
-            workflowExecutionPage = jobsPage.map(job -> new WorkflowExecution(
-                Validate.notNull(job.getId(), "id"),
-                CollectionUtils.getFirst(
-                    projects,
-                    project -> CollectionUtils.contains(
-                        projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
-                OptionalUtils.map(
-                    instanceJobService.fetchJobInstanceId(job.getId(), AppType.AUTOMATION),
-                    projectInstanceService::getProjectInstance),
-                new JobDTO(job),
-                CollectionUtils.getFirst(workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
-                getTriggerExecutionDTO(
-                    projectInstanceId,
-                    OptionalUtils.orElse(
-                        triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
-                    job)));
         }
 
         return workflowExecutionPage;

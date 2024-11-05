@@ -53,8 +53,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -892,7 +892,7 @@
         "properties" : { }
       }
     } ],
-    "title" : "Create record",
+    "title" : "Create Record",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1818,7 +1818,7 @@
       "optionsDataSource" : null,
       "controlType" : "INTEGER"
     } ],
-    "title" : "Find records",
+    "title" : "Find Records",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -2675,7 +2675,7 @@
         "properties" : { }
       }
     } ],
-    "title" : "Update record",
+    "title" : "Update Record",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null

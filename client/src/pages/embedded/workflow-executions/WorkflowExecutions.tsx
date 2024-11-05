@@ -5,11 +5,11 @@ import PageLoader from '@/components/PageLoader';
 import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import WorkflowExecutionsFilterTitle from '@/pages/embedded/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {Environment} from '@/shared/middleware/automation/configuration';
-import {Integration} from '@/shared/middleware/embedded/configuration';
+import {Environment, Integration} from '@/shared/middleware/embedded/configuration';
 import {
     GetWorkflowExecutionsPageJobStatusEnum,
     WorkflowExecutionFromJSON,
@@ -65,8 +65,8 @@ export const WorkflowExecutions = () => {
     const [filterEndDate, setFilterEndDate] = useState<Date | undefined>(
         searchParams.get('endDate') ? new Date(+searchParams.get('endDate')!) : undefined
     );
-    const [filterEnvironment, setFilterEnvironment] = useState<string | undefined>(
-        searchParams.get('environment') ? searchParams.get('environment')! : undefined
+    const [filterEnvironment, setFilterEnvironment] = useState<number>(
+        searchParams.get('environment') ? +searchParams.get('environment')! : 0
     );
     const [filterIntegrationId, setFilterIntegrationId] = useState<number | undefined>(
         searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined
@@ -96,7 +96,11 @@ export const WorkflowExecutions = () => {
         !!filterIntegrationInstanceConfigurationId
     );
 
-    const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({});
+    const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({
+        environment:
+            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
+        integrationId: filterIntegrationId,
+    });
 
     const {data: integrations} = useGetIntegrationsQuery({});
 
@@ -105,7 +109,8 @@ export const WorkflowExecutions = () => {
         error: workflowExecutionsError,
         isLoading: workflowExecutionsIsLoading,
     } = useGetWorkflowExecutionsQuery({
-        environment: filterEnvironment as Environment,
+        environment:
+            filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         integrationId: filterIntegrationId,
         integrationInstanceConfigurationId: filterIntegrationInstanceConfigurationId,
         jobEndDate: filterEndDate,
@@ -138,7 +143,7 @@ export const WorkflowExecutions = () => {
     );
 
     function filter(
-        environment?: string,
+        environment?: number,
         status?: GetWorkflowExecutionsPageJobStatusEnum,
         startDate?: Date,
         endDate?: Date,
@@ -168,10 +173,10 @@ export const WorkflowExecutions = () => {
     };
 
     const handleEnvironmentChange = (environment: string) => {
-        setFilterEnvironment(environment);
+        setFilterEnvironment(Number(environment));
 
         filter(
-            environment,
+            Number(environment),
             filterStatus,
             filterStartDate,
             filterEndDate,
@@ -318,7 +323,11 @@ export const WorkflowExecutions = () => {
                     <Header
                         centerTitle={true}
                         position="main"
-                        title={<span className="text-base">All Workflow Executions</span>}
+                        title={
+                            <WorkflowExecutionsFilterTitle
+                                filterData={{environment: filterEnvironment, status: filterStatus}}
+                            />
+                        }
                     />
                 )
             }
@@ -327,15 +336,17 @@ export const WorkflowExecutions = () => {
                     <div className="flex flex-col space-y-2">
                         <Label>Environment</Label>
 
-                        <Select onValueChange={handleEnvironmentChange} value={filterEnvironment}>
+                        <Select onValueChange={handleEnvironmentChange} value={String(filterEnvironment)}>
                             <SelectTrigger className="w-full bg-background">
                                 <SelectValue placeholder="Select environment" />
                             </SelectTrigger>
 
                             <SelectContent>
-                                <SelectItem value="TEST">Test</SelectItem>
+                                <SelectItem value="0">All Environments</SelectItem>
 
-                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                <SelectItem value="1">Test</SelectItem>
+
+                                <SelectItem value="2">Production</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>

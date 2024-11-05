@@ -8,8 +8,9 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectedUserSheet from '@/pages/embedded/connected-users/components/ConnectedUserSheet';
 import ConnectedUserTable from '@/pages/embedded/connected-users/components/ConnectedUserTable';
+import ConnectedUsersFilterTitle from '@/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';
+import ConnectedUserSheet from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheet';
 import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -20,7 +21,7 @@ import {useGetConnectedUsersQuery} from '@/shared/queries/embedded/connectedUser
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
 import {cn} from '@/shared/util/cn-utils';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {addDays, format} from 'date-fns';
+import {format} from 'date-fns';
 import {CalendarIcon, UsersIcon} from 'lucide-react';
 import {HTMLAttributes, useState} from 'react';
 import {DateRange} from 'react-day-picker';
@@ -110,14 +111,13 @@ const ConnectedUsers = () => {
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             createDateRange: {
-                from: searchParams.get('createDateFrom')
-                    ? new Date(+searchParams.get('createDateFrom')!)
-                    : addDays(new Date(), -20),
-                to: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : new Date(),
+                from: searchParams.get('createDateFrom') ? new Date(+searchParams.get('createDateFrom')!) : undefined,
+                to: searchParams.get('createDateTo') ? new Date(+searchParams.get('createDateTo')!) : undefined,
             },
             credentialStatus: searchParams.get('credentialStatus')
                 ? (searchParams.get('credentialStatus')! as CredentialStatus)
                 : undefined,
+            environment: searchParams.get('environment') ? searchParams.get('environment')! : '0',
             integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
             search: searchParams.get('search') ? searchParams.get('search')! : '',
         },
@@ -134,7 +134,11 @@ const ConnectedUsers = () => {
         credentialStatus: searchParams.get('credentialStatus')
             ? (searchParams.get('credentialStatus')! as CredentialStatus)
             : undefined,
-        environment: searchParams.get('environment') ? (searchParams.get('environment') as Environment) : undefined,
+        environment: searchParams.get('environment')
+            ? +searchParams.get('environment')! === 1
+                ? Environment.Test
+                : Environment.Production
+            : undefined,
         integrationId: searchParams.get('integrationId') ? +searchParams.get('integrationId')! : undefined,
         pageNumber: searchParams.get('pageNumber') ? +searchParams.get('pageNumber')! : undefined,
         search: searchParams.get('search') ? searchParams.get('search')! : undefined,
@@ -147,7 +151,7 @@ const ConnectedUsers = () => {
     const {data: integrations} = useGetIntegrationsQuery({});
 
     function filter(
-        environment?: string,
+        environment?: number,
         search?: string,
         credentialStatus?: string,
         integrationIdId?: number,
@@ -159,22 +163,22 @@ const ConnectedUsers = () => {
         );
     }
 
-    function filterConnectedUsers(values: z.infer<typeof formSchema>) {
+    const handleFilterConnectedUsers = (values: z.infer<typeof formSchema>) => {
         filter(
-            values.environment,
+            Number(values.environment),
             values.search,
             values.credentialStatus,
             values.integrationId,
             values.createDateRange,
             pageNumber
         );
-    }
+    };
 
     const handlePaginationClick = (pageNumber: number) => {
         setPageNumber(pageNumber);
 
         filter(
-            form.getValues().environment,
+            Number(form.getValues().environment),
             form.getValues().search,
             form.getValues().credentialStatus,
             form.getValues().integrationId,
@@ -200,12 +204,22 @@ const ConnectedUsers = () => {
                 )
             }
             header={
-                connectedUsers &&
-                connectedUsers?.length > 0 && <Header centerTitle={true} position="main" title="All Users" />
+                <Header
+                    centerTitle={true}
+                    position="main"
+                    title={
+                        <ConnectedUsersFilterTitle
+                            filterData={{
+                                environment: +form.getValues('environment')!,
+                                status: form.getValues('credentialStatus')!,
+                            }}
+                        />
+                    }
+                />
             }
             leftSidebarBody={
                 <Form {...form}>
-                    <form className="space-y-4 px-4" onSubmit={form.handleSubmit(filterConnectedUsers)}>
+                    <form className="space-y-4 px-4" onSubmit={form.handleSubmit(handleFilterConnectedUsers)}>
                         <FormField
                             control={form.control}
                             name="environment"
@@ -218,18 +232,20 @@ const ConnectedUsers = () => {
                                             onValueChange={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
-                                            value={field.value}
+                                            value={String(field.value)}
                                         >
-                                            <SelectTrigger className="w-full">
+                                            <SelectTrigger className="w-full bg-background">
                                                 <SelectValue placeholder="Select environment" />
                                             </SelectTrigger>
 
                                             <SelectContent>
-                                                <SelectItem value="TEST">Test</SelectItem>
+                                                <SelectItem value="0">All Environments</SelectItem>
 
-                                                <SelectItem value="PRODUCTION">Production</SelectItem>
+                                                <SelectItem value="1">Test</SelectItem>
+
+                                                <SelectItem value="2">Production</SelectItem>
                                             </SelectContent>
                                         </Select>
                                     </FormControl>
@@ -247,7 +263,11 @@ const ConnectedUsers = () => {
                                     <FormLabel>Search</FormLabel>
 
                                     <FormControl>
-                                        <Input placeholder="Name, Email or User ERC" {...field} />
+                                        <Input
+                                            className="bg-background"
+                                            placeholder="Name, Email or User ERC"
+                                            {...field}
+                                        />
                                     </FormControl>
 
                                     <FormMessage />
@@ -267,11 +287,11 @@ const ConnectedUsers = () => {
                                             onValueChange={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         >
-                                            <SelectTrigger>
+                                            <SelectTrigger className="bg-background">
                                                 <SelectValue placeholder="Choose Status..." />
                                             </SelectTrigger>
 
@@ -308,7 +328,7 @@ const ConnectedUsers = () => {
                                             onChange={(item) => {
                                                 field.onChange(item?.value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />
@@ -331,7 +351,7 @@ const ConnectedUsers = () => {
                                             onSelect={(value) => {
                                                 field.onChange(value);
 
-                                                form.handleSubmit(filterConnectedUsers)();
+                                                form.handleSubmit(handleFilterConnectedUsers)();
                                             }}
                                             value={field.value}
                                         />

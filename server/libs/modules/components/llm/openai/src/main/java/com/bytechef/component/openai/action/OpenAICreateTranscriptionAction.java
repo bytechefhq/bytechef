@@ -54,7 +54,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
 public class OpenAICreateTranscriptionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
-        .title("Create transcriptions")
+        .title("Create Transcriptions")
         .description("Transcribes audio into the input language.")
         .properties(
             fileEntry(FILE)

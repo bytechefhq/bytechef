@@ -20,6 +20,13 @@ import {
     ConnectedUserIntegrationInstanceToJSON,
     ConnectedUserIntegrationInstanceToJSONTyped,
 } from './ConnectedUserIntegrationInstance';
+import type { Environment } from './Environment';
+import {
+    EnvironmentFromJSON,
+    EnvironmentFromJSONTyped,
+    EnvironmentToJSON,
+    EnvironmentToJSONTyped,
+} from './Environment';
 
 /**
  * 
@@ -51,6 +58,12 @@ export interface ConnectedUser {
      * @memberof ConnectedUser
      */
     enabled?: boolean;
+    /**
+     * 
+     * @type {Environment}
+     * @memberof ConnectedUser
+     */
+    environment?: Environment;
     /**
      * The connected user external id.
      * @type {string}
@@ -101,6 +114,8 @@ export interface ConnectedUser {
     version?: number;
 }
 
+
+
 /**
  * Check if a given object implements the ConnectedUser interface.
  */
@@ -123,6 +138,7 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'email': json['email'] == null ? undefined : json['email'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'externalId': json['externalId'],
         'id': json['id'] == null ? undefined : json['id'],
         'integrationInstances': json['integrationInstances'] == null ? undefined : ((json['integrationInstances'] as Array<any>).map(ConnectedUserIntegrationInstanceFromJSON)),
@@ -147,6 +163,7 @@ export function ConnectedUserFromJSONTyped(json: any, ignoreDiscriminator: boole
         
         'email': value['email'],
         'enabled': value['enabled'],
+        'environment': EnvironmentToJSON(value['environment']),
         'integrationInstances': value['integrationInstances'] == null ? undefined : ((value['integrationInstances'] as Array<any>).map(ConnectedUserIntegrationInstanceToJSON)),
         'name': value['name'],
         '__version': value['version'],

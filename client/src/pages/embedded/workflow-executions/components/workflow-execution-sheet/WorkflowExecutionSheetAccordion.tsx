@@ -4,7 +4,6 @@ import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/comp
 import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
 import {Job, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {AccordionContent, AccordionItem, AccordionTrigger} from '@radix-ui/react-accordion';
-import {CheckCircledIcon} from '@radix-ui/react-icons';
 import {twMerge} from 'tailwind-merge';
 
 const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
@@ -26,16 +25,14 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
         <>
             <div className="px-3 py-4">
                 <div className="mb-3 flex items-center justify-between">
-                    <span>
+                    <span
+                        className={twMerge(
+                            (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
+                            'font-semibold uppercase text-base'
+                        )}
+                    >
                         {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}
                     </span>
-
-                    <CheckCircledIcon
-                        className={twMerge(
-                            'h-5 w-5',
-                            taskExecutionsCompleted && triggerExecutionCompleted ? 'text-green-500' : 'text-red-500'
-                        )}
-                    />
                 </div>
 
                 <div className="flex justify-between text-xs">

@@ -508,7 +508,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create contact",
+    "title" : "Create Contact",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -818,7 +818,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create organization",
+    "title" : "Create Organization",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1088,12 +1088,12 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create task",
+    "title" : "Create Task",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }

@@ -19,7 +19,7 @@ package com.bytechef.embedded.connection.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.AbstractConnectionTagApiController;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -39,7 +39,7 @@ public class ConnectionTagApiController extends AbstractConnectionTagApiControll
 
     @SuppressFBWarnings("EI")
     public ConnectionTagApiController(ConnectionFacade connectionFacade, ConversionService conversionService) {
-        super(connectionFacade, conversionService, AppType.EMBEDDED);
+        super(connectionFacade, conversionService, ModeType.EMBEDDED);
     }
 
     @Override

@@ -38,6 +38,7 @@ export interface GetComponentDefinitionVersionsRequest {
 }
 
 export interface GetComponentDefinitionsRequest {
+    modeType: GetComponentDefinitionsModeTypeEnum;
     actionDefinitions?: boolean;
     connectionDefinitions?: boolean;
     triggerDefinitions?: boolean;
@@ -136,7 +137,18 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all component definitions
      */
     async getComponentDefinitionsRaw(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ComponentDefinitionBasic>>> {
+        if (requestParameters['modeType'] == null) {
+            throw new runtime.RequiredError(
+                'modeType',
+                'Required parameter "modeType" was null or undefined when calling getComponentDefinitions().'
+            );
+        }
+
         const queryParameters: any = {};
+
+        if (requestParameters['modeType'] != null) {
+            queryParameters['modeType'] = requestParameters['modeType'];
+        }
 
         if (requestParameters['actionDefinitions'] != null) {
             queryParameters['actionDefinitions'] = requestParameters['actionDefinitions'];
@@ -170,7 +182,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      * Get all component definitions.
      * Get all component definitions
      */
-    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest = {}, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
+    async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -247,6 +259,14 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
 }
 
+/**
+ * @export
+ */
+export const GetComponentDefinitionsModeTypeEnum = {
+    Automation: 'AUTOMATION',
+    Embedded: 'EMBEDDED'
+} as const;
+export type GetComponentDefinitionsModeTypeEnum = typeof GetComponentDefinitionsModeTypeEnum[keyof typeof GetComponentDefinitionsModeTypeEnum];
 /**
  * @export
  */

@@ -20,7 +20,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
         @NonNull Map<String, ?> inputParameters, @NonNull Map<String, Long> connectionIds);
 
     Object executePerform(
-        @NonNull String componentName, int componentVersion, @NonNull String actionName, AppType type, Long instanceId,
+        @NonNull String componentName, int componentVersion, @NonNull String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, Long jobId, String workflowId, @NonNull Map<String, ?> inputParameters,
         @NonNull Map<String, Long> connectionIds, Map<String, ?> extensions, boolean devEnvironment);
 

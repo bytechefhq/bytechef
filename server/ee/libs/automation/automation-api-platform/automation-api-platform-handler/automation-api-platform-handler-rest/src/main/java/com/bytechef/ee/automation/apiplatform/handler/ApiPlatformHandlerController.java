@@ -17,8 +17,8 @@ import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.constant.AppType;
 import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.tenant.TenantContext;
 import com.bytechef.platform.tenant.util.TenantUtils;
@@ -131,7 +131,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.body(), webhookRequest.method());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.AUTOMATION, apiCollection.getProjectInstanceId(),
+                ModeType.AUTOMATION, apiCollection.getProjectInstanceId(),
                 apiCollectionEndpoint.getWorkflowReferenceCode(), "trigger_1");
 
             // TODO return response from ResponseToAPIRequest action

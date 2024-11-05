@@ -18,7 +18,9 @@ package com.bytechef.platform.component.domain;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.registry.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -118,10 +120,11 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         return outputDefinition.getOutputResponse()
             .map(
-                outputResponse -> new OutputResponse(
-                    Property
-                        .toProperty((com.bytechef.component.definition.Property) outputDefinition.getOutputSchema()),
-                    outputDefinition.getSampleOutput()))
+                outputResponse -> SchemaUtils.toOutput(
+                    outputResponse,
+                    (property, sampleOutput) -> new OutputResponse(
+                        Property.toProperty((com.bytechef.component.definition.Property) property), sampleOutput),
+                    PropertyFactory.PROPERTY_FACTORY))
             .orElse(null);
     }
 }

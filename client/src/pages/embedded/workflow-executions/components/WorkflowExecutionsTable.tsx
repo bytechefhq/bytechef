@@ -32,8 +32,12 @@ const columns = [
         header: 'Integration',
     }),
     columnHelper.accessor('integrationInstanceConfiguration', {
-        cell: (info) => info.getValue()?.integrationVersion ?? '-',
-        header: 'Configuration',
+        cell: (info) => info.getValue()?.name,
+        header: 'Instance',
+    }),
+    columnHelper.accessor('integrationInstanceConfiguration', {
+        cell: (info) => `V${info.getValue()?.integrationVersion}`,
+        header: 'Version',
     }),
     columnHelper.accessor('integrationInstance', {
         cell: (info) => info.getValue()?.environment,

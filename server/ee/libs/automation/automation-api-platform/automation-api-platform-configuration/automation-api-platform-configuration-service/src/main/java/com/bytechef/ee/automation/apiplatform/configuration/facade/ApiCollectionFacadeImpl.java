@@ -7,10 +7,12 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
+import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.service.ProjectInstanceService;
 import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
@@ -40,6 +42,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ProjectInstanceService projectInstanceService;
     private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
 
@@ -47,12 +50,13 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     public ApiCollectionFacadeImpl(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
         ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        ProjectWorkflowService projectWorkflowService, TagService tagService) {
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService, TagService tagService) {
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.projectInstanceService = projectInstanceService;
         this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+        this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
     }
@@ -151,6 +155,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     private ApiCollectionDTO toApiCollectionDTO(ApiCollection apiCollection) {
+        Project project = projectService.getProject(apiCollection.getProjectInstanceId());
+
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
             apiCollection.getProjectInstanceId());
 
@@ -163,6 +169,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             .toList();
 
         return new ApiCollectionDTO(
-            apiCollection, apiCollectionEndpointDTOs, projectInstance, tagService.getTags(apiCollection.getTagIds()));
+            apiCollection, apiCollectionEndpointDTOs, project, projectInstance,
+            tagService.getTags(apiCollection.getTagIds()));
     }
 }

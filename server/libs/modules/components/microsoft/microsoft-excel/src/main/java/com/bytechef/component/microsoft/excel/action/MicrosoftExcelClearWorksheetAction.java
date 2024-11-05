@@ -39,7 +39,7 @@ import java.util.List;
 public class MicrosoftExcelClearWorksheetAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("clearWorksheet")
-        .title("Clear worksheet")
+        .title("Clear Worksheet")
         .description("Clear a worksheet of all values.")
         .properties(
             WORKBOOK_ID_PROPERTY,

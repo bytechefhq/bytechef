@@ -42,7 +42,7 @@ import java.util.Map;
 public class GithubCreateCommentOnIssueAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCommentOnIssue")
-        .title("Create comment on a issue")
+        .title("Create Comment on Issue")
         .description("Adds a comment to the specified issue.")
         .properties(
             string(REPOSITORY)

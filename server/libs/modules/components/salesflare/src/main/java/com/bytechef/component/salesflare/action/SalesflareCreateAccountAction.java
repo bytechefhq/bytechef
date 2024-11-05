@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class SalesflareCreateAccountAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
-        .title("Create account")
+        .title("Create Account")
         .description("Creates new account")
         .metadata(
             Map.of(

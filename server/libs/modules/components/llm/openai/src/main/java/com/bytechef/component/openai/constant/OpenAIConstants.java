@@ -22,7 +22,6 @@ package com.bytechef.component.openai.constant;
  */
 public final class OpenAIConstants {
 
-    public static final String OPENAI = "openai";
     public static final String QUALITY = "quality";
 
     private OpenAIConstants() {

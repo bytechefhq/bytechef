@@ -414,7 +414,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableActionDefinition output(SingleConnectionOutputFunction output) {
+        public ModifiableActionDefinition output(OutputFunction output) {
             this.outputDefinition = new OutputDefinition(output);
 
             return this;
@@ -3189,6 +3189,14 @@ public final class ComponentDsl {
         }
 
         public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
+            SampleOutput sampleOutput) {
+
+            this.outputDefinition = new OutputDefinition(sampleOutput.sampleOutput());
+
+            return this;
+        }
+
+        public <P extends ModifiableValueProperty<?, ?>> ModifiableTriggerDefinition output(
             OutputSchema<P> outputSchema, SampleOutput sampleOutput) {
 
             this.outputDefinition = new OutputDefinition(outputSchema.outputSchema(), sampleOutput.sampleOutput());
@@ -3196,19 +3204,7 @@ public final class ComponentDsl {
             return this;
         }
 
-        public ModifiableTriggerDefinition output(WebhookTriggerOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition output(ListenerTriggerOutputFunction output) {
-            this.outputDefinition = new OutputDefinition(output);
-
-            return this;
-        }
-
-        public ModifiableTriggerDefinition output(PollTriggerOutputFunction output) {
+        public ModifiableTriggerDefinition output(TriggerOutputFunction output) {
             this.outputDefinition = new OutputDefinition(output);
 
             return this;

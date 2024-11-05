@@ -73,8 +73,8 @@
       "refreshUrl" : null,
       "scopes" : { },
       "tokenUrl" : { },
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -934,7 +934,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Add assignee to an issue",
+    "title" : "Add Assignee to Issue",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1226,7 +1226,7 @@
         "options" : { }
       }
     } ],
-    "title" : "Add labels to an issue",
+    "title" : "Add Labels to Issue",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -2079,7 +2079,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create comment on a issue",
+    "title" : "Create Comment on Issue",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -2929,7 +2929,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create issue",
+    "title" : "Create Issue",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null

@@ -19,6 +19,9 @@ package com.bytechef.embedded.configuration.service;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +41,30 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
-    public IntegrationInstanceWorkflow getIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId) {
+    public IntegrationInstanceWorkflow createIntegrationInstanceWorkflow(
+        long integrationInstanceId, long integrationInstanceConfigurationWorkflowId) {
+
+        IntegrationInstanceWorkflow integrationInstanceWorkflow = new IntegrationInstanceWorkflow();
+
+        integrationInstanceWorkflow.setInputs(Map.of());
+        integrationInstanceWorkflow.setIntegrationInstanceId(integrationInstanceId);
+        integrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
+            integrationInstanceConfigurationWorkflowId);
+
+        return integrationInstanceWorkflowRepository.save(integrationInstanceWorkflow);
+    }
+
+    @Override
+    public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
+        long integrationInstanceId, @NonNull String workflowId) {
+
+        return integrationInstanceWorkflowRepository
+            .findByIntegrationInstanceIdAndWorkflowId(integrationInstanceId, workflowId);
+    }
+
+    @Override
+    public IntegrationInstanceWorkflow
+        getIntegrationInstanceWorkflow(long integrationInstanceId, @NonNull String workflowId) {
         return integrationInstanceWorkflowRepository
             .findByIntegrationInstanceIdAndWorkflowId(integrationInstanceId, workflowId)
             .orElseThrow(() -> new IllegalArgumentException("Integration instance workflow not found"));
@@ -47,6 +73,23 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     @Override
     public List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId) {
         return integrationInstanceWorkflowRepository.findAllByIntegrationInstanceId(integrationInstanceId);
+    }
+
+    @Override
+    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+        IntegrationInstanceWorkflow curIntegrationInstanceWorkflow = integrationInstanceWorkflowRepository
+            .findById(integrationInstanceWorkflow.getId())
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Integration instance workflow id=%s not found".formatted(integrationInstanceWorkflow)));
+
+        curIntegrationInstanceWorkflow.setEnabled(integrationInstanceWorkflow.isEnabled());
+        curIntegrationInstanceWorkflow.setInputs(integrationInstanceWorkflow.getInputs());
+        curIntegrationInstanceWorkflow.setIntegrationInstanceId(
+            integrationInstanceWorkflow.getIntegrationInstanceId());
+        curIntegrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
+            integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+        integrationInstanceWorkflowRepository.save(curIntegrationInstanceWorkflow);
     }
 
     @Override

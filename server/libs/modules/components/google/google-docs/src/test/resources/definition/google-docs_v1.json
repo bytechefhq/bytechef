@@ -85,7 +85,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Create a document on Google Docs",
+    "description" : "Create a document on Google Docs.",
     "help" : null,
     "metadata" : null,
     "name" : "createDocument",
@@ -131,7 +131,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create document",
+    "title" : "Create Document",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -244,7 +244,7 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Edit template file",
+    "title" : "Edit Template File",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -277,12 +277,12 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Read document",
+    "title" : "Read Document",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

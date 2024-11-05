@@ -17,7 +17,7 @@ import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
@@ -119,7 +119,7 @@ public class RemoteTriggerDefinitionFacadeClient extends AbstractWorkerClient im
 
     @Override
     public TriggerOutput executeTrigger(
-        @NonNull String componentName, int componentVersion, @NonNull String triggerName, @NonNull AppType type,
+        @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
         Long instanceId, String workflowReferenceCode, @NonNull Map<String, ?> inputParameters,
         Object triggerState, WebhookRequest webhookRequest, Long connectionId, boolean devEnvironment) {
 

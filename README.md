@@ -143,7 +143,18 @@ If you'd like to contribute, kindly read our [Contributing Guide](CONTRIBUTING.m
 ## License
 ByteChef is released under Apache License v2.0. See [LICENSE](LICENSE) for more information.
 
+## Contributors
+<!-- automd:contributors github="bytechefhq/bytechef" -->
+
+Made by [community](https://github.com/bytechefhq/bytechef/graphs/contributors) 💛
+<br><br>
+<a href="https://github.com/bytechefhq/bytechef/graphs/contributors">
+<img src="https://contrib.rocks/image?repo=bytechefhq/bytechef" />
+</a>
+
+<!-- /automd -->
+
 ## Note
-This project has started as a fork of [Piper](https://github.com/okayrunner/piper), an open-source, distributed workflow engine.
+This project has started as a fork of [Piper](https://github.com/runabol/piper), an open-source, distributed workflow engine.
 
 ![anl-readme-md](https://static.scarf.sh/a.png?x-pxid=ceb7a380-3bfc-4e25-8068-1445d2d02359)

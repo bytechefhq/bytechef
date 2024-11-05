@@ -38,7 +38,7 @@ import java.util.Map;
 public class DropboxListFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listFolder")
-        .title("List folder")
+        .title("List Folder")
         .description("List the contents of a folder.")
         .properties(
             string(PATH)

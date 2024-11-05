@@ -44,7 +44,7 @@ import com.bytechef.component.definition.TypeReference;
 public class ZendeskSellCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
-        .title("Create contact")
+        .title("Create Contact")
         .description("Creates new contact. A contact may represent a single individual or an organization.")
         .properties(
             bool(IS_ORGANIZATION)

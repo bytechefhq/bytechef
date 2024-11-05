@@ -174,7 +174,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
+                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground">
                                     <div className="mr-1">
                                         {integration.integrationWorkflowIds?.length === 1
                                             ? `${integration.integrationWorkflowIds?.length} workflow`

@@ -18,7 +18,10 @@ package com.bytechef.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
@@ -33,13 +36,17 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
+import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,11 +62,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade {
 
+    private final ConnectedUserService connectedUserService;
+    private final InstanceJobService instanceJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final JobService jobService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final WorkflowConnectionFacade workflowConnectionFacade;
     private final WorkflowService workflowService;
@@ -67,20 +77,24 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceFacadeImpl(
+        ConnectedUserService connectedUserService, InstanceJobService instanceJobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         ApplicationProperties applicationProperties,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationWorkflowService integrationWorkflowService,
-        TriggerLifecycleFacade triggerLifecycleFacade, WorkflowConnectionFacade workflowConnectionFacade,
-        WorkflowService workflowService) {
-        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        JobService jobService, TriggerLifecycleFacade triggerLifecycleFacade,
+        WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
+        this.connectedUserService = connectedUserService;
 
+        this.instanceJobService = instanceJobService;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.webhookUrl = applicationProperties.getWebhookUrl();
         this.integrationWorkflowService = integrationWorkflowService;
+        this.jobService = jobService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
         this.workflowConnectionFacade = workflowConnectionFacade;
         this.workflowService = workflowService;
@@ -88,6 +102,54 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @Override
     public void enableIntegrationInstance(long integrationInstanceId, boolean enable) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            integrationInstance.getConnectedUserId());
+
+        if (connectedUser.isEnabled()) {
+            enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, enable);
+        }
+
+        integrationInstanceService.updateEnabled(integrationInstanceId, enable);
+    }
+
+    @Override
+    public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            integrationInstance.getConnectedUserId());
+
+        long integrationInstanceWorkflowId;
+
+        if (connectedUser.isEnabled()) {
+            integrationInstanceWorkflowId = enableIntegrationInstanceWorkflowTriggers(
+                integrationInstanceId, workflowId, enable);
+        } else {
+            IntegrationInstanceWorkflow integrationInstanceWorkflow =
+                integrationInstanceWorkflowService
+                    .fetchIntegrationInstanceWorkflow(integrationInstanceId, workflowId)
+                    .orElseGet(() -> {
+
+                        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                                integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);
+
+                        return integrationInstanceWorkflowService.createIntegrationInstanceWorkflow(
+                            integrationInstanceId, integrationInstanceConfigurationWorkflow.getId());
+                    });
+
+            integrationInstanceWorkflowId = integrationInstanceWorkflow.getId();
+        }
+
+        integrationInstanceWorkflowService.updateEnabled(integrationInstanceWorkflowId, enable);
+    }
+
+    @Override
+    public void enableIntegrationInstanceWorkflowTriggers(long integrationInstanceId, boolean enable) {
         List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
             .getIntegrationInstanceWorkflows(integrationInstanceId);
 
@@ -102,12 +164,12 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 disableWorkflowTriggers(integrationInstanceWorkflow);
             }
         }
-
-        integrationInstanceService.updateEnabled(integrationInstanceId, enable);
     }
 
     @Override
-    public void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable) {
+    public long enableIntegrationInstanceWorkflowTriggers(
+        long integrationInstanceId, String workflowId, boolean enable) {
+
         IntegrationInstanceWorkflow integrationInstanceWorkflow =
             integrationInstanceWorkflowService.getIntegrationInstanceWorkflow(
                 integrationInstanceId, workflowId);
@@ -123,7 +185,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             }
         }
 
-        integrationInstanceWorkflowService.updateEnabled(integrationInstanceWorkflow.getId(), enable);
+        return integrationInstanceWorkflow.getId();
     }
 
     @Override
@@ -131,12 +193,15 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     public IntegrationInstanceDTO getIntegrationInstance(long id) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
+
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
                 integrationInstance.getIntegrationInstanceConfigurationId());
 
         return new IntegrationInstanceDTO(
-            integrationInstance,
+            integrationInstance, integrationInstanceConfiguration,
             integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(id)
                 .stream()
                 .map(integrationInstanceWorkflow -> new IntegrationInstanceWorkflowDTO(
@@ -147,7 +212,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                             integrationInstanceConfigurationWorkflow.getId(),
                             integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()),
                         IntegrationInstanceConfigurationWorkflow::getWorkflowId)))
-                .collect(Collectors.toSet()));
+                .collect(Collectors.toSet()),
+            getIntegrationInstanceLastExecutionDate(integrationInstance.getId()));
     }
 
     private void disableWorkflowTriggers(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
@@ -168,7 +234,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerDisable(
@@ -196,7 +262,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
         for (WorkflowTrigger workflowTrigger : workflowTriggers) {
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                AppType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
+                ModeType.EMBEDDED, integrationInstanceWorkflow.getIntegrationInstanceId(),
                 integrationWorkflow.getWorkflowReferenceCode(), workflowTrigger.getName());
 
             triggerLifecycleFacade.executeTriggerEnable(
@@ -229,6 +295,17 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey)
             .map(IntegrationInstanceConfigurationWorkflowConnection::getConnectionId)
             .orElse(null);
+    }
+
+    private LocalDateTime getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
+        return OptionalUtils.mapOrElse(
+            instanceJobService.fetchLastJobId(integrationInstanceId, ModeType.EMBEDDED), this::getJobEndDate, null);
+    }
+
+    private LocalDateTime getJobEndDate(Long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        return job.getEndDate();
     }
 
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId) {

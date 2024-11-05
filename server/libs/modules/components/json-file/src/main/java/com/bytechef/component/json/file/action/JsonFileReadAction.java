@@ -51,7 +51,7 @@ import java.util.stream.Stream;
 public class JsonFileReadAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(READ)
-        .title("Read from file")
+        .title("Read from File")
         .description("Reads data from a JSON file.")
         .properties(
             string(FILE_TYPE)

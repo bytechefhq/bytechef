@@ -168,7 +168,7 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-gray-700">
+                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground">
                                     <div className="mr-1">
                                         {project.projectWorkflowIds?.length === 1
                                             ? `${project.projectWorkflowIds?.length} workflow`

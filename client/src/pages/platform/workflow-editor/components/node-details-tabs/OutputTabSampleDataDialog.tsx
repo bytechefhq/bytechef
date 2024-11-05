@@ -8,35 +8,87 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import Editor from '@monaco-editor/react';
-import {useState} from 'react';
+import {editor} from 'monaco-editor';
+import {useEffect, useState} from 'react';
+import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
-const sampleOutput = {
-    country: 'USA',
-    people: [
-        {
-            age: 28,
-            firstName: 'Joe',
-            gender: 'male',
-            lastName: 'Jackson',
-            number: '7349282382',
-        },
-    ],
-};
+const placeholder = (
+    <>
+        <pre>{'//'}Write sample output value, for example:</pre>
+        <pre>{'{'}</pre>
+        <pre className="pl-4">{'"country": "USA"'}</pre>
+        <pre className="pl-4">{'"people": ['}</pre>
+        <pre className="pl-8">{'{'}</pre>
+        <pre className="pl-12">{'"firstName": Joe'}</pre>
+        <pre className="pl-12">{'"lastName": Jackson'}</pre>
+        <pre className="pl-12">{'"gender": Male'}</pre>
+        <pre className="pl-12">{'"age": 28'}</pre>
+        <pre className="pl-12">{'"number": 7349282382'}</pre>
+        <pre className="pl-8">{'}'}</pre>
+        <pre className="pl-4">{']'}</pre>
+        <pre>{'}'}</pre>
+    </>
+);
 
 const OutputTabSampleDataDialog = ({
     onClose,
     onUpload,
     open,
+    sampleOutput,
 }: {
-    open: boolean;
     onClose: () => void;
     onUpload: (value: string) => void;
+    open: boolean;
+    sampleOutput?: object;
 }) => {
-    const [value, setValue] = useState<string>(JSON.stringify(sampleOutput));
+    const [value, setValue] = useState<object | undefined>();
+
+    const handleEditorOnChange = (value: string | undefined) => {
+        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+
+        if (!placeholder) {
+            return;
+        }
+
+        placeholder.style.display = value ? 'none' : 'block';
+
+        if (value != null) {
+            try {
+                setValue(JSON.parse(value));
+
+                /* eslint-disable @typescript-eslint/no-unused-vars */
+            } catch (e) {
+                // thrown if value is not valid JSON
+            }
+        }
+    };
+
+    const handleEditorOnMount = (editor: IStandaloneCodeEditor) => {
+        const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
+
+        if (!placeholder) {
+            return;
+        }
+
+        placeholder.style.display = value ? 'none' : 'block';
+
+        editor.focus();
+    };
+
+    const handleOpenChange = (open: boolean) => {
+        if (!open) {
+            setValue(sampleOutput);
+            onClose();
+        }
+    };
+
+    useEffect(() => {
+        setValue(sampleOutput !== undefined && Object.keys(sampleOutput).length ? sampleOutput : undefined);
+    }, [sampleOutput]);
 
     return (
-        <Dialog onOpenChange={(open) => !open && onClose()} open={open}>
-            <DialogContent className="max-w-output-tab-sample-data-dialog-width">
+        <Dialog onOpenChange={handleOpenChange} open={open}>
+            <DialogContent className="max-w-max-w-output-tab-sample-data-dialog-width">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>Upload Sample Output Data</DialogTitle>
@@ -50,19 +102,28 @@ const OutputTabSampleDataDialog = ({
                 <div className="min-h-output-tab-sample-data-dialog-height relative mt-4 flex-1">
                     <div className="absolute inset-0">
                         <Editor
+                            className="bg-transparent"
                             defaultLanguage="json"
-                            onChange={(value) => value && setValue(value)}
-                            value={JSON.stringify(sampleOutput, null, 4)}
+                            onChange={handleEditorOnChange}
+                            onMount={handleEditorOnMount}
+                            value={JSON.stringify(value, null, 4)}
                         />
+
+                        <div
+                            className="absolute left-[70px] top-[-2px] h-full text-sm text-muted-foreground"
+                            id="monaco-placeholder"
+                        >
+                            {placeholder}
+                        </div>
                     </div>
                 </div>
 
                 <DialogFooter>
                     <Button
+                        disabled={!value}
                         onClick={() => {
                             if (value) {
-                                onUpload(value);
-                                setValue(JSON.stringify(sampleOutput));
+                                onUpload(value && JSON.stringify(value));
                             }
                         }}
                         type="submit"

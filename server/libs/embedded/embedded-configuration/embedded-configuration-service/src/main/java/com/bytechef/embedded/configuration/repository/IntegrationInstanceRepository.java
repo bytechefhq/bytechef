@@ -38,6 +38,8 @@ public interface IntegrationInstanceRepository
 
     List<IntegrationInstance> findAllByConnectedUserIdAndEnabled(long connectedUserId, boolean enabled);
 
+    List<IntegrationInstance> findAllByIntegrationInstanceConfigurationId(long integrationInstanceConfigurationId);
+
     @Query("""
         SELECT DISTINCT * FROM integration_instance
         JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
@@ -49,4 +51,5 @@ public interface IntegrationInstanceRepository
     Optional<IntegrationInstance> findByWorkflowIdAndEnvironment(
         @Param("connectedUserId") long connectedUserId, @Param("workflowId") String workflowId,
         @Param("environment") int environment);
+
 }

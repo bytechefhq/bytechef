@@ -23,7 +23,6 @@ import com.bytechef.component.azure.openai.action.AzureOpenAIChatAction;
 import com.bytechef.component.azure.openai.action.AzureOpenAICreateImageAction;
 import com.bytechef.component.azure.openai.action.AzureOpenAICreateTranscriptionAction;
 import com.bytechef.component.azure.openai.connection.AzureOpenAIConnection;
-import com.bytechef.component.azure.openai.constant.AzureOpenAIConstants;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -35,12 +34,11 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AzureOpenAIComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component(AzureOpenAIConstants.AZURE_OPENAI)
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("azureOpenai")
         .title("Azure OpenAI")
         .description(
-            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways "
-                +
-                "that benefit humanity as a whole.")
+            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in " +
+                "ways that benefit humanity as a whole.")
         .icon("path:assets/openai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AzureOpenAIConnection.CONNECTION_DEFINITION)

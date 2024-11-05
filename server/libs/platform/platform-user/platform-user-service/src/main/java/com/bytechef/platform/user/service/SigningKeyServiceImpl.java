@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.constant.AppType;
+import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
@@ -108,7 +108,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<SigningKey> getSigningKeys(@NonNull AppType type) {
+    public List<SigningKey> getSigningKeys(@NonNull ModeType type) {
         return signingKeyRepository.findAllByType(type.ordinal());
     }
 

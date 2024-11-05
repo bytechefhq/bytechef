@@ -85,7 +85,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new company",
+    "description" : "Creates a new company.",
     "help" : null,
     "metadata" : {
       "path" : "/v1/companies",
@@ -1852,14 +1852,14 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create a Company",
+    "title" : "Create Company",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new task",
+    "description" : "Creates a new task.",
     "help" : null,
     "metadata" : {
       "path" : "/v1/tasks",
@@ -3042,14 +3042,14 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create a Task",
+    "title" : "Create Task",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Creates a new contact",
+    "description" : "Creates a new contact.",
     "help" : null,
     "metadata" : {
       "path" : "/v1/contacts",
@@ -7617,12 +7617,12 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Create a Contact",
+    "title" : "Create Contact",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : [ ],
   "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "triggers" : [ ]
 }

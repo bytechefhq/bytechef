@@ -29,7 +29,7 @@ import com.bytechef.component.request.util.RequestUtils;
 public class RequestAwaitWorkflowAndRespondTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("awaitWorkflowAndRespond")
-        .title("Await workflow and respond")
+        .title("Await Workflow and Respond")
         .description(
             "You have the flexibility to set up your preferred response. After a workflow request is received, the request trigger enters a waiting state for the workflow's response.")
         .type(TriggerType.STATIC_WEBHOOK)

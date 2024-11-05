@@ -720,7 +720,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Create new folder",
+    "title" : "Create New Folder",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
@@ -1071,7 +1071,7 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Create a new paper file",
+    "title" : "Create New Paper File",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
@@ -1753,7 +1753,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Get file link",
+    "title" : "Get File Link",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
@@ -2156,7 +2156,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "List folder",
+    "title" : "List Folder",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
@@ -4439,12 +4439,12 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Upload file",
+    "title" : "Upload File",
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

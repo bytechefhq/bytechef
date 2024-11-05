@@ -65,7 +65,7 @@ import java.util.Map;
 public class XeroCreateQuoteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createQuote")
-        .title("Create quote")
+        .title("Create Quote")
         .description("Creates a new quote draft.")
         .properties(
             string(CONTACT_ID)

@@ -36,7 +36,6 @@ public class IntegrationInstanceConfigurationMapper {
     public interface IntegrationInstanceConfigurationBasicToIntegrationInstanceModelMapper
         extends Converter<IntegrationInstanceConfiguration, IntegrationInstanceConfigurationBasicModel> {
 
-        @Mapping(target = "lastExecutionDate", ignore = true)
         @Override
         IntegrationInstanceConfigurationBasicModel convert(IntegrationInstanceConfiguration integrationInstance);
     }
@@ -49,7 +48,6 @@ public class IntegrationInstanceConfigurationMapper {
         @Mapping(target = "connectionConnectionParameters", ignore = true)
         @Mapping(target = "integration", ignore = true)
         @Mapping(target = "integrationInstanceConfigurationWorkflows", ignore = true)
-        @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "tags", ignore = true)
         @Override
         IntegrationInstanceConfigurationModel convert(IntegrationInstanceConfiguration integrationInstance);

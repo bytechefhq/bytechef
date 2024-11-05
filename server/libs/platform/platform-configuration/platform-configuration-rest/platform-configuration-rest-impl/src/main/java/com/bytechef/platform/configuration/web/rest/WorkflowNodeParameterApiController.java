@@ -68,8 +68,7 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
 
         return ResponseEntity.ok(
             new GetWorkflowNodeParameterDisplayConditions200ResponseModel()
-                .displayConditions(
-                    workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName)));
+                .displayConditions(workflowNodeParameterFacade.getDisplayConditions(id, workflowNodeName)));
     }
 
     @Override

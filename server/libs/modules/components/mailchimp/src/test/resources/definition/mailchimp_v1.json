@@ -73,8 +73,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : { },
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -85,7 +85,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Add a new member to the list.",
+    "description" : "Adds a new member to the list.",
     "help" : null,
     "metadata" : {
       "path" : "/lists/{listId}/members",
@@ -1381,13 +1381,11 @@
           "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : {
-          "status" : "subscribed",
-          "email_address" : "string",
           "last_note" : {
-            "note" : "string",
             "created_at" : "2019-08-24T14:15:22",
             "note_id" : 0,
-            "created_by" : "string"
+            "created_by" : "string",
+            "note" : "string"
           },
           "contact_id" : "string",
           "stats" : {
@@ -1400,8 +1398,8 @@
             "avg_click_rate" : 0
           },
           "merge_fields" : {
-            "property2" : "",
-            "property1" : ""
+            "property1" : "",
+            "property2" : ""
           },
           "full_name" : "string",
           "list_id" : "string",
@@ -1424,8 +1422,8 @@
           "id" : "string",
           "timestamp_signup" : "2019-08-24T14:15:22",
           "interests" : {
-            "property2" : true,
-            "property1" : true
+            "property1" : true,
+            "property2" : true
           },
           "language" : "string",
           "email_type" : "string",
@@ -1450,8 +1448,82 @@
           },
           "ip_opt" : "string",
           "timestamp_opt" : "2019-08-24T14:15:22",
-          "unsubscribe_reason" : "string"
+          "unsubscribe_reason" : "string",
+          "status" : "subscribed",
+          "email_address" : "string"
         }
+      },
+      "sampleOutput" : {
+        "last_note" : {
+          "created_at" : "2019-08-24T14:15:22",
+          "note_id" : 0,
+          "created_by" : "string",
+          "note" : "string"
+        },
+        "contact_id" : "string",
+        "stats" : {
+          "ecommerce_data" : {
+            "currency_code" : "USD",
+            "number_of_orders" : 0,
+            "total_revenue" : 0
+          },
+          "avg_open_rate" : 0,
+          "avg_click_rate" : 0
+        },
+        "merge_fields" : {
+          "property1" : "",
+          "property2" : ""
+        },
+        "full_name" : "string",
+        "list_id" : "string",
+        "tags_count" : 0,
+        "unique_email_id" : "string",
+        "email_client" : "string",
+        "consents_to_one_to_one_messaging" : true,
+        "source" : "string",
+        "last_changed" : "2019-08-24T14:15:22",
+        "vip" : true,
+        "member_rating" : 0,
+        "web_id" : 0,
+        "_links" : [ {
+          "rel" : "string",
+          "href" : "string",
+          "schema" : "string",
+          "targetSchema" : "string",
+          "method" : "GET"
+        } ],
+        "id" : "string",
+        "timestamp_signup" : "2019-08-24T14:15:22",
+        "interests" : {
+          "property1" : true,
+          "property2" : true
+        },
+        "language" : "string",
+        "email_type" : "string",
+        "marketing_permissions" : [ {
+          "enabled" : true,
+          "marketing_permission_id" : "string",
+          "text" : "string"
+        } ],
+        "tags" : [ {
+          "name" : "string",
+          "id" : 0
+        } ],
+        "ip_signup" : "string",
+        "location" : {
+          "gmtoff" : 0,
+          "country_code" : "string",
+          "timezone" : "string",
+          "dstoff" : 0,
+          "latitude" : 0,
+          "region" : "string",
+          "longitude" : 0
+        },
+        "ip_opt" : "string",
+        "timestamp_opt" : "2019-08-24T14:15:22",
+        "unsubscribe_reason" : "string",
+        "status" : "subscribed",
+        "email_address" : "string"
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -2735,78 +2807,6 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : {
-        "status" : "subscribed",
-        "email_address" : "string",
-        "last_note" : {
-          "note" : "string",
-          "created_at" : "2019-08-24T14:15:22",
-          "note_id" : 0,
-          "created_by" : "string"
-        },
-        "contact_id" : "string",
-        "stats" : {
-          "ecommerce_data" : {
-            "currency_code" : "USD",
-            "number_of_orders" : 0,
-            "total_revenue" : 0
-          },
-          "avg_open_rate" : 0,
-          "avg_click_rate" : 0
-        },
-        "merge_fields" : {
-          "property2" : "",
-          "property1" : ""
-        },
-        "full_name" : "string",
-        "list_id" : "string",
-        "tags_count" : 0,
-        "unique_email_id" : "string",
-        "email_client" : "string",
-        "consents_to_one_to_one_messaging" : true,
-        "source" : "string",
-        "last_changed" : "2019-08-24T14:15:22",
-        "vip" : true,
-        "member_rating" : 0,
-        "web_id" : 0,
-        "_links" : [ {
-          "rel" : "string",
-          "href" : "string",
-          "schema" : "string",
-          "targetSchema" : "string",
-          "method" : "GET"
-        } ],
-        "id" : "string",
-        "timestamp_signup" : "2019-08-24T14:15:22",
-        "interests" : {
-          "property2" : true,
-          "property1" : true
-        },
-        "language" : "string",
-        "email_type" : "string",
-        "marketing_permissions" : [ {
-          "enabled" : true,
-          "marketing_permission_id" : "string",
-          "text" : "string"
-        } ],
-        "tags" : [ {
-          "name" : "string",
-          "id" : 0
-        } ],
-        "ip_signup" : "string",
-        "location" : {
-          "gmtoff" : 0,
-          "country_code" : "string",
-          "timezone" : "string",
-          "dstoff" : 0,
-          "latitude" : 0,
-          "region" : "string",
-          "longitude" : 0
-        },
-        "ip_opt" : "string",
-        "timestamp_opt" : "2019-08-24T14:15:22",
-        "unsubscribe_reason" : "string"
       }
     },
     "properties" : [ {
@@ -3365,11 +3365,13 @@
       "optionsDataSource" : null,
       "controlType" : "OBJECT_BUILDER"
     } ],
-    "title" : "Add a new member to the list",
+    "title" : "Add Member to List",
     "perform" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3679,6 +3681,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3976,8 +3979,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -4015,11 +4017,9 @@
     "webhookValidate" : null,
     "deduplicate" : null,
     "poll" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookValidateOnEnable" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ],
-  "dataStream" : null,
-  "unifiedApi" : null
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
+  } ]
 }

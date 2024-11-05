@@ -40,6 +40,7 @@ import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispa
 import static com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.VALUE_2;
 
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
+import com.bytechef.platform.workflow.task.dispatcher.definition.Property;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants.Operation;
 import org.springframework.stereotype.Component;
@@ -55,10 +56,6 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
         .description("Directs a stream based on true/false results of comparisons.")
         .icon("path:assets/condition.svg")
         .properties(
-            bool(RAW_EXPRESSION)
-                .label("Raw expression")
-                .description("Set condition as raw expression or list of conditions.")
-                .defaultValue(false),
             array(CONDITIONS)
                 .label("Conditions")
                 .placeholder("Or Condition")
@@ -67,242 +64,139 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                 .items(
                     array()
                         .items(
-                            object(BOOLEAN)
-                                .label("Boolean")
+                            object()
                                 .properties(
-                                    bool(VALUE_1)
-                                        .label("Value 1")
-                                        .description(
-                                            "The boolean value to compare with the second one.")
-                                        .defaultValue(false),
-                                    string(OPERATION)
-                                        .label("Operation")
-                                        .description(
-                                            "Compare operation to decide where to map data.")
-                                        .options(
-                                            option("Equals", Operation.EQUALS.name()),
-                                            option("Not Equals", Operation.NOT_EQUALS.name()))
-                                        .defaultValue(Operation.EQUALS.name()),
-                                    bool(VALUE_2)
-                                        .label("Value 2")
-                                        .description(
-                                            "The boolean value to compare with the first one.")
-                                        .defaultValue(false)),
-                            object(DATE_TIME)
-                                .label("Date & Time")
+                                    object(BOOLEAN)
+                                        .label("Boolean Expression")
+                                        .properties(
+                                            bool(VALUE_1)
+                                                .label("Value 1")
+                                                .description(
+                                                    "The boolean value to compare with the second one.")
+                                                .defaultValue(false),
+                                            string(OPERATION)
+                                                .label("Operation")
+                                                .description(
+                                                    "Compare operation to decide where to map data.")
+                                                .options(
+                                                    option("Equals", Operation.EQUALS.name()),
+                                                    option("Not Equals", Operation.NOT_EQUALS.name()))
+                                                .defaultValue(Operation.EQUALS.name()),
+                                            bool(VALUE_2)
+                                                .label("Value 2")
+                                                .description(
+                                                    "The boolean value to compare with the first one.")
+                                                .defaultValue(false))),
+                            object()
                                 .properties(
-                                    dateTime(VALUE_1)
-                                        .label("Value 1")
-                                        .description(
-                                            "The date & time value to compare with the second one.")
-                                        .defaultValue(null),
-                                    string(OPERATION)
-                                        .label("Operation")
-                                        .description(
-                                            "Compare operation to decide where to map data.")
-                                        .options(
-                                            option("After", Operation.AFTER.name()),
-                                            option("Before", Operation.BEFORE.name()))
-                                        .defaultValue(Operation.AFTER.name()),
-                                    dateTime(VALUE_2)
-                                        .label("Value 2")
-                                        .description(
-                                            "The date & time value to compare with the first one.")
-                                        .defaultValue(null)),
-                            object(NUMBER)
-                                .label("Number")
+                                    object(DATE_TIME)
+                                        .label("Date & Time Expression")
+                                        .properties(
+                                            dateTime(VALUE_1)
+                                                .label("Value 1")
+                                                .description(
+                                                    "The date & time value to compare with the second one.")
+                                                .defaultValue(null),
+                                            string(OPERATION)
+                                                .label("Operation")
+                                                .description(
+                                                    "Compare operation to decide where to map data.")
+                                                .options(
+                                                    option("After", Operation.AFTER.name()),
+                                                    option("Before", Operation.BEFORE.name()))
+                                                .defaultValue(Operation.AFTER.name()),
+                                            dateTime(VALUE_2)
+                                                .label("Value 2")
+                                                .description(
+                                                    "The date & time value to compare with the first one.")
+                                                .defaultValue(null))),
+                            object()
                                 .properties(
-                                    number(VALUE_1)
-                                        .label("Value 1")
-                                        .description(
-                                            "The number value to compare with the second one.")
-                                        .defaultValue(0),
-                                    string(OPERATION)
-                                        .label("Operation")
-                                        .description(
-                                            "Compare operation to decide where to map data.")
-                                        .options(
-                                            option("Less", Operation.LESS.name()),
-                                            option(
-                                                "Less or Equals",
-                                                Operation.LESS_EQUALS.name()),
-                                            option("Equals", Operation.EQUALS.name()),
-                                            option("Not Equals", Operation.NOT_EQUALS.name()),
-                                            option("Greater", Operation.GREATER.name()),
-                                            option(
-                                                "Greater or Equals",
-                                                Operation.GREATER_EQUALS.name()),
-                                            option("Empty", Operation.EMPTY.name()))
-                                        .defaultValue(Operation.LESS.name()),
-                                    number(VALUE_2)
-                                        .label("Value 2")
-                                        .description(
-                                            "The number value to compare with the first one.")
-                                        .defaultValue(0)
-                                        .displayCondition("%s != '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
-                            object(STRING)
-                                .label("String")
+                                    object(NUMBER)
+                                        .label("Number Expression")
+                                        .properties(
+                                            number(VALUE_1)
+                                                .label("Value 1")
+                                                .description(
+                                                    "The number value to compare with the second one.")
+                                                .defaultValue(0),
+                                            string(OPERATION)
+                                                .label("Operation")
+                                                .description(
+                                                    "Compare operation to decide where to map data.")
+                                                .options(
+                                                    option("Less", Operation.LESS.name()),
+                                                    option(
+                                                        "Less or Equals",
+                                                        Operation.LESS_EQUALS.name()),
+                                                    option("Equals", Operation.EQUALS.name()),
+                                                    option("Not Equals", Operation.NOT_EQUALS.name()),
+                                                    option("Greater", Operation.GREATER.name()),
+                                                    option(
+                                                        "Greater or Equals",
+                                                        Operation.GREATER_EQUALS.name()),
+                                                    option("Empty", Operation.EMPTY.name()))
+                                                .defaultValue(Operation.LESS.name()),
+                                            number(VALUE_2)
+                                                .label("Value 2")
+                                                .description(
+                                                    "The number value to compare with the first one.")
+                                                .defaultValue(0)
+                                                .displayCondition(
+                                                    "%s != '%s'".formatted(OPERATION, Operation.EMPTY.name())))),
+                            object()
                                 .properties(
-                                    string(VALUE_1)
-                                        .label("Value 1")
-                                        .description(
-                                            "The string value to compare with the second one.")
-                                        .defaultValue(""),
-                                    string(OPERATION)
-                                        .label("Operation")
-                                        .description(
-                                            "Compare operation to decide where to map data.")
-                                        .options(
-                                            option("Equals", Operation.EQUALS.name()),
-                                            option("Not Equals", Operation.NOT_EQUALS.name()),
-                                            option("Contains", Operation.CONTAINS.name()),
-                                            option(
-                                                "Not Contains",
-                                                Operation.NOT_CONTAINS.name()),
-                                            option("Starts With", Operation.STARTS_WITH.name()),
-                                            option("Ends With", Operation.ENDS_WITH.name()),
-                                            option("Regex", Operation.REGEX.name()),
-                                            option("Empty", Operation.EMPTY.name()))
-                                        .defaultValue(Operation.EQUALS.name()),
-                                    string(VALUE_2)
-                                        .label("Value 2")
-                                        .description(
-                                            "The string value to compare with the first one.")
-                                        .defaultValue("")
-                                        .displayCondition("!{'%s','%s'}.contains('%s')".formatted(
-                                            Operation.EMPTY.name(),
-                                            Operation.REGEX.name(),
-                                            OPERATION)),
-                                    string(VALUE_2)
-                                        .label("Regex")
-                                        .description(
-                                            "The regex value to compare with the first one.")
-                                        .placeholder("/text/i")
-                                        .defaultValue("")
-                                        .displayCondition("%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))
-                                .placeholder("And conditions"))),
-            array(CONDITIONS)
-                .label("Conditions")
-                .placeholder("Add Condition")
-                .description("The type of values to compare.")
-                .displayCondition("%s == false".formatted(RAW_EXPRESSION))
-                .items(
-                    object(BOOLEAN)
-                        .label("Boolean")
-                        .properties(
-                            bool(VALUE_1)
-                                .label("Value 1")
-                                .description(
-                                    "The boolean value to compare with the second one.")
-                                .defaultValue(false),
-                            string(OPERATION)
-                                .label("Operation")
-                                .description(
-                                    "Compare operation to decide where to map data.")
-                                .options(
-                                    option("Equals", Operation.EQUALS.name()),
-                                    option("Not Equals", Operation.NOT_EQUALS.name()))
-                                .defaultValue(Operation.EQUALS.name()),
-                            bool(VALUE_2)
-                                .label("Value 2")
-                                .description(
-                                    "The boolean value to compare with the first one.")
-                                .defaultValue(false)),
-                    object(DATE_TIME)
-                        .label("Date & Time")
-                        .properties(
-                            dateTime(VALUE_1)
-                                .label("Value 1")
-                                .description(
-                                    "The date & time value to compare with the second one.")
-                                .defaultValue(null),
-                            string(OPERATION)
-                                .label("Operation")
-                                .description(
-                                    "Compare operation to decide where to map data.")
-                                .options(
-                                    option("After", Operation.AFTER.name()),
-                                    option("Before", Operation.BEFORE.name()))
-                                .defaultValue(Operation.AFTER.name()),
-                            dateTime(VALUE_2)
-                                .label("Value 2")
-                                .description(
-                                    "The date & time value to compare with the first one.")
-                                .defaultValue(null)),
-                    object(NUMBER)
-                        .label("Number")
-                        .properties(
-                            number(VALUE_1)
-                                .label("Value 1")
-                                .description(
-                                    "The number value to compare with the second one.")
-                                .defaultValue(0),
-                            string(OPERATION)
-                                .label("Operation")
-                                .description(
-                                    "Compare operation to decide where to map data.")
-                                .options(
-                                    option("Less", Operation.LESS.name()),
-                                    option(
-                                        "Less or Equals",
-                                        Operation.LESS_EQUALS.name()),
-                                    option("Equals", Operation.EQUALS.name()),
-                                    option("Not Equals", Operation.NOT_EQUALS.name()),
-                                    option("Greater", Operation.GREATER.name()),
-                                    option(
-                                        "Greater or Equals",
-                                        Operation.GREATER_EQUALS.name()),
-                                    option("Empty", Operation.EMPTY.name()))
-                                .defaultValue(Operation.LESS.name()),
-                            number(VALUE_2)
-                                .label("Value 2")
-                                .description(
-                                    "The number value to compare with the first one.")
-                                .defaultValue(0)
-                                .displayCondition("%s != '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
-                    object(STRING)
-                        .label("String")
-                        .properties(
-                            string(VALUE_1)
-                                .label("Value 1")
-                                .description(
-                                    "The string value to compare with the second one.")
-                                .defaultValue(""),
-                            string(OPERATION)
-                                .label("Operation")
-                                .description(
-                                    "Compare operation to decide where to map data.")
-                                .options(
-                                    option("Equals", Operation.EQUALS.name()),
-                                    option("Not Equals", Operation.NOT_EQUALS.name()),
-                                    option("Contains", Operation.CONTAINS.name()),
-                                    option(
-                                        "Not Contains",
-                                        Operation.NOT_CONTAINS.name()),
-                                    option("Starts With", Operation.STARTS_WITH.name()),
-                                    option("Ends With", Operation.ENDS_WITH.name()),
-                                    option("Regex", Operation.REGEX.name()),
-                                    option("Empty", Operation.EMPTY.name()))
-                                .defaultValue(Operation.EQUALS.name()),
-                            string(VALUE_2)
-                                .label("Value 2")
-                                .description(
-                                    "The string value to compare with the first one.")
-                                .defaultValue("")
-                                .displayCondition("!{'%s','%s'}.contains('%s')".formatted(
-                                    Operation.EMPTY.name(),
-                                    Operation.REGEX.name(),
-                                    OPERATION)),
-                            string(VALUE_2)
-                                .label("Regex")
-                                .description(
-                                    "The regex value to compare with the first one.")
-                                .placeholder("/text/i")
-                                .defaultValue("")
-                                .displayCondition("%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))),
+                                    object(STRING)
+                                        .label("String Expression")
+                                        .properties(
+                                            string(VALUE_1)
+                                                .label("Value 1")
+                                                .description(
+                                                    "The string value to compare with the second one.")
+                                                .defaultValue(""),
+                                            string(OPERATION)
+                                                .label("Operation")
+                                                .description(
+                                                    "Compare operation to decide where to map data.")
+                                                .options(
+                                                    option("Equals", Operation.EQUALS.name()),
+                                                    option("Not Equals", Operation.NOT_EQUALS.name()),
+                                                    option("Contains", Operation.CONTAINS.name()),
+                                                    option(
+                                                        "Not Contains",
+                                                        Operation.NOT_CONTAINS.name()),
+                                                    option("Starts With", Operation.STARTS_WITH.name()),
+                                                    option("Ends With", Operation.ENDS_WITH.name()),
+                                                    option("Regex", Operation.REGEX.name()),
+                                                    option("Empty", Operation.EMPTY.name()))
+                                                .defaultValue(Operation.EQUALS.name()),
+                                            string(VALUE_2)
+                                                .label("Value 2")
+                                                .description(
+                                                    "The string value to compare with the first one.")
+                                                .defaultValue("")
+                                                .displayCondition("!{'%s','%s'}.contains('%s')".formatted(
+                                                    Operation.EMPTY.name(),
+                                                    Operation.REGEX.name(),
+                                                    OPERATION)),
+                                            string(VALUE_2)
+                                                .label("Regex")
+                                                .description(
+                                                    "The regex value to compare with the first one.")
+                                                .placeholder("/text/i")
+                                                .defaultValue("")
+                                                .displayCondition(
+                                                    "%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))
+                                        .placeholder("And conditions")))),
+            bool(RAW_EXPRESSION)
+                .label("Raw expression")
+                .description("Set condition as raw expression or list of conditions.")
+                .defaultValue(false),
             string(EXPRESSION)
                 .label("Expression")
-                .description("The raw expression."))
+                .description("The raw expression.")
+                .controlType(Property.ControlType.TEXT_AREA)
+                .displayCondition("%s == true".formatted(RAW_EXPRESSION)))
         .taskProperties(
             array(CASE_TRUE)
                 .description(

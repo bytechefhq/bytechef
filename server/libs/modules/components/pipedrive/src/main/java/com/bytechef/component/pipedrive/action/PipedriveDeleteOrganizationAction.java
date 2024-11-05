@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class PipedriveDeleteOrganizationAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteOrganization")
-        .title("Delete an organization")
+        .title("Delete Organization")
         .description("Marks an organization as deleted. After 30 days, the organization will be permanently deleted.")
         .metadata(
             Map.of(

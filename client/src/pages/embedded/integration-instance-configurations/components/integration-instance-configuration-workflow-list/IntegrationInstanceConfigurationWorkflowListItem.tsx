@@ -1,6 +1,5 @@
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useToast} from '@/hooks/use-toast';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
@@ -9,7 +8,6 @@ import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configurati
 import {useEnableIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
 import {IntegrationInstanceConfigurationKeys} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -42,10 +40,6 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
     const {setIntegrationInstanceConfigurationWorkflowSheetOpen, setWorkflowId} =
         useIntegrationInstanceConfigurationWorkflowSheetStore();
 
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_, copyToClipboard] = useCopyToClipboard();
-    const {toast} = useToast();
-
     const queryClient = useQueryClient();
 
     const enableIntegrationInstanceConfigurationWorkflowMutation =
@@ -75,47 +69,49 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
         );
     };
 
-    const handleWorkflowLabelClick = () => {
+    const handleWorkflowClick = () => {
         setWorkflowId(workflow.id!);
         setIntegrationInstanceConfigurationWorkflowSheetOpen(true);
     };
 
     return (
         <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50" key={workflow.id}>
-            <div
-                className={twMerge(
-                    'w-80 text-sm font-semibold',
-                    !integrationInstanceConfigurationWorkflow.enabled && 'text-muted-foreground'
-                )}
-            >
-                <button onClick={handleWorkflowLabelClick}>{workflow.label}</button>
-            </div>
+            <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
+                <div
+                    className={twMerge(
+                        'w-80 text-sm font-semibold',
+                        !integrationInstanceConfigurationWorkflow.enabled && 'text-muted-foreground'
+                    )}
+                >
+                    {workflow.label}
+                </div>
 
-            <div className="ml-6 flex">
-                {filteredComponentNames?.map((name) => {
-                    const componentDefinition = workflowComponentDefinitions[name];
-                    const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
+                <div className="ml-6 flex space-x-1">
+                    {filteredComponentNames?.map((name) => {
+                        const componentDefinition = workflowComponentDefinitions[name];
+                        const taskDispatcherDefinition = workflowTaskDispatcherDefinitions[name];
 
-                    return (
-                        <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                    <InlineSVG
-                                        className="size-5 flex-none"
-                                        key={name}
-                                        src={
-                                            componentDefinition?.icon
-                                                ? componentDefinition?.icon
-                                                : (taskDispatcherDefinition?.icon ?? '')
-                                        }
-                                    />
-                                </TooltipTrigger>
+                        return (
+                            <div className="mr-0.5 flex items-center justify-center rounded-full border p-1" key={name}>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                        <InlineSVG
+                                            className="size-5 flex-none"
+                                            key={name}
+                                            src={
+                                                componentDefinition?.icon
+                                                    ? componentDefinition?.icon
+                                                    : (taskDispatcherDefinition?.icon ?? '')
+                                            }
+                                        />
+                                    </TooltipTrigger>
 
-                                <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
-                            </Tooltip>
-                        </div>
-                    );
-                })}
+                                    <TooltipContent side="top">{componentDefinition?.title}</TooltipContent>
+                                </Tooltip>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
 
             <div className="flex items-center justify-end gap-x-6">

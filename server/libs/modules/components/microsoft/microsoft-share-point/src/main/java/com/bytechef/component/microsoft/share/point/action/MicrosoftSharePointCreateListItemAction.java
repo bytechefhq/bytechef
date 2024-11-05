@@ -45,7 +45,7 @@ import java.util.Map;
 public class MicrosoftSharePointCreateListItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createListItem")
-        .title("Create list item")
+        .title("Create List Item")
         .description("Creates a new item in a list.")
         .properties(
             SITE_ID_PROPERTY,

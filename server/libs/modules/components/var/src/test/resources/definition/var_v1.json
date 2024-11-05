@@ -471,10 +471,10 @@
       "optionsDataSource" : null,
       "controlType" : "TIME"
     } ],
-    "title" : "Set value",
+    "title" : "Set Value",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,

@@ -28,27 +28,28 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 class VTigerCreateContactActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor =
-        ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final Map<String, Object> elementMap = Map.of(FIRSTNAME, "John", LASTNAME, "Doe", EMAIL, "john@mail.com");
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(elementMap);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -57,41 +58,16 @@ class VTigerCreateContactActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(mockedObject);
 
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
+        Object result = VTigerCreateContactAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        when(mockedParameters.getString("elementType"))
-            .thenReturn((String) propertyStubsMap.get("elementType"));
-        when(mockedParameters.getRequired("element"))
-            .thenReturn(propertyStubsMap.get("element"));
-        when(mockedParameters.getRequiredString(FIRSTNAME))
-            .thenReturn((String) propertyStubsMap.get(FIRSTNAME));
-        when(mockedParameters.getRequiredString(LASTNAME))
-            .thenReturn((String) propertyStubsMap.get(LASTNAME));
-        when(mockedParameters.getRequiredString(EMAIL))
-            .thenReturn((String) propertyStubsMap.get(EMAIL));
-
-        Object result = VTigerCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
-
-        assertEquals(responseMap, result);
+        assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
+        Map<String, Object> bodyMap = Map.of("elementType", "Contacts", "element", elementMap);
 
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new LinkedHashMap<>();
-        Map<String, String> bodyMap = new LinkedHashMap<>();
-
-        bodyMap.put(FIRSTNAME, null);
-        bodyMap.put(LASTNAME, null);
-        bodyMap.put(EMAIL, null);
-
-        propertyStubsMap.put("elementType", "Contacts");
-        propertyStubsMap.put("element", bodyMap);
-
-        return propertyStubsMap;
+        assertEquals(bodyMap, body.getContent());
     }
 }

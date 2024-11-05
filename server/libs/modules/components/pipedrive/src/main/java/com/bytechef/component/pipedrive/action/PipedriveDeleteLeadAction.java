@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class PipedriveDeleteLeadAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("deleteLead")
-        .title("Delete lead")
+        .title("Delete Lead")
         .description("Deletes a specific lead.")
         .metadata(
             Map.of(

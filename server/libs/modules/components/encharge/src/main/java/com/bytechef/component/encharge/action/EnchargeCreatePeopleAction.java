@@ -35,7 +35,7 @@ import java.util.Map;
  */
 public class EnchargeCreatePeopleAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createPeople")
-        .title("Create people")
+        .title("Create People")
         .description("Creates new People")
         .metadata(
             Map.of(

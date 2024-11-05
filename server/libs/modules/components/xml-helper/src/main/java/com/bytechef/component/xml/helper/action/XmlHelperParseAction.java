@@ -33,7 +33,7 @@ import com.bytechef.component.definition.Parameters;
 public class XmlHelperParseAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(PARSE)
-        .title("Convert from XML string")
+        .title("Convert from XML String")
         .description("Converts the XML string to object/array.")
         .properties(
             string(SOURCE)
