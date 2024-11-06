@@ -40,7 +40,7 @@
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
+    "controlType" : "ARRAY_BUILDER"
   } ],
   "title" : "Parallel",
   "version" : 1,

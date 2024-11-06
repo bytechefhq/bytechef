@@ -6,8 +6,32 @@
   "outputDefinition" : null,
   "properties" : [ {
     "advancedOption" : null,
-    "displayCondition" : "rawExpression == false",
+    "displayCondition" : null,
     "expressionEnabled" : null,
+    "hidden" : null,
+    "metadata" : { },
+    "required" : null,
+    "name" : "rawExpression",
+    "type" : "BOOLEAN",
+    "defaultValue" : false,
+    "description" : "Set condition as raw expression or list of conditions.",
+    "exampleValue" : null,
+    "label" : "Raw expression",
+    "placeholder" : null,
+    "options" : [ {
+      "description" : null,
+      "label" : "True",
+      "value" : true
+    }, {
+      "description" : null,
+      "label" : "False",
+      "value" : true
+    } ],
+    "controlType" : "SELECT"
+  }, {
+    "advancedOption" : null,
+    "displayCondition" : "rawExpression == false",
+    "expressionEnabled" : false,
     "hidden" : null,
     "metadata" : { },
     "required" : null,
@@ -21,7 +45,7 @@
     "items" : [ {
       "advancedOption" : null,
       "displayCondition" : null,
-      "expressionEnabled" : null,
+      "expressionEnabled" : false,
       "hidden" : null,
       "metadata" : { },
       "required" : null,
@@ -30,12 +54,12 @@
       "defaultValue" : null,
       "description" : null,
       "exampleValue" : null,
-      "label" : null,
+      "label" : "And conditions",
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
         "displayCondition" : null,
-        "expressionEnabled" : null,
+        "expressionEnabled" : false,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
@@ -44,7 +68,7 @@
         "defaultValue" : null,
         "description" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Boolean Expression",
         "placeholder" : null,
         "options" : null,
         "additionalProperties" : null,
@@ -52,7 +76,7 @@
         "properties" : [ {
           "advancedOption" : null,
           "displayCondition" : null,
-          "expressionEnabled" : null,
+          "expressionEnabled" : false,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
@@ -147,7 +171,7 @@
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
-        "expressionEnabled" : null,
+        "expressionEnabled" : false,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
@@ -156,7 +180,7 @@
         "defaultValue" : null,
         "description" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Date & Time Expression",
         "placeholder" : null,
         "options" : null,
         "additionalProperties" : null,
@@ -164,7 +188,7 @@
         "properties" : [ {
           "advancedOption" : null,
           "displayCondition" : null,
-          "expressionEnabled" : null,
+          "expressionEnabled" : false,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
@@ -243,7 +267,7 @@
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
-        "expressionEnabled" : null,
+        "expressionEnabled" : false,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
@@ -252,7 +276,7 @@
         "defaultValue" : null,
         "description" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Number Expression",
         "placeholder" : null,
         "options" : null,
         "additionalProperties" : null,
@@ -260,7 +284,7 @@
         "properties" : [ {
           "advancedOption" : null,
           "displayCondition" : null,
-          "expressionEnabled" : null,
+          "expressionEnabled" : false,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
@@ -369,7 +393,7 @@
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
-        "expressionEnabled" : null,
+        "expressionEnabled" : false,
         "hidden" : null,
         "metadata" : { },
         "required" : null,
@@ -378,7 +402,7 @@
         "defaultValue" : null,
         "description" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "String Expression",
         "placeholder" : null,
         "options" : null,
         "additionalProperties" : null,
@@ -386,7 +410,7 @@
         "properties" : [ {
           "advancedOption" : null,
           "displayCondition" : null,
-          "expressionEnabled" : null,
+          "expressionEnabled" : false,
           "hidden" : null,
           "metadata" : { },
           "required" : null,
@@ -396,7 +420,7 @@
           "description" : null,
           "exampleValue" : null,
           "label" : "String Expression",
-          "placeholder" : "And conditions",
+          "placeholder" : null,
           "options" : null,
           "additionalProperties" : null,
           "multipleValues" : null,
@@ -513,37 +537,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "MULTI_SELECT"
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "maxItems" : null,
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
-  }, {
-    "advancedOption" : null,
-    "displayCondition" : null,
-    "expressionEnabled" : null,
-    "hidden" : null,
-    "metadata" : { },
-    "required" : null,
-    "name" : "rawExpression",
-    "type" : "BOOLEAN",
-    "defaultValue" : false,
-    "description" : "Set condition as raw expression or list of conditions.",
-    "exampleValue" : null,
-    "label" : "Raw expression",
-    "placeholder" : null,
-    "options" : [ {
-      "description" : null,
-      "label" : "True",
-      "value" : true
-    }, {
-      "description" : null,
-      "label" : "False",
-      "value" : true
-    } ],
-    "controlType" : "SELECT"
+    "controlType" : "ARRAY_BUILDER"
   }, {
     "advancedOption" : null,
     "displayCondition" : "rawExpression == true",
@@ -598,7 +598,7 @@
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
+    "controlType" : "ARRAY_BUILDER"
   }, {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -633,7 +633,7 @@
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
+    "controlType" : "ARRAY_BUILDER"
   } ],
   "title" : "Condition",
   "version" : 1,
