@@ -205,7 +205,6 @@ const ConnectedUsers = () => {
             }
             header={
                 <Header
-                    centerTitle={true}
                     position="main"
                     title={
                         <ConnectedUsersFilterTitle
