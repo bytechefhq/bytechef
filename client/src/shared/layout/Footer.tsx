@@ -2,18 +2,19 @@ import {PropsWithChildren, ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface FooterProps {
-    leftSidebar?: boolean;
+    centerTitle?: boolean;
+    className?: string;
     position?: 'main' | 'sidebar';
     right?: ReactNode;
 }
 
-const Footer = ({children, leftSidebar = false, position = 'sidebar', right}: PropsWithChildren<FooterProps>) => (
-    <footer className={twMerge('p-4', position === 'main' ? 'flex w-full place-self-center 2xl:w-4/5' : '')}>
+const Footer = ({centerTitle, children, className, position = 'sidebar', right}: PropsWithChildren<FooterProps>) => (
+    <footer className={twMerge('p-4', centerTitle ? '2xl:mx-auto 2xl:w-4/5' : '3xl:w-4/5', className)}>
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(
                     'flex h-footer-height w-full items-center text-lg tracking-tight',
-                    leftSidebar && 'font-semibold'
+                    position === 'sidebar' ? 'font-semibold' : ''
                 )}
             >
                 {children}
