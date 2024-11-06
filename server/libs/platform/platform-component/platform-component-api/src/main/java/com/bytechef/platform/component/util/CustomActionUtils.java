@@ -40,8 +40,10 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import java.util.List;
 import java.util.Map;
 
@@ -59,6 +61,8 @@ public class CustomActionUtils {
     private static final String METHOD = "method";
     private static final String QUERY_PARAMETERS = "queryParameters";
     private static final String PATH = "path";
+    public static final String RESPONSE_FILENAME = "responseFilename";
+    public static final String RESPONSE_FORMAT = "responseType";
 
     public static ActionDefinition getCustomActionDefinition(ComponentDefinition componentDefinition) {
         ModifiableActionDefinition customActionDefinition = ComponentDsl.action(CUSTOM_ACTION)
@@ -123,9 +127,11 @@ public class CustomActionUtils {
                     .options(
                         option("None", ""),
                         option("JSON", Http.BodyContentType.JSON.name()),
+                        option("XML", BodyContentType.XML.name()),
                         option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
                         option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
-                        option("Raw", Http.BodyContentType.RAW.name()))
+                        option("Raw", Http.BodyContentType.RAW.name()),
+                        option("Binary", Http.BodyContentType.BINARY.name()))
                     .defaultValue(""),
 
                 object(BODY_CONTENT)
@@ -160,14 +166,40 @@ public class CustomActionUtils {
                 string(BODY_CONTENT)
                     .label("Body Content - Raw")
                     .description("The raw text to send.")
-                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.RAW.name())),
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.RAW.name()))
+                    .controlType(Property.ControlType.TEXT_AREA),
 
                 string(BODY_CONTENT_MIME_TYPE)
                     .label("Content Type")
                     .description("Mime-Type to use when sending raw body content.")
-                    .displayCondition("'%s' == '%s'".formatted(Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
+                    .displayCondition(
+                        "'%s' == %s or '%s' == %s".formatted(
+                            Http.BodyContentType.BINARY.name(), BODY_CONTENT_TYPE,
+                            Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
-                    .placeholder("text/plain"))
+                    .placeholder("text/plain"),
+
+                string(RESPONSE_FORMAT)
+                    .label("Response Format")
+                    .description("The format in which the data gets returned from the URL.")
+                    .options(
+                        option(
+                            "JSON",
+                            Http.ResponseType.JSON.name(),
+                            "The response is automatically converted to object/array."),
+                        option(
+                            "XML",
+                            Http.ResponseType.XML.name(),
+                            "The response is automatically converted to object/array."),
+                        option("Text", Http.ResponseType.TEXT.name(), "The response is returned as a text."),
+                        option(
+                            "File", Http.ResponseType.BINARY.name(),
+                            "The response is returned as a file object."))
+                    .defaultValue(Http.ResponseType.JSON.name()),
+                string(RESPONSE_FILENAME)
+                    .label("Response Filename")
+                    .description("The name of the file if the response is returned as a file object.")
+                    .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, Http.ResponseType.BINARY.name())))
             .output()
             .perform(CustomActionUtils::perform);
 
@@ -190,11 +222,14 @@ public class CustomActionUtils {
             http -> http.exchange(
                 MapUtils.getRequiredString(inputParameters, PATH),
                 MapUtils.getRequired(inputParameters, METHOD, RequestMethod.class)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body(getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
+            .configuration(
+                Http.responseType(Http.ResponseType.JSON)
+                    .responseType(getResponseType(inputParameters))
+                    .filename(inputParameters.getString(RESPONSE_FILENAME)))
             .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
             .queryParameters(
                 MapUtils.toMap(queryParameters, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
+            .body(getBody(MapUtils.get(inputParameters, BODY_CONTENT_TYPE, BodyContentType.class), inputParameters))
             .execute();
     }
 
@@ -202,13 +237,30 @@ public class CustomActionUtils {
         Body body = null;
 
         if (bodyContentType != null) {
-            if (bodyContentType == Http.BodyContentType.RAW) {
-                body = Http.Body.of(MapUtils.getRequiredString(inputParameters, BODY_CONTENT));
-            } else {
-                Http.Body.of(MapUtils.getRequiredMap(inputParameters, BODY_CONTENT));
+            if (bodyContentType == Http.BodyContentType.BINARY) {
+                body = Http.Body.of(
+                    MapUtils.getRequired(inputParameters, BODY_CONTENT, FileEntry.class),
+                    MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE));
+            } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
+                body = Http.Body.of(
+                    MapUtils.getMap(inputParameters, BODY_CONTENT, List.of(FileEntry.class), Map.of()),
+                    bodyContentType);
+            } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
+                body = Http.Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
+                body = Http.Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == Http.BodyContentType.RAW) {
+                body = Http.Body.of(
+                    MapUtils.getString(inputParameters, BODY_CONTENT),
+                    MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE, "text/plain"));
             }
         }
 
         return body;
+    }
+
+    private static Http.ResponseType getResponseType(Parameters inputParameters) {
+        return inputParameters.containsKey(RESPONSE_FORMAT)
+            ? Http.ResponseType.valueOf(inputParameters.getString(RESPONSE_FORMAT)) : Http.ResponseType.JSON;
     }
 }

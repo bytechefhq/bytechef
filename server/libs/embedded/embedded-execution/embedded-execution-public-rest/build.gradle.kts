@@ -8,6 +8,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
         mapOf(
             "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
+            "useEnumCaseInsensitive" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
         )
@@ -61,6 +62,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:embedded:embedded-execution:embedded-execution-api"))

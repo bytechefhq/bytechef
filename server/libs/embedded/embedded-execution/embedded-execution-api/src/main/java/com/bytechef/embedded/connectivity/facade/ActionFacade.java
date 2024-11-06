@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.connectivity.facade;
 
+import com.bytechef.platform.constant.Environment;
 import java.util.Map;
 
 /**
@@ -25,5 +26,5 @@ public interface ActionFacade {
 
     Object executeAction(
         String componentName, Integer componentVersion, String actionName, Long connectionId,
-        Map<String, Object> input);
+        Map<String, Object> input, Environment environment);
 }
