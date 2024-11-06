@@ -56,18 +56,28 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
         .description("Directs a stream based on true/false results of comparisons.")
         .icon("path:assets/condition.svg")
         .properties(
+            bool(RAW_EXPRESSION)
+                .label("Raw expression")
+                .description("Set condition as raw expression or list of conditions.")
+                .defaultValue(false),
             array(CONDITIONS)
                 .label("Conditions")
                 .placeholder("Or Condition")
                 .description("The type of values to compare.")
+                .expressionEnabled(false)
                 .displayCondition("%s == false".formatted(RAW_EXPRESSION))
                 .items(
                     array()
+                        .label("And conditions")
+                        .expressionEnabled(false)
                         .items(
                             object()
+                                .label("Boolean Expression")
+                                .expressionEnabled(false)
                                 .properties(
                                     object(BOOLEAN)
                                         .label("Boolean Expression")
+                                        .expressionEnabled(false)
                                         .properties(
                                             bool(VALUE_1)
                                                 .label("Value 1")
@@ -88,9 +98,12 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                                     "The boolean value to compare with the first one.")
                                                 .defaultValue(false))),
                             object()
+                                .label("Date & Time Expression")
+                                .expressionEnabled(false)
                                 .properties(
                                     object(DATE_TIME)
                                         .label("Date & Time Expression")
+                                        .expressionEnabled(false)
                                         .properties(
                                             dateTime(VALUE_1)
                                                 .label("Value 1")
@@ -111,9 +124,12 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                                     "The date & time value to compare with the first one.")
                                                 .defaultValue(null))),
                             object()
+                                .label("Number Expression")
+                                .expressionEnabled(false)
                                 .properties(
                                     object(NUMBER)
                                         .label("Number Expression")
+                                        .expressionEnabled(false)
                                         .properties(
                                             number(VALUE_1)
                                                 .label("Value 1")
@@ -145,9 +161,12 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                                 .displayCondition(
                                                     "%s != '%s'".formatted(OPERATION, Operation.EMPTY.name())))),
                             object()
+                                .label("String Expression")
+                                .expressionEnabled(false)
                                 .properties(
                                     object(STRING)
                                         .label("String Expression")
+                                        .expressionEnabled(false)
                                         .properties(
                                             string(VALUE_1)
                                                 .label("Value 1")
@@ -186,12 +205,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                                 .placeholder("/text/i")
                                                 .defaultValue("")
                                                 .displayCondition(
-                                                    "%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))
-                                        .placeholder("And conditions")))),
-            bool(RAW_EXPRESSION)
-                .label("Raw expression")
-                .description("Set condition as raw expression or list of conditions.")
-                .defaultValue(false),
+                                                    "%s == '%s'".formatted(OPERATION, Operation.REGEX.name())))))),
             string(EXPRESSION)
                 .label("Expression")
                 .description("The raw expression.")
