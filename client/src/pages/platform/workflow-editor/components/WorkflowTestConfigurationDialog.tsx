@@ -214,7 +214,10 @@ const WorkflowTestConfigurationDialog = ({
 
     return (
         <Dialog onOpenChange={onClose} open={true}>
-            <DialogContent className="max-w-[600px]" onInteractOutside={(event) => event.preventDefault()}>
+            <DialogContent
+                className="max-w-workflow-test-configuration-dialog-width"
+                onInteractOutside={(event) => event.preventDefault()}
+            >
                 <Form {...form}>
                     <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
                         <DialogHeader>
@@ -226,7 +229,7 @@ const WorkflowTestConfigurationDialog = ({
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div className="max-h-[700px] overflow-y-auto">
+                        <div className="max-h-workflow-test-configuration-dialog-height overflow-y-auto">
                             <div className="space-y-4 py-4">
                                 {inputs && inputs.length > 0 && (
                                     <div className="space-y-2">

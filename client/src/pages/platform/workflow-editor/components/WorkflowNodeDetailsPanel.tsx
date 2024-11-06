@@ -445,7 +445,7 @@ const WorkflowNodeDetailsPanel = ({
 
     return (
         <div
-            className="absolute inset-y-4 right-4 z-10 w-screen max-w-[460px] overflow-hidden rounded-xl border border-muted bg-white shadow-lg"
+            className="absolute inset-y-4 right-4 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-xl border border-muted bg-white shadow-lg"
             key={currentNode?.name}
         >
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">

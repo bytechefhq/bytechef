@@ -112,7 +112,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="min-w-[550px]">
+            <DialogContent className="min-w-api-key-dialog-width">
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiKey)}>
                         <DialogHeader>

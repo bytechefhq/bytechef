@@ -117,7 +117,7 @@ const ComponentPopover = ({
                 )}
             </PopoverTrigger>
 
-            <PopoverContent align="end" className="min-w-[400px]">
+            <PopoverContent align="end" className="min-w-property-code-editor-sheet-connections-sheet-width">
                 <header className="flex items-center justify-between">
                     <span className="font-medium">Add Component</span>
 

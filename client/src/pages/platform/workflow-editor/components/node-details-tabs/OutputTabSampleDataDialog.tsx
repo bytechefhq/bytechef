@@ -88,7 +88,7 @@ const OutputTabSampleDataDialog = ({
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
-            <DialogContent className="max-w-[800px]">
+            <DialogContent className="max-w-output-tab-sample-data-dialog-width">
                 <DialogHeader>
                     <div className="flex items-center justify-between">
                         <DialogTitle>Upload Sample Output Data</DialogTitle>
@@ -99,7 +99,7 @@ const OutputTabSampleDataDialog = ({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="relative mt-4 min-h-[400px] flex-1">
+                <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
                     <div className="absolute inset-0">
                         <Editor
                             className="bg-transparent"

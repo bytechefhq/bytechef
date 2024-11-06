@@ -15,7 +15,7 @@ const Header = ({centerTitle = false, className, position = 'sidebar', right, ti
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(
-                    'flex h-[34px] items-center text-lg tracking-tight text-foreground',
+                    'flex h-header-height items-center text-lg tracking-tight text-foreground',
                     position === 'sidebar' ? 'font-semibold' : '',
                     titleClassName
                 )}
