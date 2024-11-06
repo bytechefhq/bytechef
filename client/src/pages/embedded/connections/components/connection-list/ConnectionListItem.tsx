@@ -105,7 +105,10 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
                             </div>
 
                             <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                                <div className="flex h-[38px] items-center" onClick={(event) => event.preventDefault()}>
+                                <div
+                                    className="flex h-connection-list-item-taglist-height items-center"
+                                    onClick={(event) => event.preventDefault()}
+                                >
                                     {connection.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

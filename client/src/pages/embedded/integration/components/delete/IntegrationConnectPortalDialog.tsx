@@ -6,7 +6,7 @@ import * as React from 'react';
 const IntegrationConnectPortalDialog = () => {
     return (
         <Dialog modal={false} open={true}>
-            <DialogContent className="max-w-[600px]">
+            <DialogContent className="max-w-integration-connect-portal-dialog-width">
                 <DialogHeader>
                     <div className="flex justify-between">
                         <div>

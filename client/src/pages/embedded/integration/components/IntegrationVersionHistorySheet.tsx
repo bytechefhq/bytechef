@@ -16,7 +16,7 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
     return (
         <Sheet onOpenChange={() => onClose()} open>
             <SheetContent
-                className="flex flex-col p-4 sm:max-w-[500px]"
+                className="flex flex-col p-4 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >

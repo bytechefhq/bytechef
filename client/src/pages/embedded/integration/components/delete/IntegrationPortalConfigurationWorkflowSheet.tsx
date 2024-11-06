@@ -12,7 +12,7 @@ const IntegrationPortalConfigurationWorkflowSheet = () => {
                 <div>Workflow 1</div>
             </SheetTrigger>
 
-            <SheetContent className="flex flex-col sm:max-w-[460px]">
+            <SheetContent className="flex flex-col sm:max-w-workflow-integration-portal-configuration-workflow-sheet-width">
                 <SheetHeader>
                     <SheetTitle>Workflow Configuration</SheetTitle>
 

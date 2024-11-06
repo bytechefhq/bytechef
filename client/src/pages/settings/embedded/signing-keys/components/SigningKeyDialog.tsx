@@ -115,7 +115,7 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
         >
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
-            <DialogContent className="min-w-[550px]">
+            <DialogContent className="min-w-signing-key-dialog-width">
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveSigningKey)}>
                         <DialogHeader>

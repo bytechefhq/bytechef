@@ -12,7 +12,7 @@ const Footer = ({children, leftSidebar = false, position = 'sidebar', right}: Pr
         <div className="flex w-full items-center justify-between">
             <div
                 className={twMerge(
-                    'flex h-[34px] w-full items-center text-lg tracking-tight',
+                    'flex h-footer-height w-full items-center text-lg tracking-tight',
                     leftSidebar && 'font-semibold'
                 )}
             >
