@@ -91,8 +91,8 @@
       "title" : "API Key",
       "type" : "API_KEY",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -132,8 +132,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -193,8 +193,8 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -254,8 +254,8 @@
       "title" : "Digest Auth",
       "type" : "DIGEST_AUTH",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -395,8 +395,8 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -516,8 +516,8 @@
       "title" : "OAuth2 Implicit Code",
       "type" : "OAUTH2_IMPLICIT_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -637,8 +637,8 @@
       "title" : "OAuth2 Client Credentials",
       "type" : "OAUTH2_CLIENT_CREDENTIALS",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -1312,6 +1312,10 @@
         "description" : null,
         "label" : "JSON",
         "value" : "JSON"
+      }, {
+        "description" : null,
+        "label" : "XML",
+        "value" : "XML"
       }, {
         "description" : null,
         "label" : "Form-Data",
@@ -2801,6 +2805,10 @@
         "value" : "JSON"
       }, {
         "description" : null,
+        "label" : "XML",
+        "value" : "XML"
+      }, {
+        "description" : null,
         "label" : "Form-Data",
         "value" : "FORM_DATA"
       }, {
@@ -4286,6 +4294,10 @@
         "description" : null,
         "label" : "JSON",
         "value" : "JSON"
+      }, {
+        "description" : null,
+        "label" : "XML",
+        "value" : "XML"
       }, {
         "description" : null,
         "label" : "Form-Data",
