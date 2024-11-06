@@ -80,11 +80,11 @@ paths:
               properties:
                 firstname:
                   type: "string"
-                  title: "First name"
+                  title: "First Name"
                   description: "The first name of the contact."
                 surname:
                   type: "string"
-                  title: "Last name"
+                  title: "Last Name"
                   description: "The last name of the contact."
                 company_id:
                   type: "string"

@@ -43,7 +43,7 @@ public class KeapCreateCompanyAction {
         .metadata(
             Map.of(
                 "method", "POST",
-                "path", "/v1/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "path", "/companies", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
         .properties(object("__item")
@@ -62,7 +62,7 @@ public class KeapCreateCompanyAction {
                         .required(false),
                     string("zip_four").label("Zip Four")
                         .required(false))
-                    .label("Company Address")
+                    .label("CompanyAddress")
                     .required(false),
                     string("company_name").label("Company Name")
                         .required(false),
@@ -79,7 +79,7 @@ public class KeapCreateCompanyAction {
                         .required(false),
                         string("type").label("Type")
                             .required(false))
-                        .label("Company Fax Number")
+                        .label("CompanyFaxNumber")
                         .required(false),
                     string("notes").label("Notes")
                         .required(false),
@@ -91,11 +91,11 @@ public class KeapCreateCompanyAction {
                             .required(false),
                         string("type").label("Type")
                             .required(false))
-                        .label("Company Phone Number")
+                        .label("CompanyPhoneNumber")
                         .required(false),
                     string("website").label("Website")
                         .required(false))
-                .label("Company Address")
+                .label("CompanyAddress")
                 .required(false))
             .label("Item")
             .metadata(

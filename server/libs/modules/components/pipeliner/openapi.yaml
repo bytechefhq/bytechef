@@ -13,10 +13,10 @@ paths:
       tags:
         - "Account"
       summary: "Create Account"
-      description: "Creates new account"
+      description: "Creates new account."
       operationId: "createAccount"
       requestBody:
-        description: "data of new Account"
+        description: "data of new account"
         required: true
         content:
           application/json:
@@ -27,7 +27,8 @@ paths:
                 owner_id:
                   type: "string"
                   format: "uuid"
-                  description: "User in Pipeliner Application that will become the owner of the newly created Account."
+                  description: "User in Pipeliner Application that will become the owner of the newly created account."
+                  title: "Owner"
                 name:
                   type: "string"
                   description: "Account name"
@@ -76,12 +77,15 @@ paths:
                   type: "string"
                   format: "uuid"
                   description: "User in Pipeliner Application that will become the owner of the newly created Contact."
+                  title: "Owner"
                 first_name:
                   type: "string"
                   description: "The firstname of the contact."
+                  title: "First Name"
                 last_name:
                   type: "string"
                   description: "The lastname of the contact."
+                  title: "Last Name"
               required:
                 - "owner_id"
                 - "last_name"
@@ -132,6 +136,7 @@ paths:
                   type: "string"
                   format: "uuid"
                   description: "Type of task"
+                  title: "Activity Type"
                 unit_id:
                   type: "string"
                   format: "uuid"
@@ -139,6 +144,7 @@ paths:
                 owner_id:
                   type: "string"
                   format: "uuid"
+                  title: "Owner"
               required:
                 - "subject"
                 - "activity_type_id"
@@ -146,14 +152,13 @@ paths:
                 - "owner_id"
       responses:
         201:
-          description: "Creation confirmation. Returns created Task"
+          description: "Creation confirmation. Returns created task"
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
                   success:
-                    description: "True when response succeeded, false on error."
                     type: "boolean"
                   data:
                     type: "object"

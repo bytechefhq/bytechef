@@ -12,7 +12,7 @@ paths:
       tags:
         - "Accounts"
       summary: "Create Account"
-      description: "Creates a new account"
+      description: "Creates a new account."
       operationId: "createAccount"
       requestBody:
         content:
@@ -32,7 +32,7 @@ paths:
                     accountUrl:
                       type: "string"
                       description: "Account's website"
-
+                      title: "Website"
       responses:
         201:
           description: "Successful operation. Returns created Account"
@@ -56,7 +56,7 @@ paths:
       tags:
         - "Contacts"
       summary: "Create Contact"
-      description: "Creates a new contact"
+      description: "Creates a new contact."
       operationId: "createContact"
       requestBody:
         content:
@@ -112,7 +112,7 @@ paths:
       tags:
         - "Tasks"
       summary: "Create Task"
-      description: "Creates a new task"
+      description: "Creates a new task."
       operationId: "createTask"
       requestBody:
         content:
@@ -130,21 +130,21 @@ paths:
                   properties:
                     title:
                       title: "Title"
-                      description: "The title to be assigned to the task"
+                      description: "The title to be assigned to the task."
                       type: "string"
                     relid:
-                      title: "Assigned to"
-                      description: "The id of the relational object for this task"
+                      title: "Assigned To"
+                      description: "The id of the relational object for this task."
                       type: "integer"
                       format: "int32"
                     duedate:
-                      title: "Due date"
-                      description: "Due date of the task"
+                      title: "Due Date"
+                      description: "Due date of the task."
                       type: "string"
                       format: "date"
                     dealTasktype:
-                      title: "Task type"
-                      description: "The type of the task based on the available Task Types in the account"
+                      title: "Task Type"
+                      description: "The type of the task based on the available task types in the account."
                       type: "integer"
                       format: "int32"
       responses:

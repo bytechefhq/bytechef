@@ -12,7 +12,7 @@ paths:
       tags:
         - "Companies"
       summary: "Create Company"
-      description: "Create a new company"
+      description: "Creates a new company."
       operationId: "createCompany"
       requestBody:
         content:
@@ -25,7 +25,7 @@ paths:
                   properties:
                     name:
                       type: "string"
-                      description: "The name of the company"
+                      description: "The name of the company."
                     emailOne:
                       type: "string"
                       format: "email"
@@ -69,6 +69,7 @@ paths:
           required: true
           schema:
             type: "integer"
+            title: "Task List"
       requestBody:
         content:
           application/json:
@@ -86,6 +87,7 @@ paths:
                     dueAt:
                       type: "string"
                       format: "date"
+                      title: "Due Date"
       responses:
         201:
           description: "Response contains information about created task."

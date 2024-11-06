@@ -49,7 +49,7 @@ public class FreshdeskCreateContactAction {
             string("email").label("Email")
                 .description("Primary email address of the contact.")
                 .required(true),
-            string("phone").label("Work   Phone")
+            string("phone").label("Work Phone")
                 .description("Telephone number of the contact")
                 .required(false),
             string("mobile").label("Mobile")

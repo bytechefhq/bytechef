@@ -36,15 +36,15 @@ import java.util.Map;
 public class PipelinerCreateAccountAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
         .title("Create Account")
-        .description("Creates new account")
+        .description("Creates new account.")
         .metadata(
             Map.of(
                 "method", "POST",
                 "path", "/entities/Accounts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("owner_id").label("Owner Id")
-            .description("User in Pipeliner Application that will become the owner of the newly created Account.")
+        .properties(object("__item").properties(string("owner_id").label("Owner")
+            .description("User in Pipeliner Application that will become the owner of the newly created account.")
             .required(true),
             string("name").label("Name")
                 .description("Account name")

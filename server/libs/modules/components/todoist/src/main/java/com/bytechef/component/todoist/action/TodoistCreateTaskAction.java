@@ -37,7 +37,7 @@ import java.util.Map;
 public class TodoistCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Creates a new Task.")
+        .description("Creates a new task.")
         .metadata(
             Map.of(
                 "method", "POST",

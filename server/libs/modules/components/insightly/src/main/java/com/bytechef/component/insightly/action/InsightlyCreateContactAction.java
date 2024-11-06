@@ -36,7 +36,7 @@ import java.util.Map;
 public class InsightlyCreateContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates new Contact")
+        .description("Creates new contact.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -44,20 +44,20 @@ public class InsightlyCreateContactAction {
 
             ))
         .properties(object("__item").properties(string("FIRST_NAME").maxLength(255)
-            .label("First   Name")
-            .description("The first name of the contact")
+            .label("First Name")
+            .description("The first name of the contact.")
             .required(true),
             string("LAST_NAME").maxLength(255)
-                .label("Last   Name")
-                .description("The last name of the contact")
+                .label("Last Name")
+                .description("The last name of the contact.")
                 .required(false),
             string("EMAIL_ADDRESS").maxLength(255)
-                .label("Email   Address")
-                .description("Email address of the contact")
+                .label("Email Address")
+                .description("Email address of the contact.")
                 .required(false),
             string("PHONE").maxLength(255)
                 .label("Phone")
-                .description("Phone number of the contact")
+                .description("Phone number of the contact.")
                 .required(false),
             string("TITLE").maxLength(255)
                 .label("Title")

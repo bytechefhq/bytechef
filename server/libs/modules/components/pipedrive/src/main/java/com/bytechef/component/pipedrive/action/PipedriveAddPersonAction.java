@@ -55,7 +55,7 @@ public class PipedriveAddPersonAction {
             integer("org_id").label("Organization")
                 .description("Organization this person will belong to.")
                 .required(false),
-            array("email").items(object().properties(string("value").label("Email   Address")
+            array("email").items(object().properties(string("value").label("Email Address")
                 .required(true),
                 bool("primary").label("Primary")
                     .description("If email is primary for the person or not.")
@@ -69,7 +69,7 @@ public class PipedriveAddPersonAction {
                 .label("Email")
                 .description("An email addresses related to the person.")
                 .required(false),
-            array("phone").items(object().properties(string("value").label("Phone   Number")
+            array("phone").items(object().properties(string("value").label("Phone Number")
                 .description("The phone number")
                 .required(true),
                 bool("primary").label("Primary")

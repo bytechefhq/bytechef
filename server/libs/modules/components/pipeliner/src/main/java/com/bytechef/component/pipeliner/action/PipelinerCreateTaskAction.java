@@ -46,13 +46,13 @@ public class PipelinerCreateTaskAction {
         .properties(object("__item").properties(string("subject").label("Subject")
             .description("Name of the entity and its default text representation.")
             .required(true),
-            string("activity_type_id").label("Activity Type Id")
+            string("activity_type_id").label("Activity Type")
                 .description("Type of task")
                 .required(true),
             string("unit_id").label("Unit Id")
                 .description("Sales Unit ID")
                 .required(true),
-            string("owner_id").label("Owner Id")
+            string("owner_id").label("Owner")
                 .required(true))
             .label("Task")
             .required(true)
@@ -60,8 +60,7 @@ public class PipelinerCreateTaskAction {
                 Map.of(
                     "type", PropertyType.BODY)))
         .output(outputSchema(object()
-            .properties(bool("success").description("True when response succeeded, false on error.")
-                .required(false),
+            .properties(bool("success").required(false),
                 object("data")
                     .properties(string("id").required(false), string("subject").required(false),
                         string("activity_type_id").required(false), string("unit_id").required(false),

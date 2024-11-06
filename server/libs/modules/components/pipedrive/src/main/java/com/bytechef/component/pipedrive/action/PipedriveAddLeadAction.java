@@ -54,7 +54,7 @@ public class PipedriveAddLeadAction {
                 .required(false),
             array("label_ids").items(string().description("Lead labels which will be associated with the lead."))
                 .placeholder("Add to Label Ids")
-                .label("Lead   Labels")
+                .label("Lead Labels")
                 .description("Lead labels which will be associated with the lead.")
                 .required(false),
             integer("person_id").label("Person")

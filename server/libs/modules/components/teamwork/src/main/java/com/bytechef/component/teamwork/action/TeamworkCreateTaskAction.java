@@ -45,7 +45,7 @@ public class TeamworkCreateTaskAction {
                 "application/json"
 
             ))
-        .properties(integer("tasklistId").label("Tasklist Id")
+        .properties(integer("tasklistId").label("Task List")
             .description("Task list where new task is added")
             .required(true)
             .metadata(
@@ -56,7 +56,7 @@ public class TeamworkCreateTaskAction {
                 .required(false),
                 string("description").label("Description")
                     .required(false),
-                date("dueAt").label("Due At")
+                date("dueAt").label("Due Date")
                     .required(false))
                 .label("Task")
                 .required(false))

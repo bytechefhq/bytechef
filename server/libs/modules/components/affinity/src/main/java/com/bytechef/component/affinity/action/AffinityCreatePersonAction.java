@@ -43,10 +43,10 @@ public class AffinityCreatePersonAction {
                 "path", "/persons", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("first_name").label("First   Name")
+        .properties(object("__item").properties(string("first_name").label("First Name")
             .description("The first name of the person.")
             .required(true),
-            string("last_name").label("Last   Name")
+            string("last_name").label("Last Name")
                 .description("The last name of the person.")
                 .required(true),
             array("emails").items(string().description("The email addresses of the person."))

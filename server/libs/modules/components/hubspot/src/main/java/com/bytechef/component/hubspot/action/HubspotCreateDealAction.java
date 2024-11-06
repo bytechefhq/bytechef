@@ -44,17 +44,17 @@ public class HubspotCreateDealAction {
                 "path", "/crm/v3/objects/deals", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(object("properties").properties(string("dealname").label("Deal   Name")
+        .properties(object("__item").properties(object("properties").properties(string("dealname").label("Deal Name")
             .required(false),
             number("amount").label("Amount")
                 .required(false),
-            date("closedate").label("Closedate")
+            date("closedate").label("Close Date")
                 .required(false),
             string("pipeline").label("Pipeline")
                 .required(false),
-            string("dealstage").label("Deal   Stage")
+            string("dealstage").label("Deal Stage")
                 .required(false),
-            string("hubspot_owner_id").label("Deal   Owner")
+            string("hubspot_owner_id").label("Deal Owner")
                 .required(false))
             .label("Properties")
             .required(false))

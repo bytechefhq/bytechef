@@ -12,10 +12,10 @@ paths:
       tags:
         - "Contacts"
       summary: "Create Contact"
-      description: "Creates new Contact"
+      description: "Creates new contact."
       operationId: "createContact"
       requestBody:
-        description: "data of new Contact"
+        description: "data of new contact"
         required: true
         content:
           application/json:
@@ -26,23 +26,23 @@ paths:
                 - "FIRST_NAME"
               properties:
                 FIRST_NAME:
-                  title: "First name"
-                  description: "The first name of the contact"
+                  title: "First Name"
+                  description: "The first name of the contact."
                   type: "string"
                   maxLength: 255
                 LAST_NAME:
-                  title: "Last name"
-                  description: "The last name of the contact"
+                  title: "Last Name"
+                  description: "The last name of the contact."
                   type: "string"
                   maxLength: 255
                 EMAIL_ADDRESS:
-                  title: "Email address"
-                  description: "Email address of the contact"
+                  title: "Email Address"
+                  description: "Email address of the contact."
                   type: "string"
                   maxLength: 255
                 PHONE:
                   title: "Phone"
-                  description: "Phone number of the contact"
+                  description: "Phone number of the contact."
                   type: "string"
                   maxLength: 255
                 TITLE:
@@ -76,10 +76,10 @@ paths:
       tags:
         - "Organisations"
       summary: "Create Organization"
-      description: "Creates new Organization"
+      description: "Creates new organization."
       operationId: "createOrganization"
       requestBody:
-        description: "data of new Organization"
+        description: "data of new organization"
         required: true
         content:
           application/json:
@@ -90,8 +90,8 @@ paths:
                 - "ORGANISATION_NAME"
               properties:
                 ORGANISATION_NAME:
-                  title: "Organization name"
-                  description: "The name of the organization"
+                  title: "Organization Name"
+                  description: "The name of the organization."
                   type: "string"
                   maxLength: 255
                 PHONE:
@@ -126,10 +126,10 @@ paths:
       tags:
         - "Tasks"
       summary: "Create Task"
-      description: "Creates new Task"
+      description: "Creates new task."
       operationId: "createTask"
       requestBody:
-        description: "data of new Task"
+        description: "data of new task"
         required: true
         content:
           application/json:
@@ -155,7 +155,7 @@ paths:
                     - "Waiting"
       responses:
         201:
-          description: "Creation confirmation. Returns created Task"
+          description: "Creation confirmation. Returns created task"
           content:
             application/json:
               schema:

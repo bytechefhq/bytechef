@@ -10,7 +10,7 @@ paths:
   /tasks:
     post:
       summary: "Create Task"
-      description: "Creates a new Task."
+      description: "Creates a new task."
       operationId: "createTask"
       requestBody:
         content:
@@ -79,7 +79,7 @@ paths:
   /projects:
     post:
       summary: "Create Project"
-      description: "Creates a new Project."
+      description: "Creates a new project."
       operationId: "createProject"
       requestBody:
         content:
@@ -97,7 +97,7 @@ paths:
                   type: "string"
                 is_favorite:
                   type: "boolean"
-                  title: "Is project a favorite?"
+                  title: "Is Project a Favorite?"
                   description: "Whether the project is a favorite."
       responses:
         200:

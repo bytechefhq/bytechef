@@ -37,7 +37,7 @@ import java.util.Map;
 public class SalesflareCreateContactsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContacts")
         .title("Create Contacts")
-        .description("Creates new contacts")
+        .description("Creates new contacts.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -48,13 +48,13 @@ public class SalesflareCreateContactsAction {
             .label("Email")
             .description("Email address of the contact.")
             .required(true),
-            string("firstname").label("First   Name")
+            string("firstname").label("First Name")
                 .description("The first name of the contact.")
                 .required(false),
-            string("lastname").label("Last   Name")
+            string("lastname").label("Last Name")
                 .description("The last name of the contact.")
                 .required(false),
-            string("phone_number").label("Work   Phone   Number")
+            string("phone_number").label("Work Phone Number")
                 .required(false),
             string("mobile_phone_number").label("Mobile Phone Number")
                 .required(false),

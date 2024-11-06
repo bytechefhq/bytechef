@@ -96,11 +96,11 @@ paths:
               properties:
                 first_name:
                   type: "string"
-                  title: "First name"
+                  title: "First Name"
                   description: "The first name of the person."
                 last_name:
                   type: "string"
-                  title: "Last name"
+                  title: "Last Name"
                   description: "The last name of the person."
                 emails:
                   title: "Emails"

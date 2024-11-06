@@ -20,7 +20,7 @@ paths:
         content:
           application/json:
             schema:
-              title: "Email template"
+              title: "Email Template"
               type: "object"
               required:
                 - "name"

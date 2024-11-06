@@ -12,10 +12,10 @@ paths:
       tags:
         - "Accounts"
       summary: "Create Account"
-      description: "Creates new account"
+      description: "Creates new account."
       operationId: "createAccount"
       requestBody:
-        description: "data of new Account"
+        description: "data of new account"
         required: true
         content:
           application/json:
@@ -39,8 +39,10 @@ paths:
                   maxLength: 1000
                 phone_number:
                   type: "string"
+                  title: "Phone Number"
                 social_profiles:
                   type: "array"
+                  title: "Social Profiles"
                   description: "Social profile URL"
                   items:
                     type: "string"
@@ -52,10 +54,10 @@ paths:
       tags:
         - "Contacts"
       summary: "Create Contacts"
-      description: "Creates new contacts"
+      description: "Creates new contacts."
       operationId: "createContacts"
       requestBody:
-        description: "data of new Contacts"
+        description: "data of new contacts"
         required: true
         content:
           application/json:
@@ -73,24 +75,28 @@ paths:
                     description: "Email address of the contact."
                     maxLength: 1000
                   firstname:
-                    title: "First name"
+                    title: "First Name"
                     description: "The first name of the contact."
                     type: "string"
                   lastname:
-                    title: "Last name"
+                    title: "Last Name"
                     description: "The last name of the contact."
                     type: "string"
                   phone_number:
-                    title: "Work phone number"
+                    title: "Work Phone Number"
                     type: "string"
                   mobile_phone_number:
                     type: "string"
+                    title: "Mobile Phone Number"
                   home_phone_number:
                     type: "string"
+                    title: "Home Phone Number"
                   fax_number:
                     type: "string"
+                    title: "Fax Number"
                   social_profiles:
                     type: "array"
+                    title: "Social Profiles"
                     description: "Social profile URL"
                     items:
                       type: "string"
@@ -114,10 +120,10 @@ paths:
       tags:
         - "Tasks"
       summary: "Create Tasks"
-      description: "Creates new tasks"
+      description: "Creates new tasks."
       operationId: "createTasks"
       requestBody:
-        description: "data of new Tasks"
+        description: "data of new tasks"
         required: true
         content:
           application/json:
@@ -132,10 +138,11 @@ paths:
                 properties:
                   description:
                     type: "string"
-                    description: "Description of new task"
+                    description: "Description of new task."
                   reminder_date:
                     type: "string"
                     format: "date"
+                    title: "Reminder Data"
       responses:
         200:
           description: "Creation confirmation."

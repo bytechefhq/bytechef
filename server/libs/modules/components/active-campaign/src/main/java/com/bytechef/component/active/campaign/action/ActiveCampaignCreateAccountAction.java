@@ -35,7 +35,7 @@ import java.util.Map;
 public class ActiveCampaignCreateAccountAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
         .title("Create Account")
-        .description("Creates a new account")
+        .description("Creates a new account.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -45,7 +45,7 @@ public class ActiveCampaignCreateAccountAction {
         .properties(object("__item").properties(object("account").properties(string("name").label("Name")
             .description("Account's name")
             .required(true),
-            string("accountUrl").label("Account Url")
+            string("accountUrl").label("Website")
                 .description("Account's website")
                 .required(false))
             .label("Account")

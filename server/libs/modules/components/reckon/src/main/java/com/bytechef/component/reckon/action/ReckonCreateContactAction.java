@@ -35,7 +35,7 @@ import java.util.Map;
 public class ReckonCreateContactAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates a new Contact.")
+        .description("Creates a new contact.")
         .metadata(
             Map.of(
                 "method", "POST",

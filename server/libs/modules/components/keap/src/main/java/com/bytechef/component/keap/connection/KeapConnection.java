@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl;
  */
 public class KeapConnection {
     public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.infusionsoft.com/crm/rest/v1")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
             .title("OAuth2 Authorization Code")
             .properties(
