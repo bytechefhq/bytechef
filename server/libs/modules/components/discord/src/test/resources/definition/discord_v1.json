@@ -694,7 +694,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Send direct message guild member",
+    "description" : "Send direct message guild member.",
     "help" : null,
     "metadata" : null,
     "name" : "sendDirectMessage",
@@ -852,7 +852,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The recipient to open a DM channel with",
+      "description" : "The recipient to open a DM channel with.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -905,7 +905,7 @@
       "type" : "BOOLEAN",
       "defaultValue" : false,
       "exampleValue" : null,
-      "label" : "Text To Speech",
+      "label" : "Text to Speech",
       "placeholder" : null,
       "options" : [ {
         "description" : null,
@@ -918,7 +918,7 @@
       } ],
       "controlType" : "SELECT"
     } ],
-    "title" : "Send direct message",
+    "title" : "Send Direct Message",
     "perform" : { },
     "workflowNodeDescription" : null,
     "processErrorResponse" : null

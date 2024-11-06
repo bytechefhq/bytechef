@@ -606,8 +606,116 @@
     } ],
     "title" : "Create Record",
     "perform" : null,
-    "processErrorResponse" : { },
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : { }
+  } ],
+  "dataStream" : {
+    "reader" : {
+      "properties" : null,
+      "dataStreamItemReader" : { }
+    },
+    "writer" : {
+      "properties" : null,
+      "streamTypes" : null,
+      "dataStreamItemWriter" : { }
+    }
+  },
+  "unifiedApi" : null,
+  "triggers" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Trigger off when a new entry is added to the table that you have selected.",
+    "help" : null,
+    "name" : "newRecord",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The base which contains the table that you want to monitor.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "baseId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Base",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "The table to monitor for new records.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "tableId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Table",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "baseId" ],
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "triggerField",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Trigger Field",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "New Record",
+    "type" : "POLLING",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "deduplicate" : null,
+    "webhookDisable" : null,
+    "poll" : { },
+    "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookRequest" : null,
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -657,113 +765,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "dataStream" : {
-    "writer" : {
-      "properties" : null,
-      "streamTypes" : null,
-      "dataStreamItemWriter" : { }
-    },
-    "reader" : {
-      "properties" : null,
-      "dataStreamItemReader" : { }
-    }
-  },
-  "triggers" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Trigger off when a new entry is added to the table that you have selected.",
-    "help" : null,
-    "name" : "newRecord",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "The base id.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "baseId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "BaseId",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "The table id.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "tableId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "TableId",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "baseId" ],
-        "options" : { }
-      }
-    }, {
-      "advancedOption" : null,
-      "description" : "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "triggerField",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "TriggerField",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    } ],
-    "title" : "New Record",
-    "type" : "POLLING",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : { },
-    "deduplicate" : null,
-    "webhookDisable" : null,
-    "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookRequest" : null,
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
-  } ],
-  "unifiedApi" : null
+  }
 }
