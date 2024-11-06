@@ -19,11 +19,15 @@ package com.bytechef.embedded.configuration.service;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
  */
 public interface IntegrationInstanceService {
+
+    Optional<IntegrationInstance> fetchFirstIntegrationInstance(
+        long connectedUserId, String componentName, Environment environment);
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId);
 
@@ -38,5 +42,4 @@ public interface IntegrationInstanceService {
     List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId);
 
     void updateEnabled(long id, boolean enable);
-
 }

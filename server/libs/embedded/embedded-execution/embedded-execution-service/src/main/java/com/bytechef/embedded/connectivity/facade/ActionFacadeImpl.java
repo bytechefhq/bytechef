@@ -16,8 +16,14 @@
 
 package com.bytechef.embedded.connectivity.facade;
 
+import com.bytechef.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -26,18 +32,35 @@ import org.springframework.stereotype.Service;
 public class ActionFacadeImpl implements ActionFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final ConnectedUserService connectedUserService;
+    private final IntegrationInstanceService integrationInstanceService;
 
     @SuppressFBWarnings("EI")
-    public ActionFacadeImpl(ActionDefinitionFacade actionDefinitionFacade) {
+    public ActionFacadeImpl(
+        ActionDefinitionFacade actionDefinitionFacade, ConnectedUserService connectedUserService,
+        IntegrationInstanceService integrationInstanceService) {
+
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.connectedUserService = connectedUserService;
+        this.integrationInstanceService = integrationInstanceService;
     }
 
     @Override
     public Object executeAction(
         String componentName, Integer componentVersion, String actionName, Long connectionId,
-        Map<String, Object> input) {
+        Map<String, Object> input, Environment environment) {
 
-        // TODO connection
+        if (connectionId == null) {
+            String externalId = SecurityUtils.getCurrentUserLogin()
+                .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalId);
+
+            connectionId = integrationInstanceService
+                .fetchFirstIntegrationInstance(connectedUser.getId(), componentName, environment)
+                .map(IntegrationInstance::getConnectionId)
+                .orElse(null);
+        }
 
         return actionDefinitionFacade.executePerform(
             componentName, componentVersion, actionName, ModeType.EMBEDDED, null, null, null, null, input,

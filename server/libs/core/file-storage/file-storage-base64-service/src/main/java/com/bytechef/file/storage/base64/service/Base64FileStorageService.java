@@ -33,7 +33,7 @@ import org.springframework.lang.NonNull;
  */
 public class Base64FileStorageService implements FileStorageService {
 
-    private static final String URL_PREFIX = "base64://";
+    public static final String URL_PREFIX = "base64://";
 
     public Base64FileStorageService() {
     }

@@ -21,6 +21,7 @@ import com.bytechef.embedded.configuration.repository.IntegrationInstanceReposit
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,14 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     @Override
     public List<IntegrationInstance> getConnectedUserEnabledIntegrationInstances(long connectedUserId) {
         return integrationInstanceRepository.findAllByConnectedUserIdAndEnabled(connectedUserId, true);
+    }
+
+    @Override
+    public Optional<IntegrationInstance> fetchFirstIntegrationInstance(
+        long connectedUserId, String componentName, Environment environment) {
+
+        return integrationInstanceRepository.findFirstByExternalIdAndComponentNameAndEnvironment(
+            connectedUserId, componentName, environment.ordinal());
     }
 
     @Override
