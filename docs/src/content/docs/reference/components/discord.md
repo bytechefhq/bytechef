@@ -49,7 +49,7 @@ Version: 1
 ## Actions
 
 
-### Send channel message
+### Send Channel Message
 Post a new message to a specific #channel you choose.
 
 #### Properties
@@ -79,7 +79,7 @@ Type: OBJECT
 
 
 
-### Create channel
+### Create Channel
 Create a new channel
 
 #### Properties
@@ -108,17 +108,17 @@ Type: OBJECT
 
 
 
-### Send direct message
-Send direct message guild member
+### Send Direct Message
+Send direct message guild member.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Guild | STRING | SELECT  |  |
-| Recipient | STRING | SELECT  |  The recipient to open a DM channel with  |
+| Recipient | STRING | SELECT  |  The recipient to open a DM channel with.  |
 | Message Text | STRING | TEXT  |  Message contents (up to 2000 characters)  |
-| Text To Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |
+| Text to Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |
 
 
 ### Output

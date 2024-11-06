@@ -50,7 +50,7 @@ Triggers when form is submitted.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form name | STRING | SELECT  |  |
+| Form Name | STRING | SELECT  |  |
 
 
 ### Output

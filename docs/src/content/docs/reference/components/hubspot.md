@@ -176,7 +176,7 @@ Update Contact properties.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact   To   Update . | STRING | SELECT  |  |
+| Contact | STRING | SELECT  |  |
 | Contact | {{STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(company), STRING\(website)}\(properties)} | OBJECT_BUILDER  |  |
 
 

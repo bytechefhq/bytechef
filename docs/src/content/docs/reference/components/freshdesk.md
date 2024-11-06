@@ -50,7 +50,7 @@ Version: 1
 ## Actions
 
 
-### Create company
+### Create Company
 Creates a new company
 
 #### Properties
@@ -78,7 +78,7 @@ Type: OBJECT
 
 
 
-### Create contact
+### Create Contact
 Creates a new contact
 
 #### Properties
@@ -106,7 +106,7 @@ Type: OBJECT
 
 
 
-### Create ticket
+### Create Ticket
 Creates a new ticket
 
 #### Properties

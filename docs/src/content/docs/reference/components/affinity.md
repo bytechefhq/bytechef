@@ -38,19 +38,25 @@ Version: 1
 
 
 
+## Triggers
+
+
+
+<hr />
+
 
 
 ## Actions
 
 
-### Create opportunity
-Creates a new opportunity
+### Create Opportunity
+Creates a new opportunity.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The name of the opportunity.  |
+| Opportunity | {STRING\(name)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -64,23 +70,21 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
+| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Create organization
-Creates a new organization
+### Create Organization
+Creates a new organization.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The name of the organization.  |
-| Domain | STRING | TEXT  |  The domain name of the organization.  |
+| Organization | {STRING\(name), STRING\(domain)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -94,25 +98,21 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| {STRING\(id), STRING\(name), STRING\(domain)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Create person
-Creates a new person
+### Create Person
+Creates a new person.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First name | STRING | TEXT  |  The first name of the person.  |
-| Last name | STRING | TEXT  |  The last name of the person.  |
-| Emails | [STRING] | ARRAY_BUILDER  |  The email addresses of the person.  |
+| Person | {STRING\(first_name), STRING\(last_name), [STRING]\(emails)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -126,10 +126,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
+| {STRING\(id), STRING\(first_name), STRING\(last_name), [STRING]\(emails)} | OBJECT_BUILDER  |
 
 
 

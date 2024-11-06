@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file
+### Read from File
 Reads data from a ODS file.
 
 #### Properties
@@ -36,12 +36,12 @@ Reads data from a ODS file.
 | Include Empty Cells | BOOLEAN | SELECT  |  When reading from file the empty cells will be filled with an empty string.  |
 | Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |
 | Page Number | INTEGER | INTEGER  |  The page number to get.  |
-| Read As String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
+| Read as String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
 
 
 
 
-### Write to file
+### Write to File
 Writes the data to a ODS file.
 
 #### Properties

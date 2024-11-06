@@ -49,9 +49,9 @@ Trigger off when a new entry is added to the table that you have selected.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| BaseId | STRING | SELECT  |  The base id.  |
-| TableId | STRING | SELECT  |  The table id.  |
-| TriggerField | STRING | TEXT  |  It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.  |
+| Base | STRING | SELECT  |  The base which contains the table that you want to monitor.  |
+| Table | STRING | SELECT  |  The table to monitor for new records.  |
+| Trigger Field | STRING | TEXT  |  It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.  |
 
 
 
@@ -64,15 +64,15 @@ Trigger off when a new entry is added to the table that you have selected.
 ## Actions
 
 
-### Creates a record
+### Create Record
 Adds a record into an Airtable table.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Base Id | STRING | SELECT  |  The base id.  |
-| Table Id | STRING | SELECT  |  The table id.  |
+| Base | STRING | SELECT  |  The base where table is located.  |
+| Table | STRING | SELECT  |  The table where the record will be created.  |
 | DYNAMIC_PROPERTIES | null  |
 
 

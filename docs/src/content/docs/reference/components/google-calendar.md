@@ -50,7 +50,7 @@ Triggers when an event is added or updated
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
+| Calendar Identifier | STRING | SELECT  |  |
 
 
 ### Output
@@ -99,7 +99,7 @@ Invites one or more person to an existing event.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
+| Calendar Identifier | STRING | SELECT  |  |
 | Event | STRING | SELECT  |  Event to add attendees to.  |
 | Attendees | [STRING\($email)] | ARRAY_BUILDER  |  The attendees of the event.  |
 
@@ -135,29 +135,29 @@ Type: OBJECT
 
 
 
-### Create event
+### Create Event
 Creates an event
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
+| Calendar Identifier | STRING | SELECT  |  |
 | Title | STRING | TEXT  |  Title of the event.  |
-| All day event? | BOOLEAN | SELECT  |  |
-| Start date | DATE | DATE  |  The start date of the event.  |
-| End date | DATE | DATE  |  The end date of the event.  |
-| Start date time | DATE_TIME | DATE_TIME  |  The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.  |
-| End date time | DATE_TIME | DATE_TIME  |  The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.  |
+| All Day Event? | BOOLEAN | SELECT  |  |
+| Start Date | DATE | DATE  |  The start date of the event.  |
+| End Date | DATE | DATE  |  The end date of the event.  |
+| Start Date Time | DATE_TIME | DATE_TIME  |  The (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.  |
+| End Date Time | DATE_TIME | DATE_TIME  |  The (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.  |
 | Description | STRING | TEXT  |  Description of the event. Can contain HTML.  |
 | Location | STRING | TEXT  |  Geographic location of the event as free-form text.  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  |
 | Attendees | [STRING\($email)] | ARRAY_BUILDER  |  The attendees of the event.  |
-| Guest can invite others | BOOLEAN | SELECT  |  Whether attendees other than the organizer can invite others to the event.  |
-| Guest can modify | BOOLEAN | SELECT  |  Whether attendees other than the organizer can modify the event.  |
-| Guest can see other guests | BOOLEAN | SELECT  |  Whether attendees other than the organizer can see who the event's attendees are.  |
-| Send updates | STRING | SELECT  |  Whether to send notifications about the creation of the new event. Note that some emails might still be sent.  |
-| Use default reminders | BOOLEAN | SELECT  |  Whether the default reminders of the calendar apply to the event.  |
+| Guest Can Invite Others | BOOLEAN | SELECT  |  Whether attendees other than the organizer can invite others to the event.  |
+| Guest Can Modify | BOOLEAN | SELECT  |  Whether attendees other than the organizer can modify the event.  |
+| Guest Can See Other Guests | BOOLEAN | SELECT  |  Whether attendees other than the organizer can see who the event's attendees are.  |
+| Send Updates | STRING | SELECT  |  Whether to send notifications about the creation of the new event. Note that some emails might still be sent.  |
+| Use Default Reminders | BOOLEAN | SELECT  |  Whether the default reminders of the calendar apply to the event.  |
 | Reminders | [{STRING\(method), INTEGER\(minutes)}] | ARRAY_BUILDER  |  |
 
 
@@ -199,9 +199,9 @@ Add Quick Calendar Event
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
+| Calendar Identifier | STRING | SELECT  |  |
 | Text | STRING | TEXT  |  The text describing the event to be created.  |
-| Send updates | STRING | SELECT  |  Whether to send notifications about the creation of the new event. Note that some emails might still be sent.  |
+| Send Updates | STRING | SELECT  |  Whether to send notifications about the creation of the new event. Note that some emails might still be sent.  |
 
 
 ### Output
@@ -242,7 +242,7 @@ Deletes an event from Google Calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
+| Calendar Identifier | STRING | SELECT  |  |
 | Event | STRING | SELECT  |  Event to delete.  |
 
 
@@ -255,11 +255,11 @@ List events from the specified Google Calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
-| Event type | [STRING] | ARRAY_BUILDER  |  Event types to return.  |
-| Max results | INTEGER | INTEGER  |  Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response.  |
-| Search terms | STRING | TEXT  |  Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label  |
-| Date range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find events that exist in this range.  |
+| Calendar Identifier | STRING | SELECT  |  |
+| Event Type | [STRING] | ARRAY_BUILDER  |  Event types to return.  |
+| Max Results | INTEGER | INTEGER  |  Maximum number of events returned on one result page. The number of events in the resulting page may be less than this value, or none at all, even if there are more events matching the query. Incomplete pages can be detected by a non-empty nextPageToken field in the response.  |
+| Search Terms | STRING | TEXT  |  Free text search terms to find events that match these terms in the following fields: summary, description, location, attendee's displayName, attendee's email, workingLocationProperties.officeLocation.buildingId, workingLocationProperties.officeLocation.deskId, workingLocationProperties.officeLocation.label and workingLocationProperties.customLocation.label  |
+| Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find events that exist in this range.  |
 
 
 ### Output
@@ -287,8 +287,8 @@ Get free time slots from Google Calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar identifier | STRING | SELECT  |  |
-| Date range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find free time.  |
+| Calendar Identifier | STRING | SELECT  |  |
+| Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find free time.  |
 
 
 ### Output

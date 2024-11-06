@@ -50,7 +50,7 @@ Triggers when new mail is found in your Gmail inbox.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Topic name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
+| Topic Name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
 letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
 plus signs (+). Cannot start with goog.  |
 
@@ -109,6 +109,49 @@ Type: ARRAY
 
 
 ## Actions
+
+
+### Add Labels
+Add labels to an email in your Gmail account
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Message ID | STRING | SELECT  |  ID of the message to add labels  |
+| Labels | [STRING\($label)] | ARRAY_BUILDER  |  Labels to add to this message. You can add up to 100 labels with each update.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| [STRING] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Delete Mail
+Delete an email from your Gmail account permanently via Id
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Message ID | STRING | SELECT  |  The ID of the message to delete.  |
+
+
 
 
 ### Get Mail
@@ -181,15 +224,14 @@ Lists the messages in the user's mailbox.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Max results | NUMBER | NUMBER  |  Maximum number of messages to return.  |
-| Page token | STRING | TEXT  |  Page token to retrieve a specific page of results in the list.  |
+| Max Results | NUMBER | NUMBER  |  Maximum number of messages to return.  |
+| Page Token | STRING | TEXT  |  Page token to retrieve a specific page of results in the list.  |
 | From | STRING | TEXT  |  The address sending the mail  |
 | To | STRING | TEXT  |  The address receiving the new mail  |
 | Subject | STRING | TEXT  |  Words in the subject line  |
 | Category | STRING | SELECT  |  Messages in a certain category  |
-| Label | STRING | SELECT  |  |
-| Label IDs | [STRING] | ARRAY_BUILDER  |  Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have.  |
-| Include spam trash | BOOLEAN | SELECT  |  Include messages from SPAM and TRASH in the results.  |
+| Labels | [STRING] | ARRAY_BUILDER  |  Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have.  |
+| Include Spam Trash | BOOLEAN | SELECT  |  Include messages from SPAM and TRASH in the results.  |
 
 
 ### Output
@@ -223,7 +265,7 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 | Subject | STRING | TEXT  |  Subject of the email.  |
 | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
 | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply to | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
+| Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
 | Body | STRING | TEXT  |  Body text of the email  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 

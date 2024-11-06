@@ -44,41 +44,41 @@ Version: 1
 ## Actions
 
 
-### Create document
-Create a document on Google Docs
+### Create Document
+Create a document on Google Docs.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Title | STRING | TEXT  |  Document title  |
-| Content | STRING | TEXT  |  Document content  |
+| Title | STRING | TEXT  |  Document title.  |
+| Content | STRING | TEXT  |  Document content.  |
 
 
 
 
-### Edit template file
-Edit a template file and replace the values with the ones provided
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Destination file | STRING | TEXT  |  The ID of the file to replace the values  |
-| Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value  |
-| Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL  |
-
-
-
-
-### Read document
-Read a document from Google Docs
+### Edit Template File
+Edit a template file and replace the values with the ones provided.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Document id | STRING | TEXT  |  The ID of the document to read  |
+| Destination File | STRING | TEXT  |  The ID of the file to replace the values.  |
+| Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value.  |
+| Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL.  |
+
+
+
+
+### Read Document
+Read a document from Google Docs.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Document Id | STRING | TEXT  |  The ID of the document to read.  |
 
 
 

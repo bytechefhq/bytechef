@@ -52,7 +52,7 @@ Triggers when a new issue is created.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Project | STRING | SELECT  |  Project where new issue is created.  |
-| Issue type | STRING | SELECT  |  The type of issue.  |
+| Issue Type | STRING | SELECT  |  The type of issue.  |
 
 
 ### Output
@@ -85,7 +85,7 @@ Triggers when an issue is updated.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Project | STRING | SELECT  |  Project where new issue is created.  |
-| Issue type | STRING | SELECT  |  The type of issue.  |
+| Issue Type | STRING | SELECT  |  The type of issue.  |
 
 
 ### Output
@@ -116,7 +116,7 @@ Type: OBJECT
 ## Actions
 
 
-### Create issue
+### Create Issue
 Creates a new issue.
 
 #### Properties
@@ -125,7 +125,7 @@ Creates a new issue.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Project Name | STRING | SELECT  |  The name of the project to create the issue in.  |
 | Summary | STRING | TEXT  |  A brief summary of the issue.  |
-| Issue type | STRING | SELECT  |  The type of issue.  |
+| Issue Type | STRING | SELECT  |  The type of issue.  |
 | Parent | STRING | SELECT  |    |
 | Assignee | STRING | SELECT  |  User who will be assigned to the issue.  |
 | Priority | STRING | SELECT  |  Priority of the issue.  |
@@ -152,7 +152,44 @@ Type: OBJECT
 
 
 
-### Get issue
+### Create Issue Comment
+Adds a comment to an issue.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project Name | STRING | SELECT  |  Project where the issue is located.  |
+| Issue Name | STRING | SELECT  |  Issue where the comment will be added.  |
+| Comment | STRING | TEXT  |  The text of the comment.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| {STRING\(accountId), BOOLEAN\(active), STRING\(displayName), STRING\(self)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| {STRING\(identifier), STRING\(type), STRING\(value)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Issue
 Get issue details in selected project.
 
 #### Properties
@@ -160,7 +197,7 @@ Get issue details in selected project.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Project Name | STRING | SELECT  |  Project where the issue is located.  |
-| Issue name | STRING | SELECT  |  |
+| Issue Name | STRING | SELECT  |  |
 
 
 ### Output
@@ -183,7 +220,7 @@ Type: OBJECT
 
 
 
-### Search issues
+### Search Issues
 Search for issues using JQL
 
 #### Properties
@@ -191,7 +228,7 @@ Search for issues using JQL
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | JQL | STRING | TEXT  |  The JQL that defines the search. If no JQL expression is provided, all issues are returned  |
-| Max results | INTEGER | INTEGER  |  The maximum number of items to return per page.  |
+| Max Results | INTEGER | INTEGER  |  The maximum number of items to return per page.  |
 
 
 ### Output

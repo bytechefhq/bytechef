@@ -161,7 +161,7 @@ Type: OBJECT
 ## Actions
 
 
-### Create an order
+### Create Order
 Adds an order into a Shopify store.
 
 #### Properties
@@ -196,14 +196,14 @@ Type: OBJECT
 
 
 
-### Delete an order
+### Delete Order
 Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | SELECT  |  The order id.  |
+| Order | INTEGER | SELECT  |  The order to delete.  |
 
 
 
@@ -243,14 +243,14 @@ Type: OBJECT
 
 
 
-### Update an order
+### Update Order
 Update an existing order.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | SELECT  |  The order id.  |
+| Order | INTEGER | SELECT  |  The order to update.  |
 | Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  |
 
 
@@ -279,14 +279,14 @@ Type: OBJECT
 
 
 
-### Close an order
+### Close Order
 Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | SELECT  |  The order id.  |
+| Order | INTEGER | SELECT  |  The order to close.  |
 
 
 ### Output

@@ -87,7 +87,7 @@ Get a specific message
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message id | STRING | SELECT  |  Id of the message  |
+| Message Id | STRING | SELECT  |  Id of the message  |
 
 
 ### Output
@@ -151,11 +151,11 @@ Send the message.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | From | {{{STRING\(address), STRING\(name)}\(emailAddress)}\(recipient)} | OBJECT_BUILDER  |  The owner of the mailbox from which the message is sent. In most cases, this value is the same as the sender property, except for sharing or delegation scenarios. The value must correspond to the actual mailbox used.  |
-| To recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The To: recipients for the message.  |
+| To Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The To: recipients for the message.  |
 | Subject | STRING | TEXT  |  The subject of the message.  |
-| Bcc recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Bcc recipients for the message.  |
-| Cc recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Cc recipients for the message.  |
-| Reply to | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The email addresses to use when replying.  |
+| Bcc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Bcc recipients for the message.  |
+| Cc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Cc recipients for the message.  |
+| Reply To | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The email addresses to use when replying.  |
 | Body | {STRING\(content), STRING\(contentType)} | OBJECT_BUILDER  |  The body of the message. It can be in HTML or text format.  |
 
 

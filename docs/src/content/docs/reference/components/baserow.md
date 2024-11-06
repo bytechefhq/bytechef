@@ -44,13 +44,13 @@ Version: 1
 
 
 ### Create Row
-Creates a new Projects row.
+Creates a new row.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Table | INTEGER | INTEGER  |  Table where the row must be created in.  |
+| Table ID | INTEGER | INTEGER  |  ID of the table where the row must be created in.  |
 | User Field Names | BOOLEAN | SELECT  |  The field names returned by this endpoint will be the actual names of the fields.  |
 | DYNAMIC_PROPERTIES | null  |
 
@@ -81,8 +81,8 @@ Updates the specified row.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Table | INTEGER | INTEGER  |  Table containing the row to be updated.  |
-| Row | INTEGER | INTEGER  |  The row to be updated.  |
+| Table ID | INTEGER | INTEGER  |  ID of the table containing the row to be updated.  |
+| Row ID | INTEGER | INTEGER  |  ID of the row to be updated.  |
 | User Field Names | BOOLEAN | SELECT  |  The field names returned by this endpoint will be the actual names of the fields.  |
 | DYNAMIC_PROPERTIES | null  |
 

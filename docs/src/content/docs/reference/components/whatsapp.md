@@ -42,7 +42,7 @@ Version: 1
 ## Triggers
 
 
-### Message received
+### Message Received
 Triggers when you get a new message from certain number.
 
 #### Type: DYNAMIC_WEBHOOK
@@ -50,7 +50,7 @@ Triggers when you get a new message from certain number.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Sender number | STRING | TEXT  |  Type in the number from whom you want to trigger  |
+| Sender Number | STRING | TEXT  |  Type in the number from whom you want to trigger  |
 
 
 ### Output
@@ -88,7 +88,7 @@ Send a message via WhatsApp
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Message | STRING | TEXT  |  Message to send via WhatsApp  |
-| Send message to | STRING | TEXT  |  Phone number to send the message. It must start with "+" sign  |
+| Send Message To | STRING | TEXT  |  Phone number to send the message. It must start with "+" sign  |
 
 
 ### Output

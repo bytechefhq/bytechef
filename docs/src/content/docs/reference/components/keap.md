@@ -50,8 +50,8 @@ Version: 1
 ## Actions
 
 
-### Create a Company
-Creates a new company
+### Create Company
+Creates a new company.
 
 #### Properties
 
@@ -88,8 +88,8 @@ Type: OBJECT
 
 
 
-### Create a Task
-Creates a new task
+### Create Task
+Creates a new task.
 
 #### Properties
 
@@ -130,14 +130,14 @@ Type: OBJECT
 
 
 
-### Create a Contact
-Creates a new contact
+### Create Contact
+Creates a new contact.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Create Or Patch Contact | {[{STRING\(country_code), STRING\(field), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(postal_code), STRING\(region), STRING\(zip_code), STRING\(zip_four)}]\(addresses), DATE_TIME\(anniversary), DATE_TIME\(birthday), {INTEGER\(id)}\(company), STRING\(contact_type), [{{}\(content), INTEGER\(id)}]\(custom_fields), [{STRING\(email), STRING\(field)}]\(email_addresses), STRING\(family_name), [{STRING\(field), STRING\(number), STRING\(type)}]\(fax_numbers), STRING\(given_name), STRING\(job_title), INTEGER\(lead_source_id), STRING\(middle_name), STRING\(opt_in_reason), {STRING\(ip_address)}\(origin), INTEGER\(owner_id), [{STRING\(extension), STRING\(field), STRING\(number), STRING\(type)}]\(phone_numbers), STRING\(preferred_locale), STRING\(preferred_name), STRING\(prefix), [{STRING\(name), STRING\(type)}]\(social_accounts), STRING\(source_type), STRING\(spouse_name), STRING\(suffix), STRING\(time_zone), STRING\(website)} | OBJECT_BUILDER  |  |
+| CreateOrPatchContact | {[{STRING\(country_code), STRING\(field), STRING\(line1), STRING\(line2), STRING\(locality), STRING\(postal_code), STRING\(region), STRING\(zip_code), STRING\(zip_four)}]\(addresses), DATE_TIME\(anniversary), DATE_TIME\(birthday), {INTEGER\(id)}\(company), STRING\(contact_type), [{{}\(content), INTEGER\(id)}]\(custom_fields), [{STRING\(email), STRING\(field)}]\(email_addresses), STRING\(family_name), [{STRING\(field), STRING\(number), STRING\(type)}]\(fax_numbers), STRING\(given_name), STRING\(job_title), INTEGER\(lead_source_id), STRING\(middle_name), STRING\(opt_in_reason), {STRING\(ip_address)}\(origin), INTEGER\(owner_id), [{STRING\(extension), STRING\(field), STRING\(number), STRING\(type)}]\(phone_numbers), STRING\(preferred_locale), STRING\(preferred_name), STRING\(prefix), [{STRING\(name), STRING\(type)}]\(social_accounts), STRING\(source_type), STRING\(spouse_name), STRING\(suffix), STRING\(time_zone), STRING\(website)} | OBJECT_BUILDER  |  |
 
 
 ### Output

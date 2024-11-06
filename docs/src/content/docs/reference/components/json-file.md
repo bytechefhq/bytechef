@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file
+### Read from File
 Reads data from a JSON file.
 
 #### Properties
@@ -40,7 +40,7 @@ Reads data from a JSON file.
 
 
 
-### Write to file
+### Write to File
 Writes the data to a JSON file.
 
 #### Properties

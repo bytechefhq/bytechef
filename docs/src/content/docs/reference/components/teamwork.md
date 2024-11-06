@@ -50,8 +50,8 @@ Version: 1
 ## Actions
 
 
-### Creates a company
-Create a new company
+### Create Company
+Creates a new company.
 
 #### Properties
 
@@ -78,14 +78,14 @@ Type: OBJECT
 
 
 
-### Creates a task
+### Create Task
 Create a new task
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Tasklist Id | INTEGER | SELECT  |  Task list where new task is added  |
+| Task List | INTEGER | SELECT  |  Task list where new task is added  |
 | Task | {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} | OBJECT_BUILDER  |  |
 
 

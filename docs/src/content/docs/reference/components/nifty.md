@@ -1,14 +1,14 @@
 ---
 title: "Nifty"
-description: "Nifty Project Management tool is a software designed to aid project managers in organizing, planning, and tracking tasks and resources within a project"
+description: "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity."
 ---
 ## Reference
 <hr />
 
-Nifty Project Management tool is a software designed to aid project managers in organizing, planning, and tracking tasks and resources within a project
+Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity.
 
 
-Categories: [project-management]
+Categories: [project-management, productivity-and-collaboration]
 
 
 Version: 1
@@ -28,8 +28,8 @@ Version: 1
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client id | STRING | TEXT  |  |
-| Client secret | STRING | TEXT  |  |
+| Client Id | STRING | TEXT  |  |
+| Client Secret | STRING | TEXT  |  |
 
 
 
@@ -39,23 +39,26 @@ Version: 1
 
 
 
+## Triggers
+
+
+
+<hr />
+
 
 
 ## Actions
 
 
 ### Create Task
-Create a new task
+Creates new task
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  Name of the task  |
-| Description | STRING | TEXT  |  Description of the task.  |
 | Project | STRING | SELECT  |  Project within which the task will be created.  |
-| Status | STRING | SELECT  |  |
-| Due date | DATE_TIME | DATE_TIME  |  Due date for the task.  |
+| Task | {STRING\(task_group_id), STRING\(name), STRING\(description), DATE_TIME\(due_date)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -69,12 +72,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| {STRING\(id), STRING\(name), STRING\(project), STRING\(description), DATE_TIME\(due_date)} | OBJECT_BUILDER  |
 
 
 

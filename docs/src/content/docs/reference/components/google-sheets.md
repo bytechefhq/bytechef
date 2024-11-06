@@ -51,7 +51,7 @@ Triggers when a new row is added.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
 | Sheet | STRING | SELECT  |  The name of the sheet  |
 
 
@@ -81,7 +81,7 @@ Type: ARRAY
 ## Actions
 
 
-### Clear sheet
+### Clear Sheet
 Clear a sheet of all values while preserving formats.
 
 #### Properties
@@ -89,14 +89,14 @@ Clear a sheet of all values while preserving formats.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | INTEGER | SELECT  |  The name of the sheet  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | INTEGER | SELECT  |  The name of the sheet.  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
 
 
 
 
-### Create column
+### Create Column
 Append a new column to the end of the sheet.
 
 #### Properties
@@ -104,9 +104,9 @@ Append a new column to the end of the sheet.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
-| Column name | STRING | TEXT  |  Name of the new column.  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet.  |
+| Column Name | STRING | TEXT  |  Name of the new column.  |
 
 
 ### Output
@@ -129,7 +129,7 @@ Type: OBJECT
 
 
 
-### Create sheet
+### Create Sheet
 Create a blank sheet with title. Optionally, provide headers.
 
 #### Properties
@@ -137,7 +137,7 @@ Create a blank sheet with title. Optionally, provide headers.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Sheet name | STRING | TEXT  |  The name of the new sheet.  |
+| Sheet Name | STRING | TEXT  |  The name of the new sheet.  |
 | Headers | [BOOLEAN, NUMBER, STRING] | ARRAY_BUILDER  |  The headers of the new sheet.  |
 
 
@@ -153,33 +153,33 @@ Type: OBJECT
 
 
 
-### Delete row
-Delete row on an existing sheet
+### Delete Row
+Delete row on an existing sheet.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | INTEGER | SELECT  |  The name of the sheet  |
-| Row number | INTEGER | INTEGER  |  The row number to delete  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | INTEGER | SELECT  |  The name of the sheet.  |
+| Row Number | INTEGER | INTEGER  |  The row number to delete.  |
 
 
 
 
-### Find row by number
-Get a row in a Google Sheet by row number
+### Find Row by Number
+Get a row in a Google Sheet by row number.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
-| Row number | INTEGER | INTEGER  |  The row number to get from the sheet.  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet.  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
+| Row Number | INTEGER | INTEGER  |  The row number to get from the sheet.  |
 
 
 ### Output
@@ -194,7 +194,7 @@ Type: OBJECT
 
 
 
-### Insert multiple rows
+### Insert Multiple Rows
 Append rows to the end of the spreadsheet.
 
 #### Properties
@@ -202,10 +202,10 @@ Append rows to the end of the spreadsheet.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
-| Value input option | STRING | SELECT  |  How the input data should be interpreted.  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet.  |
+| Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -227,18 +227,18 @@ Type: ARRAY
 
 
 
-### Insert row
-Append a row of values to an existing sheet
+### Insert Row
+Append a row of values to an existing sheet.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
-| Value input option | STRING | SELECT  |  How the input data should be interpreted.  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet.  |
+| Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -254,18 +254,18 @@ Type: OBJECT
 
 
 
-### Update row
-Overwrite values in an existing row
+### Update Row
+Overwrite values in an existing row.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Include sheets from all drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
-| Row number | INTEGER | INTEGER  |  The row number to update  |
-| Is the first row headers? | BOOLEAN | SELECT  |  If the first row is header  |
+| Include Sheets from All Drives | BOOLEAN | SELECT  |  Whether both My Drive and shared drive sheets should be included in results.  |
+| Sheet | STRING | SELECT  |  The name of the sheet.  |
+| Row Number | INTEGER | INTEGER  |  The row number to update.  |
+| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
 
 

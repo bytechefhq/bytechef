@@ -54,7 +54,7 @@ Type: FILE_ENTRY
 
 
 
-### Write to file
+### Write to File
 null
 
 #### Properties
@@ -115,7 +115,7 @@ Type: STRING
 
 
 
-### Get parent folder
+### Get Parent Folder
 Gets the path of the parent folder of the file. If the file doesn't exist, it throws an error.
 
 #### Properties

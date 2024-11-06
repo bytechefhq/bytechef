@@ -50,7 +50,7 @@ Version: 1
 ## Actions
 
 
-### Create project
+### Create Project
 Creates a new project in a workspace or team.
 
 #### Properties
@@ -78,7 +78,7 @@ Type: OBJECT
 
 
 
-### Create a task
+### Create Task
 Creates a new task
 
 #### Properties

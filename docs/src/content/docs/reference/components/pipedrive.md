@@ -310,7 +310,7 @@ Type: OBJECT
 ## Actions
 
 
-### Get deals
+### Get Deals
 Returns all deals.
 
 #### Properties
@@ -342,7 +342,7 @@ Type: OBJECT
 
 
 
-### Add deal
+### Add Deal
 Adds a new deal.
 
 #### Properties
@@ -370,7 +370,7 @@ Type: OBJECT
 
 
 
-### Search deals
+### Search Deals
 Searches all deals by title, notes and/or custom fields.
 
 #### Properties
@@ -404,7 +404,7 @@ Type: OBJECT
 
 
 
-### Delete deal
+### Delete Deal
 Marks a deal as deleted. After 30 days, the deal will be permanently deleted.
 
 #### Properties
@@ -432,7 +432,7 @@ Type: OBJECT
 
 
 
-### Get details of a deal
+### Get Details of Deal
 Returns the details of a specific deal.
 
 #### Properties
@@ -460,7 +460,7 @@ Type: OBJECT
 
 
 
-### Get leads
+### Get Leads
 Returns multiple leads. Leads are sorted by the time they were created, from oldest to newest.
 
 #### Properties
@@ -493,7 +493,7 @@ Type: OBJECT
 
 
 
-### Add lead
+### Add Lead
 Creates a lead. A lead always has to be linked to a person or an organization or both.
 
 #### Properties
@@ -521,7 +521,7 @@ Type: OBJECT
 
 
 
-### Delete lead
+### Delete Lead
 Deletes a specific lead.
 
 #### Properties
@@ -549,7 +549,7 @@ Type: OBJECT
 
 
 
-### Get lead details
+### Get Lead Details
 Returns details of a specific lead. 
 
 #### Properties
@@ -577,7 +577,7 @@ Type: OBJECT
 
 
 
-### Search leads
+### Search Leads
 Searches all leads by title, notes and/or custom fields.
 
 #### Properties
@@ -610,7 +610,7 @@ Type: OBJECT
 
 
 
-### Get all organizations
+### Get All Organizations
 Returns all organizations.
 
 #### Properties
@@ -619,7 +619,7 @@ Returns all organizations.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Owner | INTEGER | SELECT  |  Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
 | Filter | INTEGER | SELECT  |  Filter to use  |
-| First   Characters | STRING | TEXT  |  Organizations whose name starts with the specified letter will be returned (case insensitive)  |
+| First Characters | STRING | TEXT  |  Organizations whose name starts with the specified letter will be returned (case insensitive)  |
 | Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma (`field_name_1ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
 
 
@@ -641,7 +641,7 @@ Type: OBJECT
 
 
 
-### Add an organization
+### Add Organization
 Adds a new organization.
 
 #### Properties
@@ -669,7 +669,7 @@ Type: OBJECT
 
 
 
-### Search organizations
+### Search Organizations
 Searches all organizations by name, address, notes and/or custom fields. This endpoint is a wrapper of <a href="https://developers.pipedrive.com/docs/api/v1/ItemSearch#searchItem">/v1/itemSearch</a> with a narrower OAuth scope.
 
 #### Properties
@@ -699,7 +699,7 @@ Type: OBJECT
 
 
 
-### Delete an organization
+### Delete Organization
 Marks an organization as deleted. After 30 days, the organization will be permanently deleted.
 
 #### Properties
@@ -727,7 +727,7 @@ Type: OBJECT
 
 
 
-### Get details of an organization
+### Get Details of Organization
 Returns the details of an organization.
 
 #### Properties
@@ -755,7 +755,7 @@ Type: OBJECT
 
 
 
-### Get persons
+### Get Persons
 Returns all persons.
 
 #### Properties
@@ -764,7 +764,7 @@ Returns all persons.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Owner | INTEGER | SELECT  |  Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
 | Filter | INTEGER | SELECT  |  Filter to use.  |
-| First   Characters | STRING | TEXT  |  Persons whose name starts with the specified letter will be returned (case insensitive)  |
+| First Characters | STRING | TEXT  |  Persons whose name starts with the specified letter will be returned (case insensitive)  |
 | Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).  |
 
 
@@ -786,7 +786,7 @@ Type: OBJECT
 
 
 
-### Add person
+### Add Person
 Adds a new person.
 
 #### Properties
@@ -814,7 +814,7 @@ Type: OBJECT
 
 
 
-### Search persons
+### Search Persons
 Searches all persons by name, email, phone, notes and/or custom fields.
 
 #### Properties
@@ -845,7 +845,7 @@ Type: OBJECT
 
 
 
-### Delete person
+### Delete Person
 Marks a person as deleted. After 30 days, the person will be permanently deleted.
 
 #### Properties
@@ -873,7 +873,7 @@ Type: OBJECT
 
 
 
-### Get details of a person
+### Get Details of Person
 Returns the details of a person. This also returns some additional fields which are not present when asking for all persons.
 
 #### Properties

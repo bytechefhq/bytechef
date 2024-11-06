@@ -110,7 +110,7 @@ Type: ARRAY
 
 
 ### Create Contact
-Creates a new Contact.
+Creates a new contact.
 
 #### Properties
 
@@ -139,7 +139,7 @@ Type: OBJECT
 
 
 ### Create Invoice
-Create a new Invoice.
+Creates a new invoice.
 
 #### Properties
 

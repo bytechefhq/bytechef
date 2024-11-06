@@ -50,14 +50,14 @@ Version: 1
 ## Actions
 
 
-### Create email template
+### Create Email Template
 Create email template
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Email   Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  |
+| Email Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  |
 
 
 ### Output
@@ -78,7 +78,7 @@ Type: OBJECT
 
 
 
-### Create people
+### Create People
 Creates new People
 
 #### Properties
@@ -106,7 +106,7 @@ Type: OBJECT
 
 
 
-### Add tag
+### Add Tag
 Add tag(s) to an existing user.
 
 #### Properties

@@ -21,7 +21,7 @@ Version: 1
 ## Triggers
 
 
-### Every day
+### Every Day
 Trigger off at a specific time either on a daily basis or selected days of the week.
 
 #### Type: LISTENER
@@ -31,7 +31,7 @@ Trigger off at a specific time either on a daily basis or selected days of the w
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
 | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of week | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |
+| Day of Week | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |
 | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
 
 
@@ -58,7 +58,7 @@ Type: OBJECT
 
 
 
-### Every week
+### Every Week
 Trigger off at a specific day of the week.
 
 #### Type: LISTENER
@@ -68,7 +68,7 @@ Trigger off at a specific day of the week.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
 | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
+| Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
 | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
 
 
@@ -95,7 +95,7 @@ Type: OBJECT
 
 
 
-### Every month
+### Every Month
 Trigger off at a specific time in month.
 
 #### Type: LISTENER
@@ -105,7 +105,7 @@ Trigger off at a specific time in month.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
 | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of month | INTEGER | INTEGER  |  The day of the month  at which a workflow will be triggered.  |
+| Day of Month | INTEGER | INTEGER  |  The day of the month  at which a workflow will be triggered.  |
 | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
 
 
@@ -141,7 +141,7 @@ Trigger off periodically, for example every minute or day, based on a set interv
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Interval | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
-| Day of week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
+| Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
 
 
 ### Output

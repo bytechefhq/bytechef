@@ -30,8 +30,8 @@ Add two numbers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First number | NUMBER | NUMBER  |  |
-| Second number | NUMBER | NUMBER  |  |
+| First Number | NUMBER | NUMBER  |  |
+| Second Number | NUMBER | NUMBER  |  |
 
 
 ### Output
@@ -53,8 +53,8 @@ Divide two numbers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First number | NUMBER | NUMBER  |  Number to be divided.  |
-| Second number | NUMBER | NUMBER  |  Number to divide by.  |
+| First Number | NUMBER | NUMBER  |  Number to be divided.  |
+| Second Number | NUMBER | NUMBER  |  Number to divide by.  |
 
 
 ### Output
@@ -76,8 +76,8 @@ Get the remainder of the division of two numbers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First number | NUMBER | NUMBER  |  Number to be divided.  |
-| Second number | NUMBER | NUMBER  |  Number to divide by.  |
+| First Number | NUMBER | NUMBER  |  Number to be divided.  |
+| Second Number | NUMBER | NUMBER  |  Number to divide by.  |
 
 
 ### Output
@@ -99,8 +99,8 @@ Multiply two numbers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First number | NUMBER | NUMBER  |  |
-| Second number | NUMBER | NUMBER  |  |
+| First Number | NUMBER | NUMBER  |  |
+| Second Number | NUMBER | NUMBER  |  |
 
 
 ### Output
@@ -122,8 +122,8 @@ Subtract two numbers.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First number | NUMBER | NUMBER  |  Number to subtract from.  |
-| Second number | NUMBER | NUMBER  |  Number to subtract.  |
+| First Number | NUMBER | NUMBER  |  Number to subtract from.  |
+| Second Number | NUMBER | NUMBER  |  Number to subtract.  |
 
 
 ### Output

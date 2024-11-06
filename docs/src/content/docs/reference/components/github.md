@@ -117,7 +117,113 @@ Type: OBJECT
 ## Actions
 
 
-### Create issue
+### Add Assignee to Issue
+Adds an assignees to the specified issue.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  |
+| Issue | STRING | SELECT  |  The issue to add assignee to.  |
+| Assignees | STRING | SELECT  |  The list of assignees to add to the issue.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| NUMBER | NUMBER  |
+| INTEGER | INTEGER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Add Labels to Issue
+Adds labels to the specified issue.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  |
+| Issue | STRING | SELECT  |  The issue to add labels to.  |
+| Labels | STRING | SELECT  |  The list of labels to add to the issue.  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Create Comment on Issue
+Adds a comment to the specified issue.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Repository | STRING | SELECT  |  |
+| Issue | STRING | SELECT  |  The issue to comment on.  |
+| Comment | STRING | TEXT  |  The comment to add to the issue.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| NUMBER | NUMBER  |
+| INTEGER | INTEGER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Create Issue
 Create Issue in GitHub Repository
 
 #### Properties
@@ -146,6 +252,8 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 
 
@@ -181,42 +289,8 @@ Type: OBJECT
 | INTEGER | INTEGER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| STRING | TEXT  |
-
-
-
-
-
-
-### Create comment on a issue
-Adds a comment to the specified issue.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-| Issue | STRING | SELECT  |  The issue to comment on.  |
-| Comment | STRING | TEXT  |  The comment to add to the issue.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 
 

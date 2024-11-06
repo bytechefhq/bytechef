@@ -78,7 +78,7 @@ Type: OBJECT
 
 
 
-### Send direct message
+### Send Direct Message
 Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.
 
 #### Properties

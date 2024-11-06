@@ -22,13 +22,13 @@ Version: 1
 Version: 1
 
 
-### One Simple API Connection
+### null
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Access Token | STRING | TEXT  |  Access Token that is given to you when you create a API Token in OneSimpleApi  |
+| API Token | STRING | TEXT  |  |
 
 
 
@@ -44,15 +44,15 @@ Version: 1
 
 
 ### Currency Converter
-Convert your currency into any other
+Convert currency from one to another.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| From Currency | STRING | SELECT  |  Select a currency from which you want to convert  |
-| To Currency | STRING | SELECT  |  Select a currency to which you want to convert  |
-| Value | NUMBER | NUMBER  |  Input the number for conversion  |
+| From Currency | STRING | SELECT  |  Currency from which you want to convert.  |
+| To Currency | STRING | SELECT  |  Currency to which you want to convert.  |
+| Value | NUMBER | NUMBER  |  Value to convert.  |
 
 
 ### Output
@@ -69,6 +69,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
+| NUMBER | NUMBER  |
 | STRING | TEXT  |
 
 
@@ -97,6 +98,9 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 

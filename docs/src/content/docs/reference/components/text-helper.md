@@ -66,7 +66,7 @@ Extract content from the HTML content.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| HTML content to extract content from. | STRING | TEXT_AREA  |  The HTML content.  |
+| HTML Content | STRING | TEXT_AREA  |  HTML content to extract content from.  |
 | CSS Selector | STRING | TEXT  |  The CSS selector to search for.  |
 | Return Value | STRING | SELECT  |  The data to return.  |
 | Attribute | STRING | TEXT  |  The name of the attribute to return the value of  |

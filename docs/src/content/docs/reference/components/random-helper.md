@@ -30,8 +30,8 @@ Generates a random integer value.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
+| Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |
+| End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |
 
 
 ### Output
@@ -53,8 +53,8 @@ Generates a random float value.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
+| Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |
+| End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |
 
 
 ### Output

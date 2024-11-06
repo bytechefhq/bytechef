@@ -81,8 +81,8 @@ Type: OBJECT
 ## Actions
 
 
-### Add a new member to the list
-Add a new member to the list.
+### Add Member to List
+Adds a new member to the list.
 
 #### Properties
 
@@ -98,7 +98,7 @@ Add a new member to the list.
 
 ___Sample Output:___
 
-```{email_address=string, status=subscribed, unsubscribe_reason=string, timestamp_opt=2019-08-24T14:15:22, ip_opt=string, location={longitude=0, region=string, latitude=0, dstoff=0, timezone=string, country_code=string, gmtoff=0}, ip_signup=string, tags=[{id=0, name=string}], marketing_permissions=[{text=string, marketing_permission_id=string, enabled=true}], email_type=string, language=string, interests={property1=true, property2=true}, timestamp_signup=2019-08-24T14:15:22, id=string, _links=[{method=GET, targetSchema=string, schema=string, href=string, rel=string}], web_id=0, member_rating=0, vip=true, last_changed=2019-08-24T14:15:22, source=string, consents_to_one_to_one_messaging=true, email_client=string, unique_email_id=string, tags_count=0, list_id=string, full_name=string, merge_fields={property1=, property2=}, stats={avg_click_rate=0, avg_open_rate=0, ecommerce_data={total_revenue=0, number_of_orders=0, currency_code=USD}}, contact_id=string, last_note={created_by=string, note_id=0, created_at=2019-08-24T14:15:22, note=string}}```
+```{last_note={created_at=2019-08-24T14:15:22, note_id=0, created_by=string, note=string}, contact_id=string, stats={ecommerce_data={currency_code=USD, number_of_orders=0, total_revenue=0}, avg_open_rate=0, avg_click_rate=0}, merge_fields={property1=, property2=}, full_name=string, list_id=string, tags_count=0, unique_email_id=string, email_client=string, consents_to_one_to_one_messaging=true, source=string, last_changed=2019-08-24T14:15:22, vip=true, member_rating=0, web_id=0, _links=[{rel=string, href=string, schema=string, targetSchema=string, method=GET}], id=string, timestamp_signup=2019-08-24T14:15:22, interests={property1=true, property2=true}, language=string, email_type=string, marketing_permissions=[{enabled=true, marketing_permission_id=string, text=string}], tags=[{name=string, id=0}], ip_signup=string, location={gmtoff=0, country_code=string, timezone=string, dstoff=0, latitude=0, region=string, longitude=0}, ip_opt=string, timestamp_opt=2019-08-24T14:15:22, unsubscribe_reason=string, status=subscribed, email_address=string}```
 
 
 

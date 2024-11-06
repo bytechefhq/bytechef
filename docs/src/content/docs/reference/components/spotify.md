@@ -69,7 +69,7 @@ Adds one or more items to your playlist.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Playlist | STRING | SELECT  |  |
-| Uris | [STRING] | ARRAY_BUILDER  |  |
+| Tracks | [STRING] | ARRAY_BUILDER  |  |
 | Item | {INTEGER\(position)} | OBJECT_BUILDER  |  |
 
 
