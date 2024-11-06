@@ -506,8 +506,8 @@
     } ],
     "title" : "Create Company",
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1004,7 +1004,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "First   Name",
+        "label" : "First Name",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -1024,7 +1024,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Last   Name",
+        "label" : "Last Name",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -1101,8 +1101,8 @@
     } ],
     "title" : "Create Contact",
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1530,9 +1530,12 @@
     } ],
     "title" : "Create Task",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
+  "dataStream" : null,
+  "triggers" : [ ],
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1621,8 +1624,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null
+  }
 }

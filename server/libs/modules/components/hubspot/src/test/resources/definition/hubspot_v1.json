@@ -13,75 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Hubspot",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "refreshToken" : null,
-      "authorizationUrl" : { },
-      "clientSecret" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "tokenUrl" : { },
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -555,7 +486,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "First   Name",
+          "label" : "First Name",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -575,7 +506,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Last   Name",
+          "label" : "Last Name",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -595,7 +526,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Email   Address",
+          "label" : "Email Address",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -615,7 +546,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Phone   Number",
+          "label" : "Phone Number",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -671,9 +602,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Contact",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -712,9 +643,9 @@
       }
     } ],
     "title" : "Delete Contact",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1165,9 +1096,9 @@
       }
     } ],
     "title" : "Get Contact",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1607,7 +1538,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Contact   To   Update .",
+      "label" : "Contact",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1666,7 +1597,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "First   Name",
+          "label" : "First Name",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -1686,7 +1617,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Last   Name",
+          "label" : "Last Name",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -1706,7 +1637,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Email   Address",
+          "label" : "Email Address",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -1726,7 +1657,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Phone   Number",
+          "label" : "Phone Number",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -1782,9 +1713,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Update Contact",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2256,7 +2187,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Deal   Name",
+          "label" : "Deal Name",
           "placeholder" : null,
           "controlType" : "TEXT",
           "languageId" : null,
@@ -2298,7 +2229,7 @@
           "type" : "DATE",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Closedate",
+          "label" : "Close Date",
           "placeholder" : null,
           "options" : null,
           "optionsDataSource" : null,
@@ -2338,7 +2269,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Deal   Stage",
+          "label" : "Deal Stage",
           "placeholder" : null,
           "controlType" : "SELECT",
           "languageId" : null,
@@ -2361,7 +2292,7 @@
           "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Deal   Owner",
+          "label" : "Deal Owner",
           "placeholder" : null,
           "controlType" : "SELECT",
           "languageId" : null,
@@ -2380,23 +2311,78 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Deal",
+    "workflowNodeDescription" : null,
     "perform" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : {
-    "category" : "CRM",
-    "providerAdapters" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
     } ],
-    "providerMappers" : [ {
-      "modelType" : "ACCOUNT"
-    }, {
-      "modelType" : "CONTACT"
-    } ]
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
   },
   "triggers" : [ {
     "batch" : null,
@@ -3268,17 +3254,31 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
+    "dynamicWebhookRefresh" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
-  } ]
+  } ],
+  "dataStream" : null,
+  "unifiedApi" : {
+    "category" : "CRM",
+    "providerAdapters" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ],
+    "providerMappers" : [ {
+      "modelType" : "ACCOUNT"
+    }, {
+      "modelType" : "CONTACT"
+    } ]
+  }
 }
