@@ -72,7 +72,7 @@ public class ConnectionServiceImpl implements ConnectionService {
     @Transactional(readOnly = true)
     public List<Connection> getConnections(ModeType type) {
         return CollectionUtils.filter(
-            connectionRepository.findAll(Sort.by("name")), connection -> connection.getType() == type);
+            connectionRepository.findAll(Sort.by("name", "id")), connection -> connection.getType() == type);
     }
 
     @Override
