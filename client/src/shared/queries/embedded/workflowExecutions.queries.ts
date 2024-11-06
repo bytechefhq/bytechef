@@ -15,7 +15,7 @@ export const WorkflowExecutionKeys = {
         request,
     ],
     workflowExecution: (id: number) => [...WorkflowExecutionKeys.workflowExecutions, id],
-    workflowExecutions: ['workflowExecutions'] as const,
+    workflowExecutions: ['integrationWorkflowExecutions'] as const,
 };
 
 export const useGetWorkflowExecutionsQuery = (request: GetWorkflowExecutionsPageRequest) =>
