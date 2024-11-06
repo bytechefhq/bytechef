@@ -45,7 +45,7 @@ Version: 1
 ## Actions
 
 
-### Create folder
+### Create Folder
 Creates a new folder at path you specify.
 
 #### Properties
@@ -53,8 +53,8 @@ Creates a new folder at path you specify.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Site | STRING | SELECT  |  |
-| Parent folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
-| Folder name | STRING | TEXT  |  |
+| Parent Folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
+| Folder Name | STRING | TEXT  |  |
 
 
 ### Output
@@ -76,7 +76,7 @@ Type: OBJECT
 
 
 
-### Create list
+### Create List
 Creates a new list
 
 #### Properties
@@ -84,8 +84,8 @@ Creates a new list
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Site | STRING | SELECT  |  |
-| List name | STRING | TEXT  |  |
-| List description | STRING | TEXT  |  |
+| List Name | STRING | TEXT  |  |
+| List Description | STRING | TEXT  |  |
 
 
 ### Output
@@ -108,7 +108,7 @@ Type: OBJECT
 
 
 
-### Create list item
+### Create List Item
 Creates a new item in a list.
 
 #### Properties
@@ -138,7 +138,7 @@ Type: OBJECT
 
 
 
-### Upload file
+### Upload File
 Upload file to Microsoft SharePoint folder.
 
 #### Properties
@@ -146,7 +146,7 @@ Upload file to Microsoft SharePoint folder.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Site | STRING | SELECT  |  |
-| Parent folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
+| Parent Folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
 | File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
 
 

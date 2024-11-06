@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Convert from XML string
+### Convert from XML String
 Converts the XML string to object/array.
 
 #### Properties
@@ -45,7 +45,7 @@ Type: OBJECT
 
 
 
-### Convert to XML string
+### Convert to XML String
 Writes the object/array to a XML string.
 
 #### Properties

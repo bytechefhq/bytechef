@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Set value
+### Set Value
 Assign value to a variable that can be used in the following steps.
 
 #### Properties

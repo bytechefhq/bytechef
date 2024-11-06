@@ -44,17 +44,17 @@ Version: 1
 ## Actions
 
 
-### Create activity
-Creates a new Activity
+### Create Activity
+Creates a new activity.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Activity type | STRING | SELECT  |  The Activity Type of this Activity.  |
-| Details | STRING | TEXT  |  Text body of this Activity.  |
-| Parent type | STRING | SELECT  |  Parent type to associate this Activity with.  |
-| Parent name | STRING | SELECT  |  Parent this Activity will be associated with.  |
+| Activity Type | STRING | SELECT  |  The activity type of this activity.  |
+| Details | STRING | TEXT  |  Text body of this activity.  |
+| Parent Type | STRING | SELECT  |  Parent type to associate this activity with.  |
+| Parent Name | STRING | SELECT  |  Parent this activity will be associated with.  |
 
 
 ### Output
@@ -78,23 +78,23 @@ Type: OBJECT
 
 
 
-### Create company
-Creates a new Company
+### Create Company
+Creates a new company.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The name of the Company.  |
-| Assignee | STRING | SELECT  |  User that will be the owner of the Company.  |
-| Email domain | STRING | TEXT  |  The domain to which email addresses for the Company belong.  |
-| Contact type | STRING | SELECT  |  Contact Type of the Company.  |
-| Details | STRING | TEXT  |  Description of the Company.  |
-| Phone numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the Company.  |
-| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Company.  |
-| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the Company.  |
+| Name | STRING | TEXT  |  The name of the company.  |
+| Assignee | STRING | SELECT  |  User that will be the owner of the company.  |
+| Email Domain | STRING | TEXT  |  The domain to which email addresses for the company belong.  |
+| Contact Type | STRING | SELECT  |  Contact type of the company.  |
+| Details | STRING | TEXT  |  Description of the company.  |
+| Phone Numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the company.  |
+| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the company.  |
+| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the company.  |
 | Address | {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |  Company's street, city, state, postal code, and country.  |
-| Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the Company  |
+| Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the company  |
 
 
 ### Output
@@ -125,25 +125,25 @@ Type: OBJECT
 
 
 
-### Create person
-Creates a new Person
+### Create Person
+Creates a new person.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The first and last name of the Person.  |
-| Emails | [{STRING\(email), STRING\(category)}\($Email)] | ARRAY_BUILDER  |  Email addresses belonging to the Person.  |
-| Assignee | STRING | SELECT  |  User that will be the owner of the Person.  |
-| Title | STRING | TEXT  |  The professional title of the Person.  |
-| Company | STRING | SELECT  |  Primary Company with which the Person is associated.  |
-| Contact type | STRING | SELECT  |  The unique identifier of the Contact Type of the Person.  |
+| Name | STRING | TEXT  |  The first and last name of the person.  |
+| Emails | [{STRING\(email), STRING\(category)}\($Email)] | ARRAY_BUILDER  |  Email addresses belonging to the person.  |
+| Assignee | STRING | SELECT  |  User that will be the owner of the person.  |
+| Title | STRING | TEXT  |  The professional title of the person.  |
+| Company | STRING | SELECT  |  Primary company with which the person is associated.  |
+| Contact type | STRING | SELECT  |  The unique identifier of the contact type of the person.  |
 | Details | STRING | TEXT  |  Description of the person.  |
-| Phone numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the person.  |
-| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the Person.  |
-| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the Person.  |
+| Phone Numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the person.  |
+| Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the person.  |
+| Websites | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Websites belonging to the person.  |
 | Address | {STRING\(street), STRING\(city), STRING\(state), STRING\(postal_code), STRING\(country)} | OBJECT_BUILDER  |  Person's street, city, state, postal code, and country.  |
-| Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the Person.  |
+| Tags | [STRING] | ARRAY_BUILDER  |  Tags associated with the person.  |
 
 
 ### Output
@@ -170,6 +170,54 @@ Type: OBJECT
 | [STRING] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |
+
+
+
+
+
+
+### Create Task
+Creates a new task in Copper.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Name | STRING | TEXT  |  The name of the task.  |
+| Assignee | STRING | SELECT  |  User to assign the task to.  |
+| Due Date | DATE | DATE  |  The due date of the task.  |
+| Reminder Date | DATE | DATE  |  The reminder date of the task.  |
+| Description | STRING | TEXT  |  Description of the task.  |
+| Priority | STRING | SELECT  |  The priority of the task.  |
+| Tags | [STRING] | ARRAY_BUILDER  |  |
+| Status | STRING | SELECT  |  The status of the task.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| Related Resource | {STRING\(id), STRING\(type)} | OBJECT_BUILDER  |  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [] | ARRAY_BUILDER  |
+| [] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
 
 
 

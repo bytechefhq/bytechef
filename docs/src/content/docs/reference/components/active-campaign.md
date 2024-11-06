@@ -51,8 +51,8 @@ Version: 1
 ## Actions
 
 
-### Create account
-Creates a new account
+### Create Account
+Creates a new account.
 
 #### Properties
 
@@ -79,8 +79,8 @@ Type: OBJECT
 
 
 
-### Create contact
-Creates a new contact
+### Create Contact
+Creates a new contact.
 
 #### Properties
 
@@ -107,8 +107,8 @@ Type: OBJECT
 
 
 
-### Creates a task
-Creates a new task
+### Create Task
+Creates a new task.
 
 #### Properties
 

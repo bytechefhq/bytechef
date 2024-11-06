@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file
+### Read from File
 Reads data from a XML file.
 
 #### Properties
@@ -39,7 +39,7 @@ Reads data from a XML file.
 
 
 
-### Write to file
+### Write to File
 Writes the data to a XML file.
 
 #### Properties

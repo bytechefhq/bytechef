@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file
+### Read from File
 Reads data from a XLS/XLSX file.
 
 #### Properties
@@ -41,7 +41,7 @@ Reads data from a XLS/XLSX file.
 
 
 
-### Write to file
+### Write to File
 Writes the data to a XLS/XLSX file.
 
 #### Properties

@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file
+### Read from File
 Reads data from a csv file.
 
 #### Properties
@@ -32,14 +32,14 @@ Reads data from a csv file.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the csv file to read from.  |
 | Delimiter | STRING | TEXT  |  Character used to separate values within the line red from the CSV file.  |
-| Enclosing character | STRING | TEXT  |      Character used to wrap/enclose values. It is usually applied to complex CSV files where
+| Enclosing Character | STRING | TEXT  |      Character used to wrap/enclose values. It is usually applied to complex CSV files where
     values may include delimiter characters.
   |
 | Header Row | BOOLEAN | SELECT  |  The first row of the file contains the header names.  |
 | Include Empty Cells | BOOLEAN | SELECT  |  When reading from file the empty cells will be filled with an empty string.  |
 | Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |
 | Page Number | INTEGER | INTEGER  |  The page number to get.  |
-| Read As String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
+| Read as String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
 
 
 ### Output
@@ -60,7 +60,7 @@ Type: ARRAY
 
 
 
-### Write to file
+### Write to File
 Writes the data to a csv file.
 
 #### Properties

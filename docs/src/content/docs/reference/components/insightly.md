@@ -50,8 +50,8 @@ Version: 1
 ## Actions
 
 
-### Create contact
-Creates new Contact
+### Create Contact
+Creates new contact.
 
 #### Properties
 
@@ -83,8 +83,8 @@ Type: OBJECT
 
 
 
-### Create organization
-Creates new Organization
+### Create Organization
+Creates new organization.
 
 #### Properties
 
@@ -114,8 +114,8 @@ Type: OBJECT
 
 
 
-### Create task
-Creates new Task
+### Create Task
+Creates new task.
 
 #### Properties
 

@@ -1,11 +1,11 @@
 ---
 title: "VTiger"
-description: "CRM software for sales, marketing, and support teams"
+description: "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business."
 ---
 ## Reference
 <hr />
 
-CRM software for sales, marketing, and support teams
+VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business.
 
 
 Categories: [crm]
@@ -28,9 +28,9 @@ Version: 1
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| VTiger Username of email | STRING | TEXT  |  |
-| VTiger Access Key | STRING | TEXT  |  |
-| VTiger Instance URL | STRING | TEXT  |  For the instance URL, add the url without the endpoint. For example enter https://<instance>.od2.vtiger.com instead of https://<instance>.od2.vtiger.com/restapi/v1/vtiger/default  |
+| Username | STRING | TEXT  |  Enter your username/email.  |
+| Access Key | STRING | TEXT  |  |
+| VTiger Instance URL | STRING | TEXT  |  For the instance URL, add the url without the endpoint.  |
 
 
 
@@ -45,16 +45,16 @@ Version: 1
 ## Actions
 
 
-### Create a contact
-Create a new contact
+### Create Contact
+Creates a new contact.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Name | STRING | TEXT  |  First name of the contact  |
-| Last Name | STRING | TEXT  |  Last name of the contact  |
-| Contact email | STRING | TEXT  |  email for your new contact  |
+| First Name | STRING | TEXT  |  First name of the contact.  |
+| Last Name | STRING | TEXT  |  Last name of the contact.  |
+| Email | STRING | TEXT  |  Email address of the contact.  |
 
 
 ### Output
@@ -68,22 +68,22 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone)} | OBJECT_BUILDER  |
+| {STRING\(firstname), STRING\(lastname), STRING\(email), STRING\(phone), STRING\(assigned_user_id), STRING\(id)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### Create a Product
-Create a new Product for your CRM
+### Create Product
+Creates a new product for your CRM.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Product Name | STRING | TEXT  |  Name of the product  |
-| Product Type | STRING | SELECT  |  Type of the product  |
+| Product Name | STRING | TEXT  |  Name of the product.  |
+| Product Type | STRING | SELECT  |  Type of the product.  |
 
 
 ### Output
@@ -97,7 +97,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(id), STRING\(productname), STRING\(product_type), STRING\(createdtime), STRING\(source), STRING\(assigned_user_id)} | OBJECT_BUILDER  |
+| {STRING\(productname), STRING\(product_type), STRING\(assigned_user_id), STRING\(id)} | OBJECT_BUILDER  |
 
 
 
@@ -105,7 +105,7 @@ Type: OBJECT
 
 
 ### Get Me
-Get more information about yourself
+Get more information about yourself.
 
 #### Properties
 

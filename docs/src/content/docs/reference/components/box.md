@@ -115,15 +115,15 @@ Type: OBJECT
 ## Actions
 
 
-### Create folder
+### Create Folder
 Creates a new empty folder within the specified parent folder.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder name | STRING | TEXT  |  The name for the new folder.  |
-| Parent folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+| Folder Name | STRING | TEXT  |  The name for the new folder.  |
+| Parent Folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
 
 
 ### Output
@@ -147,14 +147,14 @@ Type: OBJECT
 
 
 
-### Download file
+### Download File
 Download a selected file.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder from which you want to download the file.  |
+| Parent Folder | STRING | SELECT  |  Folder from which you want to download the file.  |
 | File | STRING | SELECT  |  File to download.  |
 
 
@@ -179,14 +179,14 @@ Type: FILE_ENTRY
 
 
 
-### Upload file
+### Upload File
 Uploads a small file to Box.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
+| Parent Folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
 | File | FILE_ENTRY | FILE_ENTRY  |  |
 
 

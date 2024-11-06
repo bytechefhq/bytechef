@@ -43,7 +43,7 @@ Version: 1
 ## Actions
 
 
-### Create image
+### Create Image
 Create an image using text-to-image models
 
 #### Properties

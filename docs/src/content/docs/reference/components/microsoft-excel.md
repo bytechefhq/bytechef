@@ -45,8 +45,8 @@ Version: 1
 ## Actions
 
 
-### Append row
-Append a row of values to an existing worksheet
+### Append Row
+Append a row of values to an existing worksheet.
 
 #### Properties
 
@@ -54,7 +54,7 @@ Append a row of values to an existing worksheet
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Workbook | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
-| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
+| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -70,7 +70,7 @@ Type: OBJECT
 
 
 
-### Clear worksheet
+### Clear Worksheet
 Clear a worksheet of all values.
 
 #### Properties
@@ -79,27 +79,13 @@ Clear a worksheet of all values.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Workbook | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
-| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
+| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 
 
 
 
-### Delete row
-Delete row on an existing sheet
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Row number | INTEGER | INTEGER  |  The row number to delete  |
-
-
-
-
-### Find row by number
-Get row values from the worksheet by the row number
+### Delete Row
+Delete row on an existing sheet.
 
 #### Properties
 
@@ -107,8 +93,22 @@ Get row values from the worksheet by the row number
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Workbook | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
-| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
-| Row number | INTEGER | INTEGER  |  The row number to get the values from  |
+| Row Number | INTEGER | INTEGER  |  The row number to delete.  |
+
+
+
+
+### Find Row by Number
+Get row values from the worksheet by the row number.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Workbook | STRING | SELECT  |  |
+| Worksheet | STRING | SELECT  |  |
+| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
+| Row Number | INTEGER | INTEGER  |  The row number to get the values from.  |
 
 
 ### Output
@@ -123,8 +123,8 @@ Type: OBJECT
 
 
 
-### Update row
-Update a row in a worksheet
+### Update Row
+Update a row in a worksheet.
 
 #### Properties
 
@@ -132,8 +132,8 @@ Update a row in a worksheet
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Workbook | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
-| Row number | INTEGER | INTEGER  |  The row number to update  |
-| Is the first row header? | BOOLEAN | SELECT  |  If the first row is header  |
+| Row Number | INTEGER | INTEGER  |  The row number to update.  |
+| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
 
 

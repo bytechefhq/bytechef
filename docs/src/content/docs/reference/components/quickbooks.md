@@ -45,19 +45,47 @@ Version: 1
 ## Actions
 
 
-### Create customer
+### Create Category
 Has conditionally required parameters.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Display name | STRING | TEXT  |  The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, the system generates DisplayName by concatenating customer name components supplied in the request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.  |
+| Name | STRING | TEXT  |  Name of the category  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(domain), STRING\(Name), STRING\(Level), STRING\(Subitem), STRING\(FullyQualifiedName)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Create Customer
+Has conditionally required parameters.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Display Name | STRING | TEXT  |  The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, the system generates DisplayName by concatenating customer name components supplied in the request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.  |
 | Suffix | STRING | TEXT  |  Suffix of the name. For example, Jr. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
 | Title | STRING | TEXT  |  Title of the person. This tag supports i18n, all locales. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, Suffix, or FullyQualifiedName attributes are required during create.  |
-| Middle name | STRING | TEXT  |  Middle name of the person. The person can have zero or more middle names. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
-| Last/Family name | STRING | TEXT  |  Family name or the last name of the person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
-| First/Given name | STRING | TEXT  |  Given name or first name of a person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
+| Middle Name | STRING | TEXT  |  Middle name of the person. The person can have zero or more middle names. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
+| Last/Family Name | STRING | TEXT  |  Family name or the last name of the person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
+| First/Given Name | STRING | TEXT  |  Given name or first name of a person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
 
 
 ### Output
@@ -83,7 +111,7 @@ Type: OBJECT
 
 
 
-### Create item
+### Create Item
 Creates a new item.
 
 #### Properties
@@ -91,7 +119,7 @@ Creates a new item.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Name | STRING | TEXT  |  Name of the item. This value must be unique. Required for create.  |
-| Quantity on hand | NUMBER | NUMBER  |  Current quantity of the Inventory items available for sale. Not used for Service or NonInventory type items.Required for Inventory type items.  |
+| Quantity on Hand | NUMBER | NUMBER  |  Current quantity of the Inventory items available for sale. Not used for Service or NonInventory type items.Required for Inventory type items.  |
 
 
 ### Output
@@ -109,34 +137,6 @@ Type: OBJECT
 | Name | STRING | TEXT  |  |
 | Description | STRING | TEXT  |  |
 | Unit price | NUMBER | NUMBER  |  |
-
-
-
-
-
-
-### Create a category
-Has conditionally required parameters.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Nane | STRING | TEXT  |  Name of the category  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(domain), STRING\(Name), STRING\(Level), STRING\(Subitem), STRING\(FullyQualifiedName)} | OBJECT_BUILDER  |
 
 
 

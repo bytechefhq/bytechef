@@ -43,7 +43,7 @@ Append value to the end of a list. If the list does not exist, it will be create
 | Value | {} | OBJECT_BUILDER  |  The value to set under given key.  |
 | Value | STRING | TEXT  |  The value to set under given key.  |
 | Value | TIME | TIME  |  The value to set under given key.  |
-| Append a list as a single item | BOOLEAN | SELECT  |  When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.  |
+| Append a List as a Single Item | BOOLEAN | SELECT  |  When set to true, and the value is a list, it will be added as a single value rather than concatenating the lists.  |
 
 
 
@@ -57,7 +57,7 @@ The numeric value can be incremented atomically, and the action can be used conc
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Key | STRING | TEXT  |  The identifier of a value to increment.  |
 | Scope | STRING | SELECT  |  The namespace to obtain a value from.  |
-| Value to add | INTEGER | INTEGER  |  The value that can be added to the existing numeric value, which may have a negative value.  |
+| Value to Add | INTEGER | INTEGER  |  The value that can be added to the existing numeric value, which may have a negative value.  |
 
 
 ### Output
@@ -82,17 +82,17 @@ Wait for a value under a specified key, until it's available.
 | Key | STRING | TEXT  |  The identifier of a value to wait for.  |
 | Scope | STRING | SELECT  |  The namespace to obtain a value from.  |
 | Type | INTEGER | SELECT  |  The value type.  |
-| Default value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
-| Default value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
-| Default value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
-| Default value | DATE_TIME | DATE_TIME  |  The default value to return if no value exists under the given key.  |
-| Default value | INTEGER | INTEGER  |  The default value to return if no value exists under the given key.  |
-| Default value | NULL | NULL  |  The default value to return if no value exists under the given key.  |
-| Default value | NUMBER | NUMBER  |  The default value to return if no value exists under the given key.  |
-| Default value | {} | OBJECT_BUILDER  |  The default value to return if no value exists under the given key.  |
-| Default value | STRING | TEXT  |  The default value to return if no value exists under the given key.  |
-| Default value | TIME | TIME  |  The default value to return if no value exists under the given key.  |
-| Timeout (1 to 300 sec) | INTEGER | INTEGER  |  If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.  |
+| Default Value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
+| Default Value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
+| Default Value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
+| Default Value | DATE_TIME | DATE_TIME  |  The default value to return if no value exists under the given key.  |
+| Default Value | INTEGER | INTEGER  |  The default value to return if no value exists under the given key.  |
+| Default Value | NULL | NULL  |  The default value to return if no value exists under the given key.  |
+| Default Value | NUMBER | NUMBER  |  The default value to return if no value exists under the given key.  |
+| Default Value | {} | OBJECT_BUILDER  |  The default value to return if no value exists under the given key.  |
+| Default Value | STRING | TEXT  |  The default value to return if no value exists under the given key.  |
+| Default Value | TIME | TIME  |  The default value to return if no value exists under the given key.  |
+| Timeout | INTEGER | INTEGER  |  If a value is not found within the specified time, the action returns a null value. Therefore, the maximum wait time should be set accordingly.  |
 
 
 
@@ -162,16 +162,16 @@ Retrieve a previously assigned value within the specified scope using its corres
 | Key | STRING | TEXT  |  The identifier of a value to get, stored earlier in the selected scope.  |
 | Scope | STRING | SELECT  |  The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.  |
 | Type | INTEGER | SELECT  |  The value type.  |
-| Default value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
-| Default value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
-| Default value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
-| Default value | DATE_TIME | DATE_TIME  |  The default value to return if no value exists under the given key.  |
-| Default value | INTEGER | INTEGER  |  The default value to return if no value exists under the given key.  |
-| Default value | NULL | NULL  |  The default value to return if no value exists under the given key.  |
-| Default value | NUMBER | NUMBER  |  The default value to return if no value exists under the given key.  |
-| Default value | {} | OBJECT_BUILDER  |  The default value to return if no value exists under the given key.  |
-| Default value | STRING | TEXT  |  The default value to return if no value exists under the given key.  |
-| Default value | TIME | TIME  |  The default value to return if no value exists under the given key.  |
+| Default Value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
+| Default Value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
+| Default Value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
+| Default Value | DATE_TIME | DATE_TIME  |  The default value to return if no value exists under the given key.  |
+| Default Value | INTEGER | INTEGER  |  The default value to return if no value exists under the given key.  |
+| Default Value | NULL | NULL  |  The default value to return if no value exists under the given key.  |
+| Default Value | NUMBER | NUMBER  |  The default value to return if no value exists under the given key.  |
+| Default Value | {} | OBJECT_BUILDER  |  The default value to return if no value exists under the given key.  |
+| Default Value | STRING | TEXT  |  The default value to return if no value exists under the given key.  |
+| Default Value | TIME | TIME  |  The default value to return if no value exists under the given key.  |
 
 
 

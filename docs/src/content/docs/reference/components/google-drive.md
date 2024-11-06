@@ -50,7 +50,7 @@ Triggers when new file is uploaded to Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  |
+| Parent Folder | STRING | SELECT  |  |
 
 
 ### Output
@@ -80,7 +80,7 @@ Triggers when new file is uploaded to Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  |
+| Parent Folder | STRING | SELECT  |  |
 
 
 ### Output
@@ -109,15 +109,48 @@ Type: ARRAY
 ## Actions
 
 
-### Upload file
-Uploads a file in your Google Drive
+### Copy File
+Copy a selected file to a different location within Google Drive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Parent folder | STRING | SELECT  |  Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
+| File | STRING | SELECT  |  The id of the file to be copied.  |
+| New File Name | STRING | TEXT  |  The name of the new file created as a result of the copy operation.  |
+| Destination Folder | STRING | SELECT  |  The ID of the folder where the copied file will be stored.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Create New Folder
+Creates a new empty folder in Google Drive.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Folder Name | STRING | TEXT  |  The name of the new folder.  |
+| Parent Folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
 
 
 ### Output
@@ -125,7 +158,7 @@ Uploads a file in your Google Drive
 
 ___Sample Output:___
 
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 
@@ -145,7 +178,57 @@ Type: OBJECT
 
 
 
-### Read file
+### Create New Text File
+Creates a new text file in Google Drive.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File Name | STRING | TEXT  |  The name of the new text file.  |
+| Text | STRING | TEXT_AREA  |  The text content to add to file.  |
+| File Type | STRING | SELECT  |  Select file type.  |
+| Parent Folder | STRING | SELECT  |  Folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
+
+
+### Output
+
+
+___Sample Output:___
+
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Delete File
+Delete a selected file from Google Drive.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | STRING | SELECT  |  The id of a file to delete.  |
+
+
+
+
+### Read File
 Read a selected file from Google Drive file.
 
 #### Properties
@@ -176,15 +259,15 @@ Type: FILE_ENTRY
 
 
 
-### Create new folder
-Creates a new empty folder in Google Drive.
+### Upload File
+Uploads a file in your Google Drive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder name | STRING | TEXT  |  The name of the new folder.  |
-| Parent folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
+| Parent Folder | STRING | SELECT  |  Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
 
 
 ### Output
@@ -192,45 +275,7 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
-
-
-
-
-### Create new text file
-Creates a new text file in Google Drive.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File name | STRING | TEXT  |  The name of the new text file.  |
-| Text | STRING | TEXT_AREA  |  The text content to add to file.  |
-| File type | STRING | SELECT  |  Select file type.  |
-| Parent folder | STRING | SELECT  |  Folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
-
-
-### Output
-
-
-___Sample Output:___
-
-```{mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt}```
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 

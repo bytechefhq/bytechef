@@ -43,17 +43,17 @@ Version: 1
 ## Actions
 
 
-### Create contact
+### Create Contact
 Creates new contact. A contact may represent a single individual or an organization.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Is contact represent an organization? | BOOLEAN | SELECT  |  Is contact represent an organization or a single individual?  |
+| Is Contact Represent an Organization? | BOOLEAN | SELECT  |  Is contact represent an organization or a single individual?  |
 | Name | STRING | TEXT  |  The name of the organisation.  |
-| First name | STRING | TEXT  |  The first name of the person.  |
-| Last name | STRING | TEXT  |  The last name of the person.  |
+| First Name | STRING | TEXT  |  The first name of the person.  |
+| Last Name | STRING | TEXT  |  The last name of the person.  |
 | Title | STRING | TEXT  |  |
 | Website | STRING | TEXT  |  |
 | Email | STRING | EMAIL  |  |
@@ -78,14 +78,14 @@ Type: OBJECT
 
 
 
-### Create task
-Creates new Task
+### Create Task
+Creates new task.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task name | STRING | TEXT  |  |
+| Task Name | STRING | TEXT  |  |
 | Due Date | DATE | DATE  |  |
 
 

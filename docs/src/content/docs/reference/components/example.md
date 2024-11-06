@@ -29,6 +29,35 @@ Version: 1
 
 
 
+## Triggers
+
+
+### Updated Issue
+Triggers when an issue is updated.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+
+
+
+### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+<hr />
+
 
 
 ## Actions

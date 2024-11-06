@@ -52,8 +52,8 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Max tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
-| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
+| Max Tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
+| Response Format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |
 | Top K | INTEGER | INTEGER  |  Specify the number of token choices the generative uses to generate the next token.  |

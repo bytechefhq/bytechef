@@ -45,7 +45,7 @@ Version: 1
 ## Actions
 
 
-### Create channel
+### Create Channel
 Creates a new channel within a team.
 
 #### Properties
@@ -53,7 +53,7 @@ Creates a new channel within a team.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Team | STRING | SELECT  |  Team where the channel will be created.  |
-| Channel name | STRING | TEXT  |  |
+| Channel Name | STRING | TEXT  |  |
 | Description | STRING | TEXT  |  Description for the channel.  |
 
 
@@ -77,7 +77,7 @@ Type: OBJECT
 
 
 
-### Send channel message
+### Send Channel Message
 Sends a message to a channel.
 
 #### Properties
@@ -85,9 +85,9 @@ Sends a message to a channel.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Team | STRING | SELECT  |  Team where the channel is located.  |
-| Channel to send message to. | STRING | SELECT  |  |
-| Message text format | STRING | SELECT  |  |
-| Message text | STRING | TEXT_AREA  |  |
+| Channel | STRING | SELECT  |  Channel to send message to.  |
+| Message Text Format | STRING | SELECT  |  |
+| Message Text | STRING | TEXT_AREA  |  |
 
 
 ### Output
@@ -110,7 +110,7 @@ Type: OBJECT
 
 
 
-### Send chat message
+### Send Chat Message
 Sends a message in an existing chat.
 
 #### Properties
@@ -118,8 +118,8 @@ Sends a message in an existing chat.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Chat | STRING | SELECT  |  |
-| Message text format | STRING | SELECT  |  |
-| Message text | STRING | TEXT_AREA  |  |
+| Message Text Format | STRING | SELECT  |  |
+| Message Text | STRING | TEXT_AREA  |  |
 
 
 ### Output

@@ -31,7 +31,7 @@ Add time to the date.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Date | DATE_TIME | DATE_TIME  |  |
-| Date format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
+| Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
 | Year | INTEGER | INTEGER  |  Years to add.  |
 | Month | INTEGER | INTEGER  |  Months to add.  |
 | Day | INTEGER | INTEGER  |  Days to add.  |
@@ -59,7 +59,7 @@ Converts UNIX timestamp to ISO8601 format.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| UNIX Timestamp. | NUMBER | NUMBER  |  UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)  |
+| UNIX Timestamp | NUMBER | NUMBER  |  UNIX Timestamp in seconds (10 digits) or milliseconds (13 digits)  |
 | Date Format | STRING | SELECT  |  Formatting that should be applied the text representation of date.  |
 
 
@@ -82,8 +82,8 @@ Get the difference between two dates.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Start date | DATE_TIME | DATE_TIME  |  |
-| End date | DATE_TIME | DATE_TIME  |  |
+| Start Date | DATE_TIME | DATE_TIME  |  |
+| End Date | DATE_TIME | DATE_TIME  |  |
 | Unit | STRING | SELECT  |  The unit of difference between the two dates.  |
 
 
@@ -99,7 +99,7 @@ Type: NUMBER
 
 
 
-### Extract Date units
+### Extract Date Units
 Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.
 
 #### Properties
@@ -107,7 +107,7 @@ Extract date units (year/month/day/hour/minute/second/day of week/month name) fr
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Date | DATE_TIME | DATE_TIME  |  |
-| Unit to extract | STRING | SELECT  |  Unit to extract from date.  |
+| Unit to Extract | STRING | SELECT  |  Unit to extract from date.  |
 
 
 ### Output
@@ -129,8 +129,8 @@ Get current date in the specified format.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Time zone | STRING | SELECT  |  Time zone to use when formatting date.  |
-| Date format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
+| Time Zone | STRING | SELECT  |  Time zone to use when formatting date.  |
+| Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
 
 
 ### Output
@@ -153,7 +153,7 @@ Subtract time from date
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Date | DATE_TIME | DATE_TIME  |  |
-| Date format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
+| Date Format | STRING | SELECT  |  Here's what each part of the format (eg. YYYY) means: yyyy : Year (4 digits) yy : Year (2 digits) MMMM : Month (full name) MMM : Month (short name) MM : Month (2 digits) EEE : Day (short name) dd : Day (2 digits) HH : Hour (2 digits) mm : Minute (2 digits) ss : Second (2 digits).  |
 | Year | INTEGER | INTEGER  |  Years to subtract.  |
 | Month | INTEGER | INTEGER  |  Months to subtract.  |
 | Day | INTEGER | INTEGER  |  Days to subtract.  |

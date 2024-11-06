@@ -51,7 +51,7 @@ Version: 1
 
 
 ### Create Task
-Creates a new Task.
+Creates a new task.
 
 #### Properties
 
@@ -91,7 +91,7 @@ Mark a tas as being completed.
 
 
 ### Create Project
-Creates a new Project.
+Creates a new project.
 
 #### Properties
 

@@ -44,20 +44,20 @@ Version: 1
 ## Actions
 
 
-### Create contact
-Creates a new contact
+### Create Contact
+Creates a new contact..
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| First name | STRING | TEXT  |  The first name of the contact  |
-| Middle name | STRING | TEXT  |  The middle name of the contact  |
-| Last name | STRING | TEXT  |  The last name of the contact  |
-| Job title | STRING | TEXT  |  The job title of the contact  |
-| Company | STRING | TEXT  |  The company of the contact  |
-| Email | STRING | EMAIL  |  The email addresses of the contact  |
-| Phone number | STRING | PHONE  |  The phone numbers of the contact  |
+| First Name | STRING | TEXT  |  The first name of the contact.  |
+| Middle Name | STRING | TEXT  |  The middle name of the contact.  |
+| Last Name | STRING | TEXT  |  The last name of the contact.  |
+| Job Title | STRING | TEXT  |  The job title of the contact.  |
+| Company | STRING | TEXT  |  The company of the contact.  |
+| Email | STRING | EMAIL  |  The email addresses of the contact.  |
+| Phone Number | STRING | PHONE  |  The phone numbers of the contact.  |
 
 
 ### Output
@@ -81,14 +81,14 @@ Type: OBJECT
 
 
 
-### Create groups
-Creates a new group
+### Create Group
+Creates a new group.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Group name | STRING | TEXT  |  The name of the group  |
+| Group Name | STRING | TEXT  |  The name of the group.  |
 
 
 ### Output
@@ -103,6 +103,44 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | STRING | TEXT  |
+
+
+
+
+
+
+### Update Contact
+Modifies an existing contact.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Resource Name | STRING | TEXT  |  Resource name of the contact to be updated.  |
+| First Name | STRING | TEXT  |  New first name of the contact.  |
+| Middle Name | STRING | TEXT  |  New middle name of the contact.  |
+| Last Name | STRING | TEXT  |  Updated last name of the contact.  |
+| Job Title | STRING | TEXT  |  Updated job title of the contact.  |
+| Company | STRING | TEXT  |  Updated name of the company where the contact is employed.  |
+| Email Address | STRING | EMAIL  |  Updated email address of the contact.  |
+| Phone Number | STRING | PHONE  |  Updated phone number of the contact.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| [{STRING\(firstName), STRING\(middleName), STRING\(lastName)}] | ARRAY_BUILDER  |
+| [{STRING\(company), STRING\(jobTitle)}] | ARRAY_BUILDER  |
+| [{STRING\(value)}] | ARRAY_BUILDER  |
+| [{STRING\(value)}] | ARRAY_BUILDER  |
 
 
 

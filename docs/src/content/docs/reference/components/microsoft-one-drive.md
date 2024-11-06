@@ -51,7 +51,7 @@ Triggers when file is uploaded to folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
+| Parent Folder | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -80,15 +80,15 @@ Type: ARRAY
 ## Actions
 
 
-### Download file
-Download a file from your Microsoft OneDrive
+### Download File
+Download a file from your Microsoft OneDrive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder from which you want to download the file.  |
-| File | STRING | SELECT  |  File to download  |
+| Parent Folder | STRING | SELECT  |  Folder from which you want to download the file.  |
+| File | STRING | SELECT  |  File to download.  |
 
 
 ### Output
@@ -113,13 +113,13 @@ Type: FILE_ENTRY
 
 
 ### List Files
-List files in a OneDrive folder
+List files in a OneDrive folder.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder from which you want to list files. If no folder is specified, the root folder will be used.  |
+| Parent Folder | STRING | SELECT  |  Folder from which you want to list files. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -141,13 +141,13 @@ Type: ARRAY
 
 
 ### List Folders
-List folders in a OneDrive folder
+List folders in a OneDrive folder.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
+| Parent Folder | STRING | SELECT  |  Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -168,15 +168,15 @@ Type: ARRAY
 
 
 
-### Upload file
-Upload a file to your Microsoft OneDrive
+### Upload File
+Upload a file to your Microsoft OneDrive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
-| File | FILE_ENTRY | FILE_ENTRY  |  File to upload  |
+| Parent Folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
+| File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
 
 
 ### Output

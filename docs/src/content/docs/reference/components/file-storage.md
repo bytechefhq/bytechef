@@ -23,7 +23,7 @@ Version: 1
 ## Actions
 
 
-### Read from file as string
+### Read from File as String
 Reads data from the file as string.
 
 #### Properties
@@ -50,7 +50,7 @@ Type: STRING
 
 
 
-### Write to file
+### Write to File
 Writes the data to the file.
 
 #### Properties
@@ -82,7 +82,7 @@ Type: FILE_ENTRY
 
 
 
-### Download file
+### Download File
 Download a file from the URL.
 
 #### Properties
