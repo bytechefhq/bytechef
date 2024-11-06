@@ -62,7 +62,7 @@ public class GoogleMailNewEmailTrigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .properties(
             string(TOPIC_NAME)
-                .label("Topic name")
+                .label("Topic Name")
                 .description(
                     """
                         Must be 3-255 characters, start with a letter, and contain only the following characters:

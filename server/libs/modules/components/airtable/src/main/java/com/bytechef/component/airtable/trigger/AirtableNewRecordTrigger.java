@@ -44,21 +44,20 @@ public class AirtableNewRecordTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
         .title("New Record")
-        .description(
-            "Trigger off when a new entry is added to the table that you have selected.")
+        .description("Trigger off when a new entry is added to the table that you have selected.")
         .type(TriggerDefinition.TriggerType.POLLING)
         .properties(
             string(BASE_ID)
-                .label("BaseId")
-                .description("The base id.")
+                .label("Base")
+                .description("The base which contains the table that you want to monitor.")
                 .options(
                     (TriggerOptionsFunction<String>) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
                         context) -> AirtableUtils.getBaseIdOptions(context))
                 .required(true),
             string(TABLE_ID)
-                .label("TableId")
-                .description("The table id.")
+                .label("Table")
+                .description("The table to monitor for new records.")
                 .options(
                     (TriggerOptionsFunction<String>) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
@@ -66,7 +65,7 @@ public class AirtableNewRecordTrigger {
                 .optionsLookupDependsOn(BASE_ID)
                 .required(true),
             string(TRIGGER_FIELD)
-                .label("TriggerField")
+                .label("Trigger Field")
                 .description(
                     "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.")
                 .required(true))

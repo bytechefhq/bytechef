@@ -58,7 +58,7 @@ public class GoogleCalendarEventTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(CALENDAR_ID)
-                .label("Calendar identifier")
+                .label("Calendar Identifier")
                 .options(
                     (TriggerOptionsFunction<String>) (
                         inputParameters, connectionParameters, arrayIndex, searchText, context) -> GoogleCalendarUtils
