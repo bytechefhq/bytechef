@@ -81,7 +81,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
     };
 
     return (
-        <div className="w-full px-4 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full px-4 2xl:mx-auto 3xl:w-4/5">
             <Table className="table-auto">
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
