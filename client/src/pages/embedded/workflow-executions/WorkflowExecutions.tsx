@@ -18,9 +18,9 @@ import {
     useGetIntegrationInstanceConfigurationQuery,
     useGetIntegrationInstanceConfigurationsQuery,
 } from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {useGetWorkflowExecutionsQuery} from '@/shared/queries/embedded/integrationWorkflowExecutions.queries';
 import {useGetIntegrationVersionWorkflowsQuery} from '@/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
+import {useGetWorkflowExecutionsQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
 import {ActivityIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useNavigate, useSearchParams} from 'react-router-dom';

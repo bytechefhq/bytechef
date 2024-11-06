@@ -10,8 +10,8 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
-    connectionTags: ['projectConnectionTags'],
-    connections: ['projectConnections'],
+    connectionTags: ['automation_connectionTags'],
+    connections: ['automation_connections'],
     filteredConnections: (filters: {
         id?: number;
         componentName?: string;

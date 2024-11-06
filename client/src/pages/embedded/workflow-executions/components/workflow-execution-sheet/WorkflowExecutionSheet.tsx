@@ -1,6 +1,6 @@
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import WorkflowExecutionSheetWorkflowPanel from '@/pages/embedded/workflow-executions/components/workflow-execution-sheet/WorkflowExecutionSheetWorkflowPanel';
-import {useGetWorkflowExecutionQuery} from '@/shared/queries/embedded/integrationWorkflowExecutions.queries';
+import {useGetWorkflowExecutionQuery} from '@/shared/queries/embedded/workflowExecutions.queries';
 
 import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 import WorkflowExecutionSheetAccordion from './WorkflowExecutionSheetAccordion';
