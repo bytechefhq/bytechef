@@ -45,15 +45,15 @@ public class ShopifyOrderProperties {
             .required(false),
         string("tags").label("Tags")
             .required(false),
-        array("line_items").items(object().properties(string("fulfillment_status").label("Fulfillment Status")
+        array("line_items").items(object().properties(string("fulfillment_status").label("Fullfilment Status")
             .required(false),
             string("grams").label("Grams")
                 .required(false),
             number("price").label("Price")
                 .required(false),
-            integer("product_id").label("Product Id")
+            integer("product_id").label("Product")
                 .required(false),
-            integer("variant_id").label("Variant Id")
+            integer("variant_id").label("Variant")
                 .required(false),
             integer("quantity").label("Quantity")
                 .required(false),

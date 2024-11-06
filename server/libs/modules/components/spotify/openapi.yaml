@@ -38,6 +38,7 @@ paths:
                 position_ms:
                   type: "integer"
                   description: "The position in milliseconds to start playback from."
+                  title: "Position"
       responses:
         204:
           description: "Successful operation"
@@ -58,6 +59,7 @@ paths:
           required: true
           schema:
             type: "array"
+            title: "Tracks"
             description: "URI's of the items to add to the playlist."
             maxItems: 100
             items:

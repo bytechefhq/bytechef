@@ -77,7 +77,7 @@ paths:
                   description: "Primary email address of the contact."
                 phone:
                   type: "string"
-                  title: "Work phone"
+                  title: "Work Phone"
                   description: "Telephone number of the contact"
                 mobile:
                   type: "string"

@@ -37,7 +37,7 @@ import java.util.Map;
 public class ActiveCampaignCreateTaskAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
-        .description("Creates a new task")
+        .description("Creates a new task.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -45,16 +45,16 @@ public class ActiveCampaignCreateTaskAction {
 
             ))
         .properties(object("__item").properties(object("dealTask").properties(string("title").label("Title")
-            .description("The title to be assigned to the task")
+            .description("The title to be assigned to the task.")
             .required(false),
-            integer("relid").label("Assigned   To")
-                .description("The id of the relational object for this task")
+            integer("relid").label("Assigned To")
+                .description("The id of the relational object for this task.")
                 .required(true),
-            date("duedate").label("Due   Date")
-                .description("Due date of the task")
+            date("duedate").label("Due Date")
+                .description("Due date of the task.")
                 .required(true),
-            integer("dealTasktype").label("Task   Type")
-                .description("The type of the task based on the available Task Types in the account")
+            integer("dealTasktype").label("Task Type")
+                .description("The type of the task based on the available task types in the account.")
                 .required(true))
             .label("Deal Task")
             .required(false))

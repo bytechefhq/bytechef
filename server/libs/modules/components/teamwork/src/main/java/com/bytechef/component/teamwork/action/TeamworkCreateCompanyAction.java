@@ -35,7 +35,7 @@ import java.util.Map;
 public class TeamworkCreateCompanyAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create Company")
-        .description("Create a new company")
+        .description("Creates a new company.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -43,7 +43,7 @@ public class TeamworkCreateCompanyAction {
 
             ))
         .properties(object("__item").properties(object("company").properties(string("name").label("Name")
-            .description("The name of the company")
+            .description("The name of the company.")
             .required(false),
             string("emailOne").label("Email")
                 .required(false),

@@ -23,6 +23,7 @@ paths:
                   type: "object"
                   properties:
                     line_items:
+                      title: "Line Items"
                       description: "The list of line item objects, each containing information about an item in the order."
                       type: "array"
                       items:
@@ -47,9 +48,11 @@ paths:
                           product_id:
                             type: "integer"
                             description: "The ID of the product that the line item belongs to."
+                            title: "Product"
                           variant_id:
                             type: "integer"
                             description: "The ID of the product variant."
+                            title: "Variant"
                           quantity:
                             type: "integer"
                             description: "The number of items that were purchased."
@@ -59,6 +62,7 @@ paths:
                     total_tax:
                       description: "The sum of all the taxes applied to the order in the shop currency. Must be positive."
                       type: "string"
+                      title: "Total Tax"
                     currency:
                       description: "The three-letter code (ISO 4217 format) for the shop currency"
                       type: "string"
@@ -76,11 +80,12 @@ paths:
       operationId: "deleteOrder"
       parameters:
         - name: "orderId"
-          description: "The order id."
+          description: "The order to delete."
           in: "path"
           required: true
           schema:
             type: "integer"
+            title: "Order"
       responses:
         200:
           description: "Successful operation"
@@ -108,11 +113,12 @@ paths:
       operationId: "updateOrder"
       parameters:
         - name: "orderId"
-          description: "The order id."
+          description: "The order to update."
           in: "path"
           required: true
           schema:
             type: "integer"
+            title: "Order"
       requestBody:
         content:
           application/json:
@@ -150,11 +156,12 @@ paths:
       operationId: "closeOrder"
       parameters:
         - name: "orderId"
-          description: "The order id."
+          description: "The order to close."
           in: "path"
           required: true
           schema:
             type: "integer"
+            title: "Order"
       responses:
         200:
           description: "Successful operation"
@@ -182,11 +189,13 @@ components:
           type: "string"
         line_items:
           type: "array"
+          title: "Line Items"
           items:
             type: "object"
             properties:
               fulfillment_status:
                 type: "string"
+                title: "Fullfilment Status"
               grams:
                 type: "string"
               price:
@@ -194,8 +203,10 @@ components:
                 format: "double"
               product_id:
                 type: "integer"
+                title: "Product"
               variant_id:
                 type: "integer"
+                title: "Variant"
               quantity:
                 type: "integer"
               title:
@@ -205,4 +216,3 @@ components:
       type: "apiKey"
       in: "header"
       name: "X-Shopify-Access-Token"
-

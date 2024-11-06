@@ -42,7 +42,7 @@ public class KeapCreateTaskAction {
         .metadata(
             Map.of(
                 "method", "POST",
-                "path", "/v1/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "path", "/tasks", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
         .properties(object("__item").properties(bool("completed").label("Completed")
@@ -57,7 +57,7 @@ public class KeapCreateTaskAction {
                     .required(false),
                 string("last_name").label("Last Name")
                     .required(false))
-                .label("Basic Contact")
+                .label("BasicContact")
                 .required(false),
             dateTime("creation_date").label("Creation Date")
                 .required(false),

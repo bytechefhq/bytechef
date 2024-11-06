@@ -109,6 +109,7 @@ paths:
                     due_on:
                       type: "string"
                       format: "date"
+                      title: "Due Date"
                       description: "The date on which this task is due."
                     tags:
                       type: "array"

@@ -52,7 +52,7 @@ public class SpotifyAddItemsToPlaylistAction {
                     "type", PropertyType.PATH)),
             array("uris").items(string().description("URI's of the items to add to the playlist."))
                 .placeholder("Add to Uris")
-                .label("Uris")
+                .label("Tracks")
                 .required(true)
                 .metadata(
                     Map.of(

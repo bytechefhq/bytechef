@@ -56,7 +56,7 @@ public class AsanaCreateTaskAction {
             string("notes").label("Notes")
                 .description("Free-form textual information associated with the task (i.e. its description).")
                 .required(true),
-            date("due_on").label("Due On")
+            date("due_on").label("Due Date")
                 .description("The date on which this task is due.")
                 .required(false),
             array("tags").items(string().description("Tags to add to the task."))

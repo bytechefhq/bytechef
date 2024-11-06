@@ -43,18 +43,18 @@ public class HubspotUpdateContactAction {
                 "application/json"
 
             ))
-        .properties(string("contactId").label("Contact   To   Update .")
+        .properties(string("contactId").label("Contact")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            object("__item").properties(object("properties").properties(string("firstname").label("First   Name")
+            object("__item").properties(object("properties").properties(string("firstname").label("First Name")
                 .required(false),
-                string("lastname").label("Last   Name")
+                string("lastname").label("Last Name")
                     .required(false),
-                string("email").label("Email   Address")
+                string("email").label("Email Address")
                     .required(false),
-                string("phone").label("Phone   Number")
+                string("phone").label("Phone Number")
                     .required(false),
                 string("company").label("Company")
                     .description("Company contact belongs to.")

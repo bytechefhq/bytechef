@@ -56,7 +56,7 @@ public class PipedriveGetOrganizationsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            string("first_char").label("First   Characters")
+            string("first_char").label("First Characters")
                 .description(
                     "Organizations whose name starts with the specified letter will be returned (case insensitive)")
                 .required(false)

@@ -55,7 +55,7 @@ public class SpotifyStartResumePlaybackAction {
                     .label("Tracks")
                     .description("Spotify track URIs to play.")
                     .required(false),
-                integer("position_ms").label("Position Ms")
+                integer("position_ms").label("Position")
                     .description("The position in milliseconds to start playback from.")
                     .required(false))
                 .label("Item")

@@ -42,10 +42,10 @@ public class AcceloCreateContactAction {
                 "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(object("__item").properties(string("firstname").label("First   Name")
+        .properties(object("__item").properties(string("firstname").label("First Name")
             .description("The first name of the contact.")
             .required(false),
-            string("surname").label("Last   Name")
+            string("surname").label("Last Name")
                 .description("The last name of the contact.")
                 .required(false),
             string("company_id").label("Company")

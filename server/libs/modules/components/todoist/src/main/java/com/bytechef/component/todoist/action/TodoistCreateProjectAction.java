@@ -36,7 +36,7 @@ import java.util.Map;
 public class TodoistCreateProjectAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createProject")
         .title("Create Project")
-        .description("Creates a new Project.")
+        .description("Creates a new project.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -48,7 +48,7 @@ public class TodoistCreateProjectAction {
             .required(true),
             string("color").label("Color")
                 .required(false),
-            bool("is_favorite").label("Is   Project   A   Favorite ?")
+            bool("is_favorite").label("Is Project a Favorite?")
                 .description("Whether the project is a favorite.")
                 .required(false))
             .label("Project")

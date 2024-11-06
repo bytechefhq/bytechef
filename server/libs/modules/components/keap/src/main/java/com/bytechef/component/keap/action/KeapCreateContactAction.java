@@ -44,7 +44,7 @@ public class KeapCreateContactAction {
         .metadata(
             Map.of(
                 "method", "POST",
-                "path", "/v1/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "path", "/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
         .properties(object("__item").properties(array("addresses").items(object().properties(
@@ -82,7 +82,7 @@ public class KeapCreateContactAction {
                 .required(false),
             object("company").properties(integer("id").label("Id")
                 .required(false))
-                .label("Request Company Reference")
+                .label("RequestCompanyReference")
                 .required(false),
             string("contact_type").label("Contact Type")
                 .required(false),
@@ -125,7 +125,7 @@ public class KeapCreateContactAction {
                 .required(false),
             object("origin").properties(string("ip_address").label("Ip Address")
                 .required(true))
-                .label("Create Contact Origin")
+                .label("CreateContactOrigin")
                 .required(false),
             integer("owner_id").label("Owner Id")
                 .required(false),
@@ -174,7 +174,7 @@ public class KeapCreateContactAction {
                 .required(false),
             string("website").label("Website")
                 .required(false))
-            .label("Create Or Patch Contact")
+            .label("CreateOrPatchContact")
             .metadata(
                 Map.of(
                     "type", PropertyType.BODY)))

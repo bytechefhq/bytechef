@@ -63,10 +63,10 @@ public class ShopifyCreateOrderAction {
                                 .description(
                                     "The price of the item before discounts have been applied in the shop currency.")
                                 .required(false),
-                            integer("product_id").label("Product Id")
+                            integer("product_id").label("Product")
                                 .description("The ID of the product that the line item belongs to.")
                                 .required(false),
-                            integer("variant_id").label("Variant Id")
+                            integer("variant_id").label("Variant")
                                 .description("The ID of the product variant.")
                                 .required(false),
                             integer("quantity").label("Quantity")

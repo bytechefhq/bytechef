@@ -33,11 +33,11 @@ paths:
               properties:
                 content:
                   type: "string"
-                  title: "Message text"
+                  title: "Message Text"
                   description: "Message contents (up to 2000 characters)"
                 tts:
                   type: "boolean"
-                  title: "Text to speech"
+                  title: "Text to Speech"
                   description: "True if this is a TTS message"
                   default: "false"
       responses:

@@ -34,6 +34,7 @@ paths:
                   type: "string"
                   format: "date-time"
                   description: "Due date for the task."
+                  title: "Due Date"
               required:
                 - "task_group_id"
                 - "name"

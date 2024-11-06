@@ -43,7 +43,7 @@ public class FigmaPostCommentAction {
                 "application/json"
 
             ))
-        .properties(string("fileKey").label("File   Key")
+        .properties(string("fileKey").label("File Key")
             .description("File to add comments in. Figma file key copy from Figma file URL.")
             .required(true)
             .metadata(

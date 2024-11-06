@@ -55,7 +55,7 @@ public class EnchargeCreateEmailAction {
             string("replyEmail").label("Reply Email")
                 .description("Address that recipients will reply to by default.")
                 .required(false))
-            .label("Email   Template")
+            .label("Email Template")
             .required(true)
             .metadata(
                 Map.of(

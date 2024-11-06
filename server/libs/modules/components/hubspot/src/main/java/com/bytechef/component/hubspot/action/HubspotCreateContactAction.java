@@ -43,23 +43,22 @@ public class HubspotCreateContactAction {
                 "application/json"
 
             ))
-        .properties(object("__item")
-            .properties(object("properties").properties(string("firstname").label("First   Name")
+        .properties(object("__item").properties(object("properties").properties(string("firstname").label("First Name")
+            .required(false),
+            string("lastname").label("Last Name")
                 .required(false),
-                string("lastname").label("Last   Name")
-                    .required(false),
-                string("email").label("Email   Address")
-                    .required(false),
-                string("phone").label("Phone   Number")
-                    .required(false),
-                string("company").label("Company")
-                    .description("Company contact belongs to.")
-                    .required(false),
-                string("website").label("Website")
-                    .description("Website of the contact.")
-                    .required(false))
-                .label("Properties")
+            string("email").label("Email Address")
+                .required(false),
+            string("phone").label("Phone Number")
+                .required(false),
+            string("company").label("Company")
+                .description("Company contact belongs to.")
+                .required(false),
+            string("website").label("Website")
+                .description("Website of the contact.")
                 .required(false))
+            .label("Properties")
+            .required(false))
             .label("Contact")
             .metadata(
                 Map.of(

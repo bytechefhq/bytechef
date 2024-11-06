@@ -38,7 +38,7 @@ import java.util.Map;
 public class SalesflareCreateTasksAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTasks")
         .title("Create Tasks")
-        .description("Creates new tasks")
+        .description("Creates new tasks.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -46,9 +46,9 @@ public class SalesflareCreateTasksAction {
 
             ))
         .properties(array("__items").items(object().properties(string("description").label("Description")
-            .description("Description of new task")
+            .description("Description of new task.")
             .required(true),
-            date("reminder_date").label("Reminder Date")
+            date("reminder_date").label("Reminder Data")
                 .required(false)))
             .placeholder("Add to Items")
             .label("Tasks")

@@ -39,7 +39,7 @@ import java.util.Map;
 public class ReckonCreateInvoiceAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createInvoice")
         .title("Create Invoice")
-        .description("Create a new Invoice.")
+        .description("Creates a new invoice.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -55,10 +55,10 @@ public class ReckonCreateInvoiceAction {
             object("__item").properties(string("customer").label("Customer")
                 .description("The customer that is being invoiced.")
                 .required(true),
-                date("invoiceDate").label("Invoice   Date")
+                date("invoiceDate").label("Invoice Date")
                     .description("The date of the invoice.")
                     .required(true),
-                string("amountTaxStatus").label("Amount   Tax   Status")
+                string("amountTaxStatus").label("Amount Tax Status")
                     .description("The amount tax status of the amounts in the invoice.")
                     .options(option("NonTaxed", "NonTaxed"), option("Inclusive", "Inclusive"),
                         option("Exclusive", "Exclusive"))
@@ -67,7 +67,7 @@ public class ReckonCreateInvoiceAction {
                     .required(false))
                     .description("The individual items that make up the invoice."))
                     .placeholder("Add to Line Items")
-                    .label("Line   Items")
+                    .label("Line Items")
                     .description("The individual items that make up the invoice.")
                     .required(true))
                 .label("Invoice")

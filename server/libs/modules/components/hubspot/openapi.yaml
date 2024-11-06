@@ -26,16 +26,16 @@ paths:
                   properties:
                     firstname:
                       type: "string"
-                      title: "First name"
+                      title: "First Name"
                     lastname:
                       type: "string"
-                      title: "Last name"
+                      title: "Last Name"
                     email:
                       type: "string"
-                      title: "Email address"
+                      title: "Email Address"
                     phone:
                       type: "string"
-                      title: "Phone number"
+                      title: "Phone Number"
                     company:
                       type: "string"
                       description: "Company contact belongs to."
@@ -135,7 +135,8 @@ paths:
           style: "simple"
           explode: false
           schema:
-            title: "Contact to update."
+            title: "Contact"
+            description: "Contact to update."
             type: "string"
       requestBody:
         content:
@@ -149,16 +150,16 @@ paths:
                   properties:
                     firstname:
                       type: "string"
-                      title: "First name"
+                      title: "First Name"
                     lastname:
                       type: "string"
-                      title: "Last name"
+                      title: "Last Name"
                     email:
                       type: "string"
-                      title: "Email address"
+                      title: "Email Address"
                     phone:
                       type: "string"
-                      title: "Phone number"
+                      title: "Phone Number"
                     company:
                       type: "string"
                       description: "Company contact belongs to."
@@ -210,21 +211,22 @@ paths:
                   properties:
                     dealname:
                       type: "string"
-                      title: "Deal name"
+                      title: "Deal Name"
                     amount:
                       type: "number"
                     closedate:
                       type: "string"
                       format: "date"
+                      title: "Close Date"
                     pipeline:
                       type: "string"
                       title: "Pipeline"
                     dealstage:
                       type: "string"
-                      title: "Deal stage"
+                      title: "Deal Stage"
                     hubspot_owner_id:
                       type: "string"
-                      title: "Deal owner"
+                      title: "Deal Owner"
       responses:
         201:
           description: "successful operation"
