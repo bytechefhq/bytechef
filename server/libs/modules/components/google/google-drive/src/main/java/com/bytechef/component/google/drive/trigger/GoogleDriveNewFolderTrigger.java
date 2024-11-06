@@ -43,7 +43,7 @@ public class GoogleDriveNewFolderTrigger {
         .type(TriggerType.POLLING)
         .properties(
             string(PARENT_FOLDER)
-                .label("Parent folder")
+                .label("Parent Folder")
                 .options((TriggerOptionsFunction<String>) GoogleDriveUtils::getFolderOptions)
                 .required(true))
         .output(

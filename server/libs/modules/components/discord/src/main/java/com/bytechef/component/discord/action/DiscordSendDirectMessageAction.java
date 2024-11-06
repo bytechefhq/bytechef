@@ -25,7 +25,6 @@ import static com.bytechef.component.discord.constant.DiscordConstants.CONTENT;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID;
 import static com.bytechef.component.discord.constant.DiscordConstants.GUILD_ID_PROPERTY;
 import static com.bytechef.component.discord.constant.DiscordConstants.RECIPIENT_ID;
-import static com.bytechef.component.discord.constant.DiscordConstants.SEND_DIRECT_MESSAGE;
 import static com.bytechef.component.discord.constant.DiscordConstants.TTS;
 import static com.bytechef.component.discord.util.DiscordUtils.getDMChannel;
 
@@ -42,14 +41,14 @@ import java.util.Map;
  * @author Monika Domiter
  */
 public class DiscordSendDirectMessageAction {
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action(SEND_DIRECT_MESSAGE)
-        .title("Send direct message")
-        .description("Send direct message guild member")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendDirectMessage")
+        .title("Send Direct Message")
+        .description("Send direct message guild member.")
         .properties(
             GUILD_ID_PROPERTY,
             string(RECIPIENT_ID)
                 .label("Recipient")
-                .description("The recipient to open a DM channel with")
+                .description("The recipient to open a DM channel with.")
                 .optionsLookupDependsOn(GUILD_ID)
                 .options((ActionOptionsFunction<String>) DiscordUtils::getGuildMemberIdOptions)
                 .required(true),
@@ -58,7 +57,7 @@ public class DiscordSendDirectMessageAction {
                 .description("Message contents (up to 2000 characters)")
                 .required(true),
             bool(TTS)
-                .label("Text To Speech")
+                .label("Text to Speech")
                 .description("True if this is a TTS message")
                 .defaultValue(false)
                 .required(false))
