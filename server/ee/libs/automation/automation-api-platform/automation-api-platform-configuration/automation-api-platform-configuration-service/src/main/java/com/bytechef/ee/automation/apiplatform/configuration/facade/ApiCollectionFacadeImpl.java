@@ -155,7 +155,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     private ApiCollectionDTO toApiCollectionDTO(ApiCollection apiCollection) {
-        Project project = projectService.getProject(apiCollection.getProjectInstanceId());
+        Project project = projectService.getProjectInstanceProject(apiCollection.getProjectInstanceId());
 
         ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
             apiCollection.getProjectInstanceId());
