@@ -353,7 +353,11 @@ public final class TaskDispatcherDsl {
 
         @Override
         public ControlType getControlType() {
-            return ControlType.MULTI_SELECT;
+            if (options == null) {
+                return ControlType.ARRAY_BUILDER;
+            } else {
+                return ControlType.MULTI_SELECT;
+            }
         }
 
         @Override
