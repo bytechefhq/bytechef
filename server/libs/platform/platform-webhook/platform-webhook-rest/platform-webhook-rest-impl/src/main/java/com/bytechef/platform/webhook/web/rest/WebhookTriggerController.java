@@ -75,8 +75,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
                     WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
-                    WebhookRequest webhookRequest = getWebhookRequest(
-                        httpServletRequest, webhookTriggerFlags);
+                    WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
                     if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
                         responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest);

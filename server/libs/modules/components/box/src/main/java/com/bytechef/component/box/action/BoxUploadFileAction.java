@@ -83,7 +83,8 @@ public class BoxUploadFileAction {
                     Map.of(
                         "attributes",
                         context.json(json -> json.write(
-                            Map.of(NAME, fileEntry.getName(),
+                            Map.of(
+                                NAME, fileEntry.getName(),
                                 PARENT, Map.of(ID, inputParameters.getRequiredString(ID))))),
                         FILE, fileEntry),
                     BodyContentType.FORM_DATA))

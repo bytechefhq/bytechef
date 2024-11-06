@@ -150,8 +150,9 @@ class HttpClientExecutor {
         if (body == null) {
             bodyPublisher = BodyPublishers.noBody();
         } else {
-            if (body.getContentType() == Http.BodyContentType.BINARY
-                && body.getContent() instanceof FileEntry fileEntry) {
+            if (body.getContentType() == Http.BodyContentType.BINARY &&
+                body.getContent() instanceof FileEntry fileEntry) {
+
                 bodyPublisher = getBinaryBodyPublisher(body, fileEntry);
             } else if (body.getContentType() == Http.BodyContentType.FORM_DATA) {
                 bodyPublisher = getFormDataBodyPublisher(body);
