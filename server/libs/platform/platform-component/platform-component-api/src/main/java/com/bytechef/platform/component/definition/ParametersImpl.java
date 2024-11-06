@@ -326,9 +326,7 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public Map<String, ?> getMap(
-        String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
-
+    public Map<String, ?> getMap(String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
         return MapUtils.getMap(map, key, valueTypes, defaultValue);
     }
 

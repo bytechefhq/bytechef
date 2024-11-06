@@ -137,9 +137,7 @@ public class OpenApiClientUtils {
         }
 
         for (Property property : properties) {
-            if (Objects.equals(
-                MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
-
+            if (Objects.equals(MapUtils.get(property.getMetadata(), TYPE, PropertyType.class), PropertyType.BODY)) {
                 return switch (bodyContentType) {
                     case BINARY -> Http.Body.of(
                         MapUtils.get(inputParameters, property.getName(), FileEntry.class), mimeType);
