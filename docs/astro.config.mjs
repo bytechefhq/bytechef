@@ -1,13 +1,13 @@
-import { defineConfig } from 'astro/config';
+import {defineConfig} from 'astro/config';
 import starlight from '@astrojs/starlight';
 import tailwind from '@astrojs/tailwind';
 
 // https://astro.build/config
 export default defineConfig({
     site: 'https://docs.bytechef.io',
-	integrations: [
-		starlight({
-			title: 'ByteChef',
+    integrations: [
+        starlight({
+            title: 'ByteChef',
             description: 'ByteChef is an open-source, low-code tool for integrating and building automation workflows across your SaaS apps, internal APIs, and databases.',
             logo: {
                 src: './src/assets/icons/logo.svg',
@@ -21,28 +21,29 @@ export default defineConfig({
                     },
                 },
             ],
-			social: {
+            social: {
                 discord: 'https://discord.gg/JcNSqJ7vK8',
-				github: 'https://github.com/bytechefhq/bytechef',
+                github: 'https://github.com/bytechefhq/bytechef',
                 twitter: 'https://twitter.com/bytechefhq',
-			},
+            },
             editLink: {
                 baseUrl: 'https://github.com/bytechefhq/bytechef/edit/master/docs/',
             },
-			sidebar: [
-                { label: 'Welcome', link: '/welcome' },
-				{
-					label: 'Automation',
+            sidebar: [
+                {label: 'Welcome', link: '/welcome'},
+                {
+                    label: 'Automation',
                     items: [
                         {
                             label: 'Getting Started',
                             items: [
                                 // { label: 'Introduction', link: '/automation/getting-started/introduction' },
-                                { label: 'Quick Start', link: '/automation/getting-started/quick-start' },
+                                {label: 'Glossary', link: '/automation/getting-started/glossary'},
+                                {label: 'Quick Start', link: '/automation/getting-started/quick-start'},
                             ],
                         },
                     ],
-				},
+                },
                 {
                     label: 'Embedded',
                     items: [
@@ -50,7 +51,7 @@ export default defineConfig({
                             label: 'Getting Started',
                             items: [
                                 // { label: 'Introduction', link: '/embedded/getting-started/introduction' },
-                                { label: 'Quick Start', link: '/embedded/getting-started/quick-start' },
+                                {label: 'Quick Start', link: '/embedded/getting-started/quick-start'},
                             ]
                         },
                     ],
@@ -59,30 +60,44 @@ export default defineConfig({
                     label: 'Developer Guide',
                     items: [
                         {
-                            label: 'Components',
-                            autogenerate: { directory: '/developing_guide/components' },
+                            label: 'Build Component',
+                            items: [
+                                {label: 'Overview', link: '/developer_guide/build_component/overview'},
+                                {label: 'Initial Setup', link: '/developer_guide/build_component/initial_setup'},
+                                {
+                                    label: 'Create Component Definition',
+                                    link: '/developer_guide/build_component/create_component_definition'
+                                }
+                            ],
                             collapsed: true,
-                        }
+                        },
+                        {
+                            label: 'Component Specification',
+                            items: [
+                                {label: 'Component', link: '/developer_guide/component_specification/component'}
+                            ],
+                            collapsed: true,
+                        },
                     ]
                 },
-				{
-					label: 'Reference',
+                {
+                    label: 'Reference',
                     items: [
                         {
                             label: 'Components',
-                            autogenerate: { directory: '/reference/components' },
+                            autogenerate: {directory: '/reference/components'},
                             collapsed: true,
                         },
                         {
                             label: 'Flow Controls',
-                            autogenerate: { directory: '/reference/task-dispatchers' },
+                            autogenerate: {directory: '/reference/task-dispatchers'},
                             collapsed: true,
                         }
                     ]
-				},
-			],
-			customCss: ['./src/tailwind.css'],
-		}),
-		tailwind({ applyBaseStyles: false }),
-	],
+                },
+            ],
+            customCss: ['./src/tailwind.css'],
+        }),
+        tailwind({applyBaseStyles: false}),
+    ],
 });
