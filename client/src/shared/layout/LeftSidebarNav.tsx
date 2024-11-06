@@ -42,7 +42,7 @@ const LeftSidebarNavItem = ({icon, item: {current, id, name, onItemClick}, toLin
         aria-current={current ? 'page' : undefined}
         className={cn(
             buttonVariants({variant: 'ghost'}),
-            current ? 'bg-background hover:bg-background' : 'hover:bg-background',
+            current ? 'bg-accent hover:bg-accent' : 'hover:bg-accent',
             'justify-start px-2 font-normal'
         )}
         onClick={() => (onItemClick ? onItemClick(id) : null)}
