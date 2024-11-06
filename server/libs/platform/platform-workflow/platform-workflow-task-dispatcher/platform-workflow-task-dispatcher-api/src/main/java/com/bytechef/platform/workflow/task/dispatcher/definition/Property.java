@@ -36,6 +36,7 @@ public interface Property extends BaseProperty {
      *
      */
     enum ControlType implements BaseControlType {
+        ARRAY_BUILDER,
         DATE,
         DATE_TIME,
         EMAIL,
