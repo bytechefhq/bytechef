@@ -23,7 +23,7 @@
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
+    "controlType" : "ARRAY_BUILDER"
   }, {
     "advancedOption" : null,
     "displayCondition" : null,
@@ -84,7 +84,7 @@
     "minItems" : null,
     "multipleValues" : null,
     "options" : null,
-    "controlType" : "MULTI_SELECT"
+    "controlType" : "ARRAY_BUILDER"
   } ],
   "title" : "Loop",
   "version" : 1,
