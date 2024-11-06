@@ -51,7 +51,6 @@ const automationNavigation: NavigationType[] = [
         icon: Layers3Icon,
         name: 'Project Instances',
     },
-    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
     {
         href: '/automation/api-platform/api-collections',
         icon: LandmarkIcon,
@@ -62,6 +61,7 @@ const automationNavigation: NavigationType[] = [
         icon: ActivityIcon,
         name: 'Workflow Execution History',
     },
+    {href: '/automation/connections', icon: Link2Icon, name: 'Connections'},
 ];
 
 const embeddedNavigation: NavigationType[] = [
@@ -81,12 +81,12 @@ const embeddedNavigation: NavigationType[] = [
         name: 'Connected Users',
     },
     {href: '/embedded/app-events', icon: ZapIcon, name: 'App Events'},
-    {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
     {
         href: '/embedded/executions',
         icon: ActivityIcon,
         name: 'Workflow Execution History',
     },
+    {href: '/embedded/connections', icon: Link2Icon, name: 'Connections'},
 ];
 
 const platformNavigation = [
