@@ -208,14 +208,6 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'instances',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <AutomationConnections />
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'connections',
-                                },
-                                {
                                     children: [
                                         {
                                             element: (
@@ -237,6 +229,14 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <AutomationConnections />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'connections',
                                 },
                                 {
                                     children: [
@@ -331,18 +331,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <EmbeddedConnections />
-                                        </PrivateRoute>
-                                    ),
-                                    path: 'connections',
-                                },
-                                {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                             <EmbeddedIntegrationWorkflowExecutions />
                                         </PrivateRoute>
                                     ),
                                     path: 'executions',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EmbeddedConnections />
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'connections',
                                 },
                                 {
                                     children: [
