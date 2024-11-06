@@ -318,7 +318,6 @@ export const WorkflowExecutions = () => {
                 workflowExecutionPage?.content &&
                 workflowExecutionPage.content.length > 0 && (
                     <Header
-                        centerTitle={true}
                         position="main"
                         title={
                             <WorkflowExecutionsFilterTitle
