@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
@@ -31,8 +31,11 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
+import com.bytechef.component.stripe.trigger.StripeNewCustomerTrigger;
+import com.bytechef.component.stripe.trigger.StripeNewInvoiceTrigger;
 import com.bytechef.component.stripe.util.StripeUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -48,6 +51,11 @@ import java.util.Optional;
 public class StripeComponentHandler extends AbstractStripeComponentHandler {
 
     @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(StripeNewCustomerTrigger.TRIGGER_DEFINITION, StripeNewInvoiceTrigger.TRIGGER_DEFINITION);
+    }
+
+    @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
@@ -61,17 +69,18 @@ public class StripeComponentHandler extends AbstractStripeComponentHandler {
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://api.stripe.com/v1")
-            .authorizations(authorization(AuthorizationType.BEARER_TOKEN)
-                .title("Bearer Token")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true))
-                .apply((connectionParameters, context) -> Authorization.ApplyResponse
-                    .ofHeaders(
-                        Map.of(
-                            "Content-Type", List.of("application/x-www-form-urlencoded"),
-                            AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN))))));
+            .authorizations(
+                authorization(AuthorizationType.BEARER_TOKEN)
+                    .title("Bearer Token")
+                    .properties(
+                        string(TOKEN)
+                            .label("Token")
+                            .required(true))
+                    .apply((connectionParameters, context) -> ApplyResponse
+                        .ofHeaders(
+                            Map.of(
+                                "Content-Type", List.of("application/x-www-form-urlencoded"),
+                                AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(TOKEN))))));
     }
 
     @Override
