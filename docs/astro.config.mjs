@@ -67,6 +67,14 @@ export default defineConfig({
                                 {
                                     label: 'Create Component Definition',
                                     link: '/developer_guide/build_component/create_component_definition'
+                                },
+                                {
+                                    label: 'Add Connection',
+                                    link: '/developer_guide/build_component/add_connection'
+                                },
+                                {
+                                    label: 'Create Action',
+                                    link: '/developer_guide/build_component/create_action'
                                 }
                             ],
                             collapsed: true,
@@ -78,6 +86,11 @@ export default defineConfig({
                             ],
                             collapsed: true,
                         },
+                        {
+                            label: 'Components',
+                            autogenerate: {directory: '/developer_guide/components'},
+                            collapsed: true,
+                        }
                     ]
                 },
                 {
