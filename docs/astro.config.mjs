@@ -82,7 +82,10 @@ export default defineConfig({
                         {
                             label: 'Component Specification',
                             items: [
-                                {label: 'Component', link: '/developer_guide/component_specification/component'}
+                                {label: 'Component', link: '/developer_guide/component_specification/component'},
+                                {label: 'Connection', link: '/developer_guide/component_specification/connection'},
+                                {label: 'Action', link: '/developer_guide/component_specification/action'},
+                                {label: 'Property', link: '/developer_guide/component_specification/property'}
                             ],
                             collapsed: true,
                         },
