@@ -1,0 +1,136 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Stripe"
+  description: "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely."
+  version: "v1"
+servers:
+  - url: "https://api.stripe.com/v1"
+paths:
+  /customers:
+    post:
+      summary: "Create Customer"
+      description: "Creates a new customer."
+      operationId: "createCustomer"
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              title: "Customer"
+              type: "object"
+              properties:
+                email:
+                  type: "string"
+                  description: "Customer’s email address."
+                  maxLength: 512
+                name:
+                  type: "string"
+                  description: "The customer's full name."
+                description:
+                  type: "string"
+                phone:
+                  type: "string"
+                address:
+                  type: "object"
+                  properties:
+                    city:
+                      type: "string"
+                    country:
+                      type: "string"
+                    line1:
+                      type: "string"
+                      title: "Address Line 1"
+                    line2:
+                      type: "string"
+                      title: "Address Line 2"
+                    postal_code:
+                      type: "string"
+                      title: "Postal Code"
+                    state:
+                      type: "string"
+                      description: "State, country, province, or region."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      description:
+                        type: "string"
+                      email:
+                        type: "string"
+                      name:
+                        type: "string"
+                      phone:
+                        type: "string"
+                      address:
+                        type: "object"
+                        properties:
+                          city:
+                            type: "string"
+                          country:
+                            type: "string"
+                          line1:
+                            type: "string"
+                          line2:
+                            type: "string"
+                          postal_code:
+                            type: "string"
+                          state:
+                            type: "string"
+  /invoices:
+    post:
+      summary: "Create Invoice"
+      description: "Creates a new invoice."
+      operationId: "createInvoice"
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              title: "Invoice"
+              type: "object"
+              required:
+                - "customer_id"
+                - "currency"
+              properties:
+                customer:
+                  type: "string"
+                  title: "Customer"
+                  description: "Customer who will be billed."
+                currency:
+                  type: "string"
+                  description: "Currency used for invoice."
+                description:
+                  type: "string"
+                  description: "Description for the invoice."
+      responses:
+        200:
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      customer:
+                        type: "string"
+                      currency:
+                        type: "string"
+                      description:
+                        type: "string"
+components:
+  securitySchemes:
+    bearerAuth:
+      scheme: "bearer"
+      type: "http"
