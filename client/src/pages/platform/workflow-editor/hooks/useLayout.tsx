@@ -73,14 +73,14 @@ const createConditionNode = ({
     taskNode: Node;
 }) => {
     const leftPlaceholderNode: Node = {
-        data: {conditionId: taskNode.id, label: '+'},
+        data: {conditionCase: CONDITION_CASE_TRUE, conditionId: taskNode.id, label: '+'},
         id: `${taskNode.id}-left-placeholder-0`,
         position: {x: 0, y: 0},
         type: 'placeholder',
     };
 
     const rightPlaceholderNode: Node = {
-        data: {conditionId: taskNode.id, label: '+'},
+        data: {conditionCase: CONDITION_CASE_FALSE, conditionId: taskNode.id, label: '+'},
         id: `${taskNode.id}-right-placeholder-0`,
         position: {x: 0, y: 0},
         type: 'placeholder',
@@ -104,6 +104,24 @@ const createConditionNode = ({
     allNodes.splice(insertIndex, 0, leftPlaceholderNode, rightPlaceholderNode, bottomPlaceholderNode);
 
     return allNodes;
+};
+
+const filterConditionCaseNodes = (nodes: Node[], node: Node) => {
+    return nodes.filter((nodeItem) => {
+        if (nodeItem.id === node.id) {
+            return false;
+        }
+
+        if (!nodeItem.data.conditionId || !node.data.conditionCase) {
+            return false;
+        }
+
+        return (
+            nodeItem.data.conditionId === node.data.conditionId &&
+            nodeItem.data.conditionCase === node.data.conditionCase &&
+            nodeItem.id !== node.id
+        );
+    });
 };
 
 export default function useLayout({
@@ -220,7 +238,7 @@ export default function useLayout({
             const belowPlaceholderNodeId = getNextPlaceholderId(sourcePlaceholderNode.id);
 
             const belowPlaceholderNode = {
-                data: {conditionId, label: '+'},
+                data: {conditionCase, conditionId, label: '+'},
                 id: belowPlaceholderNodeId,
                 position: {x: 0, y: 0},
                 type: 'placeholder',
@@ -473,15 +491,25 @@ export default function useLayout({
             let height = NODE_HEIGHT;
 
             if (node.id.includes('placeholder')) {
-                if (node.id.includes('0')) {
-                    height = PLACEHOLDER_NODE_HEIGHT * 2;
+                height = PLACEHOLDER_NODE_HEIGHT * 2;
+
+                if (node.id.includes('placeholder-0')) {
+                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+
+                    if (hasOtherConditionCaseNodes.length) {
+                        height = 0;
+                    } else {
+                        height = PLACEHOLDER_NODE_HEIGHT * 2;
+                    }
                 } else {
-                    height = NODE_HEIGHT;
+                    height = 0;
                 }
 
                 if (node.id.includes('bottom')) {
                     height = PLACEHOLDER_NODE_HEIGHT;
                 }
+            } else if (!node.data.conditionData) {
+                height = NODE_HEIGHT * 1.2;
             }
 
             dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
@@ -493,7 +521,29 @@ export default function useLayout({
 
         Dagre.layout(dagreGraph);
 
-        nodes = nodes.map((node) => ({...node, position: dagreGraph.node(node.id)}));
+        nodes = nodes.map((node) => {
+            let positionY = dagreGraph.node(node.id).y;
+
+            if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
+                const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+
+                if (hasOtherConditionCaseNodes.length) {
+                    positionY += 35;
+                }
+            }
+
+            if (node.id.includes('bottom-placeholder')) {
+                positionY += 35;
+            }
+
+            return {
+                ...node,
+                position: {
+                    x: dagreGraph.node(node.id).x,
+                    y: positionY,
+                },
+            };
+        });
 
         const uniqueEdges = edges.reduce(
             (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {

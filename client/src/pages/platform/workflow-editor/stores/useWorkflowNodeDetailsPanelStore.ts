@@ -1,5 +1,3 @@
-import {ComponentDefinition} from '@/shared/middleware/platform/configuration';
-
 /* eslint-disable sort-keys */
 import {ComponentType, NodeType} from '@/shared/types';
 import {create} from 'zustand';
@@ -8,9 +6,6 @@ import {devtools} from 'zustand/middleware';
 interface WorkflowNodeDetailsPanelStateI {
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
-
-    currentComponentDefinition: ComponentDefinition | undefined;
-    setCurrentComponentDefinition: (currentComponentDefinition: ComponentDefinition | undefined) => void;
 
     currentNode: NodeType | undefined;
     setCurrentNode: (currentNode: NodeType | undefined) => void;
@@ -31,10 +26,6 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>(
         (set) => ({
             currentComponent: undefined,
             setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
-
-            currentComponentDefinition: undefined,
-            setCurrentComponentDefinition: (currentComponentDefinition) =>
-                set((state) => ({...state, currentComponentDefinition})),
 
             currentNode: undefined,
             setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),

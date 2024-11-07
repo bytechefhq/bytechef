@@ -7,7 +7,7 @@ import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {Handle, NodeProps, Position, useReactFlow} from 'reactflow';
+import {Handle, NodeProps, Position, useReactFlow, useViewport} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -30,6 +30,8 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {getNode} = useReactFlow();
 
+    const viewport = useViewport();
+
     const isSelected = currentNode?.name === data.name;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
@@ -44,7 +46,9 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const handleDeleteNodeClick = () =>
+    const handleDeleteNodeClick = () => {
+        localStorage.setItem(`${workflow.id}-viewport`, JSON.stringify(viewport));
+
         handleDeleteTask({
             componentNames,
             currentComponent,
@@ -59,6 +63,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             updateWorkflowMutation,
             workflow,
         });
+    };
 
     return (
         <div

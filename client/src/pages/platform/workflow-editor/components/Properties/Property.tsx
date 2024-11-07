@@ -102,7 +102,6 @@ const Property = ({
 
     const {
         currentComponent,
-        currentComponentDefinition,
         currentNode,
         focusedInput,
         setCurrentComponent,
@@ -261,7 +260,7 @@ const Property = ({
 
                 mentionInput.insertItem(
                     {
-                        componentIcon: currentComponentDefinition?.icon,
+                        componentIcon: currentNode?.icon,
                         id: currentNode?.name,
                         value: strippedValue.replace('${', '').replace('}', ''),
                     },
@@ -806,34 +805,30 @@ const Property = ({
                 customClassName
             )}
         >
-            {mentionInput &&
-                currentComponent &&
-                currentComponentDefinition &&
-                type !== 'DYNAMIC_PROPERTIES' &&
-                controlType !== 'CODE_EDITOR' && (
-                    <PropertyMentionsInput
-                        controlType={controlType || 'TEXT'}
-                        defaultValue={defaultValue}
-                        deletePropertyButton={deletePropertyButton}
-                        description={description}
-                        handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
-                        key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
-                        label={label || name}
-                        leadingIcon={typeIcon}
-                        onChange={handleMentionsInputChange}
-                        onKeyPress={(event: KeyboardEvent) => {
-                            if (type !== 'STRING' && event.key !== '{') {
-                                event.preventDefault();
-                            }
-                        }}
-                        placeholder={placeholder}
-                        ref={editorRef}
-                        required={required}
-                        showInputTypeSwitchButton={showInputTypeSwitchButton}
-                        singleMention={type !== 'STRING'}
-                        value={mentionInputValue}
-                    />
-                )}
+            {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
+                <PropertyMentionsInput
+                    controlType={controlType || 'TEXT'}
+                    defaultValue={defaultValue}
+                    deletePropertyButton={deletePropertyButton}
+                    description={description}
+                    handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                    key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+                    label={label || name}
+                    leadingIcon={typeIcon}
+                    onChange={handleMentionsInputChange}
+                    onKeyPress={(event: KeyboardEvent) => {
+                        if (type !== 'STRING' && event.key !== '{') {
+                            event.preventDefault();
+                        }
+                    }}
+                    placeholder={placeholder}
+                    ref={editorRef}
+                    required={required}
+                    showInputTypeSwitchButton={showInputTypeSwitchButton}
+                    singleMention={type !== 'STRING'}
+                    value={mentionInputValue}
+                />
+            )}
 
             {!mentionInput && (
                 <>
@@ -1113,7 +1108,7 @@ const Property = ({
                 </>
             )}
 
-            {type === 'DYNAMIC_PROPERTIES' && currentComponentDefinition && currentComponent && (
+            {type === 'DYNAMIC_PROPERTIES' && currentComponent && (
                 <PropertyDynamicProperties
                     currentNodeConnectionId={currentNode?.connectionId}
                     currentOperationName={operationName}

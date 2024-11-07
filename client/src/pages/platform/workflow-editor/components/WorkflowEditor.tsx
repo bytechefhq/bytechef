@@ -185,12 +185,20 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             adaptedViewportWidth -= 140;
         }
 
+        const viewport = localStorage.getItem(`${workflow.id}-viewport`);
+
+        if (viewport) {
+            setViewport(JSON.parse(viewport));
+
+            return;
+        }
+
         setViewport({
             x: adaptedViewportWidth,
             y: 50,
             zoom: 1,
         });
-    }, [componentNames, setViewport, width]);
+    }, [componentNames, setViewport, width, workflow.id]);
 
     // Update nodeNames and componentActions when workflow definition changes
     useEffect(() => {
