@@ -1,12 +1,11 @@
 ---
 title: "Initial Setup"
-description: " "
 ---
 
 To create new component, we will use `example` component as template.
 
 1. Copy the example component from `server/libs/modules/components/example` into a new package `server/libs/modules/components/newcomponent`, where `newcomponent` is name of your new component.
-2. Inside the new package, replace all occurrences of word `example` with `newcomponent`. Then, replace all occurrences of `Example` with `NewConnector`.
+2. Inside the new package, replace all occurrences of word `example` with `newcomponent`. Then, replace all occurrences of `Example` with `NewComponent`.
 
 #### Setup Gradle
 

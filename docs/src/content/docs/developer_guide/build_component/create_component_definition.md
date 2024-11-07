@@ -1,9 +1,11 @@
 ---
 title: "Create Component Definition"
-description: " "
+description: "How to create a new component definition."
 ---
 
-In `server/libs/modules/components/yourconnector/src/main/java/com/bytechef/component/newcomponent` package, the `NewComponentComponentHandler` class defines the component. The `COMPONENT_DEFINITION` constant contains all the details about the component, including its name, title, description, icon, categories, connection, actions, and triggers.
+In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/component/newcomponent` package, the
+`NewComponentComponentHandler` class defines the component. The `COMPONENT_DEFINITION` constant contains all the details
+about the component, including its name, title, description, icon, categories, connection, actions, triggers and others.
 
 ```
 private static final ComponentDefinition COMPONENT_DEFINITION = component("newComponent")
@@ -15,3 +17,7 @@ private static final ComponentDefinition COMPONENT_DEFINITION = component("newCo
     .actions(NewComponentDummyAction.ACTION_DEFINITION)
     .triggers(NewComponentDummyTrigger.TRIGGER_DEFINITION);
 ```
+
+### Icon
+
+Find and download a user interface icon in .svg format for your component and place it in `server/libs/modules/components/newcomponent/src/main/resources/assets/newcomponent.svg`
