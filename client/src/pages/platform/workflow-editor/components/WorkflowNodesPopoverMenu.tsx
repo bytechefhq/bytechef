@@ -4,7 +4,7 @@ import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefini
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {PropsWithChildren, useEffect, useState} from 'react';
-import {useReactFlow} from 'reactflow';
+import {useReactFlow, useViewport} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
@@ -42,6 +42,7 @@ const WorkflowNodesPopoverMenu = ({
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {getNodes} = useReactFlow();
+    const viewport = useViewport();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -54,6 +55,8 @@ const WorkflowNodesPopoverMenu = ({
     };
 
     const handleComponentClick = async (clickedItem: ClickedDefinitionType) => {
+        localStorage.setItem(`${workflow.id}-viewport`, JSON.stringify(viewport));
+
         if (clickedItem.name.includes('condition')) {
             await handleConditionClick({
                 clickedItem,
@@ -66,6 +69,8 @@ const WorkflowNodesPopoverMenu = ({
                 updateWorkflowMutation,
                 workflow,
             });
+
+            setPopoverOpen(false);
 
             return;
         }

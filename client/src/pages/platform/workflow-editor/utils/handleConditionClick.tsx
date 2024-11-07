@@ -77,9 +77,7 @@ export default async function handleConditionClick({
     let nodeIndex = getNodes().length;
 
     if (edge) {
-        sourceNodeId = sourceNodeId.split('=')[0];
-
-        nodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId);
+        nodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId) + 1;
     }
 
     let conditionId: string | undefined;
