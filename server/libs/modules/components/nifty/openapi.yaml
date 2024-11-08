@@ -7,6 +7,51 @@ info:
 servers:
   - url: "https://openapi.niftypm.com/api/v1.0"
 paths:
+  /projects:
+    post:
+      summary: "Create Project"
+      description: "Creates new project."
+      operationId: "createProject"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Project"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  format: "uuid"
+                  description: "Name of the project."
+                description:
+                  type: "string"
+                  description: "Description of the project's purpose, goals, or any other relevent information."
+                template_id:
+                  type: "string"
+                  title: "Template"
+                  description: "Template that can be used to pre-configure the project."
+      responses:
+        201:
+          description: "Creation confirmation. Returns created Project"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      description:
+                        type: "string"
+                      template_id:
+                        type: "string"
   /tasks:
     post:
       summary: "Create Task"
