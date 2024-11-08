@@ -80,6 +80,9 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
                     ((ModifiableStringProperty) baseProperty)
                         .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskGroupIdOptions)
                         .optionsLookupDependsOn(PROJECT);
+                } else if (Objects.equals(baseProperty.getName(), "template_id")) {
+                    ((ModifiableStringProperty) baseProperty)
+                        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectTemplateOptions);
                 }
             }
         }

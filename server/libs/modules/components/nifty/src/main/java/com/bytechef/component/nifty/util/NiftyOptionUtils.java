@@ -49,17 +49,7 @@ public class NiftyOptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body != null && body.get("items") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        return options;
+        return getOptions(body, "items");
     }
 
     public static List<Option<String>> getProjectIdOptions(
@@ -71,9 +61,26 @@ public class NiftyOptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
+        return getOptions(body, "projects");
+    }
+
+    public static List<Option<String>> getProjectTemplateOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/templates"))
+            .queryParameter("type", "project")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, "items");
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> body, String resource) {
         List<Option<String>> options = new ArrayList<>();
 
-        if (body != null && body.get("projects") instanceof List<?> list) {
+        if (body != null && body.get(resource) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
                     options.add(option((String) map.get(NAME), (String) map.get(ID)));
