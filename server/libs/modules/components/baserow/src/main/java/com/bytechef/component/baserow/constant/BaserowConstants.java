@@ -30,8 +30,10 @@ public class BaserowConstants {
 
     public static final String FIELDS = "fields";
     public static final String NAME = "name";
+    public static final String ORDER_BY = "order_by";
     public static final String READ_ONLY = "read_only";
     public static final String ROW_ID = "rowId";
+    public static final String SIZE = "size";
     public static final String TABLE_ID = "tableId";
     public static final String TYPE = "type";
     public static final String USER_FIELD_NAMES = "user_field_names";
