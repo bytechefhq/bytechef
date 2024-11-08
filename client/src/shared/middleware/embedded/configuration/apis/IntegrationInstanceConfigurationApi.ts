@@ -85,7 +85,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Create a new integration instance configuration.
      * Create a new integration instance configuration
      */
-    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
+    async createIntegrationInstanceConfigurationRaw(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['integrationInstanceConfiguration'] == null) {
             throw new runtime.RequiredError(
                 'integrationInstanceConfiguration',
@@ -107,14 +107,18 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create a new integration instance configuration.
      * Create a new integration instance configuration
      */
-    async createIntegrationInstanceConfiguration(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfiguration> {
+    async createIntegrationInstanceConfiguration(requestParameters: CreateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -363,7 +367,7 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
      * Update an existing integration instance configuration.
      * Update an existing integration instance configuration
      */
-    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfiguration>> {
+    async updateIntegrationInstanceConfigurationRaw(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -392,23 +396,22 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             body: IntegrationInstanceConfigurationToJSON(requestParameters['integrationInstanceConfiguration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing integration instance configuration.
      * Update an existing integration instance configuration
      */
-    async updateIntegrationInstanceConfiguration(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfiguration> {
-        const response = await this.updateIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateIntegrationInstanceConfiguration(requestParameters: UpdateIntegrationInstanceConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationInstanceConfigurationRaw(requestParameters, initOverrides);
     }
 
     /**
      * Update an existing integration instance configuration workflow.
      * Update an existing integration instance configuration workflow
      */
-    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<IntegrationInstanceConfigurationWorkflow>> {
+    async updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -444,16 +447,15 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
             body: IntegrationInstanceConfigurationWorkflowToJSON(requestParameters['integrationInstanceConfigurationWorkflow']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationInstanceConfigurationWorkflowFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing integration instance configuration workflow.
      * Update an existing integration instance configuration workflow
      */
-    async updateIntegrationInstanceConfigurationWorkflow(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<IntegrationInstanceConfigurationWorkflow> {
-        const response = await this.updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateIntegrationInstanceConfigurationWorkflow(requestParameters: UpdateIntegrationInstanceConfigurationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationInstanceConfigurationWorkflowRaw(requestParameters, initOverrides);
     }
 
 }

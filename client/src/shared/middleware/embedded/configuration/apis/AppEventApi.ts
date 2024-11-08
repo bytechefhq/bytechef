@@ -48,7 +48,7 @@ export class AppEventApi extends runtime.BaseAPI {
      * Create a new app event.
      * Create a new app event
      */
-    async createAppEventRaw(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AppEvent>> {
+    async createAppEventRaw(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['appEvent'] == null) {
             throw new runtime.RequiredError(
                 'appEvent',
@@ -70,14 +70,18 @@ export class AppEventApi extends runtime.BaseAPI {
             body: AppEventToJSON(requestParameters['appEvent']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AppEventFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create a new app event.
      * Create a new app event
      */
-    async createAppEvent(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AppEvent> {
+    async createAppEvent(requestParameters: CreateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createAppEventRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -183,7 +187,7 @@ export class AppEventApi extends runtime.BaseAPI {
      * Update an existing app event.
      * Update an existing app event
      */
-    async updateAppEventRaw(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<AppEvent>> {
+    async updateAppEventRaw(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -212,16 +216,15 @@ export class AppEventApi extends runtime.BaseAPI {
             body: AppEventToJSON(requestParameters['appEvent']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => AppEventFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing app event.
      * Update an existing app event
      */
-    async updateAppEvent(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<AppEvent> {
-        const response = await this.updateAppEventRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateAppEvent(requestParameters: UpdateAppEventRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateAppEventRaw(requestParameters, initOverrides);
     }
 
 }

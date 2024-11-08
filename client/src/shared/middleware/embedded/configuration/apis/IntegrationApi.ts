@@ -81,7 +81,7 @@ export class IntegrationApi extends runtime.BaseAPI {
      * Create a new integration.
      * Create a new integration
      */
-    async createIntegrationRaw(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async createIntegrationRaw(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['integration'] == null) {
             throw new runtime.RequiredError(
                 'integration',
@@ -103,14 +103,18 @@ export class IntegrationApi extends runtime.BaseAPI {
             body: IntegrationToJSON(requestParameters['integration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create a new integration.
      * Create a new integration
      */
-    async createIntegration(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
+    async createIntegration(requestParameters: CreateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createIntegrationRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -119,7 +123,7 @@ export class IntegrationApi extends runtime.BaseAPI {
      * Create new workflow and adds it to an existing integration.
      * Create new workflow and adds it to an existing integration
      */
-    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Workflow>> {
+    async createIntegrationWorkflowRaw(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -148,14 +152,18 @@ export class IntegrationApi extends runtime.BaseAPI {
             body: WorkflowToJSON(requestParameters['workflow']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create new workflow and adds it to an existing integration.
      * Create new workflow and adds it to an existing integration
      */
-    async createIntegrationWorkflow(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Workflow> {
+    async createIntegrationWorkflow(requestParameters: CreateIntegrationWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createIntegrationWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -349,7 +357,7 @@ export class IntegrationApi extends runtime.BaseAPI {
      * Update an existing integration.
      * Update an existing integration
      */
-    async updateIntegrationRaw(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Integration>> {
+    async updateIntegrationRaw(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -378,16 +386,15 @@ export class IntegrationApi extends runtime.BaseAPI {
             body: IntegrationToJSON(requestParameters['integration']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => IntegrationFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing integration.
      * Update an existing integration
      */
-    async updateIntegration(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Integration> {
-        const response = await this.updateIntegrationRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateIntegration(requestParameters: UpdateIntegrationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateIntegrationRaw(requestParameters, initOverrides);
     }
 
 }

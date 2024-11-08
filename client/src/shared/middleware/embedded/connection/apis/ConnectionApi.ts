@@ -58,7 +58,7 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Create a new connection.
      * Create a new connection
      */
-    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+    async createConnectionRaw(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['connection'] == null) {
             throw new runtime.RequiredError(
                 'connection',
@@ -80,14 +80,18 @@ export class ConnectionApi extends runtime.BaseAPI {
             body: ConnectionToJSON(requestParameters['connection']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create a new connection.
      * Create a new connection
      */
-    async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Connection> {
+    async createConnection(requestParameters: CreateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -209,7 +213,7 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Update an existing connection.
      * Update an existing connection
      */
-    async updateConnectionRaw(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Connection>> {
+    async updateConnectionRaw(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -238,16 +242,15 @@ export class ConnectionApi extends runtime.BaseAPI {
             body: ConnectionToJSON(requestParameters['connection']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ConnectionFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing connection.
      * Update an existing connection
      */
-    async updateConnection(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Connection> {
-        const response = await this.updateConnectionRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateConnection(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateConnectionRaw(requestParameters, initOverrides);
     }
 
 }

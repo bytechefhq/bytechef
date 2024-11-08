@@ -78,7 +78,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Create a new project.
      * Create a new project.
      */
-    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+    async createProjectRaw(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
         if (requestParameters['project'] == null) {
             throw new runtime.RequiredError(
                 'project',
@@ -100,14 +100,18 @@ export class ProjectApi extends runtime.BaseAPI {
             body: ProjectToJSON(requestParameters['project']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
+        if (this.isJsonMime(response.headers.get('content-type'))) {
+            return new runtime.JSONApiResponse<number>(response);
+        } else {
+            return new runtime.TextApiResponse(response) as any;
+        }
     }
 
     /**
      * Create a new project.
      * Create a new project.
      */
-    async createProject(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
+    async createProject(requestParameters: CreateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
         const response = await this.createProjectRaw(requestParameters, initOverrides);
         return await response.value();
     }
@@ -343,7 +347,7 @@ export class ProjectApi extends runtime.BaseAPI {
      * Update an existing project.
      * Update an existing project.
      */
-    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Project>> {
+    async updateProjectRaw(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -372,16 +376,15 @@ export class ProjectApi extends runtime.BaseAPI {
             body: ProjectToJSON(requestParameters['project']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ProjectFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing project.
      * Update an existing project.
      */
-    async updateProject(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Project> {
-        const response = await this.updateProjectRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateProject(requestParameters: UpdateProjectRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateProjectRaw(requestParameters, initOverrides);
     }
 
 }

@@ -186,7 +186,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
      * Update an existing Signing key.
      * Update an existing Signing key
      */
-    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<SigningKey>> {
+    async updateSigningKeyRaw(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -215,16 +215,15 @@ export class SigningKeyApi extends runtime.BaseAPI {
             body: SigningKeyToJSON(requestParameters['signingKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => SigningKeyFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing Signing key.
      * Update an existing Signing key
      */
-    async updateSigningKey(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<SigningKey> {
-        const response = await this.updateSigningKeyRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateSigningKey(requestParameters: UpdateSigningKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateSigningKeyRaw(requestParameters, initOverrides);
     }
 
 }

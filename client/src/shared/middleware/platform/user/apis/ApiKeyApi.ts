@@ -186,7 +186,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
      * Update an existing API key.
      * Update an existing API key
      */
-    async updateApiKeyRaw(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ApiKey>> {
+    async updateApiKeyRaw(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -215,16 +215,15 @@ export class ApiKeyApi extends runtime.BaseAPI {
             body: ApiKeyToJSON(requestParameters['apiKey']),
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => ApiKeyFromJSON(jsonValue));
+        return new runtime.VoidApiResponse(response);
     }
 
     /**
      * Update an existing API key.
      * Update an existing API key
      */
-    async updateApiKey(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ApiKey> {
-        const response = await this.updateApiKeyRaw(requestParameters, initOverrides);
-        return await response.value();
+    async updateApiKey(requestParameters: UpdateApiKeyRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateApiKeyRaw(requestParameters, initOverrides);
     }
 
 }
