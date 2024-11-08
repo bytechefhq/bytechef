@@ -17,81 +17,80 @@
 package com.bytechef.component.nifty.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
+import static com.bytechef.component.nifty.constant.NiftyConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Luka Ljubić
  */
 class NiftyOptionUtilsTest {
 
-    private final ActionContext mockedContext = Mockito.mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = Mockito.mock(Http.Executor.class);
-    private final Parameters mockedParameters = Mockito.mock(Parameters.class);
-    private final Http.Response mockedResponse = Mockito.mock(Http.Response.class);
+    private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> queryNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> queryValueArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @BeforeEach
     public void beforeEach() {
-
-        Mockito.when(mockedContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.headers(any()))
+        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.configuration(any()))
+        when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
-        Mockito.when(mockedExecutor.execute())
+        when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
     }
 
     @Test
     void testGetTaskGroupIdOptions() {
-        Map<String, Object> body = new HashMap<>();
-        Map<String, String> task = new LinkedHashMap<>();
-        task.put("name", "taskName");
-        task.put("id", "123");
-        body.put("items", List.of(task));
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("items", List.of(Map.of(NAME, "abc", ID, "123"))));
 
-        Mockito.when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("taskName", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             NiftyOptionUtils.getTaskGroupIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
     }
 
     @Test
     void testGetProjectIdOptions() {
-        Map<String, Object> body = new HashMap<>();
-        Map<String, String> task = new LinkedHashMap<>();
-        task.put("name", "ProjectName");
-        task.put("id", "123");
-        body.put("projects", List.of(task));
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("projects", List.of(Map.of(NAME, "abc", ID, "123"))));
 
-        Mockito.when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("ProjectName", "123"));
-
-        assertEquals(expectedOptions,
+        assertEquals(
+            expectedOptions,
             NiftyOptionUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+    }
+
+    @Test
+    void testGetProjectTemplateOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("items", List.of(Map.of(NAME, "abc", ID, "123"))));
+
+        assertEquals(
+            expectedOptions,
+            NiftyOptionUtils.getProjectTemplateOptions(mockedParameters, mockedParameters, Map.of(), "",
+                mockedContext));
+
+        assertEquals("type", queryNameArgumentCaptor.getValue());
+        assertEquals("project", queryValueArgumentCaptor.getValue());
     }
 }
