@@ -50,6 +50,34 @@ Version: 1
 ## Actions
 
 
+### Create Project
+Creates new project.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project | {STRING\(name), STRING\(description), STRING\(template_id)} | OBJECT_BUILDER  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(name), STRING\(description), STRING\(template_id)} | OBJECT_BUILDER  |
+
+
+
+
+
+
 ### Create Task
 Creates new task
 
