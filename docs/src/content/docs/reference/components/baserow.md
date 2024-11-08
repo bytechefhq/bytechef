@@ -74,6 +74,35 @@ Type: OBJECT
 
 
 
+### Get Row
+Fetches a single table row.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Table ID | INTEGER | INTEGER  |  ID of the table where you want to get the row from.  |
+| Row ID | INTEGER | INTEGER  |  ID of the row to get.  |
+| User Field Names | BOOLEAN | SELECT  |  The field names returned by this endpoint will be the actual names of the fields.  |
+
+
+
+
+### List Rows
+Lists table rows.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Table ID | INTEGER | INTEGER  |  ID of the table where you want to get the rows from.  |
+| Size | INTEGER | INTEGER  |  The maximum number of rows to retrieve.  |
+| Order By | STRING | TEXT  |  If provided rows will be order by specific field. Use - sign for descending ordering.  |
+| User Field Names | BOOLEAN | SELECT  |  The field names returned by this endpoint will be the actual names of the fields.  |
+
+
+
+
 ### Update Row
 Updates the specified row.
 
