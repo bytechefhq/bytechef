@@ -43,7 +43,16 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public String getIntegrationWorkflowId(long integrationInstanceId, String workflowReferenceCode) {
+    public IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getIntegrationInstanceIntegrationWorkflowWorkflowId(
+        long integrationInstanceId, String workflowReferenceCode) {
+
         throw new UnsupportedOperationException();
     }
 

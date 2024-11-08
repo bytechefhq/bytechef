@@ -62,12 +62,18 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
-    public ProjectWorkflow getProjectWorkflow(long id) {
+    public ProjectWorkflow getProjectInstanceProjectWorkflow(long id) {
         return OptionalUtils.get(projectWorkflowRepository.findById(id));
     }
 
     @Override
-    public String getProjectWorkflowId(long projectInstanceId, String workflowReferenceCode) {
+    public ProjectWorkflow getProjectInstanceProjectWorkflow(long projectInstanceId, String workflowId) {
+        return OptionalUtils.get(
+            projectWorkflowRepository.findByProjectInstanceIdAndWorkflowId(projectInstanceId, workflowId));
+    }
+
+    @Override
+    public String getProjectInstanceProjectWorkflowWorkflowId(long projectInstanceId, String workflowReferenceCode) {
         return OptionalUtils.get(
             projectWorkflowRepository
                 .findByProjectInstanceIdAndWorkflowReferenceCode(projectInstanceId, workflowReferenceCode)

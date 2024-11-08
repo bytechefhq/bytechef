@@ -93,7 +93,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
         projectInstanceWorkflow.setProjectInstanceId(apiCollection.getProjectInstanceId());
         projectInstanceWorkflow.setWorkflowId(
-            projectWorkflowService.getProjectWorkflowId(
+            projectWorkflowService.getProjectInstanceProjectWorkflowWorkflowId(
                 apiCollection.getProjectInstanceId(), apiCollectionEndpoint.getWorkflowReferenceCode()));
 
         projectInstanceWorkflow = projectInstanceWorkflowService.create(projectInstanceWorkflow);

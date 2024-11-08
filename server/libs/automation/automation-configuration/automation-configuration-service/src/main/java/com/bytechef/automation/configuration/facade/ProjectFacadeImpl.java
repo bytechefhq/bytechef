@@ -257,7 +257,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(projectWorkflowId);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(projectWorkflowId);
 
         return new ProjectWorkflowDTO(workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow);
     }

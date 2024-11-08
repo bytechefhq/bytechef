@@ -134,7 +134,7 @@ public class ProjectFacadeIntTest {
         ProjectWorkflowDTO workflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
         ProjectWorkflow projectWorkflow =
-            projectWorkflowServiceImpl.getProjectWorkflow(workflowDTO.getProjectWorkflowId());
+            projectWorkflowServiceImpl.getProjectInstanceProjectWorkflow(workflowDTO.getProjectWorkflowId());
 
         Optional<Workflow> workflowOptional = workflowRepository.findById(projectWorkflow.getWorkflowId());
 

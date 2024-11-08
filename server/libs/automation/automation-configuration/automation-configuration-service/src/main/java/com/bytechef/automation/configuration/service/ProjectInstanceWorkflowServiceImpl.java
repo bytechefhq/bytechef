@@ -61,9 +61,11 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public void deleteProjectInstanceWorkflows(long projectInstanceId) {
-        projectInstanceWorkflowRepository.deleteAll(
-            projectInstanceWorkflowRepository.findAllByProjectInstanceId(projectInstanceId));
+    public void deleteProjectInstanceWorkflows(long projectInstanceId, List<Long> exclude) {
+        projectInstanceWorkflowRepository.findAllByProjectInstanceId(projectInstanceId)
+            .stream()
+            .filter(projectInstanceWorkflow -> !exclude.contains(projectInstanceWorkflow.getId()))
+            .forEach(projectInstanceWorkflowRepository::delete);
     }
 
     @Override

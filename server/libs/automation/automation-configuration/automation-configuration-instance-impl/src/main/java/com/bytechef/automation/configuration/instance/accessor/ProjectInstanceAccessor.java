@@ -80,6 +80,6 @@ public class ProjectInstanceAccessor implements InstanceAccessor {
 
     @Override
     public String getWorkflowId(long instanceId, String workflowReferenceCode) {
-        return projectWorkflowService.getProjectWorkflowId(instanceId, workflowReferenceCode);
+        return projectWorkflowService.getProjectInstanceProjectWorkflowWorkflowId(instanceId, workflowReferenceCode);
     }
 }

@@ -319,12 +319,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<ProjectInstanceDTO> getProjectInstances(Environment environment, Long projectId, Long tagId) {
-        return getProjectInstances(null, environment, projectId, tagId);
-    }
-
-    @Override
     public List<ProjectInstanceDTO> getWorkspaceProjectInstances(
         long id, Environment environment, Long projectId, Long tagId) {
 
@@ -341,17 +335,29 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstance.setTags(tags);
         }
 
-        projectInstance = projectInstanceService.update(projectInstance);
+        ProjectInstance oldProjectInstance = projectInstanceService.getProjectInstance(projectInstanceDTO.id());
+        ;
 
-        projectInstanceWorkflowService.deleteProjectInstanceWorkflows(projectInstance.getId());
+        projectInstance = projectInstanceService.update(projectInstance);
 
         List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
             projectInstance,
             CollectionUtils.map(
                 projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
 
+        checkWorkflowTriggers(
+            projectInstance.getProjectId(), oldProjectInstance.getProjectVersion(), projectInstance.getId(),
+            projectInstanceWorkflows);
+
+        List<Long> projectInstanceWorkflowIds = projectInstanceWorkflows.stream()
+            .map(ProjectInstanceWorkflow::getId)
+            .toList();
+
+        projectInstanceWorkflowService.deleteProjectInstanceWorkflows(
+            projectInstance.getId(), projectInstanceWorkflowIds);
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            projectInstanceDTO.projectId(), projectInstanceDTO.projectVersion());
+            projectInstance.getProjectId(), projectInstance.getProjectVersion());
 
         return new ProjectInstanceDTO(
             projectInstance,
@@ -365,8 +371,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     getWorkflowReferenceCode(
                         projectInstanceWorkflow.getWorkflowId(), projectInstanceDTO.projectVersion(),
                         projectWorkflows))),
-            projectService.getProject(projectInstanceDTO.projectId()),
-            getProjectInstanceLastExecutionDate(projectInstanceDTO.id()), tags);
+            projectService.getProject(projectInstance.getProjectId()),
+            getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), tags);
     }
 
     @Override
@@ -405,6 +411,61 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private List<Tag> checkTags(List<Tag> tags) {
         return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
+    }
+
+    private void checkWorkflowTriggers(
+        long projectId, int oldProjectVersion, Long projectInstanceId,
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+
+        List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService
+            .getProjectWorkflows(projectId, oldProjectVersion);
+        List<ProjectInstanceWorkflow> oldProjectInstanceWorkflows = projectInstanceWorkflowService
+            .getProjectInstanceWorkflows(projectInstanceId);
+
+        for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
+            for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(
+                    projectInstanceId, projectInstanceWorkflow.getWorkflowId());
+
+                if (Objects.equals(projectWorkflow.getWorkflowReferenceCode(),
+                    oldProjectWorkflow.getWorkflowReferenceCode())) {
+                    ProjectInstanceWorkflow oldProjectInstanceWorkflow = oldProjectInstanceWorkflows.stream()
+                        .filter(curProjectInstanceWorkflow -> Objects.equals(curProjectInstanceWorkflow.getWorkflowId(),
+                            oldProjectWorkflow.getWorkflowId()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalArgumentException(
+                            "Project instance workflow with workflowId=%s not found".formatted(
+                                oldProjectWorkflow.getWorkflowId())));
+
+                    if (projectInstanceWorkflow.isEnabled()) {
+                        if (!oldProjectInstanceWorkflow.isEnabled()) {
+                            enableProjectInstanceWorkflow(
+                                projectInstanceId, projectInstanceWorkflow.getWorkflowId(), true);
+                        }
+                    } else {
+                        if (oldProjectInstanceWorkflow.isEnabled()) {
+                            enableProjectInstanceWorkflow(
+                                projectInstanceId, oldProjectInstanceWorkflow.getWorkflowId(), false);
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        projectInstanceWorkflows.stream()
+            .filter(ProjectInstanceWorkflow::isEnabled)
+            .filter(projectInstanceWorkflow -> {
+                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(
+                    projectInstanceId, projectInstanceWorkflow.getWorkflowId());
+
+                return oldProjectWorkflows.stream()
+                    .noneMatch(oldProjectWorkflow -> Objects.equals(
+                        oldProjectWorkflow.getWorkflowReferenceCode(), projectWorkflow.getWorkflowReferenceCode()));
+            })
+            .forEach(projectInstanceWorkflow -> enableProjectInstanceWorkflow(
+                projectInstanceId, projectInstanceWorkflow.getWorkflowId(), true));
     }
 
     private static boolean containsTag(ProjectInstance projectInstance, Tag tag) {

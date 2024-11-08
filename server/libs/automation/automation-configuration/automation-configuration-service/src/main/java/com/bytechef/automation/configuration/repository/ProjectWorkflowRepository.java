@@ -42,11 +42,21 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
     Optional<ProjectWorkflow> findByWorkflowId(String workflowId);
 
     @Query("""
-            SELECT project_workflow.* FROM project_workflow
-            JOIN project_instance ON project_instance.project_id = project_workflow.project_id
-            AND project_instance.project_version = project_workflow.project_version
-            WHERE project_workflow.workflow_reference_code = :workflowReferenceCode
-            AND project_instance.id = :projectInstanceId
+        SELECT project_workflow.* FROM project_workflow
+        JOIN project_instance ON project_instance.project_id = project_workflow.project_id
+        AND project_instance.project_version = project_workflow.project_version
+        WHERE project_workflow.workflow_id = :workflowId
+        AND project_instance.id = :projectInstanceId
+        """)
+    Optional<ProjectWorkflow> findByProjectInstanceIdAndWorkflowId(
+        @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId);
+
+    @Query("""
+        SELECT project_workflow.* FROM project_workflow
+        JOIN project_instance ON project_instance.project_id = project_workflow.project_id
+        AND project_instance.project_version = project_workflow.project_version
+        WHERE project_workflow.workflow_reference_code = :workflowReferenceCode
+        AND project_instance.id = :projectInstanceId
         """)
     Optional<ProjectWorkflow> findByProjectInstanceIdAndWorkflowReferenceCode(
         @Param("projectInstanceId") long projectInstanceId,
