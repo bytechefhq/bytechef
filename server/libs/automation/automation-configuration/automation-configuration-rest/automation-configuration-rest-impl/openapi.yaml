@@ -36,11 +36,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The project instance object."
+          description: "The project instance id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectInstance"
+                type: integer
+                format: int64
   /project-instances/tags:
     get:
       description: "Get project instance tags."
@@ -74,7 +75,7 @@ paths:
           type: "integer"
           format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a project instance by id."
@@ -118,12 +119,8 @@ paths:
               $ref: "#/components/schemas/ProjectInstance"
         required: true
       responses:
-        "200":
-          description: "The updated project instance object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjectInstance"
+        "204":
+          description: "Successful operation."
   /project-instances/{id}/enable/{enable}:
     patch:
       description: "Enable/disable a project instance."
@@ -146,7 +143,7 @@ paths:
         schema:
           type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /project-instances/{id}/tags:
     put:
@@ -170,7 +167,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
     patch:
@@ -200,7 +197,7 @@ paths:
         schema:
           type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}:
     put:
@@ -231,12 +228,8 @@ paths:
               $ref: "#/components/schemas/ProjectInstanceWorkflow"
         required: true
       responses:
-        "200":
-          description: "The updated project instance workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjectInstanceWorkflow"
+        "204":
+          description: "Successful operation."
   /project-instances/{id}/workflows/{workflowId}/jobs:
     post:
       description: "Create a request for running a new job."
@@ -285,11 +278,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The project object."
+          description: "The project id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Project"
+                type: integer
+                format: int64
   /projects/categories:
     get:
       description: "Get categories."
@@ -340,7 +334,7 @@ paths:
           type: "integer"
           format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a project by id."
@@ -384,12 +378,8 @@ paths:
               $ref: "#/components/schemas/Project"
         required: true
       responses:
-        "200":
-          description: "The updated project object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Project"
+        "204":
+          description: "Successful operation."
   /projects/{id}/duplicate:
     post:
       description: "Duplicates existing project."
@@ -437,7 +427,7 @@ paths:
                   description: The description of a project version.
                   type: "string"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /projects/{id}/versions:
     get:
@@ -515,7 +505,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /projects/{id}/workflows:
     get:
@@ -563,11 +553,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The updated project object."
+          description: "The project workflow id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                type: integer
+                format: int64
   /projects/{id}/workflows/{workflowId}/duplicate:
     post:
       description: "Duplicates existing workflow."
@@ -635,7 +626,7 @@ paths:
           schema:
             type: "string"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a workflow by id."
@@ -677,12 +668,8 @@ paths:
               $ref: "#/components/schemas/Workflow"
         required: true
       responses:
-        "200":
-          description: "The updated workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
+        "204":
+          description: "Successful operation."
   /workflows/by-project-workflow-id/{projectWorkflowId}:
     get:
       description: "Get workflow for particular project."

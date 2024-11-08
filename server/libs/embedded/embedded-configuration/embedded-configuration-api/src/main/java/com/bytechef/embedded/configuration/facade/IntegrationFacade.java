@@ -30,9 +30,9 @@ import org.springframework.lang.NonNull;
  */
 public interface IntegrationFacade {
 
-    IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition);
+    long addWorkflow(long id, @NonNull String definition);
 
-    IntegrationDTO createIntegration(@NonNull IntegrationDTO integrationDTO);
+    long createIntegration(@NonNull IntegrationDTO integrationDTO);
 
     void deleteIntegration(long id);
 
@@ -61,9 +61,9 @@ public interface IntegrationFacade {
 
     void publishIntegration(long id, String description);
 
-    IntegrationDTO updateIntegration(@NonNull IntegrationDTO integration);
+    void updateIntegration(@NonNull IntegrationDTO integration);
 
     void updateIntegrationTags(long id, @NonNull List<Tag> tags);
 
-    IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+    void updateWorkflow(String workflowId, String definition, int version);
 }

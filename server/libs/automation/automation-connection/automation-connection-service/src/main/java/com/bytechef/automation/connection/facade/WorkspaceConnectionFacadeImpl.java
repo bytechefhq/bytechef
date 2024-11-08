@@ -47,12 +47,12 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    public ConnectionDTO create(long workspaceId, ConnectionDTO connectionDTO) {
-        connectionDTO = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
+    public long create(long workspaceId, ConnectionDTO connectionDTO) {
+        long connectionId = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
 
-        workspaceConnectionService.create(connectionDTO.id(), workspaceId);
+        workspaceConnectionService.create(connectionId, workspaceId);
 
-        return connectionDTO;
+        return connectionId;
     }
 
     @Override

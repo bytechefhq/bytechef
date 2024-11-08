@@ -27,6 +27,7 @@ import com.bytechef.embedded.connection.web.rest.model.ConnectionModel;
 import com.bytechef.embedded.connection.web.rest.model.UpdateTagsRequestModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
@@ -58,6 +59,9 @@ public class ConnectionApiControllerIntTest {
 
     @MockBean
     private ConnectionFacade connectionFacade;
+
+    @MockBean
+    private ConnectionService connectionService;
 
     @Autowired
     private ConnectionMapper connectionMapper;
@@ -207,7 +211,7 @@ public class ConnectionApiControllerIntTest {
             .name("name")
             .parameters(Map.of("key1", "value1"));
 
-        when(connectionFacade.create(any(), ModeType.EMBEDDED)).thenReturn(getConnection());
+        when(connectionFacade.create(any(), ModeType.EMBEDDED)).thenReturn(getConnection().id());
 
         try {
             assert connectionDTO.id() != null;
@@ -245,17 +249,7 @@ public class ConnectionApiControllerIntTest {
 
     @Test
     public void testPutConnection() {
-        ConnectionDTO connection = ConnectionDTO.builder()
-            .componentName("componentName")
-            .id(1L)
-            .name("name2")
-            .parameters(Map.of("key1", "value1"))
-            .version(1)
-            .build();
         ConnectionModel connectionModel = new ConnectionModel().name("name2");
-
-        when(connectionFacade.update(any(ConnectionDTO.class)))
-            .thenReturn(connection);
 
         try {
             this.webTestClient
@@ -266,12 +260,7 @@ public class ConnectionApiControllerIntTest {
                 .bodyValue(connectionModel)
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.id")
-                .isEqualTo(connection.id())
-                .jsonPath("$.name")
-                .isEqualTo("name2");
+                .isNoContent();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -294,17 +283,17 @@ public class ConnectionApiControllerIntTest {
             Assertions.fail(exception);
         }
 
-        ArgumentCaptor<List<Tag>> tagsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+        ArgumentCaptor<List<Long>> tagIdsArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
-        verify(connectionFacade).update(anyLong(), tagsArgumentCaptor.capture());
+        verify(connectionService).update(anyLong(), tagIdsArgumentCaptor.capture());
 
-        List<Tag> capturedTags = tagsArgumentCaptor.getValue();
+        List<Long> capturedTagIds = tagIdsArgumentCaptor.getValue();
 
-        Iterator<Tag> tagIterator = capturedTags.iterator();
+        Iterator<Long> tagIdIterator = capturedTagIds.iterator();
 
-        Tag capturedTag = tagIterator.next();
+        Long capturedTagId = tagIdIterator.next();
 
-        Assertions.assertEquals("tag1", capturedTag.getName());
+        Assertions.assertEquals(2, capturedTagId);
     }
 
     private static ConnectionDTO getConnection() {

@@ -27,12 +27,12 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
-    public IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, @NonNull String definition) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public IntegrationDTO createIntegration(@NonNull IntegrationDTO integrationDTO) {
+    public long createIntegration(@NonNull IntegrationDTO integrationDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -104,7 +104,7 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationDTO updateIntegration(@NonNull IntegrationDTO integration) {
+    public void updateIntegration(@NonNull IntegrationDTO integration) {
         throw new UnsupportedOperationException();
     }
 
@@ -114,7 +114,7 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+    public void updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }
 }

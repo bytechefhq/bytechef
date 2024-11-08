@@ -107,9 +107,10 @@ public class IntegrationFacadeIntTest {
                     Workflow.Format.JSON),
                 List.of(), List.of()));
 
-        IntegrationWorkflowDTO workflow = integrationFacade.addWorkflow(
-            Validate.notNull(integration.getId(), "id"),
-            "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}");
+        IntegrationWorkflowDTO workflow = integrationFacade.getIntegrationWorkflow(
+            integrationFacade.addWorkflow(
+                Validate.notNull(integration.getId(), "id"),
+                "{\"label\": \"New Workflow\", \"description\": \"Description\", \"tasks\": []}"));
 
         assertThat(workflow.getDescription()).isEqualTo("Description");
         assertThat(workflow.getLabel()).isEqualTo("New Workflow");
@@ -126,7 +127,7 @@ public class IntegrationFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        integrationDTO = integrationFacade.createIntegration(integrationDTO);
+        integrationDTO = integrationFacade.getIntegration(integrationFacade.createIntegration(integrationDTO));
 
         assertThat(integrationDTO.category()).isEqualTo(category);
         assertThat(integrationDTO.id()).isNotNull();
@@ -144,7 +145,7 @@ public class IntegrationFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        integrationDTO1 = integrationFacade.createIntegration(integrationDTO1);
+        integrationDTO1 = integrationFacade.getIntegration(integrationFacade.createIntegration(integrationDTO1));
 
         IntegrationDTO integrationDTO2 = IntegrationDTO.builder()
             .componentName("componentName2")
@@ -152,7 +153,7 @@ public class IntegrationFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        integrationDTO2 = integrationFacade.createIntegration(integrationDTO2);
+        integrationDTO2 = integrationFacade.getIntegration(integrationFacade.createIntegration(integrationDTO2));
 
         assertThat(integrationRepository.count()).isEqualTo(2);
         assertThat(tagRepository.count()).isEqualTo(1);
@@ -307,7 +308,7 @@ public class IntegrationFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        integrationDTO = integrationFacade.createIntegration(integrationDTO);
+        integrationDTO = integrationFacade.getIntegration(integrationFacade.createIntegration(integrationDTO));
 
         assertThat(integrationDTO.tags()).hasSize(2);
         assertThat(integrationDTO.integrationWorkflowIds()).hasSize(0);
@@ -320,7 +321,9 @@ public class IntegrationFacadeIntTest {
             .version(integrationDTO.version())
             .build();
 
-        integrationDTO = integrationFacade.updateIntegration(integrationDTO);
+        integrationFacade.updateIntegration(integrationDTO);
+
+        integrationDTO = integrationFacade.getIntegration(integrationDTO.id());
 
         assertThat(integrationDTO.tags()).hasSize(1);
     }

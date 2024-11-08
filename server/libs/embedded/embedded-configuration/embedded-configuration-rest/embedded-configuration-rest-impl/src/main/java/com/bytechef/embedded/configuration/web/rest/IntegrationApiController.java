@@ -57,20 +57,16 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    public ResponseEntity<IntegrationModel> createIntegration(IntegrationModel integrationModel) {
+    public ResponseEntity<Long> createIntegration(IntegrationModel integrationModel) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.createIntegration(
-                    Validate.notNull(
-                        conversionService.convert(integrationModel, IntegrationDTO.class), "integrationDTO")),
-                IntegrationModel.class));
+            integrationFacade.createIntegration(
+                Validate.notNull(
+                    conversionService.convert(integrationModel, IntegrationDTO.class), "integrationDTO")));
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> createIntegrationWorkflow(Long id, WorkflowModel workflowModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.addWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
+    public ResponseEntity<Long> createIntegrationWorkflow(Long id, WorkflowModel workflowModel) {
+        return ResponseEntity.ok(integrationFacade.addWorkflow(id, workflowModel.getDefinition()));
     }
 
     @Override
@@ -122,12 +118,12 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    public ResponseEntity<IntegrationModel> updateIntegration(Long id, IntegrationModel integrationModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                integrationFacade.updateIntegration(
-                    Validate.notNull(
-                        conversionService.convert(integrationModel.id(id), IntegrationDTO.class), "integrationDTO")),
-                IntegrationModel.class));
+    public ResponseEntity<Void> updateIntegration(Long id, IntegrationModel integrationModel) {
+        integrationFacade.updateIntegration(
+            Validate.notNull(
+                conversionService.convert(integrationModel.id(id), IntegrationDTO.class), "integrationDTO"));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

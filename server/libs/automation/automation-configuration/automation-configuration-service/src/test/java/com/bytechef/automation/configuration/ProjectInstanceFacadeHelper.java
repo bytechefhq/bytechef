@@ -36,11 +36,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Igor Beslic
  */
-
+@Component
 public class ProjectInstanceFacadeHelper {
 
     public static final String PREFIX_PROJECT_DESCRIPTION = "Test description explains purpose of ";
@@ -82,7 +83,7 @@ public class ProjectInstanceFacadeHelper {
             .workspaceId(workspaceId)
             .build();
 
-        return projectFacade.createProject(projectDTO);
+        return projectFacade.getProject(projectFacade.createProject(projectDTO));
     }
 
     public ProjectInstanceDTO createProjectInstance(long workspaceId, ProjectDTO projectDTO) {
@@ -117,15 +118,17 @@ public class ProjectInstanceFacadeHelper {
             .projectInstanceWorkflows(List.of(projectInstanceWorkflowDTO))
             .build();
 
-        return projectInstanceFacade.createProjectInstance(projectInstanceDTO);
+        return projectInstanceFacade.getProjectInstance(
+            projectInstanceFacade.createProjectInstance(projectInstanceDTO));
     }
 
     public ProjectWorkflowDTO addTestWorkflow(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
-        return projectFacade.addWorkflow(
-            Validate.notNull(project.getId(), "id"),
-            "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}");
+        return projectFacade.getProjectWorkflow(
+            projectFacade.addWorkflow(
+                Validate.notNull(project.getId(), "id"),
+                "{\"label\": \"Test Workflow\", \"description\": \"Test Description\", \"tasks\": []}"));
     }
 
     private List<Tag> randomTags() {

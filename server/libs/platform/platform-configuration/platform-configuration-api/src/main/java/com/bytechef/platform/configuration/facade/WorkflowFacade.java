@@ -25,5 +25,5 @@ public interface WorkflowFacade {
 
     WorkflowDTO getWorkflow(String id);
 
-    WorkflowDTO update(String id, String definition, Integer version);
+    void update(String id, String definition, Integer version);
 }

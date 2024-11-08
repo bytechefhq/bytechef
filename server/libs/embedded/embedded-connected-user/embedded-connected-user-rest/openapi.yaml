@@ -108,7 +108,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /connected-users/{id}/enable/{enable}:
     patch:
@@ -132,7 +132,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
 components:
   schemas:

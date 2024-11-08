@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface IntegrationInstanceConfigurationFacade {
 
-    IntegrationInstanceConfigurationDTO createIntegrationInstanceConfiguration(
+    long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
 
     long createIntegrationInstanceConfigurationWorkflowJob(Long id, String workflowId);
@@ -46,11 +46,11 @@ public interface IntegrationInstanceConfigurationFacade {
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
         Environment environment, Long integrationId, Long tagId);
 
-    IntegrationInstanceConfigurationDTO updateIntegrationInstanceConfiguration(
+    void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);
 
     void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags);
 
-    IntegrationInstanceConfigurationWorkflow updateIntegrationInstanceConfigurationWorkflow(
+    void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);
 }

@@ -88,11 +88,11 @@ public class ApiKeyApiController implements ApiKeyApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ApiKeyModel> updateApiKey(Long id, ApiKeyModel appEventModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class)),
-                ApiKeyModel.class));
+    public ResponseEntity<Void> updateApiKey(Long id, ApiKeyModel appEventModel) {
+        apiKeyService.update(conversionService.convert(appEventModel.id(id), ApiKey.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     private static String obfuscate(String secretKey) {

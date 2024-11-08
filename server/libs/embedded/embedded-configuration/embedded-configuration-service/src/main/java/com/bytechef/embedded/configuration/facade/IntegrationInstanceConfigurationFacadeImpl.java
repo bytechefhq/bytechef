@@ -135,7 +135,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    public IntegrationInstanceConfigurationDTO createIntegrationInstanceConfiguration(
+    public long createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
@@ -189,17 +189,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
 
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-            createIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfiguration, CollectionUtils.map(
-                    integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
-                    IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
+        createIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceConfiguration, CollectionUtils.map(
+                integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
+                IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
 
-        List<IntegrationWorkflow> integrationWorkflows = getIntegrationWorkflows(integrationInstanceConfiguration);
-
-        return toIntegrationInstanceConfigurationDTO(
-            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId()),
-            integrationInstanceConfiguration, integrationInstanceConfigurationWorkflows, integrationWorkflows, tags);
+        return integrationInstanceConfiguration.getId();
     }
 
     @Override
@@ -414,7 +409,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    public IntegrationInstanceConfigurationDTO updateIntegrationInstanceConfiguration(
+    public void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
@@ -451,16 +446,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
         integrationInstanceConfigurationWorkflowService.deleteIntegrationInstanceConfigurationWorkflows(
             integrationInstanceConfiguration.getId(), integrationInstanceConfigurationWorkflowIds);
-
-        List<IntegrationWorkflow> integrationWorkflows =
-            integrationWorkflowService.getIntegrationWorkflows(
-                integrationInstanceConfiguration.getIntegrationId(),
-                integrationInstanceConfiguration.getIntegrationVersion());
-
-        return toIntegrationInstanceConfigurationDTO(
-            integrationService.getIntegration(integrationInstanceConfigurationDTO.integrationId()),
-            integrationInstanceConfiguration, integrationInstanceConfigurationWorkflows, integrationWorkflows,
-            tags);
     }
 
     @Override
@@ -469,12 +454,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    public IntegrationInstanceConfigurationWorkflow updateIntegrationInstanceConfigurationWorkflow(
+    public void updateIntegrationInstanceConfigurationWorkflow(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
         validateInputs(integrationInstanceConfigurationWorkflow);
 
-        return integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
+        integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

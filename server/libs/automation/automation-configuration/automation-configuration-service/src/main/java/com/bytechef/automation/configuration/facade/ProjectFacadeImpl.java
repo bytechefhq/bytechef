@@ -95,7 +95,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectWorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, @NonNull String definition) {
         Project project = projectService.getProject(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -103,11 +103,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
         ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
             id, project.getLastProjectVersion(), workflow.getId());
 
-        return new ProjectWorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), projectWorkflow);
+        return projectWorkflow.getId();
     }
 
     @Override
-    public ProjectDTO createProject(@NonNull ProjectDTO projectDTO) {
+    public long createProject(@NonNull ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
 
         Category category = projectDTO.category();
@@ -126,7 +126,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         project = projectService.create(project);
 
-        return new ProjectDTO(category, project, List.of(), tags);
+        return project.getId();
     }
 
     @Override
@@ -337,18 +337,14 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
-        Category category = projectDTO.category() == null ? null : categoryService.save(projectDTO.category());
+    public void updateProject(@NonNull ProjectDTO projectDTO) {
         List<Tag> tags = checkTags(projectDTO.tags());
 
         Project project = projectDTO.toProject();
 
         project.setTags(tags);
 
-        return new ProjectDTO(
-            category, projectService.update(project),
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
-            tags);
+        projectService.update(project);
     }
 
     @Override
@@ -359,10 +355,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
-
-        return new ProjectWorkflowDTO(workflowFacade.update(workflowId, definition, version), projectWorkflow);
+    public void updateWorkflow(String workflowId, String definition, int version) {
+        workflowService.update(workflowId, definition, version);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

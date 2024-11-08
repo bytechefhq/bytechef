@@ -121,7 +121,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
+    public long createProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
 
         long projectId = Validate.notNull(projectInstance.getProjectId(), "projectId");
@@ -148,27 +148,12 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         projectInstance = projectInstanceService.create(projectInstance);
 
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
+        createProjectInstanceWorkflows(
             projectInstance,
             CollectionUtils.map(
                 projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
 
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            projectInstanceDTO.projectId(), projectInstanceDTO.projectVersion());
-
-        return new ProjectInstanceDTO(
-            projectInstance,
-            CollectionUtils.map(
-                projectInstanceWorkflows,
-                projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
-                    projectInstanceWorkflow, getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
-                    getStaticWebhookUrl(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()),
-                    getWorkflowReferenceCode(
-                        projectInstanceWorkflow.getWorkflowId(), projectInstanceDTO.projectVersion(),
-                        projectWorkflows))),
-            projectService.getProject(projectInstance.getProjectId()),
-            getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), tags);
+        return projectInstance.getId();
     }
 
     @Override
@@ -326,7 +311,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
+    public void updateProjectInstance(ProjectInstanceDTO projectInstanceDTO) {
         ProjectInstance projectInstance = projectInstanceDTO.toProjectInstance();
 
         List<Tag> tags = checkTags(projectInstanceDTO.tags());
@@ -336,7 +321,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         }
 
         ProjectInstance oldProjectInstance = projectInstanceService.getProjectInstance(projectInstanceDTO.id());
-        ;
 
         projectInstance = projectInstanceService.update(projectInstance);
 
@@ -355,24 +339,6 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         projectInstanceWorkflowService.deleteProjectInstanceWorkflows(
             projectInstance.getId(), projectInstanceWorkflowIds);
-
-        List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
-            projectInstance.getProjectId(), projectInstance.getProjectVersion());
-
-        return new ProjectInstanceDTO(
-            projectInstance,
-            CollectionUtils.map(
-                projectInstanceWorkflows,
-                projectInstanceWorkflow -> new ProjectInstanceWorkflowDTO(
-                    projectInstanceWorkflow,
-                    getWorkflowLastExecutionDate(projectInstanceWorkflow.getWorkflowId()),
-                    getStaticWebhookUrl(
-                        projectInstanceWorkflow.getProjectInstanceId(), projectInstanceWorkflow.getWorkflowId()),
-                    getWorkflowReferenceCode(
-                        projectInstanceWorkflow.getWorkflowId(), projectInstanceDTO.projectVersion(),
-                        projectWorkflows))),
-            projectService.getProject(projectInstance.getProjectId()),
-            getProjectInstanceLastExecutionDate(Validate.notNull(projectInstance.getId(), "id")), tags);
     }
 
     @Override
@@ -381,10 +347,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     @Override
-    public ProjectInstanceWorkflow updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
+    public void updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
         validateInputs(projectInstanceWorkflow);
 
-        return projectInstanceWorkflowService.update(projectInstanceWorkflow);
+        projectInstanceWorkflowService.update(projectInstanceWorkflow);
     }
 
     private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(

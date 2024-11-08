@@ -29,9 +29,9 @@ import org.springframework.lang.NonNull;
  */
 public interface ProjectFacade {
 
-    ProjectWorkflowDTO addWorkflow(long id, @NonNull String definition);
+    long addWorkflow(long id, @NonNull String definition);
 
-    ProjectDTO createProject(@NonNull ProjectDTO projectDTO);
+    long createProject(@NonNull ProjectDTO projectDTO);
 
     void deleteProject(long id);
 
@@ -64,9 +64,9 @@ public interface ProjectFacade {
 
     void publishProject(long id, String description);
 
-    ProjectDTO updateProject(@NonNull ProjectDTO projectDTO);
+    void updateProject(@NonNull ProjectDTO projectDTO);
 
     void updateProjectTags(long id, @NonNull List<Tag> tags);
 
-    ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version);
+    void updateWorkflow(String workflowId, String definition, int version);
 }

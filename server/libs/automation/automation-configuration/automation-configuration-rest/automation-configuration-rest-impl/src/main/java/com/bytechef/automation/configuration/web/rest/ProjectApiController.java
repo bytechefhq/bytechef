@@ -55,12 +55,10 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    public ResponseEntity<ProjectModel> createProject(ProjectModel projectModel) {
+    public ResponseEntity<Long> createProject(ProjectModel projectModel) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.createProject(
-                    Validate.notNull(conversionService.convert(projectModel, ProjectDTO.class), "projectDTO")),
-                ProjectModel.class));
+            projectFacade.createProject(
+                Validate.notNull(conversionService.convert(projectModel, ProjectDTO.class), "projectDTO")));
     }
 
     @Override
@@ -114,11 +112,11 @@ public class ProjectApiController implements ProjectApi {
     }
 
     @Override
-    public ResponseEntity<ProjectModel> updateProject(Long id, ProjectModel projectModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.updateProject(
-                    Validate.notNull(conversionService.convert(projectModel.id(id), ProjectDTO.class), "projectDTO")),
-                ProjectModel.class));
+    public ResponseEntity<Void> updateProject(Long id, ProjectModel projectModel) {
+        projectFacade.updateProject(
+            Validate.notNull(conversionService.convert(projectModel.id(id), ProjectDTO.class), "projectDTO"));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

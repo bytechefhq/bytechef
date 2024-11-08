@@ -250,7 +250,7 @@ public class IntegrationApiControllerIntTest {
         IntegrationDTO integrationDTO = getIntegrationDTO();
         IntegrationModel integrationModel = new IntegrationModel();
 
-        when(integrationFacade.createIntegration(any())).thenReturn(integrationDTO);
+        when(integrationFacade.createIntegration(any())).thenReturn(integrationDTO.id());
 
         try {
             assert integrationDTO.id() != null;
@@ -287,11 +287,11 @@ public class IntegrationApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        IntegrationWorkflowDTO workflow =
+        IntegrationWorkflowDTO integrationWorkflowDTO =
             new IntegrationWorkflowDTO(new Workflow("id", definition, Format.JSON), new IntegrationWorkflow());
 
         when(integrationFacade.addWorkflow(anyLong(), any()))
-            .thenReturn(workflow);
+            .thenReturn(integrationWorkflowDTO.getIntegrationWorkflowId());
 
         try {
             this.webTestClient
@@ -307,7 +307,7 @@ public class IntegrationApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
+                .isEqualTo(Validate.notNull(integrationWorkflowDTO.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
@@ -326,17 +326,8 @@ public class IntegrationApiControllerIntTest {
 
     @Test
     public void testPutIntegration() {
-        IntegrationDTO integrationDTO = IntegrationDTO.builder()
-            .category(new Category(1L, "category"))
-            .id(1L)
-            .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
-            .integrationWorkflowIds(List.of(1L))
-            .name("Name")
-            .build();
         IntegrationModel integrationModel = new IntegrationModel()
             .id(1L);
-
-        when(integrationFacade.updateIntegration(any(IntegrationDTO.class))).thenReturn(integrationDTO);
 
         try {
             this.webTestClient
@@ -347,14 +338,7 @@ public class IntegrationApiControllerIntTest {
                 .bodyValue(integrationModel)
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.id")
-                .isEqualTo(integrationDTO.id())
-                .jsonPath("$.name")
-                .isEqualTo("name2")
-                .jsonPath("$.integrationWorkflowIds[0]")
-                .isEqualTo(1L);
+                .isNoContent();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

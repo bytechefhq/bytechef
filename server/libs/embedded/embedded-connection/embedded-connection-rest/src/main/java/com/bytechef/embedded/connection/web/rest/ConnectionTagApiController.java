@@ -48,9 +48,7 @@ public class ConnectionTagApiController extends AbstractConnectionTagApiControll
     }
 
     @Override
-    public ResponseEntity<Void> updateConnectionTags(
-        Long id, UpdateTagsRequestModel comBytechefPlatformTagWebRestModelUpdateTagsRequestModel) {
-
-        return doUpdateConnectionTags(id, comBytechefPlatformTagWebRestModelUpdateTagsRequestModel);
+    public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
+        return doUpdateConnectionTags(id, updateTagsRequestModel);
     }
 }

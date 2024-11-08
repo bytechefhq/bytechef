@@ -60,7 +60,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an custom component by id."
@@ -105,7 +105,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
 #  /custom-components/{id}/tags:
 #    put:
@@ -129,7 +129,7 @@ paths:
 #              $ref: "#/components/schemas/UpdateTagsRequest"
 #        required: true
 #      responses:
-#        "200":
+#        "204":
 #          description: "Successful operation."
 components:
   schemas:

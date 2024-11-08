@@ -24,6 +24,7 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -43,26 +44,26 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
+    private final ConnectionService connectionService;
     private final ConversionService conversionService;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
-        ConnectionFacade connectionFacade, ConversionService conversionService,
+        ConnectionFacade connectionFacade, ConnectionService connectionService, ConversionService conversionService,
         WorkspaceConnectionFacade workspaceConnectionFacade) {
 
         this.connectionFacade = connectionFacade;
+        this.connectionService = connectionService;
         this.conversionService = conversionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
+    public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            toConnectionModel(
-                workspaceConnectionFacade.create(
-                    connectionModel.getWorkspaceId(),
-                    conversionService.convert(connectionModel, ConnectionDTO.class))));
+            workspaceConnectionFacade.create(
+                connectionModel.getWorkspaceId(), conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 
     @Override
@@ -94,12 +95,14 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> updateConnection(
-        Long id, ConnectionModel connectionModel) {
+    public ResponseEntity<Void> updateConnection(Long id, ConnectionModel connectionModel) {
+        ConnectionDTO connectionDTO = Validate.notNull(
+            conversionService.convert(connectionModel.id(id), ConnectionDTO.class), "connectionDTO");
 
-        return ResponseEntity.ok(
-            toConnectionModel(
-                connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
+        connectionService.update(connectionDTO.toConnection());
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @SuppressFBWarnings("NP")

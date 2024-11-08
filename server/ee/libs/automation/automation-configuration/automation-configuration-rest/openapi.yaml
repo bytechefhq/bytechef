@@ -84,7 +84,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a workspace by id."

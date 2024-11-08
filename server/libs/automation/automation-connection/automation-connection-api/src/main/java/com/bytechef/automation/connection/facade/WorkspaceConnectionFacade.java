@@ -25,7 +25,7 @@ import java.util.List;
  */
 public interface WorkspaceConnectionFacade {
 
-    ConnectionDTO create(long workspaceId, ConnectionDTO connectionDTO);
+    long create(long workspaceId, ConnectionDTO connectionDTO);
 
     void delete(long connectionId);
 

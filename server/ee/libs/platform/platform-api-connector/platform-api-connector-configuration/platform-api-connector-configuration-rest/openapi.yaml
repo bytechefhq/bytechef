@@ -68,7 +68,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /api-connectors/import:
     post:
@@ -119,7 +119,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an API Connector by id."

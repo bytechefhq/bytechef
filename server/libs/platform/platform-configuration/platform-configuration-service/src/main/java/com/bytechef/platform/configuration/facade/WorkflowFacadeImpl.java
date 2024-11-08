@@ -52,8 +52,8 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     }
 
     @Override
-    public WorkflowDTO update(String id, String definition, Integer version) {
-        return toWorkflowDTO(workflowService.update(id, definition, version));
+    public void update(String id, String definition, Integer version) {
+        workflowService.update(id, definition, version);
     }
 
     private WorkflowDTO toWorkflowDTO(Workflow workflow) {

@@ -82,7 +82,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public ConnectionDTO create(ConnectionDTO connectionDTO, ModeType type) {
+    public long create(ConnectionDTO connectionDTO, ModeType type) {
         Connection connection = connectionDTO.toConnection();
 
         if (StringUtils.isNotBlank(connection.getAuthorizationName()) &&
@@ -124,7 +124,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
         connection = connectionService.create(connection);
 
-        return toConnectionDTO(false, connection, tags);
+        return connection.getId();
     }
 
     @Override
@@ -179,24 +179,21 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public ConnectionDTO update(Long id, List<Tag> tags) {
-        tags = checkTags(tags);
-
-        Connection connection = connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
-
-        return toConnectionDTO(
-            isConnectionUsed(Validate.notNull(connection.getId(), "id"), connection.getType()), connection, tags);
-    }
-
-    @Override
-    public ConnectionDTO update(ConnectionDTO connectionDTO) {
+    public void update(ConnectionDTO connectionDTO) {
         List<Tag> tags = checkTags(connectionDTO.tags());
 
         Connection connection = connectionDTO.toConnection();
 
-        connection = connectionService.update(connection);
+        connection.setTags(tags);
 
-        return toConnectionDTO(isConnectionUsed(connectionDTO.id(), connection.getType()), connection, tags);
+        connectionService.update(connection);
+    }
+
+    @Override
+    public void update(Long id, List<Tag> tags) {
+        tags = checkTags(tags);
+
+        connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

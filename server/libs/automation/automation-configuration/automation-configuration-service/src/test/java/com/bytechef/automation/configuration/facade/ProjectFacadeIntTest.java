@@ -103,7 +103,9 @@ public class ProjectFacadeIntTest {
     @Autowired
     private WorkspaceRepository workspaceRepository;
 
+    @Autowired
     private ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
+
     @Autowired
     private ProjectWorkflowServiceImpl projectWorkflowServiceImpl;
 
@@ -123,8 +125,6 @@ public class ProjectFacadeIntTest {
     @BeforeEach
     public void beforeEach() {
         workspace = workspaceRepository.save(new Workspace("test"));
-        projectFacadeInstanceHelper = new ProjectInstanceFacadeHelper(
-            categoryRepository, projectFacade, projectRepository, projectInstanceFacade, projectWorkflowRepository);
     }
 
     @Test
@@ -308,27 +308,29 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testUpdate() {
-        ProjectDTO project = projectFacadeInstanceHelper.createProject(workspace.getId());
+        ProjectDTO projectDTO = projectFacadeInstanceHelper.createProject(workspace.getId());
 
-        projectFacadeInstanceHelper.addTestWorkflow(project);
+        projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
-        assertThat(project.tags()).hasSize(3);
+        assertThat(projectDTO.tags()).hasSize(3);
 
-        assertThat(project.projectWorkflowIds()).hasSize(0);
+        assertThat(projectDTO.projectWorkflowIds()).hasSize(0);
 
-        project = ProjectDTO.builder()
-            .id(project.id())
+        projectDTO = ProjectDTO.builder()
+            .id(projectDTO.id())
             .name("Updated Name")
             .tags(List.of(new Tag("TAG_UPDATE")))
-            .projectWorkflowIds(project.projectWorkflowIds())
-            .version(project.version())
+            .projectWorkflowIds(projectDTO.projectWorkflowIds())
+            .version(projectDTO.version())
             .workspaceId(workspace.getId())
             .build();
 
-        project = projectFacade.updateProject(project);
+        projectFacade.updateProject(projectDTO);
 
-        assertThat(project.tags()).hasSize(1);
-        assertThat(project.name()).isEqualTo("Updated Name");
+        projectDTO = projectFacade.getProject(projectDTO.id());
+
+        assertThat(projectDTO.tags()).hasSize(1);
+        assertThat(projectDTO.name()).isEqualTo("Updated Name");
     }
 
     @TestConfiguration

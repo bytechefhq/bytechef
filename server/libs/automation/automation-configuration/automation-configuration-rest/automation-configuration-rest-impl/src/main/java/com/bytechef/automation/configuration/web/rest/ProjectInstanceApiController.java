@@ -52,12 +52,10 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    public ResponseEntity<ProjectInstanceModel> createProjectInstance(ProjectInstanceModel projectInstanceModel) {
+    public ResponseEntity<Long> createProjectInstance(ProjectInstanceModel projectInstanceModel) {
         return ResponseEntity.ok(
-            conversionService.convert(
-                projectInstanceFacade.createProjectInstance(
-                    conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)),
-                ProjectInstanceModel.class));
+            projectInstanceFacade.createProjectInstance(
+                conversionService.convert(projectInstanceModel, ProjectInstanceDTO.class)));
     }
 
     @Override
@@ -113,25 +111,25 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
     }
 
     @Override
-    public ResponseEntity<ProjectInstanceModel> updateProjectInstance(
-        Long id, ProjectInstanceModel projectInstanceModel) {
+    public ResponseEntity<Void> updateProjectInstance(Long id, ProjectInstanceModel projectInstanceModel) {
+        projectInstanceFacade.updateProjectInstance(
+            conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class));
 
-        return ResponseEntity.ok(conversionService.convert(
-            projectInstanceFacade.updateProjectInstance(
-                conversionService.convert(projectInstanceModel.id(id), ProjectInstanceDTO.class)),
-            ProjectInstanceModel.class));
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
-    public ResponseEntity<ProjectInstanceWorkflowModel> updateProjectInstanceWorkflow(
+    public ResponseEntity<Void> updateProjectInstanceWorkflow(
         Long id, Long projectInstanceWorkflowId, ProjectInstanceWorkflowModel projectInstanceWorkflowModel) {
 
-        return ResponseEntity.ok(conversionService.convert(
-            projectInstanceFacade.updateProjectInstanceWorkflow(
-                conversionService.convert(
-                    projectInstanceWorkflowModel.id(projectInstanceWorkflowId)
-                        .projectInstanceId(id),
-                    ProjectInstanceWorkflow.class)),
-            ProjectInstanceWorkflowModel.class));
+        projectInstanceFacade.updateProjectInstanceWorkflow(
+            conversionService.convert(
+                projectInstanceWorkflowModel.id(projectInstanceWorkflowId)
+                    .projectInstanceId(id),
+                ProjectInstanceWorkflow.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

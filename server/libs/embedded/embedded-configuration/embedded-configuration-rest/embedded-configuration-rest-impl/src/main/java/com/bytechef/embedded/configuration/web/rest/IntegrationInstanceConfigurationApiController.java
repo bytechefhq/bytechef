@@ -57,14 +57,13 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
-    public ResponseEntity<IntegrationInstanceConfigurationModel> createIntegrationInstanceConfiguration(
+    public ResponseEntity<Long> createIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
         return ResponseEntity.ok(
-            toIntegrationInstanceConfigurationModel(
-                integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
-                    conversionService.convert(
-                        integrationInstanceConfigurationModel, IntegrationInstanceConfigurationDTO.class))));
+            integrationInstanceConfigurationFacade.createIntegrationInstanceConfiguration(
+                conversionService.convert(
+                    integrationInstanceConfigurationModel, IntegrationInstanceConfigurationDTO.class)));
     }
 
     @Override
@@ -124,29 +123,30 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
     }
 
     @Override
-    public ResponseEntity<IntegrationInstanceConfigurationModel> updateIntegrationInstanceConfiguration(
+    public ResponseEntity<Void> updateIntegrationInstanceConfiguration(
         Long id, IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel) {
 
-        return ResponseEntity.ok(
-            toIntegrationInstanceConfigurationModel(
-                integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
-                    conversionService.convert(
-                        integrationInstanceConfigurationModel.id(id), IntegrationInstanceConfigurationDTO.class))));
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfiguration(
+            conversionService.convert(
+                integrationInstanceConfigurationModel.id(id), IntegrationInstanceConfigurationDTO.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
-    public ResponseEntity<IntegrationInstanceConfigurationWorkflowModel> updateIntegrationInstanceConfigurationWorkflow(
+    public ResponseEntity<Void> updateIntegrationInstanceConfigurationWorkflow(
         Long id, Long integrationInstanceConfigurationWorkflowId,
         IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel) {
 
-        return ResponseEntity.ok(
+        integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
             conversionService.convert(
-                integrationInstanceConfigurationFacade.updateIntegrationInstanceConfigurationWorkflow(
-                    conversionService.convert(
-                        integrationInstanceConfigurationWorkflowModel.id(integrationInstanceConfigurationWorkflowId)
-                            .integrationInstanceConfigurationId(id),
-                        IntegrationInstanceConfigurationWorkflow.class)),
-                IntegrationInstanceConfigurationWorkflowModel.class));
+                integrationInstanceConfigurationWorkflowModel.id(integrationInstanceConfigurationWorkflowId)
+                    .integrationInstanceConfigurationId(id),
+                IntegrationInstanceConfigurationWorkflow.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @SuppressFBWarnings("NP")

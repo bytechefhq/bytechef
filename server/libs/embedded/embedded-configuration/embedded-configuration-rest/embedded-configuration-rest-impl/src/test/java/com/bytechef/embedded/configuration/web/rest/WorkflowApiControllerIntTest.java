@@ -33,7 +33,6 @@ import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import java.util.List;
-import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -123,13 +122,6 @@ public class WorkflowApiControllerIntTest {
             .definition(DEFINITION)
             .version(0);
 
-        IntegrationWorkflowDTO workflowDTO = getWorkflowDTO();
-
-        when(integrationFacade.updateWorkflow("1", DEFINITION, 0))
-            .thenReturn(workflowDTO);
-
-        Workflow.Format format = workflowDTO.getFormat();
-
         try {
             this.webTestClient
                 .put()
@@ -139,20 +131,7 @@ public class WorkflowApiControllerIntTest {
                 .bodyValue(workflowModel)
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.format")
-                .isEqualTo(format.toString())
-                .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflowDTO.getId(), "id"))
-                .jsonPath("$.label")
-                .isEqualTo(workflowDTO.getLabel())
-                .jsonPath("$.tasks")
-                .isArray()
-                .jsonPath("$.tasks[0].name")
-                .isEqualTo("airtable")
-                .jsonPath("$.tasks[0].type")
-                .isEqualTo("airtable/v1/create");
+                .isNoContent();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

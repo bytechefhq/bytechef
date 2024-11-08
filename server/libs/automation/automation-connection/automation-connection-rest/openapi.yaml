@@ -26,11 +26,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The connection object."
+          description: "The connection id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Connection"
+                type: integer
+                format: int64
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -64,7 +65,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a connection by id."
@@ -108,12 +109,8 @@ paths:
               $ref: "#/components/schemas/Connection"
         required: true
       responses:
-        "200":
-          description: "The updated connection object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Connection"
+        "204":
+          description: "Successful operation."
   /connections/{id}/tags:
     put:
       description: "Updates tags of an existing connection."
@@ -136,7 +133,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /workspaces/{id}/connections:
     get:

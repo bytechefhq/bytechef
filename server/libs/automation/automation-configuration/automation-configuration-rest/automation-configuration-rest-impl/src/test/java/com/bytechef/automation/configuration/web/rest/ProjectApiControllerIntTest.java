@@ -263,9 +263,6 @@ public class ProjectApiControllerIntTest {
             .name("name")
             .description("description");
 
-        when(projectFacade.createProject(any()))
-            .thenReturn(projectDTO);
-
         try {
             assert projectDTO.id() != null;
             this.webTestClient
@@ -276,16 +273,7 @@ public class ProjectApiControllerIntTest {
                 .bodyValue(projectModel)
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.description")
-                .isEqualTo(projectDTO.description())
-                .jsonPath("$.id")
-                .isEqualTo(projectDTO.id())
-                .jsonPath("$.name")
-                .isEqualTo(projectDTO.name())
-                .jsonPath("$.workflowIds[0]")
-                .isEqualTo("workflow1");
+                .isNoContent();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }
@@ -305,11 +293,11 @@ public class ProjectApiControllerIntTest {
         String definition = "{\"description\": \"My description\", \"label\": \"New Workflow\", \"tasks\": []}";
 
         WorkflowModel workflowModel = new WorkflowModel().definition(definition);
-        ProjectWorkflowDTO workflow =
+        ProjectWorkflowDTO projectWorkflowDTO =
             new ProjectWorkflowDTO(new Workflow("id", definition, Format.JSON), new ProjectWorkflow());
 
         when(projectFacade.addWorkflow(anyLong(), any()))
-            .thenReturn(workflow);
+            .thenReturn(projectWorkflowDTO.getProjectWorkflowId());
 
         try {
             this.webTestClient
@@ -325,7 +313,7 @@ public class ProjectApiControllerIntTest {
                 .jsonPath("$.description")
                 .isEqualTo("My description")
                 .jsonPath("$.id")
-                .isEqualTo(Validate.notNull(workflow.getId(), "id"))
+                .isEqualTo(Validate.notNull(projectWorkflowDTO.getId(), "id"))
                 .jsonPath("$.label")
                 .isEqualTo("New Workflow");
         } catch (Exception exception) {
@@ -344,20 +332,9 @@ public class ProjectApiControllerIntTest {
 
     @Test
     public void testPutIntegration() {
-        ProjectDTO projectDTO = ProjectDTO.builder()
-            .category(new Category(1L, "category"))
-            .description("description")
-            .id(1L)
-            .name("name2")
-            .tags(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")))
-            .projectWorkflowIds(List.of(1L))
-            .build();
         ProjectModel projectModel = new ProjectModel()
             .id(1L)
             .name("name2");
-
-        when(projectFacade.updateProject(any(ProjectDTO.class)))
-            .thenReturn(projectDTO);
 
         try {
             this.webTestClient
@@ -368,16 +345,7 @@ public class ProjectApiControllerIntTest {
                 .bodyValue(projectModel)
                 .exchange()
                 .expectStatus()
-                .isOk()
-                .expectBody()
-                .jsonPath("$.id")
-                .isEqualTo(projectDTO.id())
-                .jsonPath("$.description")
-                .isEqualTo(projectDTO.description())
-                .jsonPath("$.name")
-                .isEqualTo("name2")
-                .jsonPath("$.projectWorkflowIds[0]")
-                .isEqualTo(1L);
+                .isNoContent();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

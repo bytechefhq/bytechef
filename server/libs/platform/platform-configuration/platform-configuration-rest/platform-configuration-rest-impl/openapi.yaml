@@ -593,7 +593,7 @@ paths:
                     type: "string"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /workflow-test-configurations/{workflowId}/connections/{workflowNodeName}/{workflowConnectionKey}:
     put:
@@ -632,7 +632,7 @@ paths:
                   format: "int64"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /workflows/{id}/descriptions/{workflowNodeName}:
     get:
@@ -991,7 +991,7 @@ paths:
           schema:
             type: "string"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     put:
       description: "Create a new or update existing workflow node test output."

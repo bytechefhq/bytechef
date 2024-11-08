@@ -82,10 +82,11 @@ public class SigningKeyApiController implements SigningKeyApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<SigningKeyModel> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
-        return ResponseEntity.ok(
-            getSigningKeyModel(
-                signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class))));
+    public ResponseEntity<Void> updateSigningKey(Long id, SigningKeyModel signingKeyModel) {
+        signingKeyService.update(conversionService.convert(signingKeyModel.id(id), SigningKey.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     private SigningKeyModel getSigningKeyModel(SigningKey signingKey) {

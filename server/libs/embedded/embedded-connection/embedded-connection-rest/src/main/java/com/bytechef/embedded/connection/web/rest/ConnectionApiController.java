@@ -52,11 +52,10 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> createConnection(ConnectionModel connectionModel) {
+    public ResponseEntity<Long> createConnection(ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            toConnectionModel(
-                connectionFacade.create(
-                    conversionService.convert(connectionModel, ConnectionDTO.class), ModeType.EMBEDDED)));
+            connectionFacade.create(
+                conversionService.convert(connectionModel, ConnectionDTO.class), ModeType.EMBEDDED));
     }
 
     @Override
@@ -89,9 +88,11 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<ConnectionModel> updateConnection(Long id, ConnectionModel connectionModel) {
-        return ResponseEntity.ok(toConnectionModel(
-            connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class))));
+    public ResponseEntity<Void> updateConnection(Long id, ConnectionModel connectionModel) {
+        connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class));
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @SuppressFBWarnings("NP")

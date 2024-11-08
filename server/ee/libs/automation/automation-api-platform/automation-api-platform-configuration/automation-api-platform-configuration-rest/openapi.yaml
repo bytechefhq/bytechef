@@ -66,7 +66,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an API collection by id."
@@ -138,7 +138,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /api-collection-endpoints:
     post:
@@ -176,7 +176,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an API collection endpoint by id."

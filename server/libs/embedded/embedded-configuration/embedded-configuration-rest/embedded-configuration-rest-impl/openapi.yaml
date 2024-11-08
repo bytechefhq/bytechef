@@ -51,11 +51,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The app event object."
+          description: "The app event id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AppEvent"
+                type: integer
+                format: int64
   /app-events/{id}:
     delete:
       description: "Delete an app event."
@@ -72,7 +73,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an app event by id."
@@ -116,12 +117,8 @@ paths:
               $ref: "#/components/schemas/AppEvent"
         required: true
       responses:
-        "200":
-          description: "The updated app event object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AppEvent"
+        "204":
+          description: "Successful operation."
   /integration-instance-configurations/tags:
     get:
       description: "Get integration instance configuration tags."
@@ -190,11 +187,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The integration instance configuration object."
+          description: "The integration instance configuration id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/IntegrationInstanceConfiguration"
+                type: integer
+                format: int64
   /integration-instance-configurations/{id}:
     delete:
       description: "Delete an integration instance configuration."
@@ -211,7 +209,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an integration instance configuration by id."
@@ -255,12 +253,8 @@ paths:
               $ref: "#/components/schemas/IntegrationInstanceConfiguration"
         required: true
       responses:
-        "200":
-          description: "The updated integration instance configuration object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/IntegrationInstanceConfiguration"
+        "204":
+          description: "Successful operation."
   /integration-instance-configurations/{id}/enable/{enable}:
     patch:
       description: "Enable/disable an integration instance configuration."
@@ -283,7 +277,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integration-instance-configurations/{id}/tags:
     put:
@@ -307,7 +301,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integration-instance-configurations/{id}/workflows/{workflowId}/enable/{enable}:
     patch:
@@ -337,7 +331,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integration-instance-configurations/{id}/workflows/{workflowId}:
     put:
@@ -368,12 +362,8 @@ paths:
               $ref: "#/components/schemas/IntegrationInstanceConfigurationWorkflow"
         required: true
       responses:
-        "200":
-          description: "The updated integration instance configuration workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/IntegrationInstanceConfigurationWorkflow"
+        "204":
+          description: "Successful operation."
   /integration-instance-configurations/{id}/workflows/{workflowId}/jobs:
     post:
       description: "Create a request for running a new job."
@@ -475,7 +465,7 @@ paths:
             type: "integer"
             format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integration-instances/{id}/enable/{enable}:
     patch:
@@ -499,7 +489,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integration-instances/{id}/workflows/{workflowId}/enable/{enable}:
     patch:
@@ -529,7 +519,7 @@ paths:
           schema:
             type: "boolean"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integrations:
     get:
@@ -588,11 +578,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The integration object."
+          description: "The integration id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Integration"
+                type: integer
+                format: int64
   /integrations/categories:
     get:
       description: "Get integration categories."
@@ -643,7 +634,7 @@ paths:
           type: "integer"
           format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get an integration by id."
@@ -687,12 +678,8 @@ paths:
               $ref: "#/components/schemas/Integration"
         required: true
       responses:
-        "200":
-          description: "The updated integration object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Integration"
+        "204":
+          description: "Successful operation."
   /integrations/{id}/publish:
     post:
       description: "Publishes existing integration."
@@ -718,7 +705,7 @@ paths:
                   description: The description of a integration version.
                   type: "string"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integrations/{id}/versions:
     get:
@@ -796,7 +783,7 @@ paths:
               $ref: "#/components/schemas/UpdateTagsRequest"
         required: true
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /integrations/{id}/workflows:
     get:
@@ -844,11 +831,12 @@ paths:
         required: true
       responses:
         "200":
-          description: "The updated integration object."
+          description: "The integration workflow id."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                type: integer
+                format: int64
   /workflows/{id}:
     delete:
       description: "Delete a workflow."
@@ -864,7 +852,7 @@ paths:
           schema:
             type: "string"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
     get:
       description: "Get a workflow by id."
@@ -906,12 +894,8 @@ paths:
               $ref: "#/components/schemas/Workflow"
         required: true
       responses:
-        "200":
-          description: "The updated workflow object."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Workflow"
+        "204":
+          description: "Successful operation."
   /workflows/by-integration-workflow-id/{integrationWorkflowId}:
     get:
       description: "Get workflow for particular integration."

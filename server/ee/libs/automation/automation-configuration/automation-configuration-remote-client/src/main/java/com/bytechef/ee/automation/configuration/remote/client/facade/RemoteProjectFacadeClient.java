@@ -26,12 +26,12 @@ import org.springframework.stereotype.Component;
 public class RemoteProjectFacadeClient implements ProjectFacade {
 
     @Override
-    public ProjectWorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, @NonNull String definition) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ProjectDTO createProject(@NonNull ProjectDTO projectDTO) {
+    public long createProject(@NonNull ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -113,7 +113,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public ProjectDTO updateProject(@NonNull ProjectDTO projectDTO) {
+    public void updateProject(@NonNull ProjectDTO projectDTO) {
         throw new UnsupportedOperationException();
     }
 
@@ -123,7 +123,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
+    public void updateWorkflow(String workflowId, String definition, int version) {
         throw new UnsupportedOperationException();
     }
 }

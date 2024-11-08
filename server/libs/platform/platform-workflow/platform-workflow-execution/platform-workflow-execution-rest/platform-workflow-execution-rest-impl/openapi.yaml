@@ -86,7 +86,7 @@ paths:
           type: "integer"
           format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /jobs/{id}/stop:
     put:
@@ -104,7 +104,7 @@ paths:
           type: "integer"
           format: "int64"
       responses:
-        "200":
+        "204":
           description: "Successful operation."
   /trigger-executions:
     get:

@@ -102,14 +102,10 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
+        long connectionId = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
 
-        Assertions.assertThat(connectionDTO.name())
-            .isEqualTo("name1");
-        Assertions.assertThat(connectionDTO.id())
-            .isNotNull();
-        Assertions.assertThat(connectionDTO.tags())
-            .hasSize(1);
+        Assertions.assertThat(connectionId)
+            .isEqualTo(1054L);
     }
 
     @Test
@@ -122,7 +118,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO1 = connectionFacade.create(connectionDTO1, ModeType.AUTOMATION);
+        long connectionId1 = connectionFacade.create(connectionDTO1, ModeType.AUTOMATION);
 
         ConnectionDTO connectionDTO2 = ConnectionDTO.builder()
             .componentName("componentName")
@@ -132,19 +128,19 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(new Tag("tag1")))
             .build();
 
-        connectionDTO2 = connectionFacade.create(connectionDTO2, ModeType.AUTOMATION);
+        long connectionId2 = connectionFacade.create(connectionDTO2, ModeType.AUTOMATION);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(2);
         Assertions.assertThat(tagRepository.count())
             .isEqualTo(1);
 
-        connectionFacade.delete(connectionDTO1.id());
+        connectionFacade.delete(connectionId1);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(1);
 
-        connectionFacade.delete(connectionDTO2.id());
+        connectionFacade.delete(connectionId2);
 
         Assertions.assertThat(connectionRepository.count())
             .isEqualTo(0);
@@ -261,7 +257,7 @@ public class ConnectionFacadeIntTest {
             .tags(List.of(tag1, tagRepository.save(new Tag("tag2"))))
             .build();
 
-        connectionDTO = connectionFacade.create(connectionDTO, ModeType.AUTOMATION);
+        connectionDTO = connectionFacade.getConnection(connectionFacade.create(connectionDTO, ModeType.AUTOMATION));
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
@@ -275,7 +271,7 @@ public class ConnectionFacadeIntTest {
             .version(connectionDTO.version())
             .build();
 
-        connectionDTO = connectionFacade.update(connectionDTO);
+        connectionFacade.update(connectionDTO);
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(1);

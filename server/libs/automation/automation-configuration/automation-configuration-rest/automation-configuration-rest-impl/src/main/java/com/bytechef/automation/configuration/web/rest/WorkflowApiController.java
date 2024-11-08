@@ -55,10 +55,8 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
-        return ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.addWorkflow(id, workflowModel.getDefinition()), WorkflowModel.class));
+    public ResponseEntity<Long> createProjectWorkflow(Long id, WorkflowModel workflowModel) {
+        return ResponseEntity.ok(projectFacade.addWorkflow(id, workflowModel.getDefinition()));
     }
 
     @Override
@@ -110,12 +108,12 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<WorkflowModel> updateWorkflow(String id, WorkflowModel workflowModel) {
+    public ResponseEntity<Void> updateWorkflow(String id, WorkflowModel workflowModel) {
         // TODO Add check regarding platform type
 
-        return ResponseEntity.ok(
-            conversionService.convert(
-                projectFacade.updateWorkflow(id, workflowModel.getDefinition(), workflowModel.getVersion()),
-                WorkflowModel.class));
+        projectFacade.updateWorkflow(id, workflowModel.getDefinition(), workflowModel.getVersion());
+
+        return ResponseEntity.noContent()
+            .build();
     }
 }

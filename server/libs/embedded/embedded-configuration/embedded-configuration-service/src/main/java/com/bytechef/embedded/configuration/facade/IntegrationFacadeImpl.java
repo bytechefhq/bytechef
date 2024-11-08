@@ -99,7 +99,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationWorkflowDTO addWorkflow(long id, @NonNull String definition) {
+    public long addWorkflow(long id, @NonNull String definition) {
         Integration integration = integrationService.getIntegration(id);
 
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
@@ -107,11 +107,11 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
             id, integration.getLastIntegrationVersion(), workflow.getId());
 
-        return new IntegrationWorkflowDTO(workflowFacade.getWorkflow(workflow.getId()), integrationWorkflow);
+        return integrationWorkflow.getId();
     }
 
     @Override
-    public IntegrationDTO createIntegration(@NonNull IntegrationDTO integrationDTO) {
+    public long createIntegration(@NonNull IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
 
         Category category = integrationDTO.category();
@@ -130,7 +130,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             integration.setTags(tags);
         }
 
-        return new IntegrationDTO(category, integrationService.create(integration), List.of(), tags);
+        integration = integrationService.create(integration);
+
+        return integration.getId();
     }
 
     @Override
@@ -397,8 +399,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationDTO updateIntegration(@NonNull IntegrationDTO integrationDTO) {
-        Category category = integrationDTO.category() == null ? null : categoryService.save(integrationDTO.category());
+    public void updateIntegration(@NonNull IntegrationDTO integrationDTO) {
         List<Tag> tags = CollectionUtils.isEmpty(integrationDTO.tags())
             ? Collections.emptyList()
             : tagService.save(integrationDTO.tags());
@@ -407,8 +408,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         integration.setTags(tags);
 
-        return new IntegrationDTO(
-            category, integrationService.update(integration), getIntegrationWorkflowIds(integration), tags);
+        integrationService.update(integration);
     }
 
     @Override
@@ -419,10 +419,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
-        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
-
-        return new IntegrationWorkflowDTO(workflowFacade.update(workflowId, definition, version), integrationWorkflow);
+    public void updateWorkflow(String workflowId, String definition, int version) {
+        workflowService.update(workflowId, definition, version);
     }
 
     private Category getCategory(Integration integration) {

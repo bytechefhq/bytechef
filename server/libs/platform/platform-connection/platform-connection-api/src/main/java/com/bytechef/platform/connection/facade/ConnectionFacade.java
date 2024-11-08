@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface ConnectionFacade {
 
-    ConnectionDTO create(ConnectionDTO connectionDTO, ModeType type);
+    long create(ConnectionDTO connectionDTO, ModeType type);
 
     void delete(Long id);
 
@@ -39,7 +39,7 @@ public interface ConnectionFacade {
 
     List<Tag> getConnectionTags(ModeType type);
 
-    ConnectionDTO update(Long id, List<Tag> tags);
+    void update(ConnectionDTO connectionDTO);
 
-    ConnectionDTO update(ConnectionDTO connectionDTO);
+    void update(Long id, List<Tag> tags);
 }

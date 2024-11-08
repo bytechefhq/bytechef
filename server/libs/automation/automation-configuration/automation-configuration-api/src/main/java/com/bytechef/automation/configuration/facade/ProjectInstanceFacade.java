@@ -27,7 +27,7 @@ import java.util.List;
  */
 public interface ProjectInstanceFacade {
 
-    ProjectInstanceDTO createProjectInstance(ProjectInstanceDTO projectInstanceDTO);
+    long createProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
     long createProjectInstanceWorkflowJob(Long id, String workflowId);
 
@@ -43,9 +43,9 @@ public interface ProjectInstanceFacade {
 
     List<ProjectInstanceDTO> getWorkspaceProjectInstances(long id, Environment environment, Long projectId, Long tagId);
 
-    ProjectInstanceDTO updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
+    void updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 
     void updateProjectInstanceTags(long id, List<Tag> tags);
 
-    ProjectInstanceWorkflow updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow);
+    void updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow);
 }
