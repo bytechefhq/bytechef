@@ -35,11 +35,11 @@ export const useDeleteSigningKeyMutation = (mutationProps?: DeleteSigningKeyMuta
 
 interface UpdateSigningKeyMutationProps {
     onError?: (error: Error, variables: SigningKey) => void;
-    onSuccess?: (result: SigningKey, variables: SigningKey) => void;
+    onSuccess?: (result: void, variables: SigningKey) => void;
 }
 
 export const useUpdateSigningKeyMutation = (mutationProps?: UpdateSigningKeyMutationProps) =>
-    useMutation<SigningKey, Error, SigningKey>({
+    useMutation<void, Error, SigningKey>({
         mutationFn: (signingKey: SigningKey) => {
             return new SigningKeyApi().updateSigningKey({
                 id: signingKey.id!,

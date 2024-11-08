@@ -3,11 +3,11 @@ import {useMutation} from '@tanstack/react-query';
 
 interface CreateAppEventMutationProps {
     onError?: (error: Error, variables: AppEvent) => void;
-    onSuccess?: (result: AppEvent, variables: AppEvent) => void;
+    onSuccess?: (result: number, variables: AppEvent) => void;
 }
 
 export const useCreateAppEventMutation = (mutationProps?: CreateAppEventMutationProps) =>
-    useMutation<AppEvent, Error, AppEvent>({
+    useMutation<number, Error, AppEvent>({
         mutationFn: (appEvent: AppEvent) => {
             return new AppEventApi().createAppEvent({
                 appEvent,
@@ -35,11 +35,11 @@ export const useDeleteAppEventMutation = (mutationProps?: DeleteAppEventMutation
 
 interface UpdateAppEventMutationProps {
     onError?: (error: Error, variables: AppEvent) => void;
-    onSuccess?: (result: AppEvent, variables: AppEvent) => void;
+    onSuccess?: (result: void, variables: AppEvent) => void;
 }
 
 export const useUpdateAppEventMutation = (mutationProps?: UpdateAppEventMutationProps) =>
-    useMutation<AppEvent, Error, AppEvent>({
+    useMutation<void, Error, AppEvent>({
         mutationFn: (appEvent: AppEvent) => {
             return new AppEventApi().updateAppEvent({
                 appEvent,

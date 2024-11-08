@@ -77,7 +77,7 @@ const ProjectWorkflowListItem = ({
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(project.id!),
             });

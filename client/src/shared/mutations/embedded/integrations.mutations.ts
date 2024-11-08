@@ -8,7 +8,7 @@ import {
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationMutationProps {
-    onSuccess?: (result: Integration, variables: Integration) => void;
+    onSuccess?: (result: number, variables: Integration) => void;
     onError?: (error: Error, variables: Integration) => void;
 }
 
@@ -24,7 +24,7 @@ export const useCreateIntegrationMutation = (mutationProps?: CreateIntegrationMu
     });
 
 interface UpdateIntegrationMutationProps {
-    onSuccess?: (result: Integration, variables: Integration) => void;
+    onSuccess?: (result: void, variables: Integration) => void;
     onError?: (error: Error, variables: Integration) => void;
 }
 

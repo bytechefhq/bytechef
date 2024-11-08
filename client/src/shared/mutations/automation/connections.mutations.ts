@@ -3,14 +3,14 @@ import {Connection, ConnectionApi} from '@/shared/middleware/automation/connecti
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateConnectionMutationProps {
-    onSuccess?: (result: Connection, variables: Connection) => void;
+    onSuccess?: (result: number, variables: Connection) => void;
     onError?: (error: Error, variables: Connection) => void;
 }
 
 export const useCreateConnectionMutation = (mutationProps?: CreateConnectionMutationProps) => {
     const {currentWorkspaceId} = useWorkspaceStore();
 
-    return useMutation<Connection, Error, Connection>({
+    return useMutation<number, Error, Connection>({
         mutationFn: (connection: Connection) => {
             return new ConnectionApi().createConnection({
                 connection: {
@@ -41,12 +41,12 @@ export const useDeleteConnectionMutation = (mutationProps?: DeleteConnectionMuta
     });
 
 interface UpdateConnectionMutationProps {
-    onSuccess?: (result: Connection, variables: Connection) => void;
+    onSuccess?: (result: void, variables: Connection) => void;
     onError?: (error: Error, variables: Connection) => void;
 }
 
 export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMutationProps) =>
-    useMutation<Connection, Error, Connection>({
+    useMutation<void, Error, Connection>({
         mutationFn: (connection: Connection) => {
             return new ConnectionApi().updateConnection({
                 connection: connection,

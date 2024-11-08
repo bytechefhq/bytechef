@@ -20,7 +20,7 @@ export const useEnableProjectInstanceWorkflowMutation = (mutationProps: EnablePr
     });
 
 interface UpdateProjectInstanceWorkflowMutationProps {
-    onSuccess?: (result: ProjectInstanceWorkflow, variables: ProjectInstanceWorkflow) => void;
+    onSuccess?: (result: void, variables: ProjectInstanceWorkflow) => void;
     onError?: (error: Error, variables: ProjectInstanceWorkflow) => void;
 }
 

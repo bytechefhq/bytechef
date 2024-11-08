@@ -35,11 +35,11 @@ export const useDeleteApiKeyMutation = (mutationProps?: DeleteApiKeyMutationProp
 
 interface UpdateApiKeyMutationProps {
     onError?: (error: Error, variables: ApiKey) => void;
-    onSuccess?: (result: ApiKey, variables: ApiKey) => void;
+    onSuccess?: (result: void, variables: ApiKey) => void;
 }
 
 export const useUpdateApiKeyMutation = (mutationProps?: UpdateApiKeyMutationProps) =>
-    useMutation<ApiKey, Error, ApiKey>({
+    useMutation<void, Error, ApiKey>({
         mutationFn: (apiKey: ApiKey) => {
             return new ApiKeyApi().updateApiKey({
                 apiKey,

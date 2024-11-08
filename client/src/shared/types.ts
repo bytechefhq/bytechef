@@ -20,7 +20,6 @@ import {
     TimeProperty,
     TriggerDefinition,
     ValueProperty,
-    Workflow,
     WorkflowConnection,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
@@ -248,4 +247,4 @@ export type PropertyAllType = Omit<PropertyTypeAllType, 'controlType'> & {
     expressionEnabled?: boolean;
 };
 
-export type UpdateWorkflowMutationType = UseMutationResult<Workflow, Error, UpdateWorkflowRequestI, unknown>;
+export type UpdateWorkflowMutationType = UseMutationResult<void, Error, UpdateWorkflowRequestI, unknown>;

@@ -6,7 +6,7 @@ import {
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectInstanceMutationProps {
-    onSuccess?: (result: ProjectInstance, variables: ProjectInstance) => void;
+    onSuccess?: (result: number, variables: ProjectInstance) => void;
     onError?: (error: Error, variables: ProjectInstance) => void;
 }
 
@@ -52,7 +52,7 @@ export const useEnableProjectInstanceMutation = (mutationProps: EnableProjectIns
     });
 
 interface UpdateProjectInstanceMutationProps {
-    onSuccess?: (result: ProjectInstance, variables: ProjectInstance) => void;
+    onSuccess?: (result: void, variables: ProjectInstance) => void;
     onError?: (error: Error, variables: ProjectInstance) => void;
 }
 

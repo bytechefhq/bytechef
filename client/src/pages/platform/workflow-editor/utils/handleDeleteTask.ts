@@ -25,7 +25,7 @@ interface HandleDeleteTaskProps {
     setCurrentComponent: (component: ComponentType | undefined) => void;
     setCurrentNode: (node: NodeType | undefined) => void;
     setWorkflow: (workflow: Workflow & WorkflowTaskDataType) => void;
-    updateWorkflowMutation: UseMutationResult<Workflow, unknown, {id: string; workflow: Workflow}>;
+    updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 

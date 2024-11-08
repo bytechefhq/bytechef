@@ -64,12 +64,19 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
 
     const queryClient = useQueryClient();
 
-    const onSuccess = (project: Project) => {
+    const onSuccess = (projectId: number | void) => {
         captureProjectCreated();
 
-        queryClient.invalidateQueries({
-            queryKey: ProjectKeys.project(project.id!),
-        });
+        if (!projectId && project) {
+            projectId = project.id!;
+        }
+
+        if (projectId) {
+            queryClient.invalidateQueries({
+                queryKey: ProjectKeys.project(projectId),
+            });
+        }
+
         queryClient.invalidateQueries({
             queryKey: ProjectCategoryKeys.projectCategories,
         });

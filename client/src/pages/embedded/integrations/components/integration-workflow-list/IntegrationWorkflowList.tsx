@@ -40,12 +40,10 @@ const IntegrationWorkflowList = ({integration}: {integration: Integration}) => {
     } = {};
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (integrationWorkflowId) => {
             captureIntegrationWorkflowCreated();
 
-            navigate(
-                `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}`
-            );
+            navigate(`/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}`);
         },
     });
 

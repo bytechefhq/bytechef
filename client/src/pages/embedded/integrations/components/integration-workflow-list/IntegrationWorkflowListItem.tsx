@@ -65,7 +65,7 @@ const IntegrationWorkflowListItem = ({
     });
 
     const updateWorkflowMutation = useUpdateWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflows(integration.id!),
             });

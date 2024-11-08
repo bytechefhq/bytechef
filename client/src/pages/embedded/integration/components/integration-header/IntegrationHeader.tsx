@@ -82,7 +82,7 @@ const IntegrationHeader = ({
     const queryClient = useQueryClient();
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (integrationWorkflowId) => {
             captureIntegrationWorkflowCreated();
 
             queryClient.invalidateQueries({
@@ -96,7 +96,7 @@ const IntegrationHeader = ({
                 bottomResizablePanelRef.current.resize(0);
             }
 
-            navigate(`/embedded/integrations/${integrationId}/integration-workflows/${workflow.integrationWorkflowId}`);
+            navigate(`/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowId}`);
         },
     });
 

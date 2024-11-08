@@ -78,7 +78,7 @@ const ProjectHeader = ({
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
             queryClient.invalidateQueries({
@@ -92,7 +92,7 @@ const ProjectHeader = ({
                 bottomResizablePanelRef.current.resize(0);
             }
 
-            navigate(`/automation/projects/${projectId}/project-workflows/${workflow.projectWorkflowId}`);
+            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}`);
         },
     });
 

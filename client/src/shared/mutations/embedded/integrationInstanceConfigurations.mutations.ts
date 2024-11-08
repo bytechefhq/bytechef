@@ -11,7 +11,7 @@ import {
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationInstanceMutationProps {
-    onSuccess?: (result: IntegrationInstanceConfiguration, variables: IntegrationInstanceConfiguration) => void;
+    onSuccess?: (result: number, variables: IntegrationInstanceConfiguration) => void;
     onError?: (error: Error, variables: IntegrationInstanceConfiguration) => void;
 }
 
@@ -79,7 +79,7 @@ export const useEnableIntegrationInstanceConfigurationWorkflowMutation = (
     });
 
 interface UpdateIntegrationInstanceConfigurationMutationProps {
-    onSuccess?: (result: IntegrationInstanceConfiguration, variables: IntegrationInstanceConfiguration) => void;
+    onSuccess?: (result: void, variables: IntegrationInstanceConfiguration) => void;
     onError?: (error: Error, variables: IntegrationInstanceConfiguration) => void;
 }
 
@@ -113,10 +113,7 @@ export const useUpdateIntegrationInstanceConfigurationWorkflowMutation = (
     });
 
 interface UpdateIntegrationInstanceConfigurationWorkflowMutationProps {
-    onSuccess?: (
-        result: IntegrationInstanceConfigurationWorkflow,
-        variables: IntegrationInstanceConfigurationWorkflow
-    ) => void;
+    onSuccess?: (result: void, variables: IntegrationInstanceConfigurationWorkflow) => void;
     onError?: (error: Error, variables: IntegrationInstanceConfigurationWorkflow) => void;
 }
 

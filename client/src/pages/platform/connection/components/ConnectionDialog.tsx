@@ -52,14 +52,14 @@ interface ConnectionDialogProps {
     connectionsQueryKey: QueryKey;
     onClose?: () => void;
     useCreateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionI, variables: ConnectionI) => void;
+        onSuccess?: (result: number, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
-    }) => UseMutationResult<ConnectionI, Error, ConnectionI, unknown>;
+    }) => UseMutationResult<number, Error, ConnectionI, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
     useUpdateConnectionMutation?: (mutationProps: {
-        onSuccess?: (result: ConnectionI, variables: ConnectionI) => void;
+        onSuccess?: (result: void, variables: ConnectionI) => void;
         onError?: (error: Error, variables: ConnectionI) => void;
-    }) => UseMutationResult<ConnectionI, Error, ConnectionI, unknown>;
+    }) => UseMutationResult<void, Error, ConnectionI, unknown>;
     triggerNode?: ReactNode;
 }
 
@@ -333,7 +333,8 @@ const ConnectionDialog = ({
         if (connection?.id) {
             const {name, tags} = getValues();
 
-            connectionMutation.mutate({
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            (connectionMutation as any).mutate({
                 componentName: connection.componentName,
                 id: connection?.id,
                 name,

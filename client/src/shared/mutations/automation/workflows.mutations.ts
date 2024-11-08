@@ -3,13 +3,12 @@ import {
     DeleteWorkflowRequest,
     DuplicateWorkflowRequest,
     UpdateWorkflowRequest,
-    Workflow,
     WorkflowApi,
 } from '@/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectWorkflowMutationProps {
-    onSuccess?: (result: Workflow, variables: CreateProjectWorkflowRequest) => void;
+    onSuccess?: (result: number, variables: CreateProjectWorkflowRequest) => void;
     onError?: (error: Error, variables: CreateProjectWorkflowRequest) => void;
 }
 
@@ -52,7 +51,7 @@ export const useDuplicateWorkflowMutation = (mutationProps?: DuplicateWorkflowMu
     });
 
 interface UpdateWorkflowMutationProps {
-    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequest) => void;
+    onSuccess?: (result: void, variables: UpdateWorkflowRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
 }
 

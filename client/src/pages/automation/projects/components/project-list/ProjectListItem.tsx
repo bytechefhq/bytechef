@@ -64,12 +64,10 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
     const queryClient = useQueryClient();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
-            navigate(
-                `/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}?${searchParams}`
-            );
+            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}?${searchParams}`);
 
             setShowWorkflowDialog(false);
         },

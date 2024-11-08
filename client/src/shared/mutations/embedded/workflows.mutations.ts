@@ -3,13 +3,12 @@ import {
     DeleteWorkflowRequest,
     IntegrationApi,
     UpdateWorkflowRequest,
-    Workflow,
     WorkflowApi,
 } from '@/shared/middleware/embedded/configuration';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateIntegrationWorkflowMutationProps {
-    onSuccess?: (result: Workflow, variables: CreateIntegrationWorkflowRequest) => void;
+    onSuccess?: (result: number, variables: CreateIntegrationWorkflowRequest) => void;
     onError?: (error: Error, variables: CreateIntegrationWorkflowRequest) => void;
 }
 
@@ -37,7 +36,7 @@ export const useDeleteWorkflowMutation = (mutationProps?: DeleteWorkflowMutation
     });
 
 interface UpdateWorkflowMutationProps {
-    onSuccess?: (result: Workflow, variables: UpdateWorkflowRequest) => void;
+    onSuccess?: (result: void, variables: UpdateWorkflowRequest) => void;
     onError?: (error: Error, variables: UpdateWorkflowRequest) => void;
 }
 

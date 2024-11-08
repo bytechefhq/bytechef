@@ -72,11 +72,11 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     const queryClient = useQueryClient();
 
     const createIntegrationWorkflowMutation = useCreateIntegrationWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (integrationWorkflowId) => {
             captureIntegrationWorkflowCreated();
 
             navigate(
-                `/embedded/integrations/${integration.id}/integration-workflows/${workflow?.integrationWorkflowId}?${searchParams}`
+                `/embedded/integrations/${integration.id}/integration-workflows/${integrationWorkflowId}?${searchParams}`
             );
 
             setShowWorkflowDialog(false);

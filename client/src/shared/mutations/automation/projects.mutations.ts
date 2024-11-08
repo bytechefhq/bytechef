@@ -2,7 +2,7 @@ import {Project, ProjectApi, PublishProjectOperationRequest} from '@/shared/midd
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateProjectMutationProps {
-    onSuccess?: (result: Project, variables: Project) => void;
+    onSuccess?: (result: number, variables: Project) => void;
     onError?: (error: Error, variables: Project) => void;
 }
 
@@ -62,7 +62,7 @@ export const usePublishProjectMutation = (mutationProps?: PublishProjectMutation
     });
 
 interface UpdateProjectMutationProps {
-    onSuccess?: (result: Project, variables: Project) => void;
+    onSuccess?: (result: void, variables: Project) => void;
     onError?: (error: Error, variables: Project) => void;
 }
 

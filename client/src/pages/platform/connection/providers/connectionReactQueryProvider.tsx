@@ -42,7 +42,7 @@ export interface ConnectionKeysI {
 }
 
 export interface CreateConnectionMutationProps {
-    onSuccess?: (result: ConnectionI, variables: ConnectionI) => void;
+    onSuccess?: (result: number, variables: ConnectionI) => void;
     onError?: (error: Error, variables: ConnectionI) => void;
 }
 
@@ -50,7 +50,7 @@ export interface ConnectionQueryStateI {
     ConnectionKeys: ConnectionKeysI;
     useCreateConnectionMutation: (
         props?: CreateConnectionMutationProps
-    ) => UseMutationResult<ConnectionI, Error, ConnectionI, unknown>;
+    ) => UseMutationResult<number, Error, ConnectionI, unknown>;
     useGetConnectionTagsQuery: () => UseQueryResult<Tag[], Error>;
     useGetConnectionsQuery: (request: RequestI, enabled?: boolean) => UseQueryResult<ConnectionI[], Error>;
 }

@@ -41,10 +41,10 @@ const ProjectWorkflowList = ({project}: {project: Project}) => {
     } = {};
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
-        onSuccess: (workflow) => {
+        onSuccess: (projectWorkflowId) => {
             captureProjectWorkflowCreated();
 
-            navigate(`/automation/projects/${project.id}/project-workflows/${workflow?.projectWorkflowId}`);
+            navigate(`/automation/projects/${project.id}/project-workflows/${projectWorkflowId}`);
         },
     });
 

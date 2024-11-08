@@ -23,10 +23,10 @@ interface SaveWorkflowDefinitionProps {
     conditionId?: string;
     nodeData: NodeDataType;
     nodeIndex?: number;
-    onSuccess?: (workflow: Workflow) => void;
+    onSuccess?: () => void;
     placeholderId?: string;
     queryClient: QueryClient;
-    updateWorkflowMutation: UseMutationResult<Workflow, Error, UpdateWorkflowRequestType, unknown>;
+    updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
     workflow: Workflow;
 }
 
