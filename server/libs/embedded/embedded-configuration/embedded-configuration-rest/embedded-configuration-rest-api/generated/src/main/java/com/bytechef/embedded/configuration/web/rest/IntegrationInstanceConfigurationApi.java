@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T18:32:19.624287+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -49,7 +49,7 @@ public interface IntegrationInstanceConfigurationApi {
      * Create a new integration instance configuration.
      *
      * @param integrationInstanceConfigurationModel  (required)
-     * @return The integration instance configuration object. (status code 200)
+     * @return The integration instance configuration id. (status code 200)
      */
     @Operation(
         operationId = "createIntegrationInstanceConfiguration",
@@ -57,8 +57,8 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Create a new integration instance configuration.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The integration instance configuration object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationInstanceConfigurationModel.class))
+            @ApiResponse(responseCode = "200", description = "The integration instance configuration id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
             })
         }
     )
@@ -69,18 +69,9 @@ public interface IntegrationInstanceConfigurationApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<IntegrationInstanceConfigurationModel> createIntegrationInstanceConfiguration(
+    default ResponseEntity<Long> createIntegrationInstanceConfiguration(
         @Parameter(name = "IntegrationInstanceConfigurationModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"integrationId\" : 6, \"integrationInstanceConfigurationWorkflows\" : [ { \"integrationInstanceConfigurationId\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : 7, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }, { \"integrationInstanceConfigurationId\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : 7, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" } ], \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"enabled\" : true, \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"__version\" : 2, \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdBy\" : \"createdBy\", \"integrationVersion\" : 1, \"name\" : \"name\", \"integration\" : { \"allowMultipleInstances\" : false, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"componentName\" : \"componentName\", \"id\" : 5, \"lastIntegrationVersion\" : 5, \"lastStatus\" : \"DRAFT\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -134,7 +125,7 @@ public interface IntegrationInstanceConfigurationApi {
      * Delete an integration instance configuration.
      *
      * @param id The id of an integration instance configuration. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteIntegrationInstanceConfiguration",
@@ -142,7 +133,7 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Delete an integration instance configuration.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -164,7 +155,7 @@ public interface IntegrationInstanceConfigurationApi {
      *
      * @param id The id of an integration instance configuration. (required)
      * @param enable Enable/disable the integration instance configuration. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableIntegrationInstanceConfiguration",
@@ -172,7 +163,7 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Enable/disable an integration instance configuration.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -196,7 +187,7 @@ public interface IntegrationInstanceConfigurationApi {
      * @param id The id of an integration instance configuration. (required)
      * @param workflowId The id of an integration workflow. (required)
      * @param enable Enable/disable the workflow of an integration instance configuration. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableIntegrationInstanceConfigurationWorkflow",
@@ -204,7 +195,7 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Enable/disable a workflow of an integration instance configuration.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -314,7 +305,7 @@ public interface IntegrationInstanceConfigurationApi {
      *
      * @param id The id of an integration instance configuration. (required)
      * @param integrationInstanceConfigurationModel  (required)
-     * @return The updated integration instance configuration object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateIntegrationInstanceConfiguration",
@@ -322,31 +313,19 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Update an existing integration instance configuration.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated integration instance configuration object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationInstanceConfigurationModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/integration-instance-configurations/{id}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<IntegrationInstanceConfigurationModel> updateIntegrationInstanceConfiguration(
+    default ResponseEntity<Void> updateIntegrationInstanceConfiguration(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "IntegrationInstanceConfigurationModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationModel integrationInstanceConfigurationModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"description\" : \"description\", \"integrationId\" : 6, \"integrationInstanceConfigurationWorkflows\" : [ { \"integrationInstanceConfigurationId\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : 7, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }, { \"integrationInstanceConfigurationId\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : 7, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" } ], \"connectionAuthorizationParameters\" : { \"key\" : \"\" }, \"enabled\" : true, \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"__version\" : 2, \"environment\" : \"TEST\", \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdBy\" : \"createdBy\", \"integrationVersion\" : 1, \"name\" : \"name\", \"integration\" : { \"allowMultipleInstances\" : false, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastPublishedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"description\" : \"description\", \"componentName\" : \"componentName\", \"id\" : 5, \"lastIntegrationVersion\" : 5, \"lastStatus\" : \"DRAFT\" }, \"connectionConnectionParameters\" : { \"key\" : \"\" }, \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -359,7 +338,7 @@ public interface IntegrationInstanceConfigurationApi {
      * @param id The id of an integration instance configuration. (required)
      * @param workflowId The id of an integration instance configuration workflow. (required)
      * @param integrationInstanceConfigurationWorkflowModel  (required)
-     * @return The updated integration instance configuration workflow object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateIntegrationInstanceConfigurationWorkflow",
@@ -367,32 +346,20 @@ public interface IntegrationInstanceConfigurationApi {
         description = "Update an existing integration instance configuration workflow.",
         tags = { "integration-instance-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated integration instance configuration workflow object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationInstanceConfigurationWorkflowModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/integration-instance-configurations/{id}/workflows/{workflowId}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<IntegrationInstanceConfigurationWorkflowModel> updateIntegrationInstanceConfigurationWorkflow(
+    default ResponseEntity<Void> updateIntegrationInstanceConfigurationWorkflow(
         @Parameter(name = "id", description = "The id of an integration instance configuration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "workflowId", description = "The id of an integration instance configuration workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") Long workflowId,
         @Parameter(name = "IntegrationInstanceConfigurationWorkflowModel", description = "", required = true) @Valid @RequestBody IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"integrationInstanceConfigurationId\" : 9, \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"enabled\" : true, \"workflowReferenceCode\" : \"workflowReferenceCode\", \"__version\" : 3, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"id\" : 7, \"lastExecutionDate\" : \"2000-01-23T04:56:07.000+00:00\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" }, { \"workflowNodeName\" : \"workflowNodeName\", \"connectionId\" : 2, \"key\" : \"key\" } ], \"workflowId\" : \"workflowId\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

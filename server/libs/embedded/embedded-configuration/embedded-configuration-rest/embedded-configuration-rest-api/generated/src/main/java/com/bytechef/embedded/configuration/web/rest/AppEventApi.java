@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T18:32:19.624287+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "app-event", description = "The Embedded App Event Internal API")
 public interface AppEventApi {
@@ -46,7 +46,7 @@ public interface AppEventApi {
      * Create a new app event.
      *
      * @param appEventModel  (required)
-     * @return The app event object. (status code 200)
+     * @return The app event id. (status code 200)
      */
     @Operation(
         operationId = "createAppEvent",
@@ -54,8 +54,8 @@ public interface AppEventApi {
         description = "Create a new app event.",
         tags = { "app-event" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The app event object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = AppEventModel.class))
+            @ApiResponse(responseCode = "200", description = "The app event id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
             })
         }
     )
@@ -66,18 +66,9 @@ public interface AppEventApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<AppEventModel> createAppEvent(
+    default ResponseEntity<Long> createAppEvent(
         @Parameter(name = "AppEventModel", description = "", required = true) @Valid @RequestBody AppEventModel appEventModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"schema\" : \"schema\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -88,7 +79,7 @@ public interface AppEventApi {
      * Delete an app event.
      *
      * @param id The id of an app event. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteAppEvent",
@@ -96,7 +87,7 @@ public interface AppEventApi {
         description = "Delete an app event.",
         tags = { "app-event" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -199,7 +190,7 @@ public interface AppEventApi {
      *
      * @param id The id of an app event. (required)
      * @param appEventModel  (required)
-     * @return The updated app event object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateAppEvent",
@@ -207,31 +198,19 @@ public interface AppEventApi {
         description = "Update an existing app event.",
         tags = { "app-event" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated app event object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = AppEventModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/app-events/{id}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<AppEventModel> updateAppEvent(
+    default ResponseEntity<Void> updateAppEvent(
         @Parameter(name = "id", description = "The id of an app event.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "AppEventModel", description = "", required = true) @Valid @RequestBody AppEventModel appEventModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"schema\" : \"schema\", \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

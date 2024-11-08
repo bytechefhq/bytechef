@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:30:01.517773+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:57.901582+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "api-collection-tag", description = "The Automation API Platform Collection Tag Internal API")
 public interface ApiCollectionTagApi {
@@ -87,7 +87,7 @@ public interface ApiCollectionTagApi {
      *
      * @param id The id of an API collection. (required)
      * @param comBytechefPlatformTagWebRestModelUpdateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateApiCollectionTags",
@@ -95,7 +95,7 @@ public interface ApiCollectionTagApi {
         description = "Updates tags of an existing API collection.",
         tags = { "api-collection-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

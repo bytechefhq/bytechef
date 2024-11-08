@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:35.438467+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:55.310498+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "signing-key", description = "The Embedded User Signing Key Internal API")
 public interface SigningKeyApi {
@@ -88,7 +88,7 @@ public interface SigningKeyApi {
      * Delete an Signing key.
      *
      * @param id The id of an Signing key. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteSigningKey",
@@ -96,7 +96,7 @@ public interface SigningKeyApi {
         description = "Delete an Signing key.",
         tags = { "signing-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -199,7 +199,7 @@ public interface SigningKeyApi {
      *
      * @param id The id of an Signing key. (required)
      * @param comBytechefPlatformUserWebRestModelSigningKeyModel  (required)
-     * @return The updated Signing key object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateSigningKey",
@@ -207,31 +207,19 @@ public interface SigningKeyApi {
         description = "Update an existing Signing key.",
         tags = { "signing-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated Signing key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = com.bytechef.platform.user.web.rest.model.SigningKeyModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/signing-keys/{id}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<com.bytechef.platform.user.web.rest.model.SigningKeyModel> updateSigningKey(
+    default ResponseEntity<Void> updateSigningKey(
         @Parameter(name = "id", description = "The id of an Signing key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "com.bytechef.platform.user.web.rest.model.SigningKeyModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.user.web.rest.model.SigningKeyModel comBytechefPlatformUserWebRestModelSigningKeyModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"keyId\" : \"keyId\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

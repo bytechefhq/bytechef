@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:04:08.835662+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:56.288956+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "workflow-node-test-output", description = "The Platform Workflow Node Test Output Internal API")
 public interface WorkflowNodeTestOutputApi {
@@ -47,7 +47,7 @@ public interface WorkflowNodeTestOutputApi {
      *
      * @param id The id of a workflow. (required)
      * @param workflowNodeName The name of a workflow node for which to create test output objects. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteWorkflowNodeTestOutput",
@@ -55,7 +55,7 @@ public interface WorkflowNodeTestOutputApi {
         description = "Delete existing workflow node test output.",
         tags = { "workflow-node-test-output" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T17:04:08.835662+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:56.288956+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "The Platform Workflow Test Configuration Internal API")
 public interface WorkflowTestConfigurationApi {
@@ -180,7 +180,7 @@ public interface WorkflowTestConfigurationApi {
      * @param workflowNodeName The action/trigger name defined in the workflow. (required)
      * @param workflowConnectionKey The key of a connection. (required)
      * @param saveWorkflowTestConfigurationConnectionRequestModel  (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "saveWorkflowTestConfigurationConnection",
@@ -188,7 +188,7 @@ public interface WorkflowTestConfigurationApi {
         description = "Save a workflow test configuration connection.",
         tags = { "workflow-test-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -214,7 +214,7 @@ public interface WorkflowTestConfigurationApi {
      *
      * @param workflowId The id of a testing workflow. (required)
      * @param saveWorkflowTestConfigurationInputsRequestModel  (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "saveWorkflowTestConfigurationInputs",
@@ -222,7 +222,7 @@ public interface WorkflowTestConfigurationApi {
         description = "Save a workflow test configuration inputs.",
         tags = { "workflow-test-configuration" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

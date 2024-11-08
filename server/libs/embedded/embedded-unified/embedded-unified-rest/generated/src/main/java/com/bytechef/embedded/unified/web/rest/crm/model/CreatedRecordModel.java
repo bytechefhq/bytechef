@@ -20,7 +20,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("created_record")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:37:54.317752+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:55.031052+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class CreatedRecordModel {
 
   private String id;

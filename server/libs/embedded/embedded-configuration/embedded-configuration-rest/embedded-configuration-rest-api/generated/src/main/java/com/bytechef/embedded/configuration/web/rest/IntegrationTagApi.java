@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T18:32:19.624287+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "integration-tag", description = "The Embedded Tag Internal API")
 public interface IntegrationTagApi {
@@ -87,7 +87,7 @@ public interface IntegrationTagApi {
      *
      * @param id The id of an integration. (required)
      * @param comBytechefPlatformTagWebRestModelUpdateTagsRequestModel  (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateIntegrationTags",
@@ -95,7 +95,7 @@ public interface IntegrationTagApi {
         description = "Updates tags of an existing integration.",
         tags = { "integration-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

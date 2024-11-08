@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:34.038608+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:53.977931+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "connection", description = "The Automation Connection Internal API")
 public interface ConnectionApi {
@@ -46,7 +46,7 @@ public interface ConnectionApi {
      * Create a new connection.
      *
      * @param connectionModel  (required)
-     * @return The connection object. (status code 200)
+     * @return The connection id. (status code 200)
      */
     @Operation(
         operationId = "createConnection",
@@ -54,8 +54,8 @@ public interface ConnectionApi {
         description = "Create a new connection.",
         tags = { "connection" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
+            @ApiResponse(responseCode = "200", description = "The connection id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
             })
         }
     )
@@ -66,18 +66,9 @@ public interface ConnectionApi {
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ConnectionModel> createConnection(
+    default ResponseEntity<Long> createConnection(
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 2 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }
@@ -88,7 +79,7 @@ public interface ConnectionApi {
      * Delete a connection.
      *
      * @param id The id of a connection. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteConnection",
@@ -96,7 +87,7 @@ public interface ConnectionApi {
         description = "Delete a connection.",
         tags = { "connection" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -142,7 +133,7 @@ public interface ConnectionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 2 }";
+                    String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 1, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -191,7 +182,7 @@ public interface ConnectionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 2 }, { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 2 } ]";
+                    String exampleString = "[ { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 1, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 }, { \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 1, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -208,7 +199,7 @@ public interface ConnectionApi {
      *
      * @param id The id of a connection. (required)
      * @param connectionModel  (required)
-     * @return The updated connection object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateConnection",
@@ -216,31 +207,19 @@ public interface ConnectionApi {
         description = "Update an existing connection.",
         tags = { "connection" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated connection object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ConnectionModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/connections/{id}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ConnectionModel> updateConnection(
+    default ResponseEntity<Void> updateConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"authorizationName\" : \"authorizationName\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 }, { \"__version\" : 5, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 1 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"environment\" : \"DEVELOPMENT\", \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"name\" : \"name\", \"componentName\" : \"componentName\", \"id\" : 6, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 2 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

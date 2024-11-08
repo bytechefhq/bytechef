@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:37:54.621222+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:57.781463+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "api-key", description = "The Platform User API Key Internal API")
 public interface ApiKeyApi {
@@ -89,7 +89,7 @@ public interface ApiKeyApi {
      * Delete an API key.
      *
      * @param id The id of an API key. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteApiKey",
@@ -97,7 +97,7 @@ public interface ApiKeyApi {
         description = "Delete an API key.",
         tags = { "api-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -200,7 +200,7 @@ public interface ApiKeyApi {
      *
      * @param id The id of an API key. (required)
      * @param apiKeyModel  (required)
-     * @return The updated API key object. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "updateApiKey",
@@ -208,31 +208,19 @@ public interface ApiKeyApi {
         description = "Update an existing API key.",
         tags = { "api-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The updated API key object.", content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = ApiKeyModel.class))
-            })
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
         value = "/api-keys/{id}",
-        produces = { "application/json" },
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<ApiKeyModel> updateApiKey(
+    default ResponseEntity<Void> updateApiKey(
         @Parameter(name = "id", description = "The id of an API key.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "ApiKeyModel", description = "", required = true) @Valid @RequestBody ApiKeyModel apiKeyModel
     ) {
-        getRequest().ifPresent(request -> {
-            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
-                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastUsedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"secretKey\" : \"secretKey\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    break;
-                }
-            }
-        });
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

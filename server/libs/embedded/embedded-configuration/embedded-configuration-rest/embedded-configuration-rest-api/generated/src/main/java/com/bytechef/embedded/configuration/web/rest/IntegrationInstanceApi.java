@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:24:23.760223+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T18:32:19.624287+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "integration-instance", description = "the integration-instance API")
 public interface IntegrationInstanceApi {
@@ -46,7 +46,7 @@ public interface IntegrationInstanceApi {
      * Delete an integration instance.
      *
      * @param id The id of an integration instance. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteIntegrationInstance",
@@ -54,7 +54,7 @@ public interface IntegrationInstanceApi {
         description = "Delete an integration instance.",
         tags = { "integration-instance" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -76,7 +76,7 @@ public interface IntegrationInstanceApi {
      *
      * @param id The id of an integration instance. (required)
      * @param enable Enable/disable the integration instance. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableIntegrationInstance",
@@ -84,7 +84,7 @@ public interface IntegrationInstanceApi {
         description = "Enable/disable an integration instance.",
         tags = { "integration-instance" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -108,7 +108,7 @@ public interface IntegrationInstanceApi {
      * @param id The id of an integration instance. (required)
      * @param workflowId The id of an integration instance workflow. (required)
      * @param enable Enable/disable the integration instance workflow. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableIntegrationInstanceWorkflow",
@@ -116,7 +116,7 @@ public interface IntegrationInstanceApi {
         description = "Enable/disable an integration instance workflow.",
         tags = { "integration-instance" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

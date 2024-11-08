@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-02T19:14:13.791686+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:54.177903+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "connected-user", description = "The Embedded Connected User Internal API")
 public interface ConnectedUserApi {
@@ -49,7 +49,7 @@ public interface ConnectedUserApi {
      * Delete a connected user.
      *
      * @param id The id of an integration instance configuration. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteConnectedUser",
@@ -57,7 +57,7 @@ public interface ConnectedUserApi {
         description = "Delete a connected user.",
         tags = { "connected-user" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -79,7 +79,7 @@ public interface ConnectedUserApi {
      *
      * @param id The id of a connected user. (required)
      * @param enable Enable/disable the connected user. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableConnectedUser",
@@ -87,7 +87,7 @@ public interface ConnectedUserApi {
         description = "Enable/disable a connected user.",
         tags = { "connected-user" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

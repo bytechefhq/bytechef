@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:38.341909+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:58.078472+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "api-connector", description = "The Platform API Connector Internal API")
 public interface ApiConnectorApi {
@@ -89,7 +89,7 @@ public interface ApiConnectorApi {
      * Delete an API Connector.
      *
      * @param id The id of the API Connector. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "deleteApiConnector",
@@ -97,7 +97,7 @@ public interface ApiConnectorApi {
         description = "Delete an API Connector.",
         tags = { "api-connector" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -119,7 +119,7 @@ public interface ApiConnectorApi {
      *
      * @param id The id of the API Connector. (required)
      * @param enable Enable/disable the API Connector. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "enableApiConnector",
@@ -127,7 +127,7 @@ public interface ApiConnectorApi {
         description = "Enable/disable a API Connector.",
         tags = { "api-connector" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(

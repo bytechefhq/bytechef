@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-10-28T06:11:38.505691+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:58.302273+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "job", description = "The Platform Workflow Job API")
 public interface JobApi {
@@ -209,7 +209,7 @@ public interface JobApi {
      * Restart a job.
      *
      * @param id The id of a job to restart. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "restartJob",
@@ -217,7 +217,7 @@ public interface JobApi {
         description = "Restart a job.",
         tags = { "job" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
@@ -238,7 +238,7 @@ public interface JobApi {
      * Stop a job.
      *
      * @param id The id of a job to stop. (required)
-     * @return Successful operation. (status code 200)
+     * @return Successful operation. (status code 204)
      */
     @Operation(
         operationId = "stopJob",
@@ -246,7 +246,7 @@ public interface JobApi {
         description = "Stop a job.",
         tags = { "job" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "Successful operation.")
+            @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
