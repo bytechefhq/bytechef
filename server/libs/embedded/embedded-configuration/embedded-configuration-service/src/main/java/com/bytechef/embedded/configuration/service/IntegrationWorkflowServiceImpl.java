@@ -66,7 +66,18 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     }
 
     @Override
-    public String getIntegrationWorkflowId(long integrationInstanceId, String workflowReferenceCode) {
+    public IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId) {
+
+        return OptionalUtils.get(
+            integrationWorkflowRepository.findByIntegrationInstanceConfigurationIdWorkflowId(
+                integrationInstanceConfigurationId, workflowId));
+    }
+
+    @Override
+    public String getIntegrationInstanceIntegrationWorkflowWorkflowId(
+        long integrationInstanceId, String workflowReferenceCode) {
+
         return OptionalUtils.get(
             integrationWorkflowRepository
                 .findByIntegrationInstanceIdWorkflowReferenceCode(integrationInstanceId, workflowReferenceCode)

@@ -42,6 +42,16 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
+    public void delete(Long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, @NonNull String workflowId) {
 
@@ -66,7 +76,7 @@ public class RemoteIntegrationInstanceWorkflowServiceClient implements Integrati
     }
 
     @Override
-    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+    public void update(@NonNull IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         throw new UnsupportedOperationException();
     }
 

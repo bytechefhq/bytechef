@@ -51,7 +51,7 @@ public class IntegrationTriggerDispatcherPreSendProcessor extends AbstractDispat
     public TriggerExecution process(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        String workflowId = integrationWorkflowService.getIntegrationWorkflowId(
+        String workflowId = integrationWorkflowService.getIntegrationInstanceIntegrationWorkflowWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(

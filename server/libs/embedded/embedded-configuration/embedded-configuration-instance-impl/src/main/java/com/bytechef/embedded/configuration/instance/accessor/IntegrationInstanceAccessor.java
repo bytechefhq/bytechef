@@ -82,6 +82,7 @@ public class IntegrationInstanceAccessor implements InstanceAccessor {
 
     @Override
     public String getWorkflowId(long instanceId, String workflowReferenceCode) {
-        return integrationWorkflowService.getIntegrationWorkflowId(instanceId, workflowReferenceCode);
+        return integrationWorkflowService.getIntegrationInstanceIntegrationWorkflowWorkflowId(instanceId,
+            workflowReferenceCode);
     }
 }

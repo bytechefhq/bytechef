@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.repository.IntegrationInstanceWorkflowRepository;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
 
     private final IntegrationInstanceWorkflowRepository integrationInstanceWorkflowRepository;
 
+    @SuppressFBWarnings("EI")
     public IntegrationInstanceWorkflowServiceImpl(
         IntegrationInstanceWorkflowRepository integrationInstanceWorkflowRepository) {
 

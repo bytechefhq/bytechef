@@ -33,7 +33,11 @@ public interface IntegrationWorkflowService {
 
     IntegrationWorkflow getIntegrationWorkflow(long id);
 
-    String getIntegrationWorkflowId(long integrationInstanceId, String workflowReferenceCode);
+    IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId);
+
+    String
+        getIntegrationInstanceIntegrationWorkflowWorkflowId(long integrationInstanceId, String workflowReferenceCode);
 
     List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion);
 

@@ -179,8 +179,8 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
         IntegrationInstanceConfigurationWorkflow curIntegrationInstanceConfigurationWorkflow = OptionalUtils.get(
-            integrationInstanceConfigurationWorkflowRepository
-                .findById(Validate.notNull(integrationInstanceConfigurationWorkflow.getId(), "id")));
+            integrationInstanceConfigurationWorkflowRepository.findById(
+                Validate.notNull(integrationInstanceConfigurationWorkflow.getId(), "id")));
 
         curIntegrationInstanceConfigurationWorkflow.setConnections(
             integrationInstanceConfigurationWorkflow.getConnections());

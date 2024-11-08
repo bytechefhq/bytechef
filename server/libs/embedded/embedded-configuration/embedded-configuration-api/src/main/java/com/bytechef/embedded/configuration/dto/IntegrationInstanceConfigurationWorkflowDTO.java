@@ -44,7 +44,7 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
             integrationInstanceConfigurationWorkflow.getCreatedDate(),
             integrationInstanceConfigurationWorkflow.getInputs(),
             integrationInstanceConfigurationWorkflow.isEnabled(),
-            integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+            integrationInstanceConfigurationWorkflow.getId(),
             lastExecutionDate, integrationInstanceConfigurationWorkflow.getLastModifiedBy(),
             integrationInstanceConfigurationWorkflow.getLastModifiedDate(),
             integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),

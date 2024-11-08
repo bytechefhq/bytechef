@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -39,15 +40,27 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
     Optional<IntegrationWorkflow> findByWorkflowId(String workflowId);
 
     @Query("""
-            SELECT integration_workflow.* FROM integration_workflow
-            JOIN integration_instance_configuration ON integration_instance_configuration.integration_id = integration_workflow.integration_id
-            AND integration_instance_configuration.integration_version = integration_workflow.integration_version
-            JOIN integration_instance ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
-            WHERE integration_workflow.workflow_reference_code = :workflowReferenceCode
-            AND integration_instance.id = :integrationInstanceId
+        SELECT integration_workflow.* FROM integration_workflow
+        JOIN integration_instance_configuration ON integration_instance_configuration.integration_id = integration_workflow.integration_id
+        AND integration_instance_configuration.integration_version = integration_workflow.integration_version
+        WHERE integration_workflow.workflow_id = :workflowId
+        AND integration_instance_configuration.id = :integrationInstanceConfigurationId
+        """)
+    Optional<IntegrationWorkflow> findByIntegrationInstanceConfigurationIdWorkflowId(
+        @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId,
+        @Param("workflowId") String workflowId);
+
+    @Query("""
+        SELECT integration_workflow.* FROM integration_workflow
+        JOIN integration_instance_configuration ON integration_instance_configuration.integration_id = integration_workflow.integration_id
+        AND integration_instance_configuration.integration_version = integration_workflow.integration_version
+        JOIN integration_instance ON integration_instance.integration_instance_configuration_id = integration_instance_configuration.id
+        WHERE integration_workflow.workflow_reference_code = :workflowReferenceCode
+        AND integration_instance.id = :integrationInstanceId
         """)
     Optional<IntegrationWorkflow> findByIntegrationInstanceIdWorkflowReferenceCode(
-        long integrationInstanceId, String workflowReferenceCode);
+        @Param("integrationInstanceId") long integrationInstanceId,
+        @Param("workflowReferenceCode") String workflowReferenceCode);
 
     Optional<IntegrationWorkflow> findLatestIntegrationWorkflowByWorkflowReferenceCode(String workflowReferenceCode);
 }
