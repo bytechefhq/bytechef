@@ -9,7 +9,6 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 const IntegrationInstanceConfigurationWorkflowList = ({
     componentName,
     integrationId,
-    integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflows,
     integrationVersion,
@@ -17,7 +16,6 @@ const IntegrationInstanceConfigurationWorkflowList = ({
     componentName: string;
     integrationId: number;
     integrationInstanceConfigurationId: number;
-    integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationWorkflows?: Array<IntegrationInstanceConfigurationWorkflow>;
     integrationVersion: number;
 }) => {
@@ -108,7 +106,6 @@ const IntegrationInstanceConfigurationWorkflowList = ({
                                 <IntegrationInstanceConfigurationWorkflowListItem
                                     componentName={componentName}
                                     filteredComponentNames={filteredComponentNames}
-                                    integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
                                     integrationInstanceConfigurationId={integrationInstanceConfigurationId}
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                                     key={workflow.id}

@@ -1,5 +1,4 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {Integration, IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
@@ -17,10 +16,6 @@ const IntegrationInstanceConfigurationList = ({
     integrationInstanceConfigurations: IntegrationInstanceConfiguration[];
     tags: Tag[];
 }) => {
-    const integrationInstanceConfigurationMap = useIntegrationInstanceConfigurationsEnabledStore(
-        ({integrationInstanceConfigurationMap}) => integrationInstanceConfigurationMap
-    );
-
     return (
         <>
             {integrationInstanceConfigurations.length > 0 && (
@@ -50,15 +45,6 @@ const IntegrationInstanceConfigurationList = ({
                                     <IntegrationInstanceConfigurationWorkflowList
                                         componentName={integration.componentName}
                                         integrationId={integration.id}
-                                        integrationInstanceConfigurationEnabled={
-                                            integrationInstanceConfigurationMap.has(
-                                                integrationInstanceConfiguration.id!
-                                            )
-                                                ? integrationInstanceConfigurationMap.get(
-                                                      integrationInstanceConfiguration.id!
-                                                  )!
-                                                : integrationInstanceConfiguration.enabled!
-                                        }
                                         integrationInstanceConfigurationId={integrationInstanceConfiguration.id!}
                                         integrationInstanceConfigurationWorkflows={
                                             integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows

@@ -67,8 +67,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs = ({
     return properties?.length ? (
         <Properties
             control={control}
+            controlPath={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.inputs`}
             formState={formState}
-            path={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.inputs`}
             properties={properties}
         />
     ) : (

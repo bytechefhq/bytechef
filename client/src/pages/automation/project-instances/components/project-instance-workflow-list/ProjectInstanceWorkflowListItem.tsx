@@ -154,7 +154,7 @@ const ProjectInstanceWorkflowListItem = ({
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-x-6">
+            <div className="flex items-center gap-x-4">
                 {projectInstanceWorkflow?.lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -169,8 +169,8 @@ const ProjectInstanceWorkflowListItem = ({
                     <span className="text-xs">No executions</span>
                 )}
 
-                {projectInstanceWorkflow && (
-                    <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-6">
+                    <div className="min-w-[36px]">
                         {(!workflow.triggers?.length || workflow.triggers?.[0]?.type.includes('manual')) && (
                             <Button
                                 disabled={!projectInstanceEnabled || !projectInstanceWorkflow.enabled}
@@ -204,27 +204,27 @@ const ProjectInstanceWorkflowListItem = ({
                                 </Tooltip>
                             </Button>
                         )}
+                    </div>
 
-                        <div className="relative flex items-center">
-                            {enableProjectInstanceWorkflowMutation.isPending && (
-                                <LoadingIcon className="absolute left-[-15px] top-[3px]" />
-                            )}
+                    <div className="relative flex items-center">
+                        {enableProjectInstanceWorkflowMutation.isPending && (
+                            <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                        )}
 
-                            <Switch
-                                checked={projectInstanceWorkflow.enabled}
-                                className="mr-2"
-                                disabled={enableProjectInstanceWorkflowMutation.isPending}
-                                onCheckedChange={handleEnableProjectInstanceWorkflow}
-                                onClick={(event) => event.stopPropagation()}
-                            />
-                        </div>
-
-                        <ProjectInstanceWorkflowListItemDropdownMenu
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                            workflow={workflow}
+                        <Switch
+                            checked={projectInstanceWorkflow.enabled}
+                            className="mr-2"
+                            disabled={enableProjectInstanceWorkflowMutation.isPending}
+                            onCheckedChange={handleEnableProjectInstanceWorkflow}
+                            onClick={(event) => event.stopPropagation()}
                         />
                     </div>
-                )}
+                </div>
+
+                <ProjectInstanceWorkflowListItemDropdownMenu
+                    onEditClick={() => setShowEditWorkflowDialog(true)}
+                    workflow={workflow}
+                />
             </div>
 
             {showEditWorkflowDialog && projectInstanceWorkflow && (

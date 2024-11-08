@@ -189,6 +189,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
 
             {showDeleteDialog && (
                 <ProjectInstanceListItemAlertDialog
+                    isPending={deleteProjectInstanceMutation.isPending}
                     onCancelClick={() => setShowDeleteDialog(false)}
                     onDeleteClick={() => {
                         if (projectInstance.id) {

@@ -1,4 +1,4 @@
-import ConnectedUserSheetPanelIntegrations from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrations';
+import ConnectedUserSheetPanelIntegrationList from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
 import ConnectedUserSheetPanelProfile from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
 import {ConnectedUser} from '@/shared/middleware/embedded/connected-user';
 
@@ -21,7 +21,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         <div className="px-2 text-base font-semibold">Integrations</div>
 
                         {connectedUser.integrationInstances && (
-                            <ConnectedUserSheetPanelIntegrations
+                            <ConnectedUserSheetPanelIntegrationList
                                 connectedUserId={connectedUser.id!}
                                 connectedUserIntegrationInstances={connectedUser.integrationInstances}
                             />

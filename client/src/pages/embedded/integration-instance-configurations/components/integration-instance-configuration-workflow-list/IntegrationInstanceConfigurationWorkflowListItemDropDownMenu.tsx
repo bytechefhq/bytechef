@@ -5,17 +5,11 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps {
     onEditClick: () => void;
-    onEnableClick: () => void;
-    integrationInstanceConfigurationEnabled: boolean;
-    integrationInstanceConfigurationWorkflowEnabled: boolean;
     workflow: Workflow;
 }
 
-const IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps = ({
-    integrationInstanceConfigurationEnabled,
-    integrationInstanceConfigurationWorkflowEnabled,
+const IntegrationInstanceConfigurationWorkflowListItemDropDownMenu = ({
     onEditClick,
-    onEnableClick,
     workflow,
 }: IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps) => {
     return (
@@ -28,21 +22,14 @@ const IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps = ({
 
             <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                    disabled={
-                        integrationInstanceConfigurationEnabled ||
-                        (workflow.connectionsCount === 0 && workflow?.inputsCount === 0)
-                    }
+                    disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
                     onClick={onEditClick}
                 >
                     Edit
-                </DropdownMenuItem>
-
-                <DropdownMenuItem disabled={integrationInstanceConfigurationEnabled} onClick={onEnableClick}>
-                    {integrationInstanceConfigurationWorkflowEnabled ? 'Disable' : 'Enable'}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
 };
 
-export default IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps;
+export default IntegrationInstanceConfigurationWorkflowListItemDropDownMenu;

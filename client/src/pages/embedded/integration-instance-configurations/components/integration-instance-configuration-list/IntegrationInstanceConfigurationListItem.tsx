@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
@@ -164,10 +165,15 @@ const IntegrationInstanceConfigurationListItem = ({
                         <Badge variant="secondary">{integrationInstanceConfiguration.environment}</Badge>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <Switch
-                                checked={integrationInstanceConfiguration.enabled}
-                                onCheckedChange={handleOnCheckedChange}
-                            />
+                            <div className="flex items-center">
+                                {enableIntegrationInstanceConfigurationMutation.isPending && <LoadingIcon />}
+
+                                <Switch
+                                    checked={integrationInstanceConfiguration.enabled}
+                                    disabled={enableIntegrationInstanceConfigurationMutation.isPending}
+                                    onCheckedChange={handleOnCheckedChange}
+                                />
+                            </div>
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -202,6 +208,7 @@ const IntegrationInstanceConfigurationListItem = ({
 
             {showDeleteDialog && (
                 <IntegrationInstanceConfigurationListItemAlertDialog
+                    isPending={deleteIntegrationInstanceConfigurationMutation.isPending}
                     onCancelClick={() => setShowDeleteDialog(false)}
                     onDeleteClick={() => {
                         if (integrationInstanceConfiguration.id) {

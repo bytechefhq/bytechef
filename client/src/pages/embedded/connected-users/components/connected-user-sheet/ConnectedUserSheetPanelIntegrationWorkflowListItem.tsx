@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
@@ -15,7 +16,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
-const ConnectedUserSheetPanelIntegrationWorkflow = ({
+const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
     componentDefinitions,
     integrationInstance,
     integrationInstanceConfigurationWorkflow,
@@ -67,17 +68,23 @@ const ConnectedUserSheetPanelIntegrationWorkflow = ({
             </div>
 
             <div className="flex items-center space-x-1">
-                <Switch
-                    checked={integrationInstanceWorkflow?.enabled}
-                    disabled={integrationInstance.enabled || !integrationInstanceConfigurationWorkflow?.enabled}
-                    onCheckedChange={(value) => {
-                        enableIntegrationInstanceWorkflowMutation.mutate({
-                            enable: value,
-                            id: integrationInstance.id!,
-                            workflowId: workflow.id!,
-                        });
-                    }}
-                />
+                <div className="relative flex items-center">
+                    {enableIntegrationInstanceWorkflowMutation.isPending && (
+                        <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                    )}
+
+                    <Switch
+                        checked={integrationInstanceWorkflow?.enabled}
+                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                        onCheckedChange={(value) => {
+                            enableIntegrationInstanceWorkflowMutation.mutate({
+                                enable: value,
+                                id: integrationInstance.id!,
+                                workflowId: workflow.id!,
+                            });
+                        }}
+                    />
+                </div>
 
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -95,4 +102,4 @@ const ConnectedUserSheetPanelIntegrationWorkflow = ({
     );
 };
 
-export default ConnectedUserSheetPanelIntegrationWorkflow;
+export default ConnectedUserSheetPanelIntegrationWorkflowListItem;

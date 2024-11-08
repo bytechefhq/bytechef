@@ -1,10 +1,10 @@
-import ConnectedUserSheetPanelIntegration from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegration';
+import ConnectedUserSheetPanelIntegrationListItem from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationListItem';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
 import type {ConnectedUserIntegrationInstance} from '@/shared/middleware/embedded/connected-user';
 
-const ConnectedUserSheetPanelIntegrations = ({
+const ConnectedUserSheetPanelIntegrationList = ({
     connectedUserId,
     connectedUserIntegrationInstances,
 }: {
@@ -26,7 +26,7 @@ const ConnectedUserSheetPanelIntegrations = ({
                 return (
                     componentDefinition &&
                     componentDefinitions && (
-                        <ConnectedUserSheetPanelIntegration
+                        <ConnectedUserSheetPanelIntegrationListItem
                             componentDefinition={componentDefinition}
                             componentDefinitions={componentDefinitions}
                             connectedUserId={connectedUserId}
@@ -42,4 +42,4 @@ const ConnectedUserSheetPanelIntegrations = ({
     );
 };
 
-export default ConnectedUserSheetPanelIntegrations;
+export default ConnectedUserSheetPanelIntegrationList;

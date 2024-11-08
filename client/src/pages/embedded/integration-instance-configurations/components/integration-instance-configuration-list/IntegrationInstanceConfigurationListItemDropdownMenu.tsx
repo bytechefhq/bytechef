@@ -34,10 +34,7 @@ const IntegrationInstanceConfigurationListItemDropdownMenu = ({
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
-                <DropdownMenuItem
-                    disabled={integrationInstanceConfigurationEnabled}
-                    onClick={onUpdateIntegrationVersionClick}
-                >
+                <DropdownMenuItem onClick={onUpdateIntegrationVersionClick}>
                     Update Integration Version
                 </DropdownMenuItem>
 

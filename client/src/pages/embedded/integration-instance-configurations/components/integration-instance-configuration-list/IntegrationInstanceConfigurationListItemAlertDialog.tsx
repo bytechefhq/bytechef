@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,9 +13,11 @@ import {
 interface IntegrationInstanceConfigurationListItemAlertDialogProps {
     onCancelClick: () => void;
     onDeleteClick: () => void;
+    isPending?: boolean;
 }
 
 const IntegrationInstanceConfigurationListItemAlertDialog = ({
+    isPending,
     onCancelClick,
     onDeleteClick,
 }: IntegrationInstanceConfigurationListItemAlertDialogProps) => {
@@ -33,7 +36,8 @@ const IntegrationInstanceConfigurationListItemAlertDialog = ({
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={onCancelClick}>Cancel</AlertDialogCancel>
 
-                    <AlertDialogAction className="bg-destructive" onClick={onDeleteClick}>
+                    <AlertDialogAction className="bg-destructive" disabled={isPending} onClick={onDeleteClick}>
+                        {isPending && <LoadingIcon />}
                         Delete
                     </AlertDialogAction>
                 </AlertDialogFooter>

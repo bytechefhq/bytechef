@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -323,7 +324,17 @@ const ProjectInstanceDialog = ({
                                     </Button>
                                 )}
 
-                                <Button onClick={handleSubmit(handleSaveClick)}>Save</Button>
+                                <Button
+                                    disabled={
+                                        createProjectInstanceMutation.isPending ||
+                                        updateProjectInstanceMutation.isPending
+                                    }
+                                    onClick={handleSubmit(handleSaveClick)}
+                                >
+                                    {createProjectInstanceMutation.isPending ||
+                                        (updateProjectInstanceMutation.isPending && <LoadingIcon />)}
+                                    Save
+                                </Button>
                             </>
                         )}
                     </DialogFooter>

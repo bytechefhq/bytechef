@@ -80,18 +80,16 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
 
             {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
                 <div className="mt-2 space-y-6">
-                    {workflow && (
-                        <div className="flex flex-col gap-3">
-                            <Label className="font-semibold">Inputs</Label>
+                    <div className="flex flex-col gap-3">
+                        <Label className="font-semibold">Inputs</Label>
 
-                            <IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs
-                                control={control}
-                                formState={formState}
-                                workflow={workflow}
-                                workflowIndex={workflowIndex}
-                            />
-                        </div>
-                    )}
+                        <IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs
+                            control={control}
+                            formState={formState}
+                            workflow={workflow}
+                            workflowIndex={workflowIndex}
+                        />
+                    </div>
 
                     <div className="flex flex-col gap-3">
                         <Label className="font-semibold">Connections</Label>

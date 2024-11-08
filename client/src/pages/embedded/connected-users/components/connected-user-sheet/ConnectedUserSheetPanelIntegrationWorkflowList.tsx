@@ -1,4 +1,4 @@
-import ConnectedUserSheetPanelIntegrationWorkflow from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflow';
+import ConnectedUserSheetPanelIntegrationWorkflowListItem from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowListItem';
 import {
     IntegrationInstance,
     IntegrationInstanceConfiguration,
@@ -6,7 +6,7 @@ import {
 } from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 
-const ConnectedUserSheetPanelIntegrationWorkflows = ({
+const ConnectedUserSheetPanelIntegrationWorkflowList = ({
     componentDefinitions,
     integrationInstance,
     integrationInstanceConfiguration,
@@ -37,7 +37,7 @@ const ConnectedUserSheetPanelIntegrationWorkflows = ({
                         return (
                             integrationInstance &&
                             integrationInstanceConfigurationWorkflow && (
-                                <ConnectedUserSheetPanelIntegrationWorkflow
+                                <ConnectedUserSheetPanelIntegrationWorkflowListItem
                                     componentDefinitions={componentDefinitions}
                                     integrationInstance={integrationInstance}
                                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
@@ -56,4 +56,4 @@ const ConnectedUserSheetPanelIntegrationWorkflows = ({
     );
 };
 
-export default ConnectedUserSheetPanelIntegrationWorkflows;
+export default ConnectedUserSheetPanelIntegrationWorkflowList;

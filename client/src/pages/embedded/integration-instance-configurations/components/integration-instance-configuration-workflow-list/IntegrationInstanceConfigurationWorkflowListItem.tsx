@@ -1,7 +1,8 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
-import IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
+import IntegrationInstanceConfigurationWorkflowListItemDropDownMenu from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-workflow-list/IntegrationInstanceConfigurationWorkflowListItemDropDownMenu';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import {IntegrationInstanceConfigurationWorkflow, Workflow} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
@@ -15,7 +16,6 @@ import {twMerge} from 'tailwind-merge';
 const IntegrationInstanceConfigurationWorkflowListItem = ({
     componentName,
     filteredComponentNames,
-    integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationId,
     integrationInstanceConfigurationWorkflow,
     workflow,
@@ -24,7 +24,6 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
 }: {
     componentName: string;
     filteredComponentNames?: string[];
-    integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationId: number;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     workflow: Workflow;
@@ -51,19 +50,17 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
             },
         });
 
-    const handleIntegrationInstanceConfigurationEnable = () => {
+    const handleEnableIntegrationInstanceConfigurationWorkflow = (value: boolean) => {
         enableIntegrationInstanceConfigurationWorkflowMutation.mutate(
             {
-                enable: !integrationInstanceConfigurationWorkflow.enabled,
+                enable: value,
                 id: integrationInstanceConfigurationId,
                 workflowId: workflow.id!,
             },
             {
                 onSuccess: () => {
-                    integrationInstanceConfigurationWorkflow = {
-                        ...integrationInstanceConfigurationWorkflow,
-                        enabled: !integrationInstanceConfigurationWorkflow?.enabled,
-                    };
+                    integrationInstanceConfigurationWorkflow.enabled =
+                        !integrationInstanceConfigurationWorkflow?.enabled;
                 },
             }
         );
@@ -114,61 +111,45 @@ const IntegrationInstanceConfigurationWorkflowListItem = ({
                 </div>
             </div>
 
-            <div className="flex items-center justify-end gap-x-6">
-                {integrationInstanceConfigurationWorkflow?.lastExecutionDate ? (
-                    <Tooltip>
-                        <TooltipTrigger className="flex items-center text-sm text-gray-500">
-                            <span className="text-xs">
-                                {`Executed at ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
-                            </span>
-                        </TooltipTrigger>
+            <div className="flex items-center gap-x-4">
+                <div className="flex items-center gap-x-6">
+                    {integrationInstanceConfigurationWorkflow?.lastExecutionDate ? (
+                        <Tooltip>
+                            <TooltipTrigger className="flex items-center text-sm text-gray-500">
+                                <span className="text-xs">
+                                    {`Executed at ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleDateString()} ${integrationInstanceConfigurationWorkflow.lastExecutionDate?.toLocaleTimeString()}`}
+                                </span>
+                            </TooltipTrigger>
 
-                        <TooltipContent>Last Execution Date</TooltipContent>
-                    </Tooltip>
-                ) : (
-                    <span className="text-xs">No executions</span>
-                )}
+                            <TooltipContent>Last Execution Date</TooltipContent>
+                        </Tooltip>
+                    ) : (
+                        <span className="text-xs">No executions</span>
+                    )}
 
-                {integrationInstanceConfigurationWorkflow && (
-                    <div className="flex items-center gap-x-4">
+                    <div className="relative flex items-center">
+                        {enableIntegrationInstanceConfigurationWorkflowMutation.isPending && (
+                            <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                        )}
+
                         <Switch
                             checked={integrationInstanceConfigurationWorkflow.enabled}
                             className="mr-2"
-                            disabled={integrationInstanceConfigurationEnabled}
-                            onCheckedChange={(value) => {
-                                enableIntegrationInstanceConfigurationWorkflowMutation.mutate(
-                                    {
-                                        enable: value,
-                                        id: integrationInstanceConfigurationId,
-                                        workflowId: workflow.id!,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            integrationInstanceConfigurationWorkflow.enabled =
-                                                !integrationInstanceConfigurationWorkflow?.enabled;
-                                        },
-                                    }
-                                );
-                            }}
-                        />
-
-                        <IntegrationInstanceConfigurationWorkflowListItemDropDownMenuProps
-                            integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
-                            integrationInstanceConfigurationWorkflowEnabled={
-                                integrationInstanceConfigurationWorkflow.enabled!
-                            }
-                            onEditClick={() => setShowEditWorkflowDialog(true)}
-                            onEnableClick={() => handleIntegrationInstanceConfigurationEnable()}
-                            workflow={workflow}
+                            disabled={enableIntegrationInstanceConfigurationWorkflowMutation.isPending}
+                            onCheckedChange={handleEnableIntegrationInstanceConfigurationWorkflow}
                         />
                     </div>
-                )}
+                </div>
+
+                <IntegrationInstanceConfigurationWorkflowListItemDropDownMenu
+                    onEditClick={() => setShowEditWorkflowDialog(true)}
+                    workflow={workflow}
+                />
             </div>
 
             {showEditWorkflowDialog && integrationInstanceConfigurationWorkflow && (
                 <IntegrationInstanceConfigurationEditWorkflowDialog
                     componentName={componentName}
-                    integrationInstanceConfigurationEnabled={integrationInstanceConfigurationEnabled}
                     integrationInstanceConfigurationWorkflow={integrationInstanceConfigurationWorkflow}
                     onClose={() => setShowEditWorkflowDialog(false)}
                     workflow={workflow}

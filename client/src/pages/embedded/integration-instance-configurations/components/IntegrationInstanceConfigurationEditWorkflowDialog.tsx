@@ -18,14 +18,12 @@ import {useForm} from 'react-hook-form';
 interface IntegrationInstanceConfigurationEditWorkflowDialogProps {
     componentName: string;
     onClose?: () => void;
-    integrationInstanceConfigurationEnabled: boolean;
     integrationInstanceConfigurationWorkflow: IntegrationInstanceConfigurationWorkflow;
     workflow: Workflow;
 }
 
 const IntegrationInstanceConfigurationEditWorkflowDialog = ({
     componentName,
-    integrationInstanceConfigurationEnabled,
     integrationInstanceConfigurationWorkflow,
     onClose,
     workflow,
@@ -76,7 +74,8 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
 
         const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
             .flatMap((task) => task.connections ?? [])
-            .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
+            .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
+            .filter((connection) => connection.componentName !== componentName);
 
         for (const workflowConnection of workflowConnections) {
             let integrationInstanceConfigurationWorkflowConnection =
@@ -150,12 +149,7 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
 
-                        <Button
-                            disabled={integrationInstanceConfigurationEnabled}
-                            onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}
-                        >
-                            Save
-                        </Button>
+                        <Button onClick={handleSubmit(updateIntegrationInstanceConfigurationWorkflow)}>Save</Button>
                     </DialogFooter>
                 </Form>
             </DialogContent>

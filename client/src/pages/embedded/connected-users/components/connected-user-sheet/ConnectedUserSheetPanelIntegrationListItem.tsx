@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
@@ -5,7 +6,7 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import CredentialsStatus from '@/pages/embedded/connected-users/components/CredentialsStatus';
-import ConnectedUserSheetPanelIntegrationWorkflows from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflows';
+import ConnectedUserSheetPanelIntegrationWorkflowList from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {ConnectedUserIntegrationInstance} from '@/shared/middleware/embedded/connected-user';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableIntegrationInstanceMutation} from '@/shared/mutations/embedded/integrationInstances.mutations';
@@ -21,7 +22,7 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
-const ConnectedUserSheetPanelIntegration = ({
+const ConnectedUserSheetPanelIntegrationListItem = ({
     componentDefinition,
     componentDefinitions,
     connectedUserId,
@@ -110,16 +111,22 @@ const ConnectedUserSheetPanelIntegration = ({
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
-                                <Switch
-                                    checked={connectedUserIntegrationInstance.enabled}
-                                    disabled={!integrationInstance?.integrationInstanceConfiguration?.enabled}
-                                    onCheckedChange={(value) => {
-                                        enableIntegrationInstanceMutation.mutate({
-                                            enable: value,
-                                            id: connectedUserIntegrationInstance.id!,
-                                        });
-                                    }}
-                                />
+                                <div className="relative flex items-center">
+                                    {enableIntegrationInstanceMutation.isPending && (
+                                        <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                                    )}
+
+                                    <Switch
+                                        checked={connectedUserIntegrationInstance.enabled}
+                                        disabled={!integrationInstance?.integrationInstanceConfiguration?.enabled}
+                                        onCheckedChange={(value) => {
+                                            enableIntegrationInstanceMutation.mutate({
+                                                enable: value,
+                                                id: connectedUserIntegrationInstance.id!,
+                                            });
+                                        }}
+                                    />
+                                </div>
 
                                 <Tooltip>
                                     <TooltipTrigger className="flex items-center text-sm text-gray-500">
@@ -154,7 +161,7 @@ const ConnectedUserSheetPanelIntegration = ({
 
             <CollapsibleContent>
                 {workflows && integrationInstance && integrationInstanceConfiguration && (
-                    <ConnectedUserSheetPanelIntegrationWorkflows
+                    <ConnectedUserSheetPanelIntegrationWorkflowList
                         componentDefinitions={componentDefinitions}
                         integrationInstance={integrationInstance}
                         integrationInstanceConfiguration={integrationInstanceConfiguration}
@@ -166,4 +173,4 @@ const ConnectedUserSheetPanelIntegration = ({
     );
 };
 
-export default ConnectedUserSheetPanelIntegration;
+export default ConnectedUserSheetPanelIntegrationListItem;
