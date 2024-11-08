@@ -17,11 +17,21 @@
 package com.bytechef.component.calendly;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class CalendlyComponentHandler extends AbstractCalendlyComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/calendly.svg")
+            .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    }
 }
