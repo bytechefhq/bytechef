@@ -122,7 +122,6 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     private void update(CustomComponent customComponent, ComponentDefinition componentDefinition) {
-
         customComponent.setDescription(
             OptionalUtils.orElse(componentDefinition.getDescription(), null));
         customComponent.setIcon(OptionalUtils.orElse(componentDefinition.getIcon(), null));
