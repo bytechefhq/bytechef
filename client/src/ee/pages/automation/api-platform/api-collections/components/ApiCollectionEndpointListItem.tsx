@@ -158,7 +158,6 @@ const ApiCollectionEndpointListItem = ({
             {showEditWorkflowDialog && projectInstanceWorkflow && (
                 <ProjectInstanceEditWorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    projectInstanceEnabled={apiCollectionEndpoint.enabled}
                     projectInstanceWorkflow={projectInstanceWorkflow}
                     workflow={workflow}
                 />

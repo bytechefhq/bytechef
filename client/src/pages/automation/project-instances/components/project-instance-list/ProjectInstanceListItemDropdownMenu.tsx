@@ -34,9 +34,7 @@ const ProjectInstanceListItemDropdownMenu = ({
             <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
-                <DropdownMenuItem disabled={projectInstanceEnabled} onClick={onUpdateProjectVersionClick}>
-                    Update Project Version
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onEnableClick}>
                     {projectInstanceEnabled ? 'Disable' : 'Enable'}

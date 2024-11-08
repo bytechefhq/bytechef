@@ -17,14 +17,12 @@ import {useForm} from 'react-hook-form';
 
 interface ProjectInstanceEditWorkflowDialogProps {
     onClose?: () => void;
-    projectInstanceEnabled: boolean;
     projectInstanceWorkflow: ProjectInstanceWorkflow;
     workflow: Workflow;
 }
 
 const ProjectInstanceEditWorkflowDialog = ({
     onClose,
-    projectInstanceEnabled,
     projectInstanceWorkflow,
     workflow,
 }: ProjectInstanceEditWorkflowDialogProps) => {
@@ -143,9 +141,7 @@ const ProjectInstanceEditWorkflowDialog = ({
                             <Button variant="outline">Cancel</Button>
                         </DialogClose>
 
-                        <Button disabled={projectInstanceEnabled} onClick={handleSubmit(updateProjectInstanceWorkflow)}>
-                            Save
-                        </Button>
+                        <Button onClick={handleSubmit(updateProjectInstanceWorkflow)}>Save</Button>
                     </DialogFooter>
                 </Form>
             </DialogContent>

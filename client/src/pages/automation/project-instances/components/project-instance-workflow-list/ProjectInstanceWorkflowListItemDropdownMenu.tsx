@@ -5,17 +5,11 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 
 interface ProjectInstanceWorkflowListItemDropDownProps {
     onEditClick: () => void;
-    onEnableClick: () => void;
-    projectInstanceEnabled: boolean;
-    projectInstanceWorkflowEnabled: boolean;
     workflow: Workflow;
 }
 
 const ProjectInstanceWorkflowListItemDropdownMenu = ({
     onEditClick,
-    onEnableClick,
-    projectInstanceEnabled,
-    projectInstanceWorkflowEnabled,
     workflow,
 }: ProjectInstanceWorkflowListItemDropDownProps) => {
     return (
@@ -28,16 +22,10 @@ const ProjectInstanceWorkflowListItemDropdownMenu = ({
 
             <DropdownMenuContent align="end">
                 <DropdownMenuItem
-                    disabled={
-                        projectInstanceEnabled || (workflow.connectionsCount === 0 && workflow?.inputsCount === 0)
-                    }
+                    disabled={workflow.connectionsCount === 0 && workflow?.inputsCount === 0}
                     onClick={onEditClick}
                 >
                     Edit
-                </DropdownMenuItem>
-
-                <DropdownMenuItem disabled={projectInstanceEnabled} onClick={onEnableClick}>
-                    {projectInstanceWorkflowEnabled ? 'Disable' : 'Enable'}
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

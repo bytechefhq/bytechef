@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Badge} from '@/components/ui/badge';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Switch} from '@/components/ui/switch';
@@ -145,7 +146,15 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                         <Badge variant="secondary">{projectInstance.environment}</Badge>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <Switch checked={projectInstance.enabled} onCheckedChange={handleOnCheckedChange} />
+                            <div className="flex items-center">
+                                {enableProjectInstanceMutation.isPending && <LoadingIcon />}
+
+                                <Switch
+                                    checked={projectInstance.enabled}
+                                    disabled={enableProjectInstanceMutation.isPending}
+                                    onCheckedChange={handleOnCheckedChange}
+                                />
+                            </div>
 
                             <Tooltip>
                                 <TooltipTrigger className="flex items-center text-sm text-gray-500">

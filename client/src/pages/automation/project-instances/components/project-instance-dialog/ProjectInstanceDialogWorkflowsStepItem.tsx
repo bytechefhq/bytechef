@@ -67,7 +67,7 @@ const ProjectInstanceDialogWorkflowsStepItem = ({
                 </div>
             )}
 
-            {workflow && (workflowEnabledMap.get(workflow.id!) || switchHidden) && (
+            {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
                 <div className="mt-2 space-y-6">
                     <div className="flex flex-col gap-3">
                         <Label className="font-semibold">Inputs</Label>

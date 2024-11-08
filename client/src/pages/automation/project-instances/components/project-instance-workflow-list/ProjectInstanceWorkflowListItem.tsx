@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -97,6 +98,21 @@ const ProjectInstanceWorkflowListItem = ({
             );
     };
 
+    const handleEnableProjectInstanceWorkflow = (value: boolean) => {
+        enableProjectInstanceWorkflowMutation.mutate(
+            {
+                enable: value,
+                id: projectInstanceId,
+                workflowId: workflow.id!,
+            },
+            {
+                onSuccess: () => {
+                    projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
+                },
+            }
+        );
+    };
+
     return (
         <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50">
             <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
@@ -139,7 +155,7 @@ const ProjectInstanceWorkflowListItem = ({
             </div>
 
             <div className="flex items-center justify-end gap-x-6">
-                {projectInstanceWorkflow?.lastExecutionDate && (
+                {projectInstanceWorkflow?.lastExecutionDate ? (
                     <Tooltip>
                         <TooltipTrigger className="flex items-center text-sm text-gray-500">
                             <span className="text-xs">
@@ -149,6 +165,8 @@ const ProjectInstanceWorkflowListItem = ({
 
                         <TooltipContent>Last Execution Date</TooltipContent>
                     </Tooltip>
+                ) : (
+                    <span className="text-xs">No executions</span>
                 )}
 
                 {projectInstanceWorkflow && (
@@ -187,32 +205,22 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        <Switch
-                            checked={projectInstanceWorkflow.enabled}
-                            className="mr-2"
-                            disabled={projectInstanceEnabled}
-                            onCheckedChange={(value) => {
-                                enableProjectInstanceWorkflowMutation.mutate(
-                                    {
-                                        enable: value,
-                                        id: projectInstanceId,
-                                        workflowId: workflow.id!,
-                                    },
-                                    {
-                                        onSuccess: () => {
-                                            projectInstanceWorkflow.enabled = !projectInstanceWorkflow?.enabled;
-                                        },
-                                    }
-                                );
-                            }}
-                            onClick={(event) => event.stopPropagation()}
-                        />
+                        <div className="relative flex items-center">
+                            {enableProjectInstanceWorkflowMutation.isPending && (
+                                <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                            )}
+
+                            <Switch
+                                checked={projectInstanceWorkflow.enabled}
+                                className="mr-2"
+                                disabled={enableProjectInstanceWorkflowMutation.isPending}
+                                onCheckedChange={handleEnableProjectInstanceWorkflow}
+                                onClick={(event) => event.stopPropagation()}
+                            />
+                        </div>
 
                         <ProjectInstanceWorkflowListItemDropdownMenu
                             onEditClick={() => setShowEditWorkflowDialog(true)}
-                            onEnableClick={() => handleProjectInstanceEnable()}
-                            projectInstanceEnabled={projectInstanceEnabled}
-                            projectInstanceWorkflowEnabled={projectInstanceWorkflow.enabled!}
                             workflow={workflow}
                         />
                     </div>
@@ -222,7 +230,6 @@ const ProjectInstanceWorkflowListItem = ({
             {showEditWorkflowDialog && projectInstanceWorkflow && (
                 <ProjectInstanceEditWorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    projectInstanceEnabled={projectInstanceEnabled}
                     projectInstanceWorkflow={projectInstanceWorkflow}
                     workflow={workflow}
                 />
