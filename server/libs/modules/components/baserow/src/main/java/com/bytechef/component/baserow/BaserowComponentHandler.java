@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.baserow.action.BaserowCreateRowAction;
+import com.bytechef.component.baserow.action.BaserowGetRowAction;
 import com.bytechef.component.baserow.action.BaserowUpdateRowAction;
 import com.bytechef.component.baserow.connection.BaserowConnection;
 import com.bytechef.component.definition.ComponentCategory;
@@ -41,7 +42,10 @@ public class BaserowComponentHandler implements ComponentHandler {
         .icon("path:assets/baserow.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(BaserowConnection.CONNECTION_DEFINITION)
-        .actions(BaserowCreateRowAction.ACTION_DEFINITION, BaserowUpdateRowAction.ACTION_DEFINITION);
+        .actions(
+            BaserowCreateRowAction.ACTION_DEFINITION,
+            BaserowGetRowAction.ACTION_DEFINITION,
+            BaserowUpdateRowAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
