@@ -31,7 +31,20 @@ const Properties = ({
 }: PropertiesProps) => {
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const advancedProperties = properties.filter((property) => property.name && property.advancedOption);
+    const advancedProperties = properties.filter((property) => {
+        const {advancedOption, displayCondition, name} = property;
+
+        if (!name || !advancedOption) {
+            return false;
+        }
+
+        if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+            return false;
+        }
+
+        return true;
+    });
+
     const simpleProperties = properties.filter((property) => property.name && !property.advancedOption);
 
     return (
