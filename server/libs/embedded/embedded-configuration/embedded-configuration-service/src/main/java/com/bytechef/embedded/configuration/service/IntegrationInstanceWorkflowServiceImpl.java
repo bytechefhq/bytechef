@@ -57,11 +57,22 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
+    public void delete(Long id) {
+        integrationInstanceWorkflowRepository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId) {
+        integrationInstanceWorkflowRepository.deleteByIntegrationInstanceConfigurationWorkflowId(
+            integrationInstanceConfigurationWorkflowId);
+    }
+
+    @Override
     public Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, @NonNull String workflowId) {
 
-        return integrationInstanceWorkflowRepository
-            .findByIntegrationInstanceIdAndWorkflowId(integrationInstanceId, workflowId);
+        return integrationInstanceWorkflowRepository.findByIntegrationInstanceIdAndWorkflowId(
+            integrationInstanceId, workflowId);
     }
 
     @Override
@@ -78,7 +89,7 @@ public class IntegrationInstanceWorkflowServiceImpl implements IntegrationInstan
     }
 
     @Override
-    public void update(IntegrationInstanceWorkflow integrationInstanceWorkflow) {
+    public void update(@NonNull IntegrationInstanceWorkflow integrationInstanceWorkflow) {
         IntegrationInstanceWorkflow curIntegrationInstanceWorkflow = integrationInstanceWorkflowRepository
             .findById(integrationInstanceWorkflow.getId())
             .orElseThrow(() -> new IllegalArgumentException(

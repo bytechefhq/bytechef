@@ -186,6 +186,8 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
             integrationInstanceConfigurationWorkflow.getConnections());
         curIntegrationInstanceConfigurationWorkflow.setEnabled(integrationInstanceConfigurationWorkflow.isEnabled());
         curIntegrationInstanceConfigurationWorkflow.setInputs(integrationInstanceConfigurationWorkflow.getInputs());
+        curIntegrationInstanceConfigurationWorkflow.setWorkflowId(
+            integrationInstanceConfigurationWorkflow.getWorkflowId());
         curIntegrationInstanceConfigurationWorkflow.setVersion(integrationInstanceConfigurationWorkflow.getVersion());
 
         return integrationInstanceConfigurationWorkflowRepository.save(curIntegrationInstanceConfigurationWorkflow);

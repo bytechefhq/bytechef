@@ -29,6 +29,10 @@ public interface IntegrationInstanceWorkflowService {
     IntegrationInstanceWorkflow createIntegrationInstanceWorkflow(
         long integrationInstanceId, long integrationInstanceConfigurationWorkflowId);
 
+    void delete(Long id);
+
+    void deleteByIntegrationInstanceConfigurationWorkflowId(Long integrationInstanceConfigurationWorkflowId);
+
     Optional<IntegrationInstanceWorkflow> fetchIntegrationInstanceWorkflow(
         long integrationInstanceId, @NonNull String workflowId);
 
@@ -36,7 +40,8 @@ public interface IntegrationInstanceWorkflowService {
 
     List<IntegrationInstanceWorkflow> getIntegrationInstanceWorkflows(long integrationInstanceId);
 
-    void update(IntegrationInstanceWorkflow integrationInstanceWorkflow);
+    void update(@NonNull IntegrationInstanceWorkflow integrationInstanceWorkflow);
 
     void updateEnabled(Long id, boolean enabled);
+
 }

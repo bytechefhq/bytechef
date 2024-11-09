@@ -189,10 +189,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         integrationInstanceConfiguration = integrationInstanceConfigurationService.create(
             integrationInstanceConfiguration);
 
-        createIntegrationInstanceConfigurationWorkflows(
-            integrationInstanceConfiguration, CollectionUtils.map(
-                integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
-                IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
+        checkIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceConfiguration, -1, Collections.emptyList(), Collections.emptyList());
 
         return integrationInstanceConfiguration.getId();
     }
@@ -268,6 +266,283 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         long integrationInstanceConfigurationId, String workflowId, boolean enable) {
 
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+            doEnableIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, workflowId, enable);
+
+        integrationInstanceConfigurationWorkflowService.updateEnabled(
+            integrationInstanceConfigurationWorkflow.getId(), enable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @SuppressFBWarnings("NP")
+    public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(id);
+
+        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
+            integrationInstanceConfiguration.getIntegrationId(),
+            integrationInstanceConfiguration.getIntegrationVersion());
+        List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
+
+        return toIntegrationInstanceConfigurationDTO(
+            integrationInstanceConfiguration,
+            CollectionUtils.filter(
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                    integrationInstanceConfiguration.getId()),
+                integrationInstanceConfigurationWorkflow -> workflowIds
+                    .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
+            integrationWorkflows);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Tag> getIntegrationInstanceConfigurationTags() {
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
+
+        return tagService.getTags(
+            integrationInstanceConfigurations
+                .stream()
+                .map(IntegrationInstanceConfiguration::getTagIds)
+                .flatMap(Collection::stream)
+                .toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
+        Environment environment, Long integrationId, Long tagId) {
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
+                environment, integrationId, tagId);
+
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
+            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfiguration::getId));
+        List<Integration> integrations = getIntegrations(integrationInstanceConfigurations);
+        List<Tag> tags = getTags(integrationInstanceConfigurations);
+
+        return CollectionUtils.map(
+            integrationInstanceConfigurations,
+            integrationInstanceConfiguration -> {
+                List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
+
+                return toIntegrationInstanceConfigurationDTO(
+                    CollectionUtils.getFirst(
+                        integrations, integration -> Objects.equals(
+                            integration.getId(), integrationInstanceConfiguration.getIntegrationId())),
+                    integrationInstanceConfiguration,
+                    CollectionUtils.filter(
+                        integrationInstanceConfigurationWorkflows,
+                        integrationInstanceConfigurationWorkflow -> Objects.equals(
+                            integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                            integrationInstanceConfiguration.getId()) &&
+                            workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
+                    integrationWorkflowService.getIntegrationWorkflows(
+                        integrationInstanceConfiguration.getIntegrationId(),
+                        integrationInstanceConfiguration.getIntegrationVersion()),
+                    filterTags(tags, integrationInstanceConfiguration));
+            });
+    }
+
+    @Override
+    public void updateIntegrationInstanceConfiguration(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
+
+        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
+            .toIntegrationInstanceConfiguration();
+
+        List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
+
+        if (!tags.isEmpty()) {
+            integrationInstanceConfiguration.setTags(tags);
+        }
+
+        IntegrationInstanceConfiguration oldIntegrationInstanceConfiguration = integrationInstanceConfigurationService
+            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationDTO.id());
+
+        integrationInstanceConfiguration = integrationInstanceConfigurationService.update(
+            integrationInstanceConfiguration);
+
+        checkIntegrationInstanceConfigurationWorkflows(
+            integrationInstanceConfiguration, oldIntegrationInstanceConfiguration.getIntegrationVersion(),
+            CollectionUtils.map(
+                integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
+                IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow),
+            integrationWorkflowService.getIntegrationWorkflows(integrationInstanceConfiguration.getIntegrationId()));
+    }
+
+    @Override
+    public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
+        integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
+    }
+
+    @Override
+    public void updateIntegrationInstanceConfigurationWorkflow(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
+
+        validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+
+        integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
+    }
+
+    private void checkIntegrationInstanceConfigurationWorkflows(
+        IntegrationInstanceConfiguration integrationInstanceConfiguration, int oldIntegrationVersion,
+        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows,
+        List<IntegrationWorkflow> allIntegrationWorkflows) {
+
+        List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows = List.of();
+
+        if (oldIntegrationVersion != -1) {
+            oldIntegrationInstanceConfigurationWorkflows =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                    integrationInstanceConfiguration.getId());
+        }
+
+        for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
+
+            IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow = null;
+
+            if (oldIntegrationVersion != -1) {
+                String workflowReferenceCode = allIntegrationWorkflows.stream()
+                    .filter(curIntegrationWorkflow -> Objects.equals(
+                        curIntegrationWorkflow.getWorkflowId(),
+                        integrationInstanceConfigurationWorkflow.getWorkflowId()))
+                    .findFirst()
+                    .map(IntegrationWorkflow::getWorkflowReferenceCode)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Project workflow with workflowId=%s not found".formatted(
+                            integrationInstanceConfigurationWorkflow.getWorkflowId())));
+
+                String oldWorkflowId = allIntegrationWorkflows.stream()
+                    .filter(curIntegrationWorkflow -> Objects.equals(
+                        curIntegrationWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                        curIntegrationWorkflow.getIntegrationVersion() == oldIntegrationVersion)
+                    .map(IntegrationWorkflow::getWorkflowId)
+                    .findFirst()
+                    .orElse(null);
+
+                if (oldWorkflowId != null) {
+                    oldIntegrationInstanceConfigurationWorkflow = oldIntegrationInstanceConfigurationWorkflows.stream()
+                        .filter(curIntegrationInstanceConfigurationWorkflow -> Objects.equals(
+                            curIntegrationInstanceConfigurationWorkflow.getWorkflowId(),
+                            oldWorkflowId))
+                        .findFirst()
+                        .orElse(null);
+                }
+            }
+
+            if (oldIntegrationInstanceConfigurationWorkflow == null) {
+                validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+
+                integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
+                    integrationInstanceConfiguration.getId());
+
+                integrationInstanceConfigurationWorkflowService.create(integrationInstanceConfigurationWorkflow);
+
+                if (integrationInstanceConfiguration.isEnabled() &&
+                    integrationInstanceConfigurationWorkflow.isEnabled()) {
+
+                    enableIntegrationInstanceConfigurationWorkflow(
+                        integrationInstanceConfiguration.getId(),
+                        integrationInstanceConfigurationWorkflow.getWorkflowId(), true);
+                }
+            } else {
+                boolean oldIntegrationInstanceConfigurationWorkflowEnabled =
+                    oldIntegrationInstanceConfigurationWorkflow.isEnabled();
+
+                validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+
+                String oldWorkflowId = oldIntegrationInstanceConfigurationWorkflow.getWorkflowId();
+
+                oldIntegrationInstanceConfigurationWorkflow
+                    .setConnections(integrationInstanceConfigurationWorkflow.getConnections());
+                oldIntegrationInstanceConfigurationWorkflow
+                    .setEnabled(integrationInstanceConfigurationWorkflow.isEnabled());
+                oldIntegrationInstanceConfigurationWorkflow
+                    .setInputs(integrationInstanceConfigurationWorkflow.getInputs());
+                oldIntegrationInstanceConfigurationWorkflow
+                    .setWorkflowId(integrationInstanceConfigurationWorkflow.getWorkflowId());
+
+                if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+                    integrationInstanceConfigurationWorkflowService.update(oldIntegrationInstanceConfigurationWorkflow);
+
+                    if (integrationInstanceConfiguration.isEnabled() &&
+                        !oldIntegrationInstanceConfigurationWorkflowEnabled) {
+
+                        validateIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationWorkflow);
+
+                        doEnableIntegrationInstanceConfigurationWorkflow(
+                            integrationInstanceConfiguration.getId(),
+                            integrationInstanceConfigurationWorkflow.getWorkflowId(), true);
+                    }
+                } else {
+                    if (oldIntegrationInstanceConfigurationWorkflowEnabled) {
+                        doEnableIntegrationInstanceConfigurationWorkflow(
+                            integrationInstanceConfiguration.getId(), oldWorkflowId, false);
+                    }
+
+                    integrationInstanceConfigurationWorkflowService.update(oldIntegrationInstanceConfigurationWorkflow);
+                }
+            }
+        }
+
+        for (IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow : oldIntegrationInstanceConfigurationWorkflows) {
+
+            String workflowReferenceCode = allIntegrationWorkflows.stream()
+                .filter(curIntegrationWorkflow -> Objects.equals(
+                    curIntegrationWorkflow.getWorkflowId(),
+                    oldIntegrationInstanceConfigurationWorkflow.getWorkflowId()))
+                .findFirst()
+                .map(IntegrationWorkflow::getWorkflowReferenceCode)
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Integration workflow with workflowId=%s not found".formatted(
+                        oldIntegrationInstanceConfigurationWorkflow.getWorkflowId())));
+
+            String workflowId = allIntegrationWorkflows.stream()
+                .filter(curIntegrationWorkflow -> Objects.equals(
+                    curIntegrationWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                    curIntegrationWorkflow.getIntegrationVersion() == integrationInstanceConfiguration
+                        .getIntegrationVersion())
+                .findFirst()
+                .map(IntegrationWorkflow::getWorkflowId)
+                .orElse(null);
+
+            if (workflowId == null || CollectionUtils.noneMatch(
+                integrationInstanceConfigurationWorkflows,
+                integrationInstanceConfigurationWorkflow -> Objects.equals(
+                    integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowId))) {
+
+                if (oldIntegrationInstanceConfigurationWorkflow.isEnabled()) {
+                    doEnableIntegrationInstanceConfigurationWorkflow(
+                        integrationInstanceConfiguration.getId(),
+                        oldIntegrationInstanceConfigurationWorkflow.getWorkflowId(), false);
+                }
+
+                integrationInstanceWorkflowService.deleteByIntegrationInstanceConfigurationWorkflowId(
+                    oldIntegrationInstanceConfigurationWorkflow.getId());
+
+                integrationInstanceConfigurationWorkflowService.delete(
+                    oldIntegrationInstanceConfigurationWorkflow.getId());
+            }
+        }
+    }
+
+    private List<Tag> checkTags(List<Tag> tags) {
+        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
+    }
+
+    private static boolean containsTag(IntegrationInstanceConfiguration integrationInstanceConfiguration, Tag tag) {
+        List<Long> tagIds = integrationInstanceConfiguration.getTagIds();
+
+        return tagIds.contains(tag.getId());
+    }
+
+    private IntegrationInstanceConfigurationWorkflow doEnableIntegrationInstanceConfigurationWorkflow(
+        long integrationInstanceConfigurationId, String workflowId, boolean enable) {
+
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                 integrationInstanceConfigurationId, workflowId);
 
@@ -334,231 +609,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             }
         }
 
-        integrationInstanceConfigurationWorkflowService.updateEnabled(
-            integrationInstanceConfigurationWorkflow.getId(), enable);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    @SuppressFBWarnings("NP")
-    public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
-        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
-            .getIntegrationInstanceConfiguration(id);
-
-        List<IntegrationWorkflow> integrationWorkflows = getIntegrationWorkflows(integrationInstanceConfiguration);
-        List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
-
-        return toIntegrationInstanceConfigurationDTO(
-            integrationInstanceConfiguration,
-            CollectionUtils.filter(
-                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                    integrationInstanceConfiguration.getId()),
-                integrationInstanceConfigurationWorkflow -> workflowIds
-                    .contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-            integrationWorkflows);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<Tag> getIntegrationInstanceConfigurationTags() {
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
-
-        return tagService.getTags(
-            integrationInstanceConfigurations
-                .stream()
-                .map(IntegrationInstanceConfiguration::getTagIds)
-                .flatMap(Collection::stream)
-                .toList());
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
-        Environment environment, Long integrationId, Long tagId) {
-
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
-                environment, integrationId, tagId);
-
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfiguration::getId));
-        List<Integration> integrations = getIntegrations(integrationInstanceConfigurations);
-        List<Tag> tags = getTags(integrationInstanceConfigurations);
-
-        return CollectionUtils.map(
-            integrationInstanceConfigurations,
-            integrationInstanceConfiguration -> {
-                List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
-
-                return toIntegrationInstanceConfigurationDTO(
-                    CollectionUtils.getFirst(
-                        integrations, integration -> Objects.equals(
-                            integration.getId(), integrationInstanceConfiguration.getIntegrationId())),
-                    integrationInstanceConfiguration,
-                    CollectionUtils.filter(
-                        integrationInstanceConfigurationWorkflows,
-                        integrationInstanceConfigurationWorkflow -> Objects.equals(
-                            integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                            integrationInstanceConfiguration.getId()) &&
-                            workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-                    getIntegrationWorkflows(integrationInstanceConfiguration),
-                    filterTags(tags, integrationInstanceConfiguration));
-            });
-    }
-
-    @Override
-    public void updateIntegrationInstanceConfiguration(
-        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO) {
-
-        IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationDTO
-            .toIntegrationInstanceConfiguration();
-
-        List<Tag> tags = checkTags(integrationInstanceConfigurationDTO.tags());
-
-        if (!tags.isEmpty()) {
-            integrationInstanceConfiguration.setTags(tags);
-        }
-
-        IntegrationInstanceConfiguration oldIntegrationInstanceConfiguration = integrationInstanceConfigurationService
-            .getIntegrationInstanceConfiguration(integrationInstanceConfigurationDTO.id());
-
-        integrationInstanceConfiguration = integrationInstanceConfigurationService.update(
-            integrationInstanceConfiguration);
-
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-            createIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfiguration, CollectionUtils.map(
-                    integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
-                    IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow));
-
-        updateIntegrationInstanceWorkflows(integrationInstanceConfiguration, integrationInstanceConfigurationWorkflows);
-
-        checkWorkflowTriggers(
-            integrationInstanceConfiguration.getIntegrationId(),
-            oldIntegrationInstanceConfiguration.getIntegrationVersion(),
-            integrationInstanceConfiguration.getId(), integrationInstanceConfigurationWorkflows);
-
-        List<Long> integrationInstanceConfigurationWorkflowIds = integrationInstanceConfigurationWorkflows.stream()
-            .map(IntegrationInstanceConfigurationWorkflow::getId)
-            .toList();
-
-        integrationInstanceConfigurationWorkflowService.deleteIntegrationInstanceConfigurationWorkflows(
-            integrationInstanceConfiguration.getId(), integrationInstanceConfigurationWorkflowIds);
-    }
-
-    @Override
-    public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
-        integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
-    }
-
-    @Override
-    public void updateIntegrationInstanceConfigurationWorkflow(
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
-
-        validateInputs(integrationInstanceConfigurationWorkflow);
-
-        integrationInstanceConfigurationWorkflowService.update(integrationInstanceConfigurationWorkflow);
-    }
-
-    private List<Tag> checkTags(List<Tag> tags) {
-        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
-    }
-
-    private void checkWorkflowTriggers(
-        long integrationId, int oldIntegrationVersion, Long integrationInstanceConfigurationId,
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
-
-        List<IntegrationWorkflow> oldIntegrationWorkflows = integrationWorkflowService
-            .getIntegrationWorkflows(integrationId, oldIntegrationVersion);
-        List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfigurationId);
-
-        for (IntegrationWorkflow oldIntegrationWorkflow : oldIntegrationWorkflows) {
-            for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
-
-                IntegrationWorkflow integrationWorkflow = integrationWorkflowService
-                    .getIntegrationInstanceConfigurationIntegrationWorkflow(
-                        integrationInstanceConfigurationId, integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-                if (Objects.equals(integrationWorkflow.getWorkflowReferenceCode(),
-                    oldIntegrationWorkflow.getWorkflowReferenceCode())) {
-                    IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow =
-                        oldIntegrationInstanceConfigurationWorkflows.stream()
-                            .filter(curIntegrationInstanceConfigurationWorkflow -> Objects.equals(
-                                curIntegrationInstanceConfigurationWorkflow.getWorkflowId(),
-                                oldIntegrationWorkflow.getWorkflowId()))
-                            .findFirst()
-                            .orElseThrow(() -> new IllegalArgumentException(
-                                "Project instance workflow with workflowId=%s not found".formatted(
-                                    oldIntegrationWorkflow.getWorkflowId())));
-
-                    if (integrationInstanceConfigurationWorkflow.isEnabled()) {
-                        if (!oldIntegrationInstanceConfigurationWorkflow.isEnabled()) {
-                            enableIntegrationInstanceConfigurationWorkflow(
-                                integrationInstanceConfigurationId,
-                                integrationInstanceConfigurationWorkflow.getWorkflowId(), true);
-                        }
-                    } else {
-                        if (oldIntegrationInstanceConfigurationWorkflow.isEnabled()) {
-                            enableIntegrationInstanceConfigurationWorkflow(
-                                integrationInstanceConfigurationId,
-                                oldIntegrationInstanceConfigurationWorkflow.getWorkflowId(), false);
-                        }
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        integrationInstanceConfigurationWorkflows.stream()
-            .filter(IntegrationInstanceConfigurationWorkflow::isEnabled)
-            .filter(projectInstanceWorkflow -> {
-                IntegrationWorkflow projectWorkflow = integrationWorkflowService
-                    .getIntegrationInstanceConfigurationIntegrationWorkflow(
-                        integrationInstanceConfigurationId, projectInstanceWorkflow.getWorkflowId());
-
-                return oldIntegrationWorkflows.stream()
-                    .noneMatch(oldIntegrationWorkflow -> Objects.equals(
-                        oldIntegrationWorkflow.getWorkflowReferenceCode(), projectWorkflow.getWorkflowReferenceCode()));
-            })
-            .forEach(projectInstanceWorkflow -> enableIntegrationInstanceConfigurationWorkflow(
-                integrationInstanceConfigurationId, projectInstanceWorkflow.getWorkflowId(), true));
-    }
-
-    private static boolean containsTag(IntegrationInstanceConfiguration integrationInstanceConfiguration, Tag tag) {
-        List<Long> tagIds = integrationInstanceConfiguration.getTagIds();
-
-        return tagIds.contains(tag.getId());
-    }
-
-    private List<IntegrationInstanceConfigurationWorkflow> createIntegrationInstanceConfigurationWorkflows(
-        IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
-
-        integrationInstanceConfigurationWorkflows = integrationInstanceConfigurationWorkflowService.create(
-            integrationInstanceConfigurationWorkflows
-                .stream()
-                .peek(integrationInstanceConfigurationWorkflow -> {
-                    if (integrationInstanceConfigurationWorkflow.isEnabled()) {
-                        List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceConfigurationWorkflowConnections =
-                            integrationInstanceConfigurationWorkflow.getConnections();
-                        Workflow workflow = workflowService.getWorkflow(
-                            integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-                        validateConnections(integrationInstanceConfigurationWorkflowConnections, workflow);
-                        validateInputs(integrationInstanceConfigurationWorkflow.getInputs(), workflow);
-                    }
-
-                    integrationInstanceConfigurationWorkflow.setIntegrationInstanceConfigurationId(
-                        Validate.notNull(integrationInstanceConfiguration.getId(), "id"));
-                })
-                .toList());
-
-        return integrationInstanceConfigurationWorkflows;
+        return integrationInstanceConfigurationWorkflow;
     }
 
     private List<Tag> filterTags(List<Tag> tags, IntegrationInstanceConfiguration integrationInstanceConfiguration) {
@@ -581,17 +632,6 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .stream()
             .filter(entry -> connectionPropertyNames.contains(entry.getKey()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    @SuppressFBWarnings("NP")
-    private List<IntegrationWorkflow> getIntegrationWorkflows(
-        IntegrationInstanceConfiguration integrationInstanceConfiguration) {
-
-        return integrationInstanceConfiguration.getIntegrationVersion() == null
-            ? List.of()
-            : integrationWorkflowService.getIntegrationWorkflows(
-                integrationInstanceConfiguration.getIntegrationId(),
-                integrationInstanceConfiguration.getIntegrationVersion());
     }
 
     private List<Integration> getIntegrations(
@@ -696,57 +736,21 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             tags);
     }
 
-    private void updateIntegrationInstanceWorkflows(
-        IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows) {
+    private void validateIntegrationInstanceConfigurationWorkflow(
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
-        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
-            integrationInstanceConfiguration.getId());
+        if (integrationInstanceConfigurationWorkflow.isEnabled()) {
+            List<IntegrationInstanceConfigurationWorkflowConnection> projectInstanceWorkflowConnections =
+                integrationInstanceConfigurationWorkflow.getConnections();
+            Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
-        List<IntegrationInstanceConfigurationWorkflow> oldIntegrationInstanceConfigurationWorkflows =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                integrationInstanceConfiguration.getId());
-
-        for (IntegrationInstance integrationInstance : integrationInstances) {
-            List<IntegrationInstanceWorkflow> integrationInstanceWorkflows = integrationInstanceWorkflowService
-                .getIntegrationInstanceWorkflows(integrationInstance.getId());
-
-            for (IntegrationInstanceWorkflow integrationInstanceWorkflow : integrationInstanceWorkflows) {
-                IntegrationInstanceConfigurationWorkflow oldIntegrationInstanceConfigurationWorkflow =
-                    oldIntegrationInstanceConfigurationWorkflows.stream()
-                        .filter(curIntegrationInstanceConfigurationWorkflow -> Objects.equals(
-                            curIntegrationInstanceConfigurationWorkflow.getId(),
-                            integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException(
-                            "IntegrationInstanceConfigurationWorkflow not found"));
-
-                IntegrationWorkflow oldIntegrationWorkflow = integrationWorkflowService.getWorkflowIntegrationWorkflow(
-                    oldIntegrationInstanceConfigurationWorkflow.getWorkflowId());
-
-                IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-                    integrationInstanceConfigurationWorkflows.stream()
-                        .filter(curIntegrationInstanceConfigurationWorkflow -> {
-                            IntegrationWorkflow integrationWorkflow = integrationWorkflowService
-                                .getWorkflowIntegrationWorkflow(
-                                    curIntegrationInstanceConfigurationWorkflow.getWorkflowId());
-                            return Objects.equals(
-                                integrationWorkflow.getWorkflowReferenceCode(),
-                                oldIntegrationWorkflow.getWorkflowReferenceCode());
-                        })
-                        .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException(
-                            "IntegrationInstanceConfigurationWorkflow not found"));
-
-                integrationInstanceWorkflow.setIntegrationInstanceConfigurationWorkflowId(
-                    integrationInstanceConfigurationWorkflow.getId());
-
-                integrationInstanceWorkflowService.update(integrationInstanceWorkflow);
-            }
+            validateIntegrationInstanceConfigurationWorkflowConnections(projectInstanceWorkflowConnections, workflow);
+            validateIntegrationInstanceConfigurationWorkflowInputs(integrationInstanceConfigurationWorkflow.getInputs(),
+                workflow);
         }
     }
 
-    private void validateConnections(
+    private void validateIntegrationInstanceConfigurationWorkflowConnections(
         List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceConfigurationWorkflowConnections,
         Workflow workflow) {
 
@@ -766,13 +770,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         }
     }
 
-    private void validateInputs(IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
-        Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
-
-        validateInputs(integrationInstanceConfigurationWorkflow.getInputs(), workflow);
-    }
-
-    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
+    private void validateIntegrationInstanceConfigurationWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
                 Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());

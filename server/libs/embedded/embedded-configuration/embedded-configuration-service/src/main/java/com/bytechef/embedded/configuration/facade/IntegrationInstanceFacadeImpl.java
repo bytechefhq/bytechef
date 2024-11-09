@@ -138,7 +138,6 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
                 integrationInstanceWorkflowService
                     .fetchIntegrationInstanceWorkflow(integrationInstanceId, workflowId)
                     .orElseGet(() -> {
-
                         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
                             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                                 integrationInstance.getIntegrationInstanceConfigurationId(), workflowId);

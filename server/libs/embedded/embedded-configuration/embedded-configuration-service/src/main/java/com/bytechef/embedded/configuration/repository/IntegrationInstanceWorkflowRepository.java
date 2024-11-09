@@ -19,6 +19,7 @@ package com.bytechef.embedded.configuration.repository;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -40,4 +41,13 @@ public interface IntegrationInstanceWorkflowRepository extends ListCrudRepositor
         """)
     Optional<IntegrationInstanceWorkflow> findByIntegrationInstanceIdAndWorkflowId(
         @Param("integrationInstanceId") long integrationInstanceId, @Param("workflowId") String workflowId);
+
+    @Modifying
+    @Query("""
+        DELETE FROM integration_instance_workflow
+        WHERE integration_instance_configuration_workflow_id = :integrationInstanceConfigurationWorkflowId
+        """)
+    void deleteByIntegrationInstanceConfigurationWorkflowId(
+        @Param("integrationInstanceConfigurationWorkflowId") long integrationInstanceConfigurationWorkflowId);
+
 }
