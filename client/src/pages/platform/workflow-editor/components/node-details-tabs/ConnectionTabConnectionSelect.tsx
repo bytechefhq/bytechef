@@ -152,11 +152,11 @@ const ConnectionTabConnectionSelect = ({
                                     <div className="flex items-center space-x-1">
                                         <span>{connection.name}</span>
 
-                                        <Badge variant="outline">{connection.environment}</Badge>
-
                                         <span className="text-xs text-gray-500">
                                             {connection?.tags?.map((tag) => tag.name).join(', ')}
                                         </span>
+
+                                        <Badge variant="outline">{connection.environment}</Badge>
                                     </div>
                                 </SelectItem>
                             ))}
