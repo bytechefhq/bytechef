@@ -130,6 +130,8 @@ const ProjectHeader = ({
     const handleDeleteProjectAlertDialogClick = () => {
         if (projectId) {
             deleteProjectMutation.mutate(projectId);
+
+            navigate('/automation/projects');
         }
     };
 

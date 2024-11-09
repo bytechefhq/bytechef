@@ -127,7 +127,11 @@ const Project = () => {
         isLoading: taskDispatcherDefinitionsLoading,
     } = useGetTaskDispatcherDefinitionsQuery();
 
-    const {data: currentWorkflow} = useGetProjectWorkflowQuery(+projectId!, +projectWorkflowId!, true, {});
+    const {data: currentWorkflow} = useGetProjectWorkflowQuery(
+        parseInt(projectId!),
+        parseInt(projectWorkflowId!),
+        !!projectId && !!projectWorkflowId
+    );
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
