@@ -1,5 +1,7 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
@@ -427,16 +429,12 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.name, matchingOperation?.name]);
 
-    const data = currentComponentDefinition || currentTaskDispatcherDefinition;
-    const dataFetched = currentActionFetched || currentTriggerFetched;
+    const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
+    const currentOperationFetcher = currentActionFetched || currentTriggerFetched;
 
-    if (
-        !workflowNodeDetailsPanelOpen ||
-        !currentNode?.name ||
-        !data ||
-        (currentComponent?.operationName && !matchingOperation?.name) ||
-        (currentComponent?.operationName && !dataFetched)
-    ) {
+    const actionDataMissing = currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetcher);
+
+    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
         return <></>;
     }
 
@@ -447,13 +445,19 @@ const WorkflowNodeDetailsPanel = ({
         >
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                 <header className="flex items-center p-4 text-lg font-medium">
-                    {data.icon && <InlineSVG className="mr-2 size-6" src={data.icon} />}
+                    {currentTaskData.icon && (
+                        <InlineSVG
+                            className="mr-2 size-6"
+                            loader={<LoadingIcon className="ml-0 mr-2 size-6 text-muted-foreground" />}
+                            src={currentTaskData.icon}
+                        />
+                    )}
 
                     {currentNode?.label}
 
                     <span className="mx-2 text-sm text-gray-500">({currentNode?.name})</span>
 
-                    {data.description && (
+                    {currentTaskData.description && (
                         <Tooltip delayDuration={500}>
                             <TooltipTrigger>
                                 <InfoCircledIcon className="size-4" />
@@ -479,8 +483,16 @@ const WorkflowNodeDetailsPanel = ({
                 </header>
 
                 <main className="flex h-full flex-col">
-                    {(!!(data as ComponentDefinition).actions?.length ||
-                        !!(data as ComponentDefinition).triggers?.length) && (
+                    {actionDataMissing && (
+                        <div className="flex flex-col border-b border-muted p-4">
+                            <span className="text-sm leading-6">Actions</span>
+
+                            <Skeleton className="h-9 w-full" />
+                        </div>
+                    )}
+
+                    {(!!(currentTaskData as ComponentDefinition).actions?.length ||
+                        !!(currentTaskData as ComponentDefinition).triggers?.length) && (
                         <CurrentOperationSelect
                             description={
                                 currentNode?.trigger
@@ -522,7 +534,7 @@ const WorkflowNodeDetailsPanel = ({
                         )}
 
                     <div className="relative h-full overflow-y-scroll">
-                        {data && (
+                        {currentTaskData && (
                             <div className="absolute left-0 top-0 size-full">
                                 {activeTab === 'description' && (
                                     <DescriptionTab
@@ -548,7 +560,7 @@ const WorkflowNodeDetailsPanel = ({
                                     )}
 
                                 {activeTab === 'properties' &&
-                                    data &&
+                                    currentTaskData &&
                                     (currentOperationProperties?.length ? (
                                         <Properties
                                             customClassName="p-4"
@@ -580,7 +592,7 @@ const WorkflowNodeDetailsPanel = ({
                 </main>
 
                 <footer className="z-50 mt-auto flex bg-white px-4 py-2">
-                    <Select defaultValue={data.version.toString()}>
+                    <Select defaultValue={currentTaskData?.version.toString()}>
                         <SelectTrigger className="w-auto border-none shadow-none">
                             <SelectValue placeholder="Choose version..." />
                         </SelectTrigger>
