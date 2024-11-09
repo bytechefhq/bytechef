@@ -148,10 +148,10 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
         projectInstance = projectInstanceService.create(projectInstance);
 
-        createProjectInstanceWorkflows(
-            projectInstance,
-            CollectionUtils.map(
-                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
+        checkProjectInstanceWorkflows(
+            projectInstance, -1, CollectionUtils.map(
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow),
+            List.of());
 
         return projectInstance.getId();
     }
@@ -220,43 +220,8 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public void enableProjectInstanceWorkflow(long projectInstanceId, String workflowId, boolean enable) {
-        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            projectInstanceId, workflowId);
-
-        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
-            projectInstanceWorkflow.getProjectInstanceId());
-
-        if (enable) {
-            Workflow workflow = workflowService.getWorkflow(workflowId);
-
-            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
-                WorkflowTrigger.of(workflow)
-                    .stream()
-                    .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
-                    .filter(WorkflowConnection::required)
-                    .toList(),
-                workflow.getAllTasks()
-                    .stream()
-                    .flatMap(workflowTask -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
-                    .filter(WorkflowConnection::required)
-                    .toList());
-
-            if (requiredWorkflowConnections.size() != projectInstanceWorkflow.getConnectionsCount()) {
-                throw new PlatformException(
-                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
-                    ProjectInstanceErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
-            }
-        }
-
-        if (projectInstance.isEnabled()) {
-            if (enable) {
-                enableWorkflowTriggers(projectInstanceWorkflow);
-            } else {
-                disableWorkflowTriggers(projectInstanceWorkflow);
-            }
-        }
+        ProjectInstanceWorkflow projectInstanceWorkflow = doEnableProjectInstanceWorkflow(
+            projectInstanceId, workflowId, enable);
 
         projectInstanceWorkflowService.updateEnabled(projectInstanceWorkflow.getId(), enable);
     }
@@ -296,8 +261,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances();
 
         return tagService.getTags(
-            projectInstances
-                .stream()
+            projectInstances.stream()
                 .map(ProjectInstance::getTagIds)
                 .flatMap(Collection::stream)
                 .toList());
@@ -320,25 +284,15 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             projectInstance.setTags(tags);
         }
 
-        ProjectInstance oldProjectInstance = projectInstanceService.getProjectInstance(projectInstanceDTO.id());
+        ProjectInstance oldProjectInstance = projectInstanceService.getProjectInstance(projectInstance.getId());
 
-        projectInstance = projectInstanceService.update(projectInstance);
+        projectInstanceService.update(projectInstance);
 
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows = createProjectInstanceWorkflows(
-            projectInstance,
+        checkProjectInstanceWorkflows(
+            projectInstance, oldProjectInstance.getProjectVersion(),
             CollectionUtils.map(
-                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow));
-
-        checkWorkflowTriggers(
-            projectInstance.getProjectId(), oldProjectInstance.getProjectVersion(), projectInstance.getId(),
-            projectInstanceWorkflows);
-
-        List<Long> projectInstanceWorkflowIds = projectInstanceWorkflows.stream()
-            .map(ProjectInstanceWorkflow::getId)
-            .toList();
-
-        projectInstanceWorkflowService.deleteProjectInstanceWorkflows(
-            projectInstance.getId(), projectInstanceWorkflowIds);
+                projectInstanceDTO.projectInstanceWorkflows(), ProjectInstanceWorkflowDTO::toProjectInstanceWorkflow),
+            projectWorkflowService.getProjectWorkflows(projectInstance.getProjectId()));
     }
 
     @Override
@@ -348,90 +302,128 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     @Override
     public void updateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
-        validateInputs(projectInstanceWorkflow);
+        validateProjectInstanceWorkflow(projectInstanceWorkflow);
 
         projectInstanceWorkflowService.update(projectInstanceWorkflow);
     }
 
-    private List<ProjectInstanceWorkflow> createProjectInstanceWorkflows(
-        ProjectInstance projectInstance, List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
+    private void checkProjectInstanceWorkflows(
+        ProjectInstance projectInstance, int oldProjectVersion,
+        List<ProjectInstanceWorkflow> projectInstanceWorkflows, List<ProjectWorkflow> allProjectWorkflows) {
 
-        projectInstanceWorkflows = projectInstanceWorkflowService.create(
-            projectInstanceWorkflows.stream()
-                .peek(projectInstanceWorkflow -> {
-                    if (projectInstanceWorkflow.isEnabled()) {
-                        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
-                            projectInstanceWorkflow.getConnections();
-                        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+        List<ProjectInstanceWorkflow> oldProjectInstanceWorkflows = List.of();
 
-                        validateConnections(projectInstanceWorkflowConnections, workflow);
-                        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
-                    }
+        if (oldProjectVersion != -1) {
+            oldProjectInstanceWorkflows = projectInstanceWorkflowService.getProjectInstanceWorkflows(
+                projectInstance.getId());
+        }
 
-                    projectInstanceWorkflow.setProjectInstanceId(Validate.notNull(projectInstance.getId(), "id"));
-                })
-                .toList());
+        for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
+            ProjectInstanceWorkflow oldProjectInstanceWorkflow = null;
 
-        return projectInstanceWorkflows;
-    }
+            if (oldProjectVersion != -1) {
+                String workflowReferenceCode = allProjectWorkflows.stream()
+                    .filter(curProjectWorkflow -> Objects.equals(
+                        curProjectWorkflow.getWorkflowId(), projectInstanceWorkflow.getWorkflowId()))
+                    .findFirst()
+                    .map(ProjectWorkflow::getWorkflowReferenceCode)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "Project workflow with workflowId=%s not found".formatted(
+                            projectInstanceWorkflow.getWorkflowId())));
 
-    private List<Tag> checkTags(List<Tag> tags) {
-        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
-    }
+                String oldWorkflowId = allProjectWorkflows.stream()
+                    .filter(curProjectWorkflow -> Objects.equals(
+                        curProjectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                        curProjectWorkflow.getProjectVersion() == oldProjectVersion)
+                    .map(ProjectWorkflow::getWorkflowId)
+                    .findFirst()
+                    .orElse(null);
 
-    private void checkWorkflowTriggers(
-        long projectId, int oldProjectVersion, Long projectInstanceId,
-        List<ProjectInstanceWorkflow> projectInstanceWorkflows) {
-
-        List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService
-            .getProjectWorkflows(projectId, oldProjectVersion);
-        List<ProjectInstanceWorkflow> oldProjectInstanceWorkflows = projectInstanceWorkflowService
-            .getProjectInstanceWorkflows(projectInstanceId);
-
-        for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
-            for (ProjectInstanceWorkflow projectInstanceWorkflow : projectInstanceWorkflows) {
-                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(
-                    projectInstanceId, projectInstanceWorkflow.getWorkflowId());
-
-                if (Objects.equals(projectWorkflow.getWorkflowReferenceCode(),
-                    oldProjectWorkflow.getWorkflowReferenceCode())) {
-                    ProjectInstanceWorkflow oldProjectInstanceWorkflow = oldProjectInstanceWorkflows.stream()
+                if (oldWorkflowId != null) {
+                    oldProjectInstanceWorkflow = oldProjectInstanceWorkflows.stream()
                         .filter(curProjectInstanceWorkflow -> Objects.equals(curProjectInstanceWorkflow.getWorkflowId(),
-                            oldProjectWorkflow.getWorkflowId()))
+                            oldWorkflowId))
                         .findFirst()
-                        .orElseThrow(() -> new IllegalArgumentException(
-                            "Project instance workflow with workflowId=%s not found".formatted(
-                                oldProjectWorkflow.getWorkflowId())));
+                        .orElse(null);
+                }
+            }
 
-                    if (projectInstanceWorkflow.isEnabled()) {
-                        if (!oldProjectInstanceWorkflow.isEnabled()) {
-                            enableProjectInstanceWorkflow(
-                                projectInstanceId, projectInstanceWorkflow.getWorkflowId(), true);
-                        }
-                    } else {
-                        if (oldProjectInstanceWorkflow.isEnabled()) {
-                            enableProjectInstanceWorkflow(
-                                projectInstanceId, oldProjectInstanceWorkflow.getWorkflowId(), false);
-                        }
+            if (oldProjectInstanceWorkflow == null) {
+                validateProjectInstanceWorkflow(projectInstanceWorkflow);
+
+                projectInstanceWorkflow.setProjectInstanceId(projectInstance.getId());
+
+                projectInstanceWorkflowService.create(projectInstanceWorkflow);
+
+                if (projectInstance.isEnabled() && projectInstanceWorkflow.isEnabled()) {
+                    enableProjectInstanceWorkflow(
+                        projectInstance.getId(), projectInstanceWorkflow.getWorkflowId(), true);
+                }
+            } else {
+                boolean oldProjectInstanceWorkflowEnabled = oldProjectInstanceWorkflow.isEnabled();
+
+                validateProjectInstanceWorkflow(projectInstanceWorkflow);
+
+                String oldWorkflowId = oldProjectInstanceWorkflow.getWorkflowId();
+
+                oldProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
+                oldProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
+                oldProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
+                oldProjectInstanceWorkflow.setWorkflowId(projectInstanceWorkflow.getWorkflowId());
+
+                if (projectInstanceWorkflow.isEnabled()) {
+                    projectInstanceWorkflowService.update(oldProjectInstanceWorkflow);
+
+                    if (projectInstance.isEnabled() && !oldProjectInstanceWorkflowEnabled) {
+                        validateProjectInstanceWorkflow(projectInstanceWorkflow);
+
+                        doEnableProjectInstanceWorkflow(
+                            projectInstance.getId(), projectInstanceWorkflow.getWorkflowId(), true);
+                    }
+                } else {
+                    if (oldProjectInstanceWorkflowEnabled) {
+                        doEnableProjectInstanceWorkflow(projectInstance.getId(), oldWorkflowId, false);
                     }
 
-                    break;
+                    projectInstanceWorkflowService.update(oldProjectInstanceWorkflow);
                 }
             }
         }
 
-        projectInstanceWorkflows.stream()
-            .filter(ProjectInstanceWorkflow::isEnabled)
-            .filter(projectInstanceWorkflow -> {
-                ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(
-                    projectInstanceId, projectInstanceWorkflow.getWorkflowId());
+        for (ProjectInstanceWorkflow oldProjectInstanceWorkflow : oldProjectInstanceWorkflows) {
+            String workflowReferenceCode = allProjectWorkflows.stream()
+                .filter(curProjectWorkflow -> Objects.equals(
+                    curProjectWorkflow.getWorkflowId(), oldProjectInstanceWorkflow.getWorkflowId()))
+                .findFirst()
+                .map(ProjectWorkflow::getWorkflowReferenceCode)
+                .orElseThrow(() -> new IllegalArgumentException(
+                    "Project workflow with workflowId=%s not found".formatted(
+                        oldProjectInstanceWorkflow.getWorkflowId())));
 
-                return oldProjectWorkflows.stream()
-                    .noneMatch(oldProjectWorkflow -> Objects.equals(
-                        oldProjectWorkflow.getWorkflowReferenceCode(), projectWorkflow.getWorkflowReferenceCode()));
-            })
-            .forEach(projectInstanceWorkflow -> enableProjectInstanceWorkflow(
-                projectInstanceId, projectInstanceWorkflow.getWorkflowId(), true));
+            String workflowId = allProjectWorkflows.stream()
+                .filter(curProjectWorkflow -> Objects.equals(
+                    curProjectWorkflow.getWorkflowReferenceCode(), workflowReferenceCode) &&
+                    curProjectWorkflow.getProjectVersion() == projectInstance.getProjectVersion())
+                .findFirst()
+                .map(ProjectWorkflow::getWorkflowId)
+                .orElse(null);
+
+            if (workflowId == null || CollectionUtils.noneMatch(
+                projectInstanceWorkflows,
+                projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
+
+                if (oldProjectInstanceWorkflow.isEnabled()) {
+                    doEnableProjectInstanceWorkflow(
+                        projectInstance.getId(), oldProjectInstanceWorkflow.getWorkflowId(), false);
+                }
+
+                projectInstanceWorkflowService.delete(oldProjectInstanceWorkflow.getId());
+            }
+        }
+    }
+
+    private List<Tag> checkTags(List<Tag> tags) {
+        return CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
     }
 
     private static boolean containsTag(ProjectInstance projectInstance, Tag tag) {
@@ -458,10 +450,53 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         }
     }
 
+    private ProjectInstanceWorkflow doEnableProjectInstanceWorkflow(
+        long projectInstanceId, String workflowId, boolean enable) {
+
+        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
+            projectInstanceId, workflowId);
+
+        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(projectInstanceId);
+
+        if (enable) {
+            Workflow workflow = workflowService.getWorkflow(workflowId);
+
+            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
+                WorkflowTrigger.of(workflow)
+                    .stream()
+                    .flatMap(workflowTrigger -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
+                    .filter(WorkflowConnection::required)
+                    .toList(),
+                workflow.getAllTasks()
+                    .stream()
+                    .flatMap(workflowTask -> CollectionUtils.stream(
+                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
+                    .filter(WorkflowConnection::required)
+                    .toList());
+
+            if (requiredWorkflowConnections.size() != projectInstanceWorkflow.getConnectionsCount()) {
+                throw new PlatformException(
+                    "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
+                    ProjectInstanceErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
+            }
+        }
+
+        if (projectInstance.isEnabled()) {
+            if (enable) {
+                enableWorkflowTriggers(projectInstanceWorkflow);
+            } else {
+                disableWorkflowTriggers(projectInstanceWorkflow);
+            }
+        }
+
+        return projectInstanceWorkflow;
+    }
+
     private void enableWorkflowTriggers(ProjectInstanceWorkflow projectInstanceWorkflow) {
         Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
 
-        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
+        validateProjectInstanceWorkflowInputs(projectInstanceWorkflow.getInputs(), workflow);
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflow.getId());
@@ -602,8 +637,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
 
     private List<Tag> getTags(List<ProjectInstance> projectInstances) {
         return tagService.getTags(
-            projectInstances
-                .stream()
+            projectInstances.stream()
                 .flatMap(projectInstance -> CollectionUtils.stream(projectInstance.getTagIds()))
                 .filter(Objects::nonNull)
                 .toList());
@@ -614,10 +648,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
     }
 
     private LocalDateTime getWorkflowLastExecutionDate(String workflowId) {
-        return OptionalUtils.mapOrElse(
-            jobService.fetchLastWorkflowJob(workflowId),
-            Job::getEndDate,
-            null);
+        return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
     }
 
     private String getWorkflowReferenceCode(
@@ -631,7 +662,18 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .orElseThrow();
     }
 
-    private void validateConnections(
+    private void validateProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
+        if (projectInstanceWorkflow.isEnabled()) {
+            List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
+                projectInstanceWorkflow.getConnections();
+            Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
+
+            validateProjectInstanceWorkflowConnections(projectInstanceWorkflowConnections, workflow);
+            validateProjectInstanceWorkflowInputs(projectInstanceWorkflow.getInputs(), workflow);
+        }
+    }
+
+    private void validateProjectInstanceWorkflowConnections(
         List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections, Workflow workflow) {
 
         for (ProjectInstanceWorkflowConnection projectInstanceWorkflowConnection : projectInstanceWorkflowConnections) {
@@ -649,13 +691,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         }
     }
 
-    private void validateInputs(ProjectInstanceWorkflow projectInstanceWorkflow) {
-        Workflow workflow = workflowService.getWorkflow(projectInstanceWorkflow.getWorkflowId());
-
-        validateInputs(projectInstanceWorkflow.getInputs(), workflow);
-    }
-
-    private void validateInputs(Map<String, ?> inputs, Workflow workflow) {
+    private void validateProjectInstanceWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
                 Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());

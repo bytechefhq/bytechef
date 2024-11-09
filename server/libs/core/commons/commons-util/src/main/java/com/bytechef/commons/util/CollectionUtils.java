@@ -215,6 +215,14 @@ public final class CollectionUtils {
             .toList();
     }
 
+    public static <T> boolean noneMatch(Collection<T> list, Predicate<? super T> predicate) {
+        Validate.notNull(list, "'list' must not be null");
+        Validate.notNull(predicate, "'predicate' must not be null");
+
+        return list.stream()
+            .noneMatch(predicate);
+    }
+
     public static int size(Collection<?> collection) {
         Validate.notNull(collection, "'collection' must not be null");
 

@@ -61,14 +61,6 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
     }
 
     @Override
-    public void deleteProjectInstanceWorkflows(long projectInstanceId, List<Long> exclude) {
-        projectInstanceWorkflowRepository.findAllByProjectInstanceId(projectInstanceId)
-            .stream()
-            .filter(projectInstanceWorkflow -> !exclude.contains(projectInstanceWorkflow.getId()))
-            .forEach(projectInstanceWorkflowRepository::delete);
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceId, String workflowId, String workflowNodeName, String workflowConnectionKey) {
@@ -147,6 +139,7 @@ public class ProjectInstanceWorkflowServiceImpl implements ProjectInstanceWorkfl
         curProjectInstanceWorkflow.setConnections(projectInstanceWorkflow.getConnections());
         curProjectInstanceWorkflow.setEnabled(projectInstanceWorkflow.isEnabled());
         curProjectInstanceWorkflow.setInputs(projectInstanceWorkflow.getInputs());
+        curProjectInstanceWorkflow.setWorkflowId(projectInstanceWorkflow.getWorkflowId());
         curProjectInstanceWorkflow.setVersion(projectInstanceWorkflow.getVersion());
 
         return projectInstanceWorkflowRepository.save(curProjectInstanceWorkflow);

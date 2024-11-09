@@ -32,8 +32,6 @@ public interface ProjectInstanceWorkflowService {
 
     void delete(long id);
 
-    void deleteProjectInstanceWorkflows(long projectInstanceId, List<Long> exclude);
-
     Optional<ProjectInstanceWorkflowConnection> fetchProjectInstanceWorkflowConnection(
         long projectInstanceOd, String workflowId, String workflowNodeName, String workflowConnectionKey);
 
