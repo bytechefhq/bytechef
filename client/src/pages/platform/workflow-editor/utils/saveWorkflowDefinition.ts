@@ -21,6 +21,7 @@ type UpdateWorkflowRequestType = {
 
 interface SaveWorkflowDefinitionProps {
     conditionId?: string;
+    decorative?: boolean;
     nodeData: NodeDataType;
     nodeIndex?: number;
     onSuccess?: () => void;
@@ -32,6 +33,7 @@ interface SaveWorkflowDefinitionProps {
 
 export default async function saveWorkflowDefinition({
     conditionId,
+    decorative,
     nodeData,
     nodeIndex,
     onSuccess,
@@ -127,6 +129,7 @@ export default async function saveWorkflowDefinition({
 
     if (
         existingWorkflowTask &&
+        !decorative &&
         (!operationName ||
             (existingWorkflowTask.parameters &&
                 JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))) &&

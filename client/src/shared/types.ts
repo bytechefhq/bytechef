@@ -69,19 +69,18 @@ export type ComponentType = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: boolean;
     };
+    label?: string;
     metadata?: {
         ui?: {
             condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
-    notes?: string;
     operationName?: string;
     parameters?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: any;
     };
-    title?: string;
     type?: string;
     workflowNodeName: string;
 };
@@ -151,7 +150,7 @@ export type NodeType = {
     trigger?: boolean;
     type: string;
     version: number;
-    workflowNodeName?: string;
+    workflowNodeName: string;
 };
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};

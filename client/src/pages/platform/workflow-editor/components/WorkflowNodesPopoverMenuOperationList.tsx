@@ -110,9 +110,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     setCurrentComponent({
                         componentName: newTriggerNodeData.componentName,
-                        notes: newTriggerNodeData.description,
+                        description: newTriggerNodeData.description,
+                        label: newTriggerNodeData.label,
                         operationName: newTriggerNodeData.operationName,
-                        title: newTriggerNodeData.label,
                         type: newTriggerNodeData.type,
                         workflowNodeName: newTriggerNodeData.workflowNodeName ?? 'trigger_1',
                     });

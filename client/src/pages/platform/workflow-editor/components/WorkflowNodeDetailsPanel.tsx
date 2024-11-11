@@ -267,13 +267,13 @@ const WorkflowNodeDetailsPanel = ({
             });
         }
 
-        const {componentName, notes, title, workflowNodeName} = currentComponent;
+        const {componentName, description, label, workflowNodeName} = currentComponent;
 
         saveWorkflowDefinition({
             nodeData: {
                 componentName,
-                description: notes,
-                label: title,
+                description,
+                label,
                 name: workflowNodeName || currentNode?.name || '',
                 operationName: newOperationName,
                 parameters: getParametersWithDefaultValues({
