@@ -1492,7 +1492,7 @@ public class ComponentInitOpenApiGenerator {
                 bodyContentType = switch (mimeType) {
                     case "application/json" -> "JSON";
                     case "application/xml" -> "XML";
-                    case "application/x-www-form-urlencoded" -> "FORM_URLENCODED";
+                    case "application/x-www-form-urlencoded" -> "FORM_URL_ENCODED";
                     case "application/octet-stream" -> "BINARY";
                     case "multipart/form-data" -> "FORM_DATA";
                     default -> "RAW";
