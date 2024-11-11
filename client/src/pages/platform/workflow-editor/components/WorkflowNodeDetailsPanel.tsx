@@ -1,13 +1,11 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
 import {
     ActionDefinitionApi,
-    ComponentDefinition,
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
@@ -448,9 +446,6 @@ const WorkflowNodeDetailsPanel = ({
     }, [componentActions, currentNode?.name]);
 
     const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
-    const currentOperationFetcher = currentActionFetched || currentTriggerFetched;
-
-    const actionDataMissing = currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetcher);
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
         return <></>;
@@ -501,32 +496,21 @@ const WorkflowNodeDetailsPanel = ({
                 </header>
 
                 <main className="flex h-full flex-col">
-                    {actionDataMissing && (
-                        <div className="flex flex-col border-b border-muted p-4">
-                            <span className="text-sm leading-6">Actions</span>
-
-                            <Skeleton className="h-9 w-full" />
-                        </div>
-                    )}
-
-                    {(!!(currentTaskData as ComponentDefinition).actions?.length ||
-                        !!(currentTaskData as ComponentDefinition).triggers?.length) && (
-                        <CurrentOperationSelect
-                            description={
-                                currentNode?.trigger
-                                    ? currentTriggerDefinition?.description
-                                    : currentActionDefinition?.description
-                            }
-                            handleValueChange={handleOperationSelectChange}
-                            operations={
-                                (currentNode?.trigger
-                                    ? currentComponentDefinition?.triggers
-                                    : currentComponentDefinition?.actions)!
-                            }
-                            triggerSelect={currentNode?.trigger}
-                            value={currentOperationName}
-                        />
-                    )}
+                    <CurrentOperationSelect
+                        description={
+                            currentNode?.trigger
+                                ? currentTriggerDefinition?.description
+                                : currentActionDefinition?.description
+                        }
+                        handleValueChange={handleOperationSelectChange}
+                        operations={
+                            (currentNode?.trigger
+                                ? currentComponentDefinition?.triggers
+                                : currentComponentDefinition?.actions)!
+                        }
+                        triggerSelect={currentNode?.trigger}
+                        value={currentOperationName}
+                    />
 
                     {((!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
                         currentNode?.taskDispatcher ||
