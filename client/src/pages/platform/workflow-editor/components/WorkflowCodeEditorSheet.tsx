@@ -144,7 +144,7 @@ const WorkflowCodeEditorSheet = ({
                                                         size="icon"
                                                         variant="ghost"
                                                     >
-                                                        <PlayIcon className="text-success h-5" />
+                                                        <PlayIcon className="h-5 text-success" />
                                                     </Button>
                                                 </span>
                                             </TooltipTrigger>
@@ -187,8 +187,8 @@ const WorkflowCodeEditorSheet = ({
                                     }
                                 }}
                                 options={{
-                                    folding: true, 
-                                    foldingStrategy: 'indentation', 
+                                    folding: true,
+                                    foldingStrategy: 'indentation',
                                 }}
                                 value={workflow.definition!}
                             />
