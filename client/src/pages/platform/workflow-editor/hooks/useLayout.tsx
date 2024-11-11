@@ -7,7 +7,8 @@ import Dagre from '@dagrejs/dagre';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Edge, Node, ReactFlowState, useReactFlow, useStore} from 'reactflow';
+import {Edge, Node, useReactFlow} from 'reactflow';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getNextPlaceholderId from '../utils/getNextPlaceholderId';
@@ -29,8 +30,6 @@ const TASK_DISPATCHER_NAMES = [
     'parallel',
     'subflow',
 ];
-
-const nodeCountSelector = (state: ReactFlowState) => state.nodeInternals.size;
 
 const convertTaskToNode = (
     task: WorkflowTask,
@@ -125,15 +124,22 @@ const filterConditionCaseNodes = (nodes: Node[], node: Node) => {
 };
 
 export default function useLayout({
+    canvasWidth,
     componentDefinitions,
     taskDispatcherDefinitions,
 }: {
     componentDefinitions: Array<ComponentDefinitionBasic>;
+    canvasWidth: number;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }) {
-    const nodeCount = useStore(nodeCountSelector);
+    const {setEdges, setNodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            setEdges: state.setEdges,
+            setNodes: state.setNodes,
+        }))
+    );
 
-    const {fitView, getEdges, getNodes, setEdges, setNodes} = useReactFlow();
+    const {getNodes} = useReactFlow();
 
     const {
         workflow: {tasks, triggers},
@@ -479,13 +485,11 @@ export default function useLayout({
         dagreGraph.setGraph({rankdir: DIRECTION});
 
         let nodes: Node[] = getNodes();
-        let edges: Edge[] = getEdges();
+        let edges: Edge[] = taskEdges;
 
         if (triggerAndTaskNodes.length) {
             nodes = taskNodes?.length ? [...triggerAndTaskNodes] : [triggerNode, finalPlaceholderNode];
         }
-
-        edges = taskEdges;
 
         nodes.forEach((node) => {
             let height = NODE_HEIGHT;
@@ -539,13 +543,13 @@ export default function useLayout({
             return {
                 ...node,
                 position: {
-                    x: dagreGraph.node(node.id).x,
+                    x: dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2),
                     y: positionY,
                 },
             };
         });
 
-        const uniqueEdges = edges.reduce(
+        edges = edges.reduce(
             (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
                 const edgeKey = `${edge.source}=>${edge.target}`;
 
@@ -560,14 +564,9 @@ export default function useLayout({
             {edges: [], map: new Map<string, boolean>()}
         ).edges;
 
-        edges = uniqueEdges;
-
         setNodes(nodes);
         setEdges(edges);
 
-        window.requestAnimationFrame(() => {
-            fitView();
-        });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [finalPlaceholderNode, nodeCount, setEdges, setNodes, taskEdges, taskNodes]);
+    }, [tasks, triggers]);
 }

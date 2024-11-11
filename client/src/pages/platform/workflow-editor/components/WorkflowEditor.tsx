@@ -1,13 +1,8 @@
-import defaultEdges from '@/shared/defaultEdges';
-import defaultNodes from '@/shared/defaultNodes';
-import {
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinitionBasic,
-    WorkflowTask,
-    WorkflowTrigger,
-} from '@/shared/middleware/platform/configuration';
-import {DragEventHandler, useCallback, useEffect, useMemo, useState} from 'react';
-import ReactFlow, {Controls, MiniMap, useReactFlow, useStore} from 'reactflow';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
+import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
+import {useShallow} from 'zustand/react/shallow';
 
 import ConditionEdge from '../edges/ConditionEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
@@ -16,7 +11,6 @@ import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -24,13 +18,19 @@ export interface WorkflowEditorProps {
 }
 
 const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
-    const [viewportWidth, setViewportWidth] = useState(0);
+    const {edges, nodes, onEdgesChange, onNodesChange, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+            onEdgesChange: state.onEdgesChange,
+            onNodesChange: state.onNodesChange,
+            workflow: state.workflow,
+        }))
+    );
 
-    const {setComponentActions, setWorkflow, workflow} = useWorkflowDataStore();
+    const {getEdge, getNode, setViewport} = useReactFlow();
 
-    const {componentNames} = workflow;
-
-    const {getEdge, getNode, getNodes, setViewport} = useReactFlow();
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
 
@@ -50,8 +50,6 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }),
         []
     );
-
-    const width = useStore((store) => store.width);
 
     const onDragOver: DragEventHandler = useCallback((event) => {
         if (event.target instanceof HTMLButtonElement && event.target.dataset.nodeType === 'workflow') {
@@ -154,99 +152,37 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }
     };
 
-    useLayout({componentDefinitions, taskDispatcherDefinitions});
+    useLayout({canvasWidth: window.innerWidth - 120, componentDefinitions, taskDispatcherDefinitions});
 
-    // Update workflow node names when nodes change
     useEffect(() => {
-        const workflowNodes = getNodes();
-
-        if (workflowNodes?.length) {
-            const workflowNodeNames = workflowNodes.map((node) => {
-                if (node.data.type !== 'placeholder' && node?.data.workflowNodeName) {
-                    return node?.data.workflowNodeName;
-                }
-            });
-
-            setWorkflow({
-                ...workflow,
-                nodeNames: workflowNodeNames.filter((nodeName) => !!nodeName),
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [setWorkflow, componentNames]);
-
-    // Set viewport width and position
-    useEffect(() => {
-        setViewportWidth(width);
-
-        let adaptedViewportWidth = width / 2.5;
-
-        if (componentNames.includes('condition')) {
-            adaptedViewportWidth -= 140;
-        }
-
-        const viewport = localStorage.getItem(`${workflow.id}-viewport`);
-
-        if (viewport) {
-            setViewport(JSON.parse(viewport));
-
-            return;
-        }
-
-        setViewport({
-            x: adaptedViewportWidth,
-            y: 50,
-            zoom: 1,
-        });
-    }, [componentNames, setViewport, width, workflow.id]);
-
-    // Update nodeNames and componentActions when workflow definition changes
-    useEffect(() => {
-        const workflowComponents: Array<WorkflowTrigger & WorkflowTask> = [
-            workflow.triggers?.[0] || defaultNodes[0].data,
-            ...(workflow?.tasks || []),
-        ];
-
-        setWorkflow({
-            ...workflow,
-            nodeNames: workflowComponents?.map((component) => component.name),
-        });
-
-        setComponentActions(
-            workflowComponents.map((component) => {
-                const componentName = component.type!.split('/')[0];
-                const operationName = component.type!.split('/')[2];
-
-                return {
-                    componentName,
-                    operationName,
-                    workflowNodeName: component.name,
-                };
-            })
+        setViewport(
+            {
+                x: 0,
+                y: 0,
+                zoom: 1,
+            },
+            {
+                duration: 500,
+            }
         );
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.tasks, workflow.triggers]);
+    }, [workflow.id]);
 
     return (
-        <div className="flex h-full flex-1 flex-col">
+        <div className="flex h-full flex-1 flex-col" ref={containerRef}>
             <ReactFlow
-                defaultEdges={defaultEdges}
-                defaultNodes={defaultNodes}
-                defaultViewport={{
-                    x: viewportWidth / 2,
-                    y: 50,
-                    zoom: 1,
-                }}
-                deleteKeyCode={null}
                 edgeTypes={edgeTypes}
+                edges={edges}
                 maxZoom={1.5}
                 minZoom={0.6}
                 nodeTypes={nodeTypes}
+                nodes={nodes}
                 nodesConnectable={false}
                 nodesDraggable={false}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
+                onEdgesChange={onEdgesChange}
+                onNodesChange={onNodesChange}
                 panOnDrag
                 panOnScroll
                 proOptions={{hideAttribution: true}}
@@ -255,7 +191,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             >
                 <MiniMap />
 
-                <Controls />
+                <Controls fitViewOptions={{duration: 500, minZoom: 0.2}} showInteractive={false} />
             </ReactFlow>
         </div>
     );
