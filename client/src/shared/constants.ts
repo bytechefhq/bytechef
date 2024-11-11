@@ -29,3 +29,5 @@ export const EDGE_STYLES = {
     stroke: STROKE_GRAY_300,
     strokeWidth: 2,
 };
+
+export const PATH_SPACE_REPLACEMENT = '_SPACE_';

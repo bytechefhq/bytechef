@@ -18,6 +18,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
+import {PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {Option} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -33,6 +34,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
+import replaceSpacesInKeys from '../../utils/replaceSpacesInObjectKeys';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -174,6 +176,10 @@ const Property = ({
 
             return charCode ? `0x${charCode.toString()}` : '0x00';
         });
+    }
+
+    if (path?.includes(' ')) {
+        path = path.replace(/\s/g, PATH_SPACE_REPLACEMENT);
     }
 
     const getComponentIcon = (mentionValue: string) => {
@@ -539,12 +545,14 @@ const Property = ({
                 return;
             }
 
-            const paramValue = resolvePath(parameters, path);
+            const formattedParamaters = replaceSpacesInKeys(parameters);
+
+            const paramValue = resolvePath(formattedParamaters, path);
 
             if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
             } else {
-                setPropertyParameterValue(parameters[name]);
+                setPropertyParameterValue(formattedParamaters[name]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
