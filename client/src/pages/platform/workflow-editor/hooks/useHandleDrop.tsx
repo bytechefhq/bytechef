@@ -32,7 +32,9 @@ export default function useHandleDrop(): [
 
     const {captureComponentUsed} = useAnalytics();
 
-    const {getEdges, getNodes, setEdges, setNodes} = useReactFlow();
+    const {setEdges} = useWorkflowDataStore();
+
+    const {getEdges, getNodes} = useReactFlow();
 
     const newNodeId = getRandomId();
     const nodes = getNodes();

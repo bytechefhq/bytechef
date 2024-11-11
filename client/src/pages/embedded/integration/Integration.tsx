@@ -65,8 +65,6 @@ const Integration = () => {
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
-    const {componentNames, nodeNames} = workflow;
-
     const rightSidebarNavigation: {
         name?: string;
         icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
@@ -242,8 +240,13 @@ const Integration = () => {
 
     useEffect(() => {
         if (curWorkflow) {
-            setWorkflow({...curWorkflow, componentNames, nodeNames});
+            setWorkflow({...curWorkflow});
         }
+
+        // Reset state when component unmounts
+        return () => {
+            setWorkflow({});
+        };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [curWorkflow]);

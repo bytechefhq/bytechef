@@ -40,7 +40,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
     const {captureComponentUsed} = useAnalytics();
 
-    const {getEdge, getNode, getNodes, setEdges, setNodes} = useReactFlow();
+    const {getEdge, getNode, getNodes} = useReactFlow();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
