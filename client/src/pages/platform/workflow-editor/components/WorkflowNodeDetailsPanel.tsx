@@ -6,16 +6,26 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
 import {
+    ActionDefinitionApi,
     ComponentDefinition,
     ComponentDefinitionBasic,
+    GetComponentActionDefinitionRequest,
+    GetComponentTriggerDefinitionRequest,
+    TriggerDefinitionApi,
     WorkflowConnection,
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
-import {useGetComponentActionDefinitionQuery} from '@/shared/queries/platform/actionDefinitions.queries';
+import {
+    ActionDefinitionKeys,
+    useGetComponentActionDefinitionQuery,
+} from '@/shared/queries/platform/actionDefinitions.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {useGetTriggerDefinitionQuery} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {
+    TriggerDefinitionKeys,
+    useGetTriggerDefinitionQuery,
+} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -216,7 +226,9 @@ const WorkflowNodeDetailsPanel = ({
 
     const queryClient = useQueryClient();
 
-    const handleOperationSelectChange = (newOperationName: string) => {
+    const handleOperationSelectChange = async (newOperationName: string) => {
+        setCurrentOperationName(newOperationName);
+
         if (!currentComponentDefinition || !currentComponent) {
             return;
         }
@@ -229,6 +241,32 @@ const WorkflowNodeDetailsPanel = ({
             queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
         });
 
+        let operationData;
+
+        if (currentNode?.trigger) {
+            const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
+                componentName: currentComponentDefinition?.name,
+                componentVersion: currentComponentDefinition?.version,
+                triggerName: newOperationName,
+            };
+
+            operationData = await queryClient.fetchQuery({
+                queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
+                queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
+            });
+        } else {
+            const componentActionDefinitionRequest: GetComponentActionDefinitionRequest = {
+                actionName: newOperationName,
+                componentName: currentComponentDefinition.name,
+                componentVersion: currentComponentDefinition.version,
+            };
+
+            operationData = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(componentActionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(componentActionDefinitionRequest),
+            });
+        }
+
         const {componentName, notes, title, workflowNodeName} = currentComponent;
 
         saveWorkflowDefinition({
@@ -239,7 +277,7 @@ const WorkflowNodeDetailsPanel = ({
                 name: workflowNodeName || currentNode?.name || '',
                 operationName: newOperationName,
                 parameters: getParametersWithDefaultValues({
-                    properties: currentOperationProperties as Array<PropertyAllType>,
+                    properties: operationData.properties as Array<PropertyAllType>,
                 }),
                 trigger: currentNode?.trigger,
                 type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
@@ -254,8 +292,6 @@ const WorkflowNodeDetailsPanel = ({
                         properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
                 });
-
-                setCurrentOperationName(newOperationName);
 
                 const formattedComponentActions = componentActions.map((componentAction) => {
                     if (componentAction.workflowNodeName === currentNode?.name) {
