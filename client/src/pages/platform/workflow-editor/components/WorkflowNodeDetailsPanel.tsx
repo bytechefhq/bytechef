@@ -291,6 +291,7 @@ const WorkflowNodeDetailsPanel = ({
                     parameters: getParametersWithDefaultValues({
                         properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
+                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                 });
 
                 const formattedComponentActions = componentActions.map((componentAction) => {
@@ -439,6 +440,7 @@ const WorkflowNodeDetailsPanel = ({
             setCurrentNode({
                 ...currentNode,
                 operationName: currentOperationName,
+                type: `${currentComponent?.componentName}/v${currentComponentDefinition?.version}/${currentOperationName}`,
             });
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
