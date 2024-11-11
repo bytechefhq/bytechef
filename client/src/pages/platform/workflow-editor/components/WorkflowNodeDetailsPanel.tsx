@@ -96,7 +96,7 @@ const WorkflowNodeDetailsPanel = ({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
-    const {componentActions, setComponentActions, setDataPills, workflow} = useWorkflowDataStore();
+    const {componentActions, setDataPills, workflow} = useWorkflowDataStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
@@ -293,19 +293,6 @@ const WorkflowNodeDetailsPanel = ({
                     }),
                     type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                 });
-
-                const formattedComponentActions = componentActions.map((componentAction) => {
-                    if (componentAction.workflowNodeName === currentNode?.name) {
-                        return {
-                            ...componentAction,
-                            operationName: newOperationName,
-                        };
-                    } else {
-                        return componentAction;
-                    }
-                });
-
-                setComponentActions(formattedComponentActions);
             },
             queryClient,
             updateWorkflowMutation,
