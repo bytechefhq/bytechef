@@ -71,7 +71,10 @@ const PropertyDynamicProperties = ({
                     operationName={currentOperationName}
                     parameterValue={property.name ? parameterValue?.[property.name] : ''}
                     path={path}
-                    property={property}
+                    property={{
+                        ...property,
+                        defaultValue: property.name ? parameterValue?.[property.name] : '',
+                    }}
                 />
             ))}
         </ul>
