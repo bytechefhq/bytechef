@@ -62,7 +62,7 @@ const IntegrationHeader = ({
         showEditWorkflowDialog,
         workflowIsRunning,
     } = useWorkflowEditorStore();
-    const {setWorkflow, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
     const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowTested} = useAnalytics();
@@ -70,8 +70,6 @@ const IntegrationHeader = ({
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
-
-    const {componentNames, nodeNames} = workflow;
 
     const {data: integration} = useGetIntegrationQuery(
         integrationId,
@@ -90,7 +88,6 @@ const IntegrationHeader = ({
             });
 
             setShowBottomPanelOpen(false);
-            setWorkflow({...workflow, componentNames, nodeNames});
 
             if (bottomResizablePanelRef.current) {
                 bottomResizablePanelRef.current.resize(0);

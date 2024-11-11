@@ -7,7 +7,7 @@ import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {Handle, NodeProps, Position, useReactFlow, useViewport} from 'reactflow';
+import {Handle, NodeProps, Position, useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
@@ -22,15 +22,11 @@ const WorkflowNode = ({data, id}: NodeProps) => {
 
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
-    const {setWorkflow, workflow} = useWorkflowDataStore();
-
-    const {componentNames} = workflow;
+    const {workflow} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
     const {getNode} = useReactFlow();
-
-    const viewport = useViewport();
 
     const isSelected = currentNode?.name === data.name;
 
@@ -47,10 +43,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const handleDeleteNodeClick = () => {
-        localStorage.setItem(`${workflow.id}-viewport`, JSON.stringify(viewport));
-
         handleDeleteTask({
-            componentNames,
             currentComponent,
             currentNode,
             data,
@@ -59,7 +52,6 @@ const WorkflowNode = ({data, id}: NodeProps) => {
             queryClient,
             setCurrentComponent,
             setCurrentNode,
-            setWorkflow,
             updateWorkflowMutation,
             workflow,
         });
@@ -68,7 +60,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
     return (
         <div
             className="nodrag relative flex min-w-60 cursor-pointer items-center justify-center"
-            data-nodeType={data.trigger ? 'trigger' : 'task'}
+            data-nodetype={data.trigger ? 'trigger' : 'task'}
             onMouseOut={() => setIsHovered(false)}
             onMouseOver={() => setIsHovered(true)}
         >

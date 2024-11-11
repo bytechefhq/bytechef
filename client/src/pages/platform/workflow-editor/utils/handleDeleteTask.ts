@@ -15,7 +15,6 @@ import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
-    componentNames: Array<string>;
     currentComponent?: ComponentType;
     currentNode?: NodeType;
     data: NodeProps['data'];
@@ -24,13 +23,11 @@ interface HandleDeleteTaskProps {
     queryClient: QueryClient;
     setCurrentComponent: (component: ComponentType | undefined) => void;
     setCurrentNode: (node: NodeType | undefined) => void;
-    setWorkflow: (workflow: Workflow & WorkflowTaskDataType) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleDeleteTask({
-    componentNames,
     currentComponent,
     currentNode,
     data,
@@ -39,7 +36,6 @@ export default function handleDeleteTask({
     queryClient,
     setCurrentComponent,
     setCurrentNode,
-    setWorkflow,
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
@@ -57,7 +53,7 @@ export default function handleDeleteTask({
         return;
     }
 
-    let updatedTasks = workflowTasks;
+    let updatedTasks: Array<WorkflowTaskType>;
 
     if (data.conditionData) {
         const parentConditionTask = getParentConditionTask(workflowTasks, data.conditionData.conditionId);
@@ -127,11 +123,6 @@ export default function handleDeleteTask({
                         id: workflow.id!,
                         lastWorkflowNodeName: currentNode?.name,
                     }),
-                });
-
-                setWorkflow({
-                    ...workflow,
-                    componentNames: componentNames.filter((componentName) => componentName !== data.componentName),
                 });
 
                 if (currentNode?.name === data.name) {
