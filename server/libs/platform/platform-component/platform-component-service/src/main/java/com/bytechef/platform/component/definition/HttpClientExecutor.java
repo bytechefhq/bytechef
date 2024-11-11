@@ -376,13 +376,28 @@ class HttpClientExecutor {
 
         FormBodyPublisher.Builder builder = FormBodyPublisher.newBuilder();
 
-        for (Map.Entry<?, ?> parameter : bodyParameters.entrySet()) {
-            Object value = Validate.notNull(parameter.getValue(), "expected value for " + parameter.getKey());
-
-            builder.query((String) parameter.getKey(), value.toString());
-        }
+        processParameters("", bodyParameters, builder);
 
         return builder.build();
+    }
+
+    private void processParameters(String prefix, Map<?, ?> parameters, FormBodyPublisher.Builder builder) {
+        parameters.forEach((key, value) -> {
+            String newKey = prefix.isEmpty() ? key.toString() : prefix + "[" + key + "]";
+            Validate.notNull(value, "Expected value for " + key);
+
+            if (value instanceof Map<?, ?> nestedMap) {
+                processParameters(newKey, nestedMap, builder);
+            } else if (value instanceof List<?> list) {
+                for (int i = 0; i < list.size(); i++) {
+                    Object item = list.get(i);
+
+                    builder.query(newKey + "[" + i + "]", item.toString());
+                }
+            } else {
+                builder.query(newKey, value.toString());
+            }
+        });
     }
 
     private Methanol.Interceptor getInterceptor(
