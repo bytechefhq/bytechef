@@ -120,7 +120,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
-            actionName: currentOperationName,
+            actionName: currentNode?.operationName ?? currentOperationName,
             componentName: currentComponentDefinition?.name as string,
             componentVersion: currentComponentDefinition?.version as number,
         },
@@ -457,13 +457,6 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.name]);
-
-    useEffect(() => {
-        if (!currentOperationName || !matchingOperation?.name) {
-            setCurrentOperationName(currentNode?.operationName || currentComponentDefinition?.actions?.[0]?.name || '');
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNode?.name, matchingOperation?.name]);
 
     const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
     const currentOperationFetcher = currentActionFetched || currentTriggerFetched;
