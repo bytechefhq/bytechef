@@ -1,3 +1,4 @@
+import {PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {
     UpdateWorkflowNodeParameter200Response,
     UpdateWorkflowNodeParameterOperationRequest,
@@ -35,6 +36,10 @@ export default function saveProperty({
     workflowId,
 }: SavePropertyProps) {
     const {workflowNodeName} = currentComponent;
+
+    if (path.includes(PATH_SPACE_REPLACEMENT)) {
+        path = path.replace(new RegExp(PATH_SPACE_REPLACEMENT, 'g'), ' ');
+    }
 
     updateWorkflowNodeParameterMutation.mutate(
         {
