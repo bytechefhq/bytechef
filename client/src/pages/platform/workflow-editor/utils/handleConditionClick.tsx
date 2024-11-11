@@ -18,7 +18,6 @@ interface HandleConditionClickProps {
     edge?: boolean;
     getNodes: () => Array<Node>;
     queryClient: QueryClient;
-    setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
@@ -30,7 +29,6 @@ export default async function handleConditionClick({
     edge,
     getNodes,
     queryClient,
-    setWorkflow,
     sourceNodeId,
     updateWorkflowMutation,
     workflow,
@@ -72,7 +70,7 @@ export default async function handleConditionClick({
         type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
     };
 
-    const {componentNames, tasks} = workflow;
+    const {tasks} = workflow;
 
     let nodeIndex = getNodes().length;
 
@@ -97,12 +95,6 @@ export default async function handleConditionClick({
             conditionId = undefined;
         }
     }
-
-    setWorkflow({
-        ...workflow,
-        componentNames: [...componentNames, clickedItem.name],
-        nodeNames: [...workflow.nodeNames, workflowNodeName],
-    });
 
     saveWorkflowDefinition({
         conditionId,

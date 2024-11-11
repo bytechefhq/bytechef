@@ -108,7 +108,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
                         workflow.triggers?.[0] || defaultNodes[0].data,
                         ...(workflow?.tasks || []),
                     ];
-                    console.log(workflowComponents);
+
                     return {
                         ...state,
                         componentActions: workflowComponents.map((component) => {

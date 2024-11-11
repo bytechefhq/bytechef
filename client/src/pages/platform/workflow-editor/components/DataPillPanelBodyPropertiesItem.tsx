@@ -23,6 +23,7 @@ const DataPillPanelBodyPropertiesItem = ({
     sampleOutput: any;
 }) => {
     const {componentActions} = useWorkflowDataStore();
+
     const {getNodes} = useReactFlow();
 
     const {componentDefinition, workflowNodeName} = componentOperation;

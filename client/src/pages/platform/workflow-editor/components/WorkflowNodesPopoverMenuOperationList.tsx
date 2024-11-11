@@ -35,7 +35,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     sourceNodeId,
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
-    const {setLatestComponentDefinition, setWorkflow, workflow} = useWorkflowDataStore();
+    const {setLatestComponentDefinition, workflow} = useWorkflowDataStore();
     const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureComponentUsed} = useAnalytics();
@@ -45,8 +45,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     const {updateWorkflowMutation} = useWorkflowMutation();
 
     const queryClient = useQueryClient();
-
-    const {componentNames} = workflow;
 
     const {actions, icon, name, title, triggers, version} = componentDefinition;
 
@@ -94,11 +92,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                             id: workflow.id!,
                             lastWorkflowNodeName: currentNode?.name,
                         }),
-                    });
-
-                    setWorkflow({
-                        ...workflow,
-                        componentNames: [componentName, ...componentNames.slice(1)],
                     });
 
                     if (currentNode?.trigger) {
@@ -175,78 +168,39 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 type: 'workflow',
             };
 
-            const sourceEdge = {
-                id: `${clickedEdge.source}->${newWorkflowNode.id}`,
-                source: clickedEdge.source,
-                sourceHandle: clickedEdge.sourceHandle,
-                target: newWorkflowNode.id,
-                type: 'workflow',
-            };
+            const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
 
-            const targetEdge = {
-                id: `${newWorkflowNode.id}->${clickedEdge.target}`,
-                source: newWorkflowNode.id,
-                sourceHandle: clickedEdge.sourceHandle,
-                target: clickedEdge.target,
-                type: 'workflow',
-            };
+            const tempNodes = [...nodes];
 
-            setNodes((nodes) => {
-                const previousWorkflowNode = nodes.find((node) => node.id === clickedEdge.source);
+            tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
 
-                const previousComponentNameIndex = componentNames.findIndex(
-                    (name) => name === previousWorkflowNode?.data.componentName
-                );
+            const previousWorkflowTaskIndex = workflow.tasks?.findIndex((task) => task.name === clickedEdge.source);
 
-                const tempComponentNames = [...componentNames];
-
-                tempComponentNames.splice(previousComponentNameIndex + 1, 0, newWorkflowNode.data.componentName);
-
-                setWorkflow({
-                    ...workflow,
-                    componentNames: tempComponentNames,
-                    nodeNames: [...workflow.nodeNames, newWorkflowNode.data.name],
-                });
-
-                const previousWorkflowNodeIndex = nodes.findIndex((node) => node.id === clickedEdge.source);
-
-                const tempNodes = [...nodes];
-
-                tempNodes.splice(previousWorkflowNodeIndex + 1, 0, newWorkflowNode);
-
-                const previousWorkflowTaskIndex = workflow.tasks?.findIndex((task) => task.name === clickedEdge.source);
-
-                saveWorkflowDefinition({
-                    nodeData: {
-                        ...newWorkflowNode.data,
-                        parameters: getParametersWithDefaultValues({
-                            properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
+            saveWorkflowDefinition({
+                nodeData: {
+                    ...newWorkflowNode.data,
+                    parameters: getParametersWithDefaultValues({
+                        properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
+                    }),
+                },
+                nodeIndex: (previousWorkflowTaskIndex ?? 0) + 1,
+                onSuccess: () => {
+                    queryClient.invalidateQueries({
+                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                            id: workflow.id!,
+                            lastWorkflowNodeName: currentNode?.name,
                         }),
-                    },
-                    nodeIndex: (previousWorkflowTaskIndex ?? 0) + 1,
-                    onSuccess: () => {
-                        queryClient.invalidateQueries({
-                            queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                                id: workflow.id!,
-                                lastWorkflowNodeName: currentNode?.name,
-                            }),
-                        });
-                    },
-                    queryClient,
-                    updateWorkflowMutation,
-                    workflow,
-                });
-
-                return tempNodes;
+                    });
+                },
+                queryClient,
+                updateWorkflowMutation,
+                workflow,
             });
-
-            setEdges((edges) => edges.filter((edge) => edge.id !== sourceNodeId).concat([sourceEdge, targetEdge]));
         } else {
             if (conditionId) {
                 const nodes = getNodes();
 
                 handleConditionChildOperationClick({
-                    componentNames,
                     conditionId,
                     currentNode,
                     nodes,
@@ -254,8 +208,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     operationDefinition: clickedComponentActionDefinition,
                     placeholderId: sourceNodeId,
                     queryClient,
-                    setNodes,
-                    setWorkflow,
                     updateWorkflowMutation,
                     workflow,
                 });
@@ -273,94 +225,57 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 return;
             }
 
-            const placeholderId = placeholderNode.id;
-
             captureComponentUsed(componentName, operationName, undefined);
 
-            const childPlaceholderId = getRandomId();
+            const workflowNodeName = getFormattedName(clickedOperation.componentName!, getNodes());
 
-            const childPlaceholderNode = {
-                data: {label: '+'},
-                id: childPlaceholderId,
-                position: {
-                    x: 0,
-                    y: 0,
-                },
-                style: {
-                    zIndex: 9999,
-                },
-                type: 'placeholder',
+            const newWorkflowNodeData = {
+                componentName: clickedOperation.componentName,
+                icon: clickedOperation.icon && (
+                    <InlineSVG
+                        className="size-9"
+                        loader={<ComponentIcon className="size-9" />}
+                        src={clickedOperation.icon}
+                    />
+                ),
+                label: clickedOperation.componentLabel,
+                name: workflowNodeName,
+                type: clickedOperation.type,
+                workflowNodeName,
             };
 
-            setNodes((nodes) =>
-                nodes
-                    .map((node) => {
-                        if (node.id !== placeholderId) {
-                            return node;
-                        }
+            let taskNodeIndex: number | undefined = undefined;
 
-                        const workflowNodeName = getFormattedName(clickedOperation.componentName!, nodes);
+            if (sourceNodeId.includes('bottom-placeholder')) {
+                const sourceNodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId);
 
-                        const newWorkflowNodeData = {
-                            componentName: clickedOperation.componentName,
-                            icon: clickedOperation.icon && (
-                                <InlineSVG
-                                    className="size-9"
-                                    loader={<ComponentIcon className="size-9" />}
-                                    src={clickedOperation.icon}
-                                />
-                            ),
-                            label: clickedOperation.componentLabel,
-                            name: workflowNodeName,
-                            type: clickedOperation.type,
-                            workflowNodeName,
-                        };
+                const nextNode = getNodes()[sourceNodeIndex + 1];
 
-                        setWorkflow({
-                            ...workflow,
-                            componentNames: [...componentNames, clickedOperation.componentName],
-                            nodeNames: [...workflow.nodeNames, workflowNodeName],
-                        });
+                taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
+            }
 
-                        let taskNodeIndex: number | undefined = undefined;
+            saveWorkflowDefinition({
+                nodeData: {
+                    ...newWorkflowNodeData,
+                    parameters: getParametersWithDefaultValues({
+                        properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
+                    }),
+                },
+                nodeIndex: taskNodeIndex,
+                onSuccess: () => {
+                    queryClient.invalidateQueries({
+                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
+                            id: workflow.id!,
+                            lastWorkflowNodeName: currentNode?.name,
+                        }),
+                    });
+                },
+                queryClient,
+                updateWorkflowMutation,
+                workflow,
+            });
 
-                        if (sourceNodeId.includes('bottom-placeholder')) {
-                            const sourceNodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId);
-
-                            const nextNode = getNodes()[sourceNodeIndex + 1];
-
-                            taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
-                        }
-
-                        saveWorkflowDefinition({
-                            nodeData: {
-                                ...newWorkflowNodeData,
-                                parameters: getParametersWithDefaultValues({
-                                    properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
-                                }),
-                            },
-                            nodeIndex: taskNodeIndex,
-                            onSuccess: () => {
-                                queryClient.invalidateQueries({
-                                    queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                                        id: workflow.id!,
-                                        lastWorkflowNodeName: currentNode?.name,
-                                    }),
-                                });
-                            },
-                            queryClient,
-                            updateWorkflowMutation,
-                            workflow,
-                        });
-
-                        return {
-                            ...node,
-                            data: newWorkflowNodeData,
-                            type: 'workflow',
-                        };
-                    })
-                    .concat([childPlaceholderNode])
-            );
+            setPopoverOpen(false);
         }
     };
 

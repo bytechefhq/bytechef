@@ -62,7 +62,7 @@ const ProjectHeader = ({
         showEditWorkflowDialog,
         workflowIsRunning,
     } = useWorkflowEditorStore();
-    const {setWorkflow, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
     const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowTested} = useAnalytics();
@@ -70,8 +70,6 @@ const ProjectHeader = ({
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
-
-    const {componentNames, nodeNames} = workflow;
 
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project, !showDeleteProjectAlertDialog);
 
@@ -86,7 +84,6 @@ const ProjectHeader = ({
             });
 
             setShowBottomPanelOpen(false);
-            setWorkflow({...workflow, componentNames, nodeNames});
 
             if (bottomResizablePanelRef.current) {
                 bottomResizablePanelRef.current.resize(0);

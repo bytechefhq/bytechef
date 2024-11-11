@@ -5,7 +5,7 @@ import {ClickedOperationType, NodeType, PropertyAllType, UpdateWorkflowMutationT
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {Instance, Node} from 'reactflow';
+import {Node} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
@@ -13,7 +13,6 @@ import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
-    componentNames: Array<string>;
     conditionId: string;
     currentNode?: NodeType;
     nodes: Array<Node>;
@@ -21,14 +20,11 @@ interface HandleConditionChildOperationClickProps {
     operationDefinition: ActionDefinition;
     placeholderId: string;
     queryClient: QueryClient;
-    setNodes: Instance.SetNodes<unknown>;
-    setWorkflow: (workflowDefinition: Workflow & WorkflowTaskDataType) => void;
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleConditionChildOperationClick({
-    componentNames,
     conditionId,
     currentNode,
     nodes,
@@ -36,7 +32,6 @@ export default function handleConditionChildOperationClick({
     operationDefinition,
     placeholderId,
     queryClient,
-    setWorkflow,
     updateWorkflowMutation,
     workflow,
 }: HandleConditionChildOperationClickProps) {
@@ -71,12 +66,6 @@ export default function handleConditionChildOperationClick({
                     id: workflow.id!,
                     lastWorkflowNodeName: currentNode?.name,
                 }),
-            });
-
-            setWorkflow({
-                ...workflow,
-                componentNames: [...componentNames, componentName],
-                nodeNames: [...workflow.nodeNames, workflowNodeName],
             });
         },
         placeholderId,

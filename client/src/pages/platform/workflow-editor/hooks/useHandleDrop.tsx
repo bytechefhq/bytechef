@@ -26,9 +26,7 @@ export default function useHandleDrop(): [
     (targetEdge: Edge, droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
     (droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
 ] {
-    const {setWorkflow, workflow} = useWorkflowDataStore();
-
-    const {componentNames} = workflow;
+    const {workflow} = useWorkflowDataStore();
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -65,30 +63,6 @@ export default function useHandleDrop(): [
             type: 'workflow',
         };
 
-        const newPlaceholderNode = {
-            data: {label: '+'},
-            id: newNodeId,
-            position: {x: 0, y: 150},
-            type: 'placeholder',
-        };
-
-        setNodes((nodes) => {
-            const nodeIndex = nodes.findIndex((node) => node.id === targetNode.id);
-
-            nodes[nodeIndex] = newWorkflowNode;
-
-            const tempComponentNames = [...componentNames];
-
-            tempComponentNames.splice(nodeIndex - 1, 0, newWorkflowNode.data.componentName);
-
-            setWorkflow({
-                ...workflow,
-                componentNames: tempComponentNames,
-            });
-
-            return [...nodes, newPlaceholderNode];
-        });
-
         const sourceEdge = edges.find((edge) => edge.target === targetNode.id);
 
         if (!sourceEdge) {
@@ -109,13 +83,11 @@ export default function useHandleDrop(): [
             type: 'placeholder',
         };
 
-        setEdges((edges) => {
-            const edgeIndex = edges.findIndex((edge) => edge.id === sourceEdge?.id);
+        const edgeIndex = edges.findIndex((edge) => edge.id === sourceEdge?.id);
 
-            edges[edgeIndex] = newWorkflowEdge;
+        edges[edgeIndex] = newWorkflowEdge;
 
-            return [...edges, newPlaceholderEdge];
-        });
+        setEdges([...edges, newPlaceholderEdge]);
 
         const draggedComponentDefinition = await queryClient.fetchQuery({
             queryFn: () =>
@@ -192,23 +164,6 @@ export default function useHandleDrop(): [
             type: 'workflow',
         };
 
-        setNodes((nodes) => {
-            const nextNodeIndex = nodes.findIndex((node) => node.id === nextNode.id);
-
-            nodes.splice(nextNodeIndex, 0, newWorkflowNode);
-
-            const tempComponentNames = [...componentNames];
-
-            tempComponentNames.splice(nextNodeIndex - 1, 0, newWorkflowNode.data.componentName);
-
-            setWorkflow({
-                ...workflow,
-                componentNames: tempComponentNames,
-            });
-
-            return nodes;
-        });
-
         const newWorkflowEdge = {
             id: `${newWorkflowNode.id}=>${nextNode.id}`,
             source: newWorkflowNode.id,
@@ -216,17 +171,15 @@ export default function useHandleDrop(): [
             type: 'workflow',
         };
 
-        setEdges((edges) => {
-            edges[targetEdgeIndex] = {
-                ...targetEdge,
-                id: `${previousNode.id}=>${newWorkflowNode.id}`,
-                target: newWorkflowNode.id,
-            };
+        edges[targetEdgeIndex] = {
+            ...targetEdge,
+            id: `${previousNode.id}=>${newWorkflowNode.id}`,
+            target: newWorkflowNode.id,
+        };
 
-            edges.splice(targetEdgeIndex, 0, newWorkflowEdge);
+        edges.splice(targetEdgeIndex, 0, newWorkflowEdge);
 
-            return edges;
-        });
+        setEdges(edges);
 
         const draggedComponentDefinition = await queryClient.fetchQuery({
             queryFn: () =>
@@ -310,30 +263,6 @@ export default function useHandleDrop(): [
                 componentVersion: version,
                 triggerName: triggers?.[0].name as string,
             }),
-        });
-
-        setNodes((nodes) => {
-            const newTriggerNode = {
-                data: newTriggerNodeData,
-                id: getRandomId(),
-                name: 'trigger_1',
-                position: {
-                    x: 0,
-                    y: 0,
-                },
-                type: 'workflow',
-            };
-
-            nodes[0] = newTriggerNode;
-
-            componentNames[0] = newTriggerNodeData.componentName;
-
-            setWorkflow({
-                ...workflow,
-                componentNames: componentNames,
-            });
-
-            return nodes;
         });
 
         captureComponentUsed(name, undefined, triggers?.[0].name);
