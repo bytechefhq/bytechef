@@ -656,7 +656,10 @@ const Property = ({
         }
 
         const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map((optionLookupDependency) =>
-            resolvePath(currentComponent?.parameters, optionLookupDependency)?.toString()
+            resolvePath(
+                currentComponent?.parameters,
+                optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+            )?.toString()
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
@@ -669,7 +672,10 @@ const Property = ({
 
         const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map(
             (propertyLookupDependency) =>
-                resolvePath(currentComponent?.parameters, propertyLookupDependency)?.toString()
+                resolvePath(
+                    currentComponent?.parameters,
+                    propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                )?.toString()
         );
 
         setLookupDependsOnValues(propertiesLookupDependsOnValues);
