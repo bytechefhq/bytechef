@@ -1,4 +1,5 @@
 import {ConnectionDefinition} from '@/shared/middleware/platform/configuration';
+import {Fragment} from 'react';
 
 const ConnectionParameters = ({
     authorizationParameters,
@@ -54,7 +55,7 @@ const ConnectionParameters = ({
 
                 {hasAuthorizationParameters &&
                     existingAuthorizations.map((authorization) => (
-                        <>
+                        <Fragment key={authorization.name}>
                             <li className="flex">
                                 <span className="w-1/3  font-medium text-muted-foreground">Authorization:</span>
 
@@ -73,7 +74,7 @@ const ConnectionParameters = ({
                                             </pre>
                                         </li>
                                     ))}
-                        </>
+                        </Fragment>
                     ))}
             </ul>
         </div>
