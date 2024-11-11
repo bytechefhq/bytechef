@@ -21,7 +21,6 @@ export type WorkflowTaskDataType = {
 
 interface WorkflowDataStateI {
     componentActions: Array<ComponentOperationType>;
-    setComponentActions: (componentActions: Array<ComponentOperationType>) => void;
 
     componentDefinitions: Array<ComponentDefinitionBasic>;
     setComponentDefinitions: (componentDefinitions: Array<ComponentDefinitionBasic>) => void;
@@ -53,7 +52,6 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
     devtools(
         (set, get) => ({
             componentActions: [],
-            setComponentActions: (componentActions) => set((state) => ({...state, componentActions})),
 
             componentDefinitions: [],
             setComponentDefinitions: (componentDefinitions) => set((state) => ({...state, componentDefinitions})),
