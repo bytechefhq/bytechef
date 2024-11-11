@@ -3,7 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ComponentType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
@@ -16,16 +16,9 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
 
     const queryClient = useQueryClient();
 
-    const componentData: NodeDataType = {
-        componentName: currentComponent!.componentName!,
-        description: currentComponent?.notes,
-        icon: currentNode?.icon,
-        label: currentComponent?.title,
-        name: currentNode!.workflowNodeName!,
-        operationName: currentComponent?.operationName,
-        trigger: !!currentNode?.trigger,
-        type: currentComponent?.type,
-        workflowNodeName: currentNode?.workflowNodeName,
+    const componentData: ComponentType = {
+        ...currentComponent!,
+        workflowNodeName: currentNode!.workflowNodeName,
     };
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
@@ -34,11 +27,12 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
         }
 
         saveWorkflowDefinition({
-            nodeData: {...componentData, label: event.target.value},
+            decorative: true,
+            nodeData: {...currentComponent!, label: event.target.value, name: currentComponent.workflowNodeName},
             onSuccess: () =>
                 setCurrentComponent({
                     ...currentComponent,
-                    title: event.target.value,
+                    label: event.target.value,
                 }),
             queryClient,
             updateWorkflowMutation,
@@ -52,11 +46,12 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
         }
 
         saveWorkflowDefinition({
-            nodeData: {...componentData, description: event.target.value},
+            decorative: true,
+            nodeData: {...componentData, description: event.target.value, name: currentComponent.workflowNodeName},
             onSuccess: () =>
                 setCurrentComponent({
                     ...currentComponent,
-                    notes: event.target.value,
+                    description: event.target.value,
                 }),
             queryClient,
             updateWorkflowMutation,
@@ -70,7 +65,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                 <Label>Title</Label>
 
                 <Input
-                    defaultValue={currentComponent?.title}
+                    defaultValue={currentComponent?.label}
                     key={`${currentComponent?.componentName}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
@@ -82,7 +77,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
 
                 <Textarea
                     className="mt-1"
-                    defaultValue={currentComponent?.notes || ''}
+                    defaultValue={currentComponent?.description || ''}
                     key={`${currentComponent?.componentName}_nodeNotes`}
                     name="nodeNotes"
                     onChange={handleNotesChange}

@@ -26,12 +26,12 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
         if (data.type) {
             setCurrentComponent({
                 componentName: data.componentName,
+                description: data.description,
                 displayConditions: data.displayConditions,
+                label: data.label,
                 metadata: data.metadata,
-                notes: data.description,
                 operationName: data.operationName,
                 parameters: data.parameters,
-                title: data.label,
                 type: data.type,
                 workflowNodeName: data.name,
             });
