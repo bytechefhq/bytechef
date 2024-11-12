@@ -1,11 +1,13 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
 import {
     ActionDefinitionApi,
+    ComponentDefinition,
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
@@ -446,6 +448,10 @@ const WorkflowNodeDetailsPanel = ({
     }, [componentActions, currentNode?.name]);
 
     const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
+    const currentOperationFetched = currentActionFetched || currentTriggerFetched;
+
+    const operationDataMissing =
+        currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched);
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
         return <></>;
@@ -496,44 +502,65 @@ const WorkflowNodeDetailsPanel = ({
                 </header>
 
                 <main className="flex h-full flex-col">
-                    <CurrentOperationSelect
-                        description={
-                            currentNode?.trigger
-                                ? currentTriggerDefinition?.description
-                                : currentActionDefinition?.description
-                        }
-                        handleValueChange={handleOperationSelectChange}
-                        operations={
-                            (currentNode?.trigger
-                                ? currentComponentDefinition?.triggers
-                                : currentComponentDefinition?.actions)!
-                        }
-                        triggerSelect={currentNode?.trigger}
-                        value={currentOperationName}
-                    />
+                    {operationDataMissing && (
+                        <div className="flex flex-col border-b border-muted p-4">
+                            <span className="text-sm leading-6">Actions</span>
+
+                            <Skeleton className="h-9 w-full" />
+                        </div>
+                    )}
+
+                    {(!!(currentTaskData as ComponentDefinition).actions?.length ||
+                        !!(currentTaskData as ComponentDefinition).triggers?.length) &&
+                        !operationDataMissing && (
+                            <CurrentOperationSelect
+                                description={
+                                    currentNode?.trigger
+                                        ? currentTriggerDefinition?.description
+                                        : currentActionDefinition?.description
+                                }
+                                handleValueChange={handleOperationSelectChange}
+                                operations={
+                                    (currentNode?.trigger
+                                        ? currentComponentDefinition?.triggers
+                                        : currentComponentDefinition?.actions)!
+                                }
+                                triggerSelect={currentNode?.trigger}
+                                value={currentOperationName}
+                            />
+                        )}
 
                     {((!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
                         currentNode?.taskDispatcher ||
                         (currentNode?.trigger && currentTriggerFetched)) &&
-                        nodeTabs.length > 1 && (
-                            <div className="flex justify-center">
-                                {nodeTabs.map((tab) => (
-                                    <Button
-                                        className={twMerge(
-                                            'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
-                                            activeTab === tab?.name &&
-                                                'border-blue-500 text-blue-500 hover:text-blue-500'
-                                        )}
-                                        key={tab.name}
-                                        name={tab.name}
-                                        onClick={() => setActiveTab(tab.name)}
-                                        variant="ghost"
-                                    >
-                                        {tab.label}
-                                    </Button>
-                                ))}
-                            </div>
-                        )}
+                    nodeTabs.length > 1 ? (
+                        <div className="flex justify-center">
+                            {nodeTabs.map((tab) => (
+                                <Button
+                                    className={twMerge(
+                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                        activeTab === tab?.name && 'border-blue-500 text-blue-500 hover:text-blue-500'
+                                    )}
+                                    key={tab.name}
+                                    name={tab.name}
+                                    onClick={() => setActiveTab(tab.name)}
+                                    variant="ghost"
+                                >
+                                    {tab.label}
+                                </Button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="flex justify-center space-x-2 border-b border-gray-200 p-2">
+                            <Skeleton className="h-6 w-1/4" />
+
+                            <Skeleton className="h-6 w-1/4" />
+
+                            <Skeleton className="h-6 w-1/4" />
+
+                            <Skeleton className="h-6 w-1/4" />
+                        </div>
+                    )}
 
                     <div className="relative h-full overflow-y-scroll">
                         {currentTaskData && (
@@ -563,6 +590,7 @@ const WorkflowNodeDetailsPanel = ({
 
                                 {activeTab === 'properties' &&
                                     currentTaskData &&
+                                    !operationDataMissing &&
                                     (currentOperationProperties?.length ? (
                                         <Properties
                                             customClassName="p-4"
