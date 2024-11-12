@@ -137,6 +137,10 @@ spring:
   shell:
     noninteractive:
       enabled: false
+  cloud:
+    aws:
+      secretsmanager:
+        enabled: false
   quartz:
     job-store-type: jdbc
     jdbc:
