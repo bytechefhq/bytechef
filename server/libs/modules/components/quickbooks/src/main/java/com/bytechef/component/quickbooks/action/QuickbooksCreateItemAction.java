@@ -72,7 +72,7 @@ public class QuickbooksCreateItemAction {
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
                     QTY_ON_HAND, inputParameters.getRequiredDouble(QTY_ON_HAND)))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.XML))
             .execute()
             .getBody(new TypeReference<>() {});
     }

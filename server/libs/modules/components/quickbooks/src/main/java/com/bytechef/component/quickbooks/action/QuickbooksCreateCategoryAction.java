@@ -66,9 +66,8 @@ public class QuickbooksCreateCategoryAction {
                 Http.Body.of(
                     "Type", "Category",
                     NAME, inputParameters.getRequiredString(NAME)))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.XML))
             .execute()
             .getBody(new TypeReference<>() {});
     }
-
 }

@@ -113,7 +113,7 @@ public class QuickbooksCreateCustomerAction {
                     MIDDLE_NAME, inputParameters.getString(MIDDLE_NAME),
                     FAMILY_NAME, inputParameters.getString(FAMILY_NAME),
                     GIVEN_NAME, inputParameters.getString(GIVEN_NAME)))
-            .configuration(responseType(Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.XML))
             .execute()
             .getBody(new TypeReference<>() {});
     }
