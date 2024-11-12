@@ -8,7 +8,6 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
 
     testImplementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
-    testImplementation("io.awspring.cloud:spring-cloud-aws-dynamodb")
     testImplementation("io.awspring.cloud:spring-cloud-aws-s3")
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:localstack")
