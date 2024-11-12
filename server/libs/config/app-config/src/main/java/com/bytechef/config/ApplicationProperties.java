@@ -896,7 +896,7 @@ public class ApplicationProperties {
          * Encryption provider.
          */
         public enum Provider {
-            AWS, FILESYSTEM, PROPERTY;
+            FILESYSTEM, PROPERTY;
         }
 
         private Provider provider = Provider.FILESYSTEM;

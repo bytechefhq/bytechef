@@ -256,7 +256,6 @@ dependencies {
     implementation(project(":server:ee:libs:config:tenant-multi-security-config"))
     implementation(project(":server:ee:libs:core:audit:audit-service"))
     implementation(project(":server:ee:libs:core:cloud:cloud-aws"))
-    implementation(project(":server:ee:libs:core:encryption:encryption-aws"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-api"))
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:message:message-broker:message-broker-aws"))
