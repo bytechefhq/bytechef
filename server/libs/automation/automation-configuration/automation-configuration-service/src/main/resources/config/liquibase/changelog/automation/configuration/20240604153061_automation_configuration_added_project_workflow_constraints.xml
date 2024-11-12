@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604153061" author="Ivica Cardic">
+        <addColumn tableName="project_workflow">
+            <column name="created_by" type="VARCHAR(256)" defaultValue="system">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_date" type="TIMESTAMP" defaultValue="now">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_modified_by" type="VARCHAR(256)" defaultValue="system">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP" defaultValue="now">
+                <constraints nullable="false" />
+            </column>
+            <column name="version" type="BIGINT" defaultValue="1">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
