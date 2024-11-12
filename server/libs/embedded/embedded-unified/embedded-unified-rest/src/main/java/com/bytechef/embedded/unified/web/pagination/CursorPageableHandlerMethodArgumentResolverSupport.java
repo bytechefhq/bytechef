@@ -48,13 +48,13 @@ public abstract class CursorPageableHandlerMethodArgumentResolverSupport {
 
     private static final String INVALID_DEFAULT_PAGE_SIZE =
         "Invalid default page size configured for method %s! Must not be less than one!";
-    private static final String DEFAULT_CONTINUATIONTOKEN_PARAMETER = "continuationToken";
+    private static final String DEFAULT_CONTINUATION_TOKEN_PARAMETER = "continuationToken";
     private static final String DEFAULT_SIZE_PARAMETER = "size";
     private static final String DEFAULT_PREFIX = "";
     private static final String DEFAULT_QUALIFIER_DELIMITER = "_";
     private static final int DEFAULT_MAX_PAGE_SIZE = 2000;
 
-    private String continuationTokenParameterName = DEFAULT_CONTINUATIONTOKEN_PARAMETER;
+    private String continuationTokenParameterName = DEFAULT_CONTINUATION_TOKEN_PARAMETER;
     private String sizeParameterName = DEFAULT_SIZE_PARAMETER;
     private String prefix = DEFAULT_PREFIX;
     private String qualifierDelimiter = DEFAULT_QUALIFIER_DELIMITER;
@@ -242,6 +242,7 @@ public abstract class CursorPageableHandlerMethodArgumentResolverSupport {
         return this.maxPageSize;
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T getSpecificPropertyOrDefaultFromValue(Annotation annotation, String property) {
         Object propertyDefaultValue = AnnotationUtils.getDefaultValue(annotation, property);
         Object propertyValue = AnnotationUtils.getValue(annotation, property);
@@ -288,7 +289,6 @@ public abstract class CursorPageableHandlerMethodArgumentResolverSupport {
         boolean pageableFound = false;
 
         for (Class<?> type : method.getParameterTypes()) {
-
             if (pageableFound && type.equals(CursorPageable.class)) {
                 return true;
             }
@@ -309,7 +309,6 @@ public abstract class CursorPageableHandlerMethodArgumentResolverSupport {
      * @param annotations    must not be {@literal null}.
      */
     public static void assertQualifiersFor(Class<?>[] parameterTypes, Annotation[][] annotations) {
-
         Set<String> values = new HashSet<>();
 
         for (int i = 0; i < annotations.length; i++) {
