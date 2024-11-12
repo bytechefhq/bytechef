@@ -166,6 +166,10 @@ export const getRouter = (queryClient: QueryClient) =>
                 {
                     children: [
                         {
+                            element: <Home />,
+                            index: true,
+                        },
+                        {
                             children: [
                                 {
                                     index: true,
@@ -378,10 +382,6 @@ export const getRouter = (queryClient: QueryClient) =>
                             ],
                             errorElement: <ErrorPage />,
                             path: 'embedded',
-                        },
-                        {
-                            element: <Home />,
-                            index: true,
                         },
                     ],
                     path: '/',

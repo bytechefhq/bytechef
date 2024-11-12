@@ -19,6 +19,8 @@ const Home = () => {
     useEffect(() => {
         if (!ff_520) {
             navigate('/automation');
+
+            return;
         }
 
         if (currentType !== undefined) {

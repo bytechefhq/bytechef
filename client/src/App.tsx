@@ -198,6 +198,20 @@ function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authenticated]);
 
+    if (!sessionHasBeenFetched) {
+        return (
+            <div className="flex min-h-screen min-w-full items-center justify-center p-5">
+                <div className="flex animate-pulse space-x-2">
+                    <div className="size-3 rounded-full bg-gray-500"></div>
+
+                    <div className="size-3 rounded-full bg-gray-500"></div>
+
+                    <div className="size-3 rounded-full bg-gray-500"></div>
+                </div>
+            </div>
+        );
+    }
+
     return authenticated ? (
         <div className="flex h-full">
             <MobileSidebar
