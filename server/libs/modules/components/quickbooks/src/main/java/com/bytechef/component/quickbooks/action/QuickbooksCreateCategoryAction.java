@@ -21,7 +21,13 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACTIVE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOMAIN;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FULLY_QUALIFIED_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -44,14 +50,14 @@ public class QuickbooksCreateCategoryAction {
             outputSchema(
                 object()
                     .properties(
-                        object("item")
+                        object(ITEM)
                             .properties(
-                                string("id"),
-                                string("domain"),
-                                string("Name"),
-                                string("Level"),
-                                string("Subitem"),
-                                string("FullyQualifiedName")))))
+                                string(DOMAIN),
+                                string(ID),
+                                string(NAME),
+                                string(ACTIVE),
+                                string(FULLY_QUALIFIED_NAME),
+                                string(TYPE)))))
         .perform(QuickbooksCreateCategoryAction::perform);
 
     private QuickbooksCreateCategoryAction() {

@@ -17,15 +17,18 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACTIVE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOMAIN;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FULLY_QUALIFIED_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIVEN_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MIDDLE_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
@@ -81,20 +84,18 @@ public class QuickbooksCreateCustomerAction {
             outputSchema(
                 object()
                     .properties(
-                        string("id"),
-                        string("contactName"),
-                        object("creditChargeInfo")
+                        object(CUSTOMER)
                             .properties(
-                                string("number"),
-                                string("nameOnAcct"),
-                                integer("ccExpiryMonth"),
-                                integer("ccExpiryYear"),
-                                string("billAddrStreet"),
-                                string("postalCode"),
-                                number("amount")),
-                        number("balance"),
-                        string("acctNum"),
-                        string("businessNumber"))))
+                                string(DOMAIN),
+                                string(ID),
+                                string(TITLE),
+                                string(GIVEN_NAME),
+                                string(MIDDLE_NAME),
+                                string(FAMILY_NAME),
+                                string(SUFFIX),
+                                string(FULLY_QUALIFIED_NAME),
+                                string(DISPLAY_NAME),
+                                string(ACTIVE)))))
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {
@@ -103,7 +104,7 @@ public class QuickbooksCreateCustomerAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
+        Http.Response execute = actionContext
             .http(http -> http.post("/customer"))
             .body(
                 Http.Body.of(
@@ -114,7 +115,8 @@ public class QuickbooksCreateCustomerAction {
                     FAMILY_NAME, inputParameters.getString(FAMILY_NAME),
                     GIVEN_NAME, inputParameters.getString(GIVEN_NAME)))
             .configuration(responseType(Http.ResponseType.XML))
-            .execute()
-            .getBody(new TypeReference<>() {});
+            .execute();
+
+        return execute.getBody(new TypeReference<>() {});
     }
 }

@@ -21,18 +21,25 @@ package com.bytechef.component.quickbooks.constant;
  * @author Luka Ljubić
  * @author Monika Kušter
  */
-public final class QuickbooksConstants {
+public class QuickbooksConstants {
 
+    public static final String ACTIVE = "Active";
     public static final String BASE = "base";
     public static final String COMPANY_ID = "companyId";
+    public static final String CUSTOMER = "Customer";
     public static final String DISPLAY_NAME = "DisplayName";
+    public static final String DOMAIN = "domain";
     public static final String FAMILY_NAME = "FamilyName";
+    public static final String FULLY_QUALIFIED_NAME = "FullyQualifiedName";
     public static final String GIVEN_NAME = "GivenName";
+    public static final String ID = "Id";
+    public static final String ITEM = "Item";
     public static final String MIDDLE_NAME = "MiddleName";
     public static final String NAME = "Name";
     public static final String QTY_ON_HAND = "QtyOnHand";
     public static final String SUFFIX = "Suffix";
     public static final String TITLE = "Title";
+    public static final String TYPE = "Type";
 
     private QuickbooksConstants() {
     }

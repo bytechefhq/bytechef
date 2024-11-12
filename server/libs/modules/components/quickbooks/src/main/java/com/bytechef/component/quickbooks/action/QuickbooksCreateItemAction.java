@@ -22,8 +22,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACTIVE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOMAIN;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FULLY_QUALIFIED_NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -54,10 +60,15 @@ public class QuickbooksCreateItemAction {
             outputSchema(
                 object()
                     .properties(
-                        string("id"),
-                        string("name"),
-                        string("description"),
-                        number("unitPrice"))))
+                        object(ITEM)
+                            .properties(
+                                string(DOMAIN),
+                                string(ID),
+                                string(NAME),
+                                string("Description"),
+                                string(ACTIVE),
+                                string(FULLY_QUALIFIED_NAME),
+                                string(TYPE)))))
         .perform(QuickbooksCreateItemAction::perform);
 
     private QuickbooksCreateItemAction() {
