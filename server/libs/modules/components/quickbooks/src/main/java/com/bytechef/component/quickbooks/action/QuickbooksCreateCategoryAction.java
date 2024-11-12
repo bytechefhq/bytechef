@@ -38,10 +38,9 @@ public class QuickbooksCreateCategoryAction {
         .properties(
             string(NAME)
                 .label("Name")
-                .description("Name of the category")
+                .description("Name of the category.")
                 .maxLength(100)
                 .required(true))
-        .description("Has conditionally required parameters.")
         .output(
             outputSchema(
                 object()
@@ -59,10 +58,15 @@ public class QuickbooksCreateCategoryAction {
     private QuickbooksCreateCategoryAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item?minorversion=4"))
-            .body(Http.Body.of("Type", "Category", NAME, inputParameters.getRequiredString(NAME)))
+            .body(
+                Http.Body.of(
+                    "Type", "Category",
+                    NAME, inputParameters.getRequiredString(NAME)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

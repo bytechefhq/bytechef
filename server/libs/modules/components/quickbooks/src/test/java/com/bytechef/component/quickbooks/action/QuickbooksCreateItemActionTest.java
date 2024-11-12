@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.action;
+package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +32,10 @@ class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
 
     @Test
     void testPerform() {
+        Map<String, Object> bodyMap = Map.of(NAME, NAME, QTY_ON_HAND, 123);
+
+        mockedParameters = MockParametersFactory.create(bodyMap);
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -42,29 +45,14 @@ class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
-
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getRequiredString(NAME))
-            .thenReturn((String) propertyStubsMap.get(NAME));
-        when(mockedParameters.getString(QUANTITY))
-            .thenReturn((String) propertyStubsMap.get(QUANTITY));
+            .thenReturn(mockedObject);
 
         Object result = QuickbooksCreateItemAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(NAME, NAME);
-
-        return propertyStubsMap;
+        assertEquals(bodyMap, body.getContent());
     }
 }

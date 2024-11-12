@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.action;
+package com.bytechef.component.quickbooks.action;
 
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import java.util.Map;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -32,7 +31,7 @@ abstract class AbstractQuickbooksActionTest {
     protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     protected ActionContext mockedContext = mock(ActionContext.class);
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Object mockedObject = mock(Object.class);
+    protected Parameters mockedParameters;
     protected Http.Response mockedResponse = mock(Http.Response.class);
-    protected Map<String, Object> responeseMap = Map.of("key", "value");
 }

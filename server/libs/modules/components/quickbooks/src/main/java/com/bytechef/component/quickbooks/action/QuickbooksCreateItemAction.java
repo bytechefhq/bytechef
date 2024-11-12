@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QUANTITY;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
 import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
@@ -36,7 +36,7 @@ import com.bytechef.component.definition.TypeReference;
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
  */
-public final class QuickbooksCreateItemAction {
+public class QuickbooksCreateItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createItem")
         .title("Create Item")
@@ -44,39 +44,35 @@ public final class QuickbooksCreateItemAction {
         .properties(
             string(NAME)
                 .label("Name")
-                .description("Name of the item. This value must be unique. Required for create.")
+                .description("Name of the item.")
                 .maxLength(100)
                 .required(true),
-            number(QUANTITY)
+            number(QTY_ON_HAND)
                 .label("Quantity on Hand")
-                .description(
-                    "Current quantity of the Inventory items available for sale. Not used for Service or " +
-                        "NonInventory type items.Required for Inventory type items."))
+                .description("Current quantity of the Inventory items available for sale.")
+                .required(false))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string("id")
-                            .label("ID")
-                            .required(true),
-                        string("name")
-                            .label("Name"),
-                        string("description")
-                            .label("Description"),
-                        number("unitPrice")
-                            .label("Unit price"))))
+                        string("id"),
+                        string("name"),
+                        string("description"),
+                        number("unitPrice"))))
         .perform(QuickbooksCreateItemAction::perform);
 
     private QuickbooksCreateItemAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
-                    QUANTITY, inputParameters.getRequired(QUANTITY)))
+                    QTY_ON_HAND, inputParameters.getRequiredDouble(QTY_ON_HAND)))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

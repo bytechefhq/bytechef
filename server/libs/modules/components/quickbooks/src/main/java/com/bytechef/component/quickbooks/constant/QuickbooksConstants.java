@@ -28,7 +28,7 @@ public final class QuickbooksConstants {
     public static final String GIVEN_NAME = "GivenName";
     public static final String MIDDLE_NAME = "MiddleName";
     public static final String NAME = "Name";
-    public static final String QUANTITY = "QtyOnHand";
+    public static final String QTY_ON_HAND = "QtyOnHand";
     public static final String SUFFIX = "Suffix";
     public static final String TITLE = "Title";
 

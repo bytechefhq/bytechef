@@ -41,7 +41,7 @@ import com.bytechef.component.definition.TypeReference;
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
  */
-public final class QuickbooksCreateCustomerAction {
+public class QuickbooksCreateCustomerAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCustomer")
         .title("Create Customer")
@@ -49,85 +49,62 @@ public final class QuickbooksCreateCustomerAction {
         .properties(
             string(DISPLAY_NAME)
                 .label("Display Name")
-                .description(
-                    "The name of the person or organization as displayed. Must be unique across all Customer, " +
-                        "Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, " +
-                        "the system generates DisplayName by concatenating customer name components supplied in the " +
-                        "request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.")
+                .description("The name of the person or organization as displayed.")
                 .maxLength(500)
                 .required(true),
+            string(GIVEN_NAME)
+                .label("First Name")
+                .description("Given name or first name of a person.")
+                .maxLength(100)
+                .required(false),
+            string(FAMILY_NAME)
+                .label("Last Name")
+                .description("Family name or the last name of the person.")
+                .maxLength(100)
+                .required(false),
             string(SUFFIX)
                 .label("Suffix")
-                .description(
-                    "Suffix of the name. For example, Jr. The DisplayName attribute or at least one of Title, " +
-                        "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
-                .maxLength(16),
+                .description("Suffix of the name.")
+                .exampleValue("Jr")
+                .maxLength(16)
+                .required(false),
             string(TITLE)
                 .label("Title")
-                .description(
-                    "Title of the person. This tag supports i18n, all locales. The DisplayName attribute or at least " +
-                        "one of Title, GivenName, MiddleName, FamilyName, Suffix, or FullyQualifiedName attributes " +
-                        "are required during create.")
-                .maxLength(16),
+                .description("Title of the person.")
+                .maxLength(16)
+                .required(false),
             string(MIDDLE_NAME)
                 .label("Middle Name")
-                .description(
-                    "Middle name of the person. The person can have zero or more middle names. The DisplayName " +
-                        "attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes " +
-                        "is required for object create.")
-                .maxLength(100),
-            string(FAMILY_NAME)
-                .label("Last/Family Name")
-                .description(
-                    "Family name or the last name of the person. The DisplayName attribute or at least one of Title, " +
-                        "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
-                .maxLength(100),
-            string(GIVEN_NAME)
-                .label("First/Given Name")
-                .description(
-                    "Given name or first name of a person. The DisplayName attribute or at least one of Title, " +
-                        "GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.")
-                .maxLength(100))
-        .description("Has conditionally required parameters.")
+                .description("Middle name of the person.")
+                .maxLength(100)
+                .required(false))
         .output(
             outputSchema(
                 object()
                     .properties(
-                        string("id")
-                            .label("ID")
-                            .required(true),
-                        string("contactName")
-                            .label("Contact name"),
+                        string("id"),
+                        string("contactName"),
                         object("creditChargeInfo")
                             .properties(
-                                string("number")
-                                    .label("Number"),
-                                string("nameOnAcct")
-                                    .label("Name on account"),
-                                integer("ccExpiryMonth")
-                                    .label("Expiry month"),
-                                integer("ccExpiryYear")
-                                    .label("Expiry year"),
-                                string("billAddrStreet")
-                                    .label("Billing address street"),
-                                string("postalCode")
-                                    .label("Postal code"),
-                                number("amount")
-                                    .label("Amount"))
-                            .label("Credit card"),
-                        number("balance")
-                            .label("Balance"),
-                        string("acctNum")
-                            .label("Account number"),
-                        string("businessNumber")
-                            .label("Business number"))))
+                                string("number"),
+                                string("nameOnAcct"),
+                                integer("ccExpiryMonth"),
+                                integer("ccExpiryYear"),
+                                string("billAddrStreet"),
+                                string("postalCode"),
+                                number("amount")),
+                        number("balance"),
+                        string("acctNum"),
+                        string("businessNumber"))))
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return context
+    protected static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return actionContext
             .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
             .body(
                 Http.Body.of(

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.action;
+package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
@@ -28,8 +28,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
-import java.util.HashMap;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -37,6 +36,12 @@ class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
 
     @Test
     void testPerform() {
+        Map<String, Object> bodyMap = Map.of(
+            DISPLAY_NAME, "Name", SUFFIX, "Dr", TITLE, TITLE, MIDDLE_NAME, MIDDLE_NAME, FAMILY_NAME, FAMILY_NAME,
+            GIVEN_NAME, GIVEN_NAME);
+
+        mockedParameters = MockParametersFactory.create(bodyMap);
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -46,42 +51,14 @@ class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
-
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-
-        when(mockedParameters.getRequiredString(DISPLAY_NAME))
-            .thenReturn((String) propertyStubsMap.get(DISPLAY_NAME));
-        when(mockedParameters.getString(SUFFIX))
-            .thenReturn((String) propertyStubsMap.get(SUFFIX));
-        when(mockedParameters.getString(TITLE))
-            .thenReturn((String) propertyStubsMap.get(TITLE));
-        when(mockedParameters.getString(MIDDLE_NAME))
-            .thenReturn((String) propertyStubsMap.get(MIDDLE_NAME));
-        when(mockedParameters.getString(FAMILY_NAME))
-            .thenReturn((String) propertyStubsMap.get(FAMILY_NAME));
-        when(mockedParameters.getString(GIVEN_NAME))
-            .thenReturn((String) propertyStubsMap.get(GIVEN_NAME));
+            .thenReturn(mockedObject);
 
         Object result = QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(DISPLAY_NAME, DISPLAY_NAME);
-        propertyStubsMap.put(SUFFIX, SUFFIX);
-        propertyStubsMap.put(TITLE, TITLE);
-        propertyStubsMap.put(MIDDLE_NAME, MIDDLE_NAME);
-        propertyStubsMap.put(FAMILY_NAME, FAMILY_NAME);
-        propertyStubsMap.put(GIVEN_NAME, GIVEN_NAME);
-
-        return propertyStubsMap;
+        assertEquals(bodyMap, body.getContent());
     }
 }
