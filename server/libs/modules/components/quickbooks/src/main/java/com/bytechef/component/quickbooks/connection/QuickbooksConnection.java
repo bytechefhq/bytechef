@@ -21,9 +21,10 @@ import static com.bytechef.component.definition.Authorization.CLIENT_ID;
 import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.BASE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
-import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
@@ -36,22 +37,30 @@ import java.util.List;
 public class QuickbooksConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://quickbooks.api.intuit.com/v3/company/"
-            + getCompanyId(connectionParameters))
+        .baseUri((connectionParameters, context) -> connectionParameters.getRequiredString(BASE) + "/v3/company/"
+            + connectionParameters.getRequiredString(COMPANY_ID))
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
                 .properties(
+                    string(BASE)
+                        .label("Base")
+                        .description("The base URL for Quickbooks.")
+                        .options(
+                            option("Sandbox", "https://sandbox-quickbooks.api.intuit.com"),
+                            option("Production", "https://quickbooks.api.intuit.com"))
+                        .required(true),
+                    string(COMPANY_ID)
+                        .label("Company Id")
+                        .description(
+                            "To get the company id, go to your dashboard. On the top right corner press the gear " +
+                                "logo and click Additional information. There you will see your company ID.")
+                        .required(true),
                     string(CLIENT_ID)
                         .label("Client Id")
                         .required(true),
                     string(CLIENT_SECRET)
                         .label("Client Secret")
-                        .required(true),
-                    string(COMPANY_ID)
-                        .label("Company Id")
-                        .description("To get the company id, go to your dashboard. On the top right corner " +
-                            "press the gear logo and click Additional information. There you will see your company ID")
                         .required(true))
                 .authorizationUrl((connection, context) -> "https://appcenter.intuit.com/connect/oauth2")
                 .scopes((connection, context) -> List.of("com.intuit.quickbooks.accounting"))
