@@ -63,7 +63,6 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
-    implementation(project(":server:libs:core:file-storage:file-storage-noop-service"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-jms"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))

@@ -27,7 +27,6 @@ dependencies {
     implementation(project(":server:libs:core:message:message-event:message-event-impl"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
     implementation(project(":server:libs:core:file-storage:file-storage-filesystem-service"))
-    implementation(project(":server:libs:core:file-storage:file-storage-noop-service"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-instance-impl"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
