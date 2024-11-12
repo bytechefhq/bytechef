@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.component.definition;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
@@ -35,6 +38,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
@@ -74,7 +78,7 @@ public class HttpClientExecutorTest {
         HttpResponse.BodyHandler<?> bodyHandler = httpClientExecutor.createBodyHandler(
             configuration);
 
-        Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.discarding());
+        assertEquals(bodyHandler, HttpResponse.BodyHandlers.discarding());
 
         //
 
@@ -82,7 +86,7 @@ public class HttpClientExecutorTest {
             Http.responseType(Http.ResponseType.BINARY)
                 .build());
 
-        Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
+        assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofInputStream());
 
         //
 
@@ -90,7 +94,7 @@ public class HttpClientExecutorTest {
             Http.responseType(Http.ResponseType.XML)
                 .build());
 
-        Assertions.assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
+        assertEquals(bodyHandler, HttpResponse.BodyHandlers.ofString());
     }
 
     @Test
@@ -109,7 +113,7 @@ public class HttpClientExecutorTest {
                 Http.Body.of(
                     Map.of("key1", "value1", "key2", fileEntry), Http.BodyContentType.FORM_DATA));
 
-        Assertions.assertTrue(multipartBodyPublisher.mediaType()
+        assertTrue(multipartBodyPublisher.mediaType()
             .toString()
             .startsWith("multipart/form-data"));
 
@@ -120,45 +124,58 @@ public class HttpClientExecutorTest {
             .findFirst()
             .orElseThrow();
 
-        Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
+        assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         FormBodyPublisher formBodyPublisher = (FormBodyPublisher) httpClientExecutor.createBodyPublisher(
             Http.Body.of(
-                Map.of("key1", "value1", "key2", "value2"), Http.BodyContentType.FORM_URL_ENCODED));
+                Map.of(
+                    "key1", "value1", "key2", "value2",
+                    "key3", Map.of(
+                        "key31", "value31",
+                        "key32", Map.of(
+                            "key321", "value321",
+                            "key322", List.of("value3221", "value3222")))),
+                Http.BodyContentType.FORM_URL_ENCODED));
 
-        Assertions.assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
+        assertEquals(MediaType.APPLICATION_FORM_URLENCODED, formBodyPublisher.mediaType());
 
-        Assertions.assertTrue(formBodyPublisher.encodedString()
+        assertTrue(formBodyPublisher.encodedString()
             .contains("key1=value1"));
-        Assertions.assertTrue(formBodyPublisher.encodedString()
+        assertTrue(formBodyPublisher.encodedString()
             .contains("key2=value2"));
-
-        //
+        assertTrue(formBodyPublisher.encodedString()
+            .contains(URLEncoder.encode("key3[key31]", StandardCharsets.UTF_8) + "=value31"));
+        assertTrue(formBodyPublisher.encodedString()
+            .contains(URLEncoder.encode("key3[key32][key321]", StandardCharsets.UTF_8) + "=value321"));
+        assertTrue(formBodyPublisher.encodedString()
+            .contains(URLEncoder.encode("key3[key32][key322][0]", StandardCharsets.UTF_8) + "=value3221"));
+        assertTrue(formBodyPublisher.encodedString()
+            .contains(URLEncoder.encode("key3[key32][key322][1]", StandardCharsets.UTF_8) + "=value3222"));
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
             Http.Body.of(Map.of("key1", "value1"), Http.BodyContentType.JSON));
 
-        Assertions.assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
+        assertEquals(MediaType.APPLICATION_JSON, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
             Http.Body.of(Map.of("key1", "value1"), Http.BodyContentType.XML));
 
-        Assertions.assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
+        assertEquals(MediaType.APPLICATION_XML, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
             Http.Body.of("text"));
 
-        Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
+        assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         HttpRequest.BodyPublisher emptyBodyPublisher = httpClientExecutor.createBodyPublisher(null);
 
-        Assertions.assertEquals(0, emptyBodyPublisher.contentLength());
+        assertEquals(0, emptyBodyPublisher.contentLength());
 
         //
 
@@ -174,13 +191,13 @@ public class HttpClientExecutorTest {
         mimeBodyPublisherAdapter = (MimeBodyPublisherAdapter) httpClientExecutor.createBodyPublisher(
             Http.Body.of(fileEntry));
 
-        Assertions.assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
+        assertEquals(MediaType.TEXT_PLAIN, mimeBodyPublisherAdapter.mediaType());
 
         //
 
         HttpRequest.BodyPublisher bodyPublisher = httpClientExecutor.createBodyPublisher(null);
 
-        Assertions.assertEquals(0, bodyPublisher.contentLength());
+        assertEquals(0, bodyPublisher.contentLength());
     }
 
     @Disabled
@@ -195,7 +212,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertTrue(httpClient.authenticator()
+        assertTrue(httpClient.authenticator()
             .isEmpty());
 
         Assertions.assertNotNull(httpClient.sslContext());
@@ -220,7 +237,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
+        assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
 
 //        Mockito.when(context.fetchConnection())
 //            .thenReturn(
@@ -241,7 +258,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
+        assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
 
 //        Mockito.when(context.fetchConnection())
 //            .thenReturn(
@@ -259,7 +276,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(
+        assertEquals(
             Map.of(
                 "Authorization",
                 List.of("Basic " + encoder
@@ -282,7 +299,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
+        assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
 
 //        Mockito.when(context.fetchConnection())
 //            .thenReturn(
@@ -302,7 +319,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(
+        assertEquals(
             Map.of(
                 "Authorization",
                 List.of("Basic " + encoder.encodeToString("username:password".getBytes(StandardCharsets.UTF_8)))),
@@ -324,7 +341,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
+        assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
 
         //
 
@@ -357,7 +374,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertTrue(httpClient.proxy()
+        assertTrue(httpClient.proxy()
             .isPresent());
 
         //
@@ -370,7 +387,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1L, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(
+        assertEquals(
             Duration.ofMillis(2000), httpClient.connectTimeout()
                 .orElseThrow());
     }
@@ -383,12 +400,12 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1L, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());
+        assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());
 
         HttpHeaders httpHeaders = httpRequest.headers();
 
-        Assertions.assertEquals(Map.of("header1", List.of("value1")), httpHeaders.map());
-        Assertions.assertEquals(URI.create("http://localhost:8080?param1=value1"), httpRequest.uri());
+        assertEquals(Map.of("header1", List.of("value1")), httpHeaders.map());
+        assertEquals(URI.create("http://localhost:8080?param1=value1"), httpRequest.uri());
     }
 
     @Disabled
@@ -407,7 +424,7 @@ public class HttpClientExecutorTest {
             .when(context.file(file -> file.storeContent(Mockito.anyString(), (InputStream) Mockito.any())))
             .thenReturn(fileEntry);
 
-        Assertions.assertEquals(
+        assertEquals(
             fileEntry,
             httpClientExecutor
                 .handleResponse(
@@ -418,7 +435,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        Assertions.assertEquals(
+        assertEquals(
             Map.of("key1", "value1"),
             httpClientExecutor
                 .handleResponse(
@@ -434,7 +451,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        Assertions.assertEquals(
+        assertEquals(
             "text",
             httpClientExecutor
                 .handleResponse(
@@ -445,7 +462,7 @@ public class HttpClientExecutorTest {
 
         //
 
-        Assertions.assertEquals(
+        assertEquals(
             Map.of("object", Map.of("key1", "value1")),
             httpClientExecutor
                 .handleResponse(
@@ -467,7 +484,7 @@ public class HttpClientExecutorTest {
         Http.Configuration.ConfigurationBuilder configurationBuilder =
             Http.responseType(Http.ResponseType.TEXT);
 
-        Assertions.assertEquals(
+        assertEquals(
             new TestResponseImpl(Map.of(), "text", 200),
             httpClientExecutor.handleResponse(new TestHttpResponse("text"), configurationBuilder.build()));
     }
@@ -495,7 +512,7 @@ public class HttpClientExecutorTest {
 
         Assertions.assertNotNull(response.getBody());
 
-        Assertions.assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
 
         testHttpResponse = new TestHttpResponse(
             "<root><key1>\"value1\"</key1><key2>\"value2\"</key2></root>",
@@ -515,7 +532,7 @@ public class HttpClientExecutorTest {
 
         Assertions.assertNotNull(response.getBody());
 
-        Assertions.assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
+        assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
     }
 
     private static class TestResponseImpl implements Http.Response {
