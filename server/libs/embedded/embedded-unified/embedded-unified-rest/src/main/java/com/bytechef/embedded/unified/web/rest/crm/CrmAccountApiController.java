@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.unified.web.rest.crm;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.component.definition.UnifiedApiDefinition.Category;
 import com.bytechef.component.definition.unified.crm.CrmModelType;
 import com.bytechef.component.definition.unified.crm.model.AccountUnifiedInputModel;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1/unified/crm")
+@ConditionalOnCoordinator
 public class CrmAccountApiController implements AccountApi {
 
     private final ConversionService conversionService;

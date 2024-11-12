@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.configuration.public_.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.codeworkflow.facade.ProjectCodeWorkflowFacade;
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController("com.bytechef.automation.configuration.public_.web.rest.ProjectApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/v1")
+@ConditionalOnCoordinator
 public class ProjectApiController implements ProjectApi {
 
     private final ProjectCodeWorkflowFacade projectCodeWorkflowFacade;

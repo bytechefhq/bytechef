@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFacade;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnCoordinator
 public class ApiConnectorApiController implements ApiConnectorApi {
 
     private final ApiConnectorFacade apiConnectorFacade;

@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.handler;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
@@ -49,6 +50,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}"
     + ApiPlatformHandlerController.API_PLATFORM_ROOT_PATH + "/**")
+@ConditionalOnCoordinator
 public class ApiPlatformHandlerController extends AbstractWebhookTriggerController {
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();

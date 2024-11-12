@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.customcomponent.configuration.web.rest;
 
+import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.platform.customcomponent.configuration.service.CustomComponentService;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("com.bytechef.platform.custom.component.configuration.web.rest.CustomComponentApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnCoordinator
 public class CustomComponentApiController implements CustomComponentApi {
 
     private final CustomComponentFacade customComponentFacade;
