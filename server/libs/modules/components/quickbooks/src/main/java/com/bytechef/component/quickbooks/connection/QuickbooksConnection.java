@@ -23,6 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.COMPANY_ID;
+import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import java.util.List;
@@ -30,11 +31,13 @@ import java.util.List;
 /**
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class QuickbooksConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://quickbooks.api.intuit.com")
+        .baseUri((connectionParameters, context) -> "https://quickbooks.api.intuit.com/v3/company/"
+            + getCompanyId(connectionParameters))
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")

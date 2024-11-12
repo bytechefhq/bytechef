@@ -29,7 +29,6 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIV
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MIDDLE_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
-import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -105,7 +104,7 @@ public class QuickbooksCreateCustomerAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
-            .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/customer"))
+            .http(http -> http.post("/customer"))
             .body(
                 Http.Body.of(
                     DISPLAY_NAME, inputParameters.getRequiredString(DISPLAY_NAME),

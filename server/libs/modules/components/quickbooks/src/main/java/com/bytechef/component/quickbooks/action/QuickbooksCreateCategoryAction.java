@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getCompanyId;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -62,7 +61,7 @@ public class QuickbooksCreateCategoryAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
-            .http(http -> http.post("/v3/company/" + getCompanyId(connectionParameters) + "/item?minorversion=4"))
+            .http(http -> http.post("/item?minorversion=4"))
             .body(
                 Http.Body.of(
                     "Type", "Category",
