@@ -342,8 +342,7 @@ include("sdks:backend:java:workflow-api")
 
 // EE
 
-include("cli:ee:commands:component:init:openapi")
-
+include("server:ee:apps:runtime-app")
 include("server:ee:apps:api-gateway-app")
 include("server:ee:apps:config-server-app")
 include("server:ee:apps:configuration-app")

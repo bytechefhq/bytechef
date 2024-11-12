@@ -1,0 +1,38 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: DEBUG
+
+server:
+  port: 9555
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+  messages:
+    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+  thymeleaf:
+    cache: false
+
+#####
+
+bytechef:
+  datasource:
+    # PostgreSQL database
+    #    url: jdbc:postgresql://localhost:5432/bytechef
+    #    username: postgres
+    #    password: postgres
+    # H2 database
+    #    url: jdbc:h2:file:~/.bytechef/bytechef;DB_CLOSE_ON_EXIT=FALSE;CASE_INSENSITIVE_IDENTIFIERS=TRUE
+    #    username: sa
+    #    password:
+    url: jdbc:postgresql://localhost:5432/bytechef
+    username: postgres
+    password: postgres
+  mail:
+    host: localhost
+    port: 1025
+  security:
+    remember-me:
+      key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2

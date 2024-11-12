@@ -1,0 +1,41 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: INFO
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+server:
+  port: 8080
+  shutdown: graceful # see https://docs.spring.io/spring-boot/docs/current/reference/html/spring-boot-features.html#boot-features-graceful-shutdown
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css, application/javascript, application/json
+    min-response-size: 1024
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  thymeleaf:
+    cache: true
+
+#####
+
+bytechef:
+  analytics:
+    enabled: true
+    post-hog:
+      api-key: phc_oZ9XWAVf8xf6sI7IYBAbGldSbiud07ioZItD1XvhJ7S
+      host: https://eu.i.posthog.com
+  helpHub:
+    enabled: true
+    command-bar:
+      orgId: 3816ef6c
+

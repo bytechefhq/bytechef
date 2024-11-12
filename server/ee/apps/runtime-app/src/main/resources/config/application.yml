@@ -1,0 +1,230 @@
+---
+# Conditionally disable springdoc on missing api-docs profile
+spring:
+  config:
+    activate:
+      on-profile: '!api-docs'
+springdoc:
+  api-docs:
+    enabled: false
+---
+
+info:
+  ai:
+    enabled: ${bytechef.ai.enabled}
+  analytics:
+    enabled: ${bytechef.analytics.enabled}
+    postHog:
+      apiKey: ${bytechef.analytics.post-hog.api-key}
+      host: ${bytechef.analytics.post-hog.host}
+  application:
+    edition: ${bytechef.edition}
+  featureFlags: ${bytechef.featureFlags}
+  helpHub:
+    enabled: ${bytechef.helpHub.enabled}
+    commandBar:
+      orgId: ${bytechef.helpHub.command-bar.orgId}
+  signUp:
+    activationRequired: ${bytechef.signUp.activationRequired}
+    enabled: ${bytechef.signUp.enabled}
+
+management:
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+  observations:
+    key-values:
+      application: ${spring.application.name}
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+
+openapi:
+  openAPIDefinition:
+    base-path:
+      automation: /api/automation
+      embedded: /api/embedded
+      platform: /api/platform
+
+
+spring:
+  ai:
+    openai:
+      api-key: ${bytechef.ai.openai.api-key}
+      chat:
+        options:
+          model: ${bytechef.ai.openai.chat.options.model}
+  autoconfigure:
+    exclude:
+      org.springframework.ai.autoconfigure.anthropic.AnthropicAutoConfiguration,
+      org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration,
+      org.springframework.ai.autoconfigure.huggingface.HuggingfaceChatAutoConfiguration,
+      org.springframework.ai.autoconfigure.mistralai.MistralAiAutoConfiguration,
+      org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration,
+      org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
+      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration,
+      org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration
+  application:
+    name: server-app
+  cache:
+    type: ${bytechef.cache.provider}
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+    hikari:
+      poolName: Hikari
+  h2:
+    console:
+      enabled: false
+  jmx:
+    enabled: false
+  mail:
+    host: ${bytechef.mail.host}
+    port: ${bytechef.mail.port:25}
+    username: ${bytechef.mail.username}
+    password: {bytechef.mail.password}
+  liquibase:
+    contexts: mono, #spring.profiles.active#
+  output:
+    ansi:
+      console-available: true
+  profiles:
+    active: #spring.profiles.active#
+    group:
+      dev:
+        - dev
+        - api-docs
+  rabbitmq:
+    listener:
+      direct:
+        prefetch: 1
+  shell:
+    noninteractive:
+      enabled: false
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  task:
+    execution:
+      thread-name-prefix: server-app-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: server-app-scheduling-
+      pool:
+        size: 2
+  threads:
+    virtual:
+#      enabled: true
+
+server:
+  servlet:
+    session:
+      cookie:
+        http-only: true
+
+springdoc:
+  show-actuator: true
+  swagger-ui:
+    operationsSorter: method
+    tags-sorter: alpha
+
+#####
+
+bytechef:
+  ai:
+    enabled: false
+    openai:
+      api-key:
+      chat:
+        options:
+          model: gpt-4o
+  cache:
+    # Cache provider (redis | simple) default: simple
+    provider: simple
+  coordinator:
+    trigger:
+      scheduler:
+        # Trigger scheduler provider (aws(ee) | quartz) default: quartz
+        provider: quartz
+  data-storage:
+    # Data storage provider (aws(ee) | filesystem | jdbc) default: jdbc
+    provider: jdbc
+  # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
+  edition: ee
+  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  encryption:
+    provider: filesystem
+  file-storage:
+    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
+    provider: filesystem
+    filesystem:
+      basedir: ${user.home}/bytechef/data/file-storage
+  mail:
+    base-url: ${bytechef.public-url}
+    from: noreply@bytechef.io
+    host:
+    port: 25
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
+    provider: jms
+  oauth2:
+#    predefinedApps:
+#      mailchimp:
+#        clientId: 123456789
+#        clientSecret: 123456789
+    redirect-uri: ${bytechef.public-url}/callback
+  public-url: http://127.0.0.1:5173
+  resources:
+    web: file:///opt/bytechef/client/
+  security:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
+    remember-me:
+      key:
+  # Tenant support mode (single | multi - ee only) default: single
+  tenant:
+    mode: single
+  webhook-url: http://127.0.0.1:9555/webhooks/{id}
+  # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
+  # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
+  # property on any given task.
+  # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
+  # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
+  # bootstraps.
+  worker:
+    task:
+      subscriptions:
+        default: 10
+  workflow:
+    output-storage:
+      # Output storage provider for workflow output data (aws(ee) | filesystem | jdbc) default: jdbc
+      provider: jdbc
+    repository:
+      jdbc:
+        enabled: true
