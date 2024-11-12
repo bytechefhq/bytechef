@@ -491,7 +491,7 @@ export default function useLayout({
             nodes = taskNodes?.length ? [...triggerAndTaskNodes] : [triggerNode, finalPlaceholderNode];
         }
 
-        nodes.forEach((node) => {
+        nodes.forEach((node, index) => {
             let height = NODE_HEIGHT;
 
             if (node.id.includes('placeholder')) {
@@ -514,6 +514,16 @@ export default function useLayout({
                 }
             } else if (!node.data.conditionData) {
                 height = NODE_HEIGHT * 1.2;
+            }
+
+            if (index === nodes.length - 1) {
+                height = 20;
+
+                const penultimateNode = nodes[nodes.length - 2];
+
+                if (penultimateNode.id.includes('bottom-placeholder')) {
+                    height = 90;
+                }
             }
 
             dagreGraph.setNode(node.id, {height, width: NODE_WIDTH});
