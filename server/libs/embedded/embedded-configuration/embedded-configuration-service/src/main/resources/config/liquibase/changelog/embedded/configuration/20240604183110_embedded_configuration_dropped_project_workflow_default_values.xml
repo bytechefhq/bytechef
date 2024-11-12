@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604183110" author="Ivica Cardic">
+        <dropDefaultValue tableName="integration_workflow" columnName="created_by" />
+        <dropDefaultValue tableName="integration_workflow" columnName="created_date" />
+        <dropDefaultValue tableName="integration_workflow" columnName="last_modified_by" />
+        <dropDefaultValue tableName="integration_workflow" columnName="last_modified_date" />
+        <dropDefaultValue tableName="integration_workflow" columnName="version" />
+    </changeSet>
+</databaseChangeLog>

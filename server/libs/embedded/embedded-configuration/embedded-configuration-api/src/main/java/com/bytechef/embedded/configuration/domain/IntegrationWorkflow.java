@@ -16,8 +16,14 @@
 
 package com.bytechef.embedded.configuration.domain;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -41,6 +47,25 @@ public final class IntegrationWorkflow {
 
     @Column("workflow_reference_code")
     private String workflowReferenceCode;
+
+    @CreatedBy
+    @Column("created_by")
+    private String createdBy;
+
+    @Column("created_date")
+    @CreatedDate
+    private LocalDateTime createdDate;
+
+    @Column("last_modified_by")
+    @LastModifiedBy
+    private String lastModifiedBy;
+
+    @Column("last_modified_date")
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
+
+    @Version
+    private int version;
 
     public IntegrationWorkflow() {
     }
@@ -97,6 +122,26 @@ public final class IntegrationWorkflow {
         return workflowReferenceCode;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public LocalDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public LocalDateTime getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
     public void setIntegrationVersion(int integrationVersion) {
         this.integrationVersion = integrationVersion;
     }
@@ -109,6 +154,10 @@ public final class IntegrationWorkflow {
         this.workflowReferenceCode = workflowReferenceCode;
     }
 
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return "IntegrationWorkflow{" +
@@ -117,6 +166,11 @@ public final class IntegrationWorkflow {
             ", integrationVersion=" + integrationVersion +
             ", workflowId='" + workflowId + '\'' +
             ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", createdBy='" + createdBy + '\'' +
+            ", createdDate=" + createdDate +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
+            ", version=" + version +
             '}';
     }
 }
