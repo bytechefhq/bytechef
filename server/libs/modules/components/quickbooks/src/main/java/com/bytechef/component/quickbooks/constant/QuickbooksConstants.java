@@ -19,9 +19,11 @@ package com.bytechef.component.quickbooks.constant;
 /**
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public final class QuickbooksConstants {
 
+    public static final String BASE = "base";
     public static final String COMPANY_ID = "companyId";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String FAMILY_NAME = "FamilyName";
