@@ -3,19 +3,19 @@ import {WorkflowTask} from '@/shared/middleware/automation/configuration';
 
 import getParentConditionTask from './getParentConditionTask';
 
-interface AddConditionChildNodeProps {
+interface GetUpdatedConditionSubtasksProps {
     conditionId: string;
     tasks: Array<WorkflowTask>;
     newTask: WorkflowTask;
     placeholderId: string;
 }
 
-export default function getTasksWithConditionChildNode({
+export default function insertNewConditionSubtask({
     conditionId,
     newTask,
     placeholderId,
     tasks,
-}: AddConditionChildNodeProps): Array<WorkflowTask> {
+}: GetUpdatedConditionSubtasksProps): Array<WorkflowTask> {
     let conditionTask = tasks.find((task) => task.name === conditionId);
 
     if (!conditionTask) {
