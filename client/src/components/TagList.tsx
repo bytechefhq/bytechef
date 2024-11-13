@@ -125,9 +125,14 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                             value: tag.name.toLowerCase().replace(/\W/g, ''),
                         }))}
                         styles={{
-                            control: (styles) => ({...styles, fontSize: '0.75rem', minHeight: '1.5rem', padding: '0'}),
-                            dropdownIndicator: (styles) => ({...styles, padding: '0.2rem'}),
-                            valueContainer: (styles) => ({...styles, padding: '0 0.4rem'}),
+                            control: (styles: any) => ({
+                                ...styles,
+                                fontSize: '0.75rem',
+                                minHeight: '1.5rem',
+                                padding: '0',
+                            }),
+                            dropdownIndicator: (styles: any) => ({...styles, padding: '0.2rem'}),
+                            valueContainer: (styles: any) => ({...styles, padding: '0 0.4rem'}),
                         }}
                     />
 
