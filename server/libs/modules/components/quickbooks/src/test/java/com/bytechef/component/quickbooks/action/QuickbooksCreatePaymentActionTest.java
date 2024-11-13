@@ -16,15 +16,9 @@
 
 package com.bytechef.component.quickbooks.action;
 
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER_REF;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TOTAL_AMT;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -33,21 +27,17 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDate;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Kušter
  */
-class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
+class QuickbooksCreatePaymentActionTest extends AbstractQuickbooksActionTest {
 
     @Test
     void testPerform() {
-        mockedParameters = MockParametersFactory.create(Map.of(
-            NAME, NAME, TYPE, INVENTORY, QTY_ON_HAND, 123, EXPENSE_ACCOUNT_REF, "expense",
-            ACCOUNT, Map.of(
-                INCOME_ACCOUNT_REF, "income", ASSET_ACCOUNT_REF, "asset", INV_START_DATE, LocalDate.of(2020, 1, 1))));
+        mockedParameters = MockParametersFactory.create(Map.of(CUSTOMER, "abc", TOTAL_AMT, 123));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -60,16 +50,13 @@ class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = QuickbooksCreateItemAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = QuickbooksCreatePaymentAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        Map<String, Object> expectedBody = Map.of(
-            NAME, NAME, QTY_ON_HAND, 123.0, INCOME_ACCOUNT_REF, Map.of(VALUE, "income"),
-            ASSET_ACCOUNT_REF, Map.of(VALUE, "asset"), INV_START_DATE, "2020-01-01", EXPENSE_ACCOUNT_REF,
-            Map.of(VALUE, "expense"));
+        Map<String, Object> expectedBody = Map.of(TOTAL_AMT, 123.0, CUSTOMER_REF, Map.of(VALUE, "abc"));
 
         assertEquals(expectedBody, body.getContent());
     }
