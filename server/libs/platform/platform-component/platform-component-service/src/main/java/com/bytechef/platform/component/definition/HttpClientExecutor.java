@@ -383,8 +383,9 @@ class HttpClientExecutor {
 
     private void processParameters(String prefix, Map<?, ?> parameters, FormBodyPublisher.Builder builder) {
         parameters.forEach((key, value) -> {
-            String newKey = prefix.isEmpty() ? key.toString() : prefix + "[" + key + "]";
             Validate.notNull(value, "Expected value for " + key);
+
+            String newKey = prefix.isEmpty() ? key.toString() : prefix + "[" + key + "]";
 
             if (value instanceof Map<?, ?> nestedMap) {
                 processParameters(newKey, nestedMap, builder);

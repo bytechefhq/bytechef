@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.definition;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.definition.ActionContext;
@@ -51,7 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.net.ssl.SSLSession;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -215,7 +216,7 @@ public class HttpClientExecutorTest {
         assertTrue(httpClient.authenticator()
             .isEmpty());
 
-        Assertions.assertNotNull(httpClient.sslContext());
+        assertNotNull(httpClient.sslContext());
 
         //
 
@@ -352,7 +353,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertNotNull(httpClient.followRedirects());
+        assertNotNull(httpClient.followRedirects());
 
         //
 
@@ -363,7 +364,7 @@ public class HttpClientExecutorTest {
             new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
             Mockito.mock(Context.class));
 
-        Assertions.assertNotNull(httpClient.followRedirects());
+        assertNotNull(httpClient.followRedirects());
 
         //
 
@@ -411,7 +412,7 @@ public class HttpClientExecutorTest {
     @Disabled
     @Test
     public void testHandleResponse() {
-        Assertions.assertNull(
+        assertNull(
             httpClientExecutor
                 .handleResponse(new TestHttpResponse(null), configuration)
                 .getBody());
@@ -502,7 +503,7 @@ public class HttpClientExecutorTest {
         Http.Response response =
             httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
 
-        Assertions.assertNull(response.getBody());
+        assertNull(response.getBody());
 
         testHttpResponse = new TestHttpResponse(
             "{\"key1\":\"value1\", \"key2\":\"value2\"}",
@@ -510,7 +511,7 @@ public class HttpClientExecutorTest {
 
         response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
 
-        Assertions.assertNotNull(response.getBody());
+        assertNotNull(response.getBody());
 
         assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
 
@@ -520,7 +521,7 @@ public class HttpClientExecutorTest {
 
         response = httpClientExecutor.handleResponse(testHttpResponse, configurationBuilder.build());
 
-        Assertions.assertNull(response.getBody());
+        assertNull(response.getBody());
 
         testHttpResponse = new TestHttpResponse(
             "<root><key1>value1</key1><key2>value2</key2></root>",
@@ -530,7 +531,7 @@ public class HttpClientExecutorTest {
             testHttpResponse, configurationBuilder.responseType(Http.ResponseType.XML)
                 .build());
 
-        Assertions.assertNotNull(response.getBody());
+        assertNotNull(response.getBody());
 
         assertEquals(Map.of("key1", "value1", "key2", "value2"), response.getBody());
     }
