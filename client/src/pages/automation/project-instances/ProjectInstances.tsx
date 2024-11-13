@@ -12,7 +12,6 @@ import {useGetProjectInstanceTagsQuery} from '@/shared/queries/automation/projec
 import {useGetWorkspaceProjectInstancesQuery} from '@/shared/queries/automation/projectInstances.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ProjectInstanceDialog from './components/project-instance-dialog/ProjectInstanceDialog';
@@ -24,14 +23,11 @@ export enum Type {
 }
 
 const ProjectInstances = () => {
-    const [searchParams] = useSearchParams();
-
-    const [environment, setEnvironment] = useState<number | undefined>(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
-    );
-
     const {currentWorkspaceId} = useWorkspaceStore();
 
+    const [searchParams] = useSearchParams();
+
+    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const projectId = searchParams.get('projectId');
     const tagId = searchParams.get('tagId');
 
@@ -132,9 +128,6 @@ const ProjectInstances = () => {
                                             current: environment === item.value,
                                             id: item.value,
                                             name: item.label,
-                                            onItemClick: (id?: number | string) => {
-                                                setEnvironment(id as number);
-                                            },
                                         }}
                                         key={item.value ?? ''}
                                         toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Project ? 'projectId' : 'tagId'}=${filterData.id}` : ''}`}

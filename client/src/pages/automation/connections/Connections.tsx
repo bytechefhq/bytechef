@@ -17,7 +17,6 @@ import {
 } from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {Link2Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 import ConnectionList from './components/connection-list/ConnectionList';
@@ -28,15 +27,12 @@ export enum Type {
 }
 
 export const Connections = () => {
-    const [searchParams] = useSearchParams();
-
-    const [environment, setEnvironment] = useState<number | undefined>(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
-    );
-
     const {currentWorkspaceId} = useWorkspaceStore();
 
+    const [searchParams] = useSearchParams();
+
     const componentName = searchParams.get('componentName');
+    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const tagId = searchParams.get('tagId');
 
     const filterData = {
@@ -133,9 +129,6 @@ export const Connections = () => {
                                             current: environment === item.value,
                                             id: item.value,
                                             name: item.label,
-                                            onItemClick: (id?: number | string) => {
-                                                setEnvironment(id as number);
-                                            },
                                         }}
                                         key={item.value ?? ''}
                                         toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Component ? 'componentName' : 'tagId'}=${filterData.id}` : ''}`}
