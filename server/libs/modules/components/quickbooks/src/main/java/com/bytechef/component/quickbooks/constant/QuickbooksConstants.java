@@ -16,6 +16,11 @@
 
 package com.bytechef.component.quickbooks.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
+import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+
 /**
  * @author Mario Cvjetojevic
  * @author Luka Ljubić
@@ -29,6 +34,7 @@ public class QuickbooksConstants {
     public static final String BASE = "base";
     public static final String COMPANY_ID = "companyId";
     public static final String CUSTOMER = "Customer";
+    public static final String CUSTOMER_REF = "CustomerRef";
     public static final String DISPLAY_NAME = "DisplayName";
     public static final String DOMAIN = "domain";
     public static final String EXPENSE_ACCOUNT_REF = "ExpenseAccountRef";
@@ -38,17 +44,71 @@ public class QuickbooksConstants {
     public static final String ID = "Id";
     public static final String INCOME_ACCOUNT_REF = "IncomeAccountRef";
     public static final String INVENTORY = "Inventory";
+    public static final String INVOICE = "Invoice";
     public static final String INV_START_DATE = "InvStartDate";
     public static final String ITEM = "Item";
     public static final String MIDDLE_NAME = "MiddleName";
     public static final String NAME = "Name";
+    public static final String PAYMENT = "Payment";
     public static final String QTY_ON_HAND = "QtyOnHand";
     public static final String SERVICE = "Service";
     public static final String SUFFIX = "Suffix";
     public static final String TITLE = "Title";
+    public static final String TOTAL_AMT = "TotalAmt";
     public static final String TYPE = "Type";
     public static final String VALUE = "value";
 
     private QuickbooksConstants() {
     }
+
+    public static final ModifiableObjectProperty CUSTOMER_OUTPUT_PROPERTY = object()
+        .properties(
+            object(CUSTOMER)
+                .properties(
+                    string(DOMAIN),
+                    string(ID),
+                    string(TITLE),
+                    string(GIVEN_NAME),
+                    string(MIDDLE_NAME),
+                    string(FAMILY_NAME),
+                    string(SUFFIX),
+                    string(FULLY_QUALIFIED_NAME),
+                    string(DISPLAY_NAME),
+                    string(ACTIVE)));
+
+    public static final ModifiableObjectProperty ITEM_OUTPUT_PROPERTY =
+        object()
+            .properties(
+                object(ITEM)
+                    .properties(
+                        string(DOMAIN),
+                        string(ID),
+                        string(NAME),
+                        string(ACTIVE),
+                        string(FULLY_QUALIFIED_NAME),
+                        string(TYPE),
+                        object(INCOME_ACCOUNT_REF)
+                            .properties(
+                                string("name")),
+                        object(ASSET_ACCOUNT_REF)
+                            .properties(
+                                string("name")),
+                        object(EXPENSE_ACCOUNT_REF)
+                            .properties(
+                                string("name"))));
+
+    public static final ModifiableObjectProperty PAYMENT_OUTPUT_PROPERTY =
+        object()
+            .properties(
+                object(PAYMENT)
+                    .properties(
+                        string(DOMAIN),
+                        string(ID),
+                        object("CurrencyRef")
+                            .properties(
+                                string("name")),
+                        object(CUSTOMER_REF)
+                            .properties(
+                                string("name")),
+                        string(TOTAL_AMT)));
 }

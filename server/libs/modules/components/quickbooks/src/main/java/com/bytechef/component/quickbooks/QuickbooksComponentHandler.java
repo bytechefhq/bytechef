@@ -24,6 +24,11 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCategoryAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateCustomerAction;
 import com.bytechef.component.quickbooks.action.QuickbooksCreateItemAction;
+import com.bytechef.component.quickbooks.action.QuickbooksCreatePaymentAction;
+import com.bytechef.component.quickbooks.action.QuickbooksGetCustomerAction;
+import com.bytechef.component.quickbooks.action.QuickbooksGetInvoiceAction;
+import com.bytechef.component.quickbooks.action.QuickbooksGetItemAction;
+import com.bytechef.component.quickbooks.action.QuickbooksGetPaymentAction;
 import com.bytechef.component.quickbooks.connection.QuickbooksConnection;
 import com.google.auto.service.AutoService;
 
@@ -47,7 +52,12 @@ public class QuickbooksComponentHandler implements ComponentHandler {
         .actions(
             QuickbooksCreateCategoryAction.ACTION_DEFINITION,
             QuickbooksCreateCustomerAction.ACTION_DEFINITION,
-            QuickbooksCreateItemAction.ACTION_DEFINITION);
+            QuickbooksCreateItemAction.ACTION_DEFINITION,
+            QuickbooksCreatePaymentAction.ACTION_DEFINITION,
+            QuickbooksGetCustomerAction.ACTION_DEFINITION,
+            QuickbooksGetInvoiceAction.ACTION_DEFINITION,
+            QuickbooksGetItemAction.ACTION_DEFINITION,
+            QuickbooksGetPaymentAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -21,11 +21,16 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVOICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.PAYMENT;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
@@ -60,12 +65,12 @@ public class QuickbooksUtils {
 
         ModifiableStringProperty incomeAccount = string(INCOME_ACCOUNT_REF)
             .label("Income Account")
-            .options(QuickbooksUtils.getAccountOptions("Income"))
+            .options(getOptions(ACCOUNT, "Income"))
             .required(type.equals(INVENTORY) || type.equals(SERVICE));
 
         ModifiableStringProperty assetAccount = string(ASSET_ACCOUNT_REF)
             .label("Asset Account")
-            .options(QuickbooksUtils.getAccountOptions("Asset"))
+            .options(getOptions(ACCOUNT, "Asset"))
             .required(type.equals(INVENTORY));
 
         ModifiableDateProperty inventoryStartDate = date(INV_START_DATE)
@@ -76,10 +81,10 @@ public class QuickbooksUtils {
         return List.of(incomeAccount, assetAccount, inventoryStartDate);
     }
 
-    public static ActionOptionsFunction<String> getAccountOptions(String accountType) {
+    public static ActionOptionsFunction<String> getOptions(String entity, String accountType) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, actionContext) -> {
 
-            String encodeQuery = URLEncoder.encode("SELECT * FROM Account", StandardCharsets.UTF_8);
+            String encodeQuery = URLEncoder.encode("SELECT * FROM " + entity, StandardCharsets.UTF_8);
 
             Map<String, Object> body = actionContext
                 .http(http -> http.get("/query"))
@@ -90,19 +95,30 @@ public class QuickbooksUtils {
 
             List<Option<String>> options = new ArrayList<>();
 
-            if (body.get("QueryResponse") instanceof Map<?, ?> map && map.get(ACCOUNT) instanceof List<?> list) {
+            if (body.get("QueryResponse") instanceof Map<?, ?> map && map.get(entity) instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> entityMap) {
-                        if (entityMap.get("AccountType")
-                            .equals(accountType)) {
+                        String entityAccountType = (String) entityMap.get("AccountType");
+                        if (!entity.equals(ACCOUNT) || entityAccountType.equals(accountType)) {
+                            String displayValue = getDisplayValue(entity, entityMap);
 
-                            options.add(option((String) entityMap.get(NAME), (String) entityMap.get(ID)));
+                            options.add(option(displayValue, (String) entityMap.get(ID)));
                         }
                     }
                 }
             }
 
             return options;
+        };
+    }
+
+    private static String getDisplayValue(String entity, Map<?, ?> entityMap) {
+        return switch (entity) {
+            case ACCOUNT, ITEM -> (String) entityMap.get(NAME);
+            case CUSTOMER -> (String) entityMap.get(DISPLAY_NAME);
+            case INVOICE -> (String) entityMap.get("DocNumber");
+            case PAYMENT -> (String) entityMap.get(ID);
+            default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
 }
