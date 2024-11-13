@@ -10,7 +10,7 @@ import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefini
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
-import getTasksWithConditionChildNode from './getTasksWithConditionChildNode';
+import insertNewConditionSubtask from './insertNewConditionSubtask';
 
 const SPACE = 4;
 
@@ -171,7 +171,7 @@ export default async function saveWorkflowDefinition({
         tasks = [...(workflowDefinition.tasks || [])];
 
         if (conditionId && placeholderId) {
-            tasks = getTasksWithConditionChildNode({conditionId, newTask, placeholderId, tasks});
+            tasks = insertNewConditionSubtask({conditionId, newTask, placeholderId, tasks});
         } else if (nodeIndex !== undefined && nodeIndex > -1) {
             const tasksAfterCurrent = tasks.slice(nodeIndex);
 
