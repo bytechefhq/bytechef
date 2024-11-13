@@ -28,9 +28,10 @@ Version: 1
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
+| Base | STRING | SELECT  |  The base URL for Quickbooks.  |
+| Company Id | STRING | TEXT  |  To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID.  |
 | Client Id | STRING | TEXT  |  |
 | Client Secret | STRING | TEXT  |  |
-| Company Id | STRING | TEXT  |  To get the company id, go to your dashboard. On the top right corner press the gear logo and click Additional information. There you will see your company ID  |
 
 
 
@@ -46,13 +47,13 @@ Version: 1
 
 
 ### Create Category
-Has conditionally required parameters.
+Creates a new category.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  Name of the category  |
+| Name | STRING | TEXT  |  Name of the category.  |
 
 
 ### Output
@@ -66,7 +67,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(id), STRING\(domain), STRING\(Name), STRING\(Level), STRING\(Subitem), STRING\(FullyQualifiedName)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type)} | OBJECT_BUILDER  |
 
 
 
@@ -74,18 +75,18 @@ Type: OBJECT
 
 
 ### Create Customer
-Has conditionally required parameters.
+Creates a new customer.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Display Name | STRING | TEXT  |  The name of the person or organization as displayed. Must be unique across all Customer, Vendor, and Employee objects. Cannot be removed with sparse update. If not supplied, the system generates DisplayName by concatenating customer name components supplied in the request from the following list: Title, GivenName, MiddleName, FamilyName, and Suffix.  |
-| Suffix | STRING | TEXT  |  Suffix of the name. For example, Jr. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
-| Title | STRING | TEXT  |  Title of the person. This tag supports i18n, all locales. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, Suffix, or FullyQualifiedName attributes are required during create.  |
-| Middle Name | STRING | TEXT  |  Middle name of the person. The person can have zero or more middle names. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
-| Last/Family Name | STRING | TEXT  |  Family name or the last name of the person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
-| First/Given Name | STRING | TEXT  |  Given name or first name of a person. The DisplayName attribute or at least one of Title, GivenName, MiddleName, FamilyName, or Suffix attributes is required for object create.  |
+| Display Name | STRING | TEXT  |  The name of the person or organization as displayed.  |
+| First Name | STRING | TEXT  |  Given name or first name of a person.  |
+| Last Name | STRING | TEXT  |  Family name or the last name of the person.  |
+| Suffix | STRING | TEXT  |  Suffix of the name.  |
+| Title | STRING | TEXT  |  Title of the person.  |
+| Middle Name | STRING | TEXT  |  Middle name of the person.  |
 
 
 ### Output
@@ -99,12 +100,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| ID | STRING | TEXT  |  |
-| Contact name | STRING | TEXT  |  |
-| Credit card | {STRING\(number), STRING\(nameOnAcct), INTEGER\(ccExpiryMonth), INTEGER\(ccExpiryYear), STRING\(billAddrStreet), STRING\(postalCode), NUMBER\(amount)} | OBJECT_BUILDER  |  |
-| Balance | NUMBER | NUMBER  |  |
-| Account number | STRING | TEXT  |  |
-| Business number | STRING | TEXT  |  |
+| {STRING\(domain), STRING\(Id), STRING\(Title), STRING\(GivenName), STRING\(MiddleName), STRING\(FamilyName), STRING\(Suffix), STRING\(FullyQualifiedName), STRING\(DisplayName), STRING\(Active)} | OBJECT_BUILDER  |
 
 
 
@@ -118,8 +114,11 @@ Creates a new item.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  Name of the item. This value must be unique. Required for create.  |
-| Quantity on Hand | NUMBER | NUMBER  |  Current quantity of the Inventory items available for sale. Not used for Service or NonInventory type items.Required for Inventory type items.  |
+| Name | STRING | TEXT  |  Name of the item.  |
+| Type | STRING | SELECT  |  Type of item.  |
+| DYNAMIC_PROPERTIES | null  |
+| Expense Account | STRING | SELECT  |  |
+| Quantity on Hand | NUMBER | NUMBER  |  Current quantity of the inventory items available for sale.  |
 
 
 ### Output
@@ -133,10 +132,148 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| ID | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Description | STRING | TEXT  |  |
-| Unit price | NUMBER | NUMBER  |  |
+| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type), {STRING\(name)}\(IncomeAccountRef), {STRING\(name)}\(AssetAccountRef), {STRING\(name)}\(ExpenseAccountRef)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Create Payment
+Creates a new payment.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Customer | STRING | SELECT  |  |
+| Total Amount | NUMBER | NUMBER  |  Total amount of the transaction.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(domain), STRING\(Id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(CustomerRef), STRING\(TotalAmt)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Customer
+Gets details about a specific customer.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Customer | STRING | SELECT  |  Customer to get.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(domain), STRING\(Id), STRING\(Title), STRING\(GivenName), STRING\(MiddleName), STRING\(FamilyName), STRING\(Suffix), STRING\(FullyQualifiedName), STRING\(DisplayName), STRING\(Active)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Invoice
+Gets details about a specific invoice.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Invoice | STRING | SELECT  |  Invoice to get.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(domain), STRING\(Id), STRING\(DocNumber), {STRING\(name)}\(CustomerRef), STRING\(Balance)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Item
+Gets details about a specific item.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Item | STRING | SELECT  |  Item to get.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type), {STRING\(name)}\(IncomeAccountRef), {STRING\(name)}\(AssetAccountRef), {STRING\(name)}\(ExpenseAccountRef)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Payment
+Gets details about a specific payment.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Payment | STRING | SELECT  |  Payment to get.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(domain), STRING\(Id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(CustomerRef), STRING\(TotalAmt)} | OBJECT_BUILDER  |
 
 
 
