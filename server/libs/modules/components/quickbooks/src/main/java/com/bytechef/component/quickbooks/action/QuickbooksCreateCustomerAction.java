@@ -17,18 +17,13 @@
 package com.bytechef.component.quickbooks.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACTIVE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER_OUTPUT_PROPERTY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOMAIN;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FAMILY_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FULLY_QUALIFIED_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.GIVEN_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.MIDDLE_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUFFIX;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
@@ -80,22 +75,7 @@ public class QuickbooksCreateCustomerAction {
                 .description("Middle name of the person.")
                 .maxLength(100)
                 .required(false))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        object(CUSTOMER)
-                            .properties(
-                                string(DOMAIN),
-                                string(ID),
-                                string(TITLE),
-                                string(GIVEN_NAME),
-                                string(MIDDLE_NAME),
-                                string(FAMILY_NAME),
-                                string(SUFFIX),
-                                string(FULLY_QUALIFIED_NAME),
-                                string(DISPLAY_NAME),
-                                string(ACTIVE)))))
+        .output(outputSchema(CUSTOMER_OUTPUT_PROPERTY))
         .perform(QuickbooksCreateCustomerAction::perform);
 
     private QuickbooksCreateCustomerAction() {

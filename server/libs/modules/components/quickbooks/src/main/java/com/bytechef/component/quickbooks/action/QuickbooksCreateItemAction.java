@@ -19,22 +19,17 @@ package com.bytechef.component.quickbooks.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACTIVE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DOMAIN;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.FULLY_QUALIFIED_NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
+import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM_OUTPUT_PROPERTY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
@@ -79,34 +74,14 @@ public class QuickbooksCreateItemAction {
                 .properties(QuickbooksUtils::addPropertiesForItem),
             string(EXPENSE_ACCOUNT_REF)
                 .label("Expense Account")
-                .options(QuickbooksUtils.getAccountOptions("Expense"))
+                .options(QuickbooksUtils.getOptions(ACCOUNT, "Expense"))
                 .required(true),
             number(QTY_ON_HAND)
                 .label("Quantity on Hand")
                 .description("Current quantity of the inventory items available for sale.")
                 .displayCondition("%s == '%s'".formatted(TYPE, INVENTORY))
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        object(ITEM)
-                            .properties(
-                                string(DOMAIN),
-                                string(ID),
-                                string(NAME),
-                                string(ACTIVE),
-                                string(FULLY_QUALIFIED_NAME),
-                                string(TYPE),
-                                object(INCOME_ACCOUNT_REF)
-                                    .properties(
-                                        string("name")),
-                                object(ASSET_ACCOUNT_REF)
-                                    .properties(
-                                        string("name")),
-                                object(EXPENSE_ACCOUNT_REF)
-                                    .properties(
-                                        string("name"))))))
+        .output(outputSchema(ITEM_OUTPUT_PROPERTY))
         .perform(QuickbooksCreateItemAction::perform);
 
     private QuickbooksCreateItemAction() {
