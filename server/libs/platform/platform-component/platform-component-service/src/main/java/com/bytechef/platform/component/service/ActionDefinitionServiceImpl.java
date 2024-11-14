@@ -29,6 +29,7 @@ import com.bytechef.component.definition.DynamicOptionsProperty;
 import com.bytechef.component.definition.OptionsDataSource;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.OutputDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
@@ -75,15 +76,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
         ComponentConnection connection, @NonNull ActionContext context) {
 
-        ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
-            componentName, componentVersion, actionName, propertyName);
+        WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
 
         try {
+            ActionPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
+                componentName, componentVersion, actionName, propertyName, wrapResult.inputParameters,
+                wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap, context);
+
             return propertiesFunction
                 .apply(
-                    ParametersFactory.createParameters(inputParameters),
-                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-                    getLookupDependsOnPathsMap(lookupDependsOnPaths), context)
+                    wrapResult.inputParameters, wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap,
+                    context)
                 .stream()
                 .map(valueProperty -> (Property) Property.toProperty(valueProperty))
                 .toList();
@@ -151,15 +154,17 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, String searchText,
         ComponentConnection connection, @NonNull ActionContext context) {
 
-        ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
-            componentName, componentVersion, actionName, propertyName);
-
         try {
+            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
+
+            ActionOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+                componentName, componentVersion, actionName, propertyName, wrapResult.inputParameters(),
+                wrapResult.connectionParameters(), wrapResult.lookupDependsOnPathsMap(), context);
+
             return optionsFunction
                 .apply(
-                    ParametersFactory.createParameters(inputParameters),
-                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-                    getLookupDependsOnPathsMap(lookupDependsOnPaths), searchText, context)
+                    wrapResult.inputParameters(), wrapResult.connectionParameters(),
+                    wrapResult.lookupDependsOnPathsMap(), searchText, context)
                 .stream()
                 .map(Option::new)
                 .toList();
@@ -304,10 +309,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private ActionOptionsFunction<?> getComponentOptionsFunction(
-        String componentName, int componentVersion, String actionName, String propertyName) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ActionContext context) throws Exception {
 
         DynamicOptionsProperty<?> dynamicOptionsProperty = (DynamicOptionsProperty<?>) componentDefinitionRegistry
-            .getActionProperty(componentName, componentVersion, actionName, propertyName);
+            .getActionProperty(
+                componentName, componentVersion, actionName, propertyName, inputParameters, connectionParameters,
+                lookupDependsOnPaths, context);
 
         OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
@@ -315,10 +324,14 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     private ActionPropertiesFunction getComponentPropertiesFunction(
-        String componentName, int componentVersion, String actionName, String propertyName) {
+        String componentName, int componentVersion, String actionName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        ActionContext context) throws Exception {
 
         DynamicPropertiesProperty dynamicPropertiesProperty = (DynamicPropertiesProperty) componentDefinitionRegistry
-            .getActionProperty(componentName, componentVersion, actionName, propertyName);
+            .getActionProperty(
+                componentName, componentVersion, actionName, propertyName, inputParameters, connectionParameters,
+                lookupDependsOnPaths, context);
 
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
@@ -372,5 +385,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                     (com.bytechef.component.definition.Property) property),
                 sampleOutput),
             PropertyFactory.PROPERTY_FACTORY);
+    }
+
+    private static WrapResult wrap(
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
+
+        return new WrapResult(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(
+                connection == null ? Map.of() : connection.parameters()),
+            getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
+    private record WrapResult(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPathsMap) {
     }
 }

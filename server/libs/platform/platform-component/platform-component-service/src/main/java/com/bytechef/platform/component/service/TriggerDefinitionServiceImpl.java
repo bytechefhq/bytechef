@@ -100,18 +100,16 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull Map<String, ?> inputParameters, @NonNull String propertyName,
         List<String> lookupDependsOnPaths, @Nullable ComponentConnection connection, @NonNull TriggerContext context) {
 
-        PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
-            componentName, componentVersion, triggerName, propertyName);
-
         try {
+            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
+
+            PropertiesDataSource.TriggerPropertiesFunction propertiesFunction = getComponentPropertiesFunction(
+                componentName, componentVersion, triggerName, propertyName, wrapResult.inputParameters,
+                wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap, context);
+
             return CollectionUtils.map(
                 propertiesFunction.apply(
-                    ParametersFactory.createParameters(inputParameters),
-                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-                    MapUtils.toMap(
-                        lookupDependsOnPaths,
-                        item -> item.substring(item.lastIndexOf(".") + 1),
-                        item -> item),
+                    wrapResult.inputParameters, wrapResult.connectionParameters, wrapResult.lookupDependsOnPathsMap,
                     context),
                 valueProperty -> (ValueProperty<?>) Property.toProperty(valueProperty));
         } catch (Exception e) {
@@ -186,19 +184,17 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         @NonNull List<String> lookupDependsOnPaths,
         String searchText, ComponentConnection connection, @NonNull TriggerContext context) {
 
-        OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
-            componentName, componentVersion, triggerName, propertyName);
-
         try {
+            WrapResult wrapResult = wrap(inputParameters, lookupDependsOnPaths, connection);
+
+            OptionsDataSource.TriggerOptionsFunction<?> optionsFunction = getComponentOptionsFunction(
+                componentName, componentVersion, triggerName, propertyName, wrapResult.inputParameters(),
+                wrapResult.connectionParameters(), wrapResult.lookupDependsOnPathsMap(), context);
+
             return CollectionUtils.map(
                 optionsFunction.apply(
-                    ParametersFactory.createParameters(inputParameters),
-                    ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
-                    MapUtils.toMap(
-                        lookupDependsOnPaths,
-                        item -> item.substring(item.lastIndexOf(".") + 1),
-                        item -> item),
-                    searchText, context),
+                    wrapResult.inputParameters(), wrapResult.connectionParameters(),
+                    wrapResult.lookupDependsOnPathsMap(), searchText, context),
                 Option::new);
         } catch (Exception e) {
             throw new ComponentConfigurationException(e, inputParameters, TriggerDefinitionErrorType.EXECUTE_OPTIONS);
@@ -521,10 +517,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private OptionsDataSource.TriggerOptionsFunction<?> getComponentOptionsFunction(
-        String componentName, int componentVersion, String triggerName, String propertyName) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        TriggerContext context) throws Exception {
 
         DynamicOptionsProperty<?> dynamicOptionsProperty = (DynamicOptionsProperty<?>) componentDefinitionRegistry
-            .getTriggerProperty(componentName, componentVersion, triggerName, propertyName);
+            .getTriggerProperty(
+                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionParameters,
+                lookupDependsOnPaths, context);
 
         OptionsDataSource optionsDataSource = OptionalUtils.get(dynamicOptionsProperty.getOptionsDataSource());
 
@@ -532,11 +532,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private PropertiesDataSource.TriggerPropertiesFunction getComponentPropertiesFunction(
-        String componentName, int componentVersion, String triggerName, String propertyName) {
+        String componentName, int componentVersion, String triggerName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        TriggerContext context) throws Exception {
 
         DynamicPropertiesProperty property =
             (DynamicPropertiesProperty) componentDefinitionRegistry.getTriggerProperty(
-                componentName, componentVersion, triggerName, propertyName);
+                componentName, componentVersion, triggerName, propertyName, inputParameters, connectionParameters,
+                lookupDependsOnPaths, context);
 
         PropertiesDataSource<?> propertiesDataSource = property.getDynamicPropertiesDataSource();
 
@@ -550,6 +553,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getDynamicWebhookRefresh());
+    }
+
+    private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {
+        return MapUtils.toMap(lookupDependsOnPaths, item -> item.substring(item.lastIndexOf(".") + 1), item -> item);
     }
 
     private WebhookDisableConsumer getWebhookDisableConsumer(
@@ -619,5 +626,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return new WebhookEnableOutput(
             (Map<String, ?>) triggerState.get("parameters"), (LocalDateTime) triggerState.get("webhookExpirationDate"));
+    }
+
+    private static WrapResult wrap(
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, ComponentConnection connection) {
+
+        return new WrapResult(
+            ParametersFactory.createParameters(inputParameters),
+            ParametersFactory.createParameters(connection == null ? Map.of() : connection.parameters()),
+            getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
+    private record WrapResult(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPathsMap) {
     }
 }
