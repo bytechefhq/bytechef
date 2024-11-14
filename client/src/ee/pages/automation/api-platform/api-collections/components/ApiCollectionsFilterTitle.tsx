@@ -1,5 +1,5 @@
 import {Badge} from '@/components/ui/badge';
-import {Type} from '@/pages/automation/project-instances/ProjectInstances';
+import {Type} from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';

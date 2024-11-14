@@ -52,7 +52,7 @@ const automationNavigation: NavigationType[] = [
         name: 'Project Instances',
     },
     {
-        href: '/automation/api-platform/api-collections',
+        href: '/automation/api-platform',
         icon: LandmarkIcon,
         name: 'API Collections',
     },

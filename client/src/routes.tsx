@@ -1,4 +1,5 @@
 import App from '@/App';
+import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
 import Activate from '@/pages/account/public/Activate';
@@ -214,6 +215,12 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     children: [
                                         {
+                                            index: true,
+                                            loader: async () => {
+                                                return redirect('api-collections');
+                                            },
+                                        },
+                                        {
                                             element: (
                                                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                                                     <EEVersion>
@@ -222,6 +229,16 @@ export const getRouter = (queryClient: QueryClient) =>
                                                 </PrivateRoute>
                                             ),
                                             path: 'api-collections',
+                                        },
+                                        {
+                                            element: (
+                                                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                                    <EEVersion>
+                                                        <ApiClients />
+                                                    </EEVersion>
+                                                </PrivateRoute>
+                                            ),
+                                            path: 'api-clients',
                                         },
                                     ],
                                     path: 'api-platform',
