@@ -115,7 +115,7 @@ spring:
   jmx:
     enabled: false
   mail:
-    host: ${bytechef.mail.host}
+    host: ${bytechef.mail.host:localhost}
     port: ${bytechef.mail.port:25}
     username: ${bytechef.mail.username}
     password: ${bytechef.mail.password}
