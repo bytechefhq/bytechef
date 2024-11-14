@@ -80,6 +80,22 @@ export default defineConfig({
                             collapsed: true,
                         },
                         {
+                            label: 'Generate Component',
+                            items: [
+                                {label: 'Overview', link: '/developer_guide/generate_component/overview'},
+                                {label: 'Initial Setup', link: '/developer_guide/generate_component/initial_setup'},
+                                {
+                                    label: 'OpenAPI Specification',
+                                    link: '/developer_guide/generate_component/open_api_specification'
+                                },
+                                {
+                                    label: 'Customize Component',
+                                    link: '/developer_guide/generate_component/customize_component'
+                                },
+                            ],
+                            collapsed: true,
+                        },
+                        {
                             label: 'Component Specification',
                             items: [
                                 {label: 'Component', link: '/developer_guide/component_specification/component'},
