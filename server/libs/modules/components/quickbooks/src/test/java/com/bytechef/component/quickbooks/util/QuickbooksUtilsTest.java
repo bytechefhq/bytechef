@@ -28,7 +28,7 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAM
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.PAYMENT;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
-import static com.bytechef.component.quickbooks.util.QuickbooksUtils.addPropertiesForItem;
+import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getPropertiesForItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -61,26 +61,27 @@ class QuickbooksUtilsTest {
     private final ArgumentCaptor<String> queryValueArgumentCapture = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testAddPropertiesForItemWithInventoryType() {
+    void testGetPropertiesForItemWithInventoryType() {
         verifyProperties(INVENTORY, true, true, true);
     }
 
     @Test
-    void testAddPropertiesForItemWithServiceType() {
+    void testGetPropertiesForItemWithServiceType() {
         verifyProperties(SERVICE, true, false, false);
     }
 
     @Test
-    void testAddPropertiesForItemWithOtherType() {
+    void testGetPropertiesForItemWithOtherType() {
         verifyProperties("Non-Inventory", false, false, false);
     }
 
-    private void
-        verifyProperties(String type, boolean incomeRequired, boolean assetRequired, boolean inventoryDateRequired) {
+    private void verifyProperties(
+        String type, boolean incomeRequired, boolean assetRequired, boolean inventoryDateRequired) {
+
         when(mockedParameters.getRequiredString(TYPE)).thenReturn(type);
 
         List<? extends Property.ValueProperty<?>> properties =
-            addPropertiesForItem(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
+            getPropertiesForItem(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
 
         assertEquals(3, properties.size());
         assertEquals(incomeRequired, properties.get(0)

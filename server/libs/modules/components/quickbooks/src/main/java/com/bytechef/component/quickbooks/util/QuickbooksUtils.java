@@ -57,7 +57,7 @@ public class QuickbooksUtils {
     private QuickbooksUtils() {
     }
 
-    public static List<? extends ValueProperty<?>> addPropertiesForItem(
+    public static List<? extends ValueProperty<?>> getPropertiesForItem(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 

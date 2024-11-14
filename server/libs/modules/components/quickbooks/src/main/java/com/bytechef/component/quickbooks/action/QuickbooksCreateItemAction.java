@@ -71,7 +71,7 @@ public class QuickbooksCreateItemAction {
                 .required(true),
             dynamicProperties(ACCOUNT)
                 .propertiesLookupDependsOn(TYPE)
-                .properties(QuickbooksUtils::addPropertiesForItem),
+                .properties(QuickbooksUtils::getPropertiesForItem),
             string(EXPENSE_ACCOUNT_REF)
                 .label("Expense Account")
                 .options(QuickbooksUtils.getOptions(ACCOUNT, "Expense"))
