@@ -16,7 +16,9 @@
 
 package com.bytechef.commons.util.constant;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -39,6 +41,7 @@ public class ObjectMapperConstants {
             OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             OBJECT_MAPPER.registerModule(new JavaTimeModule());
             OBJECT_MAPPER.registerModule(new Jdk8Module());
+            OBJECT_MAPPER.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         }
     }
 
