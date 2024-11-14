@@ -96,6 +96,13 @@ export default defineConfig({
                             collapsed: true,
                         },
                         {
+                            label: 'Testing Triggers',
+                            items: [
+                                {label: 'Working with Triggers', link: '/developer_guide/testing_triggers/triggers'},
+                            ],
+                            collapsed: true,
+                        },
+                        {
                             label: 'Component Specification',
                             items: [
                                 {label: 'Component', link: '/developer_guide/component_specification/component'},
