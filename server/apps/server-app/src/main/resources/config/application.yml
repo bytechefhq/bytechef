@@ -118,7 +118,7 @@ spring:
     host: ${bytechef.mail.host}
     port: ${bytechef.mail.port:25}
     username: ${bytechef.mail.username}
-    password: {bytechef.mail.password}
+    password: ${bytechef.mail.password}
     properties:
       mail:
         smtp:
