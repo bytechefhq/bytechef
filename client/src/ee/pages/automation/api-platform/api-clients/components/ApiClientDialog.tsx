@@ -11,9 +11,9 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useToast} from '@/hooks/use-toast';
-import {ApiKey} from '@/shared/middleware/platform/user';
-import {useCreateApiKeyMutation, useUpdateApiKeyMutation} from '@/shared/mutations/platform/apiKeys.mutations';
-import {ApiKeyKeys} from '@/shared/queries/platform/apiKeys.queries';
+import {ApiClient} from '@/middleware/automation/api-platform';
+import {useCreateApiClientMutation, useUpdateApiClientMutation} from '@/shared/mutations/platform/apiClients.mutations';
+import {ApiClientKeys} from '@/shared/queries/platform/apiClients.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -28,13 +28,13 @@ const formSchema = z.object({
     }),
 });
 
-interface ApiKeyDialogProps {
-    apiKey?: ApiKey;
+interface ApiClientDialogProps {
+    apiClient?: ApiClient;
     onClose?: () => void;
     triggerNode?: ReactNode;
 }
 
-const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
+const ApiClientDialog = ({apiClient, onClose, triggerNode}: ApiClientDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [secretApiKey, setSecretApiKey] = useState<string | undefined>();
 
@@ -44,7 +44,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
-            name: apiKey?.name || '',
+            name: apiClient?.name || '',
         },
         resolver: zodResolver(formSchema),
     });
@@ -53,10 +53,10 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
     const queryClient = useQueryClient();
 
-    const createApiKeyMutation = useCreateApiKeyMutation({
+    const createApiClientMutation = useCreateApiClientMutation({
         onSuccess: (result: {secretKey?: string}) => {
             queryClient.invalidateQueries({
-                queryKey: ApiKeyKeys.apiKeys,
+                queryKey: ApiClientKeys.apiClients,
             });
 
             setSecretApiKey(result.secretKey);
@@ -64,10 +64,10 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
             reset();
         },
     });
-    const updateApiKeyMutation = useUpdateApiKeyMutation({
+    const updateApiClientMutation = useUpdateApiClientMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ApiKeyKeys.apiKeys,
+                queryKey: ApiClientKeys.apiClients,
             });
 
             closeDialog();
@@ -85,17 +85,17 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
         setSecretApiKey(undefined);
     }
 
-    function saveApiKey() {
-        if (apiKey?.id) {
-            updateApiKeyMutation.mutate({
-                ...apiKey,
+    function saveApiClient() {
+        if (apiClient?.id) {
+            updateApiClientMutation.mutate({
+                ...apiClient,
                 ...getValues(),
-            } as ApiKey);
+            } as ApiClient);
         } else {
-            createApiKeyMutation.mutate({
-                ...apiKey,
+            createApiClientMutation.mutate({
+                ...apiClient,
                 ...getValues(),
-            } as ApiKey);
+            } as ApiClient);
         }
     }
 
@@ -114,11 +114,13 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
 
             <DialogContent className="min-w-api-key-dialog-width">
                 <Form {...form}>
-                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiKey)}>
+                    <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiClient)}>
                         <DialogHeader>
                             <div className="flex items-center justify-between">
                                 <DialogTitle>
-                                    {secretApiKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} secret API Key
+                                    {secretApiKey
+                                        ? 'Save your secret API key'
+                                        : `${apiClient?.id ? 'Edit' : 'Create'} API Client`}
                                 </DialogTitle>
                             </div>
                         </DialogHeader>
@@ -173,7 +175,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                             </DialogClose>
 
                             {!secretApiKey && (
-                                <Button type="submit">{apiKey?.id ? 'Save' : 'Create secret API Key'}</Button>
+                                <Button type="submit">{apiClient?.id ? 'Save' : 'Create API Client'}</Button>
                             )}
                         </DialogFooter>
                     </form>
@@ -183,4 +185,4 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
     );
 };
 
-export default ApiKeyDialog;
+export default ApiClientDialog;
