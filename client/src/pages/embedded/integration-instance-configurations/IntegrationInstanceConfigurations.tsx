@@ -15,7 +15,6 @@ import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.qu
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
-import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
 export enum Type {
@@ -27,10 +26,7 @@ export enum Type {
 const IntegrationInstanceConfigurations = () => {
     const [searchParams] = useSearchParams();
 
-    const [environment, setEnvironment] = useState<number | undefined>(
-        searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined
-    );
-
+    const environment = searchParams.get('environment') ? parseInt(searchParams.get('environment')!) : undefined;
     const integrationId = searchParams.get('integrationId');
     const tagId = searchParams.get('tagId');
 
@@ -150,9 +146,6 @@ const IntegrationInstanceConfigurations = () => {
                                             current: environment === item.value,
                                             id: item.value,
                                             name: item.label,
-                                            onItemClick: (id?: number | string) => {
-                                                setEnvironment(id as number);
-                                            },
                                         }}
                                         key={item.value ?? ''}
                                         toLink={`?environment=${item.value ?? ''}${filterData.id ? `&${filterData.type === Type.Integration ? 'integrationId' : 'tagId'}=${filterData.id}` : ''}`}
