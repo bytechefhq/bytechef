@@ -27,8 +27,6 @@ public interface WorkflowModelAware {
 
     void setConnectionsCount(Integer connectionsCount);
 
-//    void setManualTrigger(Boolean manual);
-
     void setWorkflowTaskComponentNames(List<String> workflowTaskComponentNames);
 
     void setWorkflowTriggerComponentNames(List<String> workflowTriggerComponentNames);
