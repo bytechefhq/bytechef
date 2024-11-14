@@ -980,6 +980,7 @@ public class ApplicationProperties {
         private String baseUrl;
         private String password;
         private int port = 25;
+        private Smtp smtp = new Smtp();
         private String username;
 
         public String getBaseUrl() {
@@ -1022,8 +1023,12 @@ public class ApplicationProperties {
             this.port = port;
         }
 
+        public Smtp getSmtp() {
+            return smtp;
         }
 
+        public void setSmtp(Smtp smtp) {
+            this.smtp = this.smtp;
         }
 
         public String getUsername() {
@@ -1032,6 +1037,50 @@ public class ApplicationProperties {
 
         public void setUsername(String username) {
             this.username = username;
+        }
+
+        public static class Smtp {
+
+            private boolean auth;
+            private Starttls starttls = new Starttls();
+
+            public boolean isAuth() {
+                return auth;
+            }
+
+            public void setAuth(boolean auth) {
+                this.auth = auth;
+            }
+
+            public Starttls getStarttls() {
+                return starttls;
+            }
+
+            public void setStarttls(Starttls starttls) {
+                this.starttls = starttls;
+            }
+
+            public static class Starttls {
+
+                private boolean enable;
+                private boolean required;
+
+                public boolean isEnable() {
+                    return enable;
+                }
+
+                public void setEnable(boolean enable) {
+                    this.enable = enable;
+                }
+
+                public boolean isRequired() {
+                    return required;
+                }
+
+                public void setRequired(boolean required) {
+                    this.required = required;
+                }
+            }
         }
     }
 

@@ -119,6 +119,13 @@ spring:
     port: ${bytechef.mail.port:25}
     username: ${bytechef.mail.username}
     password: {bytechef.mail.password}
+    properties:
+      mail:
+        smtp:
+          auth: ${bytechef.mail.auth:false}
+          starttls:
+            enable: ${bytechef.mail.tls.starttls.enable:false}
+            required: ${bytechef.mail.smtp.starttls.required:false}
   liquibase:
     contexts: mono, #spring.profiles.active#
   output:
