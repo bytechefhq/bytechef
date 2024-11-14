@@ -35,5 +35,5 @@ public interface CodeWorkflowFileStorage {
 
     FileEntry storeCodeWorkflowDefinition(@NonNull String filename, @NonNull String definition);
 
-    FileEntry storeCodeWorkflowFile(String filename, @NonNull byte[] bytes);
+    FileEntry storeCodeWorkflowFile(@NonNull String filename, @NonNull byte[] bytes);
 }

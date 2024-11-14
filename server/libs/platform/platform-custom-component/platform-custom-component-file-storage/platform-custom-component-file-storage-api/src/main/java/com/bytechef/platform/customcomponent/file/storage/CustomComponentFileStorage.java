@@ -25,9 +25,9 @@ import org.springframework.lang.NonNull;
  */
 public interface CustomComponentFileStorage {
 
-    void deleteCustomComponentFile(FileEntry componentFile);
+    void deleteCustomComponentFile(@NonNull FileEntry componentFile);
 
     URL getCustomComponentFileURL(@NonNull FileEntry componentFile);
 
-    FileEntry storeCustomComponentFile(String filename, @NonNull byte[] bytes);
+    FileEntry storeCustomComponentFile(@NonNull String filename, @NonNull byte[] bytes);
 }

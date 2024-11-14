@@ -21,6 +21,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import java.io.InputStream;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -30,22 +31,22 @@ public class InMemoryFilesFileStorage implements FilesFileStorage {
     private final FilesFileStorage filesFileStorage = new FilesFileStorageImpl(new Base64FileStorageService());
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
+    public InputStream getFileStream(@NonNull FileEntry fileEntry) {
         return filesFileStorage.getFileStream(fileEntry);
     }
 
     @Override
-    public String readFileToString(FileEntry fileEntry) {
+    public String readFileToString(@NonNull FileEntry fileEntry) {
         return filesFileStorage.readFileToString(fileEntry);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) {
+    public FileEntry storeFileContent(@NonNull String fileName, @NonNull String data) {
         return filesFileStorage.storeFileContent(fileName, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String submittedFileName, InputStream inputStream) {
+    public FileEntry storeFileContent(@NonNull String submittedFileName, @NonNull InputStream inputStream) {
         return filesFileStorage.storeFileContent(submittedFileName, inputStream);
     }
 }

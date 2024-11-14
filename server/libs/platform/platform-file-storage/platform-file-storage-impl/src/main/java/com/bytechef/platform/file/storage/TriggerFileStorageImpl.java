@@ -21,7 +21,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 
 /**
@@ -40,8 +39,6 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
 
     @Override
     public Object readTriggerExecutionOutput(@NonNull FileEntry fileEntry) {
-        Validate.notNull(fileEntry, "'fileEntry' must not be null");
-
         return JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TRIGGER_EXECUTION_FILES_DIR, fileEntry)),
@@ -50,8 +47,6 @@ public class TriggerFileStorageImpl implements TriggerFileStorage {
 
     @Override
     public FileEntry storeTriggerExecutionOutput(long triggerExecutionId, @NonNull Object output) {
-        Validate.notNull(output, "'output' must not be null");
-
         return fileStorageService.storeFileContent(
             TRIGGER_EXECUTION_FILES_DIR, triggerExecutionId + ".json",
             CompressionUtils.compress(JsonUtils.write(output)));

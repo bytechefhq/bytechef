@@ -18,17 +18,18 @@ package com.bytechef.platform.file.storage;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import java.io.InputStream;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface FilesFileStorage {
 
-    InputStream getFileStream(FileEntry fileEntry);
+    InputStream getFileStream(@NonNull FileEntry fileEntry);
 
-    String readFileToString(FileEntry fileEntry);
+    String readFileToString(@NonNull FileEntry fileEntry);
 
-    FileEntry storeFileContent(String fileName, String data);
+    FileEntry storeFileContent(@NonNull String fileName, @NonNull String data);
 
-    FileEntry storeFileContent(String submittedFileName, InputStream inputStream);
+    FileEntry storeFileContent(@NonNull String submittedFileName, @NonNull InputStream inputStream);
 }

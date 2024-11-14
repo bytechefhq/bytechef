@@ -68,6 +68,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.data.domain.Page;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -81,7 +82,7 @@ public class JobSyncExecutor {
         private static final Executor executor = Executors.newCachedThreadPool();
 
         @Override
-        public void execute(Runnable task) {
+        public void execute(@NonNull Runnable task) {
             String tenantId = TenantContext.getCurrentTenantId();
 
             executor.execute(

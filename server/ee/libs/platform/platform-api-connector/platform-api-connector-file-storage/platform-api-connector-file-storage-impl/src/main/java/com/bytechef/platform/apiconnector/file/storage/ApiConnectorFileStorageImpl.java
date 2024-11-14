@@ -20,7 +20,6 @@ import com.bytechef.commons.util.CompressionUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 
 /**
@@ -39,7 +38,7 @@ public class ApiConnectorFileStorageImpl implements ApiConnectorFileStorage {
     }
 
     @Override
-    public void deleteApiConnectorDefinition(FileEntry componentFile) {
+    public void deleteApiConnectorDefinition(@NonNull FileEntry componentFile) {
         fileStorageService.deleteFile(API_CONNECTORS_DEFINITIONS_DIR, componentFile);
     }
 
@@ -62,18 +61,12 @@ public class ApiConnectorFileStorageImpl implements ApiConnectorFileStorage {
 
     @Override
     public FileEntry storeApiConnectorDefinition(String filename, @NonNull String definition) {
-        Validate.notNull(filename, "'filename' must not be null");
-        Validate.notNull(definition, "'bytes' must not be null");
-
         return fileStorageService.storeFileContent(
             API_CONNECTORS_DEFINITIONS_DIR, filename, CompressionUtils.compress(definition));
     }
 
     @Override
     public FileEntry storeApiConnectorSpecification(@NonNull String filename, @NonNull String definition) {
-        Validate.notNull(filename, "'filename' must not be null");
-        Validate.notNull(definition, "'definition' must not be null");
-
         return fileStorageService.storeFileContent(
             API_CONNECTORS_SPECIFICATIONS_DIR, filename, CompressionUtils.compress(definition));
     }

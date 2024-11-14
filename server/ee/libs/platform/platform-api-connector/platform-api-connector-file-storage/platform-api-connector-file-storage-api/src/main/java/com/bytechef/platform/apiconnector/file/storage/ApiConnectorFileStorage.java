@@ -24,7 +24,7 @@ import org.springframework.lang.NonNull;
  */
 public interface ApiConnectorFileStorage {
 
-    void deleteApiConnectorDefinition(FileEntry componentFile);
+    void deleteApiConnectorDefinition(@NonNull FileEntry componentFile);
 
     void deleteApiConnectorSpecification(@NonNull FileEntry specificationFile);
 

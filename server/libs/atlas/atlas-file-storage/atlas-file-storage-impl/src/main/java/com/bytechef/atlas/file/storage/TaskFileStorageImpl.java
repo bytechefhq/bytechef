@@ -24,7 +24,6 @@ import com.bytechef.file.storage.service.FileStorageService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 
 /**
@@ -52,8 +51,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
     @Override
     public Map<String, ?> readJobOutputs(@NonNull FileEntry fileEntry) {
-        Validate.notNull(fileEntry, "'fileEntry' must not be null");
-
         return JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(JOB_FILES_DIR, fileEntry)),
             new TypeReference<>() {});
@@ -61,8 +58,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
     @Override
     public Object readTaskExecutionOutput(@NonNull FileEntry fileEntry) {
-        Validate.notNull(fileEntry, "'fileEntry' must not be null");
-
         return JsonUtils.read(
             CompressionUtils.decompressToString(
                 fileStorageService.readFileToBytes(TASK_EXECUTION_FILES_DIR, fileEntry)),
@@ -73,9 +68,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     public FileEntry storeContextValue(
         long stackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
 
-        Validate.notNull(classname, "'classname' must not be null");
-        Validate.notNull(value, "'value' must not be null");
-
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + ".json", CompressionUtils.compress(JsonUtils.write(value)));
     }
@@ -84,9 +76,6 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     public FileEntry storeContextValue(
         long stackId, int subStackId, @NonNull Context.Classname classname, @NonNull Map<String, ?> value) {
 
-        Validate.notNull(classname, "'classname' must not be null");
-        Validate.notNull(value, "'value' must not be null");
-
         return fileStorageService.storeFileContent(
             CONTEXT_FILES_DIR, classname + "_" + stackId + "_" + subStackId + ".json",
             CompressionUtils.compress(JsonUtils.write(value)));
@@ -94,16 +83,12 @@ public class TaskFileStorageImpl implements TaskFileStorage {
 
     @Override
     public FileEntry storeJobOutputs(long jobId, @NonNull Map<String, ?> outputs) {
-        Validate.notNull(outputs, "'outputs' must not be null");
-
         return fileStorageService.storeFileContent(
             JOB_FILES_DIR, jobId + ".json", CompressionUtils.compress(JsonUtils.write(outputs)));
     }
 
     @Override
     public FileEntry storeTaskExecutionOutput(long taskExecutionId, @NonNull Object output) {
-        Validate.notNull(output, "'output' must not be null");
-
         return fileStorageService.storeFileContent(
             TASK_EXECUTION_FILES_DIR, taskExecutionId + ".json",
             CompressionUtils.compress(JsonUtils.write(output)));

@@ -20,6 +20,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -36,22 +37,22 @@ public class FilesFileStorageImpl implements FilesFileStorage {
     }
 
     @Override
-    public InputStream getFileStream(FileEntry fileEntry) {
+    public InputStream getFileStream(@NonNull FileEntry fileEntry) {
         return fileStorageService.getFileStream(FILES_DIR, fileEntry);
     }
 
     @Override
-    public String readFileToString(FileEntry fileEntry) {
+    public String readFileToString(@NonNull FileEntry fileEntry) {
         return fileStorageService.readFileToString(FILES_DIR, fileEntry);
     }
 
     @Override
-    public FileEntry storeFileContent(String fileName, String data) {
+    public FileEntry storeFileContent(@NonNull String fileName, @NonNull String data) {
         return fileStorageService.storeFileContent(FILES_DIR, fileName, data);
     }
 
     @Override
-    public FileEntry storeFileContent(String submittedFileName, InputStream inputStream) {
+    public FileEntry storeFileContent(@NonNull String submittedFileName, @NonNull InputStream inputStream) {
         return fileStorageService.storeFileContent(FILES_DIR, submittedFileName, inputStream);
     }
 }

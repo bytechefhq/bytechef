@@ -20,7 +20,6 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.service.FileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
-import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 
 /**
@@ -38,7 +37,7 @@ public class CustomComponentFileStorageImpl implements CustomComponentFileStorag
     }
 
     @Override
-    public void deleteCustomComponentFile(FileEntry componentFile) {
+    public void deleteCustomComponentFile(@NonNull FileEntry componentFile) {
         fileStorageService.deleteFile(CUSTOM_COMPONENTS_FILES_DIR, componentFile);
     }
 
@@ -48,10 +47,7 @@ public class CustomComponentFileStorageImpl implements CustomComponentFileStorag
     }
 
     @Override
-    public FileEntry storeCustomComponentFile(String filename, @NonNull byte[] bytes) {
-        Validate.notNull(filename, "'filename' must not be null");
-        Validate.notNull(bytes, "'bytes' must not be null");
-
+    public FileEntry storeCustomComponentFile(@NonNull String filename, @NonNull byte[] bytes) {
         return fileStorageService.storeFileContent(CUSTOM_COMPONENTS_FILES_DIR, filename, bytes, false);
     }
 }
