@@ -980,7 +980,6 @@ public class ApplicationProperties {
         private String baseUrl;
         private String password;
         private int port = 25;
-        private String tempDomainListUrl;
         private String username;
 
         public String getBaseUrl() {
@@ -1023,12 +1022,8 @@ public class ApplicationProperties {
             this.port = port;
         }
 
-        public String getTempDomainListUrl() {
-            return tempDomainListUrl;
         }
 
-        public void setTempDomainListUrl(String tempDomainListUrl) {
-            this.tempDomainListUrl = tempDomainListUrl;
         }
 
         public String getUsername() {
@@ -1170,6 +1165,7 @@ public class ApplicationProperties {
 
         private boolean activationRequired;
         private boolean enabled = true;
+        private String tempDomainListUrl;
 
         public boolean isActivationRequired() {
             return activationRequired;
@@ -1179,12 +1175,20 @@ public class ApplicationProperties {
             return enabled;
         }
 
+        public String getTempDomainListUrl() {
+            return tempDomainListUrl;
+        }
+
         public void setActivationRequired(boolean activationRequired) {
             this.activationRequired = activationRequired;
         }
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+
+        public void setTempDomainListUrl(String tempDomainListUrl) {
+            this.tempDomainListUrl = tempDomainListUrl;
         }
     }
 

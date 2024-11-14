@@ -34,7 +34,7 @@ public class TempEmailServiceImpl implements TempEmailService, InitializingBean 
     private final Resource resource;
     private List<String> tempEmailDomains;
 
-    public TempEmailServiceImpl(@Value("${bytechef.mail.temp-domain-list-url:''}") Resource resource) {
+    public TempEmailServiceImpl(@Value("${bytechef.signUp.temp-domain-list-url:''}") Resource resource) {
         this.resource = resource;
     }
 
