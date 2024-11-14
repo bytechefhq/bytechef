@@ -122,9 +122,9 @@ spring:
     properties:
       mail:
         smtp:
-          auth: ${bytechef.mail.auth:false}
+          auth: ${bytechef.mail.smtp.auth:false}
           starttls:
-            enable: ${bytechef.mail.tls.starttls.enable:false}
+            enable: ${bytechef.mail.smtp.starttls.enable:false}
             required: ${bytechef.mail.smtp.starttls.required:false}
   liquibase:
     contexts: mono, #spring.profiles.active#
