@@ -22,7 +22,9 @@ import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -38,11 +40,12 @@ public class WorkflowMapperUtils {
                 (int) getWorkflowTriggerConnectionsCount(workflowTriggerDTOs));
         workflowModel.setInputsCount(CollectionUtils.size(inputs));
         workflowModel.setWorkflowTaskComponentNames(
-            workflowTaskDTOs
-                .stream()
-                .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
-                .map(WorkflowNodeType::componentName)
-                .toList());
+            new ArrayList<>(
+                workflowTaskDTOs
+                    .stream()
+                    .map(workflowTask -> WorkflowNodeType.ofType(workflowTask.getType()))
+                    .map(WorkflowNodeType::componentName)
+                    .collect(Collectors.toSet())));
 
         List<String> workflowTriggerComponentNames = workflowTriggerDTOs.stream()
             .map(workflowTrigger -> WorkflowNodeType.ofType(workflowTrigger.type()))
