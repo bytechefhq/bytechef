@@ -261,7 +261,7 @@ const IntegrationInstanceConfigurations = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Instance Configurations" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader
                 errors={[

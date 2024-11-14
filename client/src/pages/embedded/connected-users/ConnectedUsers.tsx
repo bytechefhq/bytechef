@@ -364,7 +364,7 @@ const ConnectedUsers = () => {
                 </Form>
             }
             leftSidebarHeader={<Header title="Connected Users" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader errors={[connectedUsersError]} loading={connectedUsersLoading}>
                 {connectedUsers && connectedUsers?.length > 0 ? (
