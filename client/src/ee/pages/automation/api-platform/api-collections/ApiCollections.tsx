@@ -167,7 +167,7 @@ const ApiCollections = () => {
                 </>
             }
             leftSidebarHeader={<Header title="API Collections" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader
                 errors={[apiCollectionsError, projectsError, tagsError]}

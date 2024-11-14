@@ -202,7 +202,7 @@ export const Connections = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Connections" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader
                 errors={[allConnectionsError, connectionsError, tagsError]}

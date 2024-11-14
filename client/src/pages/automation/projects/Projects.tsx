@@ -62,7 +62,7 @@ const Projects = () => {
             }
             leftSidebarBody={<ProjectsLeftSidebarNav categories={categories} filterData={filterData} tags={tags} />}
             leftSidebarHeader={<Header position="sidebar" title="Projects" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader
                 errors={[categoriesError, projectsError, tagsError]}

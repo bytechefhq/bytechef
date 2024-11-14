@@ -200,7 +200,7 @@ const ProjectInstances = () => {
                 </>
             }
             leftSidebarHeader={<Header position="sidebar" title="Instances" />}
-            leftSidebarWidth="72"
+            leftSidebarWidth="64"
         >
             <PageLoader
                 errors={[projectsError, projectInstancesError, tagsError]}
