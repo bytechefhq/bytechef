@@ -46,10 +46,10 @@ public class BaserowComponentHandler implements ComponentHandler {
         .connection(BaserowConnection.CONNECTION_DEFINITION)
         .actions(
             BaserowCreateRowAction.ACTION_DEFINITION,
+            BaserowDeleteRowAction.ACTION_DEFINITION,
             BaserowGetRowAction.ACTION_DEFINITION,
             BaserowListRowsAction.ACTION_DEFINITION,
-            BaserowUpdateRowAction.ACTION_DEFINITION,
-            BaserowDeleteRowAction.ACTION_DEFINITION);
+            BaserowUpdateRowAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
