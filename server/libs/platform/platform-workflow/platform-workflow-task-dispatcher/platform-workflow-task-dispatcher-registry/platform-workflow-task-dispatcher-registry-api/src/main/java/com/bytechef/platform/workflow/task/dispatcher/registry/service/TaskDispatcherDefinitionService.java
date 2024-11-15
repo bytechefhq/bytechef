@@ -26,9 +26,11 @@ import java.util.Map;
  */
 public interface TaskDispatcherDefinitionService {
 
-    OutputResponse executeOutputSchema(String name, int version, Map<String, Object> inputParameters);
+    OutputResponse executeOutputSchema(String name, int version, Map<String, ?> inputParameters);
 
-    TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version);
+    String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters);
+
+    TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version);
 
     List<TaskDispatcherDefinition> getTaskDispatcherDefinitions();
 

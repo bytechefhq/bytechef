@@ -49,6 +49,7 @@ import com.bytechef.platform.component.exception.ComponentConfigurationException
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -336,7 +337,6 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         PropertiesDataSource<?> propertiesDataSource = dynamicPropertiesProperty.getDynamicPropertiesDataSource();
 
         return (ActionPropertiesFunction) propertiesDataSource.getProperties();
-
     }
 
     private ActionWorkflowNodeDescriptionFunction getWorkflowNodeDescriptionFunction(
@@ -355,18 +355,9 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition.getWorkflowNodeDescription()
-            .orElse((inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
-                getActionTitle(actionDefinition));
-    }
-
-    private static String getActionTitle(com.bytechef.component.definition.ActionDefinition actionDefinition) {
-        return actionDefinition.getTitle()
-            .orElse(actionDefinition.getName());
-    }
-
-    private static String getComponentTitle(ComponentDefinition componentDefinition) {
-        return componentDefinition.getTitle()
-            .orElse(componentDefinition.getName());
+            .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
+                inputParameters, OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()),
+                OptionalUtils.orElse(actionDefinition.getTitle(), actionDefinition.getName())));
     }
 
     private static Map<String, String> getLookupDependsOnPathsMap(List<String> lookupDependsOnPaths) {

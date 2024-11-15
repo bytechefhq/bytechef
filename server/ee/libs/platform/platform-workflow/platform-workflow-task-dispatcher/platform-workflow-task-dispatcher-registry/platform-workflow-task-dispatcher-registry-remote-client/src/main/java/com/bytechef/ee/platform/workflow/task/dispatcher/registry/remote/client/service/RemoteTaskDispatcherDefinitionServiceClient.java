@@ -37,7 +37,7 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
 
     @Override
     public OutputResponse executeOutputSchema(
-        String name, int version, Map<String, Object> inputParameters) {
+        String name, int version, Map<String, ?> inputParameters) {
 
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
@@ -50,7 +50,12 @@ public class RemoteTaskDispatcherDefinitionServiceClient implements TaskDispatch
     }
 
     @Override
-    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
+    public String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(COORDINATOR_APP)
