@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config;
 
-import com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter.AutomationApiPlatformConversionServiceAdapter;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter.ApiPlatformConversionServiceAdapter;
 import com.bytechef.platform.tag.web.rest.mapper.config.TagMapperSpringConfig;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -18,10 +18,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    AutomationApiPlatformConversionServiceAdapter.class, TagMapperSpringConfig.class
+    ApiPlatformConversionServiceAdapter.class, TagMapperSpringConfig.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "AutomationApiPlatformConversionServiceAdapter")
-public interface AutomationApiPlatformMapperSpringConfig {
+    conversionServiceAdapterClassName = "ApiPlatformConversionServiceAdapter")
+public interface ApiPlatformMapperSpringConfig {
 }

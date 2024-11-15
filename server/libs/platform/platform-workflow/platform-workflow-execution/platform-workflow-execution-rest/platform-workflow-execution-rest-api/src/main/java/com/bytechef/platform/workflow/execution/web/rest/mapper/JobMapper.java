@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
-import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
+import com.bytechef.platform.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
+@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
 public interface JobMapper extends Converter<JobDTO, JobModel> {
 
     @Override

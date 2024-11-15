@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.public_.web.rest.mapper.config;
+package com.bytechef.platform.configuration.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.public_.web.rest.adapter.EmbeddedPublicConfigurationConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {
-    EmbeddedPublicConfigurationConversionServiceAdapter.class
-})
+@MapperConfig(componentModel = "spring", uses = WorkflowConfigurationConversionServiceAdapter.class)
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.public_.web.rest.adapter",
-    conversionServiceAdapterClassName = "EmbeddedPublicConfigurationConversionServiceAdapter")
-public interface EmbeddedPublicConfigurationMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.platform.configuration.web.rest.adapter",
+    conversionServiceAdapterClassName = "WorkflowConfigurationConversionServiceAdapter")
+public interface WorkflowConfigurationMapperSpringConfig {
 }

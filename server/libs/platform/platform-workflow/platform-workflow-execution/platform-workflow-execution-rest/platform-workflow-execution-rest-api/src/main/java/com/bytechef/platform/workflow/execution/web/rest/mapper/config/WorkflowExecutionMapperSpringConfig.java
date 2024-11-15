@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.connected.user.web.rest.mapper.config;
+package com.bytechef.platform.workflow.execution.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.web.rest.adapter.EmbeddedConnectedUserConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,10 +25,11 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    EmbeddedConnectedUserConversionServiceAdapter.class
+    WorkflowConfigurationConversionServiceAdapter.class, WorkflowExecutionConversionServiceAdapter.class
 })
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "EmbeddedConnectedUserConversionServiceAdapter")
-public interface EmbeddedConnectedUserMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.platform.workflow.execution.web.rest.adapter",
+    conversionServiceAdapterClassName = "WorkflowExecutionConversionServiceAdapter",
+    conversionServiceBeanName = "com.bytechef.platform.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig")
+public interface WorkflowExecutionMapperSpringConfig {
 }

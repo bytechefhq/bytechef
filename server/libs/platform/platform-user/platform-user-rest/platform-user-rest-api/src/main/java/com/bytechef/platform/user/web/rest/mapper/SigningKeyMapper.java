@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.web.rest.mapper;
 
 import com.bytechef.platform.user.domain.SigningKey;
-import com.bytechef.platform.user.web.rest.mapper.config.PlatformUserMapperSpringConfig;
+import com.bytechef.platform.user.web.rest.mapper.config.UserMapperSpringConfig;
 import com.bytechef.platform.user.web.rest.model.SigningKeyModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformUserMapperSpringConfig.class)
+@Mapper(config = UserMapperSpringConfig.class)
 public interface SigningKeyMapper extends Converter<SigningKey, SigningKeyModel> {
 
     @Override

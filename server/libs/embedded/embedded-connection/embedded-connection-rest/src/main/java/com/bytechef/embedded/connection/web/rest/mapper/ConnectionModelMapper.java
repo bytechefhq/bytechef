@@ -16,7 +16,7 @@
 
 package com.bytechef.embedded.connection.web.rest.mapper;
 
-import com.bytechef.embedded.connection.web.rest.mapper.config.EmbeddedConnectionMapperSpringConfig;
+import com.bytechef.embedded.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.embedded.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import org.mapstruct.Mapper;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = EmbeddedConnectionMapperSpringConfig.class)
+@Mapper(config = ConnectionMapperSpringConfig.class)
 public interface ConnectionModelMapper extends Converter<ConnectionModel, ConnectionDTO> {
 
     @Override

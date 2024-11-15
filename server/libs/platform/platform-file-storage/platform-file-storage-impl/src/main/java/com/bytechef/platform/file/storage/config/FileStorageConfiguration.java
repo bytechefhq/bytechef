@@ -39,16 +39,18 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-public class PlatformFileStorageConfiguration {
+public class FileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(PlatformFileStorageConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
     private final AwsFileStorageService awsFileStorageService;
 
     @SuppressFBWarnings("EI")
-    public PlatformFileStorageConfiguration(ApplicationProperties applicationProperties,
+    public FileStorageConfiguration(
+        ApplicationProperties applicationProperties,
         @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
+
         this.applicationProperties = applicationProperties;
         this.awsFileStorageService = awsFileStorageService;
     }

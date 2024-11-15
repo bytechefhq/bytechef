@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
-import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ScriptTestExecutionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public interface ScriptExecutionMapper extends Converter<ScriptTestExecutionDTO, ScriptTestExecutionModel> {
 
     @Override

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.web.rest.mapper.config;
+package com.bytechef.embedded.connection.web.rest.mapper.config;
 
-import com.bytechef.platform.user.web.rest.adapter.PlatformUserConversionServiceAdapter;
+import com.bytechef.embedded.connection.web.rest.adapter.IntegrationConnectionConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = PlatformUserConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    IntegrationConnectionConversionServiceAdapter.class
+})
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.platform.user.web.rest.adapter",
-    conversionServiceAdapterClassName = "PlatformUserConversionServiceAdapter")
-public interface PlatformUserMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.embedded.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "IntegrationConnectionConversionServiceAdapter",
+    conversionServiceBeanName = "com.bytechef.embedded.connection.web.rest.mapper.config.ConnectionMapperSpringConfig")
+public interface ConnectionMapperSpringConfig {
 }

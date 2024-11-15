@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.ActionDefinition;
-import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ActionDefinitionModel;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ActionDefinitionMapper {
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionModelMapper
         extends Converter<ActionDefinition, ActionDefinitionModel> {
 
@@ -36,7 +36,7 @@ public class ActionDefinitionMapper {
         ActionDefinitionModel convert(ActionDefinition actionDefinition);
     }
 
-    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     public interface ActionDefinitionToActionDefinitionBasicModelMapper
         extends Converter<ActionDefinition, ActionDefinitionBasicModel> {
 

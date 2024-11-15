@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegrationConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel;
 import org.mapstruct.InheritInverseConfiguration;
@@ -32,7 +32,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class IntegrationInstanceConfigurationMapper {
 
-    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
+    @Mapper(config = IntegrationConfigurationMapperSpringConfig.class)
     public interface IntegrationInstanceConfigurationBasicToIntegrationInstanceModelMapper
         extends Converter<IntegrationInstanceConfiguration, IntegrationInstanceConfigurationBasicModel> {
 
@@ -40,7 +40,7 @@ public class IntegrationInstanceConfigurationMapper {
         IntegrationInstanceConfigurationBasicModel convert(IntegrationInstanceConfiguration integrationInstance);
     }
 
-    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
+    @Mapper(config = IntegrationConfigurationMapperSpringConfig.class)
     public interface IntegrationInstanceConfigurationToIntegrationInstanceModelMapper
         extends Converter<IntegrationInstanceConfiguration, IntegrationInstanceConfigurationModel> {
 
@@ -53,7 +53,7 @@ public class IntegrationInstanceConfigurationMapper {
         IntegrationInstanceConfigurationModel convert(IntegrationInstanceConfiguration integrationInstance);
     }
 
-    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
+    @Mapper(config = IntegrationConfigurationMapperSpringConfig.class)
     public interface IntegrationInstanceConfigurationDTOToIntegrationInstanceModelMapper
         extends Converter<IntegrationInstanceConfigurationDTO, IntegrationInstanceConfigurationModel> {
 

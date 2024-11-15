@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
-import com.bytechef.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.web.rest.mapper.config.IntegrationConfigurationMapperSpringConfig;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
@@ -32,7 +32,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class IntegrationWorkflowMapper {
 
-    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
+    @Mapper(config = IntegrationConfigurationMapperSpringConfig.class)
     public abstract static class IntegrationWorkflowDTOToWorkflowModelMapper
         implements Converter<IntegrationWorkflowDTO, WorkflowModel> {
 
@@ -50,7 +50,7 @@ public abstract class IntegrationWorkflowMapper {
         }
     }
 
-    @Mapper(config = EmbeddedConfigurationMapperSpringConfig.class)
+    @Mapper(config = IntegrationConfigurationMapperSpringConfig.class)
     public abstract static class IntegrationWorkflowModelToWorkflowBasicModel
         implements Converter<IntegrationWorkflowDTO, WorkflowBasicModel> {
 
