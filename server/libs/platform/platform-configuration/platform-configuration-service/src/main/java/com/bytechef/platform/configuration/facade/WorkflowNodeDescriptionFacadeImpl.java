@@ -24,6 +24,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -35,26 +36,25 @@ import org.springframework.stereotype.Service;
 public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptionFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
+    private final TaskDispatcherDefinitionService taksDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final WorkflowService workflowService;
-    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowNodeDescriptionFacadeImpl(
-        ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionFacade triggerDefinitionFacade,
-        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        ActionDefinitionFacade actionDefinitionFacade, TaskDispatcherDefinitionService taksDispatcherDefinitionService,
+        TriggerDefinitionFacade triggerDefinitionFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
+        this.taksDispatcherDefinitionService = taksDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
-        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId);
@@ -78,9 +78,15 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
 
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-                    return actionDefinitionFacade.executeWorkflowNodeDescription(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName(), workflowTask.evaluateParameters(inputs));
+                    if (workflowNodeType.componentOperationName() == null) {
+                        return taksDispatcherDefinitionService.executeWorkflowNodeDescription(
+                            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                            workflowTask.evaluateParameters(inputs));
+                    } else {
+                        return actionDefinitionFacade.executeWorkflowNodeDescription(
+                            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                            workflowNodeType.componentOperationName(), workflowTask.evaluateParameters(inputs));
+                    }
                 });
         }
 

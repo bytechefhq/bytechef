@@ -62,6 +62,7 @@ import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -510,12 +511,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             .orElse(WebhookValidateResponse.ok());
     }
 
-    private static String getComponentTitle(ComponentDefinition componentDefinition) {
-        return componentDefinition
-            .getTitle()
-            .orElse(componentDefinition.getName());
-    }
-
     private OptionsDataSource.TriggerOptionsFunction<?> getComponentOptionsFunction(
         String componentName, int componentVersion, String triggerName, String propertyName,
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -588,10 +583,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         com.bytechef.component.definition.TriggerDefinition triggerDefinition =
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
-        return OptionalUtils.orElse(
-            triggerDefinition.getWorkflowNodeDescription(),
-            (inputParameters, context) -> getComponentTitle(componentDefinition) + ": " +
-                getTriggerTitle(triggerDefinition));
+        return triggerDefinition.getWorkflowNodeDescription()
+            .orElse((inputParameters, context) -> WorkflowNodeDescriptionUtils.renderComponentProperties(
+                inputParameters, OptionalUtils.orElse(componentDefinition.getTitle(), componentDefinition.getName()),
+                OptionalUtils.orElse(triggerDefinition.getTitle(), triggerDefinition.getName())));
     }
 
     private ListenerDisableConsumer getListenerDisableConsumer(
@@ -610,12 +605,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             componentDefinitionRegistry.getTriggerDefinition(componentName, componentVersion, triggerName);
 
         return OptionalUtils.get(triggerDefinition.getListenerEnable());
-    }
-
-    private static String getTriggerTitle(com.bytechef.component.definition.TriggerDefinition triggerDefinition) {
-        return triggerDefinition
-            .getTitle()
-            .orElse(triggerDefinition.getName());
     }
 
     @SuppressWarnings("unchecked")

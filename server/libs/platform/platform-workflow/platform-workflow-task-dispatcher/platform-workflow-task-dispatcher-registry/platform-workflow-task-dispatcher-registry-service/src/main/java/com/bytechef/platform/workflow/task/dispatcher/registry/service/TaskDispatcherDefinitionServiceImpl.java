@@ -16,9 +16,11 @@
 
 package com.bytechef.platform.workflow.task.dispatcher.registry.service;
 
+import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.platform.registry.domain.OutputResponse;
 import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.registry.TaskDispatcherDefinitionRegistry;
@@ -45,7 +47,7 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
 
     @Override
     public OutputResponse executeOutputSchema(
-        @NonNull String name, int version, @NonNull Map<String, Object> inputParameters) {
+        @NonNull String name, int version, @NonNull Map<String, ?> inputParameters) {
 
         OutputFunction outputFunction = getOutputSchemaFunction(name, version);
 
@@ -64,7 +66,17 @@ public class TaskDispatcherDefinitionServiceImpl implements TaskDispatcherDefini
     }
 
     @Override
-    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, Integer version) {
+    public String executeWorkflowNodeDescription(String name, int version, Map<String, ?> inputParameters) {
+        com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDefinition taskDispatcherDefinition =
+            taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version);
+
+        return WorkflowNodeDescriptionUtils.renderTaskDispatcherProperties(
+            inputParameters,
+            OptionalUtils.orElse(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getName()));
+    }
+
+    @Override
+    public TaskDispatcherDefinition getTaskDispatcherDefinition(String name, int version) {
         return new TaskDispatcherDefinition(
             taskDispatcherDefinitionRegistry.getTaskDispatcherDefinition(name, version));
     }
