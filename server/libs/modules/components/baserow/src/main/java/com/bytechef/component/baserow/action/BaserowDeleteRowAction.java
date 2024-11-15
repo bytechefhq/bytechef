@@ -25,6 +25,9 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
+/**
+ * @author Arina Kolodeznikova
+ */
 public class BaserowDeleteRowAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteRow")
@@ -48,8 +51,9 @@ public class BaserowDeleteRowAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         actionContext
-            .http(http -> http.delete("/database/rows/table/" + inputParameters.getRequiredString(TABLE_ID) + "/"
-                + inputParameters.getRequiredString(ROW_ID) + "/"))
+            .http(http -> http.delete(
+                "/database/rows/table/" + inputParameters.getRequiredString(TABLE_ID) + "/" +
+                    inputParameters.getRequiredString(ROW_ID) + "/"))
             .execute();
 
         return null;
