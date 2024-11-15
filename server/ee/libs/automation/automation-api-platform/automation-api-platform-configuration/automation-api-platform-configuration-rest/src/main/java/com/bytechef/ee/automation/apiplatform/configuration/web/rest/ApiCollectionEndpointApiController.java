@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Ivica Cardic
  */
 @RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/internal")
+@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/api-platform/internal")
 @ConditionalOnCoordinator
 public class ApiCollectionEndpointApiController implements ApiCollectionEndpointApi {
 
