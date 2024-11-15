@@ -12,7 +12,7 @@ scopes in the `authorizations` method of the `CONNECTION_DEFINITION` constant. T
 define the properties that are required for the connection, such as Client ID and Client Secret. Here is an example of
 a connection with OAuth2 authorization:
 
-```
+``` java
 public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "base url")
         .authorizations(
