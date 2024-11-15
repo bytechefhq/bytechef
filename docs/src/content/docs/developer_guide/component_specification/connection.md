@@ -34,7 +34,7 @@ Each authorization type has different properties that are required for successfu
 
 Basic Auth is a simple authentication scheme built into the HTTP protocol. It requires a username and password, which are sent with each request.
 
-```
+```java
 authorization(AuthorizationType.BASIC_AUTH)
     .title("Basic Auth")
     .properties(
@@ -50,7 +50,7 @@ authorization(AuthorizationType.BASIC_AUTH)
 
 Bearer Token authentication involves sending a token with each request. This token is typically obtained from an authorization server and represents the user's identity.
 
-```
+```java
 authorization(AuthorizationType.BEARER_TOKEN)
     .title("Bearer Token")
     .properties(
@@ -63,7 +63,7 @@ authorization(AuthorizationType.BEARER_TOKEN)
 
 OAuth2 Authorization Code is a robust authorization framework that allows third-party applications to obtain limited access to a web service. It involves redirecting the user to an authorization server to obtain an authorization code, which is then exchanged for an access token.
 
-```
+```java
 authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
     .title("OAuth2 Authorization Code")
     .properties(
