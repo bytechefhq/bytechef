@@ -17,11 +17,21 @@
 package com.bytechef.component.zeplin;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ZeplinComponentHandler extends AbstractZeplinComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/zeplin.svg")
+            .categories(ComponentCategory.COMMUNICATION);
+    }
 }
