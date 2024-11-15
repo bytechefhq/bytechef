@@ -19,7 +19,7 @@ description: A guide in my new Starlight docs site.
 </div>
 
 ## Creating and running triggers
-If you are testing components in development, check out [Working with Triggers](../../developer_guide/components/triggers/)
+If you are testing components in development, check out [Working with Triggers](../../developer_guide/testing_triggers/triggers)
 
 <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(52.75862069% + 32px)">
 <iframe src="https://www.guidejar.com/embed/4c1580fa-5c01-47b0-9c8b-30f1239dd372?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
