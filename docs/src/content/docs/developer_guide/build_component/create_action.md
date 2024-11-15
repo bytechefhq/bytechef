@@ -7,7 +7,7 @@ In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/compo
 `NewComponentDummyAction` class defines the connection. The `ACTION_DEFINITION` constant contains all the details about
 the action, including its name, title, description, properties and others.
 
-```
+``` java
 public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummy")
         .title("Dummy Action")
         .description("Action description.")
@@ -24,17 +24,14 @@ public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummy
         .perform(NewComponentDummyAction::perform);
 ```
 
+The `perform` method contains the logic for the action. Here is the simplest example of the `perform` method that returns the value of the `name` property.
 
-
-```
-protected static Object perform(
+``` java
+protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.post("some url"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .body()
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return inputParemeters.getRequiredString("name");
     }
 ```
+
+For more information about any method in the `ACTION_DEFINITION`, refer to the [action documentation](../component_specification/action.md).

@@ -7,7 +7,7 @@ In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/compo
 `NewComponentComponentHandler` class defines the component. The `COMPONENT_DEFINITION` constant contains all the details
 about the component, including its name, title, description, icon, categories, connection, actions, triggers and others.
 
-```
+``` java
 private static final ComponentDefinition COMPONENT_DEFINITION = component("newComponent")
     .title("New Component")
     .description("New component description.")
