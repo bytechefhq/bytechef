@@ -5,9 +5,9 @@ title: "Component"
 The component definition is used to specify the properties of a component. Below is an explanation of each method that can be used in the component definition:
 
 - `component(String name)` - Builds new `ModifiableComponentDefinition` with the specified name. The name defines the component key (backend ID).
-- `actions(A... actionDefinitions)` - Specifies the actions that the component can perform.
+- [`actions(A... actionDefinitions)`](./action) - Specifies the actions that the component can perform.
 - `categories(ComponentCategory... category)` - Defines the category or categories that the component belongs to, used to group components together in the UI.
-- `connection(ModifiableConnectionDefinition connectionDefinition)` - Sets the connection definition for the component.
+- [`connection(ModifiableConnectionDefinition connectionDefinition)`](./connection)  - Sets the connection definition for the component.
 - `connectionRequired(boolean connectionRequired)` - Indicates whether the component requires a connection to be configured before it can be used.
 - `customAction(boolean customAction)` - Indicates if the component is REST-based.
 - `description(String description)` - Provides a short description of the component.

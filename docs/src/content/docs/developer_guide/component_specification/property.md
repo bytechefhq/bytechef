@@ -7,16 +7,19 @@ title: "Property"
 The `ModifiableArrayProperty` class is a customizable property type designed to handle array values within a component.
 
 - `array(String name)` - Initializes a new `ModifiableArrayProperty` with the specified name.
-- `defaultValue(...)` - Sets the default value for the property using various data types such as Boolean, Integer, Long, Float, Double, String, or Map.
-- `exampleValue(...)` - Provides an example value for illustrative purposes using various data types.
-- `items(...)` - Specifies the properties that define the items in the array.
+- `defaultValue(T... defaultValue)` - Sets the default value for the property using various data types such as Boolean, Integer, Long, Float, Double, String, or Map.
+- `exampleValue(T... exampleValue)` - Provides an example value for illustrative purposes using various data types.
+- `items(P.. properties)` - Specifies the properties that define the items in the array.
 - `optionsLookupDependsOn(String... optionsLookupDependsOn)` - Defines dependencies for option lookups.
 - `maxItems(long maxItems)` - Sets the maximum number of items allowed in the array.
 - `minItems(long minItems)` - Sets the minimum number of items required in the array.
 - `multipleValues(boolean multipleValues)` - Indicates whether the array can contain multiple values.
-- `options(...)` - Specifies a list of options for the property or defines a function to dynamically generate options.
+- `options(Option<Object>... options)` - Specifies a list of options for the property.
+- `options(OptionsFunction optionsFunction)` - Defines a function to dynamically generate options.
 
 ### Boolean Property
+
+The `ModifiableBooleanProperty` class is a customizable property type designed to handle boolean values within a component.
 
 - `bool(String name)` - Initializes a new `ModifiableBooleanProperty` with the specified name.
 - `defaultValue(boolean defaultValue)` - Sets the default value for the property.
