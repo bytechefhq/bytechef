@@ -152,10 +152,6 @@ public class SigningKey {
         this.keyId = keyId;
     }
 
-    public void setKeyId(TenantKey tenantKey) {
-        this.keyId = tenantKey.toString();
-    }
-
     public void setLastUsedDate(LocalDateTime lastUsedDate) {
         this.lastUsedDate = lastUsedDate;
     }

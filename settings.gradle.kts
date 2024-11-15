@@ -377,6 +377,7 @@ include("server:ee:libs:automation:automation-api-platform:automation-api-platfo
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-api")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-impl")
+include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-security-web:automation-api-platform-handler-security-web-impl")
 
 include("server:ee:libs:config:tenant-multi-data-config")
 include("server:ee:libs:config:tenant-multi-message-event-config")

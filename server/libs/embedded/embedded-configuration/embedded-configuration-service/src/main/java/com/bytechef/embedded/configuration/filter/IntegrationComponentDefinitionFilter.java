@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntegrationComponentDefinitionFilter implements ComponentDefinitionFilter {
 
-    private static final List<String> COMPONENT_NAMES = List.of("webhook");
+    private static final List<String> COMPONENT_NAMES = List.of("apiPlatform", "webhook");
 
     @Override
     public boolean filter(ComponentDefinition componentDefinition) {

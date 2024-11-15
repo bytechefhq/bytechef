@@ -42,27 +42,27 @@ public class ApiPlatformHandlerExecutorImpl implements ApiPlatformHandlerExecuto
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final InstanceJobFacade instanceJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
-    private final ApiPlatformHandlerTriggerSyncExecutor apiPlatformHandlerTriggerSyncExecutor;
+    private final ApiPlatformHandlerTriggerExecutor apiPlatformHandlerTriggerExecutor;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerExecutorImpl(
         InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade,
-        JobSyncExecutor jobSyncExecutor, ApiPlatformHandlerTriggerSyncExecutor apiPlatformHandlerTriggerSyncExecutor,
+        JobSyncExecutor jobSyncExecutor, ApiPlatformHandlerTriggerExecutor apiPlatformHandlerTriggerExecutor,
         TaskFileStorage taskFileStorage) {
 
         this.instanceAccessorRegistry = instanceAccessorRegistry;
         this.instanceJobFacade = instanceJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
-        this.apiPlatformHandlerTriggerSyncExecutor = apiPlatformHandlerTriggerSyncExecutor;
+        this.apiPlatformHandlerTriggerExecutor = apiPlatformHandlerTriggerExecutor;
         this.taskFileStorage = taskFileStorage;
     }
 
     @Override
-    public Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    public Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
         Object outputs;
 
-        TriggerOutput triggerOutput = apiPlatformHandlerTriggerSyncExecutor.execute(
+        TriggerOutput triggerOutput = apiPlatformHandlerTriggerExecutor.execute(
             workflowExecutionId, webhookRequest);
 
         Map<String, ?> inputMap = getInputMap(workflowExecutionId);

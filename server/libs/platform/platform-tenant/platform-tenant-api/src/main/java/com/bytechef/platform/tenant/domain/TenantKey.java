@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.domain;
+package com.bytechef.platform.tenant.domain;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.RandomUtils;

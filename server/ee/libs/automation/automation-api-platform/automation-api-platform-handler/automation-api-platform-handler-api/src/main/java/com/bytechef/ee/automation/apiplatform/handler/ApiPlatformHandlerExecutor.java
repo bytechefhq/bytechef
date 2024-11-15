@@ -24,5 +24,5 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
  */
 public interface ApiPlatformHandlerExecutor {
 
-    Object executeSync(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
+    Object execute(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest);
 }

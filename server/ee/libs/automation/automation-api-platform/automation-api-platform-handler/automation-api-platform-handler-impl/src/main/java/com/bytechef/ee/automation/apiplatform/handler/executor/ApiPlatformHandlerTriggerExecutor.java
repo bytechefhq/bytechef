@@ -21,7 +21,6 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -47,7 +46,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ApiPlatformHandlerTriggerSyncExecutor {
+public class ApiPlatformHandlerTriggerExecutor {
 
     private final InstanceAccessorRegistry instanceAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -58,7 +57,7 @@ public class ApiPlatformHandlerTriggerSyncExecutor {
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public ApiPlatformHandlerTriggerSyncExecutor(
+    public ApiPlatformHandlerTriggerExecutor(
         InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
@@ -118,36 +117,6 @@ public class ApiPlatformHandlerTriggerSyncExecutor {
         return triggerOutput;
     }
 
-    public WebhookValidateResponse validate(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        Result result = getProcessData(workflowExecutionId, webhookRequest);
-
-        TriggerExecution triggerExecution = result.triggerExecution();
-        WorkflowNodeType workflowNodeType = result.workflowNodeType();
-
-        return triggerDefinitionFacade.executeWebhookValidate(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
-            MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            OptionalUtils.orElse(CollectionUtils.findFirst(result.connectIdMap()
-                .values()), null));
-    }
-
-    public WebhookValidateResponse validateOnEnable(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-
-        Result result = getProcessData(workflowExecutionId, webhookRequest);
-
-        TriggerExecution triggerExecution = result.triggerExecution();
-        WorkflowNodeType workflowNodeType = result.workflowNodeType();
-
-        return triggerDefinitionFacade.executeWebhookValidateOnEnable(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName(), triggerExecution.getParameters(),
-            MapUtils.getRequired(triggerExecution.getMetadata(), WebhookRequest.WEBHOOK_REQUEST, WebhookRequest.class),
-            OptionalUtils.orElse(CollectionUtils.findFirst(result.connectIdMap()
-                .values()), null));
-    }
-
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId, String workflowId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -161,25 +130,6 @@ public class ApiPlatformHandlerTriggerSyncExecutor {
 
         return instanceAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
-    }
-
-    private Result getProcessData(WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
-        String workflowId = getWorkflowId(workflowExecutionId);
-
-        TriggerExecution triggerExecution = TriggerExecution.builder()
-            .metadata(Map.of(WebhookRequest.WEBHOOK_REQUEST, webhookRequest))
-            .workflowExecutionId(workflowExecutionId)
-            .workflowTrigger(getWorkflowTrigger(workflowExecutionId, workflowId))
-            .build();
-
-        triggerExecution = preProcess(triggerExecution.evaluate(getInputMap(workflowExecutionId)));
-
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId, workflowId);
-
-        Map<String, Long> connectIdMap = MapUtils.getMap(
-            triggerExecution.getMetadata(), MetadataConstants.CONNECTION_IDS, Long.class, Map.of());
-
-        return new Result(triggerExecution, workflowNodeType, connectIdMap);
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
@@ -213,9 +163,5 @@ public class ApiPlatformHandlerTriggerSyncExecutor {
         }
 
         return triggerExecution;
-    }
-
-    private record Result(
-        TriggerExecution triggerExecution, WorkflowNodeType workflowNodeType, Map<String, Long> connectIdMap) {
     }
 }

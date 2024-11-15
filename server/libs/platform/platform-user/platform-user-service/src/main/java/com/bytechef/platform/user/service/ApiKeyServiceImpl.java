@@ -17,8 +17,8 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.platform.tenant.domain.TenantKey;
 import com.bytechef.platform.user.domain.ApiKey;
-import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         Validate.isTrue(apiKey.getId() == null, "'id' must be null");
         Validate.notNull(apiKey.getName(), "'name' must not be null");
 
-        apiKey.setSecretKey(TenantKey.of());
+        apiKey.setSecretKey(String.valueOf(TenantKey.of()));
 
         apiKey = apiKeyRepository.save(apiKey);
 

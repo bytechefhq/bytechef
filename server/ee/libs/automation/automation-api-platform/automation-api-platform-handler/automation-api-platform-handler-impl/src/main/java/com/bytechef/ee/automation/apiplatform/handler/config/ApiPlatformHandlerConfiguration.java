@@ -33,7 +33,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.ee.automation.apiplatform.handler.ApiPlatformHandlerExecutor;
 import com.bytechef.ee.automation.apiplatform.handler.executor.ApiPlatformHandlerExecutorImpl;
-import com.bytechef.ee.automation.apiplatform.handler.executor.ApiPlatformHandlerTriggerSyncExecutor;
+import com.bytechef.ee.automation.apiplatform.handler.executor.ApiPlatformHandlerTriggerExecutor;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
@@ -71,7 +71,7 @@ public class ApiPlatformHandlerConfiguration {
         InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade, JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         TaskExecutionService taskExecutionService, TaskHandlerRegistry taskHandlerRegistry,
-        ApiPlatformHandlerTriggerSyncExecutor apiPlatformHandlerTriggerSyncExecutor, TaskFileStorage taskFileStorage,
+        ApiPlatformHandlerTriggerExecutor apiPlatformHandlerTriggerExecutor, TaskFileStorage taskFileStorage,
         WorkflowService workflowService) {
 
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
@@ -88,7 +88,7 @@ public class ApiPlatformHandlerConfiguration {
                     contextService, counterService, syncMessageBroker, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage,
                 workflowService),
-            apiPlatformHandlerTriggerSyncExecutor, taskFileStorage);
+            apiPlatformHandlerTriggerExecutor, taskFileStorage);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {

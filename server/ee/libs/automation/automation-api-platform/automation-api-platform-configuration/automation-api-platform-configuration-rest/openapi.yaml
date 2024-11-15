@@ -4,15 +4,118 @@ info:
   title: "The Automation API Platform Internal API"
   version: "1"
 servers:
-  - url: "/api/automation/internal"
+  - url: "/api/automation/api-platform/internal"
 tags:
   - name: "api-collection"
     description: "The Automation API Platform Collection Internal API"
+  - name: "api-client"
+    description: "The Automation API Platform Client Internal API"
   - name: "api-collection-tag"
     description: "The Automation API Platform Collection Tag Internal API"
   - name: "api-collection-endpoint"
     description: "The Automation API Platform Collection Endpoint Internal API"
 paths:
+  /api-clients:
+    get:
+      description: "Get API clients."
+      summary: "Get API clients"
+      tags:
+        - "api-client"
+      operationId: "getApiClients"
+      responses:
+        "200":
+          description: "The list of API clients."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ApiClient"
+    post:
+      description: "Create a new API client."
+      summary: "Create a new API client"
+      tags:
+        - "api-client"
+      operationId: "createApiClient"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiClient"
+        required: true
+      responses:
+        "200":
+          description: "The secret API key object."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  secretKey:
+                    description: "The secret API key."
+                    type: "string"
+  /api-client/{id}:
+    delete:
+      description: "Delete an API client."
+      summary: "Delete an API client"
+      tags:
+        - "api-client"
+      operationId: "deleteApiClient"
+      parameters:
+        - name: "id"
+          description: "The id of an API client."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+    get:
+      description: "Get an API client by id."
+      summary: "Get an API client by id"
+      tags:
+        - "api-client"
+      operationId: "getApiClient"
+      parameters:
+        - name: "id"
+          description: "The id of an API client."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The API client object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiClient"
+    put:
+      description: "Update an existing API client."
+      summary: "Update an existing API client"
+      tags:
+        - "api-client"
+      operationId: "updateApiClient"
+      parameters:
+        - name: "id"
+          description: "The id of an API client."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApiClient"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /api-collections:
     post:
       description: "Create a new API collection."
@@ -272,6 +375,48 @@ paths:
                   $ref: "#/components/schemas/ApiCollection"
 components:
   schemas:
+    ApiClient:
+      description: "Contains generated key required for calling API."
+      type: "object"
+      required:
+        - name
+        - secretKey
+      properties:
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        id:
+          description: "The id of an API key."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastUsedDate:
+          description: "The last used date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        name:
+          description: "The name of an API key."
+          type: "string"
+        secretKey:
+          description: "The preview of secret API key."
+          type: "string"
+          readOnly: true
     ApiCollection:
       description: "An API collection."
       required:
