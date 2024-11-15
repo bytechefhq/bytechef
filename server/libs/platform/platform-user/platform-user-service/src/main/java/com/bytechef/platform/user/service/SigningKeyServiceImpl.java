@@ -18,8 +18,8 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.tenant.domain.TenantKey;
 import com.bytechef.platform.user.domain.SigningKey;
-import com.bytechef.platform.user.domain.TenantKey;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyFactory;
@@ -74,7 +74,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
         KeyPair keyPair = keyPairGenerator.generateKeyPair();
 
-        signingKey.setKeyId(TenantKey.of());
+        signingKey.setKeyId(String.valueOf(TenantKey.of()));
 
         PublicKey publicKey = keyPair.getPublic();
 

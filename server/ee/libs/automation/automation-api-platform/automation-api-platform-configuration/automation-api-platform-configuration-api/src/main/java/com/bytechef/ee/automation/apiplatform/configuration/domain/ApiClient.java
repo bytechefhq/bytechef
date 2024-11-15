@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.user.domain;
+package com.bytechef.ee.automation.apiplatform.configuration.domain;
 
-import com.bytechef.platform.constant.ModeType;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -24,15 +23,23 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
  * @author Ivica Cardic
  */
-@Table("api_key")
-public class ApiKey {
+@Table("api_client")
+public class ApiClient {
+
+    @Id
+    private Long id;
+
+    @Column
+    private String name;
+
+    @Column("secret_key")
+    private String secretKey;
 
     @CreatedBy
     @Column("created_by")
@@ -41,9 +48,6 @@ public class ApiKey {
     @Column("created_date")
     @CreatedDate
     private LocalDateTime createdDate;
-
-    @Id
-    private Long id;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -56,19 +60,7 @@ public class ApiKey {
     @Column("last_used_date")
     private LocalDateTime lastUsedDate;
 
-    @Column
-    private String name;
-
-    @Column("secret_key")
-    private String secretKey;
-
-    @Column
-    private Integer type;
-
-    @Column
-    private AggregateReference<User, Long> userId;
-
-    public ApiKey() {
+    public ApiClient() {
     }
 
     @Override
@@ -77,11 +69,11 @@ public class ApiKey {
             return true;
         }
 
-        if (!(o instanceof ApiKey apiKey)) {
+        if (!(o instanceof ApiClient apiClient)) {
             return false;
         }
 
-        return Objects.equals(id, apiKey.id);
+        return Objects.equals(id, apiClient.id);
     }
 
     @Override
@@ -91,6 +83,14 @@ public class ApiKey {
 
     public Long getId() {
         return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
     }
 
     public String getCreatedBy() {
@@ -113,40 +113,8 @@ public class ApiKey {
         return lastUsedDate;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getSecretKey() {
-        return secretKey;
-    }
-
-    public ModeType getType() {
-        if (type == null) {
-            return null;
-        }
-
-        return ModeType.values()[type];
-    }
-
-    public Long getUserId() {
-        return userId.getId();
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setLastUsedDate(LocalDateTime lastUsedDate) {
-        this.lastUsedDate = lastUsedDate;
     }
 
     public void setName(String name) {
@@ -157,26 +125,16 @@ public class ApiKey {
         this.secretKey = secretKey;
     }
 
-    public void setType(ModeType type) {
-        if (type != null) {
-            this.type = type.ordinal();
-        }
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = AggregateReference.to(userId);
-    }
-
     @Override
     public String toString() {
-        return "APIKey{" +
+        return "ApiKey{" +
             "id=" + id +
             ", name='" + name + '\'' +
-            ", type=" + type +
-            ", userId=" + userId +
+            ", secretKey='" + secretKey + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
-            ", secretKey='" + secretKey + '\'' +
+            ", lastModifiedBy='" + lastModifiedBy + '\'' +
+            ", lastModifiedDate=" + lastModifiedDate +
             ", lastUsedDate=" + lastUsedDate +
             '}';
     }

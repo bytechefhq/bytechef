@@ -14,7 +14,7 @@ paths:
   /api-keys:
     get:
       description: "Get API keys."
-      summary: "Get api keys"
+      summary: "Get API keys"
       tags:
         - "api-key"
       operationId: "getApiKeys"

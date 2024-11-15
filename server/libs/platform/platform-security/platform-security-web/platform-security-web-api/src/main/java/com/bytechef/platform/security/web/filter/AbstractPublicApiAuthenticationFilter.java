@@ -18,8 +18,8 @@ package com.bytechef.platform.security.web.filter;
 
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
+import com.bytechef.platform.tenant.domain.TenantKey;
 import com.bytechef.platform.tenant.util.TenantUtils;
-import com.bytechef.platform.user.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;

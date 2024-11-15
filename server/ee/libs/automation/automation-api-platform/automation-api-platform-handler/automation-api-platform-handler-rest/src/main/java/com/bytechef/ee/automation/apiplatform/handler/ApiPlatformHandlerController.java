@@ -138,7 +138,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
             // TODO return response from ResponseToAPIRequest action
 
-            return apiPlatformHandlerExecutor.executeSync(workflowExecutionId, webhookRequest);
+            return apiPlatformHandlerExecutor.execute(workflowExecutionId, webhookRequest);
         });
     }
 

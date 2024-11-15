@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
  * @author Ivica Cardic
  */
 @Disabled
-public class ApiPlatformHandlerTriggerSyncExecutorTest {
+public class ApiPlatformHandlerTriggerExecutorTest {
 
     @Test
     public void testExecute() {
