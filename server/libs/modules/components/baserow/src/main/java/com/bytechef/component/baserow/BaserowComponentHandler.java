@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.baserow.action.BaserowCreateRowAction;
+import com.bytechef.component.baserow.action.BaserowDeleteRowAction;
 import com.bytechef.component.baserow.action.BaserowGetRowAction;
 import com.bytechef.component.baserow.action.BaserowListRowsAction;
 import com.bytechef.component.baserow.action.BaserowUpdateRowAction;
@@ -47,7 +48,8 @@ public class BaserowComponentHandler implements ComponentHandler {
             BaserowCreateRowAction.ACTION_DEFINITION,
             BaserowGetRowAction.ACTION_DEFINITION,
             BaserowListRowsAction.ACTION_DEFINITION,
-            BaserowUpdateRowAction.ACTION_DEFINITION);
+            BaserowUpdateRowAction.ACTION_DEFINITION,
+            BaserowDeleteRowAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
