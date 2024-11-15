@@ -17,9 +17,15 @@
 package com.bytechef.component.zeplin;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.zeplin.util.ZeplinUtils;
 import com.google.auto.service.AutoService;
+import java.util.Objects;
 
 /**
  * @author Monika Kušter
@@ -33,5 +39,17 @@ public class ZeplinComponentHandler extends AbstractZeplinComponentHandler {
             .customAction(true)
             .icon("path:assets/zeplin.svg")
             .categories(ComponentCategory.COMMUNICATION);
+    }
+
+    @Override
+    public ModifiableProperty<?> modifyProperty(
+        ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
+
+        if (Objects.equals(modifiableProperty.getName(), "project_id")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options((ActionOptionsFunction<String>) ZeplinUtils::getProjectIdOptions);
+        }
+
+        return modifiableProperty;
     }
 }
