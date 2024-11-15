@@ -74,6 +74,19 @@ Type: OBJECT
 
 
 
+### Delete Row
+Deletes the specified row.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Table ID | INTEGER | INTEGER  |  ID of the table containing the row to be deleted.  |
+| Row ID | INTEGER | INTEGER  |  ID of the row to be deleted.  |
+
+
+
+
 ### Get Row
 Fetches a single table row.
 
