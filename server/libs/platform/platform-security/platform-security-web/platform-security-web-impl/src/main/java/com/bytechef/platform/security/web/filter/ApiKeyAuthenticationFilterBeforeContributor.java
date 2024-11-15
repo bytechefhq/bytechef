@@ -18,7 +18,6 @@ package com.bytechef.platform.security.web.filter;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.Filter;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
@@ -27,7 +26,6 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component("com.bytechef.platform.security.web.filter.ApiKeyAuthenticationFilterBeforeContributor")
-@Order
 public class ApiKeyAuthenticationFilterBeforeContributor implements FilterBeforeContributor {
 
     @Override

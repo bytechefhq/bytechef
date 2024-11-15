@@ -16,9 +16,9 @@
 
 package com.bytechef.embedded.configuration.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.web.rest.adapter.EmbeddedConfigurationConversionServiceAdapter;
+import com.bytechef.embedded.configuration.web.rest.adapter.IntegrationConfigurationConversionServiceAdapter;
 import com.bytechef.platform.category.web.rest.adapter.CategoryConversionServiceAdapter;
-import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
 import com.bytechef.platform.tag.web.rest.adapter.TagConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -27,11 +27,11 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    CategoryConversionServiceAdapter.class, EmbeddedConfigurationConversionServiceAdapter.class,
-    PlatformConfigurationConversionServiceAdapter.class, TagConversionServiceAdapter.class
+    CategoryConversionServiceAdapter.class, IntegrationConfigurationConversionServiceAdapter.class,
+    WorkflowConfigurationConversionServiceAdapter.class, TagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "EmbeddedConfigurationConversionServiceAdapter")
-public interface EmbeddedConfigurationMapperSpringConfig {
+    conversionServiceAdapterClassName = "IntegrationConfigurationConversionServiceAdapter")
+public interface IntegrationConfigurationMapperSpringConfig {
 }

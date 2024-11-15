@@ -17,7 +17,7 @@
 package com.bytechef.platform.customcomponent.configuration.web.rest.mapper;
 
 import com.bytechef.platform.customcomponent.configuration.domain.CustomComponent;
-import com.bytechef.platform.customcomponent.configuration.web.rest.mapper.config.PlatformCustomComponentMapperSpringConfig;
+import com.bytechef.platform.customcomponent.configuration.web.rest.mapper.config.CustomComponentMapperSpringConfig;
 import com.bytechef.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformCustomComponentMapperSpringConfig.class)
+@Mapper(config = CustomComponentMapperSpringConfig.class)
 public interface CustomComponentMapper extends Converter<CustomComponent, CustomComponentModel> {
 
     @Override

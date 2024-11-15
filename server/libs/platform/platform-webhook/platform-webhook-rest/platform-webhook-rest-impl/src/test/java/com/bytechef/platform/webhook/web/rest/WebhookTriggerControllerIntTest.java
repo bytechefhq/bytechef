@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.web.rest;
 
+import com.bytechef.platform.webhook.web.WebhookTriggerController;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

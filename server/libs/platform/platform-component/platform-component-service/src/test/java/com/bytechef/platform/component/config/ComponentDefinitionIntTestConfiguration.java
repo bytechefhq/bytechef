@@ -29,6 +29,6 @@ import org.springframework.context.annotation.Import;
 @EnableAutoConfiguration
 @Import(LiquibaseConfiguration.class)
 @Configuration
-public class PlatformIntTestConfiguration {
+public class ComponentDefinitionIntTestConfiguration {
 
 }

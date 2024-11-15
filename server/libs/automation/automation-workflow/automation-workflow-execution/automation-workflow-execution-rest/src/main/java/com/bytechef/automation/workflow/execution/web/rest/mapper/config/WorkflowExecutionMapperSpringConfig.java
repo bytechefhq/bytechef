@@ -16,10 +16,10 @@
 
 package com.bytechef.automation.workflow.execution.web.rest.mapper.config;
 
-import com.bytechef.automation.configuration.web.rest.adapter.AutomationConfigurationConversionServiceAdapter;
-import com.bytechef.automation.workflow.execution.web.rest.adapter.AutomationWorkflowExecutionConversionServiceAdapter;
-import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
-import com.bytechef.platform.workflow.execution.web.rest.adapter.PlatformWorkflowExecutionConversionServiceAdapter;
+import com.bytechef.automation.configuration.web.rest.adapter.ProjectConfigurationConversionServiceAdapter;
+import com.bytechef.automation.workflow.execution.web.rest.adapter.ProjectWorkflowExecutionConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -27,11 +27,12 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    AutomationConfigurationConversionServiceAdapter.class, AutomationWorkflowExecutionConversionServiceAdapter.class,
-    PlatformConfigurationConversionServiceAdapter.class, PlatformWorkflowExecutionConversionServiceAdapter.class,
+    ProjectConfigurationConversionServiceAdapter.class, ProjectWorkflowExecutionConversionServiceAdapter.class,
+    WorkflowConfigurationConversionServiceAdapter.class, WorkflowExecutionConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.automation.workflow.execution.web.rest.adapter",
-    conversionServiceAdapterClassName = "AutomationWorkflowExecutionConversionServiceAdapter")
-public interface AutomationWorkflowExecutionMapperSpringConfig {
+    conversionServiceAdapterClassName = "ProjectWorkflowExecutionConversionServiceAdapter",
+    conversionServiceBeanName = "com.bytechef.automation.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig")
+public interface WorkflowExecutionMapperSpringConfig {
 }

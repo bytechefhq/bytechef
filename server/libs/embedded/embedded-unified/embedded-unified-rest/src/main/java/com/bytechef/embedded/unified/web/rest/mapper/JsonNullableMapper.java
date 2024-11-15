@@ -16,7 +16,7 @@
 
 package com.bytechef.embedded.unified.web.rest.mapper;
 
-import com.bytechef.embedded.unified.web.rest.mapper.config.EmbeddedUnifiedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -24,7 +24,7 @@ import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
 
 @Mapper(
-    config = EmbeddedUnifiedConfigurationMapperSpringConfig.class,
+    config = UnifiedConfigurationMapperSpringConfig.class,
     implementationName = "EmbeddedUnifiedJsonNullableMapper")
 public interface JsonNullableMapper {
 

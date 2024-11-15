@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.web.rest.mapper.config;
 
-import com.bytechef.ee.platform.apiconnector.configuration.web.rest.adapter.PlatformApiConnectorConversionServiceAdapter;
+import com.bytechef.ee.platform.apiconnector.configuration.web.rest.adapter.ApiConnectorConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -17,10 +17,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    PlatformApiConnectorConversionServiceAdapter.class
+    ApiConnectorConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.platform.apiconnector.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "PlatformApiConnectorConversionServiceAdapter")
-public interface PlatformApiConnectorMapperSpringConfig {
+    conversionServiceAdapterClassName = "ApiConnectorConversionServiceAdapter")
+public interface ApiConnectorMapperSpringConfig {
 }

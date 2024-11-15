@@ -18,8 +18,8 @@ package com.bytechef.platform.component.facade;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
+import com.bytechef.platform.component.config.ComponentDefinitionIntTestConfiguration;
 import com.bytechef.platform.component.config.JacksonConfiguration;
-import com.bytechef.platform.component.config.PlatformIntTestConfiguration;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.helper.TokenRefreshHelper;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -42,7 +42,8 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.bytechef.platform.component")
 @SpringBootTest(
     classes = {
-        JacksonConfiguration.class, PostgreSQLContainerConfiguration.class, PlatformIntTestConfiguration.class
+        JacksonConfiguration.class, PostgreSQLContainerConfiguration.class,
+        ComponentDefinitionIntTestConfiguration.class
     })
 public class ActionDefinitionFacadeIntTest {
 

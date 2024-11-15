@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.connection.web.rest.mapper;
 
-import com.bytechef.automation.connection.web.rest.mapper.config.AutomationConnectionMapperSpringConfig;
+import com.bytechef.automation.connection.web.rest.mapper.config.ConnectionMapperSpringConfig;
 import com.bytechef.automation.connection.web.rest.model.ConnectionModel;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import org.mapstruct.InheritInverseConfiguration;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = AutomationConnectionMapperSpringConfig.class)
+@Mapper(config = ConnectionMapperSpringConfig.class)
 public interface WorkspaceConnectionMapper extends Converter<ConnectionDTO, ConnectionModel> {
 
     @Override

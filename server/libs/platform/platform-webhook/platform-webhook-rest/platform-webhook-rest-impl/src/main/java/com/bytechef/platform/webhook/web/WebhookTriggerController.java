@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.webhook.web.rest;
+package com.bytechef.platform.webhook.web;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
@@ -26,22 +26,23 @@ import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorReg
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.tenant.util.TenantUtils;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.web.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Objects;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.MultiValueMapAdapter;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Ivica Cardic
  */
-@RestController
+@Controller
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
 

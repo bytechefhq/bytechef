@@ -19,11 +19,11 @@ package com.bytechef.embedded.unified.web.rest.accounting.mapper;
 import com.bytechef.component.definition.unified.accounting.model.AccountUnifiedInputModel;
 import com.bytechef.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.embedded.unified.web.rest.mapper.JsonNullableMapper;
-import com.bytechef.embedded.unified.web.rest.mapper.config.EmbeddedUnifiedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-@Mapper(config = EmbeddedUnifiedConfigurationMapperSpringConfig.class, uses = {
+@Mapper(config = UnifiedConfigurationMapperSpringConfig.class, uses = {
     JsonNullableMapper.class
 })
 public interface AccountingCreateUpdateAccountModelMapper

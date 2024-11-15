@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +62,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * @author Ivica Cardic
  */
+@Controller
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
 public class AppEventTriggerApiController extends AbstractWebhookTriggerController implements AppEventTriggerApi {

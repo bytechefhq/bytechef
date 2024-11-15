@@ -17,7 +17,7 @@
 package com.bytechef.embedded.workflow.execution.web.rest.mapper;
 
 import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
-import com.bytechef.embedded.workflow.execution.web.rest.mapper.config.EmbeddedWorkflowExecutionMapperSpringConfig;
+import com.bytechef.embedded.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
 import com.bytechef.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class WorkflowExecutionMapper {
 
-    @Mapper(config = EmbeddedWorkflowExecutionMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
+    @Mapper(config = WorkflowExecutionMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
     public interface WorkflowExecutionDTOToWorkflowExecutionModelMapper
         extends Converter<WorkflowExecution, WorkflowExecutionModel> {
 
@@ -36,7 +36,7 @@ public class WorkflowExecutionMapper {
         WorkflowExecutionModel convert(WorkflowExecution workflowExecution);
     }
 
-    @Mapper(config = EmbeddedWorkflowExecutionMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
+    @Mapper(config = WorkflowExecutionMapperSpringConfig.class, implementationName = "Embedded<CLASS_NAME>Impl")
     public interface WorkflowExecutionDTOToWorkflowExecutionBasicModelMapper
         extends Converter<WorkflowExecution, WorkflowExecutionBasicModel> {
 

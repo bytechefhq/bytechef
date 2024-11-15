@@ -16,14 +16,14 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
 
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
 public interface JsonNullableMapper {
 
     default JsonNullable<Object> mapToJsonNullable(Object value) {
