@@ -1,0 +1,51 @@
+---
+openapi: "3.0.2"
+info:
+  title: "Zeplin"
+  description: "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development."
+  version: "v1"
+servers:
+  - url: "https://api.zeplin.dev/v1"
+paths:
+  /projects/{project_id}:
+    patch:
+      summary: "Update Project"
+      description: "Updates an existing project."
+      operationId: "updateProject"
+      parameters:
+        - name: "project_id"
+          in: "path"
+          description: "Project to update."
+          required: true
+          schema:
+            type: "string"
+            title: "Project"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Project"
+              required:
+                - "name"
+              properties:
+                name:
+                  type: "string"
+                  format: "uuid"
+                  description: "New name for the project."
+                description:
+                  type: "string"
+                  description: "New description for the project."
+      responses:
+        204:
+          description: "Successful update."
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://api.zeplin.dev/v1/oauth/authorize"
+          tokenUrl: "https://api.zeplin.dev/v1/oauth/token"
+          refreshUrl: "https://api.zeplin.dev/v1/oauth/token"

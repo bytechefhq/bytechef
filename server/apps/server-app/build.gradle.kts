@@ -234,6 +234,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:xml-file"))
     implementation(project(":server:libs:modules:components:xml-helper"))
     implementation(project(":server:libs:modules:components:zendesk-sell"))
+    implementation(project(":server:libs:modules:components:zeplin"))
     implementation(project(":server:libs:modules:components:zoho:zoho-crm"))
 
     implementation(project(":server:libs:modules:task-dispatchers:branch"))
