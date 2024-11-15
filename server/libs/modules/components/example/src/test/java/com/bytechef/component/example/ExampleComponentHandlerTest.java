@@ -19,9 +19,6 @@ package com.bytechef.component.example;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Mario Cvjetojevic
- */
 class ExampleComponentHandlerTest {
 
     @Test

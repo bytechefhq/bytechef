@@ -26,9 +26,6 @@ import com.bytechef.component.example.connection.ExampleConnection;
 import com.bytechef.component.example.trigger.ExampleDummyTrigger;
 import com.google.auto.service.AutoService;
 
-/**
- * @author Mario Cvjetojevic
- */
 @AutoService(ComponentHandler.class)
 public class ExampleComponentHandler implements ComponentHandler {
 
