@@ -24,9 +24,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 
-/**
- * @author Mario Cvjetojevic
- */
 public class ExampleDummyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("dummyAction")

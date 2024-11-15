@@ -16,10 +16,7 @@
 
 package com.bytechef.component.example.constant;
 
-/**
- * @author Mario Cvjetojevic
- */
-public final class ExampleConstants {
+public class ExampleConstants {
 
     public static final String ID = "id";
 
