@@ -1,10 +1,13 @@
+apis/ApiClientApi.ts
 apis/ApiCollectionApi.ts
 apis/ApiCollectionEndpointApi.ts
 apis/ApiCollectionTagApi.ts
 apis/index.ts
 index.ts
+models/ApiClient.ts
 models/ApiCollection.ts
 models/ApiCollectionEndpoint.ts
+models/CreateApiClient200Response.ts
 models/Environment.ts
 models/HttpMethod.ts
 models/ProjectBasic.ts
