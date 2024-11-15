@@ -1780,8 +1780,8 @@ public class ComponentInitOpenApiGenerator {
             }
         } else {
             builder.add(
-                getExtensionsCodeBlock(propertyName, propertyDescription, required, schema, outputSchema,
-                    extensionMap));
+                getExtensionsCodeBlock(
+                    propertyName, propertyDescription, required, schema, outputSchema, extensionMap));
         }
 
         return builder.build();
