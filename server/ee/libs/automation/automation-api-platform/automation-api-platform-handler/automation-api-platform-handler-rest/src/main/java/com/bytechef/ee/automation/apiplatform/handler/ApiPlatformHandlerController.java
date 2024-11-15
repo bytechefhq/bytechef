@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,31 +40,27 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@RestController
-@RequestMapping("${openapi.openAPIDefinition.base-path.automation:}"
-    + ApiPlatformHandlerController.API_PLATFORM_ROOT_PATH + "/**")
+@Controller
+@RequestMapping(ApiPlatformHandlerController.API_PLATFORM_BASE_PATH + "/**")
 @ConditionalOnCoordinator
 public class ApiPlatformHandlerController extends AbstractWebhookTriggerController {
 
     private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
-    protected static final String API_PLATFORM_ROOT_PATH = "/o";
+    protected static final String API_PLATFORM_BASE_PATH = "/api/o";
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ApiPlatformHandlerExecutor apiPlatformHandlerExecutor;
-    private final String basePath;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
-        @Value("${openapi.openAPIDefinition.base-path.automation:}") String basePath,
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
         ApiPlatformHandlerExecutor apiPlatformHandlerExecutor, FilesFileStorage filesFileStorage,
         InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
@@ -75,7 +71,6 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.apiPlatformHandlerExecutor = apiPlatformHandlerExecutor;
-        this.basePath = basePath;
     }
 
     @DeleteMapping(produces = "application/json")
@@ -109,7 +104,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
             String requestURI = request.getRequestURI();
 
-            String path = requestURI.replace(basePath + API_PLATFORM_ROOT_PATH, "");
+            String path = requestURI.replace(API_PLATFORM_BASE_PATH, "");
 
             ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(path, getEnvironment(request));
 
