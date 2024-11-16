@@ -1028,7 +1028,7 @@ public class ApplicationProperties {
         }
 
         public void setSmtp(Smtp smtp) {
-            this.smtp = this.smtp;
+            this.smtp = smtp;
         }
 
         public String getUsername() {
