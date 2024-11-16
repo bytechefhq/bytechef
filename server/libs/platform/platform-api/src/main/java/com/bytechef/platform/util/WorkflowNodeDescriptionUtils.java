@@ -30,18 +30,10 @@ public class WorkflowNodeDescriptionUtils {
         renderProperties(null, inputParameters, sb);
 
         return """
-            <div class="flex flex-col">%n\
-                <div class="flex">%n\
-                     <div class="w-6/12 text-muted-foreground">Component:</div>%n\
-                     <div class="w-6/12">%s</div%n\
-                </div>%n\
-                <div class="flex">%n\
-                     <div class="w-6/12 text-muted-foreground">Action:</div>%n\
-                     <div class="w-6/12">%s</div>%n\
-                </div>%n\
-                <div class="flex">%n\
-                      <div class="w-6/12 text-muted-foreground">Properties:</div>%n\
-                      <div class="w-6/12"></div>%n\
+            <div class="flex flex-col space-y-2">%n\
+                <div class="flex flex-col font-semibold">%n\
+                     <div class="text-base">%s</div>%n\
+                     <div>%s</div>%n\
                 </div>%n\
                 %s%n\
             </div>%n\
@@ -54,14 +46,9 @@ public class WorkflowNodeDescriptionUtils {
         renderProperties(null, inputParameters, sb);
 
         return """
-            <div class="flex flex-col">%n\
-                <div class="flex">%n\
-                     <div class="w-6/12 text-muted-foreground">Flow Control:</div>%n\
-                     <div class="w-6/12">%s</div>%n\
-                </div>%n\
-                <div class="flex">%n\
-                      <div class="w-6/12 text-muted-foreground">Properties:</div>%n\
-                      <div class="w-6/12"></div>%n\
+            <div class="flex flex-col space-y-2">%n\
+                <div class="font-semibold">%n\
+                     <div class="text-base">%s</div>%n\
                 </div>%n\
                 %s%n\
             </div>%n\
@@ -69,6 +56,12 @@ public class WorkflowNodeDescriptionUtils {
     }
 
     private static void renderProperties(String namePrefix, Map<?, ?> parameterMap, StringBuilder sb) {
+        if (parameterMap.isEmpty()) {
+            return;
+        }
+
+        sb.append("<div class=\"flex flex-col space-y-0.5\">");
+
         for (Map.Entry<?, ?> entry : parameterMap.entrySet()) {
             String name = (String) entry.getKey();
 
@@ -84,10 +77,12 @@ public class WorkflowNodeDescriptionUtils {
 
             sb.append("""
                 <div class="flex">%n\
-                    <div class="w-6/12 text-muted-foreground pl-2">%s:</div>%n\
+                    <div class="w-6/12 text-muted-foreground">%s:</div>%n\
                     <div class="w-6/12">%s</div>%n\
                 </div>%n\
                 """.formatted(name, entry.getValue()));
         }
+
+        sb.append("</div>");
     }
 }
