@@ -39,6 +39,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
 
     return integrations && componentDefinitions ? (
         <ComboBox
+            emptyMessage="No published integrations found. Please publish an integration first."
             items={integrations.map((integration) => {
                 const componentDefinition = componentDefinitions.filter(
                     (componentDefinition) => componentDefinition.name === integration.componentName
