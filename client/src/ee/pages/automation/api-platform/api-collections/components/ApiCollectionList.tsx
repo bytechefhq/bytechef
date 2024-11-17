@@ -6,7 +6,7 @@ import ApiCollectionListItem from './ApiCollectionListItem';
 
 const ApiCollectionList = ({apiCollections}: {apiCollections: ApiCollection[]}) => {
     return (
-        <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+        <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
             {apiCollections.length > 0 &&
                 apiCollections.map((apiCollection) => {
                     return (

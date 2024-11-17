@@ -31,7 +31,7 @@ const ApiCollectionsFilterTitle = ({
 
             <Badge variant="secondary">
                 <span className="text-sm">
-                    {environment === undefined ? 'All environments' : environment === 1 ? 'Test' : 'Production'}
+                    {environment === undefined ? 'All Environments' : environment === 1 ? 'Test' : 'Production'}
                 </span>
             </Badge>
 

@@ -85,7 +85,7 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
             <Table>
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
+                        <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header, index) => (
                                 <TableHead key={`${headerGroup.id}_${header.id}_${index}`}>
                                     {!header.isPlaceholder &&
@@ -98,7 +98,11 @@ const WorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) => {
 
                 <TableBody>
                     {rows.map((row) => (
-                        <TableRow className="cursor-pointer" key={row.id} onClick={() => handleRowClick(row.index)}>
+                        <TableRow
+                            className="cursor-pointer border-b-border/50"
+                            key={row.id}
+                            onClick={() => handleRowClick(row.index)}
+                        >
                             {row.getVisibleCells().map((cell, index) => (
                                 <TableCell className="whitespace-nowrap py-4" key={`${row.id}_${cell.id}_${index}`}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}

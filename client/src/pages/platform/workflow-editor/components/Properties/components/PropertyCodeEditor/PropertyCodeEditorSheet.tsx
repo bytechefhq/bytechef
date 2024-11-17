@@ -170,7 +170,7 @@ const PropertyCodeEditorSheet = ({
                             </ResizablePanel>
                         </ResizablePanelGroup>
 
-                        <div className="flex border-l">
+                        <div className="flex border-l border-l-border/50">
                             <RightSidebar
                                 className="bg-transparent"
                                 navigation={[
@@ -185,7 +185,7 @@ const PropertyCodeEditorSheet = ({
                     </div>
 
                     {showConnections && (
-                        <div className="w-80 border-l">
+                        <div className="w-80 border-l border-l-border/50">
                             <PropertyCodeEditorSheetConnectionsSheet
                                 onCLose={() => setShowConnections(false)}
                                 workflow={workflow}

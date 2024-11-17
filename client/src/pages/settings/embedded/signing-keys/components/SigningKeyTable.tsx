@@ -160,7 +160,7 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
             <Table>
                 <TableHeader>
                     {headerGroups.map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
+                        <TableRow className="border-b-border/50" key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
                                 <TableHead
                                     className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500"
@@ -174,9 +174,9 @@ const SigningKeyTable = ({signingKeys}: SigningKeyTableProps) => {
                     ))}
                 </TableHeader>
 
-                <TableBody className="divide-y divide-gray-200 bg-white">
+                <TableBody>
                     {rows.map((row) => (
-                        <TableRow className="cursor-pointer" key={row.id}>
+                        <TableRow className="cursor-pointer border-b-border/50" key={row.id}>
                             {row.getVisibleCells().map((cell) => (
                                 <TableCell
                                     className={twMerge(

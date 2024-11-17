@@ -19,7 +19,7 @@ const IntegrationInstanceConfigurationList = ({
     return (
         <>
             {integrationInstanceConfigurations.length > 0 && (
-                <div className="w-full">
+                <>
                     {integrationInstanceConfigurations.map((integrationInstanceConfiguration) => {
                         const integrationTagIds = integrationInstanceConfiguration.tags?.map((tag) => tag.id);
 
@@ -55,7 +55,7 @@ const IntegrationInstanceConfigurationList = ({
                             </Collapsible>
                         );
                     })}
-                </div>
+                </>
             )}
         </>
     );

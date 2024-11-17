@@ -5,7 +5,7 @@ import ApiConnectorEndpointListItem from './ApiConnectorEndpointListItem';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ApiConnectorEndpointList = ({apiConnectorEndpoints}: {apiConnectorEndpoints?: Array<ApiConnectorEndpoint>}) => {
     return (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="border-b border-b-border/50 py-3 pl-4">
             <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">Endpoints</h3>
 
             <ul>

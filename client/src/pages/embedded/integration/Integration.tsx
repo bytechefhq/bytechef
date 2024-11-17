@@ -274,7 +274,7 @@ const Integration = () => {
                 rightSidebarOpen={rightSidebarOpen}
                 rightSidebarWidth="96"
                 rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l"
+                rightToolbarClass="border-l border-l-border/50"
                 rightToolbarOpen={true}
                 topHeader={
                     integrationId && (

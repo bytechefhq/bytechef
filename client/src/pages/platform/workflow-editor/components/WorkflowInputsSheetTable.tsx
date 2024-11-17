@@ -64,7 +64,7 @@ const WorkflowInputsSheetTable = ({
             {workflow.inputs && workflow.inputs.length > 0 ? (
                 <Table>
                     <TableHeader>
-                        <TableRow>
+                        <TableRow className="border-b-border/50">
                             <TableHead>Name</TableHead>
 
                             <TableHead>Label</TableHead>
@@ -84,7 +84,7 @@ const WorkflowInputsSheetTable = ({
                     <TableBody>
                         {workflow.inputs &&
                             workflow.inputs.map((input, index) => (
-                                <TableRow key={input.name}>
+                                <TableRow className="cursor-pointer border-b-border/50" key={input.name}>
                                     <TableCell>{input.name}</TableCell>
 
                                     <TableCell>{input.label}</TableCell>

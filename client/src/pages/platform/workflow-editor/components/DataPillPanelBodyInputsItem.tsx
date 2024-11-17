@@ -10,7 +10,7 @@ const DataPillPanelBodyInputsItem = () => {
 
     return workflow.inputs && workflow.inputs.length > 0 ? (
         <>
-            <AccordionTrigger className="group flex w-full items-center justify-between border-muted bg-background p-4 group-data-[state=closed]:border-b">
+            <AccordionTrigger className="group flex w-full items-center justify-between border-border/50 bg-background p-4 group-data-[state=closed]:border-b">
                 <div className="flex items-center space-x-4">
                     <div className="flex size-5 items-center">
                         <FormInputIcon />
@@ -21,8 +21,8 @@ const DataPillPanelBodyInputsItem = () => {
 
                 <ChevronDownIcon className="size-5 text-gray-400 transition-transform duration-300 group-data-[state=open]:rotate-180" />
             </AccordionTrigger>
-            <AccordionContent className="size-full space-y-2 border-b border-muted px-4 pb-4">
-                <ul className="flex w-full flex-col space-y-2 border-l pl-4 group-data-[state=open]:h-full">
+            <AccordionContent className="size-full space-y-2 border-b border-b-border/50 px-4 pb-4">
+                <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4 group-data-[state=open]:h-full">
                     {workflow.inputs?.map((input) => {
                         return (
                             <div className="flex items-center space-x-3" key={input.name}>

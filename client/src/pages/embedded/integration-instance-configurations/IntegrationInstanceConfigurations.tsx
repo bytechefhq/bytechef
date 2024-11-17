@@ -273,7 +273,7 @@ const IntegrationInstanceConfigurations = () => {
                 {componentDefinitions &&
                 integrationInstanceConfigurations &&
                 integrationInstanceConfigurations?.length > 0 ? (
-                    <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
+                    <div className="w-full divide-y divide-border/50 px-4 2xl:mx-auto 2xl:w-4/5">
                         {Array.from(integrationInstanceConfigurationMap.keys())?.map(
                             (integrationId) =>
                                 integrations &&

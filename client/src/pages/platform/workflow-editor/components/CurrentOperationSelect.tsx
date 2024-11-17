@@ -85,7 +85,7 @@ const CurrentOperationSelect = ({
     triggerSelect,
     value,
 }: CurrentOperationSelectProps) => (
-    <div className="flex items-end border-b border-muted p-4">
+    <div className="flex items-end border-b border-b-border/50 p-4">
         {operations?.length === 1 && !!operations[0] ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">

@@ -166,7 +166,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
                     )}
 
                     {(outputSchema as PropertyAllType)?.items && sampleOutput && (
-                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1">
+                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1">
                             <SchemaProperties
                                 copiedValue={copiedValue}
                                 copyToClipboard={copyToClipboard}

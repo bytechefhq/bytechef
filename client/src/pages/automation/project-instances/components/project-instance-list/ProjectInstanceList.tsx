@@ -17,7 +17,7 @@ const ProjectInstanceList = ({
     const projectInstanceMap = useProjectInstancesEnabledStore(({projectInstanceMap}) => projectInstanceMap);
 
     return (
-        <div className="w-full">
+        <>
             {projectInstances.map((projectInstance) => {
                 const projectTagIds = projectInstance.tags?.map((tag) => tag.id);
 
@@ -51,7 +51,7 @@ const ProjectInstanceList = ({
                     </Collapsible>
                 );
             })}
-        </div>
+        </>
     );
 };
 
