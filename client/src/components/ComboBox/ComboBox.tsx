@@ -17,6 +17,7 @@ export type ComboBoxItemType = {
 
 export interface ComboBoxProps {
     disabled?: boolean;
+    emptyMessage?: string;
     items: ComboBoxItemType[];
     maxHeight?: boolean;
     name?: string;
@@ -26,7 +27,15 @@ export interface ComboBoxProps {
     value?: any;
 }
 
-const ComboBox: React.FC<ComboBoxProps> = ({disabled, items, name, onBlur, onChange, value}: ComboBoxProps) => {
+const ComboBox: React.FC<ComboBoxProps> = ({
+    disabled,
+    emptyMessage,
+    items,
+    name,
+    onBlur,
+    onChange,
+    value,
+}: ComboBoxProps) => {
     const [open, setOpen] = useState(false);
 
     const commandItems = items.map((comboBoxItem) => (
@@ -84,7 +93,7 @@ const ComboBox: React.FC<ComboBoxProps> = ({disabled, items, name, onBlur, onCha
                     <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
                     <CommandList>
-                        <CommandEmpty>No item found.</CommandEmpty>
+                        <CommandEmpty>{emptyMessage ?? 'No item found.'}</CommandEmpty>
 
                         <CommandGroup>{commandItems}</CommandGroup>
                     </CommandList>
