@@ -30,6 +30,7 @@ const ProjectInstanceDialogBasicStepProjectsComboBox = ({
 
     return projects ? (
         <ComboBox
+            emptyMessage="No published projects found. Please publish a project first."
             items={projects.map(
                 (project) =>
                     ({
