@@ -90,23 +90,14 @@ public class AzureOpenAIChatAction {
     private AzureOpenAIChatAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return CHAT.getResponse(inputParameters, connectionParameters, context);
     }
 
     private static final Chat CHAT = new Chat() {
-
         @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT));
-
-            return new AzureOpenAiChatModel(
-                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
             AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
                 ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
@@ -124,7 +115,23 @@ public class AzureOpenAIChatAction {
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(format);
 
+            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
+
+            if (functions != null) {
+                builder.withFunctions(new HashSet<>(functions));
+            }
+
             return builder.build();
+        }
+
+        @Override
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT));
+
+            return new AzureOpenAiChatModel(
+                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

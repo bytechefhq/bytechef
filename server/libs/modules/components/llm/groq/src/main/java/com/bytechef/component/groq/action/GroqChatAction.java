@@ -90,7 +90,7 @@ public class GroqChatAction {
         return CHAT.getResponse(inputParameters, connectionParameters, context);
     }
 
-    private static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = new Chat() {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
