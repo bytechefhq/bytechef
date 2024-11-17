@@ -90,7 +90,7 @@ public class NVIDIAChatAction {
         return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = new Chat() {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {

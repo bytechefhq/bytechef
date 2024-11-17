@@ -49,12 +49,14 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatModel;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatOptions;
@@ -65,6 +67,13 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 public class AmazonBedrockJurassic2ChatAction {
 
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
+                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askJurassic2")
         .title("Ask Jurassic2")
         .description("Ask anything you want.")
@@ -74,12 +83,7 @@ public class AmazonBedrockJurassic2ChatAction {
                 .description("ID of the model to use.")
                 .required(true)
                 .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
-                                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
+                    ),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
@@ -109,25 +113,15 @@ public class AmazonBedrockJurassic2ChatAction {
     private AmazonBedrockJurassic2ChatAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters);
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    private static final Chat CHAT = new Chat() {
-
+    public static final Chat CHAT = new Chat() {
         @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockAi21Jurassic2ChatModel(
-                new Ai21Jurassic2ChatBedrockApi(
-                    inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (BedrockAi21Jurassic2ChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockAi21Jurassic2ChatOptions.builder()
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
@@ -147,6 +141,18 @@ public class AmazonBedrockJurassic2ChatAction {
                     .scale(inputParameters.getDouble(PRESENCE_PENALTY))
                     .build())
                 .build();
+        }
+
+        @Override
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new BedrockAi21Jurassic2ChatModel(
+                new Ai21Jurassic2ChatBedrockApi(
+                    inputParameters.getRequiredString(MODEL),
+                    () -> AwsBasicCredentials.create(
+                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+                (BedrockAi21Jurassic2ChatOptions) createChatOptions(inputParameters));
         }
     };
 }

@@ -267,16 +267,21 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
+        private Component component = new Component();
         private Copilot copilot = new Copilot();
 
         public Copilot getCopilot() {
             return copilot;
         }
-
+        public Component getComponent() {
+            return component;
+        }
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
-
+        public void setComponent(Component component) {
+            this.component = component;
+        }
         public static class Copilot {
 
             public enum Provider {
@@ -356,6 +361,208 @@ public class ApplicationProperties {
                     public void setModel(String model) {
                         this.model = model;
                     }
+                }
+            }
+        }
+
+        public static class Component {
+            private AmazonBedrock amazonBedrock = new AmazonBedrock();
+
+            public AmazonBedrock getAmazonBedrock() {
+                return amazonBedrock;
+            }
+
+            public void setAmazonBedrock(AmazonBedrock amazonBedrock) {
+                this.amazonBedrock = amazonBedrock;
+            }
+
+            public static class AmazonBedrock {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private Anthropic anthropic = new Anthropic();
+
+            public Anthropic getAnthropic() {
+                return anthropic;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            public static class Anthropic {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+            public AzureOpenAi getAzureOpenAi() {
+                return azureOpenAi;
+            }
+
+            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                this.azureOpenAi = azureOpenAi;
+            }
+
+            public static class AzureOpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private Groq groq = new Groq();
+
+            public Groq getGroq() {
+                return groq;
+            }
+
+            public void setGroq(Groq groq) {
+                this.groq = groq;
+            }
+
+            public static class Groq {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private NVIDIA NVIDIA = new NVIDIA();
+
+            public NVIDIA getNVIDIA() {
+                return NVIDIA;
+            }
+
+            public void setNVIDIA(NVIDIA NVIDIA) {
+                this.NVIDIA = NVIDIA;
+            }
+
+            public static class NVIDIA {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private HuggingFace huggingFace = new HuggingFace();
+
+            public HuggingFace getHuggingFace() {
+                return huggingFace;
+            }
+
+            public void setHuggingFace(HuggingFace huggingFace) {
+                this.huggingFace = huggingFace;
+            }
+
+            public static class HuggingFace {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private Mistral mistral = new Mistral();
+
+            public Mistral getMistral() {
+                return mistral;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            public static class Mistral {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private OpenAi openAi = new OpenAi();
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public static class OpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+            private VertexGemini vertexGemini = new VertexGemini();
+
+            public VertexGemini getVertexGemini() {
+                return vertexGemini;
+            }
+
+            public void setVertexGemini(VertexGemini vertexGemini) {
+                this.vertexGemini = vertexGemini;
+            }
+
+            public static class VertexGemini {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
                 }
             }
         }
