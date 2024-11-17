@@ -23,7 +23,7 @@ interface TagProps {
 }
 
 const Tag = ({onDeleteTag, tag}: TagProps) => (
-    <div className="group flex max-h-8 items-center justify-between rounded-full border border-muted pl-2 pr-1 text-xs text-gray-700">
+    <div className="group flex max-h-8 items-center justify-between rounded-full border border-border/50 pl-2 pr-1 text-xs text-gray-700">
         <span className="py-1">{tag.name}</span>
 
         <Tooltip>
@@ -153,7 +153,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                 </>
             ) : (
                 <div
-                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-muted hover:bg-gray-200"
+                    className="flex size-6 cursor-pointer items-center justify-center rounded border border-border/50 hover:bg-gray-200"
                     onClick={(event) => {
                         event.preventDefault();
 

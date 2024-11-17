@@ -90,7 +90,7 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
     return (
         <>
             <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-                <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
@@ -143,7 +143,9 @@ const ProjectInstanceListItem = ({projectInstance, remainingTags}: ProjectInstan
                     <div className="flex items-center justify-end gap-x-6">
                         <Badge variant="secondary">V{projectInstance.projectVersion}</Badge>
 
-                        <Badge variant="secondary">{projectInstance.environment}</Badge>
+                        <div className="flex min-w-28 justify-end">
+                            <Badge variant="secondary">{projectInstance.environment}</Badge>
+                        </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <div className="flex items-center">

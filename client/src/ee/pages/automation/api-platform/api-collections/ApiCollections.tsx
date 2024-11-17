@@ -23,7 +23,6 @@ export enum Type {
 }
 
 const ApiCollections = () => {
-    console.log('ApiCollections');
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const location = useLocation();

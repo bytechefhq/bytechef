@@ -63,7 +63,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
             {workflow.outputs && workflow.outputs.length > 0 ? (
                 <Table>
                     <TableHeader>
-                        <TableRow>
+                        <TableRow className="border-b-border/50">
                             <TableHead>Name</TableHead>
 
                             <TableHead>Value</TableHead>
@@ -77,7 +77,7 @@ const WorkflowOutputsSheetTable = ({workflow}: {workflow: Workflow}) => {
                     <TableBody>
                         {workflow.outputs &&
                             workflow.outputs.map((output, index) => (
-                                <TableRow key={output.name}>
+                                <TableRow className="cursor-pointer border-b-border/50" key={output.name}>
                                     <TableCell>{output.name}</TableCell>
 
                                     <TableCell>

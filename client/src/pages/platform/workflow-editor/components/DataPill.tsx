@@ -128,7 +128,7 @@ const DataPill = ({
             </div>
 
             {!!subProperties?.length && (
-                <ul className="mt-2 flex flex-col space-y-2 border-l border-gray-200 pl-4">
+                <ul className="mt-2 flex flex-col space-y-2 border-l border-l-border/50 pl-4">
                     {subProperties?.map((subProperty, index) => {
                         let sampleValue;
 

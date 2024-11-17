@@ -131,8 +131,8 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-                <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
+            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-muted/50">
+                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center gap-2">
                             {project.projectWorkflowIds && project.projectWorkflowIds.length > 0 ? (

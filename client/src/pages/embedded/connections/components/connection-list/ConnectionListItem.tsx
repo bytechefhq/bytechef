@@ -90,7 +90,7 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
         <li key={connection.id}>
             <>
                 <div className="group flex items-center rounded-md bg-white px-2 hover:bg-gray-50">
-                    <div className="flex flex-1 items-center border-b border-muted py-5">
+                    <div className="flex flex-1 items-center py-5">
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex items-center gap-2">

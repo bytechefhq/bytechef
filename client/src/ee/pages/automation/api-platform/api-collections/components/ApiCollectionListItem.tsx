@@ -76,7 +76,7 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
     return (
         <>
             <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-                <div className="flex flex-1 items-center border-b border-muted py-5 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center justify-between">
@@ -131,7 +131,9 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                             <span>V{apiCollection.collectionVersion}</span>
                         </Badge>
 
-                        <Badge variant="secondary">{apiCollection.projectInstance?.environment}</Badge>
+                        <div className="flex min-w-28 justify-end">
+                            <Badge variant="secondary">{apiCollection.projectInstance?.environment}</Badge>
+                        </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
                             <Switch checked={apiCollection.enabled} onCheckedChange={handleOnCheckedChange} />

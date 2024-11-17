@@ -62,7 +62,7 @@ const Sessions = () => {
                     <div className="w-full px-2 2xl:mx-auto 2xl:w-4/5">
                         <Table className="table-auto">
                             <TableHeader>
-                                <TableRow>
+                                <TableRow className="border-b-border/50">
                                     <TableHead>IP Address</TableHead>
 
                                     <TableHead>User agent</TableHead>
@@ -75,7 +75,7 @@ const Sessions = () => {
 
                             <TableBody>
                                 {sessions.map((s, index) => (
-                                    <TableRow key={index}>
+                                    <TableRow className="cursor-pointer border-b-border/50" key={index}>
                                         <TableCell>{s.ipAddress}</TableCell>
 
                                         <TableCell>

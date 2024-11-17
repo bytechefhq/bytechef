@@ -230,7 +230,7 @@ function App() {
                     <Outlet />
 
                     {ai.enabled && showCopilot && (
-                        <aside className="border-l">
+                        <aside className="border-l border-l-border/70">
                             <CopilotPanel />
                         </aside>
                     )}

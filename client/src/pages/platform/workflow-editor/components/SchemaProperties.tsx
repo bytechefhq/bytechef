@@ -38,7 +38,7 @@ const SchemaProperties = ({
                     />
 
                     {properties && !!properties.length && (
-                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1" key={name}>
+                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1" key={name}>
                             <SchemaProperties
                                 copiedValue={copiedValue}
                                 copyToClipboard={copyToClipboard}
@@ -51,7 +51,7 @@ const SchemaProperties = ({
                     )}
 
                     {items && !!items.length && (
-                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-gray-200 pl-1" key={name}>
+                        <div className="ml-3 flex flex-col overflow-y-auto border-l border-l-border/50 pl-1" key={name}>
                             <SchemaProperties
                                 copiedValue={copiedValue}
                                 copyToClipboard={copyToClipboard}

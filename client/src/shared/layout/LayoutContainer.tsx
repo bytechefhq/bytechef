@@ -87,7 +87,7 @@ const LayoutContainer = ({
             {leftSidebarOpen && (
                 <aside
                     className={twMerge(
-                        'hidden lg:flex lg:flex-col border-r bg-muted/50',
+                        'hidden lg:flex lg:flex-col border-r border-r-border/50 bg-muted/50',
                         'lg:fixed lg:inset-y-0',
                         leftSidebarClass,
                         leftSidebarWidths[leftSidebarWidth][0]

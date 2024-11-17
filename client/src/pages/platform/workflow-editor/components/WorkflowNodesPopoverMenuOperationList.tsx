@@ -280,7 +280,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     };
 
     return (
-        <div className="flex w-workflow-nodes-popover-actions-menu-width flex-col rounded-r-lg border-l">
+        <div className="flex w-workflow-nodes-popover-actions-menu-width flex-col rounded-r-lg border-l border-l-border/50">
             <header className="flex items-center space-x-2 rounded-tr-lg bg-white px-3 py-1.5">
                 {icon ? (
                     <InlineSVG className="size-8" loader={<ComponentIcon className="size-8" />} src={icon} />

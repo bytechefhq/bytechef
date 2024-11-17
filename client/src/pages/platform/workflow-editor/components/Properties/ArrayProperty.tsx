@@ -269,7 +269,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
     return (
         <Fragment key={`${path}_${name}_arrayProperty`}>
-            <ul className="ml-2 flex flex-col space-y-4 border-l">
+            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
                 {arrayItems?.map((arrayItem, index) =>
                     Array.isArray(arrayItem) ? (
                         arrayItem.map((subItem: ArrayPropertyType, subItemIndex: number) => (

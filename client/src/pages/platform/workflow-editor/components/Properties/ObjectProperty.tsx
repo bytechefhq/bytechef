@@ -179,7 +179,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             <ul
                 className={twMerge(
                     'space-y-4',
-                    label && !isContainerObject && 'ml-2 border-l',
+                    label && !isContainerObject && 'ml-2 border-l border-l-border/50',
                     arrayName && !isContainerObject && 'pl-2'
                 )}
             >

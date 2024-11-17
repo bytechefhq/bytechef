@@ -51,11 +51,11 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
                 <Accordion collapsible defaultValue={triggerExecution?.id || ''} type="single">
                     {triggerExecution && (
                         <AccordionItem key={triggerExecution.id} value={triggerExecution.id || ''}>
-                            <AccordionTrigger className="flex w-full items-center justify-between border-muted bg-background data-[state=closed]:border-b">
+                            <AccordionTrigger className="flex w-full items-center justify-between border-border/50 bg-background data-[state=closed]:border-b">
                                 <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
                             </AccordionTrigger>
 
-                            <AccordionContent className="space-y-4 border-b border-muted p-3">
+                            <AccordionContent className="space-y-4 border-b border-b-border/50 p-3">
                                 <WorkflowExecutionContent {...triggerExecution} />
                             </AccordionContent>
                         </AccordionItem>
@@ -64,11 +64,11 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
                     {job?.taskExecutions &&
                         job?.taskExecutions.map((taskExecution) => (
                             <AccordionItem key={taskExecution.id} value={taskExecution.id || ''}>
-                                <AccordionTrigger className="flex w-full items-center justify-between border-muted bg-background data-[state=closed]:border-b">
+                                <AccordionTrigger className="flex w-full items-center justify-between border-border/50 bg-background data-[state=closed]:border-b">
                                     <WorkflowTaskExecutionItem taskExecution={taskExecution} />
                                 </AccordionTrigger>
 
-                                <AccordionContent className="space-y-4 border-b border-muted p-3">
+                                <AccordionContent className="space-y-4 border-b border-b-border/50 p-3">
                                     <WorkflowExecutionContent {...taskExecution} />
                                 </AccordionContent>
                             </AccordionItem>
