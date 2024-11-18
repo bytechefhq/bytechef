@@ -14,7 +14,7 @@ interface SubPropertyPopoverProps {
     condition?: boolean;
     handleClick: () => void;
     newPropertyName?: string;
-    newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
+    newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
     setNewPropertyName?: (value: string) => void;
     setNewPropertyType: (value: keyof typeof VALUE_PROPERTY_CONTROL_TYPES) => void;
 }

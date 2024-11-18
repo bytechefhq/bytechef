@@ -18,20 +18,16 @@ interface ArrayPropertyProps {
     property: PropertyAllType;
 }
 
-type ValuePropertyControlType = keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
-
 const initialAvailablePropertyTypes = Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-    label: type as ValuePropertyControlType,
-    value: type as ValuePropertyControlType,
+    label: type as string,
+    value: type as string,
 }));
 
 const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [availablePropertyTypes, setAvailablePropertyTypes] =
-        useState<Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}>>(
-            initialAvailablePropertyTypes
-        );
-    const [newPropertyType, setNewPropertyType] = useState<ValuePropertyControlType>();
+        useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
+    const [newPropertyType, setNewPropertyType] = useState<string>();
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
@@ -44,18 +40,24 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             return;
         }
 
+        const controlType: ControlType = matchingItem
+            ? (matchingItem.controlType as ControlType)
+            : newPropertyType && newPropertyType in VALUE_PROPERTY_CONTROL_TYPES
+              ? (VALUE_PROPERTY_CONTROL_TYPES[
+                    newPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                ] as ControlType)
+              : ('STRING' as ControlType);
+
         const newItem = {
             ...matchingItem,
-            controlType: matchingItem
-                ? matchingItem?.controlType
-                : (VALUE_PROPERTY_CONTROL_TYPES[newPropertyType!] as ControlType),
+            controlType,
             custom: true,
             expressionEnabled: true,
             key: getRandomId(),
             label: `Item ${arrayItems.length.toString()}`,
             name: `${name}__${arrayItems.length.toString()}`,
             path: `${path}[${arrayItems.length.toString()}]`,
-            type: matchingItem?.type || newPropertyType || 'STRING',
+            type: (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING',
         };
 
         setArrayItems([...arrayItems, newItem]);
@@ -75,24 +77,24 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
     // get available property types from items and additional properties
     useEffect(() => {
-        let propertyTypes: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}> = [];
+        let propertyTypes: Array<{label: string; value: string}> = [];
 
         const hasDuplicateTypes = items?.some(
             (item, index) => items.findIndex((otherItem) => otherItem.type === item.type) !== index
         );
 
         const processItems = (items: Array<PropertyAllType>) =>
-            items.reduce((types: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}>, item) => {
+            items.reduce((types: Array<{label: string; value: string}>, item) => {
                 if (item.type) {
                     if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
-                            label: item.label,
+                            label: item.label ?? item.type,
                             value: `${item.type}_${item.label}`,
                         });
                     } else {
                         types.push({
-                            label: item.type as ValuePropertyControlType,
-                            value: item.type as ValuePropertyControlType,
+                            label: item.type,
+                            value: item.type,
                         });
                     }
                 }
@@ -130,7 +132,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
     useEffect(() => {
         if (currentComponent?.componentName === 'condition' && availablePropertyTypes.length) {
-            setNewPropertyType(availablePropertyTypes[0].label);
+            setNewPropertyType(availablePropertyTypes[0].value);
         }
     }, [currentComponent?.componentName, availablePropertyTypes]);
 
@@ -187,11 +189,16 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     parameterItemType = 'ARRAY';
                 }
 
+                const controlType: ControlType =
+                    parameterItemType && parameterItemType in VALUE_PROPERTY_CONTROL_TYPES
+                        ? (VALUE_PROPERTY_CONTROL_TYPES[
+                              parameterItemType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                          ] as ControlType)
+                        : ('STRING' as ControlType);
+
                 const newSubProperty = {
                     arrayName: name,
-                    controlType: VALUE_PROPERTY_CONTROL_TYPES[
-                        parameterItemType as ValuePropertyControlType
-                    ] as ControlType,
+                    controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
                     expressionEnabled: true,
