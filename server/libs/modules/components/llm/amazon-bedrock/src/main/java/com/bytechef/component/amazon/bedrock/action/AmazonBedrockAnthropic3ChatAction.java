@@ -38,13 +38,17 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
 import org.springframework.ai.bedrock.anthropic3.Anthropic3ChatOptions;
 import org.springframework.ai.bedrock.anthropic3.BedrockAnthropic3ChatModel;
 import org.springframework.ai.bedrock.anthropic3.api.Anthropic3ChatBedrockApi;
@@ -56,6 +60,12 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  * @author Marko Kriskovic
  */
 public class AmazonBedrockAnthropic3ChatAction {
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(Anthropic3ChatBedrockApi.AnthropicChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName,
+                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askAnthropic3")
         .title("Ask Anthropic3")
@@ -65,13 +75,7 @@ public class AmazonBedrockAnthropic3ChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(Anthropic3ChatBedrockApi.AnthropicChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName,
-                                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")

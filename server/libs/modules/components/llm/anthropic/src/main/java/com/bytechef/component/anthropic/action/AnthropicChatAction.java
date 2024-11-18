@@ -39,6 +39,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
@@ -57,6 +58,11 @@ import org.springframework.ai.chat.prompt.ChatOptions;
  * @author Marko Kriskovic
  */
 public class AnthropicChatAction {
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(AnthropicApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
@@ -66,12 +72,7 @@ public class AnthropicChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(AnthropicApi.ChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")

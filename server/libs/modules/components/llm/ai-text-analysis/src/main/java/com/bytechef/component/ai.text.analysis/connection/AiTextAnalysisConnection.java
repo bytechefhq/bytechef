@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.text.analysis.connection;
 
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CONNECTION_PROVIDER;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.ACCESS_KEY_ID;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.REGION;
 import static com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants.SECRET_ACCESS_KEY;
@@ -23,6 +24,7 @@ import static com.bytechef.component.definition.Authorization.AuthorizationType.
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ConnectionDefinition.BASE_URI;
@@ -43,6 +45,31 @@ import com.bytechef.component.watsonx.constant.WatsonxConstants;
 public final class AiTextAnalysisConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> {
+            return switch(connectionParameters.getInteger(CONNECTION_PROVIDER)) {
+                case 6 -> "https://api.anthropic.com/";
+                case 8 -> "https://api.groq.com/openai";
+                case 9 -> "https://api-inference.huggingface.co";
+                case 10 -> "https://api.mistral.ai/";
+                case 11 -> "https://integrate.api.nvidia.com/";
+                case 12 -> "https://api.openai.com/v1";
+                default -> "";
+            };
+        })
+        .properties(
+            integer(CONNECTION_PROVIDER)
+                .label("Connection provider")
+                .options(
+                    option("Amazon Bedrock: Anthropic 2", 0),
+                    option("Amazon Bedrock: Anthropic 3", 1),
+                    option("Anthropic", 6),
+                    option("Azure Open AI", 7),
+                    option("Groq", 8),
+                    option("Hugging Face", 9),
+                    option("Mistral", 10),
+                    option("NVIDIA", 11),
+                    option("Open AI", 12),
+                    option("Vertex Gemini", 13)))
         .authorizations(
             authorization(Authorization.AuthorizationType.CUSTOM)
                 .title("Amazon Bedrock")
@@ -70,56 +97,20 @@ public final class AiTextAnalysisConnection {
                         .required(true)
                         .defaultValue("us-east-1")),
             authorization(BEARER_TOKEN)
-                .title("Anthropic")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Azure Open AI")
+                .title("Others (Bearer Token)")
                 .properties(
                     string(ENDPOINT)
                         .label("Endpoint")
+                        .displayCondition("connectionProvider == 7")
                         .required(true),
                     string(TOKEN)
                         .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Groq")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Hugging Face")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Mistral")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("NVIDIA")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Open AI")
-                .properties(
-                    string(TOKEN)
-                        .label("Token")
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Vertex Gemini")
-                .properties(
+                        .displayCondition("connectionProvider >= 6 && connectionProvider < 13")
+                        .required(true),
                     string(PROJECT_ID)
                         .label("Project Id")
                         .description("Google Cloud Platform project ID")
+                        .displayCondition("connectionProvider == 13")
                         .required(true),
                     string(LOCATION)
                         .label("Location")
@@ -153,36 +144,7 @@ public final class AiTextAnalysisConnection {
                             option("Dallas, us-south1", "us-south1"),
                             option("Oregon, us-west1", "us-west1"),
                             option("Nevada, us-west4", "us-west4"))
-                        .required(true)),
-            authorization(BEARER_TOKEN)
-                .title("Watsonx")
-                .properties(
-                    string(URL)
-                        .label("Region")
-                        .description("URL to connect to.")
-                        .options(option("Dallas [us-south]", "https://us-south.ml.cloud.ibm.com"),
-                            option("London [eu-gb]", "https://eu-gb.ml.cloud.ibm.com"),
-                            option("Tokyo [jp-tok]", "https://jp-tok.ml.cloud.ibm.com"),
-                            option("Frankfurt [eu-de]", "https://eu-de.ml.cloud.ibm.com"))
-                        .required(true),
-                    string(STREAM_ENDPOINT)
-                        .label("Stream Endpoint")
-                        .description("The streaming endpoint.")
-                        .defaultValue("generation/stream?version=2023-05-29")
-                        .required(true),
-                    string(TEXT_ENDPOINT)
-                        .label("Text Endpoint")
-                        .description("The text endpoint.")
-                        .defaultValue("generation/text?version=2023-05-29")
-                        .required(true),
-                    string(WatsonxConstants.PROJECT_ID)
-                        .label("Project ID")
-                        .description("The project ID.")
-                        .required(true),
-                    string(TOKEN)
-                        .label("IAM Token")
-                        .description("The IBM Cloud account IAM token.")
-                        .required(true)));
+                        .displayCondition("connectionProvider == 13")));
 
     private AiTextAnalysisConnection() {
     }
