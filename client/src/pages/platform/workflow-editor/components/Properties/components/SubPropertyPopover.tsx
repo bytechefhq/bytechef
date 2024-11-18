@@ -11,6 +11,7 @@ import PropertySelect from './PropertySelect';
 interface SubPropertyPopoverProps {
     array?: boolean;
     availablePropertyTypes: Array<{label: string; value: string}>;
+    condition?: boolean;
     handleClick: () => void;
     newPropertyName?: string;
     newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
@@ -21,6 +22,7 @@ interface SubPropertyPopoverProps {
 const SubPropertyPopover = ({
     array,
     availablePropertyTypes,
+    condition,
     handleClick,
     newPropertyName,
     newPropertyType,
@@ -77,29 +79,44 @@ const SubPropertyPopover = ({
                         />
                     )}
 
-                    {availablePropertyTypes?.length > 1 ? (
+                    {condition && availablePropertyTypes?.length > 1 && (
                         <PropertySelect
                             label="Type"
                             onValueChange={(value) =>
                                 setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
                             }
                             options={availablePropertyTypes.map((property) => ({
-                                label: property.value!,
-                                value: property.value!,
+                                label: property.label!,
+                                value: property.label!,
                             }))}
                             value={newPropertyType}
                         />
-                    ) : (
-                        <div className="flex w-full items-center gap-2 text-sm">
-                            <span className="font-medium">Type</span>
-
-                            {availablePropertyTypes[0] && (
-                                <span className="inline-flex w-full rounded-md bg-white">
-                                    {availablePropertyTypes[0].value}
-                                </span>
-                            )}
-                        </div>
                     )}
+
+                    {!condition &&
+                        (availablePropertyTypes?.length > 1 ? (
+                            <PropertySelect
+                                label="Type"
+                                onValueChange={(value) =>
+                                    setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
+                                }
+                                options={availablePropertyTypes.map((property) => ({
+                                    label: property.label!,
+                                    value: property.value!,
+                                }))}
+                                value={newPropertyType}
+                            />
+                        ) : (
+                            <div className="flex w-full items-center gap-2 text-sm">
+                                <span className="font-medium">Type</span>
+
+                                {availablePropertyTypes[0] && (
+                                    <span className="inline-flex w-full rounded-md bg-white">
+                                        {availablePropertyTypes[0].value}
+                                    </span>
+                                )}
+                            </div>
+                        ))}
                 </main>
 
                 <footer className="flex items-center justify-end space-x-2">
