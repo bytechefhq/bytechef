@@ -77,14 +77,26 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     useEffect(() => {
         let propertyTypes: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}> = [];
 
+        const hasDuplicateTypes = items?.some(
+            (item, index) => items.findIndex((otherItem) => otherItem.type === item.type) !== index
+        );
+
         const processItems = (items: Array<PropertyAllType>) =>
             items.reduce((types: Array<{label: ValuePropertyControlType; value: ValuePropertyControlType}>, item) => {
                 if (item.type) {
-                    types.push({
-                        label: item.type as ValuePropertyControlType,
-                        value: item.type as ValuePropertyControlType,
-                    });
+                    if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
+                        types.push({
+                            label: item.label,
+                            value: `${item.type}_${item.label}`,
+                        });
+                    } else {
+                        types.push({
+                            label: item.type as ValuePropertyControlType,
+                            value: item.type as ValuePropertyControlType,
+                        });
+                    }
                 }
+
                 return types;
             }, []);
 
@@ -115,6 +127,12 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             setNewPropertyType(availablePropertyTypes[0].value);
         }
     }, [availablePropertyTypes]);
+
+    useEffect(() => {
+        if (currentComponent?.componentName === 'condition' && availablePropertyTypes.length) {
+            setNewPropertyType(availablePropertyTypes[0].label);
+        }
+    }, [currentComponent?.componentName, availablePropertyTypes]);
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
@@ -236,6 +254,12 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        if (property.items?.length) {
+            setArrayItems(property.items);
+        }
+    }, [property.items]);
+
     return (
         <Fragment key={`${path}_${name}_arrayProperty`}>
             <ul className="ml-2 flex flex-col space-y-4 border-l">
@@ -272,6 +296,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
+                    condition={currentComponent?.componentName === 'condition'}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}
                     newPropertyType={newPropertyType}
