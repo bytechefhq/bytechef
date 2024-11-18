@@ -14,6 +14,7 @@ import {
     TriggerDefinitionApi,
     WorkflowConnection,
     WorkflowNodeOutput,
+    WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {
@@ -33,6 +34,7 @@ import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/
 import {
     ComponentPropertiesType,
     DataPillType,
+    NodeDataType,
     PropertyAllType,
     UpdateWorkflowMutationType,
     WorkflowDefinitionType,
@@ -50,6 +52,7 @@ import getAllTaskNames from '../utils/getAllTaskNames';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
+import updateConditionSubtask from '../utils/updateRootConditionNode';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -96,7 +99,7 @@ const WorkflowNodeDetailsPanel = ({
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
 
-    const {componentActions, setDataPills, workflow} = useWorkflowDataStore();
+    const {componentActions, nodes, setDataPills, workflow} = useWorkflowDataStore();
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
@@ -269,19 +272,72 @@ const WorkflowNodeDetailsPanel = ({
 
         const {componentName, description, label, workflowNodeName} = currentComponent;
 
+        let nodeData = {
+            componentName,
+            description,
+            label,
+            name: workflowNodeName || currentNode?.name || '',
+            operationName: newOperationName,
+            parameters: getParametersWithDefaultValues({
+                properties: operationData.properties as Array<PropertyAllType>,
+            }),
+            trigger: currentNode?.trigger,
+            type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+        };
+
+        if (currentNode?.conditionData) {
+            const parentConditionNode = nodes.find(
+                (node) => node.data.name === currentNode?.conditionData?.conditionId
+            );
+
+            if (!parentConditionNode) {
+                return;
+            }
+
+            const conditionCase = currentNode.conditionData.conditionCase;
+            const conditionParameters: Array<WorkflowTask> = parentConditionNode.data.parameters[conditionCase];
+
+            if (conditionParameters) {
+                const nodeIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
+
+                if (nodeIndex !== -1) {
+                    conditionParameters[nodeIndex] = {
+                        ...conditionParameters[nodeIndex],
+                        type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                    };
+
+                    if (!workflow.definition) {
+                        return;
+                    }
+
+                    const tasks = JSON.parse(workflow.definition).tasks;
+
+                    const updatedParentConditionTask = workflow.tasks?.find(
+                        (task) => task.name === currentNode.conditionData?.conditionId
+                    );
+
+                    if (!updatedParentConditionTask) {
+                        return;
+                    }
+
+                    const updatedRootConditionNode = updateConditionSubtask({
+                        conditionCase,
+                        conditionId: currentNode.conditionData.conditionId,
+                        nodeIndex,
+                        nodes,
+                        tasks,
+                        updatedParentConditionNodeData: parentConditionNode.data,
+                        updatedParentConditionTask,
+                        workflow,
+                    });
+
+                    nodeData = updatedRootConditionNode.data ?? (updatedRootConditionNode as NodeDataType);
+                }
+            }
+        }
+
         saveWorkflowDefinition({
-            nodeData: {
-                componentName,
-                description,
-                label,
-                name: workflowNodeName || currentNode?.name || '',
-                operationName: newOperationName,
-                parameters: getParametersWithDefaultValues({
-                    properties: operationData.properties as Array<PropertyAllType>,
-                }),
-                trigger: currentNode?.trigger,
-                type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-            },
+            nodeData,
             onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
@@ -295,6 +351,7 @@ const WorkflowNodeDetailsPanel = ({
                 });
             },
             queryClient,
+            subtask: !!currentNode?.conditionData,
             updateWorkflowMutation,
             workflow,
         });
