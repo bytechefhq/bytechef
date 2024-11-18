@@ -24,6 +24,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
+import {Node} from 'reactflow';
 
 export type DataPillType = {
     componentName?: string;
@@ -125,8 +126,14 @@ export type NodeDataType = {
 
 export type NodeType = {
     componentName?: string;
+    conditionData?: {
+        conditionCase: string;
+        conditionId: string;
+        index: number;
+    };
     connections?: Array<WorkflowConnectionType>;
     connectionId?: number;
+    data: NodeDataType;
     displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [key: string]: boolean;
@@ -151,7 +158,7 @@ export type NodeType = {
     type: string;
     version: number;
     workflowNodeName: string;
-};
+} & Node;
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};
 

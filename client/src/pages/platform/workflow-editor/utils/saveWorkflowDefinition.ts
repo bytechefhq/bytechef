@@ -27,6 +27,7 @@ interface SaveWorkflowDefinitionProps {
     onSuccess?: () => void;
     placeholderId?: string;
     queryClient: QueryClient;
+    subtask?: boolean;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
     workflow: Workflow;
 }
@@ -39,6 +40,7 @@ export default async function saveWorkflowDefinition({
     onSuccess,
     placeholderId,
     queryClient,
+    subtask,
     updateWorkflowMutation,
     workflow,
 }: SaveWorkflowDefinitionProps) {
@@ -130,6 +132,7 @@ export default async function saveWorkflowDefinition({
     if (
         existingWorkflowTask &&
         !decorative &&
+        !subtask &&
         (!operationName ||
             (existingWorkflowTask.parameters &&
                 JSON.stringify(existingWorkflowTask.parameters) === JSON.stringify(newTask.parameters))) &&
