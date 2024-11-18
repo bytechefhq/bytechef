@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
+    implementation(project(":server:libs:platform:platform-webhook:platform-webhook-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service"))
 
@@ -64,6 +65,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client"))
 
     runtimeOnly("org.postgresql:postgresql")
     runtimeOnly("com.zaxxer:HikariCP")
