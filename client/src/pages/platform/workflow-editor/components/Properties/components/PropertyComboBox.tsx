@@ -118,6 +118,8 @@ const PropertyComboBox = ({
 
     const missingConnection = !options.length && currentNode?.connections?.length && !currentNode.connectionId;
 
+    const noOptionsAvailable = !lookupDependsOnValues && !options.length && !missingConnection;
+
     if (lookupDependsOnValues?.length && !options.length) {
         placeholder = `${lookupDependsOnPaths} is not defined`;
     } else if (missingConnection) {
@@ -168,7 +170,7 @@ const PropertyComboBox = ({
                             leadingIcon && 'relative',
                             showInputTypeSwitchButton && 'mt-0'
                         )}
-                        disabled={isRefetching}
+                        disabled={isRefetching || noOptionsAvailable || missingConnection}
                         name={name}
                         role="combobox"
                         variant="outline"
@@ -191,10 +193,8 @@ const PropertyComboBox = ({
                             </span>
                         )}
 
-                        {!lookupDependsOnValues && !options.length && !missingConnection && (
-                            <span className="rounded-md border p-2 text-sm text-muted-foreground">
-                                No options available
-                            </span>
+                        {noOptionsAvailable && (
+                            <span className="w-full p-2 text-sm text-muted-foreground">No options available</span>
                         )}
 
                         {((lookupDependsOnValues && !isLoading) || !lookupDependsOnValues) && (
@@ -208,7 +208,8 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    !isRefetching && (
+                                    !isRefetching &&
+                                    !noOptionsAvailable && (
                                         <span
                                             className={twMerge(
                                                 leadingIcon && 'ml-9',
