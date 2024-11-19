@@ -239,6 +239,26 @@
       "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
       "displayCondition" : null,
@@ -1920,9 +1940,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1971,5 +1988,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
 }

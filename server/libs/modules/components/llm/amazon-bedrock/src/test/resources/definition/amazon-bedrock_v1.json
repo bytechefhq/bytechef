@@ -222,6 +222,26 @@
       "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
       "displayCondition" : null,
@@ -327,9 +347,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic3",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -523,6 +543,26 @@
       "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
       "displayCondition" : null,
@@ -628,9 +668,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic2",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -799,6 +839,26 @@
         "value" : 2
       } ],
       "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
@@ -1070,9 +1130,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Cohere",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1241,6 +1301,26 @@
         "value" : 2
       } ],
       "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
@@ -1491,9 +1571,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Jurassic2",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1700,6 +1780,26 @@
       "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
       "displayCondition" : null,
@@ -1764,9 +1864,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Llama",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1941,6 +2041,26 @@
       "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
       "displayCondition" : null,
@@ -2046,9 +2166,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Titan",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
