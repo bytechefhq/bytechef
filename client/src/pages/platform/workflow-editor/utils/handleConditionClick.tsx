@@ -72,10 +72,12 @@ export default async function handleConditionClick({
 
     const {tasks} = workflow;
 
-    let nodeIndex = getNodes().length;
+    let taskIndex = tasks?.length;
 
-    if (edge) {
-        nodeIndex = getNodes().findIndex((node) => node.id === sourceNodeId) + 1;
+    if (edge && tasks) {
+        sourceNodeId = sourceNodeId.split('=>')[0];
+
+        taskIndex = tasks.findIndex((task) => task.name === sourceNodeId) + 1;
     }
 
     let conditionId: string | undefined;
@@ -87,10 +89,10 @@ export default async function handleConditionClick({
             return;
         }
 
-        nodeIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
+        taskIndex = tasks.findIndex((task) => task.name === conditionId) + 1;
 
         if (sourceNodeId.includes('left') || sourceNodeId.includes('right')) {
-            nodeIndex = parseInt(sourceNodeId.split('-')[3]);
+            taskIndex = parseInt(sourceNodeId.split('-')[3]);
         } else {
             conditionId = undefined;
         }
@@ -108,7 +110,7 @@ export default async function handleConditionClick({
                 caseTrue: [],
             },
         },
-        nodeIndex,
+        nodeIndex: taskIndex,
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({

@@ -38,12 +38,12 @@ export default function insertNewConditionSubtask({
     const caseTasks: Array<WorkflowTask> =
         conditionCase === CONDITION_CASE_TRUE ? conditionTask.parameters.caseTrue : conditionTask.parameters.caseFalse;
 
-    const nodeIndex = parseInt(placeholderId.split('-').pop() || '-1');
+    const taskIndex = parseInt(placeholderId.split('-').pop() || '-1');
 
-    if (nodeIndex === undefined || nodeIndex === -1 || typeof nodeIndex !== 'number') {
+    if (taskIndex === undefined || taskIndex === -1 || typeof taskIndex !== 'number') {
         caseTasks.push(newTask);
     } else {
-        caseTasks.splice(nodeIndex, 0, newTask);
+        caseTasks.splice(taskIndex, 0, newTask);
 
         conditionTask.parameters = {
             ...conditionTask.parameters,
