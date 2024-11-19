@@ -42,6 +42,38 @@ Version: 1
 ## Triggers
 
 
+### New Task
+Triggers when new task is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Application | STRING | SELECT  |  Application to be used for the trigger.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
 
 <hr />
 
