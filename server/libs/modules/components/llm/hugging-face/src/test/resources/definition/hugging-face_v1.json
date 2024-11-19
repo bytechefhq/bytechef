@@ -23,8 +23,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -173,6 +173,26 @@
         "value" : 2
       } ],
       "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Define the JSON schema for the response.",
+      "displayCondition" : "responseFormat != 0",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "responseSchema",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response Schema",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
