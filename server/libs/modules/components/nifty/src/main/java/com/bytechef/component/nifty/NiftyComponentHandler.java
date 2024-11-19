@@ -27,8 +27,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinit
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.nifty.trigger.NiftyNewTaskTrigger;
 import com.bytechef.component.nifty.util.NiftyOptionUtils;
 import com.bytechef.definition.BaseProperty;
 import com.google.auto.service.AutoService;
@@ -43,6 +45,11 @@ import java.util.Optional;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(NiftyNewTaskTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public List<? extends ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
