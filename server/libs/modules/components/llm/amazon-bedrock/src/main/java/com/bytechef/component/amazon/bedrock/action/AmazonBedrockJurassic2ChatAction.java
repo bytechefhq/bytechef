@@ -37,6 +37,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PROMPT;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
@@ -81,6 +82,7 @@ public class AmazonBedrockJurassic2ChatAction {
                                     Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             integer(MIN_TOKENS)
                 .label("Min Tokens")
                 .description("The minimum number of tokens to generate in the chat completion.")

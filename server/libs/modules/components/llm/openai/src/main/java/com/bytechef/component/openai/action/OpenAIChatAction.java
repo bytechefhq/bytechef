@@ -35,6 +35,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
@@ -82,6 +83,7 @@ public class OpenAIChatAction {
                                     OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -99,7 +101,7 @@ public class OpenAIChatAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }

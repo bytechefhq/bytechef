@@ -26,6 +26,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPER
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
@@ -72,6 +73,7 @@ public class AmazonBedrockTitanChatAction {
                                     (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,

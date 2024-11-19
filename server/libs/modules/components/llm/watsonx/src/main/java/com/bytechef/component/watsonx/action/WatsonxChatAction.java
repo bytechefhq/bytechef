@@ -27,6 +27,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPER
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
@@ -73,6 +74,7 @@ public class WatsonxChatAction {
                 .required(false),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             string(DECODING_METHOD)
                 .label("Decoding Method")
                 .description("Decoding is the process that a model uses to choose the tokens in the generated output.")

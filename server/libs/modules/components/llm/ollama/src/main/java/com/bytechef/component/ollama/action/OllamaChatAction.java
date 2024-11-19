@@ -33,6 +33,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
@@ -113,6 +114,7 @@ public class OllamaChatAction {
                     option("List", 2, "JSON response that is a list."))
                 .defaultValue(1)
                 .required(false),
+            RESPONSE_SCHEMA_PROPERTY,
             string(KEEP_ALIVE)
                 .label("Keep alive for")
                 .description("Controls how long the model will stay loaded into memory following the request")

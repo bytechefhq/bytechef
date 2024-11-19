@@ -37,6 +37,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
@@ -77,6 +78,7 @@ public class AzureOpenAIChatAction {
                 .required(true),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,

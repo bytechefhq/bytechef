@@ -29,6 +29,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Property.ControlType;
 import java.util.List;
 
 /**
@@ -56,6 +57,7 @@ public class LLMConstants {
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
     public static final String RESPONSE_FORMAT = "responseFormat";
+    public static final String RESPONSE_SCHEMA = "responseSchema";
     public static final String ROLE = "role";
     public static final String STOP = "stop";
     public static final String STYLE = "style";
@@ -262,6 +264,13 @@ public class LLMConstants {
                 option("Urdu", "ur"),
                 option("Vietnamese", "vi"),
                 option("Welsh", "cy")))
+        .required(false);
+
+    public static final ModifiableStringProperty RESPONSE_SCHEMA_PROPERTY = string(RESPONSE_SCHEMA)
+        .label("Response Schema")
+        .description("Define the JSON schema for the response.")
+        .controlType(ControlType.TEXT_AREA)
+        .displayCondition("responseFormat != 0")
         .required(false);
 
     private LLMConstants() {
