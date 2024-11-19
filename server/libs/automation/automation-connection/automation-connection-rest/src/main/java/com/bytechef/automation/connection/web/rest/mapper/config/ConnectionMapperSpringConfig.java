@@ -29,7 +29,6 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
 @SpringMapperConfig(
 
     conversionServiceAdapterPackage = "com.bytechef.automation.connection.web.rest.adapter",
-    conversionServiceAdapterClassName = "ProjectConnectionConversionServiceAdapter",
-    conversionServiceBeanName = "com.bytechef.automation.connection.web.rest.mapper.config.ConnectionMapperSpringConfig")
+    conversionServiceAdapterClassName = "ProjectConnectionConversionServiceAdapter")
 public interface ConnectionMapperSpringConfig {
 }

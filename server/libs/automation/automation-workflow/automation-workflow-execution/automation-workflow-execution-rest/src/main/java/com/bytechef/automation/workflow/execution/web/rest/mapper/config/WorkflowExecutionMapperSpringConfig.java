@@ -32,7 +32,6 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.automation.workflow.execution.web.rest.adapter",
-    conversionServiceAdapterClassName = "ProjectWorkflowExecutionConversionServiceAdapter",
-    conversionServiceBeanName = "com.bytechef.automation.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig")
+    conversionServiceAdapterClassName = "ProjectWorkflowExecutionConversionServiceAdapter")
 public interface WorkflowExecutionMapperSpringConfig {
 }
