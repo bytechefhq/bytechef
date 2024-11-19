@@ -18,6 +18,7 @@ package com.bytechef.component.llm;
 
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.Parameters;
@@ -25,6 +26,7 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.converter.ListOutputConverter;
@@ -36,7 +38,9 @@ import org.springframework.core.convert.support.DefaultConversionService;
  */
 public interface Chat {
 
-    static Object getResponse(Chat chat, Parameters inputParameters, Parameters connectionParameters) {
+    static Object getResponse(
+        Chat chat, Parameters inputParameters, Parameters connectionParameters) {
+
         ChatModel chatModel = chat.createChatModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters);
@@ -53,12 +57,22 @@ public interface Chat {
 
     ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
 
-    private static List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
+    private static List<org.springframework.ai.chat.messages.Message> getMessages(
+        Parameters inputParameters) {
+
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
-        return messages.stream()
+        List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(messages.stream()
             .map(message -> createMessage(message.role(), message.content()))
-            .toList();
+            .toList());
+
+        String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
+
+        if (responseSchema != null && !responseSchema.isEmpty()) {
+            list.add(new SystemMessage(responseSchema));
+        }
+
+        return list;
     }
 
     private static Object returnChatEntity(Integer integer, ChatClient.CallResponseSpec call) {

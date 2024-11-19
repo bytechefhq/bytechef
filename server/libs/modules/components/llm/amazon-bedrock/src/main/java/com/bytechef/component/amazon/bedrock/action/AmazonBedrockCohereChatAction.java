@@ -35,6 +35,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.N;
 import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
@@ -83,6 +84,7 @@ public class AmazonBedrockCohereChatAction {
                                     CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)))),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
+            RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
