@@ -41,8 +41,6 @@ export default function updateRootConditionNode({
             break;
         }
 
-        console.log('parentConditionTaskNode: ', parentConditionTaskNode);
-
         const currentConditionCase = currentTaskNodeConditionData.conditionCase;
 
         const parentConditionCaseTasks: Array<WorkflowTask> =

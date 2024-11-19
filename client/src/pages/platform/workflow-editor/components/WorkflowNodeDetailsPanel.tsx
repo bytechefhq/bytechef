@@ -298,11 +298,11 @@ const WorkflowNodeDetailsPanel = ({
             const conditionParameters: Array<WorkflowTask> = parentConditionNode.data.parameters[conditionCase];
 
             if (conditionParameters) {
-                const nodeIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
+                const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
 
-                if (nodeIndex !== -1) {
-                    conditionParameters[nodeIndex] = {
-                        ...conditionParameters[nodeIndex],
+                if (taskIndex !== -1) {
+                    conditionParameters[taskIndex] = {
+                        ...conditionParameters[taskIndex],
                         type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
                     };
 
@@ -323,7 +323,7 @@ const WorkflowNodeDetailsPanel = ({
                     const updatedRootConditionNode = updateConditionSubtask({
                         conditionCase,
                         conditionId: currentNode.conditionData.conditionId,
-                        nodeIndex,
+                        nodeIndex: taskIndex,
                         nodes,
                         tasks,
                         updatedParentConditionNodeData: parentConditionNode.data,
