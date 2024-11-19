@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +33,34 @@ import java.util.Map;
 
 /**
  * @author Luka Ljubić
+ * @author Monika Kušter
  */
 public class NiftyOptionUtils {
 
     private NiftyOptionUtils() {
+    }
+
+    public static List<Option<String>> getAppIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, TriggerContext triggerContext) {
+
+        Map<String, Object> body = triggerContext.http(http -> http.get("/apps"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .queryParameters("limit", 100, "offset", 0)
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body != null && body.get("apps") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getTaskGroupIdOptions(

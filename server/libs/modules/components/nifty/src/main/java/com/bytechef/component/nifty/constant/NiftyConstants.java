@@ -27,6 +27,7 @@ import com.bytechef.component.nifty.util.NiftyOptionUtils;
  */
 public class NiftyConstants {
 
+    public static final String APP_ID = "app_id";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String PROJECT = "project";
