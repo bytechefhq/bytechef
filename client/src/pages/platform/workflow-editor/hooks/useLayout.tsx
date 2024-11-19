@@ -506,7 +506,7 @@ export default function useLayout({
                         height = PLACEHOLDER_NODE_HEIGHT * 2;
                     }
                 } else {
-                    height = 0;
+                    height = PLACEHOLDER_NODE_HEIGHT;
                 }
 
                 if (node.id.includes('bottom')) {
@@ -544,9 +544,7 @@ export default function useLayout({
                 if (hasOtherConditionCaseNodes.length) {
                     positionY += 35;
                 }
-            }
-
-            if (node.id.includes('bottom-placeholder')) {
+            } else if (node.id.includes('bottom-placeholder')) {
                 positionY += 35;
             }
 
