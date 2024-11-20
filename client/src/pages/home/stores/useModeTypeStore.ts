@@ -15,7 +15,7 @@ export const useModeTypeStore = create<ModeTypeI>()(
     devtools(
         persist(
             (set) => ({
-                currentType: undefined,
+                currentType: ModeType.AUTOMATION,
                 setCurrentType: (currentType) =>
                     set(() => ({
                         currentType,
