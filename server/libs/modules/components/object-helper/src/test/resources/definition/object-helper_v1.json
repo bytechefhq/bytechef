@@ -16,130 +16,6 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Converts the JSON string to object/array.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "parse",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "The JSON string to convert to the data.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "source",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Source",
-      "placeholder" : null,
-      "controlType" : "TEXT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : null
-    } ],
-    "title" : "Convert from JSON String",
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  }, {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Writes the object/array to a JSON string.",
-    "help" : null,
-    "metadata" : null,
-    "name" : "stringify",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "The value type.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "type",
-      "type" : "INTEGER",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Type",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Object",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Array",
-        "value" : 2
-      } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The data to convert to JSON string.",
-      "displayCondition" : "type == 1",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "source",
-      "type" : "OBJECT",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Source",
-      "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "The data to convert to JSON string.",
-      "displayCondition" : "type == 2",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "source",
-      "type" : "ARRAY",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Source",
-      "placeholder" : null,
-      "items" : null,
-      "maxItems" : null,
-      "minItems" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
-    } ],
-    "title" : "Convert to JSON String",
-    "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  }, {
-    "batch" : null,
-    "deprecated" : null,
     "description" : "Add value to the object by key if it exists. Otherwise, update the value",
     "help" : null,
     "metadata" : null,
@@ -1117,6 +993,115 @@
   }, {
     "batch" : null,
     "deprecated" : null,
+    "description" : "Checks if the given key exists in the given object.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "contains",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Object that you'd like to check.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "input",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Input",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Key to check for existence.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "key",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Key",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Contains",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
     "description" : "Deletes a key-value pair in the given object by the specified key. Returns the modified object.",
     "help" : null,
     "metadata" : null,
@@ -1172,9 +1157,118 @@
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Compares two objects and returns true if they are equal.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "equals",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "BOOLEAN",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "True",
+            "value" : true
+          }, {
+            "description" : null,
+            "label" : "False",
+            "value" : false
+          } ],
+          "controlType" : "SELECT"
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "BOOLEAN",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "True",
+          "value" : true
+        }, {
+          "description" : null,
+          "label" : "False",
+          "value" : false
+        } ],
+        "controlType" : "SELECT"
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The source object to compare.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "source",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Source",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The target object to compare against.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "target",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Target",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Equals",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
+  "connection" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "dataStream" : null,
+  "unifiedApi" : null
 }
