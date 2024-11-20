@@ -14,33 +14,31 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper;
+package com.bytechef.component.json.helper;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.object.helper.action.ObjectHelperAddKeyValuePairsAction;
-import com.bytechef.component.object.helper.action.ObjectHelperAddValueByKeyAction;
-import com.bytechef.component.object.helper.action.ObjectHelperDeleteKeyValuePairAction;
+import com.bytechef.component.json.helper.action.JsonHelperParseAction;
+import com.bytechef.component.json.helper.action.JsonHelperStringifyAction;
 import com.google.auto.service.AutoService;
 
 /**
- * @author Ivica Cardic
+ * @author Monika Kušter
  */
 @AutoService(ComponentHandler.class)
-public class ObjectHelperComponentHandler implements ComponentHandler {
+public class JsonHelperComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("objectHelper")
-        .title("Object Helper")
-        .description("Object Helper allows you to do various operations on objects.")
-        .icon("path:assets/object-helper.svg")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("jsonHelper")
+        .title("JSON Helper")
+        .description("JSON helper component provides actions for parsing and stringifying JSON.")
+        .icon("path:assets/json-helper.svg")
         .categories(ComponentCategory.HELPERS)
         .actions(
-            ObjectHelperAddValueByKeyAction.ACTION_DEFINITION,
-            ObjectHelperAddKeyValuePairsAction.ACTION_DEFINITION,
-            ObjectHelperDeleteKeyValuePairAction.ACTION_DEFINITION);
+            JsonHelperParseAction.ACTION_DEFINITION,
+            JsonHelperStringifyAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

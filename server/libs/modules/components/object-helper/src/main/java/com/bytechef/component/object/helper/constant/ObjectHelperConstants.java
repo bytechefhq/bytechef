@@ -33,7 +33,7 @@ public class ObjectHelperConstants {
     public static final String KEY = "key";
     public static final String SOURCE = "source";
     public static final String SOURCE_TYPE = "sourceType";
-    public static final String TYPE = "type";
+    public static final String TARGET = "target";
     public static final List<Option<Long>> TYPE_OPTIONS = List.of(
         option("Array", 1),
         option("Boolean", 2),
