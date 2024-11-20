@@ -23,32 +23,6 @@ Version: 1
 ## Actions
 
 
-### Convert from JSON String
-Converts the JSON string to object/array.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Source | STRING | TEXT  |  The JSON string to convert to the data.  |
-
-
-
-
-### Convert to JSON String
-Writes the object/array to a JSON string.
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type | INTEGER | SELECT  |  The value type.  |
-| Source | {} | OBJECT_BUILDER  |  The data to convert to JSON string.  |
-| Source | [] | ARRAY_BUILDER  |  The data to convert to JSON string.  |
-
-
-
-
 ### Add Value to the Object by Key
 Add value to the object by key if it exists. Otherwise, update the value
 
@@ -88,6 +62,29 @@ Add values from list to object or array. If the source is object, the items in t
 
 
 
+### Contains
+Checks if the given key exists in the given object.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Input | {} | OBJECT_BUILDER  |  Object that you'd like to check.  |
+| Key | STRING | TEXT  |  Key to check for existence.  |
+
+
+### Output
+
+
+
+Type: BOOLEAN
+
+
+
+
+
+
+
 ### Delete Key-Value Pair
 Deletes a key-value pair in the given object by the specified key. Returns the modified object.
 
@@ -97,6 +94,29 @@ Deletes a key-value pair in the given object by the specified key. Returns the m
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Input | {} | OBJECT_BUILDER  |  The object from which to delete the key-value pair.  |
 | Key | STRING | TEXT  |  The key of the key-value pair to delete.  |
+
+
+
+
+### Equals
+Compares two objects and returns true if they are equal.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Source | {} | OBJECT_BUILDER  |  The source object to compare.  |
+| Target | {} | OBJECT_BUILDER  |  The target object to compare against.  |
+
+
+### Output
+
+
+
+Type: BOOLEAN
+
+
+
 
 
 
