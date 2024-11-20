@@ -1,4 +1,4 @@
-import {PATH_SPACE_REPLACEMENT} from '@/shared/constants';
+import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {
     UpdateWorkflowNodeParameter200Response,
     UpdateWorkflowNodeParameterOperationRequest,
@@ -39,6 +39,10 @@ export default function saveProperty({
 
     if (path.includes(PATH_SPACE_REPLACEMENT)) {
         path = path.replace(new RegExp(PATH_SPACE_REPLACEMENT, 'g'), ' ');
+    }
+
+    if (path.includes(PATH_DIGIT_PREFIX)) {
+        path = path.replace(new RegExp(PATH_DIGIT_PREFIX, 'g'), '');
     }
 
     updateWorkflowNodeParameterMutation.mutate(

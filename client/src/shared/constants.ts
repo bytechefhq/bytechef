@@ -31,3 +31,4 @@ export const EDGE_STYLES = {
 };
 
 export const PATH_SPACE_REPLACEMENT = '_SPACE_';
+export const PATH_DIGIT_PREFIX = '_DIGIT_';

@@ -204,7 +204,6 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                         key={`${property.name}_${subProperty.name}_${index}`}
                         objectName={arrayName ? '' : name}
                         operationName={operationName}
-                        parameterValue={subProperty.defaultValue}
                         path={`${path}.${subProperty.name}`}
                         property={{
                             ...subProperty,

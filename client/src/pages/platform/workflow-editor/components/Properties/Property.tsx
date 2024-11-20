@@ -18,7 +18,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {PATH_SPACE_REPLACEMENT} from '@/shared/constants';
+import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {Option} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -182,6 +182,13 @@ const Property = ({
         path = path.replace(/\s/g, PATH_SPACE_REPLACEMENT);
     }
 
+    if (path) {
+        path = path
+            .split('.')
+            .map((step) => (step.match(/^\d/) ? `${PATH_DIGIT_PREFIX}${step}` : step))
+            .join('.');
+    }
+
     const getComponentIcon = (mentionValue: string) => {
         let componentName = mentionValue.split('_')[0].replace('${', '');
 
@@ -190,6 +197,24 @@ const Property = ({
         }
 
         return componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
+    };
+
+    const formatKeysWithDigits = (obj: any) => {
+        const formattedObj = {...obj};
+
+        Object.keys(formattedObj).forEach((key) => {
+            if (key.match(/^\d/)) {
+                formattedObj[`${PATH_DIGIT_PREFIX}${key}`] = formattedObj[key];
+
+                delete formattedObj[key];
+            }
+
+            if (typeof formattedObj[key] === 'object' && formattedObj[key] !== null) {
+                formattedObj[key] = formatKeysWithDigits(formattedObj[key]);
+            }
+        });
+
+        return formattedObj;
     };
 
     const saveInputValue = useDebouncedCallback(() => {
@@ -538,21 +563,23 @@ const Property = ({
 
         const {parameters} = currentComponent;
 
-        if (!propertyParameterValue || propertyParameterValue === defaultValue) {
+        if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
             if (!path) {
                 setPropertyParameterValue(parameters[name]);
 
                 return;
             }
 
-            const formattedParamaters = replaceSpacesInKeys(parameters);
+            let formattedParameters = replaceSpacesInKeys(parameters);
 
-            const paramValue = resolvePath(formattedParamaters, path);
+            formattedParameters = formatKeysWithDigits(formattedParameters);
+
+            const paramValue = resolvePath(formattedParameters, path);
 
             if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
             } else {
-                setPropertyParameterValue(formattedParamaters[name]);
+                setPropertyParameterValue(formattedParameters[name]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -623,10 +650,7 @@ const Property = ({
             setInputValue(propertyParameterValue);
         }
 
-        if (
-            controlType === 'SELECT' &&
-            (selectValue === '' || (selectValue === defaultValue && propertyParameterValue !== undefined))
-        ) {
+        if (controlType === 'SELECT' && propertyParameterValue !== undefined) {
             if (propertyParameterValue === null) {
                 setSelectValue('null');
             } else if (propertyParameterValue !== undefined) {
@@ -958,6 +982,7 @@ const Property = ({
                                     name={name}
                                     onValueChange={(value) => {
                                         onChange(value);
+
                                         setSelectValue(value);
                                     }}
                                     options={options as Array<SelectOptionType>}
