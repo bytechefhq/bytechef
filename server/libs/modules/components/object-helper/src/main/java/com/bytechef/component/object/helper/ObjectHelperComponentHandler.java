@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.object.helper.action.ObjectHelperAddKeyValuePairsAction;
 import com.bytechef.component.object.helper.action.ObjectHelperAddValueByKeyAction;
+import com.bytechef.component.object.helper.action.ObjectHelperContainsAction;
 import com.bytechef.component.object.helper.action.ObjectHelperDeleteKeyValuePairAction;
 import com.google.auto.service.AutoService;
 
@@ -40,6 +41,7 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
         .actions(
             ObjectHelperAddValueByKeyAction.ACTION_DEFINITION,
             ObjectHelperAddKeyValuePairsAction.ACTION_DEFINITION,
+            ObjectHelperContainsAction.ACTION_DEFINITION,
             ObjectHelperDeleteKeyValuePairAction.ACTION_DEFINITION);
 
     @Override
