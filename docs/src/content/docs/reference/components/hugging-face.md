@@ -53,6 +53,7 @@ Ask anything you want.
 | URL | STRING | TEXT  |  Url of the inference endpoint  |
 | Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Response Format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
+| Response Schema | STRING | TEXT_AREA  |  Define the JSON schema for the response.  |
 
 
 
