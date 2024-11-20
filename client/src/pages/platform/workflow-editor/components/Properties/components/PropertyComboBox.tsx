@@ -170,7 +170,7 @@ const PropertyComboBox = ({
                             leadingIcon && 'relative',
                             showInputTypeSwitchButton && 'mt-0'
                         )}
-                        disabled={isRefetching || noOptionsAvailable || missingConnection}
+                        disabled={isRefetching || noOptionsAvailable || !!missingConnection}
                         name={name}
                         role="combobox"
                         variant="outline"
