@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper.action;
+package com.bytechef.component.json.helper.action;
 
+import static com.bytechef.component.json.helper.constant.JsonHelperConstants.SOURCE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.object.helper.constant.ObjectHelperConstants;
 import java.util.Map;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -31,14 +31,14 @@ import org.mockito.Mockito;
  * @author Ivica Cardic
  */
 @Disabled
-public class ObjectHelperStringifyActionTest {
+class JsonHelperStringifyActionTest {
 
     @Test
-    public void testPerformStringify() {
+    void testPerformStringify() {
         Context context = Mockito.mock(Context.class);
         Parameters parameters = Mockito.mock(Parameters.class);
 
-        Mockito.when(parameters.getRequired(Mockito.eq(ObjectHelperConstants.SOURCE)))
+        Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(Map.of("key", 3));
         Mockito.when(context.json(Mockito.any()))
             .thenReturn("""
@@ -47,7 +47,7 @@ public class ObjectHelperStringifyActionTest {
                 }
                 """);
 
-        assertThat(ObjectHelperStringifyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)))
+        assertThat(JsonHelperStringifyAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)))
             .isEqualTo("""
                 {
                     "key": 3

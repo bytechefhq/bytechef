@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper.action;
+package com.bytechef.component.json.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.json.helper.constant.JsonHelperConstants.SOURCE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperParseAction {
+public class JsonHelperParseAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("parse")
         .title("Convert from JSON String")
@@ -38,9 +38,9 @@ public class ObjectHelperParseAction {
                 .description("The JSON string to convert to the data.")
                 .required(true))
         .output()
-        .perform(ObjectHelperParseAction::perform);
+        .perform(JsonHelperParseAction::perform);
 
-    private ObjectHelperParseAction() {
+    private JsonHelperParseAction() {
     }
 
     protected static Object perform(

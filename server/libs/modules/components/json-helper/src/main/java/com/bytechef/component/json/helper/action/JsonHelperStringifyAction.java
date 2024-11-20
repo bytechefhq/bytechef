@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.object.helper.action;
+package com.bytechef.component.json.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE;
+import static com.bytechef.component.json.helper.constant.JsonHelperConstants.SOURCE;
+import static com.bytechef.component.json.helper.constant.JsonHelperConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -31,7 +31,7 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class ObjectHelperStringifyAction {
+public class JsonHelperStringifyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("stringify")
         .title("Convert to JSON String")
@@ -54,9 +54,9 @@ public class ObjectHelperStringifyAction {
                 .displayCondition("type == 2")
                 .required(true))
         .output()
-        .perform(ObjectHelperStringifyAction::perform);
+        .perform(JsonHelperStringifyAction::perform);
 
-    private ObjectHelperStringifyAction() {
+    private JsonHelperStringifyAction() {
     }
 
     protected static String perform(
