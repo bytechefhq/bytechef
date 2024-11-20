@@ -35,6 +35,7 @@ public class SlackConstants {
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String TEXT = "text";
+    public static final String NEW_MESSAGE = "newMessage";
 
     public static final ModifiableObjectProperty CHAT_POST_MESSAGE_RESPONSE_PROPERTY = object()
         .properties(

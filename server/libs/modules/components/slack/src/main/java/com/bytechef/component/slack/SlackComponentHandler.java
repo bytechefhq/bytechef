@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.action.SlackSendMessageAction;
 import com.bytechef.component.slack.connection.SlackConnection;
+import com.bytechef.component.slack.trigger.SlackNewMessageTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -41,7 +42,9 @@ public final class SlackComponentHandler implements ComponentHandler {
         .connection(SlackConnection.CONNECTION_DEFINITION)
         .actions(
             SlackSendMessageAction.ACTION_DEFINITION,
-            SlackSendDirectMessageAction.ACTION_DEFINITION);
+            SlackSendDirectMessageAction.ACTION_DEFINITION)
+        .triggers(
+            SlackNewMessageTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

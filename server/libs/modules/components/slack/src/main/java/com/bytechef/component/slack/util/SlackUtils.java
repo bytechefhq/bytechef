@@ -26,6 +26,12 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
+import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
+import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +40,7 @@ import java.util.Map;
 /**
  * @author Ivica Cardic
  * @author Monika Kušter
+ * @author Vihar Shah
  */
 public class SlackUtils {
 
@@ -96,5 +103,16 @@ public class SlackUtils {
         }
 
         return options;
+    }
+
+    public static WebhookValidateResponse webhookValidate(
+        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext context) {
+        Map<String, Object> payload = body.getContent(new TypeReference<>() {});
+        if ("url_verification".equals(payload.get("type"))) {
+            String challengeCode = (String) payload.get("challenge");
+            return new WebhookValidateResponse(Map.of("challenge", challengeCode), 200);
+        }
+        return new WebhookValidateResponse(401);
     }
 }
