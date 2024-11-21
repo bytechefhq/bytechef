@@ -171,8 +171,9 @@ public class PropertyMapper {
         com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property.PropertyVisitor {
 
         @Override
-        default PropertyModel
-            convert(com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property property) {
+        default PropertyModel convert(
+            com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property property) {
+
             return (PropertyModel) property.accept(this);
         }
 

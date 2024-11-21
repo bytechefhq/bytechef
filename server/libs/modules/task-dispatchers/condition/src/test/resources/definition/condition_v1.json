@@ -85,7 +85,7 @@
           "defaultValue" : null,
           "description" : null,
           "exampleValue" : null,
-          "label" : "Boolean Expression",
+          "label" : "Boolean",
           "placeholder" : null,
           "options" : null,
           "additionalProperties" : null,
@@ -165,9 +165,9 @@
             } ],
             "controlType" : "SELECT"
           } ],
-          "controlType" : "SELECT"
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "SELECT"
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
@@ -197,7 +197,7 @@
           "defaultValue" : null,
           "description" : null,
           "exampleValue" : null,
-          "label" : "Date & Time Expression",
+          "label" : "Date & Time",
           "placeholder" : null,
           "options" : null,
           "additionalProperties" : null,
@@ -261,9 +261,9 @@
             "options" : null,
             "controlType" : "DATE_TIME"
           } ],
-          "controlType" : "SELECT"
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "SELECT"
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
@@ -293,7 +293,7 @@
           "defaultValue" : null,
           "description" : null,
           "exampleValue" : null,
-          "label" : "Number Expression",
+          "label" : "Number",
           "placeholder" : null,
           "options" : null,
           "additionalProperties" : null,
@@ -387,9 +387,9 @@
             "numberPrecision" : null,
             "controlType" : "NUMBER"
           } ],
-          "controlType" : "SELECT"
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "SELECT"
+        "controlType" : "OBJECT_BUILDER"
       }, {
         "advancedOption" : null,
         "displayCondition" : null,
@@ -419,7 +419,7 @@
           "defaultValue" : null,
           "description" : null,
           "exampleValue" : null,
-          "label" : "String Expression",
+          "label" : "String",
           "placeholder" : null,
           "options" : null,
           "additionalProperties" : null,
@@ -529,9 +529,9 @@
             "maxLength" : null,
             "minLength" : null
           } ],
-          "controlType" : "SELECT"
+          "controlType" : "OBJECT_BUILDER"
         } ],
-        "controlType" : "SELECT"
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,

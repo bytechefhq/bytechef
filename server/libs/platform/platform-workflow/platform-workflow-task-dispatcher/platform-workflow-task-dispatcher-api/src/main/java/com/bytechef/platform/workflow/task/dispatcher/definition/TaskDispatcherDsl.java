@@ -914,7 +914,11 @@ public final class TaskDispatcherDsl {
 
         @Override
         public ControlType getControlType() {
-            return ControlType.SELECT;
+            if (options == null) {
+                return ControlType.OBJECT_BUILDER;
+            } else {
+                return ControlType.SELECT;
+            }
         }
 
         public Optional<Boolean> getMultipleValues() {
