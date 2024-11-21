@@ -290,7 +290,19 @@ public class ComponentDefinitionRegistry {
         List<String> subProperties = Arrays.asList(propertyName.split("\\."));
 
         if (subProperties.size() == 1) {
-            return CollectionUtils.getFirst(properties, property -> Objects.equals(propertyName, property.getName()));
+            if (propertyName.endsWith("]")) {
+                Property.ArrayProperty arrayProperty = (Property.ArrayProperty) CollectionUtils.getFirst(
+                    properties,
+                    curProperty -> Objects.equals(
+                        curProperty.getName(), propertyName.substring(0, propertyName.length() - 3)));
+
+                List<? extends Property> items = OptionalUtils.get(arrayProperty.getItems());
+
+                return items.getFirst();
+            } else {
+                return CollectionUtils.getFirst(properties,
+                    property -> Objects.equals(propertyName, property.getName()));
+            }
         } else {
             Property firstProperty = CollectionUtils.getFirst(
                 properties, property -> Objects.equals(property.getName(), subProperties.getFirst()));
