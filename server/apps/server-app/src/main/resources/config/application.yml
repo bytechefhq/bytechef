@@ -35,8 +35,7 @@ management:
         include: '*'
   endpoint:
     health:
-      show-details: when_authorized
-      roles: 'ROLE_ADMIN'
+      showDetails: always
       probes:
         enabled: true
       group:
