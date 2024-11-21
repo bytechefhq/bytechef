@@ -54,7 +54,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             custom: true,
             expressionEnabled: true,
             key: getRandomId(),
-            label: `Item ${arrayItems.length.toString()}`,
+            label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
             name: `${name}__${arrayItems.length.toString()}`,
             path: `${path}[${arrayItems.length.toString()}]`,
             type: (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING',
@@ -129,12 +129,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             setNewPropertyType(availablePropertyTypes[0].value);
         }
     }, [availablePropertyTypes]);
-
-    useEffect(() => {
-        if (currentComponent?.componentName === 'condition' && availablePropertyTypes.length) {
-            setNewPropertyType(availablePropertyTypes[0].value);
-        }
-    }, [currentComponent?.componentName, availablePropertyTypes]);
 
     // render individual array items with data gathered from parameters
     useEffect(() => {
@@ -260,12 +254,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (property.items?.length) {
-            setArrayItems(property.items);
-        }
-    }, [property.items]);
 
     return (
         <Fragment key={`${path}_${name}_arrayProperty`}>
