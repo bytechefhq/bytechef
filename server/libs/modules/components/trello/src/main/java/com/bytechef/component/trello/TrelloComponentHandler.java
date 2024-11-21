@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.trello.action.TrelloCreateBoardAction;
 import com.bytechef.component.trello.action.TrelloCreateCardAction;
+import com.bytechef.component.trello.action.TrelloGetCardAction;
 import com.bytechef.component.trello.connection.TrelloConnection;
 import com.bytechef.component.trello.trigger.TrelloNewCardTrigger;
 import com.google.auto.service.AutoService;
@@ -44,7 +45,8 @@ public class TrelloComponentHandler implements ComponentHandler {
         .connection(TrelloConnection.CONNECTION_DEFINITION)
         .actions(
             TrelloCreateBoardAction.ACTION_DEFINITION,
-            TrelloCreateCardAction.ACTION_DEFINITION)
+            TrelloCreateCardAction.ACTION_DEFINITION,
+            TrelloGetCardAction.ACTION_DEFINITION)
         .triggers(TrelloNewCardTrigger.TRIGGER_DEFINITION);
 
     @Override

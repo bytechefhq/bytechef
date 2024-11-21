@@ -52,6 +52,19 @@ public class TrelloUtils {
         return getOptions(body);
     }
 
+    public static List<Option<String>> getCardOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
+        Context context) {
+
+        List<Map<String, Object>> body = context
+            .http(http -> http.get("/boards/" + inputParameters.getRequiredString(ID_BOARD) + "/cards"))
+            .configuration(responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body);
+    }
+
     public static List<Option<String>> getListOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
         Context context) {
