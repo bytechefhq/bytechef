@@ -65,6 +65,13 @@ class TrelloUtilsTest {
     }
 
     @Test
+    void testGetCardOptions() {
+        assertEquals(
+            expectedOptions,
+            TrelloUtils.getBoardOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+    }
+
+    @Test
     void testGetListOptions() {
         assertEquals(
             expectedOptions,
