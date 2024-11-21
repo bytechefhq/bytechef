@@ -132,3 +132,36 @@ Type: OBJECT
 
 
 
+### Get Card
+Gets a card details.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Board | STRING | SELECT  |  Board where card is located.  |
+| Card | STRING | SELECT  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
