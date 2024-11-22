@@ -510,6 +510,14 @@ const WorkflowNodeDetailsPanel = ({
     const operationDataMissing =
         currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched);
 
+    const tabDataExists =
+        (!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
+        currentNode?.taskDispatcher ||
+        (currentNode?.trigger &&
+            currentTriggerFetched &&
+            nodeTabs.length > 1 &&
+            currentNode.componentName !== 'manual');
+
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
         return <></>;
     }
@@ -587,10 +595,7 @@ const WorkflowNodeDetailsPanel = ({
                             />
                         )}
 
-                    {((!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
-                        currentNode?.taskDispatcher ||
-                        (currentNode?.trigger && currentTriggerFetched)) &&
-                    nodeTabs.length > 1 ? (
+                    {tabDataExists && (
                         <div className="flex justify-center">
                             {nodeTabs.map((tab) => (
                                 <Button
@@ -607,7 +612,9 @@ const WorkflowNodeDetailsPanel = ({
                                 </Button>
                             ))}
                         </div>
-                    ) : (
+                    )}
+
+                    {currentNode.componentName !== 'manual' && !tabDataExists && (
                         <div className="flex justify-center space-x-2 border-b border-gray-200 p-2">
                             <Skeleton className="h-6 w-1/4" />
 
