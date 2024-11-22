@@ -28,7 +28,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
  */
 class GithubAddLabelsToIssueActionTest extends AbstractGithubActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, "help-wanted"));
+        Map.of(REPOSITORY, "testRepo", ISSUE, "testIssue", LABELS, List.of("help-wanted", "docs")));
     private final Object mockedObject = mock(Object.class);
 
     @Test
@@ -51,6 +51,6 @@ class GithubAddLabelsToIssueActionTest extends AbstractGithubActionTest {
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(Map.of(LABELS, Collections.singletonList("help-wanted")), body.getContent());
+        assertEquals(Map.of(LABELS, List.of("help-wanted", "docs")), body.getContent());
     }
 }
