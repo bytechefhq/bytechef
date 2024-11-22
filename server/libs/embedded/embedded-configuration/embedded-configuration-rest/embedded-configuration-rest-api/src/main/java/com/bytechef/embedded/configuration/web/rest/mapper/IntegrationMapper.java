@@ -36,6 +36,7 @@ public class IntegrationMapper {
     public interface IntegrationToIntegrationBasicModelMapper extends Converter<Integration, IntegrationBasicModel> {
 
         @Override
+        @Mapping(target = "icon", ignore = true)
         IntegrationBasicModel convert(Integration integration);
     }
 

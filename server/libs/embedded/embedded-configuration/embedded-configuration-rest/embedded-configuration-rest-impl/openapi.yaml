@@ -1007,6 +1007,9 @@ components:
         description:
           description: "The description of an integration."
           type: "string"
+        icon:
+          description: "The icon."
+          type: "string"
         id:
           description: "The id of an integration."
           type: "integer"
