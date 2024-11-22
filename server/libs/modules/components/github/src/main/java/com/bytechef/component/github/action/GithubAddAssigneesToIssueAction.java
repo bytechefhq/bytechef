@@ -17,6 +17,7 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
@@ -54,11 +55,16 @@ public class GithubAddAssigneesToIssueAction {
                 .label("Issue")
                 .description("The issue to add assignee to.")
                 .required(true),
-            string(ASSIGNEES)
-                .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
-                .optionsLookupDependsOn(REPOSITORY)
+            array(ASSIGNEES)
                 .label("Assignees")
                 .description("The list of assignees to add to the issue.")
+                .items(
+                    string("assignee")
+                        .label("Assignee")
+                        .options((ActionOptionsFunction<String>) GithubUtils::getCollaborators)
+                        .optionsLookupDependsOn(REPOSITORY)
+                        .required(true))
+                .maxItems(10)
                 .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubAddAssigneesToIssueAction::perform);
@@ -73,8 +79,9 @@ public class GithubAddAssigneesToIssueAction {
             .http(http -> http.post(
                 "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
                     + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/assignees"))
-            .body(Http.Body.of(
-                Map.of(ASSIGNEES, inputParameters.getRequiredString(ASSIGNEES))))
+            .body(
+                Http.Body.of(
+                    Map.of(ASSIGNEES, inputParameters.getRequiredList(ASSIGNEES, String.class))))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
