@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getCustomEvents;
 
@@ -32,7 +33,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -79,7 +82,22 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
 
         List<CustomEvent> customEvents = new ArrayList<>(getCustomEvents(inputParameters, connectionParameters));
 
-        customEvents.sort(Comparator.comparing(CustomEvent::startTime));
+        customEvents.sort(Comparator.comparing(CustomEvent::startTime, (s1, s2) -> {
+            if (s1 instanceof LocalDateTime l1 && s2 instanceof LocalDateTime l2) {
+                return l1.compareTo(l2);
+            }
+            if (s1 instanceof LocalDateTime l1 && s2 instanceof LocalDate l2) {
+                return l1.compareTo(LocalDateTime.of(l2, LOCAL_TIME_MIN));
+            }
+            if (s1 instanceof LocalDate l1 && s2 instanceof LocalDateTime l2) {
+                return LocalDateTime.of(l1, LOCAL_TIME_MIN)
+                    .compareTo(l2);
+            } else if (s1 instanceof LocalDate l1 && s2 instanceof LocalDate l2) {
+                return l1.compareTo(l2);
+            } else {
+                throw new IllegalArgumentException("Unsupported type");
+            }
+        }));
 
         return getIntervals(customEvents, inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of()));
     }
@@ -96,14 +114,26 @@ public class GoogleCalendarGetFreeTimeSlotsAction {
             LocalDateTime previousEndTime = from;
 
             for (CustomEvent customEvent : customEvents) {
-                LocalDateTime startTime = customEvent.startTime();
-                LocalDateTime endTime = customEvent.endTime();
+                Temporal startTime = customEvent.startTime();
+                Temporal endTime = customEvent.endTime();
 
-                if (startTime.isAfter(previousEndTime)) {
-                    intervals.add(new Interval(previousEndTime, startTime));
+                if (startTime instanceof LocalDateTime start && endTime instanceof LocalDateTime end) {
+                    if (start.isAfter(previousEndTime)) {
+                        intervals.add(new Interval(previousEndTime, start));
+                    }
+
+                    previousEndTime = previousEndTime.isAfter(end) ? previousEndTime : end;
+                } else if (startTime instanceof LocalDate start && endTime instanceof LocalDate end) {
+
+                    if (LocalDateTime.of(start, LOCAL_TIME_MIN)
+                        .isAfter(previousEndTime)) {
+
+                        intervals.add(new Interval(previousEndTime, LocalDateTime.of(start, LOCAL_TIME_MIN)));
+                    }
+
+                    previousEndTime = previousEndTime.isAfter(LocalDateTime.of(end, LOCAL_TIME_MIN))
+                        ? previousEndTime : LocalDateTime.of(end, LOCAL_TIME_MIN);
                 }
-
-                previousEndTime = previousEndTime.isAfter(endTime) ? previousEndTime : endTime;
             }
 
             if (previousEndTime.isBefore(to)) {

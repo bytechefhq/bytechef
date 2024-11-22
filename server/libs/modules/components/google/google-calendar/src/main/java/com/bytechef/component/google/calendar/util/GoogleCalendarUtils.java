@@ -19,8 +19,11 @@ package com.bytechef.component.google.calendar.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.MAX_RESULTS;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.Q;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
@@ -28,7 +31,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.calendar.constant.GoogleCalendarConstants;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
@@ -41,8 +43,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,14 +61,20 @@ public class GoogleCalendarUtils {
     private GoogleCalendarUtils() {
     }
 
-    public static LocalDateTime convertEventDateTimeToLocalDateTime(EventDateTime eventDateTime) {
-        DateTime dateTime = eventDateTime.getDateTime();
-
-        return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
-    }
-
     public static Date convertToDateViaSqlTimestamp(LocalDateTime dateToConvert) {
         return dateToConvert == null ? null : java.sql.Timestamp.valueOf(dateToConvert);
+    }
+
+    public static Temporal convertToTemporalFromEventDateTime(EventDateTime eventDateTime) {
+        DateTime dateTime = eventDateTime.getDateTime();
+
+        if (dateTime != null) {
+            return LocalDateTime.ofInstant(Instant.parse(dateTime.toString()), ZoneId.systemDefault());
+        }
+
+        DateTime allDayDate = eventDateTime.getDate();
+
+        return LocalDate.parse(allDayDate.toString(), DateTimeFormatter.ISO_LOCAL_DATE);
     }
 
     public static EventDateTime createEventDateTime(Parameters inputParameters, String time) {
@@ -86,7 +97,7 @@ public class GoogleCalendarUtils {
     public static CustomEvent createCustomEvent(Event event) {
         return new CustomEvent(
             event.getICalUID(), event.getId(), event.getSummary(), event.getDescription(),
-            convertEventDateTimeToLocalDateTime(event.getStart()), convertEventDateTimeToLocalDateTime(event.getEnd()),
+            convertToTemporalFromEventDateTime(event.getStart()), convertToTemporalFromEventDateTime(event.getEnd()),
             event.getEtag(), event.getEventType(), event.getHtmlLink(), event.getStatus(), event.getLocation(),
             event.getHangoutLink(), event.getAttendees(), event.getAttachments(), event.getReminders());
     }
@@ -125,43 +136,71 @@ public class GoogleCalendarUtils {
             .execute()
             .getItems();
 
-        Map<String, LocalDateTime> timePeriod =
-            inputParameters.getMap(GoogleCalendarConstants.DATE_RANGE, LocalDateTime.class, Map.of());
+        Map<String, LocalDateTime> timePeriod = inputParameters.getMap(DATE_RANGE, LocalDateTime.class, Map.of());
 
         LocalDateTime from = timePeriod.get(FROM);
         LocalDateTime to = timePeriod.get(TO);
 
-        if (from == null && to == null) {
-            return convertToCustomEvents(items);
-        } else if (from != null && to == null) {
-            List<Event> result = items.stream()
-                .filter(event -> convertEventDateTimeToLocalDateTime(event.getEnd()).isAfter(from))
-                .toList();
+        return convertToCustomEvents(filterEvents(from, to, items));
+    }
 
-            return convertToCustomEvents(result);
+    private static List<Event> filterEvents(LocalDateTime from, LocalDateTime to, List<Event> items) {
+        if (from == null && to == null) {
+            return items;
+        } else if (from != null && to == null) {
+
+            return items.stream()
+                .filter(event -> isAfter(event.getEnd(), from))
+                .toList();
 
         } else if (from == null) {
-            List<Event> result = items.stream()
-                .filter(event -> convertEventDateTimeToLocalDateTime(event.getStart()).isBefore(to))
+
+            return items.stream()
+                .filter(event -> isBefore(event.getStart(), to))
                 .toList();
-
-            return convertToCustomEvents(result);
         } else {
-            List<Event> result = new ArrayList<>();
-
-            for (Event event : items) {
-                LocalDateTime startLocalDateTime = convertEventDateTimeToLocalDateTime(event.getStart());
-                LocalDateTime endLocalDateTime = convertEventDateTimeToLocalDateTime(event.getEnd());
-
-                if ((startLocalDateTime.isAfter(from) && startLocalDateTime.isBefore(to)) ||
-                    (endLocalDateTime.isAfter(from) && endLocalDateTime.isBefore(to)) ||
-                    (startLocalDateTime.isBefore(from) && endLocalDateTime.isAfter(to))) {
-                    result.add(event);
-                }
-            }
-
-            return convertToCustomEvents(result);
+            return items.stream()
+                .filter(event -> isWithinRange(event, from, to))
+                .toList();
         }
+    }
+
+    private static boolean isAfter(EventDateTime eventDateTime, LocalDateTime from) {
+        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime);
+
+        return temporal instanceof LocalDateTime localDateTime ? localDateTime.isAfter(from)
+            : LocalDateTime.of(((LocalDate) temporal).minusDays(1), LOCAL_TIME_MAX)
+                .isAfter(from);
+    }
+
+    private static boolean isBefore(EventDateTime eventDateTime, LocalDateTime to) {
+        Temporal temporal = convertToTemporalFromEventDateTime(eventDateTime);
+
+        return temporal instanceof LocalDateTime localDateTime ? localDateTime.isBefore(to)
+            : LocalDateTime.of((LocalDate) temporal, LOCAL_TIME_MIN)
+                .isBefore(to);
+    }
+
+    private static boolean isWithinRange(Event event, LocalDateTime from, LocalDateTime to) {
+        Temporal start = convertToTemporalFromEventDateTime(event.getStart());
+        Temporal end = convertToTemporalFromEventDateTime(event.getEnd());
+
+        if (start instanceof LocalDateTime startLDT && end instanceof LocalDateTime endLDT) {
+
+            return (startLDT.isAfter(from) && startLDT.isBefore(to)) ||
+                (endLDT.isAfter(from) && endLDT.isBefore(to)) ||
+                (startLDT.isBefore(from) && endLDT.isAfter(to));
+
+        } else if (start instanceof LocalDate startLD && end instanceof LocalDate endLD) {
+            LocalDateTime startMin = LocalDateTime.of(startLD, LOCAL_TIME_MIN);
+            LocalDateTime endMax = LocalDateTime.of(endLD.minusDays(1), LOCAL_TIME_MAX);
+
+            return (startMin.isAfter(from) && startMin.isBefore(to)) ||
+                (endMax.isAfter(from) && endMax.isBefore(to)) ||
+                (startMin.isBefore(from) && endMax.isAfter(to));
+        }
+
+        return false;
     }
 
     private static List<CustomEvent> convertToCustomEvents(List<Event> eventList) {
@@ -196,7 +235,7 @@ public class GoogleCalendarUtils {
 
     @SuppressFBWarnings("EI")
     public record CustomEvent(
-        String iCalUID, String id, String summary, String description, LocalDateTime startTime, LocalDateTime endTime,
+        String iCalUID, String id, String summary, String description, Temporal startTime, Temporal endTime,
         String etag, String eventType, String htmlLink, String status, String location, String hangoutLink,
         List<EventAttendee> attendeeList, List<EventAttachment> attachments, Event.Reminders reminders) {
     }
