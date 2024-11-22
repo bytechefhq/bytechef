@@ -27,14 +27,17 @@ public class WorkflowNodeDescriptionUtils {
         Map<String, ?> inputParameters, String componentTile, String operationTitle) {
 
         StringBuilder sb = new StringBuilder();
+
         renderProperties(null, inputParameters, sb);
 
         return """
-            <div class="flex flex-col space-y-2">%n\
-                <div class="flex flex-col font-semibold">%n\
-                     <div class="text-base">%s</div>%n\
-                     <div>%s</div>%n\
+            <div class="flex flex-col w-full">%n\
+                <div class="flex flex-col space-y-0.5">%n\
+                    <div class="font-semibold">%s</div>%n\
+
+                    <div class="text-sm">%s</div>%n\
                 </div>%n\
+
                 %s%n\
             </div>%n\
             """.formatted(componentTile, operationTitle, sb);
@@ -46,10 +49,11 @@ public class WorkflowNodeDescriptionUtils {
         renderProperties(null, inputParameters, sb);
 
         return """
-            <div class="flex flex-col space-y-2">%n\
-                <div class="font-semibold">%n\
-                     <div class="text-base">%s</div>%n\
+            <div class="flex flex-col w-full">%n\
+                <div>%n\
+                    <div class="font-semibold">%s</div>%n\
                 </div>%n\
+
                 %s%n\
             </div>%n\
             """.formatted(taskDispatcherTitle, ""); // TODO render properties only for the current task dispatcher
@@ -60,7 +64,7 @@ public class WorkflowNodeDescriptionUtils {
             return;
         }
 
-        sb.append("<div class=\"flex flex-col space-y-0.5\">");
+        sb.append("<table class=\"w-full mt-4\">");
 
         for (Map.Entry<?, ?> entry : parameterMap.entrySet()) {
             String name = (String) entry.getKey();
@@ -76,13 +80,13 @@ public class WorkflowNodeDescriptionUtils {
             }
 
             sb.append("""
-                <div class="flex">%n\
-                    <div class="w-6/12 text-muted-foreground">%s:</div>%n\
-                    <div class="w-6/12">%s</div>%n\
-                </div>%n\
+                <tr>%n\
+                    <td class="text-muted-foreground pr-4 pt-0.5 pb-0.5">%s:</td>%n\
+                    <td>%s</td>%n\
+                </tr>%n\
                 """.formatted(name, entry.getValue()));
         }
 
-        sb.append("</div>");
+        sb.append("</table>");
     }
 }
