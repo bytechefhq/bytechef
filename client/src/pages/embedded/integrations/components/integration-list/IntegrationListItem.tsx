@@ -34,7 +34,6 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {IntegrationCategoryKeys} from '@/shared/queries/embedded/integrationCategories.queries';
 import {IntegrationTagKeys} from '@/shared/queries/embedded/integrationTags.quries';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
-import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -64,10 +63,6 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     const [searchParams] = useSearchParams();
 
     const {toast} = useToast();
-
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: integration.componentName!,
-    });
 
     const queryClient = useQueryClient();
 
@@ -150,8 +145,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         className="flex items-center gap-1"
                                         to={`/embedded/integrations/${integration?.id}/integration-workflows/${integration?.integrationWorkflowIds![0]}?${searchParams}`}
                                     >
-                                        {componentDefinition?.icon && (
-                                            <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
+                                        {integration?.icon && (
+                                            <InlineSVG className="size-5 flex-none" src={integration.icon} />
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">
@@ -160,8 +155,8 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                     </Link>
                                 ) : (
                                     <div className="flex items-center gap-1">
-                                        {componentDefinition?.icon && (
-                                            <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
+                                        {integration?.icon && (
+                                            <InlineSVG className="size-5 flex-none" src={integration.icon} />
                                         )}
 
                                         <span className="text-base font-semibold text-gray-900">

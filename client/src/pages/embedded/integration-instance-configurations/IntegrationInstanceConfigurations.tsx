@@ -279,7 +279,6 @@ const IntegrationInstanceConfigurations = () => {
                                 integrations &&
                                 tags && (
                                     <IntegrationInstanceConfigurationList
-                                        componentDefinitions={componentDefinitions}
                                         integration={
                                             integrations.find(
                                                 (currentIntegration) => currentIntegration.id === integrationId

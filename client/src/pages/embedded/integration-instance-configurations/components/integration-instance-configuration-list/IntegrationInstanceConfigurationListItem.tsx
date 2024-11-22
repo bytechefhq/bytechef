@@ -8,7 +8,6 @@ import IntegrationInstanceConfigurationListItemDropdownMenu from '@/pages/embedd
 import {useIntegrationInstanceConfigurationsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationsEnabledStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {IntegrationInstanceConfiguration, Tag} from '@/shared/middleware/embedded/configuration';
-import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {
     useDeleteIntegrationInstanceConfigurationMutation,
     useEnableIntegrationInstanceConfigurationMutation,
@@ -25,13 +24,11 @@ import TagList from '../../../../../components/TagList';
 import IntegrationInstanceConfigurationDialog from '../integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 
 interface IntegrationInstanceConfigurationListItemProps {
-    componentDefinition: ComponentDefinitionBasic;
     integrationInstanceConfiguration: IntegrationInstanceConfiguration;
     remainingTags?: Tag[];
 }
 
 const IntegrationInstanceConfigurationListItem = ({
-    componentDefinition,
     integrationInstanceConfiguration,
     remainingTags,
 }: IntegrationInstanceConfigurationListItemProps) => {
@@ -104,8 +101,11 @@ const IntegrationInstanceConfigurationListItem = ({
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">
                                 <div className="flex items-center gap-1">
-                                    {componentDefinition?.icon && (
-                                        <InlineSVG className="size-5 flex-none" src={componentDefinition.icon} />
+                                    {integrationInstanceConfiguration?.integration?.icon && (
+                                        <InlineSVG
+                                            className="size-5 flex-none"
+                                            src={integrationInstanceConfiguration?.integration.icon}
+                                        />
                                     )}
 
                                     <span className="text-base font-semibold text-gray-900">
