@@ -37,6 +37,7 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceBasicModel> {
 
         @Override
+        @Mapping(target = "environment", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         IntegrationInstanceBasicModel convert(IntegrationInstance integrationInstanc);
     }
@@ -46,6 +47,7 @@ public class IntegrationInstanceMapper {
         extends Converter<IntegrationInstance, IntegrationInstanceModel> {
 
         @Override
+        @Mapping(target = "environment", ignore = true)
         @Mapping(target = "lastExecutionDate", ignore = true)
         @Mapping(target = "integrationInstanceConfiguration", ignore = true)
         @Mapping(target = "integrationInstanceWorkflows", ignore = true)

@@ -1088,6 +1088,8 @@ components:
         enabled:
           description: "If an integration instance is enabled or not."
           type: "boolean"
+        environment:
+          $ref: '#/components/schemas/Environment'
         id:
           description: "The id of an integration instance."
           type: "integer"

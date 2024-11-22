@@ -57,6 +57,7 @@ public class IntegrationInstanceConfigurationWorkflowMapper {
 
         @InheritInverseConfiguration
         @DelegatingConverter
+        @Mapping(target = "workflow", ignore = true)
         IntegrationInstanceConfigurationWorkflowDTO invertConvert(
             IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel);
     }
