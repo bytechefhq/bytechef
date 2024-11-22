@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
+import java.time.LocalTime;
 
 /**
  * @author Monika Kušter
@@ -56,6 +57,8 @@ public class GoogleCalendarConstants {
     public static final String LOCATION = "location";
     public static final String MAX_RESULTS = "maxResults";
     public static final String METHOD = "method";
+    public static final LocalTime LOCAL_TIME_MAX = LocalTime.MAX;
+    public static final LocalTime LOCAL_TIME_MIN = LocalTime.MIN;
     public static final String MINUTES = "minutes";
     public static final String ORGANIZER = "organizer";
     public static final String Q = "q";
