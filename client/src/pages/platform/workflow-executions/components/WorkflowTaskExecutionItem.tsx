@@ -12,7 +12,7 @@ const WorkflowTaskExecutionItem = ({
     taskExecution: TaskExecution;
     onClick?: () => void;
 }) => {
-    const {component, endDate, startDate, workflowTask} = taskExecution;
+    const {endDate, icon, startDate, title, workflowTask} = taskExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
 
@@ -28,11 +28,9 @@ const WorkflowTaskExecutionItem = ({
                 <WorkflowExecutionBadge status={taskExecution.status} />
 
                 <div className="flex items-center gap-x-1">
-                    {taskExecution?.component?.icon && (
-                        <InlineSVG className="size-4" src={taskExecution?.component?.icon} />
-                    )}
+                    {icon && <InlineSVG className="size-4" src={icon} />}
 
-                    <span>{component?.title}</span>
+                    <span>{title}</span>
 
                     <span className="text-xs text-muted-foreground">({workflowTask?.name || workflowTask?.type})</span>
                 </div>

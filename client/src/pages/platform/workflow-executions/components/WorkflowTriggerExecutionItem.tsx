@@ -12,7 +12,7 @@ const WorkflowTriggerExecutionItem = ({
     triggerExecution: TriggerExecution;
     onClick?: () => void;
 }) => {
-    const {component, endDate, startDate, workflowTrigger} = triggerExecution;
+    const {endDate, icon, startDate, title, workflowTrigger} = triggerExecution;
 
     const duration = startDate && endDate && Math.round(endDate?.getTime() - startDate.getTime());
 
@@ -28,11 +28,9 @@ const WorkflowTriggerExecutionItem = ({
                 <WorkflowExecutionBadge status={triggerExecution.status} />
 
                 <div className="flex items-center gap-x-1">
-                    {triggerExecution?.component?.icon && (
-                        <InlineSVG className="size-4" src={triggerExecution?.component?.icon} />
-                    )}
+                    {icon && <InlineSVG className="size-4" src={icon} />}
 
-                    <span>{component?.title}</span>
+                    <span>{title}</span>
 
                     <span className="text-xs text-muted-foreground">
                         ({workflowTrigger?.name || workflowTrigger?.type})
