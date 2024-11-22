@@ -47,10 +47,12 @@ public class ActionFacadeImpl implements ActionFacade {
 
     @Override
     public Object executeAction(
-        String componentName, Integer componentVersion, String actionName, Long connectionId,
-        Map<String, Object> input, Environment environment) {
+        String componentName, Integer componentVersion, String actionName, Map<String, Object> input,
+        Environment environment, Long instanceId) {
 
-        if (connectionId == null) {
+        Long connectionId;
+
+        if (instanceId == null) {
             String externalId = SecurityUtils.getCurrentUserLogin()
                 .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
@@ -60,6 +62,10 @@ public class ActionFacadeImpl implements ActionFacade {
                 .fetchFirstIntegrationInstance(connectedUser.getId(), componentName, environment)
                 .map(IntegrationInstance::getConnectionId)
                 .orElse(null);
+        } else {
+            IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+
+            connectionId = integrationInstance.getConnectionId();
         }
 
         return actionDefinitionFacade.executePerform(

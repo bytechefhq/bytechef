@@ -59,8 +59,8 @@ public class ActionApiController implements ActionApi {
 
     @Override
     public ResponseEntity<ExecuteAction200ResponseModel> executeAction(
-        String componentName, Integer componentVersion, String actionName, Long xConnectionId,
-        EnvironmentModel xEnvironment, ExecuteActionRequestModel executeActionRequestModel) {
+        String componentName, Integer componentVersion, String actionName, EnvironmentModel xEnvironment,
+        Long xInstanceId, ExecuteActionRequestModel executeActionRequestModel) {
 
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
@@ -105,7 +105,7 @@ public class ActionApiController implements ActionApi {
         return ResponseEntity.ok(
             new ExecuteAction200ResponseModel().output(
                 actionFacade.executeAction(
-                    componentName, componentVersion, actionName, xConnectionId, inputParameters, environment)));
+                    componentName, componentVersion, actionName, inputParameters, environment, xInstanceId)));
     }
 
     @InitBinder

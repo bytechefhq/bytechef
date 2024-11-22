@@ -113,20 +113,20 @@ paths:
         - "action"
       operationId: "executeAction"
       parameters:
-        - name: x-connection-id
-          in: header
-          schema:
-            type: integer
-            format: int64
-          example: 1234
-          description: The connection ID that uniquely identifies the customer in your application
-          required: false
         - name: "x-environment"
           description: "The environment."
           in: "header"
           required: false
           schema:
             $ref: '#/components/schemas/Environment'
+        - name: x-instance-id
+          in: header
+          schema:
+            type: integer
+            format: int64
+          example: 1234
+          description: The integration instance Id that uniquely identifies the connected user's specific integration instance
+          required: false
         - name: "componentName"
           description: "The component name."
           in: "path"
