@@ -126,7 +126,7 @@ Adds an assignees to the specified issue.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Repository | STRING | SELECT  |  |
 | Issue | STRING | SELECT  |  The issue to add assignee to.  |
-| Assignees | STRING | SELECT  |  The list of assignees to add to the issue.  |
+| Assignees | [STRING\($assignee)] | ARRAY_BUILDER  |  The list of assignees to add to the issue.  |
 
 
 ### Output
@@ -164,7 +164,7 @@ Adds labels to the specified issue.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Repository | STRING | SELECT  |  |
 | Issue | STRING | SELECT  |  The issue to add labels to.  |
-| Labels | STRING | SELECT  |  The list of labels to add to the issue.  |
+| Labels | [STRING\($label)] | ARRAY_BUILDER  |  The list of labels to add to the issue.  |
 
 
 ### Output
