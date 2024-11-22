@@ -27,10 +27,8 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:58.302273+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:41:25.280846+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class TaskExecutionModel {
-
-  private com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component;
 
   private String createdBy;
 
@@ -43,6 +41,8 @@ public class TaskExecutionModel {
   private ExecutionErrorModel error;
 
   private Long executionTime;
+
+  private String icon;
 
   private String id;
 
@@ -120,6 +120,8 @@ public class TaskExecutionModel {
 
   private Integer taskNumber;
 
+  private String title;
+
   private Long retryDelayMillis;
 
   private com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask;
@@ -138,26 +140,6 @@ public class TaskExecutionModel {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
-  }
-
-  public TaskExecutionModel component(com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component) {
-    this.component = component;
-    return this;
-  }
-
-  /**
-   * Get component
-   * @return component
-   */
-  @Valid 
-  @Schema(name = "component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("component")
-  public com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel getComponent() {
-    return component;
-  }
-
-  public void setComponent(com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component) {
-    this.component = component;
   }
 
   public TaskExecutionModel createdBy(String createdBy) {
@@ -258,6 +240,26 @@ public class TaskExecutionModel {
 
   public void setExecutionTime(Long executionTime) {
     this.executionTime = executionTime;
+  }
+
+  public TaskExecutionModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon of the task.
+   * @return icon
+   */
+  
+  @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public TaskExecutionModel id(String id) {
@@ -588,6 +590,26 @@ public class TaskExecutionModel {
     this.taskNumber = taskNumber;
   }
 
+  public TaskExecutionModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title of the task.
+   * @return title
+   */
+  
+  @Schema(name = "title", accessMode = Schema.AccessMode.READ_ONLY, description = "The title of the task.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   public TaskExecutionModel retryDelayMillis(Long retryDelayMillis) {
     this.retryDelayMillis = retryDelayMillis;
     return this;
@@ -657,12 +679,12 @@ public class TaskExecutionModel {
       return false;
     }
     TaskExecutionModel taskExecution = (TaskExecutionModel) o;
-    return Objects.equals(this.component, taskExecution.component) &&
-        Objects.equals(this.createdBy, taskExecution.createdBy) &&
+    return Objects.equals(this.createdBy, taskExecution.createdBy) &&
         Objects.equals(this.createdDate, taskExecution.createdDate) &&
         Objects.equals(this.endDate, taskExecution.endDate) &&
         Objects.equals(this.error, taskExecution.error) &&
         Objects.equals(this.executionTime, taskExecution.executionTime) &&
+        Objects.equals(this.icon, taskExecution.icon) &&
         Objects.equals(this.id, taskExecution.id) &&
         Objects.equals(this.input, taskExecution.input) &&
         Objects.equals(this.jobId, taskExecution.jobId) &&
@@ -679,6 +701,7 @@ public class TaskExecutionModel {
         Objects.equals(this.startDate, taskExecution.startDate) &&
         Objects.equals(this.status, taskExecution.status) &&
         Objects.equals(this.taskNumber, taskExecution.taskNumber) &&
+        Objects.equals(this.title, taskExecution.title) &&
         Objects.equals(this.retryDelayMillis, taskExecution.retryDelayMillis) &&
         Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
         Objects.equals(this.type, taskExecution.type);
@@ -686,19 +709,19 @@ public class TaskExecutionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(component, createdBy, createdDate, endDate, error, executionTime, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, retryDelayMillis, workflowTask, type);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class TaskExecutionModel {\n");
-    sb.append("    component: ").append(toIndentedString(component)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    executionTime: ").append(toIndentedString(executionTime)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    input: ").append(toIndentedString(input)).append("\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
@@ -715,6 +738,7 @@ public class TaskExecutionModel {
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    taskNumber: ").append(toIndentedString(taskNumber)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    retryDelayMillis: ").append(toIndentedString(retryDelayMillis)).append("\n");
     sb.append("    workflowTask: ").append(toIndentedString(workflowTask)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");

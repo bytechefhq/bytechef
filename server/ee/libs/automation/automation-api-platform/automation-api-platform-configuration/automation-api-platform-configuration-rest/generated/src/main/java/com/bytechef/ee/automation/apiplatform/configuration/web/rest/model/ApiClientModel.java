@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiClient", description = "Contains generated key required for calling API.")
 @JsonTypeName("ApiClient")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-15T12:48:42.005777+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:43:59.041202+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class ApiClientModel {
 
   private String createdBy;

@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:57.781463+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:43:58.807458+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "api-key", description = "The Platform User API Key Internal API")
 public interface ApiKeyApi {
@@ -155,14 +155,14 @@ public interface ApiKeyApi {
 
 
     /**
-     * GET /api-keys : Get api keys
+     * GET /api-keys : Get API keys
      * Get API keys.
      *
      * @return The list of API keys. (status code 200)
      */
     @Operation(
         operationId = "getApiKeys",
-        summary = "Get api keys",
+        summary = "Get API keys",
         description = "Get API keys.",
         tags = { "api-key" },
         responses = {

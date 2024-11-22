@@ -27,12 +27,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:58.302273+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:41:25.280846+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class TriggerExecutionModel {
 
   private Boolean batch;
-
-  private com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component;
 
   private String createdBy;
 
@@ -45,6 +43,8 @@ public class TriggerExecutionModel {
   private ExecutionErrorModel error;
 
   private Long executionTime;
+
+  private String icon;
 
   private String id;
 
@@ -118,6 +118,8 @@ public class TriggerExecutionModel {
 
   private com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger;
 
+  private String title;
+
   private String type;
 
   public TriggerExecutionModel() {
@@ -151,26 +153,6 @@ public class TriggerExecutionModel {
 
   public void setBatch(Boolean batch) {
     this.batch = batch;
-  }
-
-  public TriggerExecutionModel component(com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component) {
-    this.component = component;
-    return this;
-  }
-
-  /**
-   * Get component
-   * @return component
-   */
-  @Valid 
-  @Schema(name = "component", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("component")
-  public com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel getComponent() {
-    return component;
-  }
-
-  public void setComponent(com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel component) {
-    this.component = component;
   }
 
   public TriggerExecutionModel createdBy(String createdBy) {
@@ -271,6 +253,26 @@ public class TriggerExecutionModel {
 
   public void setExecutionTime(Long executionTime) {
     this.executionTime = executionTime;
+  }
+
+  public TriggerExecutionModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon of the trigger.
+   * @return icon
+   */
+  
+  @Schema(name = "icon", accessMode = Schema.AccessMode.READ_ONLY, description = "The icon of the trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public TriggerExecutionModel id(String id) {
@@ -561,6 +563,26 @@ public class TriggerExecutionModel {
     this.workflowTrigger = workflowTrigger;
   }
 
+  public TriggerExecutionModel title(String title) {
+    this.title = title;
+    return this;
+  }
+
+  /**
+   * The title of the trigger.
+   * @return title
+   */
+  
+  @Schema(name = "title", accessMode = Schema.AccessMode.READ_ONLY, description = "The title of the trigger.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("title")
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
+
   public TriggerExecutionModel type(String type) {
     this.type = type;
     return this;
@@ -591,12 +613,12 @@ public class TriggerExecutionModel {
     }
     TriggerExecutionModel triggerExecution = (TriggerExecutionModel) o;
     return Objects.equals(this.batch, triggerExecution.batch) &&
-        Objects.equals(this.component, triggerExecution.component) &&
         Objects.equals(this.createdBy, triggerExecution.createdBy) &&
         Objects.equals(this.createdDate, triggerExecution.createdDate) &&
         Objects.equals(this.endDate, triggerExecution.endDate) &&
         Objects.equals(this.error, triggerExecution.error) &&
         Objects.equals(this.executionTime, triggerExecution.executionTime) &&
+        Objects.equals(this.icon, triggerExecution.icon) &&
         Objects.equals(this.id, triggerExecution.id) &&
         Objects.equals(this.input, triggerExecution.input) &&
         Objects.equals(this.lastModifiedBy, triggerExecution.lastModifiedBy) &&
@@ -611,12 +633,13 @@ public class TriggerExecutionModel {
         Objects.equals(this.startDate, triggerExecution.startDate) &&
         Objects.equals(this.status, triggerExecution.status) &&
         Objects.equals(this.workflowTrigger, triggerExecution.workflowTrigger) &&
+        Objects.equals(this.title, triggerExecution.title) &&
         Objects.equals(this.type, triggerExecution.type);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(batch, component, createdBy, createdDate, endDate, error, executionTime, id, input, lastModifiedBy, lastModifiedDate, maxRetries, output, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis, startDate, status, workflowTrigger, type);
+    return Objects.hash(batch, createdBy, createdDate, endDate, error, executionTime, icon, id, input, lastModifiedBy, lastModifiedDate, maxRetries, output, priority, retryAttempts, retryDelay, retryDelayFactor, retryDelayMillis, startDate, status, workflowTrigger, title, type);
   }
 
   @Override
@@ -624,12 +647,12 @@ public class TriggerExecutionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class TriggerExecutionModel {\n");
     sb.append("    batch: ").append(toIndentedString(batch)).append("\n");
-    sb.append("    component: ").append(toIndentedString(component)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    endDate: ").append(toIndentedString(endDate)).append("\n");
     sb.append("    error: ").append(toIndentedString(error)).append("\n");
     sb.append("    executionTime: ").append(toIndentedString(executionTime)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    input: ").append(toIndentedString(input)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
@@ -644,6 +667,7 @@ public class TriggerExecutionModel {
     sb.append("    startDate: ").append(toIndentedString(startDate)).append("\n");
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    workflowTrigger: ").append(toIndentedString(workflowTrigger)).append("\n");
+    sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("}");
     return sb.toString();
