@@ -1,23 +1,52 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Embedded Configuration Public V1 API"
+  title: "The Embedded Public V1 API"
   version: "1"
 servers:
 - url: "/api/embedded/v1"
 tags:
+- name: "connection"
+  description: "The Embedded Connection Public API"
+- name: "frontend-integration"
+  description: "The Embedded Frontend Integration Public API"
 - name: "integration"
   description: "The Embedded Integration Public API"
+- name: "integration-instance"
+  description: "The Embedded Integration Instance Public API"
 - name: "workflow"
   description: "The Embedded Workflow Public API"
 paths:
-  /integrations:
+#  /connections:
+#    get:
+#      description: "Get connections."
+#      summary: "Get connections"
+#      tags:
+#        - "connection"
+#      operationId: "getConnections"
+#      parameters:
+#        - name: "x-environment"
+#          description: "The environment."
+#          in: "header"
+#          required: false
+#          schema:
+#              $ref: '#/components/schemas/Environment'
+#      responses:
+#        "200":
+#          description: "The list of connections."
+#          content:
+#              application/json:
+#                schema:
+#                  type: "array"
+#                  items:
+#                    $ref: "#/components/schemas/Connection"
+  /frontend/integrations:
     get:
       description: "Get active integrations."
-      summary: "Get active configurations"
+      summary: "Get active integrations"
       tags:
-        - "integration"
-      operationId: "getIntegrations"
+        - "frontend-integration"
+      operationId: "getFrontendIntegrations"
       parameters:
         - name: "x-environment"
           description: "The environment."
@@ -34,8 +63,125 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Integration"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - frontendBearerAuth: [ ]
+  /frontend/integrations/{id}:
+    get:
+      description: "Get an integration by id."
+      summary: "Get an integration by id"
+      tags:
+        - "frontend-integration"
+      operationId: "getFrontendIntegration"
+      parameters:
+        - name: "x-environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "id"
+          description: "The id of an integration."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The integration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - frontendBearerAuth: [ ]
+  /integrations:
+    get:
+      description: "Get active integrations."
+      summary: "Get active integrations"
+      tags:
+        - "integration"
+      operationId: "getIntegrations"
+      parameters:
+        - name: "x-environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "query"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of active integrations."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Integration"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - frontendBearerAuth: [ ]
+#  /integrations-instances:
+#    get:
+#      description: "Get integration instances."
+#      summary: "Get integration instances"
+#      tags:
+#        - "integration-instance"
+#      operationId: "getIntegrationInstances"
+#      parameters:
+#        - name: "x-environment"
+#          description: "The environment."
+#          in: "header"
+#          required: false
+#          schema:
+#            $ref: '#/components/schemas/Environment'
+#      responses:
+#        "200":
+#          description: "The list of integration instances."
+#          content:
+#            application/json:
+#              schema:
+#                type: "array"
+#                items:
+#                  $ref: "#/components/schemas/IntegrationInstance"
 components:
   schemas:
+    Connection:
+      description: "Contains all required information to open a connection to a service\
+              \ defined by componentName parameter."
+      type: "object"
+      required:
+        - "name"
+        - "componentName"
+        - "componentVersion"
+        - "parameters"
+      properties:
+        active:
+          description: "If a connection is used in any of active workflows."
+          type: "boolean"
+          readOnly: true
+        connectionVersion:
+          description: "The version of a component that uses this connection."
+          type: "integer"
+          readOnly: true
+        credentialStatus:
+          $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+        id:
+          description: "The id of a connection."
+          type: "integer"
+          format: "int64"
+          readOnly: true
     Environment:
       $ref: "../../../platform/platform-rest/openapi/components/schemas/objects/environment.yaml"
     Integration:
@@ -46,28 +192,69 @@ components:
         - "icon"
         - "componentName"
       properties:
-        allowMultipleInstances:
-          description: "If multiple instances of an integration are allowed or not."
-          type: "boolean"
-          default: false
-        componentName:
-          description: "The name of the integration's component."
-          type: "string"
-        description:
-          description: "The description of a project."
-          type: "string"
-        icon:
-          description: "The icon."
-          type: "string"
         id:
           description: "The id of an integration."
           type: "integer"
           format: "int64"
           readOnly: true
-        integrationVersion:
-          description: "The version of an integration."
-          type: "integer"
+        componentName:
+          description: "The name of the integration's component."
+          type: "string"
           readOnly: true
         title:
           description: "The title of the integration's component."
           type: "string"
+          readOnly: true
+        description:
+          description: "The description of a project."
+          type: "string"
+          readOnly: true
+        icon:
+          description: "The icon."
+          type: "string"
+          readOnly: true
+        integrationVersion:
+          description: "The version of an integration."
+          type: "integer"
+          readOnly: true
+        allowMultipleInstances:
+          description: "If multiple instances of an integration are allowed or not."
+          type: "boolean"
+          default: false
+          readOnly: true
+        workflows:
+          description: "The list of workflows."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Workflow"
+#    IntegrationInstance:
+    Workflow:
+      description: "A group of tasks that make one logical workflow."
+      type: "object"
+      required:
+        - "name"
+        - "tasks"
+      properties:
+        workflowReferenceCode:
+          description: "The reference code of a workflow."
+          type: "string"
+          readOnly: true
+        label:
+          description: "The label of a workflow."
+          type: "string"
+          readOnly: true
+        description:
+          description: "The description of a workflow."
+          type: "string"
+          readOnly: true
+  responses:
+    UnauthorizedError:
+      description: Access token is missing or invalid
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+    frontendBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

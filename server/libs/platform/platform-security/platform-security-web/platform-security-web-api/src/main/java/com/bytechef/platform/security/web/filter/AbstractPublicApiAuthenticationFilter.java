@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.security.web.filter;
 
+import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.authentication.AbstractPublicApiAuthenticationToken;
 import com.bytechef.platform.security.web.authentication.ApiKeyAuthenticationToken;
 import com.bytechef.platform.tenant.domain.TenantKey;
@@ -24,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -86,6 +88,16 @@ public abstract class AbstractPublicApiAuthenticationFilter extends OncePerReque
         }
 
         return token.replace("Bearer ", "");
+    }
+
+    protected Environment getEnvironment(HttpServletRequest request) {
+        String environment = request.getHeader("x-environment");
+
+        if (StringUtils.isNotBlank(environment)) {
+            return Environment.valueOf(environment.toUpperCase());
+        }
+
+        return Environment.PRODUCTION;
     }
 
     @Override

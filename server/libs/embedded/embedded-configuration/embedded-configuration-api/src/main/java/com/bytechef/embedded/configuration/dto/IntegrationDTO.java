@@ -40,28 +40,15 @@ public record IntegrationDTO(
 
     public IntegrationDTO(
         Category category, ComponentDefinition componentDefinition, Integration integration,
-        List<Long> integrationWorkflowIds, LocalDateTime lastPublishedDate, Status lastStatus,
-        int lastIntegrationVersion) {
+        List<Long> integrationWorkflowIds, List<Tag> tags) {
 
         this(
             integration.isAllowMultipleInstances(), category, integration.getComponentName(),
             integration.getCreatedBy(), integration.getCreatedDate(), getDescription(componentDefinition, integration),
             componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
             integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            lastPublishedDate, lastStatus, lastIntegrationVersion, integration.getName(), List.of(),
-            componentDefinition.getTitle(), integration.getVersion());
-    }
-
-    public IntegrationDTO(
-        Category category, Integration integration, List<Long> integrationWorkflowIds, List<Tag> tags) {
-
-        this(
-            integration.isAllowMultipleInstances(), category, integration.getComponentName(),
-            integration.getCreatedBy(), integration.getCreatedDate(), integration.getDescription(), null,
-            integration.getId(), integration.getIntegrationVersions(), integrationWorkflowIds,
-            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
-            integration.getLastStatus(), integration.getLastIntegrationVersion(), integration.getName(), tags, null,
-            integration.getVersion());
+            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastIntegrationVersion(),
+            integration.getName(), tags, componentDefinition.getTitle(), integration.getVersion());
     }
 
     public static Builder builder() {

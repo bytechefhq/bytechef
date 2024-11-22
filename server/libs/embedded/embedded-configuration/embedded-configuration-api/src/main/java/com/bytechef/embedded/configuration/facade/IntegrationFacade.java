@@ -20,7 +20,6 @@ import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.lang.NonNull;
@@ -37,8 +36,6 @@ public interface IntegrationFacade {
     void deleteIntegration(long id);
 
     void deleteWorkflow(@NonNull String workflowId);
-
-    List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment);
 
     IntegrationDTO getIntegration(long id);
 

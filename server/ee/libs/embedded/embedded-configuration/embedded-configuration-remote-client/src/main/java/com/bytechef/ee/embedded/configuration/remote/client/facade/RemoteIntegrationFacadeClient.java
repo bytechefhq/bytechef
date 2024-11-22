@@ -12,7 +12,6 @@ import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.lang.NonNull;
@@ -43,11 +42,6 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
     public void deleteWorkflow(@NonNull String workflowId) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment) {
         throw new UnsupportedOperationException();
     }
 

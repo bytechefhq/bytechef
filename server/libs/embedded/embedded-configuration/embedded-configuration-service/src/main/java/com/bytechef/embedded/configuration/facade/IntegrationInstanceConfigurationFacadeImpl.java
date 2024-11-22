@@ -32,6 +32,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurati
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.embedded.configuration.exception.IntegrationInstanceConfigurationErrorType;
@@ -43,7 +44,10 @@ import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.platform.category.domain.Category;
+import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -69,6 +73,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +85,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationInstanceConfigurationFacade {
 
+    private final CategoryService categoryService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ConnectionDefinitionService connectionDefinitionService;
@@ -102,6 +109,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceConfigurationFacadeImpl(
+        CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
         ConnectionDefinitionService connectionDefinitionService, InstanceJobFacade instanceJobFacade,
         InstanceJobService instanceJobService, JobFacade jobFacade,
@@ -112,8 +120,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationWorkflowService integrationWorkflowService, OAuth2Service oAuth2Service, TagService tagService,
         TriggerExecutionService triggerExecutionService, WorkflowConnectionFacade workflowConnectionFacade,
         WorkflowService workflowService) {
-        this.connectedUserService = connectedUserService;
 
+        this.categoryService = categoryService;
+        this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
         this.instanceJobFacade = instanceJobFacade;
@@ -273,6 +283,57 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
+    public IntegrationInstanceConfigurationDTO getEnabledIntegrationInstanceConfigurationIntegration(
+        long integrationId, @NonNull Environment environment) {
+
+        return getEnabledIntegrationInstanceConfigurationIntegrations(environment)
+            .stream()
+            .filter(integrationDTO -> Objects.equals(integrationDTO.id(), integrationId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("Integration instance configuration not found"));
+    }
+
+    @Override
+    public List<IntegrationInstanceConfigurationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(
+        Environment environment) {
+
+        List<IntegrationInstanceConfigurationDTO> integrationInstanceConfigurationDTOs = List.of();
+
+        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
+            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(environment);
+
+        if (!integrationInstanceConfigurations.isEmpty()) {
+            List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
+            List<Tag> tags = getTags(integrationInstanceConfigurations);
+
+            integrationInstanceConfigurationDTOs = integrationInstanceConfigurations.stream()
+                .map(integrationInstanceConfiguration -> {
+                    IntegrationDTO integrationDTO = integrationDTOs.stream()
+                        .filter(curIntegration -> Objects.equals(
+                            curIntegration.id(), integrationInstanceConfiguration.getIntegrationId()))
+                        .findFirst()
+                        .orElseThrow();
+
+                    return toIntegrationInstanceConfigurationDTO(
+                        integrationDTO,
+                        integrationInstanceConfiguration,
+                        integrationInstanceConfigurationWorkflowService
+                            .getIntegrationInstanceConfigurationWorkflows(integrationInstanceConfiguration.getId())
+                            .stream()
+                            .filter(IntegrationInstanceConfigurationWorkflow::isEnabled)
+                            .toList(),
+                        integrationWorkflowService.getIntegrationWorkflows(
+                            integrationInstanceConfiguration.getIntegrationId(),
+                            integrationInstanceConfiguration.getIntegrationVersion()),
+                        filterTags(tags, integrationInstanceConfiguration));
+                })
+                .toList();
+        }
+
+        return integrationInstanceConfigurationDTOs;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     @SuppressFBWarnings("NP")
     public IntegrationInstanceConfigurationDTO getIntegrationInstanceConfiguration(long id) {
@@ -320,7 +381,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
                 CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfiguration::getId));
-        List<Integration> integrations = getIntegrations(integrationInstanceConfigurations);
+        List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
         List<Tag> tags = getTags(integrationInstanceConfigurations);
 
         return CollectionUtils.map(
@@ -330,8 +391,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
                 return toIntegrationInstanceConfigurationDTO(
                     CollectionUtils.getFirst(
-                        integrations, integration -> Objects.equals(
-                            integration.getId(), integrationInstanceConfiguration.getIntegrationId())),
+                        integrationDTOs, integration -> Objects.equals(
+                            integration.id(), integrationInstanceConfiguration.getIntegrationId())),
                     integrationInstanceConfiguration,
                     CollectionUtils.filter(
                         integrationInstanceConfigurationWorkflows,
@@ -616,6 +677,10 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         return CollectionUtils.filter(tags, tag -> containsTag(integrationInstanceConfiguration, tag));
     }
 
+    private Category getCategory(Integration integration) {
+        return integration.getCategoryId() == null ? null : categoryService.getCategory(integration.getCategoryId());
+    }
+
     private static Map<String, ?> getConnectionAuthorizationParameters(
         Map<String, ?> parameters, List<String> authorizationPropertyNames) {
 
@@ -634,15 +699,22 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    private List<Integration> getIntegrations(
+    private List<IntegrationDTO> getIntegrations(
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
 
         return integrationService.getIntegrations(
-            integrationInstanceConfigurations
-                .stream()
+            integrationInstanceConfigurations.stream()
                 .map(IntegrationInstanceConfiguration::getIntegrationId)
                 .filter(Objects::nonNull)
-                .toList());
+                .toList())
+            .stream()
+            .map(this::toIntegrationDTO)
+            .toList();
+    }
+
+    private List<Long> getIntegrationWorkflowIds(Integration integration) {
+        return integrationWorkflowService.getIntegrationWorkflowIds(
+            integration.getId(), integration.getLastIntegrationVersion());
     }
 
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
@@ -692,20 +764,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationWorkflow> integrationWorkflows) {
 
         return toIntegrationInstanceConfigurationDTO(
-            integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId()),
+            toIntegrationDTO(integrationService.getIntegration(integrationInstanceConfiguration.getIntegrationId())),
             integrationInstanceConfiguration, integrationInstanceWorkflows, integrationWorkflows,
             tagService.getTags(integrationInstanceConfiguration.getTagIds()));
     }
 
     private IntegrationInstanceConfigurationDTO toIntegrationInstanceConfigurationDTO(
-        Integration integration, IntegrationInstanceConfiguration integrationInstanceConfiguration,
+        IntegrationDTO integrationDTO, IntegrationInstanceConfiguration integrationInstanceConfiguration,
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceWorkflows,
         List<IntegrationWorkflow> integrationWorkflows, List<Tag> tags) {
 
         // TODO define scenarios when there are multiple component versions and workflows
 
         ConnectionDefinition connectionDefinition = connectionDefinitionService.getConnectionDefinition(
-            integration.getComponentName(), null);
+            integrationDTO.componentName(), null);
 
         List<String> authorizationPropertyNames = connectionDefinition.getAuthorizations()
             .stream()
@@ -729,11 +801,20 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationWorkflow -> new IntegrationInstanceConfigurationWorkflowDTO(
                     integrationInstanceConfigurationWorkflow,
                     getWorkflowLastExecutionDate(integrationInstanceConfigurationWorkflow.getWorkflowId()),
+                    workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId()),
                     getWorkflowReferenceCode(
                         integrationInstanceConfigurationWorkflow.getWorkflowId(),
                         integrationInstanceConfiguration.getIntegrationVersion(), integrationWorkflows))),
-            integration,
+            integrationDTO,
             tags);
+    }
+
+    private IntegrationDTO toIntegrationDTO(Integration integration) {
+        return new IntegrationDTO(
+            getCategory(integration),
+            componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+            integration, getIntegrationWorkflowIds(integration),
+            tagService.getTags(integration.getTagIds()));
     }
 
     private void validateIntegrationInstanceConfigurationWorkflow(

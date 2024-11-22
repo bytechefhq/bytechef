@@ -17,7 +17,6 @@
 package com.bytechef.embedded.configuration.dto;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
@@ -34,14 +33,14 @@ public record IntegrationInstanceConfigurationDTO(
     Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
     Map<String, ?> connectionParameters, String createdBy, LocalDateTime createdDate, String description,
     boolean enabled, Environment environment, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    Integration integration, long integrationId, Integer integrationVersion, String name,
+    IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
     List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
     int version) {
 
     public IntegrationInstanceConfigurationDTO(
         Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
         IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceWorkflows, Integration integration,
+        List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceWorkflows, IntegrationDTO integration,
         List<Tag> tags) {
 
         this(
@@ -87,7 +86,7 @@ public record IntegrationInstanceConfigurationDTO(
         private Long id;
         private String lastModifiedBy;
         private LocalDateTime lastModifiedDate;
-        private Integration integration;
+        private IntegrationDTO integration;
         private long integrationId;
         private int integrationVersion;
         private List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows;
@@ -152,7 +151,7 @@ public record IntegrationInstanceConfigurationDTO(
             return this;
         }
 
-        public Builder integration(Integration integration) {
+        public Builder integration(IntegrationDTO integration) {
             this.integration = integration;
 
             return this;

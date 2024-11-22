@@ -24,7 +24,6 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
-import com.bytechef.embedded.configuration.domain.IntegrationVersion;
 import com.bytechef.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
@@ -39,13 +38,11 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -190,51 +187,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         integrationWorkflowService.removeWorkflow(
-            integration.getId(), Validate.notNull(integration.getLastIntegrationVersion(), "lastVersion"), workflowId);
+            integration.getId(), integration.getLastIntegrationVersion(), workflowId);
 
         workflowService.delete(workflowId);
-    }
-
-    @Override
-    public List<IntegrationDTO> getEnabledIntegrationInstanceConfigurationIntegrations(Environment environment) {
-        List<IntegrationDTO> integrationDTOs = List.of();
-
-        List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
-            integrationInstanceConfigurationService.getEnabledIntegrationInstanceConfigurations(environment);
-
-        if (!integrationInstanceConfigurations.isEmpty()) {
-            List<Long> integrationIds = integrationInstanceConfigurations.stream()
-                .map(IntegrationInstanceConfiguration::getIntegrationId)
-                .toList();
-
-            List<Integration> integrations = integrationService.getIntegrations(integrationIds);
-
-            integrationDTOs = integrationInstanceConfigurations.stream()
-                .map(integrationInstanceConfiguration -> {
-                    Integration integration = integrations.stream()
-                        .filter(curIntegration -> Objects.equals(
-                            curIntegration.getId(), integrationInstanceConfiguration.getIntegrationId()))
-                        .findFirst()
-                        .orElseThrow();
-
-                    IntegrationVersion lastIntegrationVersion = integration.getIntegrationVersions()
-                        .stream()
-                        .filter(integrationVersion -> integrationVersion
-                            .getVersion() <= integrationInstanceConfiguration.getIntegrationVersion())
-                        .max(Comparator.comparingInt(IntegrationVersion::getVersion))
-                        .orElseThrow();
-
-                    return new IntegrationDTO(
-                        integration.getCategoryId() == null
-                            ? null : categoryService.getCategory(integration.getCategoryId()),
-                        componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
-                        integration, getIntegrationWorkflowIds(integration), lastIntegrationVersion.getPublishedDate(),
-                        lastIntegrationVersion.getStatus(), lastIntegrationVersion.getVersion());
-                })
-                .toList();
-        }
-
-        return integrationDTOs;
     }
 
     @Override
@@ -345,27 +300,26 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         List<Integration> integrations = integrationService.getIntegrations(categoryId, integrationIds, tagId, status);
 
+        List<Category> categories = categoryService.getCategories(
+            integrations.stream()
+                .map(Integration::getCategoryId)
+                .filter(Objects::nonNull)
+                .toList());
+        List<Tag> tags = tagService.getTags(
+            integrations.stream()
+                .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))
+                .filter(Objects::nonNull)
+                .toList());
+
         return CollectionUtils.map(
             integrations,
             integration -> new IntegrationDTO(
                 CollectionUtils.findFirstFilterOrElse(
-                    categoryService.getCategories(
-                        integrations
-                            .stream()
-                            .map(Integration::getCategoryId)
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    category -> Objects.equals(integration.getCategoryId(), category.getId()),
-                    null),
+                    categories, category -> Objects.equals(integration.getCategoryId(), category.getId()), null),
+                componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
                 integration,
                 getIntegrationWorkflowIds(integration),
-                CollectionUtils.filter(
-                    tagService.getTags(
-                        integrations.stream()
-                            .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+                CollectionUtils.filter(tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
     }
 
     @Override
@@ -434,7 +388,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {
         return new IntegrationDTO(
-            getCategory(integration), integration, getIntegrationWorkflowIds(integration),
+            getCategory(integration),
+            componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+            integration, getIntegrationWorkflowIds(integration),
             tagService.getTags(integration.getTagIds()));
     }
 }

@@ -29,5 +29,5 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.public_.web.rest.adapter",
     conversionServiceAdapterClassName = "IntegrationPublicConfigurationConversionServiceAdapter")
-public interface IntegrationPublicConfigurationMapperSpringConfig {
+public interface IntegrationConfigurationMapperSpringConfig {
 }

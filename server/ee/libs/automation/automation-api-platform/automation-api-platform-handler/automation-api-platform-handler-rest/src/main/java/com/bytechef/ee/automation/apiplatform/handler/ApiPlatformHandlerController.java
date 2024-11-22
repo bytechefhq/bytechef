@@ -154,7 +154,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         throw new IllegalArgumentException("No API Collection endpoint found for request uri: " + path);
     }
 
-    protected Environment getEnvironment(HttpServletRequest request) {
+    private Environment getEnvironment(HttpServletRequest request) {
         String environment = request.getHeader("x-environment");
 
         if (StringUtils.isNotBlank(environment)) {

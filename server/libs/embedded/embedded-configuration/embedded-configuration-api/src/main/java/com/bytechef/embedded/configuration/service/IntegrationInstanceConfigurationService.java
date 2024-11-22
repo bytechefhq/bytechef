@@ -39,6 +39,8 @@ public interface IntegrationInstanceConfigurationService {
 
     List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations(long integrationId);
 
+    IntegrationInstanceConfiguration getEnabledIntegrationInstanceConfiguration(long id, Environment environment);
+
     List<IntegrationInstanceConfiguration> getEnabledIntegrationInstanceConfigurations(Environment environment);
 
     List<IntegrationInstanceConfiguration> getIntegrationInstanceConfigurations(List<Long> ids);

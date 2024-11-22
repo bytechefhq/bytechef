@@ -81,6 +81,15 @@ public class IntegrationInstanceConfigurationServiceImpl implements IntegrationI
     }
 
     @Override
+    public IntegrationInstanceConfiguration getEnabledIntegrationInstanceConfiguration(
+        long id, Environment environment) {
+
+        return integrationInstanceConfigurationRepository
+            .findByIdAndEnvironmentAndEnabled(id, environment.ordinal(), true)
+            .orElseThrow(() -> new IllegalArgumentException("Integration instance configuration not found"));
+    }
+
+    @Override
     public List<IntegrationInstanceConfiguration> getEnabledIntegrationInstanceConfigurations(
         Environment environment) {
 

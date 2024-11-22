@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.repository;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -37,4 +38,7 @@ public interface IntegrationInstanceConfigurationRepository
     List<IntegrationInstanceConfiguration> findAllByEnvironmentAndEnabled(int environment, boolean enabled);
 
     List<IntegrationInstanceConfiguration> findAllByIdIn(List<Long> ids);
+
+    Optional<IntegrationInstanceConfiguration> findByIdAndEnvironmentAndEnabled(
+        long id, int environment, boolean enabled);
 }

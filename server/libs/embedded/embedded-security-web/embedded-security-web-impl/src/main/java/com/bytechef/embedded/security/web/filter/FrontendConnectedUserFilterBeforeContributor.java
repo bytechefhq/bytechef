@@ -30,19 +30,19 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
-public class ConnectedUserFilterBeforeContributor implements FilterBeforeContributor {
+public class FrontendConnectedUserFilterBeforeContributor implements FilterBeforeContributor {
 
     private final SigningKeyService signingKeyService;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserFilterBeforeContributor(SigningKeyService signingKeyService) {
+    public FrontendConnectedUserFilterBeforeContributor(SigningKeyService signingKeyService) {
         this.signingKeyService = signingKeyService;
     }
 
     @Override
     @SuppressFBWarnings("EI")
     public Filter getFilter(AuthenticationManager authenticationManager) {
-        return new ConnectedUserAuthenticationFilter(authenticationManager);
+        return new FrontendConnectedUserAuthenticationFilter(authenticationManager, signingKeyService);
     }
 
     @Override

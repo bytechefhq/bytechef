@@ -17,21 +17,11 @@
 package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
-import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
 import com.bytechef.platform.tenant.domain.TenantKey;
-import com.bytechef.platform.tenant.util.TenantUtils;
-import com.bytechef.platform.user.service.SigningKeyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Header;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.JwsHeader;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.Locator;
 import jakarta.servlet.http.HttpServletRequest;
-import java.security.Key;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 
@@ -40,61 +30,21 @@ import org.springframework.security.core.Authentication;
  */
 public class ConnectedUserAuthenticationFilter extends AbstractPublicApiAuthenticationFilter {
 
-    private final SigningKeyService signingKeyService;
-
     @SuppressFBWarnings("EI")
-    public ConnectedUserAuthenticationFilter(
-        AuthenticationManager authenticationManager, SigningKeyService signingKeyService) {
+    public ConnectedUserAuthenticationFilter(AuthenticationManager authenticationManager) {
+        super("^/api/embedded/v[0-9]+/(?!frontend/).+", authenticationManager);
 
-        super("^/api/embedded/v[0-9]+/.+", authenticationManager);
-
-        this.signingKeyService = signingKeyService;
     }
 
     @Override
     protected Authentication getAuthentication(HttpServletRequest request) {
         String token = getAuthToken(request);
 
-        Jws<Claims> jws = getJws(token);
+        TenantKey tenantKey = TenantKey.parse(token);
 
-        Claims payload = jws.getPayload();
+        Validate.notNull(request.getParameterValues("externalUserId"), "externalUserId parameter is required");
 
-        String externalUserId = payload.getSubject();
-
-        JwsHeader header = jws.getHeader();
-
-        TenantKey tenantKey = TenantKey.parse(header.getKeyId());
-
-        return new ConnectedUserAuthenticationToken(externalUserId, getEnvironment(request), tenantKey.getTenantId());
-    }
-
-    private Environment getEnvironment(HttpServletRequest request) {
-        String environment = request.getHeader("x-environment");
-
-        if (StringUtils.isNotBlank(environment)) {
-            return Environment.valueOf(environment.toUpperCase());
-        }
-
-        return Environment.PRODUCTION;
-    }
-
-    private Jws<Claims> getJws(String secretKey) {
-        return Jwts.parser()
-            .keyLocator(new SigningKeyLocator())
-            .build()
-            .parseSignedClaims(secretKey);
-    }
-
-    private class SigningKeyLocator implements Locator<Key> {
-
-        @Override
-        public Key locate(Header header) {
-            String keyId = (String) header.get("kid");
-
-            TenantKey tenantKey = TenantKey.parse(keyId);
-
-            return TenantUtils.callWithTenantId(
-                tenantKey.getTenantId(), () -> signingKeyService.getPublicKey(keyId));
-        }
+        return new ConnectedUserAuthenticationToken(
+            request.getParameterValues("externalUserId")[0], getEnvironment(request), tenantKey.getTenantId());
     }
 }

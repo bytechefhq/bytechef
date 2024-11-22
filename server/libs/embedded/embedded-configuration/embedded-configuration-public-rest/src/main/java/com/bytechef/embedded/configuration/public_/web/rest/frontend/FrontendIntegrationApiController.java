@@ -14,32 +14,40 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.public_.web.rest;
+package com.bytechef.embedded.configuration.public_.web.rest.frontend;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.embedded.configuration.public_.web.rest.FrontendIntegrationApi;
 import com.bytechef.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.constant.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController("com.bytechef.embedded.configuration.public_.web.rest.IntegrationApiController")
+/**
+ * @author Ivica Cardic
+ */
+@CrossOrigin
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
-public class IntegrationApiController implements IntegrationApi {
+public class FrontendIntegrationApiController implements FrontendIntegrationApi {
 
     private final ConversionService conversionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
-    public IntegrationApiController(
+    @SuppressFBWarnings("EI")
+    public FrontendIntegrationApiController(
         ConversionService conversionService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade) {
 
@@ -48,9 +56,19 @@ public class IntegrationApiController implements IntegrationApi {
     }
 
     @Override
-    public ResponseEntity<List<IntegrationModel>> getIntegrations(
-        String externalUserId, EnvironmentModel xEnvironment) {
+    public ResponseEntity<IntegrationModel> getFrontendIntegration(Long id, EnvironmentModel xEnvironment) {
+        Environment environment = xEnvironment == null
+            ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationInstanceConfigurationFacade.getEnabledIntegrationInstanceConfigurationIntegration(
+                    id, environment),
+                IntegrationModel.class));
+    }
+
+    @Override
+    public ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(EnvironmentModel xEnvironment) {
         Environment environment = xEnvironment == null
             ? Environment.PRODUCTION : Environment.valueOf(StringUtils.upperCase(xEnvironment.name()));
 
