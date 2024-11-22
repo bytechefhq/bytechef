@@ -26,6 +26,7 @@ import com.bytechef.component.object.helper.action.ObjectHelperAddValueByKeyActi
 import com.bytechef.component.object.helper.action.ObjectHelperContainsAction;
 import com.bytechef.component.object.helper.action.ObjectHelperDeleteKeyValuePairAction;
 import com.bytechef.component.object.helper.action.ObjectHelperEqualsAction;
+import com.bytechef.component.object.helper.action.ObjectHelperMergeTwoObjectsAction;
 import com.google.auto.service.AutoService;
 
 /**
@@ -44,7 +45,8 @@ public class ObjectHelperComponentHandler implements ComponentHandler {
             ObjectHelperAddKeyValuePairsAction.ACTION_DEFINITION,
             ObjectHelperContainsAction.ACTION_DEFINITION,
             ObjectHelperDeleteKeyValuePairAction.ACTION_DEFINITION,
-            ObjectHelperEqualsAction.ACTION_DEFINITION);
+            ObjectHelperEqualsAction.ACTION_DEFINITION,
+            ObjectHelperMergeTwoObjectsAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
