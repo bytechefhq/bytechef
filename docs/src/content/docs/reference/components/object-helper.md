@@ -121,3 +121,16 @@ Type: BOOLEAN
 
 
 
+### Merge Two Objects
+Merge two objects into one. If there is any property with the same name, the source value will be used.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Source | {} | OBJECT_BUILDER  |  The source object to merge.  |
+| Target | {} | OBJECT_BUILDER  |  The target object to merge into.  |
+
+
+
+
