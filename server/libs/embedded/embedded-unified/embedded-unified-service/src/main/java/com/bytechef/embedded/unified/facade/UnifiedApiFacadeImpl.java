@@ -27,6 +27,8 @@ import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
+import com.bytechef.embedded.configuration.domain.IntegrationInstance;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.unified.exception.CursorPaginationException;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
@@ -48,6 +50,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
 
+/**
+ * @author Ivica Cardic
+ */
 @Service
 public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
@@ -56,23 +61,25 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
+    private final IntegrationInstanceService integrationInstanceService;
 
     @SuppressFBWarnings("EI")
     public UnifiedApiFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory) {
+        ContextFactory contextFactory, IntegrationInstanceService integrationInstanceService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.connectionService = connectionService;
         this.contextFactory = contextFactory;
+        this.integrationInstanceService = integrationInstanceService;
     }
 
     @Override
     public String create(
         UnifiedInputModel unifiedInputModel, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long connectionId) {
+        long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(connectionId, environment);
+        ComponentConnection connection = getComponentConnection(environment, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -92,9 +99,9 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void delete(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long connectionId) {
+        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(connectionId, environment);
+        ComponentConnection connection = getComponentConnection(environment, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -109,9 +116,9 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long connectionId) {
+        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(connectionId, environment);
+        ComponentConnection connection = getComponentConnection(environment, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -132,7 +139,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     @Override
     public CursorPageSlice<? extends UnifiedOutputModel> getPage(
         CursorPageable cursorPageable, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long connectionId) {
+        long instanceId) {
 
         boolean isSorted = StringUtils.hasText(cursorPageable.getSort());
 
@@ -141,7 +148,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 //            throw new IllegalArgumentException("Sorting is only allowed on fields: " + sortableFields);
 //        }
 
-        ComponentConnection connection = getComponentConnection(connectionId, environment);
+        ComponentConnection connection = getComponentConnection(environment, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -215,9 +222,9 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     @Override
     public void update(
         String id, UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        ConnectionEnvironment environment, long connectionId) {
+        ConnectionEnvironment environment, long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(connectionId, environment);
+        ComponentConnection connection = getComponentConnection(environment, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -256,7 +263,11 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         }
     }
 
-    private ComponentConnection getComponentConnection(long connectionId, ConnectionEnvironment environment) {
+    private ComponentConnection getComponentConnection(ConnectionEnvironment environment, long instanceId) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+
+        long connectionId = integrationInstance.getConnectionId();
+
         Connection connection = connectionService.getConnection(connectionId);
 
         if (connection.getEnvironment() != environment) {

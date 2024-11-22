@@ -103,8 +103,8 @@ components:
 #      $ref: ../../common/components/parameters/query/page_size.yaml
     pageable:
       $ref: ../../common/components/parameters/query/pageable.yaml
-    x-connection-id:
-      $ref: ../../common/components/parameters/header/x-connection-id.yaml
+    x-instance-id:
+      $ref: ../../common/components/parameters/header/x-instance-id.yaml
 #    object_type:
 #      $ref: ./components/parameters/query/object_type.yaml
 #    object_name:

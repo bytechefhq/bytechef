@@ -66,13 +66,13 @@ public class CrmAccountApiController implements AccountApi {
 
     @Override
     public ResponseEntity<AccountModel> getAccount(
-        Long xConnectionId, String accountId, String environment, Boolean includeRawData) {
+        Long xInstanceId, String accountId, String environment, Boolean includeRawData) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
                     accountId, Category.CRM, CrmModelType.ACCOUNT,
-                    ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xConnectionId),
+                    ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
                 AccountModel.class));
     }
 

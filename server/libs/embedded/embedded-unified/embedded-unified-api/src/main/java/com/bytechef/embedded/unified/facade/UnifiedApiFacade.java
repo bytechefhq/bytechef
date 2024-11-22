@@ -24,23 +24,26 @@ import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 
+/**
+ * @author Ivica Cardic
+ */
 public interface UnifiedApiFacade {
 
     String create(
         UnifiedInputModel unifiedInputModel, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long connectionId);
+        long instanceId);
 
     void delete(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long connectionId);
+        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId);
 
     UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long connectionId);
+        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId);
 
     CursorPageSlice<? extends UnifiedOutputModel> getPage(
         CursorPageable cursorPageable, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long connectionId);
+        long instanceId);
 
     void update(
         String id, UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        ConnectionEnvironment environment, long connectionId);
+        ConnectionEnvironment environment, long instanceId);
 }

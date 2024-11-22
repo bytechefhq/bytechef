@@ -54,25 +54,25 @@ public class AccountingAccountApiController implements AccountApi {
 
     @Override
     public ResponseEntity<CreatedModel> createAccount(
-        Long xConnectionId, CreateUpdateAccountModel createUpdateAccountModel, String environment) {
+        Long xInstanceId, CreateUpdateAccountModel createUpdateAccountModel, String environment) {
 
         return ResponseEntity.ok(
             new CreatedModel(
                 unifiedApiFacade.create(
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class), Category.CRM,
                     AccountingModelType.ACCOUNT, ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)),
-                    xConnectionId)));
+                    xInstanceId)));
     }
 
     @Override
     public ResponseEntity<AccountModel> getAccount(
-        Long xConnectionId, String accountId, String environment, Boolean includeRawData) {
+        Long xInstanceId, String accountId, String environment, Boolean includeRawData) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
                     accountId, Category.CRM, AccountingModelType.ACCOUNT,
-                    ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xConnectionId),
+                    ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
                 AccountModel.class));
     }
 

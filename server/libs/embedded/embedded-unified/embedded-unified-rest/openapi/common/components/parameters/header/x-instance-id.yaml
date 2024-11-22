@@ -1,0 +1,8 @@
+name: x-instance-id
+in: header
+schema:
+  type: integer
+  format: int64
+example: 1234
+description: The integration instance Id that uniquely identifies the connected user's specific integration instance
+required: true

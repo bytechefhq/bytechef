@@ -1,8 +1,0 @@
-name: x-connection-id
-in: header
-schema:
-  type: integer
-  format: int64
-example: 1234
-description: The connection ID that uniquely identifies the customer in your application
-required: true

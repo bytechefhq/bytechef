@@ -3,8 +3,6 @@ post:
   summary: Create account
   tags:
     - account
-  parameters:
-    - $ref: "../../../common/components/parameters/query/environment.yaml"
   security:
     - bearer: []
   requestBody:
@@ -46,7 +44,6 @@ get:
   security:
     - bearer: []
   parameters:
-    - $ref: "../../../common/components/parameters/query/environment.yaml"
     - $ref: ../../../common/components/parameters/query/include_raw_data.yaml
     - $ref: ../../../common/components/parameters/query/pageable.yaml
 #    - $ref: ../../../common/components/parameters/query/read_from_cache.yaml
@@ -75,4 +72,5 @@ get:
     '501':
       $ref: ../../../common/components/responses/notImplemented.yaml
 parameters:
-  - $ref: ../../../common/components/parameters/header/x-connection-id.yaml
+  - $ref: ../../../common/components/parameters/header/x-instance-id.yaml
+  - $ref: "../../../common/components/parameters/query/environment.yaml"

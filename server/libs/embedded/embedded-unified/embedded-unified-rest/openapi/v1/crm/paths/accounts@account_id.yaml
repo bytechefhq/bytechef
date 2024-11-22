@@ -105,7 +105,7 @@ patch:
     '501':
       $ref: ../../../common/components/responses/notImplemented.yaml
 parameters:
-  - $ref: ../../../common/components/parameters/header/x-connection-id.yaml
+  - $ref: ../../../common/components/parameters/header/x-instance-id.yaml
   - name: account_id
     in: path
     required: true

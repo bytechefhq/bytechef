@@ -55,8 +55,8 @@ components:
       $ref: ../../common/components/parameters/query/include_raw_data.yaml
     pageable:
       $ref: ../../common/components/parameters/query/pageable.yaml
-    x-connection-id:
-      $ref: ../../common/components/parameters/header/x-connection-id.yaml
+    x-instance-id:
+      $ref: ../../common/components/parameters/header/x-instance-id.yaml
   responses:
     badRequest:
       $ref: ../../common/components/responses/badRequest.yaml
