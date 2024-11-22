@@ -292,7 +292,10 @@ public class OllamaChatAction {
 
             OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
 
-            return new OllamaChatModel(ollamaApi, (OllamaOptions) createChatOptions(inputParameters));
+            return OllamaChatModel.builder()
+                .withOllamaApi(ollamaApi)
+                .withDefaultOptions((OllamaOptions) createChatOptions(inputParameters))
+                .build();
         }
     };
 }
