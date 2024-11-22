@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:54.533891+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-18T16:25:22.450861+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -50,8 +50,8 @@ public interface ActionApi {
      * @param componentName The component name. (required)
      * @param componentVersion The component version. (required)
      * @param actionName The name of the action to call. (required)
-     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (optional)
      * @param xEnvironment The environment. (optional)
+     * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (optional)
      * @param executeActionRequestModel  (optional)
      * @return The list of component action objects. (status code 200)
      *         or Invalid Input (status code 400)
@@ -89,8 +89,8 @@ public interface ActionApi {
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
-        @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = false) Long xConnectionId,
         @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment,
+        @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) Long xInstanceId,
         @Parameter(name = "ExecuteActionRequestModel", description = "") @Valid @RequestBody(required = false) ExecuteActionRequestModel executeActionRequestModel
     ) {
         getRequest().ifPresent(request -> {

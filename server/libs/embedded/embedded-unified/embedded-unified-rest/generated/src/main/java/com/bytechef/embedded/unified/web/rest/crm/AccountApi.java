@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T12:07:55.031052+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-18T16:25:05.509275+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
 @Tag(name = "account", description = "The `Account` Common Object represents a \"company\" in CRMs.")
 public interface AccountApi {
@@ -48,7 +48,7 @@ public interface AccountApi {
     /**
      * POST /accounts : Create account
      *
-     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (required)
+     * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (required)
      * @param createUpdateAccountModel  (required)
      * @param xEnvironment The environment of an integration. (optional)
      * @return Account created (status code 201)
@@ -110,7 +110,7 @@ public interface AccountApi {
     )
     
     default ResponseEntity<CreatedModel> createAccount(
-        @NotNull @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = true) Long xConnectionId,
+        @NotNull @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = true) Long xInstanceId,
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
         @Parameter(name = "x-environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) String xEnvironment
     ) {
@@ -176,7 +176,7 @@ public interface AccountApi {
     /**
      * GET /accounts/{account_id} : Get account
      *
-     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (required)
+     * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (required)
      * @param accountId  (required)
      * @param xEnvironment The environment of an integration. (optional)
      * @param includeRawData Whether to include raw data fetched from the 3rd party provider. (optional)
@@ -230,7 +230,7 @@ public interface AccountApi {
     )
     
     default ResponseEntity<AccountModel> getAccount(
-        @NotNull @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = true) Long xConnectionId,
+        @NotNull @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = true) Long xInstanceId,
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "x-environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) String xEnvironment,
         @Parameter(name = "include_raw_data", description = "Whether to include raw data fetched from the 3rd party provider.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include_raw_data", required = false) Boolean includeRawData
@@ -287,7 +287,7 @@ public interface AccountApi {
     /**
      * GET /accounts : List accounts
      *
-     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (required)
+     * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (required)
      * @param xEnvironment The environment of an integration. (optional)
      * @param includeRawData Whether to include raw data fetched from the 3rd party provider. (optional)
      * @param pageable Pageable parameters. (optional)
@@ -341,7 +341,7 @@ public interface AccountApi {
     )
     
     default ResponseEntity<com.bytechef.embedded.unified.pagination.CursorPageSlice> listAccounts(
-        @NotNull @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = true) Long xConnectionId,
+        @NotNull @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = true) Long xInstanceId,
         @Parameter(name = "x-environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) String xEnvironment,
         @Parameter(name = "include_raw_data", description = "Whether to include raw data fetched from the 3rd party provider.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "include_raw_data", required = false) Boolean includeRawData,
         @Parameter(name = "pageable", description = "Pageable parameters.", in = ParameterIn.QUERY) @Valid ListAccountsPageableParameterModel pageable
@@ -398,7 +398,7 @@ public interface AccountApi {
     /**
      * PATCH /accounts/{account_id} : Update account
      *
-     * @param xConnectionId The connection ID that uniquely identifies the customer in your application (required)
+     * @param xInstanceId The integration instance Id that uniquely identifies the connected user&#39;s specific integration instance (required)
      * @param accountId  (required)
      * @param createUpdateAccountModel  (required)
      * @param xEnvironment The environment of an integration. (optional)
@@ -459,7 +459,7 @@ public interface AccountApi {
     )
     
     default ResponseEntity<Void> updateAccount(
-        @NotNull @Parameter(name = "x-connection-id", description = "The connection ID that uniquely identifies the customer in your application", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-connection-id", required = true) Long xConnectionId,
+        @NotNull @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", required = true, in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = true) Long xInstanceId,
         @Parameter(name = "account_id", description = "", required = true, in = ParameterIn.PATH) @PathVariable("account_id") String accountId,
         @Parameter(name = "CreateUpdateAccountModel", description = "", required = true) @Valid @RequestBody CreateUpdateAccountModel createUpdateAccountModel,
         @Parameter(name = "x-environment", description = "The environment of an integration.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) String xEnvironment
