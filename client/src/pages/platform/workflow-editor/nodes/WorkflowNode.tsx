@@ -111,12 +111,13 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                     </Button>
                 </HoverCardTrigger>
 
-                <HoverCardContent className="min-w-96 text-sm" side="right">
+                <HoverCardContent className="w-fit min-w-72 max-w-[601px] text-sm" side="right">
                     {workflowNodeDescription?.description && (
                         <div
+                            className="flex"
                             dangerouslySetInnerHTML={{
                                 __html: sanitize(workflowNodeDescription.description, {
-                                    allowedAttributes: {div: ['class']},
+                                    allowedAttributes: {div: ['class'], table: ['class'], td: ['class'], tr: ['class']},
                                 }),
                             }}
                         />
