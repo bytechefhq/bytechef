@@ -35,7 +35,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.github.util.GithubUtils;
-import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -57,11 +56,15 @@ public class GithubAddLabelsToIssueAction {
                 .label("Issue")
                 .description("The issue to add labels to.")
                 .required(true),
-            string(LABELS)
-                .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
-                .optionsLookupDependsOn(REPOSITORY)
+            array(LABELS)
                 .label("Labels")
                 .description("The list of labels to add to the issue.")
+                .items(
+                    string("label")
+                        .label("Label")
+                        .options((ActionOptionsFunction<String>) GithubUtils::getLabels)
+                        .optionsLookupDependsOn(REPOSITORY)
+                        .required(true))
                 .required(true))
         .output(outputSchema(
             array()
@@ -83,8 +86,9 @@ public class GithubAddLabelsToIssueAction {
             .http(http -> http.post(
                 "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY)
                     + "/issues/" + inputParameters.getRequiredString(ISSUE) + "/labels"))
-            .body(Http.Body.of(
-                Map.of(LABELS, Collections.singletonList(inputParameters.getRequiredString(LABELS)))))
+            .body(
+                Http.Body.of(
+                    Map.of(LABELS, inputParameters.getRequiredList(LABELS, String.class))))
             .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
