@@ -86,12 +86,22 @@ public class GoogleCalendarAddAttendeesToEventAction {
 
         List<String> newAttendees = inputParameters.getList(ATTENDEES, String.class, List.of());
 
-        event.getAttendees()
-            .addAll(
+        List<EventAttendee> attendees = event.getAttendees();
+
+        if (attendees == null) {
+            event.setAttendees(
                 newAttendees
                     .stream()
                     .map(attendee -> new EventAttendee().setEmail(attendee))
                     .toList());
+        } else {
+            event.getAttendees()
+                .addAll(
+                    newAttendees
+                        .stream()
+                        .map(attendee -> new EventAttendee().setEmail(attendee))
+                        .toList());
+        }
 
         Event updatedEvent = calendar
             .events()
