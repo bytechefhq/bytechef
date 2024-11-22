@@ -32,9 +32,9 @@ const Properties = ({
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const advancedProperties = properties.filter((property) => {
-        const {advancedOption, displayCondition, name} = property;
+        const {advancedOption, displayCondition, hidden, name} = property;
 
-        if (!name || !advancedOption) {
+        if (!name || !advancedOption || hidden) {
             return false;
         }
 
@@ -45,7 +45,9 @@ const Properties = ({
         return true;
     });
 
-    const simpleProperties = properties.filter((property) => property.name && !property.advancedOption);
+    const simpleProperties = properties.filter(
+        (property) => property.name && !property.advancedOption && !property.hidden
+    );
 
     return (
         <>
