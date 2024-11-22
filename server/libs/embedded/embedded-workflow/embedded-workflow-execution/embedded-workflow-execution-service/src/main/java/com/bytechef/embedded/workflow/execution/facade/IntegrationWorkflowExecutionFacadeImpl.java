@@ -52,6 +52,8 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -79,6 +81,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
     private final IntegrationService integrationService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobService jobService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
     private final TriggerExecutionService triggerExecutionService;
@@ -93,7 +96,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
-        JobService jobService, TaskExecutionService taskExecutionService,
+        JobService jobService, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        TaskExecutionService taskExecutionService,
         TaskFileStorage taskFileStorage, TriggerExecutionService triggerExecutionService,
         TriggerFileStorage triggerFileStorage, WorkflowService workflowService) {
 
@@ -107,6 +111,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         this.jobService = jobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationService = integrationService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
         this.triggerExecutionService = triggerExecutionService;
@@ -223,6 +228,24 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         }
     }
 
+    private DefinitionResult getDefinition(String type) {
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+        if (componentDefinitionService.hasComponentDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion())) {
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+            return new DefinitionResult(componentDefinition.getTitle(), componentDefinition.getIcon());
+        }
+
+        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+        return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
+    }
+
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
         return CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
@@ -231,22 +254,17 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
                     contextService.peek(
                         Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
+                DefinitionResult definitionResult = getDefinition(taskExecution.getType());
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                Object output = taskExecution.getOutput() == null
+                    ? null
+                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
                 return new TaskExecutionDTO(
                     taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
-                    getComponentDefinition(taskExecution.getType()), workflowTask.evaluateParameters(context),
-                    taskExecution.getOutput() == null
-                        ? null
-                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                    definitionResult.title(), definitionResult.icon(), workflowTask.evaluateParameters(context),
+                    output);
             });
-    }
-
-    private ComponentDefinition getComponentDefinition(String type) {
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
-
-        return componentDefinitionService.getComponentDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion());
     }
 
     private List<String> getWorkflowIds(Integration integration) {
@@ -263,12 +281,17 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
                 integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
                     integrationInstanceId.longValue(), job.getWorkflowId());
 
+            DefinitionResult definitionResult = getDefinition(triggerExecution.getType());
+
             triggerExecutionDTO = new TriggerExecutionDTO(
-                getComponentDefinition(triggerExecution.getType()),
+                triggerExecution, definitionResult.title(), definitionResult.icon(),
                 integrationInstanceConfigurationWorkflow.getInputs(),
-                triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()), triggerExecution);
+                triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
         }
 
         return triggerExecutionDTO;
+    }
+
+    record DefinitionResult(String title, String icon) {
     }
 }

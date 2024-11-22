@@ -31,6 +31,8 @@ import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -43,17 +45,20 @@ public class JobTestExecutor {
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final JobSyncExecutor jobSyncExecutor;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TaskExecutionService taskExecutionService;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public JobTestExecutor(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobSyncExecutor jobSyncExecutor, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
+        JobSyncExecutor jobSyncExecutor, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobSyncExecutor = jobSyncExecutor;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.taskExecutionService = taskExecutionService;
         this.taskFileStorage = taskFileStorage;
     }
@@ -72,25 +77,36 @@ public class JobTestExecutor {
                             Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
 
                     WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+                    DefinitionResult definitionResult = getDefinition(taskExecution);
+
+                    Object output = taskExecution.getOutput() == null
+                        ? null
+                        : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
                     return new TaskExecutionDTO(
-                        taskExecution, getComponentDefinition(taskExecution),
-                        workflowTask.evaluateParameters(context),
-                        taskExecution.getOutput() == null
-                            ? null
-                            : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput()));
+                        taskExecution, definitionResult.title(), definitionResult.icon(),
+                        workflowTask.evaluateParameters(context), output);
                 }));
     }
 
-    private ComponentDefinition getComponentDefinition(TaskExecution taskExecution) {
+    private DefinitionResult getDefinition(TaskExecution taskExecution) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskExecution.getType());
 
-        if (componentDefinitionService.hasComponentDefinition(workflowNodeType.componentName(),
-            workflowNodeType.componentVersion())) {
-            return componentDefinitionService.getComponentDefinition(
+        if (componentDefinitionService.hasComponentDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion())) {
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
                 workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+            return new DefinitionResult(componentDefinition.getTitle(), componentDefinition.getIcon());
         }
 
-        return componentDefinitionService.getComponentDefinition("missing", 1);
+        TaskDispatcherDefinition taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+            workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+        return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
+    }
+
+    record DefinitionResult(String title, String icon) {
     }
 }

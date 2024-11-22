@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -130,10 +131,12 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                     .workflowTrigger(workflowTrigger)
                     .build();
 
+                ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
                 triggerExecutionDTO = new TriggerExecutionDTO(
-                    componentDefinitionService.getComponentDefinition(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion()),
-                    inputs, sampleOutput, triggerExecution);
+                    triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(), inputs,
+                    sampleOutput);
 
                 inputs = MapUtils.concat((Map<String, Object>) inputs, Map.of(workflowTrigger.getName(), sampleOutput));
             }

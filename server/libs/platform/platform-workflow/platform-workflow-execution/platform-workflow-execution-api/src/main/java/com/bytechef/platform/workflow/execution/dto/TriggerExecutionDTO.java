@@ -17,7 +17,6 @@
 package com.bytechef.platform.workflow.execution.dto;
 
 import com.bytechef.error.ExecutionError;
-import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
@@ -30,25 +29,25 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TriggerExecutionDTO(
-    boolean batch, ComponentDefinition component, String createdBy, LocalDateTime createdDate,
-    LocalDateTime endDate, ExecutionError error, long executionTime, Long id, Map<String, ?> input,
+    boolean batch, String createdBy, LocalDateTime createdDate,
+    LocalDateTime endDate, ExecutionError error, long executionTime, String icon, Long id, Map<String, ?> input,
     String lastModifiedBy, LocalDateTime lastModifiedDate, int maxRetries, Object output, int priority,
     int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
-    Object state, TriggerExecution.Status status, WorkflowExecutionId workflowExecutionId, String type,
+    Object state, TriggerExecution.Status status, WorkflowExecutionId workflowExecutionId, String title, String type,
     WorkflowTrigger workflowTrigger) {
 
     public TriggerExecutionDTO(
-        ComponentDefinition component, Map<String, ?> input, Object output, TriggerExecution triggerExecution) {
+        TriggerExecution triggerExecution, String title, String icon, Map<String, ?> input, Object output) {
 
         this(
-            triggerExecution.isBatch(), component, triggerExecution.getCreatedBy(),
-            triggerExecution.getCreatedDate(), triggerExecution.getEndDate(), triggerExecution.getError(),
-            triggerExecution.getExecutionTime(), triggerExecution.getId(), input, triggerExecution.getLastModifiedBy(),
+            triggerExecution.isBatch(), triggerExecution.getCreatedBy(), triggerExecution.getCreatedDate(),
+            triggerExecution.getEndDate(), triggerExecution.getError(), triggerExecution.getExecutionTime(),
+            icon, triggerExecution.getId(), input, triggerExecution.getLastModifiedBy(),
             triggerExecution.getLastModifiedDate(), triggerExecution.getMaxRetries(), output,
             triggerExecution.getPriority(), triggerExecution.getRetryAttempts(), triggerExecution.getRetryDelay(),
             triggerExecution.getRetryDelayFactor(), triggerExecution.getRetryDelayMillis(),
             triggerExecution.getStartDate(), triggerExecution.getState(), triggerExecution.getStatus(),
-            triggerExecution.getWorkflowExecutionId(), triggerExecution.getType(),
+            triggerExecution.getWorkflowExecutionId(), title, triggerExecution.getType(),
             triggerExecution.getWorkflowTrigger());
     }
 }

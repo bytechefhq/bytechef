@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.dto;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -28,7 +29,7 @@ import java.util.Set;
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceDTO(
     long connectedUserId, long connectionId, String createdBy, LocalDateTime createdDate, boolean enabled,
-    Long id, long integrationInstanceConfigurationId,
+    Environment environment, Long id, long integrationInstanceConfigurationId,
     IntegrationInstanceConfiguration integrationInstanceConfiguration,
     Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, LocalDateTime lastExecutionDate,
     String lastModifiedBy, LocalDateTime lastModifiedDate, int version) {
@@ -40,9 +41,9 @@ public record IntegrationInstanceDTO(
         this(
             integrationInstance.getConnectedUserId(), integrationInstance.getConnectionId(),
             integrationInstance.getCreatedBy(), integrationInstance.getCreatedDate(), integrationInstance.isEnabled(),
-            integrationInstance.getId(), integrationInstance.getIntegrationInstanceConfigurationId(),
-            integrationInstanceConfiguration, integrationInstanceWorkflows, lastExecutionDate,
-            integrationInstance.getLastModifiedBy(), integrationInstance.getLastModifiedDate(),
-            integrationInstance.getVersion());
+            integrationInstanceConfiguration.getEnvironment(), integrationInstance.getId(),
+            integrationInstance.getIntegrationInstanceConfigurationId(), integrationInstanceConfiguration,
+            integrationInstanceWorkflows, lastExecutionDate, integrationInstance.getLastModifiedBy(),
+            integrationInstance.getLastModifiedDate(), integrationInstance.getVersion());
     }
 }

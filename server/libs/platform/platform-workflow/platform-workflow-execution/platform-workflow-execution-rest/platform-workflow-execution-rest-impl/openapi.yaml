@@ -364,8 +364,6 @@ components:
         - "startDate"
         - "status"
       properties:
-        component:
-          $ref: "../../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/ComponentDefinitionBasic"
         createdBy:
           description: "The created by."
           type: "string"
@@ -388,6 +386,10 @@ components:
             \ node."
           type: "integer"
           format: "int64"
+          readOnly: true
+        icon:
+          description: "The icon of the task."
+          type: "string"
           readOnly: true
         id:
           description: "The id of a task execution."
@@ -472,6 +474,10 @@ components:
           type: "integer"
           format: "int32"
           readOnly: true
+        title:
+          description: "The title of the task."
+          type: "string"
+          readOnly: true
         retryDelayMillis:
           description: "The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor."
           type: "integer"
@@ -494,8 +500,6 @@ components:
       properties:
         batch:
           type: "boolean"
-        component:
-          $ref: "../../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/ComponentDefinitionBasic"
         createdBy:
           description: "The created by."
           type: "string"
@@ -518,6 +522,10 @@ components:
             \ node."
           type: "integer"
           format: "int64"
+          readOnly: true
+        icon:
+          description: "The icon of the trigger."
+          type: "string"
           readOnly: true
         id:
           description: "The id of a task execution."
@@ -591,6 +599,10 @@ components:
           readOnly: true
         workflowTrigger:
           $ref: "../../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowTrigger"
+        title:
+          description: "The title of the trigger."
+          type: "string"
+          readOnly: true
         type:
           description: "The type of the task."
           type: "string"

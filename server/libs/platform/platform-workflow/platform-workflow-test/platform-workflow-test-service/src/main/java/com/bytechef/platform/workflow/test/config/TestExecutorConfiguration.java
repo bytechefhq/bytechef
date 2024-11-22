@@ -44,6 +44,7 @@ import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
+import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import com.bytechef.platform.workflow.test.coordinator.task.dispatcher.TestTaskDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
@@ -76,7 +77,8 @@ public class TestExecutorConfiguration {
     @Bean
     JobTestExecutor jobTestExecutor(
         ComponentDefinitionService componentDefinitionService, ObjectMapper objectMapper,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowService workflowService) {
+        TaskHandlerRegistry taskHandlerRegistry, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -99,7 +101,7 @@ public class TestExecutorConfiguration {
                 getTaskDispatcherResolverFactories(
                     syncMessageBroker, contextService, counterService, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService),
-            taskExecutionService, taskFileStorage);
+            taskDispatcherDefinitionService, taskExecutionService, taskFileStorage);
     }
 
     private static ApplicationEventPublisher getEventPublisher(SyncMessageBroker syncMessageBroker) {
