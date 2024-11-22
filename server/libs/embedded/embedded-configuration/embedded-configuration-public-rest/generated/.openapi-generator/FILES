@@ -1,6 +1,10 @@
 README.md
 pom.xml
 src/main/java/com/bytechef/embedded/configuration/public_/web/rest/ApiUtil.java
+src/main/java/com/bytechef/embedded/configuration/public_/web/rest/FrontendIntegrationApi.java
 src/main/java/com/bytechef/embedded/configuration/public_/web/rest/IntegrationApi.java
+src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/ConnectionModel.java
+src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/IntegrationModel.java
+src/main/java/com/bytechef/embedded/configuration/public_/web/rest/model/WorkflowModel.java

@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-07T18:32:19.624287+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-18T18:06:13.175551+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 public class IntegrationBasicModel {
 
   private Boolean allowMultipleInstances = false;
@@ -38,6 +38,8 @@ public class IntegrationBasicModel {
   private LocalDateTime createdDate;
 
   private String description;
+
+  private String icon;
 
   private Long id;
 
@@ -165,6 +167,26 @@ public class IntegrationBasicModel {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public IntegrationBasicModel icon(String icon) {
+    this.icon = icon;
+    return this;
+  }
+
+  /**
+   * The icon.
+   * @return icon
+   */
+  
+  @Schema(name = "icon", description = "The icon.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("icon")
+  public String getIcon() {
+    return icon;
+  }
+
+  public void setIcon(String icon) {
+    this.icon = icon;
   }
 
   public IntegrationBasicModel id(Long id) {
@@ -321,6 +343,7 @@ public class IntegrationBasicModel {
         Objects.equals(this.createdBy, integrationBasic.createdBy) &&
         Objects.equals(this.createdDate, integrationBasic.createdDate) &&
         Objects.equals(this.description, integrationBasic.description) &&
+        Objects.equals(this.icon, integrationBasic.icon) &&
         Objects.equals(this.id, integrationBasic.id) &&
         Objects.equals(this.lastModifiedBy, integrationBasic.lastModifiedBy) &&
         Objects.equals(this.lastModifiedDate, integrationBasic.lastModifiedDate) &&
@@ -332,7 +355,7 @@ public class IntegrationBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(allowMultipleInstances, componentName, createdBy, createdDate, description, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, name);
+    return Objects.hash(allowMultipleInstances, componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, name);
   }
 
   @Override
@@ -344,6 +367,7 @@ public class IntegrationBasicModel {
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");

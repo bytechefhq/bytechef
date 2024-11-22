@@ -17,19 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The environment of a project.
+ * Gets or Sets credential_status
  */
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-20T18:38:11.857333+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
-public enum EnvironmentModel {
+public enum CredentialStatusModel {
   
-  TEST("TEST"),
+  VALID("VALID"),
   
-  PRODUCTION("PRODUCTION");
+  INVALID("INVALID");
 
   private String value;
 
-  EnvironmentModel(String value) {
+  CredentialStatusModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +44,8 @@ public enum EnvironmentModel {
   }
 
   @JsonCreator
-  public static EnvironmentModel fromValue(String value) {
-    for (EnvironmentModel b : EnvironmentModel.values()) {
+  public static CredentialStatusModel fromValue(String value) {
+    for (CredentialStatusModel b : CredentialStatusModel.values()) {
       if (b.value.equalsIgnoreCase(value)) {
         return b;
       }

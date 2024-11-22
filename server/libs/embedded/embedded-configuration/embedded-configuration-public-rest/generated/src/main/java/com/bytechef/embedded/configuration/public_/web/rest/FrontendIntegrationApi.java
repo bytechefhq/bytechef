@@ -35,27 +35,74 @@ import jakarta.annotation.Generated;
 
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-20T18:38:11.857333+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
 @Validated
-@Tag(name = "integration", description = "The Embedded Integration Public API")
-public interface IntegrationApi {
+@Tag(name = "frontend-integration", description = "The Embedded Frontend Integration Public API")
+public interface FrontendIntegrationApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /integrations : Get active integrations
+     * GET /frontend/integrations/{id} : Get an integration by id
+     * Get an integration by id.
+     *
+     * @param id The id of an integration. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The integration object. (status code 200)
+     *         or Access token is missing or invalid (status code 401)
+     */
+    @Operation(
+        operationId = "getFrontendIntegration",
+        summary = "Get an integration by id",
+        description = "Get an integration by id.",
+        tags = { "frontend-integration" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The integration object.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = IntegrationModel.class))
+            }),
+            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+        },
+        security = {
+            @SecurityRequirement(name = "frontendBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/frontend/integrations/{id}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<IntegrationModel> getFrontendIntegration(
+        @Parameter(name = "id", description = "The id of an integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"allowMultipleInstances\" : false, \"icon\" : \"icon\", \"integrationVersion\" : 6, \"description\" : \"description\", \"id\" : 0, \"componentName\" : \"componentName\", \"workflows\" : [ { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" }, { \"description\" : \"description\", \"label\" : \"label\", \"workflowReferenceCode\" : \"workflowReferenceCode\" } ], \"title\" : \"title\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /frontend/integrations : Get active integrations
      * Get active integrations.
      *
-     * @param externalUserId The external user id. (required)
      * @param xEnvironment The environment. (optional)
      * @return The list of active integrations. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
     @Operation(
-        operationId = "getIntegrations",
+        operationId = "getFrontendIntegrations",
         summary = "Get active integrations",
         description = "Get active integrations.",
-        tags = { "integration" },
+        tags = { "frontend-integration" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = IntegrationModel.class)))
@@ -68,12 +115,11 @@ public interface IntegrationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/integrations",
+        value = "/frontend/integrations",
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<IntegrationModel>> getIntegrations(
-        @NotNull @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.QUERY) @Valid @RequestParam(value = "externalUserId", required = true) String externalUserId,
+    default ResponseEntity<List<IntegrationModel>> getFrontendIntegrations(
         @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {
