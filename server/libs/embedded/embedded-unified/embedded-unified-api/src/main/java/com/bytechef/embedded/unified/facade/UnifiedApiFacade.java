@@ -22,7 +22,8 @@ import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
+import com.bytechef.platform.constant.Environment;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -30,20 +31,22 @@ import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 public interface UnifiedApiFacade {
 
     String create(
-        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long instanceId);
+        @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category, @NonNull ModelType modelType,
+        @NonNull Environment environment, Long instanceId);
 
     void delete(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId);
+        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        Long instanceId);
 
     UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId);
+        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        Long instanceId);
 
     CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        CursorPageable cursorPageable, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long instanceId);
+        @NonNull CursorPageable cursorPageable, @NonNull Category category, @NonNull ModelType modelType,
+        @NonNull Environment environment, Long instanceId);
 
     void update(
-        String id, UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        ConnectionEnvironment environment, long instanceId);
+        @NonNull String id, @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category,
+        @NonNull ModelType modelType, @NonNull Environment environment, Long instanceId);
 }

@@ -29,23 +29,30 @@ import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
+import com.bytechef.embedded.connected.user.domain.ConnectedUser;
+import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.unified.exception.CursorPaginationException;
 import com.bytechef.embedded.unified.pagination.CursorPageSlice;
 import com.bytechef.embedded.unified.pagination.CursorPageable;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.constant.Environment;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
@@ -59,16 +66,19 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
     private static final Logger log = LoggerFactory.getLogger(UnifiedApiFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
+    private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ContextFactory contextFactory;
     private final IntegrationInstanceService integrationInstanceService;
 
     @SuppressFBWarnings("EI")
     public UnifiedApiFacadeImpl(
-        ComponentDefinitionService componentDefinitionService, ConnectionService connectionService,
-        ContextFactory contextFactory, IntegrationInstanceService integrationInstanceService) {
+        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
+        ConnectionService connectionService, ContextFactory contextFactory,
+        IntegrationInstanceService integrationInstanceService) {
 
         this.componentDefinitionService = componentDefinitionService;
+        this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.contextFactory = contextFactory;
         this.integrationInstanceService = integrationInstanceService;
@@ -76,10 +86,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public String create(
-        UnifiedInputModel unifiedInputModel, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long instanceId) {
+        @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category, @NonNull ModelType modelType,
+        @NonNull Environment environment, Long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -99,9 +109,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void delete(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId) {
+        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        Long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -116,9 +127,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public UnifiedOutputModel get(
-        String id, Category category, ModelType modelType, ConnectionEnvironment environment, long instanceId) {
+        @NonNull String id, @NonNull Category category, @NonNull ModelType modelType, @NonNull Environment environment,
+        Long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -138,8 +150,8 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public CursorPageSlice<? extends UnifiedOutputModel> getPage(
-        CursorPageable cursorPageable, Category category, ModelType modelType, ConnectionEnvironment environment,
-        long instanceId) {
+        @NonNull CursorPageable cursorPageable, @NonNull Category category, @NonNull ModelType modelType,
+        @NonNull Environment environment, Long instanceId) {
 
         boolean isSorted = StringUtils.hasText(cursorPageable.getSort());
 
@@ -148,7 +160,7 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 //            throw new IllegalArgumentException("Sorting is only allowed on fields: " + sortableFields);
 //        }
 
-        ComponentConnection connection = getComponentConnection(environment, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -221,10 +233,10 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
 
     @Override
     public void update(
-        String id, UnifiedInputModel unifiedInputModel, Category category, ModelType modelType,
-        ConnectionEnvironment environment, long instanceId) {
+        @NonNull String id, @NonNull UnifiedInputModel unifiedInputModel, @NonNull Category category,
+        @NonNull ModelType modelType, @NonNull Environment environment, Long instanceId) {
 
-        ComponentConnection connection = getComponentConnection(environment, instanceId);
+        ComponentConnection connection = getComponentConnection(environment, category, instanceId);
 
         String componentName = connection.getComponentName();
 
@@ -263,14 +275,40 @@ public class UnifiedApiFacadeImpl implements UnifiedApiFacade {
         }
     }
 
-    private ComponentConnection getComponentConnection(ConnectionEnvironment environment, long instanceId) {
+    private ComponentConnection getComponentConnection(
+        Environment environment, Category category, Long instanceId) {
+
+        if (instanceId == null) {
+            List<String> componentNames = componentDefinitionService
+                .getUnifiedApiComponentDefinitions(category)
+                .stream()
+                .map(ComponentDefinition::getName)
+                .toList();
+
+            if (componentNames.isEmpty()) {
+                throw new IllegalArgumentException("No component definitions found for category: " + category);
+            }
+
+            String externalId = SecurityUtils.getCurrentUserLogin()
+                .orElseThrow(() -> new RuntimeException("User not authenticated"));
+
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(environment, externalId);
+
+            IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+                connectedUser.getId(), componentNames, environment);
+
+            instanceId = integrationInstance.getId();
+        }
+
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
 
         long connectionId = integrationInstance.getConnectionId();
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        if (connection.getEnvironment() != environment) {
+        ConnectionEnvironment connectionEnvironment = connection.getEnvironment();
+
+        if (!Objects.equals(connectionEnvironment.name(), environment.name())) {
             throw new IllegalArgumentException("Connection is not valid for the current environment");
         }
 

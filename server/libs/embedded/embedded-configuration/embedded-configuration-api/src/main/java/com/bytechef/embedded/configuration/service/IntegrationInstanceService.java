@@ -29,6 +29,9 @@ public interface IntegrationInstanceService {
     Optional<IntegrationInstance> fetchFirstIntegrationInstance(
         long connectedUserId, String componentName, Environment environment);
 
+    IntegrationInstance getIntegrationInstance(
+        long connectedUserId, List<String> componentNames, Environment environment);
+
     List<IntegrationInstance> getConnectedUserIntegrationInstances(long connectedUserId);
 
     List<IntegrationInstance> getConnectedUserIntegrationInstances(List<Long> connectedUserIds);
@@ -42,4 +45,5 @@ public interface IntegrationInstanceService {
     List<IntegrationInstance> getIntegrationInstances(long integrationInstanceConfigurationId);
 
     void updateEnabled(long id, boolean enable);
+
 }

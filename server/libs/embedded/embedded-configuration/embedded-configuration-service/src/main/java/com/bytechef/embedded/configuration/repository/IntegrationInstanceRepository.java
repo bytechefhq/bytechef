@@ -62,7 +62,21 @@ public interface IntegrationInstanceRepository
         ORDER BY integration_instance.created_date DESC
         LIMIT 1
         """)
-    Optional<IntegrationInstance> findFirstByExternalIdAndComponentNameAndEnvironment(
+    Optional<IntegrationInstance> findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
         @Param("connectedUserId") long connectedUserId, @Param("componentName") String componentName,
+        @Param("environment") int environment);
+
+    @Query("""
+        SELECT DISTINCT integration_instance.* FROM integration_instance
+        JOIN integration_instance_configuration on integration_instance_configuration_id = integration_instance_configuration.id
+        JOIN integration on integration_instance_configuration.integration_id = integration.id
+        WHERE integration.component_name in (:componentNames)
+        AND integration_instance_configuration.environment = :environment
+        AND integration_instance.connected_user_id = :connectedUserId
+        ORDER BY integration_instance.created_date DESC
+        LIMIT 1
+        """)
+    IntegrationInstance findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
+        @Param("connectedUserId") long connectedUserId, @Param("componentNames") List<String> componentNames,
         @Param("environment") int environment);
 }

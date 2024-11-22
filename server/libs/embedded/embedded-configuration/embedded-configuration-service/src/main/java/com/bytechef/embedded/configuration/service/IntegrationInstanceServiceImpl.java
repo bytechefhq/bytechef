@@ -60,8 +60,16 @@ public class IntegrationInstanceServiceImpl implements IntegrationInstanceServic
     public Optional<IntegrationInstance> fetchFirstIntegrationInstance(
         long connectedUserId, String componentName, Environment environment) {
 
-        return integrationInstanceRepository.findFirstByExternalIdAndComponentNameAndEnvironment(
+        return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNameAndEnvironment(
             connectedUserId, componentName, environment.ordinal());
+    }
+
+    @Override
+    public IntegrationInstance getIntegrationInstance(
+        long connectedUserId, List<String> componentNames, Environment environment) {
+
+        return integrationInstanceRepository.findFirstByConnectedUserIdIdAndComponentNamesAndEnvironment(
+            connectedUserId, componentNames, environment.ordinal());
     }
 
     @Override

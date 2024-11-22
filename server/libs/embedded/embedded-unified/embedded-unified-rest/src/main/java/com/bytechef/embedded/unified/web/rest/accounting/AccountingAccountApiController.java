@@ -27,7 +27,7 @@ import com.bytechef.embedded.unified.web.rest.accounting.model.AccountModel;
 import com.bytechef.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
 import com.bytechef.embedded.unified.web.rest.accounting.model.CreatedModel;
 import com.bytechef.embedded.unified.web.rest.accounting.model.ListAccountsPageableParameterModel;
-import com.bytechef.platform.connection.domain.ConnectionEnvironment;
+import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -54,49 +54,49 @@ public class AccountingAccountApiController implements AccountApi {
 
     @Override
     public ResponseEntity<CreatedModel> createAccount(
-        Long xInstanceId, CreateUpdateAccountModel createUpdateAccountModel, String environment) {
+        CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
         return ResponseEntity.ok(
             new CreatedModel(
                 unifiedApiFacade.create(
                     conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class), Category.CRM,
-                    AccountingModelType.ACCOUNT, ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)),
+                    AccountingModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
                     xInstanceId)));
     }
 
     @Override
     public ResponseEntity<AccountModel> getAccount(
-        Long xInstanceId, String accountId, String environment, Boolean includeRawData) {
+        String accountId, Long xInstanceId, String environment, Boolean includeRawData) {
 
         return ResponseEntity.ok(
             conversionService.convert(
                 unifiedApiFacade.get(
                     accountId, Category.CRM, AccountingModelType.ACCOUNT,
-                    ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
+                    Environment.valueOf(StringUtils.upperCase(environment)), xInstanceId),
                 AccountModel.class));
     }
 
     @Override
     public ResponseEntity<CursorPageSlice> listAccounts(
-        Long xConnectionId, String environment, Boolean includeRawData, ListAccountsPageableParameterModel pageable) {
+        Long xInstanceId, String environment, Boolean includeRawData, ListAccountsPageableParameterModel pageable) {
 
         return ResponseEntity.ok(
             unifiedApiFacade
                 .getPage(
                     conversionService.convert(pageable, CursorPageRequest.class), Category.CRM,
-                    AccountingModelType.ACCOUNT, ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)),
-                    xConnectionId)
+                    AccountingModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
+                    xInstanceId)
                 .map(unifiedOutputModel -> conversionService.convert(unifiedOutputModel, AccountModel.class)));
     }
 
     @Override
     public ResponseEntity<Void> updateAccount(
-        Long xConnectionId, String accountId, CreateUpdateAccountModel createUpdateAccountModel, String environment) {
+        String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
         unifiedApiFacade.update(
             accountId, conversionService.convert(createUpdateAccountModel, AccountUnifiedInputModel.class),
-            Category.CRM, AccountingModelType.ACCOUNT,
-            ConnectionEnvironment.valueOf(StringUtils.upperCase(environment)), xConnectionId);
+            Category.CRM, AccountingModelType.ACCOUNT, Environment.valueOf(StringUtils.upperCase(environment)),
+            xInstanceId);
 
         return ResponseEntity.noContent()
             .build();
