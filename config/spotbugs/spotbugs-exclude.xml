@@ -3,6 +3,9 @@
         <Source name="~.*generated.*"/>
     </Match>
     <Match>
+        <Source name="~.*MapperImpl.*"/>
+    </Match>
+    <Match>
         <Bug pattern="EI_EXPOSE_REP"/>
         <Package name="~com\.bytechef\.component.*" />
         <Method name="getDefinition"/>

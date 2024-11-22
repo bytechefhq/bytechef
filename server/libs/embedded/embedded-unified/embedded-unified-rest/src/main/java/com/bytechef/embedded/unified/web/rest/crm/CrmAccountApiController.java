@@ -53,6 +53,7 @@ public class CrmAccountApiController implements AccountApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<CreatedModel> createAccount(
         CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 
@@ -77,6 +78,7 @@ public class CrmAccountApiController implements AccountApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<CursorPageSlice> listAccounts(
         Long xInstanceId, String environment, Boolean includeRawData, ListAccountsPageableParameterModel pageable) {
 
@@ -89,6 +91,7 @@ public class CrmAccountApiController implements AccountApi {
     }
 
     @Override
+    @SuppressFBWarnings("NP")
     public ResponseEntity<Void> updateAccount(
         String accountId, CreateUpdateAccountModel createUpdateAccountModel, Long xInstanceId, String environment) {
 

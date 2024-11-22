@@ -34,10 +34,8 @@ public class WorkflowNodeDescriptionUtils {
             <div class="flex flex-col w-full">%n\
                 <div class="flex flex-col space-y-0.5">%n\
                     <div class="font-semibold">%s</div>%n\
-
                     <div class="text-sm">%s</div>%n\
                 </div>%n\
-
                 %s%n\
             </div>%n\
             """.formatted(componentTile, operationTitle, sb);
@@ -53,7 +51,6 @@ public class WorkflowNodeDescriptionUtils {
                 <div>%n\
                     <div class="font-semibold">%s</div>%n\
                 </div>%n\
-
                 %s%n\
             </div>%n\
             """.formatted(taskDispatcherTitle, ""); // TODO render properties only for the current task dispatcher

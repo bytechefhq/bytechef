@@ -22,6 +22,7 @@ import com.bytechef.embedded.configuration.public_.web.rest.converter.CaseInsens
 import com.bytechef.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.constant.Environment;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.convert.ConversionService;
@@ -39,6 +40,7 @@ public class IntegrationApiController implements IntegrationApi {
     private final ConversionService conversionService;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
+    @SuppressFBWarnings("EI")
     public IntegrationApiController(
         ConversionService conversionService,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade) {

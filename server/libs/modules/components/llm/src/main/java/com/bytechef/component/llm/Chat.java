@@ -23,6 +23,7 @@ import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
@@ -75,6 +76,7 @@ public interface Chat {
         return list;
     }
 
+    @SuppressFBWarnings("NP")
     private static Object returnChatEntity(Integer integer, ChatClient.CallResponseSpec call) {
         return switch (integer) {
             case 1 -> call.entity(new ParameterizedTypeReference<Map<String, Object>>() {});
