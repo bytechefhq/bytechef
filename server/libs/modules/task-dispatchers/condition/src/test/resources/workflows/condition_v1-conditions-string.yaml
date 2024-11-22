@@ -12,10 +12,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "EQUALS"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "EQUALS"
+        value2: "${value2}"
     caseTrue:
     - name: "equalsResult"
       type: "var"
@@ -30,10 +30,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "NOT_EQUALS"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "NOT_EQUALS"
+        value2: "${value2}"
     caseTrue:
     - name: "notEqualsResult"
       type: "var"
@@ -48,10 +48,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "CONTAINS"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "CONTAINS"
+        value2: "${value2}"
     caseTrue:
     - name: "containsResult"
       type: "var"
@@ -66,10 +66,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "NOT_CONTAINS"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "NOT_CONTAINS"
+        value2: "${value2}"
     caseTrue:
     - name: "notContainsResult"
       type: "var"
@@ -84,10 +84,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "STARTS_WITH"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "STARTS_WITH"
+        value2: "${value2}"
     caseTrue:
     - name: "startsWithResult"
       type: "var"
@@ -102,10 +102,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "ENDS_WITH"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "ENDS_WITH"
+        value2: "${value2}"
     caseTrue:
     - name: "endsWithResult"
       type: "var"
@@ -120,10 +120,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "EMPTY"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "EMPTY"
+        value2: "${value2}"
     caseTrue:
     - name: "isEmptyResult"
       type: "var"
@@ -138,10 +138,10 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "REGEX"
-          value2: "${value2}"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "REGEX"
+        value2: "${value2}"
     caseTrue:
     - name: "regexResult"
       type: "var"

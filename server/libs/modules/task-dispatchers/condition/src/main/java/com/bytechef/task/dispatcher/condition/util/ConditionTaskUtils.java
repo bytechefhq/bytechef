@@ -46,13 +46,13 @@ public class ConditionTaskUtils {
                 .parseExpression(MapUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION))
                 .getValue(Boolean.class);
         } else {
-            List<List<Map<String, Map<String, ?>>>> conditions = MapUtils.getList(
+            List<List<Map<String, ?>>> conditions = MapUtils.getList(
                 conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
                 new TypeReference<>() {}, Collections.emptyList());
 
             List<String> conditionExpressions = new ArrayList<>();
 
-            for (List<Map<String, Map<String, ?>>> andConditions : conditions) {
+            for (List<Map<String, ?>> andConditions : conditions) {
                 conditionExpressions.add(String.join(" && ", getConditionExpressions(andConditions)));
             }
 
@@ -64,26 +64,24 @@ public class ConditionTaskUtils {
         return result != null && result;
     }
 
-    private static List<String> getConditionExpressions(List<Map<String, Map<String, ?>>> conditions) {
+    private static List<String> getConditionExpressions(List<Map<String, ?>> conditions) {
         List<String> conditionExpressions = new ArrayList<>();
 
-        for (Map<String, Map<String, ?>> condition : conditions) {
-            for (String operandType : condition.keySet()) {
-                Map<String, ?> conditionParts = MapUtils.getMap(condition, operandType);
+        for (Map<String, ?> condition : conditions) {
+            String operandType = MapUtils.getRequiredString(condition, "type");
 
-                String conditionTemplate = conditionTemplates
-                    .get(operandType)
-                    .get(MapUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.OPERATION));
+            String conditionTemplate = conditionTemplates
+                .get(operandType)
+                .get(MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.OPERATION));
 
-                conditionExpressions.add(
-                    conditionTemplate
-                        .replace(
-                            "${value1}",
-                            MapUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_1))
-                        .replace(
-                            "${value2}",
-                            MapUtils.getRequiredString(conditionParts, ConditionTaskDispatcherConstants.VALUE_2)));
-            }
+            conditionExpressions.add(
+                conditionTemplate
+                    .replace(
+                        "${value1}",
+                        MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.VALUE_1))
+                    .replace(
+                        "${value2}",
+                        MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.VALUE_2)));
         }
 
         return conditionExpressions;

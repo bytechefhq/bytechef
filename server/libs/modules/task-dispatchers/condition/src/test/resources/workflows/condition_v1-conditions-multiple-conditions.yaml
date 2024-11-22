@@ -12,14 +12,14 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "EQUALS"
-          value2: "${value2}"
-    - - string:
-          value1: "aaa"
-          operation: "EQUALS"
-          value2: "aaa"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "EQUALS"
+        value2: "${value2}"
+    - - type: "string"
+        value1: "aaa"
+        operation: "EQUALS"
+        value2: "aaa"
     caseTrue:
     - name: "equalsResult"
       type: "var"
@@ -34,18 +34,18 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "EQUALS"
-          value2: "${value2}"
-      - string:
-          value1: "aaa"
-          operation: "EQUALS"
-          value2: "bbb"
-    - - string:
-          value1: "aaa"
-          operation: "EQUALS"
-          value2: "aaa"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "EQUALS"
+        value2: "${value2}"
+      - type: "string"
+        value1: "aaa"
+        operation: "EQUALS"
+        value2: "bbb"
+    - - type: "string"
+        value1: "aaa"
+        operation: "EQUALS"
+        value2: "aaa"
     caseTrue:
     - name: "equalsResult"
       type: "var"
@@ -60,18 +60,18 @@ tasks:
   type: "condition/v1"
   parameters:
     conditions:
-    - - string:
-          value1: "${value1}"
-          operation: "EQUALS"
-          value2: "${value2}"
-      - string:
-          value1: "aaa"
-          operation: "EQUALS"
-          value2: "bbb"
-    - - string:
-          value1: "aaa"
-          operation: "EQUALS"
-          value2: "ccc"
+    - - type: "string"
+        value1: "${value1}"
+        operation: "EQUALS"
+        value2: "${value2}"
+      - type: "string"
+        value1: "aaa"
+        operation: "EQUALS"
+        value2: "bbb"
+    - - type: "string"
+        value1: "aaa"
+        operation: "EQUALS"
+        value2: "ccc"
     caseTrue:
     - name: "notEqualsResult"
       type: "var"

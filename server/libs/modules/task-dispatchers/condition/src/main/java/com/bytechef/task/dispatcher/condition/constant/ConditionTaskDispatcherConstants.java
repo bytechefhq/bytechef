@@ -34,6 +34,7 @@ public class ConditionTaskDispatcherConstants {
     public static final String NUMBER = "number";
     public static final String CASE_TRUE = "caseTrue";
     public static final String CASE_FALSE = "caseFalse";
+    public static final String TYPE = "type";
 
     public enum Operation {
         EQUALS,
