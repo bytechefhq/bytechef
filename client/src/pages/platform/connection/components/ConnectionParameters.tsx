@@ -57,7 +57,7 @@ const ConnectionParameters = ({
                     existingAuthorizations.map((authorization) => (
                         <Fragment key={authorization.name}>
                             <li className="flex">
-                                <span className="w-1/3  font-medium text-muted-foreground">Authorization:</span>
+                                <span className="w-1/3 font-medium text-muted-foreground">Authorization:</span>
 
                                 <span>{authorization.title}</span>
                             </li>

@@ -321,7 +321,7 @@ const PropertyMentionsInput = forwardRef(
 
                     <ReactQuill
                         className={twMerge(
-                            'h-full w-full bg-white rounded-md',
+                            'h-full w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pl-10',
                             controlType === 'TEXT_AREA' && 'min-h-32',
                             className

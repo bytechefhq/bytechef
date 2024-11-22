@@ -20,7 +20,7 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 <div className="flex flex-1 items-center">
                     <Badge
                         className={twMerge(
-                            'w-20 mr-4 border-transparent',
+                            'mr-4 w-20 border-transparent',
                             apiConnectorEndpoint.httpMethod === 'DELETE' && 'bg-red-400',
                             apiConnectorEndpoint.httpMethod === 'GET' && 'bg-blue-400',
                             apiConnectorEndpoint.httpMethod === 'POST' && 'bg-green-400',

@@ -26,7 +26,7 @@ const IntegrationsSidebar = ({integrationId}: {integrationId: number}) => {
                     .map((curIntegration) => (
                         <div
                             className={twMerge(
-                                'py-3 px-2 flex cursor-pointer items-center justify-between hover:bg-background/50 rounded-lg text-sm',
+                                'flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 text-sm hover:bg-background/50',
                                 curIntegration.id === integrationId && 'bg-background/50'
                             )}
                             key={curIntegration.id}

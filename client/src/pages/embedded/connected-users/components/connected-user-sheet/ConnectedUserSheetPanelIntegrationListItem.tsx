@@ -72,7 +72,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
                                 <div
                                     className={twMerge(
-                                        'text-base font-semibold flex items-center space-x-1',
+                                        'flex items-center space-x-1 text-base font-semibold',
                                         !connectedUserIntegrationInstance.enabled && 'text-muted-foreground'
                                     )}
                                 >
@@ -81,7 +81,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </div>
 
                             <div className="flex gap-4">
-                                <div className="flex  items-center space-x-1 text-xs text-muted-foreground">
+                                <div className="flex items-center space-x-1 text-xs text-muted-foreground">
                                     <CredentialsStatus
                                         enabled={connectedUserIntegrationInstance.credentialStatus === 'VALID'}
                                     />

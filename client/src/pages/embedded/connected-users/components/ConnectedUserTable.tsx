@@ -219,7 +219,7 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
                                             !connectedUsers[row.index].enabled && 'text-muted-foreground',
                                             cell.id.endsWith('actions') && 'flex justify-end',
                                             cell.id.endsWith('enabled') && 'flex justify-center',
-                                            cell.id.endsWith('status') && 'pl-8 '
+                                            cell.id.endsWith('status') && 'pl-8'
                                         )}
                                         key={cell.id}
                                         onClick={(event) => {

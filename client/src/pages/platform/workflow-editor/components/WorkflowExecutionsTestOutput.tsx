@@ -41,7 +41,7 @@ const WorkflowExecutionsTestOutputHeader = ({
                 <span
                     className={twMerge(
                         (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
-                        'font-semibold uppercase text-sm'
+                        'text-sm font-semibold uppercase'
                     )}
                 >
                     {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}
