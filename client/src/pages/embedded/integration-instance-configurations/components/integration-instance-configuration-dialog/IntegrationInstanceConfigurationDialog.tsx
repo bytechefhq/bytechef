@@ -372,8 +372,9 @@ const IntegrationInstanceConfigurationDialog = ({
                     <div
                         className={twMerge(
                             ((activeStepIndex === 1 && !oAuth2Authorization) ||
+                                (activeStepIndex === 1 && oAuth2Authorization && updateIntegrationVersion) ||
                                 (activeStepIndex === 2 && oAuth2Authorization)) &&
-                                'max-h-[600px] overflow-y-auto'
+                                'max-h-integration-instance-configuration-dialog-height overflow-y-auto'
                         )}
                     >
                         {integrationInstanceConfigurationDialogSteps[activeStepIndex].content}

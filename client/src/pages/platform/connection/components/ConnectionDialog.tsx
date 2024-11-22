@@ -398,7 +398,7 @@ const ConnectionDialog = ({
 
                         {errors?.length > 0 && <Errors errors={errors} />}
 
-                        <div className="flex flex-col space-y-4 overflow-y-auto p-6">
+                        <div className="flex max-h-connection-dialog-height flex-col space-y-4 overflow-y-auto p-6">
                             {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                                 <>
                                     {!connection?.id && (
