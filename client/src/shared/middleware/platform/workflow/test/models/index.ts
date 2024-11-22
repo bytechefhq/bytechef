@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-export * from './ComponentDefinitionBasic';
 export * from './DataStreamComponent';
 export * from './ExecutionError';
 export * from './Job';

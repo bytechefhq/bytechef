@@ -27,13 +27,6 @@ import {
     WorkflowTaskToJSON,
     WorkflowTaskToJSONTyped,
 } from './WorkflowTask';
-import type { ComponentDefinitionBasic } from './ComponentDefinitionBasic';
-import {
-    ComponentDefinitionBasicFromJSON,
-    ComponentDefinitionBasicFromJSONTyped,
-    ComponentDefinitionBasicToJSON,
-    ComponentDefinitionBasicToJSONTyped,
-} from './ComponentDefinitionBasic';
 
 /**
  * Adds execution semantics to a task.
@@ -41,12 +34,6 @@ import {
  * @interface TaskExecution
  */
 export interface TaskExecution {
-    /**
-     * 
-     * @type {ComponentDefinitionBasic}
-     * @memberof TaskExecution
-     */
-    component?: ComponentDefinitionBasic;
     /**
      * The created by.
      * @type {string}
@@ -77,6 +64,12 @@ export interface TaskExecution {
      * @memberof TaskExecution
      */
     readonly executionTime?: number;
+    /**
+     * The icon of the task.
+     * @type {string}
+     * @memberof TaskExecution
+     */
+    readonly icon?: string;
     /**
      * The id of a task execution.
      * @type {string}
@@ -174,6 +167,12 @@ export interface TaskExecution {
      */
     readonly taskNumber?: number;
     /**
+     * The title of the task.
+     * @type {string}
+     * @memberof TaskExecution
+     */
+    readonly title?: string;
+    /**
      * The calculated retry delay. i.e. delay * retryAttempts * retryDelayFactor.
      * @type {number}
      * @memberof TaskExecution
@@ -228,12 +227,12 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
-        'component': json['component'] == null ? undefined : ComponentDefinitionBasicFromJSON(json['component']),
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
         'error': json['error'] == null ? undefined : ExecutionErrorFromJSON(json['error']),
         'executionTime': json['executionTime'] == null ? undefined : json['executionTime'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'id': json['id'] == null ? undefined : json['id'],
         'input': json['input'] == null ? undefined : json['input'],
         'jobId': json['jobId'],
@@ -250,6 +249,7 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
         'taskNumber': json['taskNumber'] == null ? undefined : json['taskNumber'],
+        'title': json['title'] == null ? undefined : json['title'],
         'retryDelayMillis': json['retryDelayMillis'] == null ? undefined : json['retryDelayMillis'],
         'workflowTask': json['workflowTask'] == null ? undefined : WorkflowTaskFromJSON(json['workflowTask']),
         'type': json['type'] == null ? undefined : json['type'],
@@ -260,14 +260,13 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
       return TaskExecutionToJSONTyped(json, false);
   }
 
-  export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
+  export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
 
     return {
         
-        'component': ComponentDefinitionBasicToJSON(value['component']),
         'error': ExecutionErrorToJSON(value['error']),
         'workflowTask': WorkflowTaskToJSON(value['workflowTask']),
     };

@@ -27,13 +27,6 @@ import {
     WorkflowTriggerToJSON,
     WorkflowTriggerToJSONTyped,
 } from './WorkflowTrigger';
-import type { ComponentDefinitionBasic } from './ComponentDefinitionBasic';
-import {
-    ComponentDefinitionBasicFromJSON,
-    ComponentDefinitionBasicFromJSONTyped,
-    ComponentDefinitionBasicToJSON,
-    ComponentDefinitionBasicToJSONTyped,
-} from './ComponentDefinitionBasic';
 
 /**
  * Adds execution semantics to a trigger.
@@ -47,12 +40,6 @@ export interface TriggerExecution {
      * @memberof TriggerExecution
      */
     batch?: boolean;
-    /**
-     * 
-     * @type {ComponentDefinitionBasic}
-     * @memberof TriggerExecution
-     */
-    component?: ComponentDefinitionBasic;
     /**
      * The created by.
      * @type {string}
@@ -83,6 +70,12 @@ export interface TriggerExecution {
      * @memberof TriggerExecution
      */
     readonly executionTime?: number;
+    /**
+     * The icon of the trigger.
+     * @type {string}
+     * @memberof TriggerExecution
+     */
+    readonly icon?: string;
     /**
      * The id of a task execution.
      * @type {string}
@@ -168,6 +161,12 @@ export interface TriggerExecution {
      */
     workflowTrigger?: WorkflowTrigger;
     /**
+     * The title of the trigger.
+     * @type {string}
+     * @memberof TriggerExecution
+     */
+    readonly title?: string;
+    /**
      * The type of the task.
      * @type {string}
      * @memberof TriggerExecution
@@ -210,12 +209,12 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'batch': json['batch'] == null ? undefined : json['batch'],
-        'component': json['component'] == null ? undefined : ComponentDefinitionBasicFromJSON(json['component']),
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'endDate': json['endDate'] == null ? undefined : (new Date(json['endDate'])),
         'error': json['error'] == null ? undefined : ExecutionErrorFromJSON(json['error']),
         'executionTime': json['executionTime'] == null ? undefined : json['executionTime'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'id': json['id'] == null ? undefined : json['id'],
         'input': json['input'] == null ? undefined : json['input'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -230,6 +229,7 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'startDate': (new Date(json['startDate'])),
         'status': json['status'],
         'workflowTrigger': json['workflowTrigger'] == null ? undefined : WorkflowTriggerFromJSON(json['workflowTrigger']),
+        'title': json['title'] == null ? undefined : json['title'],
         'type': json['type'] == null ? undefined : json['type'],
     };
 }
@@ -238,7 +238,7 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
       return TriggerExecutionToJSONTyped(json, false);
   }
 
-  export function TriggerExecutionToJSONTyped(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'type'> | null, ignoreDiscriminator: boolean = false): any {
+  export function TriggerExecutionToJSONTyped(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'title'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -246,7 +246,6 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
     return {
         
         'batch': value['batch'],
-        'component': ComponentDefinitionBasicToJSON(value['component']),
         'error': ExecutionErrorToJSON(value['error']),
         'workflowTrigger': WorkflowTriggerToJSON(value['workflowTrigger']),
     };

@@ -58,6 +58,12 @@ export interface IntegrationBasic {
      */
     description?: string;
     /**
+     * The icon.
+     * @type {string}
+     * @memberof IntegrationBasic
+     */
+    icon?: string;
+    /**
      * The id of an integration.
      * @type {number}
      * @memberof IntegrationBasic
@@ -127,6 +133,7 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
+        'icon': json['icon'] == null ? undefined : json['icon'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
@@ -151,6 +158,7 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         'allowMultipleInstances': value['allowMultipleInstances'],
         'componentName': value['componentName'],
         'description': value['description'],
+        'icon': value['icon'],
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
         'name': value['name'],
     };

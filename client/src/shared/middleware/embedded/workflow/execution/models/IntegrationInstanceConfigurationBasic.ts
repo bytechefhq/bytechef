@@ -76,12 +76,6 @@ export interface IntegrationInstanceConfigurationBasic {
      */
     integrationVersion?: number;
     /**
-     * The last execution date.
-     * @type {Date}
-     * @memberof IntegrationInstanceConfigurationBasic
-     */
-    readonly lastExecutionDate?: Date;
-    /**
      * The last modified by.
      * @type {string}
      * @memberof IntegrationInstanceConfigurationBasic
@@ -129,7 +123,6 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
         'id': json['id'] == null ? undefined : json['id'],
         'integrationId': json['integrationId'] == null ? undefined : json['integrationId'],
         'integrationVersion': json['integrationVersion'] == null ? undefined : json['integrationVersion'],
-        'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
@@ -140,7 +133,7 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
       return IntegrationInstanceConfigurationBasicToJSONTyped(json, false);
   }
 
-  export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+  export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

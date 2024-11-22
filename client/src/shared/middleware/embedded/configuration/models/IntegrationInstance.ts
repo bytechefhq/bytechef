@@ -27,6 +27,13 @@ import {
     IntegrationInstanceConfigurationBasicToJSON,
     IntegrationInstanceConfigurationBasicToJSONTyped,
 } from './IntegrationInstanceConfigurationBasic';
+import type { Environment } from './Environment';
+import {
+    EnvironmentFromJSON,
+    EnvironmentFromJSONTyped,
+    EnvironmentToJSON,
+    EnvironmentToJSONTyped,
+} from './Environment';
 
 /**
  * Contains configurations and connections required for the execution of integration workflows for a connected user.
@@ -64,6 +71,12 @@ export interface IntegrationInstance {
      * @memberof IntegrationInstance
      */
     enabled?: boolean;
+    /**
+     * 
+     * @type {Environment}
+     * @memberof IntegrationInstance
+     */
+    environment?: Environment;
     /**
      * The id of an integration instance.
      * @type {number}
@@ -114,6 +127,8 @@ export interface IntegrationInstance {
     version?: number;
 }
 
+
+
 /**
  * Check if a given object implements the IntegrationInstance interface.
  */
@@ -137,6 +152,7 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'environment': json['environment'] == null ? undefined : EnvironmentFromJSON(json['environment']),
         'id': json['id'] == null ? undefined : json['id'],
         'lastExecutionDate': json['lastExecutionDate'] == null ? undefined : (new Date(json['lastExecutionDate'])),
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
@@ -160,6 +176,7 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
     return {
         
         'enabled': value['enabled'],
+        'environment': EnvironmentToJSON(value['environment']),
         'integrationInstanceConfigurationId': value['integrationInstanceConfigurationId'],
         'integrationInstanceConfiguration': IntegrationInstanceConfigurationBasicToJSON(value['integrationInstanceConfiguration']),
         '__version': value['version'],

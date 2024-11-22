@@ -1,7 +1,6 @@
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
-models/ComponentDefinitionBasic.ts
 models/DataStreamComponent.ts
 models/Environment.ts
 models/ExecutionError.ts

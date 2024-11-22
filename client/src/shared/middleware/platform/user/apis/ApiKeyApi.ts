@@ -156,7 +156,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
 
     /**
      * Get API keys.
-     * Get api keys
+     * Get API keys
      */
     async getApiKeysRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiKey>>> {
         const queryParameters: any = {};
@@ -175,7 +175,7 @@ export class ApiKeyApi extends runtime.BaseAPI {
 
     /**
      * Get API keys.
-     * Get api keys
+     * Get API keys
      */
     async getApiKeys(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiKey>> {
         const response = await this.getApiKeysRaw(initOverrides);

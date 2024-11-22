@@ -2,7 +2,6 @@ apis/JobApi.ts
 apis/TriggerExecutionApi.ts
 apis/index.ts
 index.ts
-models/ComponentDefinitionBasic.ts
 models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
