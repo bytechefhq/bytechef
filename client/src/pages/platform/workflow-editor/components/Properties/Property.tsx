@@ -833,6 +833,10 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
 
+    if (hidden) {
+        return <></>;
+    }
+
     return (
         <li
             className={twMerge(
