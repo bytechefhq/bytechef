@@ -39,7 +39,7 @@ const ComponentSelectionInput = ({
                 <>
                     {selectedComponentDefinition?.icon ? (
                         <div className="relative">
-                            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md  px-3">
+                            <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md px-3">
                                 <InlineSVG className="size-4" src={selectedComponentDefinition.icon} />
                             </span>
 

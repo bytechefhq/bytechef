@@ -28,7 +28,7 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
                     <span
                         className={twMerge(
                             (!taskExecutionsCompleted || !triggerExecutionCompleted) && 'text-destructive',
-                            'font-semibold uppercase text-base'
+                            'text-base font-semibold uppercase'
                         )}
                     >
                         {taskExecutionsCompleted && triggerExecutionCompleted ? 'Workflow executed' : 'Workflow failed'}

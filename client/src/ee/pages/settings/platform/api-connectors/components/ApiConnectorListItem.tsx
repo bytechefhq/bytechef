@@ -81,7 +81,7 @@ const ApiConnectorListItem = ({apiConnector}: ApiConnectorItemProps) => {
                                     <TooltipContent>{apiConnector.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <div className="space-x-1 ">
+                                <div className="space-x-1">
                                     <span className="font-semibold">{apiConnector.title}</span>
 
                                     <span>-</span>

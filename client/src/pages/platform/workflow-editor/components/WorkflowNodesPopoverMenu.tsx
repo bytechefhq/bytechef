@@ -112,7 +112,7 @@ const WorkflowNodesPopoverMenu = ({
             <PopoverContent
                 align="start"
                 className={twMerge(
-                    'flex p-0 will-change-auto rounded-lg',
+                    'flex rounded-lg p-0 will-change-auto',
                     actionPanelOpen
                         ? 'w-workflow-nodes-popover-menu-width'
                         : 'w-workflow-nodes-popover-component-menu-width'

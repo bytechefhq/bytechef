@@ -54,7 +54,7 @@ const jobStatusOptions = [
 
 const ProjectLabel = ({project}: {project: Project}) => (
     <div className="flex items-center">
-        <span className="mr-1 ">{project.name}</span>
+        <span className="mr-1">{project.name}</span>
 
         <span className="text-xs text-gray-500">{project?.tags?.map((tag) => tag.name).join(', ')}</span>
     </div>
@@ -391,7 +391,7 @@ export const WorkflowExecutions = () => {
                                     ? projectInstances?.map((projectInstance) => ({
                                           label: (
                                               <span className="flex items-center">
-                                                  <span className="mr-1 ">
+                                                  <span className="mr-1">
                                                       {projectInstance.name} V{projectInstance.projectVersion}
                                                   </span>
 

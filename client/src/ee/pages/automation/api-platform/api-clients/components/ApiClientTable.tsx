@@ -170,7 +170,7 @@ const ApiClientTable = ({apiClients}: ApiClientTableProps) => {
                                     className={twMerge(
                                         'whitespace-nowrap',
                                         cell.id.endsWith('actions') && 'flex justify-end',
-                                        cell.id.endsWith('enabled') && 'flex ml-6'
+                                        cell.id.endsWith('enabled') && 'ml-6 flex'
                                     )}
                                     key={cell.id}
                                     onClick={(event) => {

@@ -600,7 +600,7 @@ const WorkflowNodeDetailsPanel = ({
                             {nodeTabs.map((tab) => (
                                 <Button
                                     className={twMerge(
-                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white text-sm font-medium py-5 text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
+                                        'grow justify-center whitespace-nowrap rounded-none border-0 border-b border-gray-200 bg-white py-5 text-sm font-medium text-gray-500 hover:border-blue-500 hover:text-blue-500 focus:border-blue-500 focus:text-blue-500 focus:outline-none',
                                         activeTab === tab?.name && 'border-blue-500 text-blue-500 hover:text-blue-500'
                                     )}
                                     key={tab.name}
