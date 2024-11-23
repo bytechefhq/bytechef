@@ -34,6 +34,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
+import formatKeysWithDigits from '../../utils/formatKeysWithDigits';
 import replaceSpacesInKeys from '../../utils/replaceSpacesInObjectKeys';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
@@ -197,24 +198,6 @@ const Property = ({
         }
 
         return componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
-    };
-
-    const formatKeysWithDigits = (obj: any) => {
-        const formattedObj = {...obj};
-
-        Object.keys(formattedObj).forEach((key) => {
-            if (key.match(/^\d/)) {
-                formattedObj[`${PATH_DIGIT_PREFIX}${key}`] = formattedObj[key];
-
-                delete formattedObj[key];
-            }
-
-            if (typeof formattedObj[key] === 'object' && formattedObj[key] !== null) {
-                formattedObj[key] = formatKeysWithDigits(formattedObj[key]);
-            }
-        });
-
-        return formattedObj;
     };
 
     const saveInputValue = useDebouncedCallback(() => {
