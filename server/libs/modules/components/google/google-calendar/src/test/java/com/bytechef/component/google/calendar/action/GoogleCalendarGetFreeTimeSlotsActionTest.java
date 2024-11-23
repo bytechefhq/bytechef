@@ -18,6 +18,7 @@ package com.bytechef.component.google.calendar.action;
 
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MIN;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -30,7 +31,9 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,7 +68,11 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
             expectedIntervals
                 .add(new Interval(LocalDateTime.of(2000, 1, 16, 9, 30, 0), LocalDateTime.of(2000, 1, 16, 9, 45, 0)));
             expectedIntervals
-                .add(new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0), LocalDateTime.of(2000, 1, 19, 8, 0, 0)));
+                .add(new Interval(LocalDateTime.of(2000, 1, 16, 10, 45, 0),
+                    LocalDateTime.of(LocalDate.of(2000, 1, 18), LOCAL_TIME_MIN)));
+            expectedIntervals
+                .add(new Interval(LocalDateTime.of(LocalDate.of(2000, 1, 19), LOCAL_TIME_MIN),
+                    LocalDateTime.of(2000, 1, 19, 8, 0, 0)));
             expectedIntervals
                 .add(new Interval(LocalDateTime.of(2000, 1, 20, 7, 0, 0), LocalDateTime.of(2000, 1, 20, 8, 0, 0)));
 
@@ -83,13 +90,32 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
         customEvents
             .add(createCustomEvent(LocalDateTime.of(2000, 1, 16, 9, 45, 0), LocalDateTime.of(2000, 1, 16, 10, 45, 0)));
         customEvents
+            .add(createCustomEvent(LocalDate.of(2000, 1, 18), LocalDate.of(2000, 1, 19)));
+        customEvents
             .add(createCustomEvent(LocalDateTime.of(2000, 1, 19, 8, 0, 0), LocalDateTime.of(2000, 1, 20, 7, 0, 0)));
 
         return customEvents;
     }
 
-    private static CustomEvent createCustomEvent(LocalDateTime startTime, LocalDateTime endTime) {
+    private static CustomEvent createCustomEvent(Temporal startTime, Temporal endTime) {
         return new CustomEvent(null, null, null, null, startTime, endTime, null, null, null, null, null, null, null,
             null, null);
+    }
+
+    @Test
+    void testPerformWhenThereIsNoFreeTime() throws IOException {
+        try (MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic =
+            mockStatic(GoogleCalendarUtils.class)) {
+
+            googleCalendarUtilsMockedStatic
+                .when(() -> GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters))
+                .thenReturn(List.of(
+                    createCustomEvent(LocalDateTime.of(2000, 1, 13, 2, 2, 2), LocalDateTime.of(2000, 1, 21, 9, 0, 0))));
+
+            List<Interval> result = GoogleCalendarGetFreeTimeSlotsAction.perform(mockedParameters, mockedParameters,
+                mock(ActionContext.class));
+
+            assertEquals(List.of(), result);
+        }
     }
 }
