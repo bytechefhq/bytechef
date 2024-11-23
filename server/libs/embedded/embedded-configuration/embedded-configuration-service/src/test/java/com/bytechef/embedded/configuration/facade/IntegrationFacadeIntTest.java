@@ -34,6 +34,8 @@ import com.bytechef.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.embedded.configuration.repository.IntegrationWorkflowRepository;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
@@ -42,6 +44,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -65,6 +68,9 @@ public class IntegrationFacadeIntTest {
     private CategoryRepository categoryRepository;
 
     @Autowired
+    private ComponentDefinitionService componentDefinitionService;
+
+    @Autowired
     private IntegrationFacade integrationFacade;
 
     @Autowired
@@ -81,6 +87,12 @@ public class IntegrationFacadeIntTest {
 
     @Autowired
     private WorkflowCrudRepository workflowRepository;
+
+    @BeforeEach
+    public void beforeEach() {
+        Mockito.when(componentDefinitionService.getComponentDefinition(Mockito.anyString(), Mockito.any()))
+            .thenReturn(new ComponentDefinition("componentName"));
+    }
 
     @AfterEach
     public void afterEach() {

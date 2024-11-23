@@ -169,7 +169,7 @@
     } ],
     "multipleValues" : null,
     "properties" : null,
-    "controlType" : "SELECT"
+    "controlType" : "OBJECT_BUILDER"
   } ],
   "resources" : null,
   "taskProperties" : null,

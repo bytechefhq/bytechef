@@ -109,7 +109,7 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER"
       } ],
-      "controlType" : "SELECT"
+      "controlType" : "OBJECT_BUILDER"
     } ],
     "maxItems" : null,
     "minItems" : null,

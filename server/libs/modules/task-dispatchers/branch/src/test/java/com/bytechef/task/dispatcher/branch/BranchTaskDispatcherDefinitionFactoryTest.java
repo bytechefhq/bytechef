@@ -29,7 +29,7 @@ public class BranchTaskDispatcherDefinitionFactoryTest {
 
     @Test
     public void testGetTaskDispatcherDefinition() {
-        JsonFileAssert.assertEquals("definition/branch_v1.json",
-            new BranchTaskDispatcherDefinitionFactory().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/branch_v1.json", new BranchTaskDispatcherDefinitionFactory().getDefinition());
     }
 }

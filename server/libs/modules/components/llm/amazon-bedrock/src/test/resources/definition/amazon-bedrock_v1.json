@@ -13,6 +13,143 @@
   "resources" : null,
   "version" : 1,
   "title" : "Amazon Bedrock",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "custom",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "accessKey",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Access Key ID",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "secretKey",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Secret Access Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "region",
+        "type" : "STRING",
+        "defaultValue" : "us-east-1",
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "US East (N. Virginia) [us-east-1]",
+          "value" : "us-east-1"
+        }, {
+          "description" : null,
+          "label" : "US West (Oregon) [us-west-2]",
+          "value" : "us-west-2"
+        }, {
+          "description" : null,
+          "label" : "Asia Pacific (Mumbai) [ap-south-1]",
+          "value" : "ap-south-1"
+        }, {
+          "description" : null,
+          "label" : "Asia Pacific (Singapore) [ap-southeast-1]",
+          "value" : "ap-southeast-1"
+        }, {
+          "description" : null,
+          "label" : "Asia Pacific (Sydney) [ap-southeast-2]",
+          "value" : "ap-southeast-2"
+        }, {
+          "description" : null,
+          "label" : "Asia Pacific (Tokyo) [ap-northeast-1]",
+          "value" : "ap-northeast-1"
+        }, {
+          "description" : null,
+          "label" : "Canada (Central) [ca-central-1]",
+          "value" : "ca-central-1"
+        }, {
+          "description" : null,
+          "label" : "Europe (Frankfurt) [eu-central-1]",
+          "value" : "eu-central-1"
+        }, {
+          "description" : null,
+          "label" : "Europe (Ireland) [eu-west-1]",
+          "value" : "eu-west-1"
+        }, {
+          "description" : null,
+          "label" : "Europe (London) [eu-west-2]",
+          "value" : "eu-west-2"
+        }, {
+          "description" : null,
+          "label" : "Europe (Paris) [eu-west-3]",
+          "value" : "eu-west-3"
+        }, {
+          "description" : null,
+          "label" : "South America (São Paulo) [sa-east-1]",
+          "value" : "sa-east-1"
+        } ],
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : null,
+      "type" : "CUSTOM",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -60,6 +197,10 @@
         "description" : null,
         "label" : "anthropic.claude-3-sonnet-20240229-v1:0",
         "value" : "anthropic.claude-3-sonnet-20240229-v1:0"
+      }, {
+        "description" : null,
+        "label" : "anthropic.claude-3-5-sonnet-20241022-v2:0",
+        "value" : "anthropic.claude-3-5-sonnet-20241022-v2:0"
       }, {
         "description" : null,
         "label" : "anthropic.claude-v2",
@@ -347,9 +488,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic3",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -668,9 +809,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Anthropic2",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1130,9 +1271,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Cohere",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1571,9 +1712,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Jurassic2",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1864,9 +2005,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Llama",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2166,148 +2307,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask Titan",
-    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "custom",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "accessKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Access Key ID",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "secretKey",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Secret Access Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "region",
-        "type" : "STRING",
-        "defaultValue" : "us-east-1",
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "US East (N. Virginia) [us-east-1]",
-          "value" : "us-east-1"
-        }, {
-          "description" : null,
-          "label" : "US West (Oregon) [us-west-2]",
-          "value" : "us-west-2"
-        }, {
-          "description" : null,
-          "label" : "Asia Pacific (Mumbai) [ap-south-1]",
-          "value" : "ap-south-1"
-        }, {
-          "description" : null,
-          "label" : "Asia Pacific (Singapore) [ap-southeast-1]",
-          "value" : "ap-southeast-1"
-        }, {
-          "description" : null,
-          "label" : "Asia Pacific (Sydney) [ap-southeast-2]",
-          "value" : "ap-southeast-2"
-        }, {
-          "description" : null,
-          "label" : "Asia Pacific (Tokyo) [ap-northeast-1]",
-          "value" : "ap-northeast-1"
-        }, {
-          "description" : null,
-          "label" : "Canada (Central) [ca-central-1]",
-          "value" : "ca-central-1"
-        }, {
-          "description" : null,
-          "label" : "Europe (Frankfurt) [eu-central-1]",
-          "value" : "eu-central-1"
-        }, {
-          "description" : null,
-          "label" : "Europe (Ireland) [eu-west-1]",
-          "value" : "eu-west-1"
-        }, {
-          "description" : null,
-          "label" : "Europe (London) [eu-west-2]",
-          "value" : "eu-west-2"
-        }, {
-          "description" : null,
-          "label" : "Europe (Paris) [eu-west-3]",
-          "value" : "eu-west-3"
-        }, {
-          "description" : null,
-          "label" : "South America (São Paulo) [sa-east-1]",
-          "value" : "sa-east-1"
-        } ],
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : null,
-      "type" : "CUSTOM",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  }
+  "unifiedApi" : null
 }

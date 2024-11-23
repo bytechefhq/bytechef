@@ -14,10 +14,10 @@ tasks:
       type: "condition/v1"
       parameters:
         conditions:
-        - - number:
-              value1: "${loop_1.item}"
-              operation: "GREATER"
-              value2: 5
+        - - type: "number"
+            value1: "${loop_1.item}"
+            operation: "GREATER"
+            value2: 5
         combineOperation: "ANY"
         caseTrue:
         - name: "loop-break_1"
