@@ -16,7 +16,10 @@
 
 package com.bytechef.platform.ai.service;
 
+import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -31,14 +34,18 @@ public class ChatServiceImpl implements ChatService {
     private final ChatClient chatClient;
 
     public ChatServiceImpl(ChatClient.Builder chatClientBuilder) {
-        this.chatClient = chatClientBuilder.build();
+        this.chatClient = chatClientBuilder
+            // TODO add multiuser, multitenant history
+            .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
+            .build();
     }
 
     @Override
-    public Flux<String> chat(String message) {
+    public Flux<Map<String, ?>> chat(String message) {
         return chatClient.prompt()
             .user(message)
             .stream()
-            .content();
+            .content()
+            .map(content -> Map.of("text", content));
     }
 }

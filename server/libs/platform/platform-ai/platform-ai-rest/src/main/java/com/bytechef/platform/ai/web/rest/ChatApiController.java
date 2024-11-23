@@ -18,10 +18,14 @@ package com.bytechef.platform.ai.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.ai.service.ChatService;
+import java.util.List;
+import java.util.Map;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
@@ -40,10 +44,26 @@ public class ChatApiController {
         this.chatService = chatService;
     }
 
-    @GetMapping("/ai/chat")
-    public Flux<String> chat(
-        @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
+    @PostMapping("/ai/chat")
+    public Flux<Map<String, ?>> chat(@RequestBody Request request) {
+        Content lastContent = request.message.content.getLast();
 
-        return chatService.chat(message);
+        return chatService.chat(lastContent.text);
+    }
+
+    public record Request(Message message) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record Message(
+        List<String> attachments, List<Content> content, String createdAt, String id, Metadata metadata, String role) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record Content(String type, String text) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record Metadata(Map<String, ?> custom) {
     }
 }

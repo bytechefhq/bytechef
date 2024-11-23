@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.ai.service;
 
+import java.util.Map;
 import reactor.core.publisher.Flux;
 
 /**
@@ -23,5 +24,5 @@ import reactor.core.publisher.Flux;
  */
 public interface ChatService {
 
-    Flux<String> chat(String message);
+    Flux<Map<String, ?>> chat(String message);
 }
