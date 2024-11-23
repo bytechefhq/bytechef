@@ -51,8 +51,10 @@ import com.google.api.services.calendar.model.EventDateTime;
 import com.google.api.services.calendar.model.Events;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -83,15 +85,27 @@ class GoogleCalendarUtilsTest {
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testConvertEventDateTimeToLocalDateTime() {
+    void testConvertToTemporalFromEventDateTimeForLocalDateTime() {
         LocalDateTime localDateTime = LocalDateTime.of(2000, 1, 1, 1, 1, 1);
 
         EventDateTime eventDateTime =
             new EventDateTime().setDateTime(new DateTime(convertToDateViaSqlTimestamp(localDateTime)));
 
-        LocalDateTime convertedDateTime = GoogleCalendarUtils.convertEventDateTimeToLocalDateTime(eventDateTime);
+        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime);
 
         assertEquals(localDateTime, convertedDateTime);
+    }
+
+    @Test
+    void testConvertToTemporalFromEventDateTimeForLocalDate() {
+        LocalDate localDate = LocalDate.of(2000, 1, 1);
+
+        EventDateTime eventDateTime =
+            new EventDateTime().setDate(new DateTime("2000-01-01"));
+
+        Temporal convertedDateTime = GoogleCalendarUtils.convertToTemporalFromEventDateTime(eventDateTime);
+
+        assertEquals(localDate, convertedDateTime);
     }
 
     @Test
@@ -263,6 +277,9 @@ class GoogleCalendarUtilsTest {
                 new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 11, 0)))))
             .setEnd(new EventDateTime().setDateTime(
                 new DateTime(convertToDateViaSqlTimestamp(LocalDateTime.of(2024, 9, 5, 12, 0)))));
+        Event e9 = new Event()
+            .setStart(new EventDateTime().setDate(new DateTime("2024-09-04")))
+            .setEnd(new EventDateTime().setDate(new DateTime("2024-09-04")));
 
         when(mockedParameters.getRequiredString(CALENDAR_ID))
             .thenReturn("calendarId");
@@ -293,13 +310,14 @@ class GoogleCalendarUtilsTest {
             when(mockedEventsList.setQ(qArgumentCaptor.capture()))
                 .thenReturn(mockedEventsList);
             when(mockedEventsList.execute())
-                .thenReturn(new Events().setItems(List.of(e1, e2, e3, e4, e5, e6, e7, e8)));
+                .thenReturn(new Events().setItems(List.of(e1, e2, e3, e4, e5, e6, e7, e8, e9)));
 
             List<GoogleCalendarUtils.CustomEvent> result =
                 GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters);
 
             assertEquals(
-                List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4)),
+                List.of(createCustomEvent(e1), createCustomEvent(e2), createCustomEvent(e3), createCustomEvent(e4),
+                    createCustomEvent(e9)),
                 result);
             assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
             assertEquals(10, maxResultsArgumentCaptor.getValue());
