@@ -28,6 +28,7 @@ import com.bytechef.component.google.calendar.action.GoogleCalendarCreateQuickEv
 import com.bytechef.component.google.calendar.action.GoogleCalendarDeleteEventAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarGetEventsAction;
 import com.bytechef.component.google.calendar.action.GoogleCalendarGetFreeTimeSlotsAction;
+import com.bytechef.component.google.calendar.action.GoogleCalendarUpdateEventAction;
 import com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger;
 import com.google.auto.service.AutoService;
 
@@ -52,7 +53,8 @@ public class GoogleCalendarComponentHandler implements ComponentHandler {
             GoogleCalendarCreateQuickEventAction.ACTION_DEFINITION,
             GoogleCalendarDeleteEventAction.ACTION_DEFINITION,
             GoogleCalendarGetEventsAction.ACTION_DEFINITION,
-            GoogleCalendarGetFreeTimeSlotsAction.ACTION_DEFINITION)
+            GoogleCalendarGetFreeTimeSlotsAction.ACTION_DEFINITION,
+            GoogleCalendarUpdateEventAction.ACTION_DEFINITION)
         .triggers(GoogleCalendarEventTrigger.TRIGGER_DEFINITION);
 
     @Override
