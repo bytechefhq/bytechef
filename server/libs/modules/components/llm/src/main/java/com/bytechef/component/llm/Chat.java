@@ -23,16 +23,14 @@ import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.llm.converter.JsonSchemaConverter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.converter.ListOutputConverter;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.convert.support.DefaultConversionService;
 
 /**
  * @author Marko Kriskovic
@@ -51,7 +49,7 @@ public interface Chat {
             .messages(messages)
             .call();
 
-        return returnChatEntity(inputParameters.getInteger(RESPONSE_FORMAT), call);
+        return returnChatEntity(inputParameters, call);
     }
 
     ChatOptions createChatOptions(Parameters inputParameters);
@@ -77,15 +75,17 @@ public interface Chat {
     }
 
     @SuppressFBWarnings("NP")
-    private static Object returnChatEntity(Integer integer, ChatClient.CallResponseSpec call) {
-        return switch (integer) {
-            case 1 -> call.entity(new ParameterizedTypeReference<Map<String, Object>>() {});
-            case 2 -> call.entity(new ListOutputConverter(new DefaultConversionService()));
-            case null, default -> call.chatResponse()
+    private static Object returnChatEntity(Parameters parameters, ChatClient.CallResponseSpec call) {
+        int responseFormat = parameters.getInteger(RESPONSE_FORMAT, 0);
+
+        if (responseFormat == 0) {
+            return Objects.requireNonNull(call.chatResponse())
                 .getResult()
                 .getOutput()
                 .getContent();
-        };
+        } else {
+            return call.entity(new JsonSchemaConverter(parameters.getRequiredString(RESPONSE_SCHEMA)));
+        }
     }
 
     record Message(String content, String role) {

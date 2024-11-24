@@ -43,8 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -54,7 +52,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -270,12 +270,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -293,7 +289,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -571,9 +567,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1146,9 +1142,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Image",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1509,9 +1505,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Text-To-Speech",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1977,11 +1973,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Transcriptions",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

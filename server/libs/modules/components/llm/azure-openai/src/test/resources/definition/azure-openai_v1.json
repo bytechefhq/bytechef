@@ -63,8 +63,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -74,7 +72,9 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -234,12 +234,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "optionsDataSource" : null,
       "controlType" : "SELECT"
@@ -257,7 +253,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -535,9 +531,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1082,9 +1078,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Image",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1550,9 +1546,9 @@
       "controlType" : "NUMBER"
     } ],
     "title" : "Create Transcriptions",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,

@@ -53,8 +53,8 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -325,7 +325,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,

@@ -91,9 +91,9 @@ public class LLMConstants {
     public static final ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
         .label("Response Format")
         .description("In which format do you want the response to be in?")
-        .options(option("Text", 0),
-            option("Object", 1, "JSON response with key-value pairs."),
-            option("List", 2, "JSON response that is a list."))
+        .options(
+            option("Text", 0),
+            option("JSON", 1, "JSON response with key-value pairs."))
         .defaultValue(0)
         .required(false);
 
@@ -269,7 +269,7 @@ public class LLMConstants {
     public static final ModifiableStringProperty RESPONSE_SCHEMA_PROPERTY = string(RESPONSE_SCHEMA)
         .label("Response Schema")
         .description("Define the JSON schema for the response.")
-        .controlType(ControlType.TEXT_AREA)
+        .controlType(ControlType.JSON_SCHEMA_BUILDER)
         .displayCondition("responseFormat != 0")
         .required(false);
 

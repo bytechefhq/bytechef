@@ -353,12 +353,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -376,7 +372,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -674,12 +670,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -697,7 +689,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -972,12 +964,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -995,7 +983,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -1434,12 +1422,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -1457,7 +1441,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -1911,12 +1895,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -1934,7 +1914,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -2172,12 +2152,8 @@
         "value" : 0
       }, {
         "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
+        "label" : "JSON",
         "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
       } ],
       "controlType" : "SELECT",
       "optionsDataSource" : null
@@ -2195,7 +2171,7 @@
       "exampleValue" : null,
       "label" : "Response Schema",
       "placeholder" : null,
-      "controlType" : "TEXT_AREA",
+      "controlType" : "JSON_SCHEMA_BUILDER",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -2311,7 +2287,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

@@ -43,6 +43,7 @@ public interface Property extends BaseProperty {
         EMAIL,
         FILE_ENTRY,
         INTEGER,
+        JSON_SCHEMA_BUILDER,
         MULTI_SELECT,
         NUMBER,
         NULL,
