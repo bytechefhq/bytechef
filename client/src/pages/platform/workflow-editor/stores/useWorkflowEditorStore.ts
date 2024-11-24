@@ -7,6 +7,9 @@ interface WorkflowEditorI {
     showBottomPanel: boolean;
     setShowBottomPanelOpen: (showBottomPanel: boolean) => void;
 
+    showPropertyJsonSchemaBuilder: boolean;
+    setShowPropertyJsonSchemaBuilder: (showPropertyJsonSchemaBuilder: boolean) => void;
+
     showPropertyCodeEditorSheet: boolean;
     setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
 
@@ -30,6 +33,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setShowBottomPanelOpen: (showBottomPanel) =>
                 set(() => ({
                     showBottomPanel,
+                })),
+
+            showPropertyJsonSchemaBuilder: false,
+            setShowPropertyJsonSchemaBuilder: (showPropertyJsonSchemaBuilder) =>
+                set(() => ({
+                    showPropertyJsonSchemaBuilder,
                 })),
 
             showPropertyCodeEditorSheet: false,

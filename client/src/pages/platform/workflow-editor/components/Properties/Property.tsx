@@ -1,3 +1,4 @@
+import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -6,6 +7,7 @@ import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Prop
 import PropertyComboBox from '@/pages/platform/workflow-editor/components/Properties/components/PropertyComboBox';
 import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/Properties/components/PropertyDynamicProperties';
 import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
+import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/Properties/components/PropertyJsonSchemaBuilder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/PropertyMentionsInput';
 import PropertySelect, {
     SelectOptionType,
@@ -113,7 +115,8 @@ const Property = ({
     } = useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {componentDefinitions, workflow} = useWorkflowDataStore();
-    const {showPropertyCodeEditorSheet, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
+    const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
+        useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
     const previousMentionInputValue = usePrevious(mentionInputValue);
@@ -355,6 +358,23 @@ const Property = ({
         );
     };
 
+    const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
+        if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
+            return;
+        }
+
+        saveProperty({
+            currentComponent,
+            includeInMetadata: property.custom,
+            path,
+            setCurrentComponent,
+            type,
+            updateWorkflowNodeParameterMutation,
+            value: JSON.stringify(value),
+            workflowId: workflow.id,
+        });
+    }, 200);
+
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         if (isNumericalInput) {
             const valueTooLow = minValue && parseFloat(numericValue) < minValue;
@@ -505,13 +525,14 @@ const Property = ({
             if (
                 typeof propertyParameterValue === 'string' &&
                 controlType !== 'SELECT' &&
+                controlType !== 'JSON_SCHEMA_BUILDER' &&
                 (propertyParameterValue.includes('${') || type === 'STRING')
             ) {
                 setMentionInput(true);
             }
         }
 
-        if (controlType === 'SELECT' || controlType === 'OBJECT_BUILDER') {
+        if (controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER' || controlType === 'OBJECT_BUILDER') {
             if (
                 propertyParameterValue &&
                 typeof propertyParameterValue === 'string' &&
@@ -633,6 +654,10 @@ const Property = ({
             setInputValue(propertyParameterValue);
         }
 
+        if (!mentionInput && controlType === 'JSON_SCHEMA_BUILDER' && propertyParameterValue !== undefined) {
+            setInputValue(propertyParameterValue);
+        }
+
         if (controlType === 'SELECT' && propertyParameterValue !== undefined) {
             if (propertyParameterValue === null) {
                 setSelectValue('null');
@@ -702,6 +727,10 @@ const Property = ({
             setShowInputTypeSwitchButton(false);
         }
 
+        if (controlType === 'JSON_SCHEMA_BUILDER') {
+            setShowInputTypeSwitchButton(true);
+        }
+
         if (controlType === 'SELECT') {
             setShowInputTypeSwitchButton(true);
         }
@@ -718,7 +747,7 @@ const Property = ({
             !currentNode?.name ||
             !name ||
             !path ||
-            !(showPropertyCodeEditorSheet || showWorkflowCodeEditorSheet)
+            !(showPropertyCodeEditorSheet || showPropertyJsonSchemaBuilder || showWorkflowCodeEditorSheet)
         ) {
             return;
         }
@@ -1070,6 +1099,20 @@ const Property = ({
                             onValueChange={(value) => handleSelectChange(value, name!)}
                             options={options as Array<SelectOptionType>}
                             value={selectValue}
+                        />
+                    )}
+
+                    {!control && controlType === 'JSON_SCHEMA_BUILDER' && (
+                        <PropertyJsonSchemaBuilder
+                            description={description}
+                            error={hasError}
+                            errorMessage={errorMessage}
+                            handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
+                            label={label || name}
+                            leadingIcon={typeIcon}
+                            name={name!}
+                            onChange={(value) => handleJsonSchemaBuilderChange(value)}
+                            schema={inputValue ? JSON.parse(inputValue) : undefined}
                         />
                     )}
 
