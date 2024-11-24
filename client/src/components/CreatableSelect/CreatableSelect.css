@@ -1,23 +1,24 @@
 .react-select__control {
-    @apply border-gray-300 !important;
+    @apply border;
+    @apply border-input !important;
     @apply rounded-md !important;
+    @apply shadow-sm !important;
     @apply sm:text-sm;
-    @apply dark:border-gray-700;
-    @apply dark:text-white;
-    @apply dark:bg-gray-800;
-    @apply dark:hover:border-gray-700 !important;
+    min-height: 36px;
 }
 
 .react-select__control--is-focused {
-    @apply border-transparent !important;
-    @apply ring !important;
-    @apply ring-blue-500 !important;
-    @apply dark:ring-sky-500 !important;
+    @apply outline-none;
+    @apply ring-1;
+    @apply ring-ring;
+    outline-offset: 0;
+}
+
+.react-select__indicator {
+    padding: 7px !important;
 }
 
 .react-select__menu {
-    @apply dark:bg-gray-800;
-    @apply dark:text-white;
     @apply sm:text-sm;
 }
 
