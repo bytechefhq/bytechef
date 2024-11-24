@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 interface PropertyTextAreaProps extends TextareaProps {
     description?: string;
     error: boolean;
+    errorMessage?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
@@ -18,7 +19,21 @@ interface PropertyTextAreaProps extends TextareaProps {
 
 const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
     (
-        {className, description, disabled, error, label, leadingIcon, name, onChange, required, title, value, ...props},
+        {
+            className,
+            description,
+            disabled,
+            error,
+            errorMessage,
+            label,
+            leadingIcon,
+            name,
+            onChange,
+            required,
+            title,
+            value,
+            ...props
+        },
         ref
     ) => (
         <fieldset className="mb-3 w-full">
@@ -77,7 +92,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
 
             {error && (
                 <p className="mt-2 text-sm text-destructive" id={`${name}-error`} role="alert">
-                    This field is required
+                    {errorMessage || 'This field is required.'}
                 </p>
             )}
         </fieldset>

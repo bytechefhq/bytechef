@@ -942,6 +942,7 @@ const Property = ({
                                     <PropertyInput
                                         description={description}
                                         error={hasError}
+                                        errorMessage={errorMessage}
                                         label={label || name}
                                         leadingIcon={typeIcon}
                                         placeholder={placeholder}
@@ -1016,6 +1017,7 @@ const Property = ({
                                 <PropertyTextArea
                                     description={description}
                                     error={hasError}
+                                    errorMessage={errorMessage}
                                     label={label || name}
                                     leadingIcon={typeIcon}
                                     required={required}
@@ -1120,6 +1122,7 @@ const Property = ({
                         <PropertyTextArea
                             description={description}
                             error={hasError}
+                            errorMessage={errorMessage}
                             key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                             label={label || name}
                             leadingIcon={typeIcon}
@@ -1149,6 +1152,8 @@ const Property = ({
                 <PropertyCodeEditor
                     defaultValue={defaultValue}
                     description={description}
+                    error={hasError}
+                    errorMessage={errorMessage}
                     key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
                     label={label || name}
                     language={languageId!}
