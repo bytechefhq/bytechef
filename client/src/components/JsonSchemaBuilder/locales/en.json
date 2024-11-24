@@ -1,0 +1,43 @@
+{
+    "type": "Type",
+    "schemaTypes": {
+        "text": "Text",
+        "integer": "Integer",
+        "decimal": "Decimal",
+        "boolean": "Boolean",
+        "object": "Object",
+        "array": "Array"
+    },
+    "formatOptions": {
+        "date": "Date",
+        "email": "Email",
+        "hostname": "Hostname",
+        "ipv4": "IPv4",
+        "ipv6": "IPv6",
+        "uri": "URI"
+    },
+    "requirement": {
+        "minLength": "Min Length",
+        "maxLength": "Max Length",
+        "minimum": "Minimum",
+        "maximum": "Maximum",
+        "multipleOf": "Multiple of",
+        "required": "Required fields",
+        "minItems": "Min Items",
+        "maxItems": "Max Items",
+        "uniqueItems": "Unique Items"
+    },
+    "description": "Description",
+    "options": "Options",
+    "noOptions": "No options",
+    "pattern": "Pattern",
+    "format": "Format",
+    "title": "Title",
+    "key": "Key",
+    "collapse": "Collapse schema",
+    "extraOptions": "Open extra options menu",
+    "delete": "Delete schema",
+    "add": "Add schema",
+    "extraFields": "Extra fields",
+    "addFields": "Add fields"
+}
