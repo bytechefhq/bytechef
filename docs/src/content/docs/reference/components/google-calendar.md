@@ -309,6 +309,56 @@ Type: ARRAY
 
 
 
+### Update Event
+Updates event in Google Calendar.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Calendar Identifier | STRING | SELECT  |  |
+| Event | STRING | SELECT  |  Event to update.  |
+| Title | STRING | TEXT  |  New title of the event.  |
+| All Day Event? | BOOLEAN | SELECT  |  |
+| Start Date | DATE | DATE  |  New start date of the event.  |
+| End Date | DATE | DATE  |  New end date of the event.  |
+| Start Date Time | DATE_TIME | DATE_TIME  |  New (inclusive) start time of the event. For a recurring event, this is the start time of the first instance.  |
+| End Date Time | DATE_TIME | DATE_TIME  |  New (exclusive) end time of the event. For a recurring event, this is the end time of the first instance.  |
+| Description | STRING | TEXT  |  New description of the event. Can contain HTML.  |
+| Attendees | [STRING\($email)] | ARRAY_BUILDER  |  New attendees of the event.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| DATE_TIME | DATE_TIME  |
+| DATE_TIME | DATE_TIME  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| [{INTEGER\(additionalGuests), STRING\(comment), STRING\(displayName), STRING\(email), STRING\(id), BOOLEAN\(optional), BOOLEAN\(organizer), BOOLEAN\(resource), STRING\(responseStatus), BOOLEAN\(self)}] | ARRAY_BUILDER  |
+| [{STRING\(fileId), STRING\(fileUrl), STRING\(iconLink), STRING\(mimeType), STRING\(title)}] | ARRAY_BUILDER  |
+| {[{STRING\(method), INTEGER\(minutes)}]\(overrides), BOOLEAN\(useDefault)} | OBJECT_BUILDER  |
+
+
+
+
+
+
 <hr />
 
 # Additional instructions
