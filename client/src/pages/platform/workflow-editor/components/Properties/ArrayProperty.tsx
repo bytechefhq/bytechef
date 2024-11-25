@@ -34,10 +34,14 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
     const {additionalProperties, items, name} = property;
 
     const handleAddItemClick = () => {
-        const matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
-
         if (!currentComponent || !name) {
             return;
+        }
+
+        let matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
+
+        if (!matchingItem) {
+            matchingItem = items?.find((item) => item.label === newPropertyType);
         }
 
         const controlType: ControlType = matchingItem
@@ -55,7 +59,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             expressionEnabled: true,
             key: getRandomId(),
             label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
-            name: `${name}__${arrayItems.length.toString()}`,
+            name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
             path: `${path}[${arrayItems.length.toString()}]`,
             type: (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING',
         };
@@ -190,13 +194,19 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                           ] as ControlType)
                         : ('STRING' as ControlType);
 
+                let label = `Item ${index}`;
+
+                if (property.name === 'conditions') {
+                    label = `AND Condition ${index}`;
+                }
+
                 const newSubProperty = {
                     arrayName: name,
                     controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
                     expressionEnabled: true,
-                    label: `Item ${index}`,
+                    label,
                     name: index.toString(),
                     path: subPropertyPath,
                     type: parameterItemType as PropertyType,
@@ -244,14 +254,6 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
             }
         }
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    // set new property type to the first available property type
-    useEffect(() => {
-        if (availablePropertyTypes.length) {
-            setNewPropertyType(availablePropertyTypes[0].value);
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

@@ -126,6 +126,7 @@ const Property = ({
 
     const {
         controlType,
+        custom,
         description,
         hidden,
         label,
@@ -213,7 +214,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            includeInMetadata: property.custom,
+            includeInMetadata: custom,
             path,
             setCurrentComponent,
             type,
@@ -322,7 +323,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            includeInMetadata: property.custom,
+            includeInMetadata: custom,
             path,
             setCurrentComponent,
             type,
@@ -339,7 +340,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            includeInMetadata: property.custom,
+            includeInMetadata: custom,
             path,
             setCurrentComponent,
             type,
@@ -503,7 +504,7 @@ const Property = ({
 
         saveProperty({
             currentComponent,
-            includeInMetadata: property.custom,
+            includeInMetadata: custom,
             path,
             setCurrentComponent,
             type,
@@ -837,7 +838,7 @@ const Property = ({
         ) {
             saveProperty({
                 currentComponent,
-                includeInMetadata: property.custom,
+                includeInMetadata: custom,
                 path,
                 setCurrentComponent,
                 type,
