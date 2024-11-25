@@ -36,6 +36,8 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.SUMMARY;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createCustomEvent;
 import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.createEventDateTime;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.getEvent;
+import static com.bytechef.component.google.calendar.util.GoogleCalendarUtils.updateEvent;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -43,8 +45,6 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventAttendee;
 import java.io.IOException;
@@ -118,15 +118,7 @@ public class GoogleCalendarUpdateEventAction {
     public static CustomEvent perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
-
-        String calendarId = inputParameters.getRequiredString(CALENDAR_ID);
-        String eventId = inputParameters.getRequiredString(EVENT_ID);
-
-        Event currentEvent = calendar
-            .events()
-            .get(calendarId, eventId)
-            .execute();
+        Event event = getEvent(inputParameters, connectionParameters);
 
         List<String> attendees = inputParameters.getList(ATTENDEES, String.class, List.of());
 
@@ -136,11 +128,11 @@ public class GoogleCalendarUpdateEventAction {
                 .map(attendee -> new EventAttendee().setEmail(attendee))
                 .toList();
 
-            List<EventAttendee> existingAttendees = currentEvent.getAttendees();
+            List<EventAttendee> existingAttendees = event.getAttendees();
             if (existingAttendees == null || existingAttendees.isEmpty()) {
-                currentEvent.setAttendees(eventAttendees);
+                event.setAttendees(eventAttendees);
             } else {
-                currentEvent.getAttendees()
+                event.getAttendees()
                     .addAll(eventAttendees);
             }
         }
@@ -148,26 +140,21 @@ public class GoogleCalendarUpdateEventAction {
         String description = inputParameters.getString(DESCRIPTION);
 
         if (description != null) {
-            currentEvent.setDescription(description);
+            event.setDescription(description);
         }
 
         String summary = inputParameters.getString(SUMMARY);
 
         if (summary != null) {
-            currentEvent.setSummary(summary);
+            event.setSummary(summary);
         }
 
         if (inputParameters.getBoolean(ALL_DAY) != null) {
-            currentEvent
+            event
                 .setEnd(createEventDateTime(inputParameters, END))
                 .setStart(createEventDateTime(inputParameters, START));
         }
 
-        Event updatedEvent = calendar
-            .events()
-            .update(calendarId, eventId, currentEvent)
-            .execute();
-
-        return createCustomEvent(updatedEvent);
+        return createCustomEvent(updateEvent(inputParameters, connectionParameters, event));
     }
 }

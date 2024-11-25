@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.ALL_DAY;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.CALENDAR_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.DATE_RANGE;
+import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_ID;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.EVENT_TYPE;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.FROM;
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.LOCAL_TIME_MAX;
@@ -209,6 +210,15 @@ public class GoogleCalendarUtils {
             .toList();
     }
 
+    public static Event getEvent(Parameters inputParameters, Parameters connectionParameters) throws IOException {
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+        return calendar
+            .events()
+            .get(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID))
+            .execute();
+    }
+
     public static List<Option<String>> getEventIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) throws IOException {
@@ -231,6 +241,16 @@ public class GoogleCalendarUtils {
         }
 
         return options;
+    }
+
+    public static Event updateEvent(Parameters inputParameters, Parameters connectionParameters, Event event)
+        throws IOException {
+        Calendar calendar = GoogleServices.getCalendar(connectionParameters);
+
+        return calendar
+            .events()
+            .update(inputParameters.getRequiredString(CALENDAR_ID), inputParameters.getRequiredString(EVENT_ID), event)
+            .execute();
     }
 
     @SuppressFBWarnings("EI")
