@@ -24,7 +24,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class MicrosoftOutlook365Constants {
 
@@ -33,6 +33,7 @@ public class MicrosoftOutlook365Constants {
     public static final String BODY = "body";
     public static final String CATEGORY = "category";
     public static final String CC_RECIPIENTS = "ccRecipients";
+    public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
     public static final String CONTENT_TYPE = "contentType";
     public static final String EMAIL_ADDRESS = "emailAddress";
