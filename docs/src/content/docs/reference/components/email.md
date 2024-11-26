@@ -51,7 +51,7 @@ Send an email to any address.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| From Email | INTEGER | INTEGER  |  From who to send the email.  |
+| From Email | STRING | TEXT  |  From who to send the email.  |
 | To Email | [STRING] | ARRAY_BUILDER  |  Who to send the email to.  |
 | CC Email | [STRING] | ARRAY_BUILDER  |  Who to CC on the email.  |
 | BCC Email | [STRING] | ARRAY_BUILDER  |  Who to BCC on the email.  |
