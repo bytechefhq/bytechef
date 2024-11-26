@@ -73,7 +73,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                         .placeholder("Add AND Condition")
                         .expressionEnabled(false)
                         .items(
-                            object()
+                            object("boolean")
                                 .label("Boolean Expression")
                                 .expressionEnabled(false)
                                 .properties(
@@ -98,7 +98,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .description(
                                             "The boolean value to compare with the first one.")
                                         .defaultValue(false)),
-                            object()
+                            object("dateTime")
                                 .label("Date & Time Expression")
                                 .expressionEnabled(false)
                                 .properties(
@@ -123,7 +123,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .description(
                                             "The date & time value to compare with the first one.")
                                         .defaultValue(null)),
-                            object()
+                            object("number")
                                 .label("Number Expression")
                                 .expressionEnabled(false)
                                 .properties(
@@ -159,7 +159,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .defaultValue(0)
                                         .displayCondition(
                                             "%s != '%s'".formatted(OPERATION, Operation.EMPTY.name()))),
-                            object()
+                            object("string")
                                 .label("String Expression")
                                 .expressionEnabled(false)
                                 .properties(
