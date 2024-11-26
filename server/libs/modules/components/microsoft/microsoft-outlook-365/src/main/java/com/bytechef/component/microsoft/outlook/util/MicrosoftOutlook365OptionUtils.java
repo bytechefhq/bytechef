@@ -18,6 +18,7 @@ package com.bytechef.component.microsoft.outlook.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
@@ -36,6 +37,37 @@ import java.util.Map;
 public class MicrosoftOutlook365OptionUtils {
 
     private MicrosoftOutlook365OptionUtils() {
+    }
+
+    public static List<Option<String>> getCalendarOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/calendars"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map) {
+
+                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
+                }
+            }
+        }
+
+        List<Map<?, ?>> categoriesFromNextPage =
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+
+        for (Map<?, ?> map : categoriesFromNextPage) {
+            options.add(option((String) map.get(NAME), (String) map.get(ID)));
+        }
+
+        return options;
     }
 
     public static List<Option<String>> getCategoryOptions(

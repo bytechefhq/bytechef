@@ -16,12 +16,17 @@
 
 package com.bytechef.component.microsoft.outlook.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 
 /**
  * @author Monika Kušter
@@ -29,24 +34,41 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 public class MicrosoftOutlook365Constants {
 
     public static final String ADDRESS = "address";
+    public static final String ALL_DAY = "allDay";
+    public static final String ATTENDEES = "attendees";
     public static final String BCC_RECIPIENTS = "bccRecipients";
     public static final String BODY = "body";
+    public static final String CALENDAR = "calendar";
     public static final String CATEGORY = "category";
     public static final String CC_RECIPIENTS = "ccRecipients";
     public static final String COMMENT = "comment";
     public static final String CONTENT = "content";
     public static final String CONTENT_TYPE = "contentType";
+    public static final String DATE_RANGE = "dateRange";
+    public static final String DATE_TIME = "dateTime";
+    public static final String END = "end";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String FROM = "from";
+    public static final String I_CAL_UID = "iCalUId";
     public static final String ID = "id";
+    public static final String IS_ONLINE_MEETING = "isOnlineMeeting";
     public static final String NAME = "name";
     public static final String ODATA_NEXT_LINK = "@odata.nextLink";
     public static final String RECIPIENT = "recipient";
+    public static final String REMINDER_MINUTES_BEFORE_START = "reminderMinutesBeforeStart";
     public static final String REPLY_TO = "replyTo";
+    public static final String START = "start";
     public static final String SUBJECT = "subject";
+    public static final String TIME_ZONE = "timeZone";
     public static final String TO = "to";
     public static final String TO_RECIPIENTS = "toRecipients";
     public static final String VALUE = "value";
+
+    public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR)
+        .label("Calendar")
+        .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
+        .required(true);
+
     public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
         .label("Content")
         .description("The content of the item.")
@@ -58,7 +80,21 @@ public class MicrosoftOutlook365Constants {
         .options(
             option("Text", "text"),
             option("Html", "html"))
+        .defaultValue("text")
         .required(false);
+
+    public static final ModifiableObjectProperty CUSTOM_EVENT_OUTPUT_PROPERTY = object()
+        .properties(
+            string(I_CAL_UID),
+            string(ID),
+            string(SUBJECT),
+            dateTime("startTime"),
+            dateTime("endTime"),
+            array(ATTENDEES)
+                .items(string()),
+            bool(IS_ONLINE_MEETING),
+            string("onlineMeetingUrl"),
+            bool(REMINDER_MINUTES_BEFORE_START));
 
     public static final ModifiableObjectProperty MESSAGE_OUTPUT_PROPERTY = object()
         .properties(
