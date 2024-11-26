@@ -76,12 +76,18 @@ public class WorkflowNodeDescriptionUtils {
                 continue;
             }
 
+            String value = String.valueOf(entry.getValue());
+
+            if (value.length() > 100) {
+                value = value.substring(0, 40) + "...";
+            }
+
             sb.append("""
                 <tr>%n\
                     <td class="text-muted-foreground pr-4 pt-0.5 pb-0.5">%s:</td>%n\
                     <td>%s</td>%n\
                 </tr>%n\
-                """.formatted(name, entry.getValue()));
+                """.formatted(name, value));
         }
 
         sb.append("</table>");
