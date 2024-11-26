@@ -11,9 +11,9 @@ springdoc:
 
 info:
   ai:
-    enabled: ${bytechef.ai.enabled}
+    enabled: ${bytechef.ai.enabled:false}
   analytics:
-    enabled: ${bytechef.analytics.enabled}
+    enabled: ${bytechef.analytics.enabled:false}
     postHog:
       apiKey: ${bytechef.analytics.post-hog.api-key}
       host: ${bytechef.analytics.post-hog.host}
@@ -21,12 +21,12 @@ info:
     edition: ${bytechef.edition}
   featureFlags: ${bytechef.featureFlags}
   helpHub:
-    enabled: ${bytechef.helpHub.enabled}
+    enabled: ${bytechef.helpHub.enabled:false}
     commandBar:
       orgId: ${bytechef.helpHub.command-bar.orgId}
   signUp:
     activationRequired: ${bytechef.signUp.activationRequired}
-    enabled: ${bytechef.signUp.enabled}
+    enabled: ${bytechef.signUp.enabled:false}
 
 management:
   endpoints:
