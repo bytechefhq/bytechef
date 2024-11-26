@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.Authorization.USERNAME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.email.constant.EmailConstants.HOST;
 import static com.bytechef.component.email.constant.EmailConstants.PORT;
@@ -69,7 +68,7 @@ public class SendEmailAction {
         .title("Send")
         .description("Send an email to any address.")
         .properties(
-            integer(FROM)
+            string(FROM)
                 .label("From Email")
                 .description("From who to send the email.")
                 .required(true),
