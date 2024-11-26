@@ -323,6 +323,7 @@ const Project = () => {
                                         >
                                             <WorkflowEditorLayout
                                                 componentDefinitions={componentDefinitions}
+                                                leftSidebarOpen={leftSidebarOpen}
                                                 taskDispatcherDefinitions={taskDispatcherDefinitions}
                                                 updateWorkflowMutation={updateWorkflowMutation}
                                             />

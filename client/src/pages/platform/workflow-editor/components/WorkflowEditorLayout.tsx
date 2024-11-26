@@ -19,12 +19,14 @@ import WorkflowEditor from './WorkflowEditor';
 
 export interface WorkflowEditorLayoutProps {
     componentDefinitions: ComponentDefinitionBasic[];
+    leftSidebarOpen: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 const WorkflowEditorLayout = ({
     componentDefinitions,
+    leftSidebarOpen,
     taskDispatcherDefinitions,
     updateWorkflowMutation,
 }: WorkflowEditorLayoutProps) => {
@@ -102,6 +104,7 @@ const WorkflowEditorLayout = ({
         <ReactFlowProvider>
             <WorkflowEditor
                 componentDefinitions={componentDefinitions}
+                leftSidebarOpen={leftSidebarOpen}
                 taskDispatcherDefinitions={taskDispatcherDefinitions}
             />
 

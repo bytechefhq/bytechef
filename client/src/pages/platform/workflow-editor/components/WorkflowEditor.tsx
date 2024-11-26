@@ -1,6 +1,8 @@
+import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
-import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
+import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -14,10 +16,11 @@ import WorkflowNode from '../nodes/WorkflowNode';
 
 export interface WorkflowEditorProps {
     componentDefinitions: ComponentDefinitionBasic[];
+    leftSidebarOpen: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 }
 
-const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: WorkflowEditorProps) => {
+const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDefinitions}: WorkflowEditorProps) => {
     const {edges, nodes, onEdgesChange, onNodesChange, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
@@ -27,10 +30,10 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
             workflow: state.workflow,
         }))
     );
+    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {rightSidebarOpen} = useRightSidebarStore();
 
     const {getEdge, getNode, setViewport} = useReactFlow();
-
-    const containerRef = useRef<HTMLDivElement>(null);
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
 
@@ -152,7 +155,20 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
         }
     };
 
-    useLayout({canvasWidth: window.innerWidth - 120, componentDefinitions, taskDispatcherDefinitions});
+    let canvasWidth = window.innerWidth - 120;
+
+    if (leftSidebarOpen) {
+        canvasWidth -= 384;
+    }
+
+    if (workflowNodeDetailsPanelOpen) {
+        canvasWidth -= 460;
+    }
+    if (rightSidebarOpen) {
+        canvasWidth -= 384;
+    }
+
+    useLayout({canvasWidth, componentDefinitions, taskDispatcherDefinitions});
 
     useEffect(() => {
         setViewport(
@@ -169,7 +185,7 @@ const WorkflowEditor = ({componentDefinitions, taskDispatcherDefinitions}: Workf
     }, [workflow.id]);
 
     return (
-        <div className="flex h-full flex-1 flex-col" ref={containerRef}>
+        <div className="flex h-full flex-1 flex-col">
             <ReactFlow
                 edgeTypes={edgeTypes}
                 edges={edges}

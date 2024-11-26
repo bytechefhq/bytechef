@@ -576,5 +576,5 @@ export default function useLayout({
         setEdges(edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tasks, triggers]);
+    }, [canvasWidth, tasks, triggers]);
 }
