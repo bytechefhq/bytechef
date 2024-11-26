@@ -4,7 +4,14 @@ module.exports = {
     content: ['./src/**/*.{js,ts,jsx,tsx}', './*.html'],
     darkMode: 'class',
     important: true,
-    plugins: [require('@tailwindcss/forms'), require('tailwindcss-animate')],
+    plugins: [
+        require('@tailwindcss/forms'),
+        require('tailwindcss-animate'),
+        require('@assistant-ui/react/tailwindcss')({
+            components: ['thread'],
+            shadcn: true,
+        }),
+    ],
     theme: {
         container: {
             center: 'true',
