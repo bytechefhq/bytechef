@@ -1,3 +1,4 @@
+import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
@@ -368,6 +369,9 @@ const Property = ({
             includeInMetadata: property.custom,
             path,
             setCurrentComponent,
+            successCallback: () => {
+                setInputValue(JSON.stringify(value));
+            },
             type,
             updateWorkflowNodeParameterMutation,
             value: JSON.stringify(value),
@@ -1112,7 +1116,7 @@ const Property = ({
                             leadingIcon={typeIcon}
                             name={name!}
                             onChange={(value) => handleJsonSchemaBuilderChange(value)}
-                            schema={inputValue ? JSON.parse(inputValue) : undefined}
+                            schema={inputValue ? JSON.parse(inputValue) : DEFAULT_SCHEMA}
                         />
                     )}
 

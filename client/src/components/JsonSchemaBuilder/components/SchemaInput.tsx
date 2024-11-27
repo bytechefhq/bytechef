@@ -1,13 +1,6 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import React, {FormEvent, useEffect, useState} from 'react';
-import {useDebouncedCallback} from 'use-debounce';
-
-const handleStringChange = (handler: (value: string) => void) => {
-    return (event: FormEvent<HTMLElement>): void => {
-        handler((event.target as HTMLInputElement).value);
-    };
-};
+import React, {useEffect, useState} from 'react';
 
 const handleEnterPress = (handler: () => void) => {
     return (event: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -32,21 +25,22 @@ const SchemaInput = ({label, onChange, placeholder, type = 'text', value = ''}: 
         setLocalVal(value);
     }, [value]);
 
-    const handleChangeValue = useDebouncedCallback(() => {
+    const onChangeValue = () => {
+        if (localVal === value) {
+            return;
+        }
+
         onChange(localVal);
-    }, 1000);
+    };
 
     return (
         <div className="w-full">
             <Label>{label}</Label>
 
             <Input
-                onBlur={() => handleChangeValue()}
-                onChange={handleStringChange((value) => {
-                    setLocalVal(value);
-                    handleChangeValue();
-                })}
-                onKeyPress={handleEnterPress(() => onChange(localVal))}
+                onBlur={onChangeValue}
+                onChange={(e) => setLocalVal(e.target.value)}
+                onKeyPress={handleEnterPress(onChangeValue)}
                 placeholder={placeholder}
                 type={type}
                 value={localVal}

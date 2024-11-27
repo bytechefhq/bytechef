@@ -1,3 +1,4 @@
+import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
@@ -6,26 +7,30 @@ import {
     DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from '@/components/ui/dialog';
 import {EDITOR_PLACEHOLDER, SPACE} from '@/shared/constants';
+import {getCookie} from '@/shared/util/cookie-utils';
 import Editor from '@monaco-editor/react';
-import {editor} from 'monaco-editor';
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
-import {useEffect, useState} from 'react';
+import {editor} from 'monaco-editor';
+import {useState} from 'react';
 
-const OutputTabSampleDataDialog = ({
-    onClose,
-    onUpload,
-    open,
-    sampleOutput,
-}: {
-    onClose: () => void;
-    onUpload: (value: string) => void;
-    open: boolean;
-    sampleOutput?: object;
-}) => {
-    const [value, setValue] = useState<object | undefined>();
+const fetchGenerateSchema = async (data: string): Promise<Response> => {
+    return await fetch('/api/platform/internal/generate-schema', {
+        body: data,
+        headers: {
+            'Content-Type': 'application/json',
+            'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+        },
+        method: 'POST',
+    }).then((response) => response);
+};
+
+const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newSchema: SchemaRecordType) => void}) => {
+    const [curSchema, setCurSchema] = useState<SchemaRecordType | undefined>();
+    const [open, setOpen] = useState<boolean>(true);
 
     const handleEditorOnChange = (value: string | undefined) => {
         const placeholder = document.querySelector('#monaco-placeholder') as HTMLElement | null;
@@ -38,12 +43,29 @@ const OutputTabSampleDataDialog = ({
 
         if (value != null) {
             try {
-                setValue(JSON.parse(value));
+                setCurSchema(JSON.parse(value));
 
                 /* eslint-disable @typescript-eslint/no-unused-vars */
             } catch (e) {
                 // thrown if value is not valid JSON
             }
+        }
+    };
+
+    const handleOnSubmit = () => {
+        if (curSchema) {
+            fetchGenerateSchema(JSON.stringify(curSchema)).then((response) => {
+                if (response.ok) {
+                    response.json().then((data) => {
+                        if (onChange) {
+                            onChange({...data});
+                        }
+                    });
+
+                    setCurSchema(undefined);
+                    setOpen(false);
+                }
+            });
         }
     };
 
@@ -54,31 +76,30 @@ const OutputTabSampleDataDialog = ({
             return;
         }
 
-        placeholder.style.display = value ? 'none' : 'block';
+        placeholder.style.display = curSchema ? 'none' : 'block';
 
         editor.focus();
     };
 
     const handleOpenChange = (open: boolean) => {
         if (!open) {
-            setValue(sampleOutput);
-            onClose();
+            setCurSchema(undefined);
         }
-    };
 
-    useEffect(() => {
-        setValue(sampleOutput !== undefined && Object.keys(sampleOutput).length ? sampleOutput : undefined);
-    }, [sampleOutput]);
+        setOpen(open);
+    };
 
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
+            <DialogTrigger asChild>
+                <Button variant="outline">Generate</Button>
+            </DialogTrigger>
+
             <DialogContent className="max-w-output-tab-sample-data-dialog-width">
                 <DialogHeader>
-                    <DialogTitle>Upload Sample Output Data</DialogTitle>
+                    <DialogTitle>Sample JSON</DialogTitle>
 
-                    <DialogDescription>
-                        Add sample value in JSON format. Click Upload when you&apos;re done.
-                    </DialogDescription>
+                    <DialogDescription>Generate JSON schema from sample JSON</DialogDescription>
                 </DialogHeader>
 
                 <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">
@@ -88,7 +109,7 @@ const OutputTabSampleDataDialog = ({
                             defaultLanguage="json"
                             onChange={handleEditorOnChange}
                             onMount={handleEditorOnMount}
-                            value={JSON.stringify(value, null, SPACE)}
+                            value={JSON.stringify(curSchema, null, SPACE)}
                         />
 
                         <div
@@ -101,16 +122,8 @@ const OutputTabSampleDataDialog = ({
                 </div>
 
                 <DialogFooter>
-                    <Button
-                        disabled={!value}
-                        onClick={() => {
-                            if (value) {
-                                onUpload(value && JSON.stringify(value));
-                            }
-                        }}
-                        type="submit"
-                    >
-                        Upload
+                    <Button disabled={!curSchema} onClick={handleOnSubmit} type="submit">
+                        Generate
                     </Button>
                 </DialogFooter>
             </DialogContent>
@@ -118,4 +131,4 @@ const OutputTabSampleDataDialog = ({
     );
 };
 
-export default OutputTabSampleDataDialog;
+export default PropertyJsonSchemaBuilderSampleDataDialog;
