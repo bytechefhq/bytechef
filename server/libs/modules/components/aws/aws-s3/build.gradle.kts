@@ -1,5 +1,5 @@
 version="1.0"
 
 dependencies {
-    implementation(libs.software.amazon.awssdk.s3)
+    implementation("software.amazon.awssdk:s3")
 }
