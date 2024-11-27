@@ -1,7 +1,17 @@
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
+import {Button} from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {SPACE} from '@/shared/constants';
 import Editor from '@monaco-editor/react';
 import React from 'react';
 
@@ -32,17 +42,44 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                                     </SheetHeader>
                                 </div>
 
-                                <TabsList>
-                                    <TabsTrigger value="designer">Designer</TabsTrigger>
+                                <div className="flex items-center gap-2">
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline">Generate</Button>
+                                        </DialogTrigger>
 
-                                    <TabsTrigger value="editor">Editor</TabsTrigger>
-                                </TabsList>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Sample JSON</DialogTitle>
+
+                                                <DialogDescription>
+                                                    Generate JSON schema from sample JSON
+                                                </DialogDescription>
+                                            </DialogHeader>
+
+                                            <Editor
+                                                defaultLanguage="json"
+                                                onChange={(value) => {
+                                                    if (value) {
+                                                    }
+                                                }}
+                                                value={JSON.stringify({}, null, SPACE)}
+                                            />
+                                        </DialogContent>
+                                    </Dialog>
+
+                                    <TabsList>
+                                        <TabsTrigger value="designer">Designer</TabsTrigger>
+
+                                        <TabsTrigger value="editor">Editor</TabsTrigger>
+                                    </TabsList>
+                                </div>
                             </div>
                         </div>
                     </SheetHeader>
 
                     <div className="flex-1 overflow-y-auto px-4">
-                        <TabsContent className="" value="designer">
+                        <TabsContent value="designer">
                             <JsonSchemaBuilder locale={locale} onChange={onChange} schema={schema} />
                         </TabsContent>
 
@@ -54,7 +91,7 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                                         onChange(JSON.parse(value));
                                     }
                                 }}
-                                value={JSON.stringify(schema, null, 4)}
+                                value={JSON.stringify(schema, null, SPACE)}
                             />
                         </TabsContent>
                     </div>

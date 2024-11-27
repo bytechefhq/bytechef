@@ -69,11 +69,11 @@ export function WebhookRetryFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function WebhookRetryToJSON(json: any): WebhookRetry {
-      return WebhookRetryToJSONTyped(json, false);
-  }
+export function WebhookRetryToJSON(json: any): WebhookRetry {
+    return WebhookRetryToJSONTyped(json, false);
+}
 
-  export function WebhookRetryToJSONTyped(value?: WebhookRetry | null, ignoreDiscriminator: boolean = false): any {
+export function WebhookRetryToJSONTyped(value?: WebhookRetry | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

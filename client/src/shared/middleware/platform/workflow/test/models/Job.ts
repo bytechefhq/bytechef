@@ -206,11 +206,11 @@ export function JobFromJSONTyped(json: any, ignoreDiscriminator: boolean): Job {
     };
 }
 
-  export function JobToJSON(json: any): Job {
-      return JobToJSONTyped(json, false);
-  }
+export function JobToJSON(json: any): Job {
+    return JobToJSONTyped(json, false);
+}
 
-  export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function JobToJSONTyped(value?: Omit<Job, 'createdBy'|'createdDate'|'currentTask'|'id'|'inputs'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'parentTaskExecutionId'|'priority'|'startDate'|'status'|'webhooks'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

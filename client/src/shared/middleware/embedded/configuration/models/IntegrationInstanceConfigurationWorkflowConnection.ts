@@ -62,11 +62,11 @@ export function IntegrationInstanceConfigurationWorkflowConnectionFromJSONTyped(
     };
 }
 
-  export function IntegrationInstanceConfigurationWorkflowConnectionToJSON(json: any): IntegrationInstanceConfigurationWorkflowConnection {
-      return IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(json, false);
-  }
+export function IntegrationInstanceConfigurationWorkflowConnectionToJSON(json: any): IntegrationInstanceConfigurationWorkflowConnection {
+    return IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(value?: IntegrationInstanceConfigurationWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceConfigurationWorkflowConnectionToJSONTyped(value?: IntegrationInstanceConfigurationWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

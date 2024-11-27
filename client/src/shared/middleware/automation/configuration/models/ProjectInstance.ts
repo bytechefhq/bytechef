@@ -178,11 +178,11 @@ export function ProjectInstanceFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function ProjectInstanceToJSON(json: any): ProjectInstance {
-      return ProjectInstanceToJSONTyped(json, false);
-  }
+export function ProjectInstanceToJSON(json: any): ProjectInstance {
+    return ProjectInstanceToJSONTyped(json, false);
+}
 
-  export function ProjectInstanceToJSONTyped(value?: Omit<ProjectInstance, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectInstanceToJSONTyped(value?: Omit<ProjectInstance, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

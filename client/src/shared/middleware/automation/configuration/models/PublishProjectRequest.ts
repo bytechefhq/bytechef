@@ -48,11 +48,11 @@ export function PublishProjectRequestFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function PublishProjectRequestToJSON(json: any): PublishProjectRequest {
-      return PublishProjectRequestToJSONTyped(json, false);
-  }
+export function PublishProjectRequestToJSON(json: any): PublishProjectRequest {
+    return PublishProjectRequestToJSONTyped(json, false);
+}
 
-  export function PublishProjectRequestToJSONTyped(value?: PublishProjectRequest | null, ignoreDiscriminator: boolean = false): any {
+export function PublishProjectRequestToJSONTyped(value?: PublishProjectRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

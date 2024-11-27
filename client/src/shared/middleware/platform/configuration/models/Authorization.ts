@@ -93,11 +93,11 @@ export function AuthorizationFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function AuthorizationToJSON(json: any): Authorization {
-      return AuthorizationToJSONTyped(json, false);
-  }
+export function AuthorizationToJSON(json: any): Authorization {
+    return AuthorizationToJSONTyped(json, false);
+}
 
-  export function AuthorizationToJSONTyped(value?: Authorization | null, ignoreDiscriminator: boolean = false): any {
+export function AuthorizationToJSONTyped(value?: Authorization | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

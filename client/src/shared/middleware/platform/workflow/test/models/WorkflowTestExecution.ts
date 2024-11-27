@@ -70,11 +70,11 @@ export function WorkflowTestExecutionFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function WorkflowTestExecutionToJSON(json: any): WorkflowTestExecution {
-      return WorkflowTestExecutionToJSONTyped(json, false);
-  }
+export function WorkflowTestExecutionToJSON(json: any): WorkflowTestExecution {
+    return WorkflowTestExecutionToJSONTyped(json, false);
+}
 
-  export function WorkflowTestExecutionToJSONTyped(value?: WorkflowTestExecution | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTestExecutionToJSONTyped(value?: WorkflowTestExecution | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

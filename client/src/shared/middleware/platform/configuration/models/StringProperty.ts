@@ -128,11 +128,11 @@ export function StringPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function StringPropertyToJSON(json: any): StringProperty {
-      return StringPropertyToJSONTyped(json, false);
-  }
+export function StringPropertyToJSON(json: any): StringProperty {
+    return StringPropertyToJSONTyped(json, false);
+}
 
-  export function StringPropertyToJSONTyped(value?: StringProperty | null, ignoreDiscriminator: boolean = false): any {
+export function StringPropertyToJSONTyped(value?: StringProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

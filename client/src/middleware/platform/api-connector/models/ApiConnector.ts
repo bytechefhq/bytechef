@@ -170,11 +170,11 @@ export function ApiConnectorFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function ApiConnectorToJSON(json: any): ApiConnector {
-      return ApiConnectorToJSONTyped(json, false);
-  }
+export function ApiConnectorToJSON(json: any): ApiConnector {
+    return ApiConnectorToJSONTyped(json, false);
+}
 
-  export function ApiConnectorToJSONTyped(value?: Omit<ApiConnector, 'createdBy'|'createdDate'|'definition'|'lastModifiedBy'|'lastModifiedDate'|'specification'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiConnectorToJSONTyped(value?: Omit<ApiConnector, 'createdBy'|'createdDate'|'definition'|'lastModifiedBy'|'lastModifiedDate'|'specification'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

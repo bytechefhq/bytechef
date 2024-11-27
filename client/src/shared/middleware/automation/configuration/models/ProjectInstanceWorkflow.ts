@@ -147,11 +147,11 @@ export function ProjectInstanceWorkflowFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function ProjectInstanceWorkflowToJSON(json: any): ProjectInstanceWorkflow {
-      return ProjectInstanceWorkflowToJSONTyped(json, false);
-  }
+export function ProjectInstanceWorkflowToJSON(json: any): ProjectInstanceWorkflow {
+    return ProjectInstanceWorkflowToJSONTyped(json, false);
+}
 
-  export function ProjectInstanceWorkflowToJSONTyped(value?: Omit<ProjectInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectInstanceWorkflowToJSONTyped(value?: Omit<ProjectInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'workflowReferenceCode'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

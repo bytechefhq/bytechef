@@ -107,11 +107,11 @@ export function DateTimePropertyFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function DateTimePropertyToJSON(json: any): DateTimeProperty {
-      return DateTimePropertyToJSONTyped(json, false);
-  }
+export function DateTimePropertyToJSON(json: any): DateTimeProperty {
+    return DateTimePropertyToJSONTyped(json, false);
+}
 
-  export function DateTimePropertyToJSONTyped(value?: DateTimeProperty | null, ignoreDiscriminator: boolean = false): any {
+export function DateTimePropertyToJSONTyped(value?: DateTimeProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

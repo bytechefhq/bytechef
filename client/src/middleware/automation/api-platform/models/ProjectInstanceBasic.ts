@@ -136,11 +136,11 @@ export function ProjectInstanceBasicFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function ProjectInstanceBasicToJSON(json: any): ProjectInstanceBasic {
-      return ProjectInstanceBasicToJSONTyped(json, false);
-  }
+export function ProjectInstanceBasicToJSON(json: any): ProjectInstanceBasic {
+    return ProjectInstanceBasicToJSONTyped(json, false);
+}
 
-  export function ProjectInstanceBasicToJSONTyped(value?: Omit<ProjectInstanceBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectInstanceBasicToJSONTyped(value?: Omit<ProjectInstanceBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

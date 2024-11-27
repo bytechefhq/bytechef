@@ -55,11 +55,11 @@ export function DataStreamComponentFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function DataStreamComponentToJSON(json: any): DataStreamComponent {
-      return DataStreamComponentToJSONTyped(json, false);
-  }
+export function DataStreamComponentToJSON(json: any): DataStreamComponent {
+    return DataStreamComponentToJSONTyped(json, false);
+}
 
-  export function DataStreamComponentToJSONTyped(value?: DataStreamComponent | null, ignoreDiscriminator: boolean = false): any {
+export function DataStreamComponentToJSONTyped(value?: DataStreamComponent | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

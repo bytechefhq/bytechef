@@ -164,11 +164,11 @@ export function IntegrationInstanceFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function IntegrationInstanceToJSON(json: any): IntegrationInstance {
-      return IntegrationInstanceToJSONTyped(json, false);
-  }
+export function IntegrationInstanceToJSON(json: any): IntegrationInstance {
+    return IntegrationInstanceToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceToJSONTyped(value?: Omit<IntegrationInstance, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'integrationInstanceWorkflows'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

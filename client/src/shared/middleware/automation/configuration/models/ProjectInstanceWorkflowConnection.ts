@@ -65,11 +65,11 @@ export function ProjectInstanceWorkflowConnectionFromJSONTyped(json: any, ignore
     };
 }
 
-  export function ProjectInstanceWorkflowConnectionToJSON(json: any): ProjectInstanceWorkflowConnection {
-      return ProjectInstanceWorkflowConnectionToJSONTyped(json, false);
-  }
+export function ProjectInstanceWorkflowConnectionToJSON(json: any): ProjectInstanceWorkflowConnection {
+    return ProjectInstanceWorkflowConnectionToJSONTyped(json, false);
+}
 
-  export function ProjectInstanceWorkflowConnectionToJSONTyped(value?: ProjectInstanceWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectInstanceWorkflowConnectionToJSONTyped(value?: ProjectInstanceWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

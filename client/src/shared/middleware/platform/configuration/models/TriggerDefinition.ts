@@ -138,11 +138,11 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function TriggerDefinitionToJSON(json: any): TriggerDefinition {
-      return TriggerDefinitionToJSONTyped(json, false);
-  }
+export function TriggerDefinitionToJSON(json: any): TriggerDefinition {
+    return TriggerDefinitionToJSONTyped(json, false);
+}
 
-  export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, ignoreDiscriminator: boolean = false): any {
+export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

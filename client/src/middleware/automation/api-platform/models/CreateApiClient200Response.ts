@@ -48,11 +48,11 @@ export function CreateApiClient200ResponseFromJSONTyped(json: any, ignoreDiscrim
     };
 }
 
-  export function CreateApiClient200ResponseToJSON(json: any): CreateApiClient200Response {
-      return CreateApiClient200ResponseToJSONTyped(json, false);
-  }
+export function CreateApiClient200ResponseToJSON(json: any): CreateApiClient200Response {
+    return CreateApiClient200ResponseToJSONTyped(json, false);
+}
 
-  export function CreateApiClient200ResponseToJSONTyped(value?: CreateApiClient200Response | null, ignoreDiscriminator: boolean = false): any {
+export function CreateApiClient200ResponseToJSONTyped(value?: CreateApiClient200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

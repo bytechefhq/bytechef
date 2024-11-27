@@ -187,11 +187,11 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function ComponentDefinitionToJSON(json: any): ComponentDefinition {
-      return ComponentDefinitionToJSONTyped(json, false);
-  }
+export function ComponentDefinitionToJSON(json: any): ComponentDefinition {
+    return ComponentDefinitionToJSONTyped(json, false);
+}
 
-  export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | null, ignoreDiscriminator: boolean = false): any {
+export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

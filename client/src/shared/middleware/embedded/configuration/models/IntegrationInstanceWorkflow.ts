@@ -107,11 +107,11 @@ export function IntegrationInstanceWorkflowFromJSONTyped(json: any, ignoreDiscri
     };
 }
 
-  export function IntegrationInstanceWorkflowToJSON(json: any): IntegrationInstanceWorkflow {
-      return IntegrationInstanceWorkflowToJSONTyped(json, false);
-  }
+export function IntegrationInstanceWorkflowToJSON(json: any): IntegrationInstanceWorkflow {
+    return IntegrationInstanceWorkflowToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceWorkflowToJSONTyped(value?: Omit<IntegrationInstanceWorkflow, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

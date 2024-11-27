@@ -133,11 +133,11 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
-      return WorkflowExecutionToJSONTyped(json, false);
-  }
+export function WorkflowExecutionToJSON(json: any): WorkflowExecution {
+    return WorkflowExecutionToJSONTyped(json, false);
+}
 
-  export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

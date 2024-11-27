@@ -162,11 +162,11 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
     };
 }
 
-  export function PropertyToJSON(json: any): Property {
-      return PropertyToJSONTyped(json, false);
-  }
+export function PropertyToJSON(json: any): Property {
+    return PropertyToJSONTyped(json, false);
+}
 
-  export function PropertyToJSONTyped(value?: Property | null, ignoreDiscriminator: boolean = false): any {
+export function PropertyToJSONTyped(value?: Property | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

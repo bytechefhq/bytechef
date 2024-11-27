@@ -48,11 +48,11 @@ export function GetWorkflowNodeDescription200ResponseFromJSONTyped(json: any, ig
     };
 }
 
-  export function GetWorkflowNodeDescription200ResponseToJSON(json: any): GetWorkflowNodeDescription200Response {
-      return GetWorkflowNodeDescription200ResponseToJSONTyped(json, false);
-  }
+export function GetWorkflowNodeDescription200ResponseToJSON(json: any): GetWorkflowNodeDescription200Response {
+    return GetWorkflowNodeDescription200ResponseToJSONTyped(json, false);
+}
 
-  export function GetWorkflowNodeDescription200ResponseToJSONTyped(value?: GetWorkflowNodeDescription200Response | null, ignoreDiscriminator: boolean = false): any {
+export function GetWorkflowNodeDescription200ResponseToJSONTyped(value?: GetWorkflowNodeDescription200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

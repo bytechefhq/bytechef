@@ -114,11 +114,11 @@ export function WorkflowNodeOutputFromJSONTyped(json: any, ignoreDiscriminator: 
     };
 }
 
-  export function WorkflowNodeOutputToJSON(json: any): WorkflowNodeOutput {
-      return WorkflowNodeOutputToJSONTyped(json, false);
-  }
+export function WorkflowNodeOutputToJSON(json: any): WorkflowNodeOutput {
+    return WorkflowNodeOutputToJSONTyped(json, false);
+}
 
-  export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowNodeOutputToJSONTyped(value?: WorkflowNodeOutput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

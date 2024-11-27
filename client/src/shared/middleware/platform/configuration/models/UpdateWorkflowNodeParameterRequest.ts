@@ -79,11 +79,11 @@ export function UpdateWorkflowNodeParameterRequestFromJSONTyped(json: any, ignor
     };
 }
 
-  export function UpdateWorkflowNodeParameterRequestToJSON(json: any): UpdateWorkflowNodeParameterRequest {
-      return UpdateWorkflowNodeParameterRequestToJSONTyped(json, false);
-  }
+export function UpdateWorkflowNodeParameterRequestToJSON(json: any): UpdateWorkflowNodeParameterRequest {
+    return UpdateWorkflowNodeParameterRequestToJSONTyped(json, false);
+}
 
-  export function UpdateWorkflowNodeParameterRequestToJSONTyped(value?: UpdateWorkflowNodeParameterRequest | null, ignoreDiscriminator: boolean = false): any {
+export function UpdateWorkflowNodeParameterRequestToJSONTyped(value?: UpdateWorkflowNodeParameterRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -129,11 +129,11 @@ export function TaskDispatcherDefinitionFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function TaskDispatcherDefinitionToJSON(json: any): TaskDispatcherDefinition {
-      return TaskDispatcherDefinitionToJSONTyped(json, false);
-  }
+export function TaskDispatcherDefinitionToJSON(json: any): TaskDispatcherDefinition {
+    return TaskDispatcherDefinitionToJSONTyped(json, false);
+}
 
-  export function TaskDispatcherDefinitionToJSONTyped(value?: TaskDispatcherDefinition | null, ignoreDiscriminator: boolean = false): any {
+export function TaskDispatcherDefinitionToJSONTyped(value?: TaskDispatcherDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

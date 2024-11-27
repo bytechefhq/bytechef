@@ -79,11 +79,11 @@ export function FileEntryPropertyFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function FileEntryPropertyToJSON(json: any): FileEntryProperty {
-      return FileEntryPropertyToJSONTyped(json, false);
-  }
+export function FileEntryPropertyToJSON(json: any): FileEntryProperty {
+    return FileEntryPropertyToJSONTyped(json, false);
+}
 
-  export function FileEntryPropertyToJSONTyped(value?: FileEntryProperty | null, ignoreDiscriminator: boolean = false): any {
+export function FileEntryPropertyToJSONTyped(value?: FileEntryProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

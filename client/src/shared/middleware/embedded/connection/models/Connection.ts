@@ -187,11 +187,11 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function ConnectionToJSON(json: any): Connection {
-      return ConnectionToJSONTyped(json, false);
-  }
+export function ConnectionToJSON(json: any): Connection {
+    return ConnectionToJSONTyped(json, false);
+}
 
-  export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

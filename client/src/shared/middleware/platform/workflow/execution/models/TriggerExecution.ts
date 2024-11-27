@@ -234,11 +234,11 @@ export function TriggerExecutionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function TriggerExecutionToJSON(json: any): TriggerExecution {
-      return TriggerExecutionToJSONTyped(json, false);
-  }
+export function TriggerExecutionToJSON(json: any): TriggerExecution {
+    return TriggerExecutionToJSONTyped(json, false);
+}
 
-  export function TriggerExecutionToJSONTyped(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'title'|'type'> | null, ignoreDiscriminator: boolean = false): any {
+export function TriggerExecutionToJSONTyped(value?: Omit<TriggerExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'priority'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'retryDelayMillis'|'startDate'|'status'|'title'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

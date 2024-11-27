@@ -63,11 +63,11 @@ export function ScriptTestExecutionFromJSONTyped(json: any, ignoreDiscriminator:
     };
 }
 
-  export function ScriptTestExecutionToJSON(json: any): ScriptTestExecution {
-      return ScriptTestExecutionToJSONTyped(json, false);
-  }
+export function ScriptTestExecutionToJSON(json: any): ScriptTestExecution {
+    return ScriptTestExecutionToJSONTyped(json, false);
+}
 
-  export function ScriptTestExecutionToJSONTyped(value?: ScriptTestExecution | null, ignoreDiscriminator: boolean = false): any {
+export function ScriptTestExecutionToJSONTyped(value?: ScriptTestExecution | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

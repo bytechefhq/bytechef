@@ -121,11 +121,11 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function ActionDefinitionToJSON(json: any): ActionDefinition {
-      return ActionDefinitionToJSONTyped(json, false);
-  }
+export function ActionDefinitionToJSON(json: any): ActionDefinition {
+    return ActionDefinitionToJSONTyped(json, false);
+}
 
-  export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ignoreDiscriminator: boolean = false): any {
+export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

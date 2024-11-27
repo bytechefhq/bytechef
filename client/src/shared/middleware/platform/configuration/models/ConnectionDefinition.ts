@@ -114,11 +114,11 @@ export function ConnectionDefinitionFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function ConnectionDefinitionToJSON(json: any): ConnectionDefinition {
-      return ConnectionDefinitionToJSONTyped(json, false);
-  }
+export function ConnectionDefinitionToJSON(json: any): ConnectionDefinition {
+    return ConnectionDefinitionToJSONTyped(json, false);
+}
 
-  export function ConnectionDefinitionToJSONTyped(value?: ConnectionDefinition | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionDefinitionToJSONTyped(value?: ConnectionDefinition | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

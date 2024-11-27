@@ -99,11 +99,11 @@ export function ApiKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean): Ap
     };
 }
 
-  export function ApiKeyToJSON(json: any): ApiKey {
-      return ApiKeyToJSONTyped(json, false);
-  }
+export function ApiKeyToJSON(json: any): ApiKey {
+    return ApiKeyToJSONTyped(json, false);
+}
 
-  export function ApiKeyToJSONTyped(value?: Omit<ApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiKeyToJSONTyped(value?: Omit<ApiKey, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

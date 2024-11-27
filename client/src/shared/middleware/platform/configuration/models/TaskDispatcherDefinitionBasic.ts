@@ -85,11 +85,11 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
     };
 }
 
-  export function TaskDispatcherDefinitionBasicToJSON(json: any): TaskDispatcherDefinitionBasic {
-      return TaskDispatcherDefinitionBasicToJSONTyped(json, false);
-  }
+export function TaskDispatcherDefinitionBasicToJSON(json: any): TaskDispatcherDefinitionBasic {
+    return TaskDispatcherDefinitionBasicToJSONTyped(json, false);
+}
 
-  export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
+export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

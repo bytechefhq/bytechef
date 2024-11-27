@@ -79,11 +79,11 @@ export function DynamicPropertiesPropertyFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function DynamicPropertiesPropertyToJSON(json: any): DynamicPropertiesProperty {
-      return DynamicPropertiesPropertyToJSONTyped(json, false);
-  }
+export function DynamicPropertiesPropertyToJSON(json: any): DynamicPropertiesProperty {
+    return DynamicPropertiesPropertyToJSONTyped(json, false);
+}
 
-  export function DynamicPropertiesPropertyToJSONTyped(value?: DynamicPropertiesProperty | null, ignoreDiscriminator: boolean = false): any {
+export function DynamicPropertiesPropertyToJSONTyped(value?: DynamicPropertiesProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

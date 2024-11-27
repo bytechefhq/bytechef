@@ -48,11 +48,11 @@ export function ResourcesFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function ResourcesToJSON(json: any): Resources {
-      return ResourcesToJSONTyped(json, false);
-  }
+export function ResourcesToJSON(json: any): Resources {
+    return ResourcesToJSONTyped(json, false);
+}
 
-  export function ResourcesToJSONTyped(value?: Resources | null, ignoreDiscriminator: boolean = false): any {
+export function ResourcesToJSONTyped(value?: Resources | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

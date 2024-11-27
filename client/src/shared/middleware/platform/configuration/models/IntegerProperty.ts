@@ -121,11 +121,11 @@ export function IntegerPropertyFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function IntegerPropertyToJSON(json: any): IntegerProperty {
-      return IntegerPropertyToJSONTyped(json, false);
-  }
+export function IntegerPropertyToJSON(json: any): IntegerProperty {
+    return IntegerPropertyToJSONTyped(json, false);
+}
 
-  export function IntegerPropertyToJSONTyped(value?: IntegerProperty | null, ignoreDiscriminator: boolean = false): any {
+export function IntegerPropertyToJSONTyped(value?: IntegerProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

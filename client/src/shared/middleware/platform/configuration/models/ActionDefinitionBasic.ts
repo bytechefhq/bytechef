@@ -78,11 +78,11 @@ export function ActionDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function ActionDefinitionBasicToJSON(json: any): ActionDefinitionBasic {
-      return ActionDefinitionBasicToJSONTyped(json, false);
-  }
+export function ActionDefinitionBasicToJSON(json: any): ActionDefinitionBasic {
+    return ActionDefinitionBasicToJSONTyped(json, false);
+}
 
-  export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
+export function ActionDefinitionBasicToJSONTyped(value?: ActionDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

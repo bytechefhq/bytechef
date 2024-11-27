@@ -93,11 +93,11 @@ export function BooleanPropertyFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function BooleanPropertyToJSON(json: any): BooleanProperty {
-      return BooleanPropertyToJSONTyped(json, false);
-  }
+export function BooleanPropertyToJSON(json: any): BooleanProperty {
+    return BooleanPropertyToJSONTyped(json, false);
+}
 
-  export function BooleanPropertyToJSONTyped(value?: BooleanProperty | null, ignoreDiscriminator: boolean = false): any {
+export function BooleanPropertyToJSONTyped(value?: BooleanProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

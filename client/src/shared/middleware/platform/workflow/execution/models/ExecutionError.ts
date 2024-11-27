@@ -55,11 +55,11 @@ export function ExecutionErrorFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function ExecutionErrorToJSON(json: any): ExecutionError {
-      return ExecutionErrorToJSONTyped(json, false);
-  }
+export function ExecutionErrorToJSON(json: any): ExecutionError {
+    return ExecutionErrorToJSONTyped(json, false);
+}
 
-  export function ExecutionErrorToJSONTyped(value?: ExecutionError | null, ignoreDiscriminator: boolean = false): any {
+export function ExecutionErrorToJSONTyped(value?: ExecutionError | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

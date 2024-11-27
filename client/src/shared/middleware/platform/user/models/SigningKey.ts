@@ -99,11 +99,11 @@ export function SigningKeyFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     };
 }
 
-  export function SigningKeyToJSON(json: any): SigningKey {
-      return SigningKeyToJSONTyped(json, false);
-  }
+export function SigningKeyToJSON(json: any): SigningKey {
+    return SigningKeyToJSONTyped(json, false);
+}
 
-  export function SigningKeyToJSONTyped(value?: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function SigningKeyToJSONTyped(value?: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

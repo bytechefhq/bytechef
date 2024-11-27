@@ -49,11 +49,11 @@ export function TaskDispatcherOperationRequestFromJSONTyped(json: any, ignoreDis
     };
 }
 
-  export function TaskDispatcherOperationRequestToJSON(json: any): TaskDispatcherOperationRequest {
-      return TaskDispatcherOperationRequestToJSONTyped(json, false);
-  }
+export function TaskDispatcherOperationRequestToJSON(json: any): TaskDispatcherOperationRequest {
+    return TaskDispatcherOperationRequestToJSONTyped(json, false);
+}
 
-  export function TaskDispatcherOperationRequestToJSONTyped(value?: TaskDispatcherOperationRequest | null, ignoreDiscriminator: boolean = false): any {
+export function TaskDispatcherOperationRequestToJSONTyped(value?: TaskDispatcherOperationRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

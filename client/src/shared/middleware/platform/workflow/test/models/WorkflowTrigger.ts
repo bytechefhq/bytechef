@@ -107,11 +107,11 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
     };
 }
 
-  export function WorkflowTriggerToJSON(json: any): WorkflowTrigger {
-      return WorkflowTriggerToJSONTyped(json, false);
-  }
+export function WorkflowTriggerToJSON(json: any): WorkflowTrigger {
+    return WorkflowTriggerToJSONTyped(json, false);
+}
 
-  export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

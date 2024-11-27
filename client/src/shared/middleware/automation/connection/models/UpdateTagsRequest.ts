@@ -56,11 +56,11 @@ export function UpdateTagsRequestFromJSONTyped(json: any, ignoreDiscriminator: b
     };
 }
 
-  export function UpdateTagsRequestToJSON(json: any): UpdateTagsRequest {
-      return UpdateTagsRequestToJSONTyped(json, false);
-  }
+export function UpdateTagsRequestToJSON(json: any): UpdateTagsRequest {
+    return UpdateTagsRequestToJSONTyped(json, false);
+}
 
-  export function UpdateTagsRequestToJSONTyped(value?: UpdateTagsRequest | null, ignoreDiscriminator: boolean = false): any {
+export function UpdateTagsRequestToJSONTyped(value?: UpdateTagsRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

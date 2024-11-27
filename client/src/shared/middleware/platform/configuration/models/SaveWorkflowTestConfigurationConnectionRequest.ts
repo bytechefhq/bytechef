@@ -48,11 +48,11 @@ export function SaveWorkflowTestConfigurationConnectionRequestFromJSONTyped(json
     };
 }
 
-  export function SaveWorkflowTestConfigurationConnectionRequestToJSON(json: any): SaveWorkflowTestConfigurationConnectionRequest {
-      return SaveWorkflowTestConfigurationConnectionRequestToJSONTyped(json, false);
-  }
+export function SaveWorkflowTestConfigurationConnectionRequestToJSON(json: any): SaveWorkflowTestConfigurationConnectionRequest {
+    return SaveWorkflowTestConfigurationConnectionRequestToJSONTyped(json, false);
+}
 
-  export function SaveWorkflowTestConfigurationConnectionRequestToJSONTyped(value?: SaveWorkflowTestConfigurationConnectionRequest | null, ignoreDiscriminator: boolean = false): any {
+export function SaveWorkflowTestConfigurationConnectionRequestToJSONTyped(value?: SaveWorkflowTestConfigurationConnectionRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -119,11 +119,11 @@ export function WorkflowExecutionBasicFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function WorkflowExecutionBasicToJSON(json: any): WorkflowExecutionBasic {
-      return WorkflowExecutionBasicToJSONTyped(json, false);
-  }
+export function WorkflowExecutionBasicToJSON(json: any): WorkflowExecutionBasic {
+    return WorkflowExecutionBasicToJSONTyped(json, false);
+}
 
-  export function WorkflowExecutionBasicToJSONTyped(value?: Omit<WorkflowExecutionBasic, 'id'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowExecutionBasicToJSONTyped(value?: Omit<WorkflowExecutionBasic, 'id'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

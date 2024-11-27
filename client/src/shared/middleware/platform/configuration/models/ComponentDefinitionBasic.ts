@@ -92,11 +92,11 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function ComponentDefinitionBasicToJSON(json: any): ComponentDefinitionBasic {
-      return ComponentDefinitionBasicToJSONTyped(json, false);
-  }
+export function ComponentDefinitionBasicToJSON(json: any): ComponentDefinitionBasic {
+    return ComponentDefinitionBasicToJSONTyped(json, false);
+}
 
-  export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
+export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
