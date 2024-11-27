@@ -54,8 +54,9 @@ public class MicrosoftOutlook365DeleteEventAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         actionContext
-            .http(http -> http.delete("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events/"
-                + inputParameters.getRequiredString(EVENT)))
+            .http(http -> http.delete(
+                "/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events/" +
+                    inputParameters.getRequiredString(EVENT)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 

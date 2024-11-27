@@ -115,7 +115,7 @@ public class MicrosoftOutlook365CreateEventAction {
     }
 
     public static CustomEvent perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         boolean allDay = inputParameters.getRequiredBoolean(ALL_DAY);
 
@@ -134,7 +134,8 @@ public class MicrosoftOutlook365CreateEventAction {
             .toList();
 
         Map<String, Object> body =
-            context.http(http -> http.post("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
+            actionContext
+                .http(http -> http.post("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .body(
                     Http.Body.of(
