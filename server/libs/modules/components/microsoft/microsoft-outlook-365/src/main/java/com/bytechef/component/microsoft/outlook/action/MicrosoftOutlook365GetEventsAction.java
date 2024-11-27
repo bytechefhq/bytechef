@@ -27,7 +27,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.CustomEvent;
-import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -46,8 +45,7 @@ public class MicrosoftOutlook365GetEventsAction {
     }
 
     public static List<CustomEvent> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws ParseException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return getCustomEvents(inputParameters, actionContext);
     }

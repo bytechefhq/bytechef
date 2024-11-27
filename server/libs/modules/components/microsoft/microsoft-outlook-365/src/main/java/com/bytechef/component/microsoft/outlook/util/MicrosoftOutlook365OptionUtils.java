@@ -43,132 +43,77 @@ public class MicrosoftOutlook365OptionUtils {
 
     public static List<Option<String>> getCalendarOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, ActionContext actionContext) {
 
-        Map<String, Object> body = context
+        Map<String, Object> body = actionContext
             .http(http -> http.get("/calendars"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-
-                    options.add(option((String) map.get(NAME), (String) map.get(ID)));
-                }
-            }
-        }
-
-        List<Map<?, ?>> categoriesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
-
-        for (Map<?, ?> map : categoriesFromNextPage) {
-            options.add(option((String) map.get(NAME), (String) map.get(ID)));
-        }
-
-        return options;
+        return getOptions(actionContext, body, NAME, ID);
     }
 
     public static List<Option<String>> getCategoryOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, ActionContext actionContext) {
 
-        Map<String, Object> body = context
+        Map<String, Object> body = actionContext
             .http(http -> http.get("/outlook/masterCategories"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Option<String>> options = new ArrayList<>();
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object object : list) {
-                if (object instanceof Map<?, ?> map) {
-                    String displayName = (String) map.get("displayName");
-
-                    options.add(option(displayName, displayName));
-                }
-            }
-        }
-
-        List<Map<?, ?>> categoriesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
-
-        for (Map<?, ?> map : categoriesFromNextPage) {
-            String displayName = (String) map.get("displayName");
-
-            options.add(option(displayName, displayName));
-        }
-
-        return options;
+        return getOptions(actionContext, body, "displayName", "displayName");
     }
 
     public static List<Option<String>> getEventOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
+        String searchText, ActionContext actionContext) {
 
-        Map<String, Object> body = context
+        Map<String, Object> body = actionContext
             .http(http -> http.get("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
+        return getOptions(actionContext, body, SUBJECT, ID);
+    }
+
+    public static List<Option<String>> getMessageIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext actionContext) {
+
+        Map<String, Object> body = actionContext.http(http -> http.get("/messages"))
+            .queryParameters("$top", 100)
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(actionContext, body, ID, ID);
+    }
+
+    private static List<Option<String>> getOptions(
+        ActionContext actionContext, Map<String, Object> body, String label, String value) {
+
         List<Option<String>> options = new ArrayList<>();
 
         if (body.get(VALUE) instanceof List<?> list) {
             for (Object object : list) {
                 if (object instanceof Map<?, ?> map) {
 
-                    options.add(option((String) map.get(SUBJECT), (String) map.get(ID)));
+                    options.add(option((String) map.get(label), (String) map.get(value)));
                 }
             }
         }
 
         List<Map<?, ?>> categoriesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), actionContext);
 
         for (Map<?, ?> map : categoriesFromNextPage) {
-            options.add(option((String) map.get(SUBJECT), (String) map.get(ID)));
+            options.add(option((String) map.get(label), (String) map.get(value)));
         }
 
         return options;
     }
-
-    public static List<Option<String>> getMessageIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, ActionContext context) {
-
-        List<Option<String>> options = new ArrayList<>();
-
-        Map<String, Object> body = context.http(http -> http.get("/messages"))
-            .queryParameters("$top", 100)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        if (body.get(VALUE) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    String id = (String) map.get(ID);
-
-                    options.add(option(id, id));
-                }
-            }
-        }
-
-        List<Map<?, ?>> messagesFromNextPage =
-            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
-
-        for (Map<?, ?> map : messagesFromNextPage) {
-            String id = (String) map.get(ID);
-
-            options.add(option(id, id));
-        }
-
-        return options;
-    }
-
 }
