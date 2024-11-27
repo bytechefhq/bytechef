@@ -6,6 +6,7 @@ import {SchemaRecordType} from './utils/types';
 import './utils/i18n';
 
 import SchemaCreator from '@/components/JsonSchemaBuilder/components/SchemaCreator';
+import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {isEmpty} from '@/components/JsonSchemaBuilder/utils/helpers';
 
 interface JsonSchemaBuilderProps {
@@ -15,16 +16,7 @@ interface JsonSchemaBuilderProps {
 }
 
 const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderProps) => {
-    const [curSchema, setCurSchema] = useState<SchemaRecordType>(
-        !isEmpty(schema)
-            ? {...schema}
-            : {
-                  $schema: 'https://json-schema.org/draft/2020-12/schema#',
-                  properties: {},
-                  required: [],
-                  type: 'object',
-              }
-    );
+    const [curSchema, setCurSchema] = useState<SchemaRecordType>(!isEmpty(schema) ? {...schema} : {...DEFAULT_SCHEMA});
 
     const {i18n, ready} = useTranslation('null', {useSuspense: false});
 

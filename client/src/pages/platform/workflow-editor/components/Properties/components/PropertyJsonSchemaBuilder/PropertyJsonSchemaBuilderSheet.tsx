@@ -1,14 +1,5 @@
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
-import {Button} from '@/components/ui/button';
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/components/ui/dialog';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {SPACE} from '@/shared/constants';
@@ -43,30 +34,9 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                                 </div>
 
                                 <div className="flex items-center gap-2">
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <Button variant="outline">Generate</Button>
-                                        </DialogTrigger>
+                                    {/*TODO Fix refresh doesn't not work properly, backend does not always return correct schema*/}
 
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Sample JSON</DialogTitle>
-
-                                                <DialogDescription>
-                                                    Generate JSON schema from sample JSON
-                                                </DialogDescription>
-                                            </DialogHeader>
-
-                                            <Editor
-                                                defaultLanguage="json"
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                    }
-                                                }}
-                                                value={JSON.stringify({}, null, SPACE)}
-                                            />
-                                        </DialogContent>
-                                    </Dialog>
+                                    {/*<PropertyJsonSchemaBuilderSampleDataDialog onChange={onChange} />*/}
 
                                     <TabsList>
                                         <TabsTrigger value="designer">Designer</TabsTrigger>

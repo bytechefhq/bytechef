@@ -20,6 +20,24 @@ export const VALUE_PROPERTY_CONTROL_TYPES = {
 export const CONDITION_CASE_TRUE = 'caseTrue';
 export const CONDITION_CASE_FALSE = 'caseFalse';
 
+export const EDITOR_PLACEHOLDER = (
+    <>
+        <pre>{'//'}Write sample output value, for example:</pre>
+        <pre>{'{'}</pre>
+        <pre className="pl-4">{'"country": "USA"'}</pre>
+        <pre className="pl-4">{'"people": ['}</pre>
+        <pre className="pl-8">{'{'}</pre>
+        <pre className="pl-12">{'"firstName": Joe'}</pre>
+        <pre className="pl-12">{'"lastName": Jackson'}</pre>
+        <pre className="pl-12">{'"gender": Male'}</pre>
+        <pre className="pl-12">{'"age": 28'}</pre>
+        <pre className="pl-12">{'"number": 7349282382'}</pre>
+        <pre className="pl-8">{'}'}</pre>
+        <pre className="pl-4">{']'}</pre>
+        <pre>{'}'}</pre>
+    </>
+);
+
 export const SPACE = 4;
 
 const STROKE_GRAY_300 = '#D1D5DB';
