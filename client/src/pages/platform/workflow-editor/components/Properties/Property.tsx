@@ -70,7 +70,7 @@ interface PropertyProps {
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
-    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
+    parentArrayItems?: Array<ArrayPropertyType>;
     path?: string;
     property: PropertyAllType;
 }
@@ -852,8 +852,15 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
 
+    // save hidden property to definition on render
     useEffect(() => {
-        if (hidden) {
+        if (
+            hidden &&
+            currentComponent &&
+            path &&
+            updateWorkflowNodeParameterMutation &&
+            resolvePath(currentComponent.parameters, path) !== defaultValue
+        ) {
             saveProperty({
                 currentComponent,
                 path,
