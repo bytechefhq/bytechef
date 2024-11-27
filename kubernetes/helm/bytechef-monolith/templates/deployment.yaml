@@ -39,7 +39,7 @@ spec:
           envFrom:
           {{- if .Values.env.secret }}
           - secretRef:
-              name: {{ include "bytechef-monolith.fullname" . }}-envs
+              name: {{ include "bytechef-monolith.fullname" . }}-secrets
           {{- end }}
           {{- if .Values.env.normal }}
           - configMapRef:
@@ -53,6 +53,8 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
             {{- toYaml .Values.readinessProbe | nindent 12 }}
+          startupProbe:
+            {{- toYaml .Values.startupProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
