@@ -3,7 +3,6 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
-import {getRandomId} from '@/shared/util/random-utils';
 import {PlusIcon} from '@radix-ui/react-icons';
 import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
@@ -63,8 +62,6 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             ...matchingItem,
             controlType,
             custom: true,
-            expressionEnabled: true,
-            key: getRandomId(),
             label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
             name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
             path: `${path}[${arrayItems.length.toString()}]`,
@@ -210,6 +207,12 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 setArrayItems(parameterArrayItems);
             }
         } else if (Array.isArray(parameterValue)) {
+            let subProperty = {};
+
+            if (items?.length === 1 && items[0].type === 'OBJECT') {
+                subProperty = items[0];
+            }
+
             const parameterArrayItems = parameterValue.map((parameterItemValue: ArrayPropertyType, index: number) => {
                 const subPropertyPath = `${path}[${index}]`;
 
@@ -237,11 +240,11 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 }
 
                 const newSubProperty = {
+                    ...subProperty,
                     arrayName: name,
                     controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
-                    expressionEnabled: true,
                     label,
                     name: index.toString(),
                     path: subPropertyPath,
