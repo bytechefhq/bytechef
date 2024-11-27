@@ -70,11 +70,11 @@ export function WorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function WorkflowInputToJSON(json: any): WorkflowInput {
-      return WorkflowInputToJSONTyped(json, false);
-  }
+export function WorkflowInputToJSON(json: any): WorkflowInput {
+    return WorkflowInputToJSONTyped(json, false);
+}
 
-  export function WorkflowInputToJSONTyped(value?: WorkflowInput | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowInputToJSONTyped(value?: WorkflowInput | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -97,11 +97,11 @@ export function WorkflowBasic1FromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function WorkflowBasic1ToJSON(json: any): WorkflowBasic1 {
-      return WorkflowBasic1ToJSONTyped(json, false);
-  }
+export function WorkflowBasic1ToJSON(json: any): WorkflowBasic1 {
+    return WorkflowBasic1ToJSONTyped(json, false);
+}
 
-  export function WorkflowBasic1ToJSONTyped(value?: Omit<WorkflowBasic1, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowBasic1ToJSONTyped(value?: Omit<WorkflowBasic1, 'createdBy'|'createdDate'|'id'|'label'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

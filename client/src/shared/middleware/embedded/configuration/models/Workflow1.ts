@@ -230,11 +230,11 @@ export function Workflow1FromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function Workflow1ToJSON(json: any): Workflow1 {
-      return Workflow1ToJSONTyped(json, false);
-  }
+export function Workflow1ToJSON(json: any): Workflow1 {
+    return Workflow1ToJSONTyped(json, false);
+}
 
-  export function Workflow1ToJSONTyped(value?: Omit<Workflow1, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'> | null, ignoreDiscriminator: boolean = false): any {
+export function Workflow1ToJSONTyped(value?: Omit<Workflow1, 'createdBy'|'createdDate'|'connectionsCount'|'id'|'inputs'|'inputsCount'|'label'|'lastModifiedBy'|'lastModifiedDate'|'outputs'|'maxRetries'|'workflowTaskComponentNames'|'workflowTriggerComponentNames'|'tasks'|'triggers'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

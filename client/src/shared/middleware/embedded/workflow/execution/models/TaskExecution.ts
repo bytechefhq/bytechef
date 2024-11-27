@@ -256,11 +256,11 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function TaskExecutionToJSON(json: any): TaskExecution {
-      return TaskExecutionToJSONTyped(json, false);
-  }
+export function TaskExecutionToJSON(json: any): TaskExecution {
+    return TaskExecutionToJSONTyped(json, false);
+}
 
-  export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
+export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'|'createdDate'|'endDate'|'executionTime'|'icon'|'id'|'input'|'jobId'|'lastModifiedBy'|'lastModifiedDate'|'maxRetries'|'output'|'parentId'|'priority'|'progress'|'retryAttempts'|'retryDelay'|'retryDelayFactor'|'startDate'|'status'|'taskNumber'|'title'|'retryDelayMillis'|'type'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

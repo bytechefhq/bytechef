@@ -48,11 +48,11 @@ export function CreateApiKey200ResponseFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-  export function CreateApiKey200ResponseToJSON(json: any): CreateApiKey200Response {
-      return CreateApiKey200ResponseToJSONTyped(json, false);
-  }
+export function CreateApiKey200ResponseToJSON(json: any): CreateApiKey200Response {
+    return CreateApiKey200ResponseToJSONTyped(json, false);
+}
 
-  export function CreateApiKey200ResponseToJSONTyped(value?: CreateApiKey200Response | null, ignoreDiscriminator: boolean = false): any {
+export function CreateApiKey200ResponseToJSONTyped(value?: CreateApiKey200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

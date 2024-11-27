@@ -153,11 +153,11 @@ export function ApiCollectionEndpointFromJSONTyped(json: any, ignoreDiscriminato
     };
 }
 
-  export function ApiCollectionEndpointToJSON(json: any): ApiCollectionEndpoint {
-      return ApiCollectionEndpointToJSONTyped(json, false);
-  }
+export function ApiCollectionEndpointToJSON(json: any): ApiCollectionEndpoint {
+    return ApiCollectionEndpointToJSONTyped(json, false);
+}
 
-  export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

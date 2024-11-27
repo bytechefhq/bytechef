@@ -156,11 +156,11 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function WorkflowTaskToJSON(json: any): WorkflowTask {
-      return WorkflowTaskToJSONTyped(json, false);
-  }
+export function WorkflowTaskToJSON(json: any): WorkflowTask {
+    return WorkflowTaskToJSONTyped(json, false);
+}
 
-  export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTaskToJSONTyped(value?: Omit<WorkflowTask, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

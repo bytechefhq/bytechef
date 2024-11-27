@@ -105,11 +105,11 @@ export function WorkflowTestConfigurationFromJSONTyped(json: any, ignoreDiscrimi
     };
 }
 
-  export function WorkflowTestConfigurationToJSON(json: any): WorkflowTestConfiguration {
-      return WorkflowTestConfigurationToJSONTyped(json, false);
-  }
+export function WorkflowTestConfigurationToJSON(json: any): WorkflowTestConfiguration {
+    return WorkflowTestConfigurationToJSONTyped(json, false);
+}
 
-  export function WorkflowTestConfigurationToJSONTyped(value?: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTestConfigurationToJSONTyped(value?: Omit<WorkflowTestConfiguration, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'workflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

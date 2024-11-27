@@ -129,11 +129,11 @@ export function ApiConnectorEndpointFromJSONTyped(json: any, ignoreDiscriminator
     };
 }
 
-  export function ApiConnectorEndpointToJSON(json: any): ApiConnectorEndpoint {
-      return ApiConnectorEndpointToJSONTyped(json, false);
-  }
+export function ApiConnectorEndpointToJSON(json: any): ApiConnectorEndpoint {
+    return ApiConnectorEndpointToJSONTyped(json, false);
+}
 
-  export function ApiConnectorEndpointToJSONTyped(value?: Omit<ApiConnectorEndpoint, 'createdBy'|'createdDate'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiConnectorEndpointToJSONTyped(value?: Omit<ApiConnectorEndpoint, 'createdBy'|'createdDate'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

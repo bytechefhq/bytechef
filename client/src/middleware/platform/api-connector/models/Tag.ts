@@ -91,11 +91,11 @@ export function TagFromJSONTyped(json: any, ignoreDiscriminator: boolean): Tag {
     };
 }
 
-  export function TagToJSON(json: any): Tag {
-      return TagToJSONTyped(json, false);
-  }
+export function TagToJSON(json: any): Tag {
+    return TagToJSONTyped(json, false);
+}
 
-  export function TagToJSONTyped(value?: Omit<Tag, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function TagToJSONTyped(value?: Omit<Tag, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

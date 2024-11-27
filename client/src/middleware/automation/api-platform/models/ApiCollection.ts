@@ -201,11 +201,11 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ApiCollectionToJSON(json: any): ApiCollection {
-      return ApiCollectionToJSONTyped(json, false);
-  }
+export function ApiCollectionToJSON(json: any): ApiCollection {
+    return ApiCollectionToJSONTyped(json, false);
+}
 
-  export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceId'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

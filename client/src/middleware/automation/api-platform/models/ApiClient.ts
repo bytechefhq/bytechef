@@ -99,11 +99,11 @@ export function ApiClientFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function ApiClientToJSON(json: any): ApiClient {
-      return ApiClientToJSONTyped(json, false);
-  }
+export function ApiClientToJSON(json: any): ApiClient {
+    return ApiClientToJSONTyped(json, false);
+}
 
-  export function ApiClientToJSONTyped(value?: Omit<ApiClient, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiClientToJSONTyped(value?: Omit<ApiClient, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

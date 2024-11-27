@@ -48,11 +48,11 @@ export function CreateIntegrationInstanceConfigurationWorkflowJob200ResponseFrom
     };
 }
 
-  export function CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON(json: any): CreateIntegrationInstanceConfigurationWorkflowJob200Response {
-      return CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSONTyped(json, false);
-  }
+export function CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSON(json: any): CreateIntegrationInstanceConfigurationWorkflowJob200Response {
+    return CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSONTyped(json, false);
+}
 
-  export function CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSONTyped(value?: CreateIntegrationInstanceConfigurationWorkflowJob200Response | null, ignoreDiscriminator: boolean = false): any {
+export function CreateIntegrationInstanceConfigurationWorkflowJob200ResponseToJSONTyped(value?: CreateIntegrationInstanceConfigurationWorkflowJob200Response | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

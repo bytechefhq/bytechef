@@ -186,11 +186,11 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
     };
 }
 
-  export function IntegrationToJSON(json: any): Integration {
-      return IntegrationToJSONTyped(json, false);
-  }
+export function IntegrationToJSON(json: any): Integration {
+    return IntegrationToJSONTyped(json, false);
+}
 
-  export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

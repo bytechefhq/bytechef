@@ -142,11 +142,11 @@ export function ArrayPropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ArrayPropertyToJSON(json: any): ArrayProperty {
-      return ArrayPropertyToJSONTyped(json, false);
-  }
+export function ArrayPropertyToJSON(json: any): ArrayProperty {
+    return ArrayPropertyToJSONTyped(json, false);
+}
 
-  export function ArrayPropertyToJSONTyped(value?: ArrayProperty | null, ignoreDiscriminator: boolean = false): any {
+export function ArrayPropertyToJSONTyped(value?: ArrayProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

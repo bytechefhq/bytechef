@@ -129,11 +129,11 @@ export function IntegrationInstanceConfigurationBasicFromJSONTyped(json: any, ig
     };
 }
 
-  export function IntegrationInstanceConfigurationBasicToJSON(json: any): IntegrationInstanceConfigurationBasic {
-      return IntegrationInstanceConfigurationBasicToJSONTyped(json, false);
-  }
+export function IntegrationInstanceConfigurationBasicToJSON(json: any): IntegrationInstanceConfigurationBasic {
+    return IntegrationInstanceConfigurationBasicToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceConfigurationBasicToJSONTyped(value?: Omit<IntegrationInstanceConfigurationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

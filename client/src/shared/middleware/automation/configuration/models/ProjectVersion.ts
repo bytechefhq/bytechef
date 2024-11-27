@@ -79,11 +79,11 @@ export function ProjectVersionFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function ProjectVersionToJSON(json: any): ProjectVersion {
-      return ProjectVersionToJSONTyped(json, false);
-  }
+export function ProjectVersionToJSON(json: any): ProjectVersion {
+    return ProjectVersionToJSONTyped(json, false);
+}
 
-  export function ProjectVersionToJSONTyped(value?: Omit<ProjectVersion, 'version'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectVersionToJSONTyped(value?: Omit<ProjectVersion, 'version'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

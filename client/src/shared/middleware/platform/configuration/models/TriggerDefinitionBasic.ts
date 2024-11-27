@@ -95,11 +95,11 @@ export function TriggerDefinitionBasicFromJSONTyped(json: any, ignoreDiscriminat
     };
 }
 
-  export function TriggerDefinitionBasicToJSON(json: any): TriggerDefinitionBasic {
-      return TriggerDefinitionBasicToJSONTyped(json, false);
-  }
+export function TriggerDefinitionBasicToJSON(json: any): TriggerDefinitionBasic {
+    return TriggerDefinitionBasicToJSONTyped(json, false);
+}
 
-  export function TriggerDefinitionBasicToJSONTyped(value?: TriggerDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
+export function TriggerDefinitionBasicToJSONTyped(value?: TriggerDefinitionBasic | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -144,11 +144,11 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
     };
 }
 
-  export function IntegrationBasicToJSON(json: any): IntegrationBasic {
-      return IntegrationBasicToJSONTyped(json, false);
-  }
+export function IntegrationBasicToJSON(json: any): IntegrationBasic {
+    return IntegrationBasicToJSONTyped(json, false);
+}
 
-  export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastIntegrationVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

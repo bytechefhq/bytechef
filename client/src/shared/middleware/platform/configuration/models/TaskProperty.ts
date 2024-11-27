@@ -65,11 +65,11 @@ export function TaskPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function TaskPropertyToJSON(json: any): TaskProperty {
-      return TaskPropertyToJSONTyped(json, false);
-  }
+export function TaskPropertyToJSON(json: any): TaskProperty {
+    return TaskPropertyToJSONTyped(json, false);
+}
 
-  export function TaskPropertyToJSONTyped(value?: TaskProperty | null, ignoreDiscriminator: boolean = false): any {
+export function TaskPropertyToJSONTyped(value?: TaskProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

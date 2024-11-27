@@ -122,11 +122,11 @@ export function ProjectBasicFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function ProjectBasicToJSON(json: any): ProjectBasic {
-      return ProjectBasicToJSONTyped(json, false);
-  }
+export function ProjectBasicToJSON(json: any): ProjectBasic {
+    return ProjectBasicToJSONTyped(json, false);
+}
 
-  export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectBasicToJSONTyped(value?: Omit<ProjectBasic, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastPublishedDate'|'lastProjectVersion'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

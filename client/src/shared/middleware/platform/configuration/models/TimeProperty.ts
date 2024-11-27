@@ -107,11 +107,11 @@ export function TimePropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     };
 }
 
-  export function TimePropertyToJSON(json: any): TimeProperty {
-      return TimePropertyToJSONTyped(json, false);
-  }
+export function TimePropertyToJSON(json: any): TimeProperty {
+    return TimePropertyToJSONTyped(json, false);
+}
 
-  export function TimePropertyToJSONTyped(value?: TimeProperty | null, ignoreDiscriminator: boolean = false): any {
+export function TimePropertyToJSONTyped(value?: TimeProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

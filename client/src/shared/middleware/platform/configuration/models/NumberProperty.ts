@@ -142,11 +142,11 @@ export function NumberPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function NumberPropertyToJSON(json: any): NumberProperty {
-      return NumberPropertyToJSONTyped(json, false);
-  }
+export function NumberPropertyToJSON(json: any): NumberProperty {
+    return NumberPropertyToJSONTyped(json, false);
+}
 
-  export function NumberPropertyToJSONTyped(value?: NumberProperty | null, ignoreDiscriminator: boolean = false): any {
+export function NumberPropertyToJSONTyped(value?: NumberProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

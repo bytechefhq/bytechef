@@ -65,11 +65,11 @@ export function WorkflowTestConfigurationConnectionFromJSONTyped(json: any, igno
     };
 }
 
-  export function WorkflowTestConfigurationConnectionToJSON(json: any): WorkflowTestConfigurationConnection {
-      return WorkflowTestConfigurationConnectionToJSONTyped(json, false);
-  }
+export function WorkflowTestConfigurationConnectionToJSON(json: any): WorkflowTestConfigurationConnection {
+    return WorkflowTestConfigurationConnectionToJSONTyped(json, false);
+}
 
-  export function WorkflowTestConfigurationConnectionToJSONTyped(value?: WorkflowTestConfigurationConnection | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTestConfigurationConnectionToJSONTyped(value?: WorkflowTestConfigurationConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

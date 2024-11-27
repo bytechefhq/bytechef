@@ -107,11 +107,11 @@ export function ConnectedUserIntegrationInstanceFromJSONTyped(json: any, ignoreD
     };
 }
 
-  export function ConnectedUserIntegrationInstanceToJSON(json: any): ConnectedUserIntegrationInstance {
-      return ConnectedUserIntegrationInstanceToJSONTyped(json, false);
-  }
+export function ConnectedUserIntegrationInstanceToJSON(json: any): ConnectedUserIntegrationInstance {
+    return ConnectedUserIntegrationInstanceToJSONTyped(json, false);
+}
 
-  export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationInstanceConfigurationId'|'integrationVersion'|'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectedUserIntegrationInstanceToJSONTyped(value?: Omit<ConnectedUserIntegrationInstance, 'id'|'integrationId'|'integrationInstanceConfigurationId'|'integrationVersion'|'connectionId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

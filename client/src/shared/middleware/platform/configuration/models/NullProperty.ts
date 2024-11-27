@@ -60,11 +60,11 @@ export function NullPropertyFromJSONTyped(json: any, ignoreDiscriminator: boolea
     return json;
 }
 
-  export function NullPropertyToJSON(json: any): NullProperty {
-      return NullPropertyToJSONTyped(json, false);
-  }
+export function NullPropertyToJSON(json: any): NullProperty {
+    return NullPropertyToJSONTyped(json, false);
+}
 
-  export function NullPropertyToJSONTyped(value?: NullProperty | null, ignoreDiscriminator: boolean = false): any {
+export function NullPropertyToJSONTyped(value?: NullProperty | null, ignoreDiscriminator: boolean = false): any {
     return value;
 }
 

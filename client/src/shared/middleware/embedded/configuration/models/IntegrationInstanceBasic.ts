@@ -129,11 +129,11 @@ export function IntegrationInstanceBasicFromJSONTyped(json: any, ignoreDiscrimin
     };
 }
 
-  export function IntegrationInstanceBasicToJSON(json: any): IntegrationInstanceBasic {
-      return IntegrationInstanceBasicToJSONTyped(json, false);
-  }
+export function IntegrationInstanceBasicToJSON(json: any): IntegrationInstanceBasic {
+    return IntegrationInstanceBasicToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceBasicToJSONTyped(value?: Omit<IntegrationInstanceBasic, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceBasicToJSONTyped(value?: Omit<IntegrationInstanceBasic, 'connectionId'|'connectedUserId'|'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

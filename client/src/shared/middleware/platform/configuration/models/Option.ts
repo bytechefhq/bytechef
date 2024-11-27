@@ -62,11 +62,11 @@ export function OptionFromJSONTyped(json: any, ignoreDiscriminator: boolean): Op
     };
 }
 
-  export function OptionToJSON(json: any): Option {
-      return OptionToJSONTyped(json, false);
-  }
+export function OptionToJSON(json: any): Option {
+    return OptionToJSONTyped(json, false);
+}
 
-  export function OptionToJSONTyped(value?: Option | null, ignoreDiscriminator: boolean = false): any {
+export function OptionToJSONTyped(value?: Option | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

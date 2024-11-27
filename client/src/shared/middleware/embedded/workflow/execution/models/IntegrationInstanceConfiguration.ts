@@ -199,11 +199,11 @@ export function IntegrationInstanceConfigurationFromJSONTyped(json: any, ignoreD
     };
 }
 
-  export function IntegrationInstanceConfigurationToJSON(json: any): IntegrationInstanceConfiguration {
-      return IntegrationInstanceConfigurationToJSONTyped(json, false);
-  }
+export function IntegrationInstanceConfigurationToJSON(json: any): IntegrationInstanceConfiguration {
+    return IntegrationInstanceConfigurationToJSONTyped(json, false);
+}
 
-  export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'> | null, ignoreDiscriminator: boolean = false): any {
+export function IntegrationInstanceConfigurationToJSONTyped(value?: Omit<IntegrationInstanceConfiguration, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'connectionAuthorizationParameters'|'connectionConnectionParameters'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

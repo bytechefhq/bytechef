@@ -71,11 +71,11 @@ export function GetOAuth2AuthorizationParametersRequestFromJSONTyped(json: any, 
     };
 }
 
-  export function GetOAuth2AuthorizationParametersRequestToJSON(json: any): GetOAuth2AuthorizationParametersRequest {
-      return GetOAuth2AuthorizationParametersRequestToJSONTyped(json, false);
-  }
+export function GetOAuth2AuthorizationParametersRequestToJSON(json: any): GetOAuth2AuthorizationParametersRequest {
+    return GetOAuth2AuthorizationParametersRequestToJSONTyped(json, false);
+}
 
-  export function GetOAuth2AuthorizationParametersRequestToJSONTyped(value?: GetOAuth2AuthorizationParametersRequest | null, ignoreDiscriminator: boolean = false): any {
+export function GetOAuth2AuthorizationParametersRequestToJSONTyped(value?: GetOAuth2AuthorizationParametersRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

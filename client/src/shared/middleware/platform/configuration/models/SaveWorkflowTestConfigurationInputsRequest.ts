@@ -48,11 +48,11 @@ export function SaveWorkflowTestConfigurationInputsRequestFromJSONTyped(json: an
     };
 }
 
-  export function SaveWorkflowTestConfigurationInputsRequestToJSON(json: any): SaveWorkflowTestConfigurationInputsRequest {
-      return SaveWorkflowTestConfigurationInputsRequestToJSONTyped(json, false);
-  }
+export function SaveWorkflowTestConfigurationInputsRequestToJSON(json: any): SaveWorkflowTestConfigurationInputsRequest {
+    return SaveWorkflowTestConfigurationInputsRequestToJSONTyped(json, false);
+}
 
-  export function SaveWorkflowTestConfigurationInputsRequestToJSONTyped(value?: SaveWorkflowTestConfigurationInputsRequest | null, ignoreDiscriminator: boolean = false): any {
+export function SaveWorkflowTestConfigurationInputsRequestToJSONTyped(value?: SaveWorkflowTestConfigurationInputsRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

@@ -135,11 +135,11 @@ export function ObjectPropertyFromJSONTyped(json: any, ignoreDiscriminator: bool
     };
 }
 
-  export function ObjectPropertyToJSON(json: any): ObjectProperty {
-      return ObjectPropertyToJSONTyped(json, false);
-  }
+export function ObjectPropertyToJSON(json: any): ObjectProperty {
+    return ObjectPropertyToJSONTyped(json, false);
+}
 
-  export function ObjectPropertyToJSONTyped(value?: ObjectProperty | null, ignoreDiscriminator: boolean = false): any {
+export function ObjectPropertyToJSONTyped(value?: ObjectProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

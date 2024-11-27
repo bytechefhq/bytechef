@@ -49,11 +49,11 @@ export function AuthorityFromJSONTyped(json: any, ignoreDiscriminator: boolean):
     };
 }
 
-  export function AuthorityToJSON(json: any): Authority {
-      return AuthorityToJSONTyped(json, false);
-  }
+export function AuthorityToJSON(json: any): Authority {
+    return AuthorityToJSONTyped(json, false);
+}
 
-  export function AuthorityToJSONTyped(value?: Authority | null, ignoreDiscriminator: boolean = false): any {
+export function AuthorityToJSONTyped(value?: Authority | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

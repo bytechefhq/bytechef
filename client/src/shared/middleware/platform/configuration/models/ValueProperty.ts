@@ -87,11 +87,11 @@ export function ValuePropertyFromJSONTyped(json: any, ignoreDiscriminator: boole
     };
 }
 
-  export function ValuePropertyToJSON(json: any): ValueProperty {
-      return ValuePropertyToJSONTyped(json, false);
-  }
+export function ValuePropertyToJSON(json: any): ValueProperty {
+    return ValuePropertyToJSONTyped(json, false);
+}
 
-  export function ValuePropertyToJSONTyped(value?: ValueProperty | null, ignoreDiscriminator: boolean = false): any {
+export function ValuePropertyToJSONTyped(value?: ValueProperty | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
