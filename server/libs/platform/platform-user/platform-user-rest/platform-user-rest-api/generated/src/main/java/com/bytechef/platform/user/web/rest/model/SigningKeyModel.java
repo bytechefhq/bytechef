@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "SigningKey", description = "Contains generated public key used for signing JWT tokens.")
 @JsonTypeName("SigningKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:43:58.807458+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:00.613241+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class SigningKeyModel {
 
   private String createdBy;

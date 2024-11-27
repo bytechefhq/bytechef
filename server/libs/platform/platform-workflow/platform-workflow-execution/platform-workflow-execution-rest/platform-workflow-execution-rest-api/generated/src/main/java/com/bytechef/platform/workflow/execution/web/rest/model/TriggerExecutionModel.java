@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:41:25.280846+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:01.205788+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class TriggerExecutionModel {
 
   private Boolean batch;

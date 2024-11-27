@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:43:55.805016+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.797159+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class WorkflowBasicModel {
 
   private String createdBy;
