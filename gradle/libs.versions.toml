@@ -1,5 +1,4 @@
 [versions]
-awssdk = "2.28.26"
 checkstyle = "10.18.1"
 com-google-auto-service = "1.1.1"
 graalvm = "24.1.1"
@@ -45,9 +44,6 @@ org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:sprin
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
 org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.9.1"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
-software-amazon-awssdk-auth = { module = "software.amazon.awssdk:auth", version.ref = "awssdk" }
-software-amazon-awssdk-regions = { module = "software.amazon.awssdk:regions", version.ref = "awssdk" }
-software-amazon-awssdk-s3 = { module = "software.amazon.awssdk:s3", version.ref = "awssdk" }
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
