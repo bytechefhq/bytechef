@@ -11,6 +11,7 @@ import PropertySelect from './PropertySelect';
 interface SubPropertyPopoverProps {
     array?: boolean;
     availablePropertyTypes: Array<{label: string; value: string}>;
+    buttonLabel?: string;
     condition?: boolean;
     handleClick: () => void;
     newPropertyName?: string;
@@ -22,6 +23,7 @@ interface SubPropertyPopoverProps {
 const SubPropertyPopover = ({
     array,
     availablePropertyTypes,
+    buttonLabel,
     condition,
     handleClick,
     newPropertyName,
@@ -49,7 +51,9 @@ const SubPropertyPopover = ({
                     size="sm"
                     variant="ghost"
                 >
-                    <PlusIcon className="mr-2 size-4" /> Add {array ? 'array item' : 'object property'}
+                    <PlusIcon className="mr-2 size-4" />
+
+                    {buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
                 </Button>
             </PopoverTrigger>
 
@@ -87,7 +91,7 @@ const SubPropertyPopover = ({
                             }
                             options={availablePropertyTypes.map((property) => ({
                                 label: property.label!,
-                                value: property.label!,
+                                value: property.value!,
                             }))}
                             value={newPropertyType}
                         />
