@@ -293,6 +293,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
+                    buttonLabel={property.placeholder ?? parentArrayItems?.[0].placeholder}
                     condition={currentComponent?.componentName === 'condition'}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}
@@ -307,7 +308,9 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                     size="sm"
                     variant="ghost"
                 >
-                    <PlusIcon className="size-4" /> Add array item
+                    <PlusIcon className="size-4" />
+
+                    {property.placeholder || 'Add array item'}
                 </Button>
             )}
         </Fragment>
