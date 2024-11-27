@@ -17,9 +17,11 @@
 package com.bytechef.component.microsoft.outlook.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -99,6 +101,37 @@ public class MicrosoftOutlook365OptionUtils {
             String displayName = (String) map.get("displayName");
 
             options.add(option(displayName, displayName));
+        }
+
+        return options;
+    }
+
+    public static List<Option<String>> getEventOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object object : list) {
+                if (object instanceof Map<?, ?> map) {
+
+                    options.add(option((String) map.get(SUBJECT), (String) map.get(ID)));
+                }
+            }
+        }
+
+        List<Map<?, ?>> categoriesFromNextPage =
+            MicrosoftOutlook365Utils.getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context);
+
+        for (Map<?, ?> map : categoriesFromNextPage) {
+            options.add(option((String) map.get(SUBJECT), (String) map.get(ID)));
         }
 
         return options;

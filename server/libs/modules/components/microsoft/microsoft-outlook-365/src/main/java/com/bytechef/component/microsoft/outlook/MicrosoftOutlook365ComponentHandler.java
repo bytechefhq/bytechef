@@ -22,6 +22,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365CreateEventAction;
+import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365DeleteEventAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetEventsAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetFreeTimeSlotsAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365GetMailAction;
@@ -49,6 +50,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
         .connection(MicrosoftOutlook365Connection.CONNECTION_DEFINITION)
         .actions(
             MicrosoftOutlook365CreateEventAction.ACTION_DEFINITION,
+            MicrosoftOutlook365DeleteEventAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetEventsAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetFreeTimeSlotsAction.ACTION_DEFINITION,
             MicrosoftOutlook365GetMailAction.ACTION_DEFINITION,
