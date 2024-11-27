@@ -30,9 +30,7 @@ const SchemaMenuList = ({fields, onChange, schema}: SchemaMenuListProps) => {
     return (
         <ul className="mb-4 grid gap-2">
             {fields.map((field) => (
-                <li className="" key={field.value}>
-                    {typeToItem[field.type]({field, onChange, schema})}
-                </li>
+                <li key={field.value}>{typeToItem[field.type]({field, onChange, schema})}</li>
             ))}
         </ul>
     );

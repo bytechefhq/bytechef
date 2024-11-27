@@ -1,4 +1,5 @@
 import React from 'react';
+import {twMerge} from 'tailwind-merge';
 
 interface RoundedButtonProps {
     onClick?: () => void;
@@ -10,7 +11,10 @@ interface RoundedButtonProps {
 const SchemaRoundedButton = ({children, className = '', onClick = () => {}, title}: RoundedButtonProps) => {
     return (
         <button
-            className={`flex size-8 items-center justify-center rounded-full border text-sm focus:outline-none ${className}`}
+            className={twMerge(
+                `flex size-8 items-center justify-center rounded-full border text-sm focus:outline-none`,
+                className
+            )}
             onClick={onClick}
             title={title}
         >

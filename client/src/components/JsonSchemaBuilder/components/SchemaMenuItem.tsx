@@ -7,7 +7,19 @@ import {useTranslation} from 'react-i18next';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
 
-import * as helpers from '../utils/helpers';
+import {
+    deleteSchemaField,
+    findOption,
+    getSchemaField,
+    hasSchemaProperties,
+    isSchemaObject,
+    optionsToStrings,
+    schemaPropertiesAsOptions,
+    schemaRequiredPropertiesAsOptions,
+    setSchemaField,
+    stringsToOptions,
+    translateLabels,
+} from '../utils/helpers';
 import {SchemaMenuOptionType, SchemaRecordType} from '../utils/types';
 
 import '../../CreatableSelect/CreatableSelect.css';
@@ -39,11 +51,11 @@ export const TextItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {t} = useTranslation();
 
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <SchemaInput
                 label={t(field.label)}
-                onChange={(text) => onChange(helpers.setSchemaField(field.value, text, schema))}
-                value={helpers.getSchemaField(schema, field.value) as string}
+                onChange={(text) => onChange(setSchemaField(field.value, text, schema))}
+                value={getSchemaField(schema, field.value) as string}
             />
         </Item>
     );
@@ -53,12 +65,12 @@ export const NumberItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {t} = useTranslation();
 
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <SchemaInput
                 label={t(field.label)}
-                onChange={(text) => onChange(helpers.setSchemaField(field.value, parseInt(text, 10), schema))}
+                onChange={(text) => onChange(setSchemaField(field.value, parseInt(text, 10), schema))}
                 type={'number'}
-                value={helpers.getSchemaField(schema, field.value) as string}
+                value={getSchemaField(schema, field.value) as string}
             />
         </Item>
     );
@@ -67,11 +79,11 @@ export const NumberItem = ({field, onChange, schema}: ItemTypeProps) => {
 export const BoolItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {t} = useTranslation();
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <SchemaCheckbox
                 label={t(field.label)}
-                onChange={(text) => onChange(helpers.setSchemaField(field.value, text, schema))}
-                value={helpers.getSchemaField(schema, field.value) as boolean}
+                onChange={(text) => onChange(setSchemaField(field.value, text, schema))}
+                value={getSchemaField(schema, field.value) as boolean}
             />
         </Item>
     );
@@ -79,12 +91,12 @@ export const BoolItem = ({field, onChange, schema}: ItemTypeProps) => {
 
 export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {t} = useTranslation();
-    const selected = helpers.getSchemaField(schema, field.value);
+    const selected = getSchemaField(schema, field.value);
 
-    const allOptions = useMemo(() => helpers.stringsToOptions(selected as string[]), [selected]);
+    const allOptions = useMemo(() => stringsToOptions(selected as string[]), [selected]);
 
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <div className="w-full">
                 <Label>{t(field.label)}</Label>
 
@@ -95,7 +107,7 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
                     noOptionsMessage={() => t('noOptions')}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(options: any) => {
-                        onChange(helpers.setSchemaField(field.value, helpers.optionsToStrings(options), schema));
+                        onChange(setSchemaField(field.value, optionsToStrings(options), schema));
                     }}
                     options={allOptions}
                     placeholder={t('options')}
@@ -108,12 +120,12 @@ export const CreatableMultiSelectItem = ({field, onChange, schema}: ItemTypeProp
 
 export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
     const {t} = useTranslation();
-    const options = React.useMemo(() => helpers.translateLabels(t, field.optionList), [field.optionList, t]);
-    const option = helpers.getSchemaField(schema, field.value);
-    const selected = React.useMemo(() => helpers.findOption(option as string)(options), [options, option]);
+    const options = useMemo(() => translateLabels(t, field.optionList), [field.optionList, t]);
+    const option = getSchemaField(schema, field.value);
+    const selected = React.useMemo(() => findOption(option as string)(options), [options, option]);
 
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <div className="w-full">
                 <Label>{t(field.label)}</Label>
 
@@ -123,7 +135,7 @@ export const SelectItem = ({field, onChange, schema}: ItemTypeProps) => {
                     noOptionsMessage={() => t('noOptions')}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(option: any) => {
-                        onChange(helpers.setSchemaField(field.value, option.value, schema));
+                        onChange(setSchemaField(field.value, option.value, schema));
                     }}
                     options={options}
                     placeholder={t('options')}
@@ -141,15 +153,15 @@ export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = (
 }: ItemTypeProps) => {
     const {t} = useTranslation();
 
-    if (!helpers.isSchemaObject(schema) || !helpers.hasSchemaProperties(schema)) {
+    if (!isSchemaObject(schema) || !hasSchemaProperties(schema)) {
         return null;
     }
 
-    const allOptions = helpers.schemaPropertiesAsOptions(schema);
-    const requiredOptions = helpers.schemaRequiredPropertiesAsOptions(schema);
+    const allOptions = schemaPropertiesAsOptions(schema);
+    const requiredOptions = schemaRequiredPropertiesAsOptions(schema);
 
     return (
-        <Item onDelete={() => onChange(helpers.deleteSchemaField(field.value, schema))}>
+        <Item onDelete={() => onChange(deleteSchemaField(field.value, schema))}>
             <div className="w-full">
                 <Label>{t(field.label)}</Label>
 
@@ -160,7 +172,7 @@ export const RequiredMultiSelectItem: React.FunctionComponent<ItemTypeProps> = (
                     noOptionsMessage={() => t('noOptions')}
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     onChange={(options: any) => {
-                        onChange(helpers.setSchemaField(field.value, helpers.optionsToStrings(options), schema));
+                        onChange(setSchemaField(field.value, optionsToStrings(options), schema));
                     }}
                     options={allOptions}
                     placeholder={t('options')}

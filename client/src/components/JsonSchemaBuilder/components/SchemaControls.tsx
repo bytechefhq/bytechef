@@ -69,11 +69,11 @@ export const SchemaControls = ({
                 {typeof onAdd === 'function' ? <SchemaAddButton onClick={onAdd} title={t('add')} /> : null}
             </div>
 
-            {isMenuOpen ? (
+            {isMenuOpen && (
                 <SchemaMenuModal onClose={() => setIsMenuOpen(false)} title={t('extraFields')}>
                     <SchemaMenu onChange={onChange} schema={schema} />
                 </SchemaMenuModal>
-            ) : null}
+            )}
         </div>
     );
 };
