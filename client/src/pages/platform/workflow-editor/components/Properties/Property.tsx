@@ -850,6 +850,21 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
 
+    useEffect(() => {
+        if (hidden) {
+            saveProperty({
+                currentComponent,
+                path,
+                setCurrentComponent,
+                type,
+                updateWorkflowNodeParameterMutation,
+                value: defaultValue,
+                workflowId: workflow.id!,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
     if (hidden) {
         return <></>;
     }
