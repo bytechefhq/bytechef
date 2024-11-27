@@ -48,6 +48,7 @@ public class MicrosoftOutlook365Constants {
     public static final String DATE_TIME = "dateTime";
     public static final String END = "end";
     public static final String EMAIL_ADDRESS = "emailAddress";
+    public static final String EVENT = "event";
     public static final String FROM = "from";
     public static final String I_CAL_UID = "iCalUId";
     public static final String ID = "id";
