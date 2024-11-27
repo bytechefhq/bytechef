@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("contact")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-19T13:43:55.350190+01:00[Europe/Zagreb]", comments = "Generator version: 7.9.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.351813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ContactModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
