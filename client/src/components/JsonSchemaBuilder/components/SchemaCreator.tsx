@@ -2,7 +2,19 @@ import SchemaBox from '@/components/JsonSchemaBuilder/components/SchemaBox';
 import {AsteriskIcon} from 'lucide-react';
 import React, {useState} from 'react';
 
-import * as helpers from '../utils/helpers';
+import {
+    addSchemaProperty,
+    deleteSchemaProperty,
+    getSchemaItems,
+    getSchemaProperties,
+    hasSchemaProperties,
+    isFieldRequired,
+    isSchemaArray,
+    isSchemaObject,
+    renameSchemaProperty,
+    setSchemaItems,
+    setSchemaProperty,
+} from '../utils/helpers';
 import {SchemaRecordType} from '../utils/types';
 import {SchemaArrayControls, SchemaControls} from './SchemaControls';
 
@@ -32,15 +44,11 @@ const SchemaCreator = ({
 
                 <SchemaControls
                     isCollapsed={isCollapsed}
-                    onAdd={
-                        helpers.isSchemaObject(schema) ? () => onChange(helpers.addSchemaProperty(schema)) : undefined
-                    }
+                    onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
                     onChange={onChange}
                     onChangeKey={schemakey !== '__root__' ? onChangeKey : undefined}
                     onCollapse={
-                        helpers.isSchemaObject(schema) || helpers.isSchemaArray(schema)
-                            ? () => setIsCollapsed((c) => !c)
-                            : undefined
+                        isSchemaObject(schema) || isSchemaArray(schema) ? () => setIsCollapsed((c) => !c) : undefined
                     }
                     onDelete={schemakey !== '__root__' ? () => onDelete(schemakey) : undefined}
                     schema={schema}
@@ -49,24 +57,22 @@ const SchemaCreator = ({
             </div>
 
             <div className={`${isCollapsed ? 'hidden' : 'block'}`}>
-                {helpers.isSchemaObject(schema) && helpers.hasSchemaProperties(schema) && (
+                {isSchemaObject(schema) && hasSchemaProperties(schema) && (
                     <SchemaBox>
                         <SchemaObjectProperties
-                            onChange={(key, s) => onChange(helpers.setSchemaProperty(key, s, schema))}
-                            onChangeKey={(oldkey, newkey) =>
-                                onChange(helpers.renameSchemaProperty(oldkey, newkey, schema))
-                            }
-                            onDelete={(key) => onChange(helpers.deleteSchemaProperty(key, schema))}
+                            onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
+                            onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
+                            onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
                             schema={schema}
                         />
                     </SchemaBox>
                 )}
 
-                {helpers.isSchemaArray(schema) && (
+                {isSchemaArray(schema) && (
                     <SchemaBox>
                         <SchemaArrayItems
-                            onChange={(s) => onChange(helpers.setSchemaItems(s, schema))}
-                            schema={helpers.getSchemaItems(schema)}
+                            onChange={(s) => onChange(setSchemaItems(s, schema))}
+                            schema={getSchemaItems(schema)}
                         />
                     </SchemaBox>
                 )}
@@ -84,27 +90,27 @@ const SchemaArrayItems = ({onChange, schema}: SchemaArrayItemsProps) => {
     return (
         <div>
             <SchemaArrayControls
-                onAdd={helpers.isSchemaObject(schema) ? () => onChange(helpers.addSchemaProperty(schema)) : undefined}
+                onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
                 onChange={onChange}
                 schema={schema}
             />
 
-            {helpers.isSchemaObject(schema) && helpers.hasSchemaProperties(schema) && (
+            {isSchemaObject(schema) && hasSchemaProperties(schema) && (
                 <div className="mt-2">
                     <SchemaObjectProperties
-                        onChange={(key, s) => onChange(helpers.setSchemaProperty(key, s, schema))}
-                        onChangeKey={(oldkey, newkey) => onChange(helpers.renameSchemaProperty(oldkey, newkey, schema))}
-                        onDelete={(key) => onChange(helpers.deleteSchemaProperty(key, schema))}
+                        onChange={(key, s) => onChange(setSchemaProperty(key, s, schema))}
+                        onChangeKey={(oldkey, newkey) => onChange(renameSchemaProperty(oldkey, newkey, schema))}
+                        onDelete={(key) => onChange(deleteSchemaProperty(key, schema))}
                         schema={schema}
                     />
                 </div>
             )}
 
-            {helpers.isSchemaArray(schema) && (
+            {isSchemaArray(schema) && (
                 <SchemaBox>
                     <SchemaArrayItems
-                        onChange={(s) => onChange(helpers.setSchemaItems(s, schema))}
-                        schema={helpers.getSchemaItems(schema)}
+                        onChange={(s) => onChange(setSchemaItems(s, schema))}
+                        schema={getSchemaItems(schema)}
                     />
                 </SchemaBox>
             )}
@@ -122,10 +128,10 @@ interface SchemaObjectPropertiesProps {
 const SchemaObjectProperties = ({onChange, onChangeKey, onDelete, schema}: SchemaObjectPropertiesProps) => {
     return (
         <ul className="grid gap-2">
-            {Object.entries(helpers.getSchemaProperties(schema)).map(([key, s]) => (
+            {Object.entries(getSchemaProperties(schema)).map(([key, s]) => (
                 <li key={key}>
                     <SchemaCreator
-                        isRequired={helpers.isFieldRequired(key, schema)}
+                        isRequired={isFieldRequired(key, schema)}
                         onChange={(newSchema) => onChange(key, newSchema)}
                         onChangeKey={(newKey) => onChangeKey(key, newKey)}
                         onDelete={onDelete}

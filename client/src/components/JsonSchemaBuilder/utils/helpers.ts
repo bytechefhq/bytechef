@@ -1,4 +1,4 @@
-import {typeToOptions, typeToValidFields} from './constants';
+import {TYPE_TO_OPTIONS, TYPE_TO_VALIDATE_FIELDS} from './constants';
 import {SchemaRecordType, SchemaType} from './types';
 
 export const getAllSchemaKeys = (schema: object) => Object.keys(schema);
@@ -128,7 +128,7 @@ export const hasSchemaProperties = (schema: SchemaRecordType) => !isEmpty(getSch
 
 export const hasSchemaItems = (schema: SchemaRecordType) => !isEmpty(getSchemaItems(schema));
 
-export const getSchemaMenuOptions = (type: SchemaType) => typeToOptions[type];
+export const getSchemaMenuOptions = (type: SchemaType) => TYPE_TO_OPTIONS[type];
 
 export const findOption = (value: string) => (options: {value: string}[]) =>
     options.find((option) => option.value === value);
@@ -155,7 +155,7 @@ export const schemaPropertiesAsOptions = (schema: SchemaRecordType) => fieldsToO
 export const schemaRequiredPropertiesAsOptions = (schema: SchemaRecordType) =>
     fieldsToOptions(getSchemaRequiredProperties(schema));
 
-export const getValidFields = (type: SchemaType) => typeToValidFields[type];
+export const getValidFields = (type: SchemaType) => TYPE_TO_VALIDATE_FIELDS[type];
 
 export const removeWrongFields = (schema: SchemaRecordType) => {
     const type = getSchemaType(schema);

@@ -3,7 +3,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import Select from 'react-select';
 
-import {schemaTypes} from '../utils/constants';
+import {SCHEMA_TYPES} from '../utils/constants';
 import * as helpers from '../utils/helpers';
 import {SchemaType} from '../utils/types';
 
@@ -17,7 +17,7 @@ interface SchemaTypesSelectProps {
 const SchemaTypesSelect = ({onChange, type}: SchemaTypesSelectProps) => {
     const {t} = useTranslation();
 
-    const options = React.useMemo(() => helpers.translateLabels(t, schemaTypes), [t]);
+    const options = React.useMemo(() => helpers.translateLabels(t, SCHEMA_TYPES), [t]);
 
     return (
         <div>
