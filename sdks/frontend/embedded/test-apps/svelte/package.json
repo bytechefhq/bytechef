@@ -9,7 +9,7 @@
   "devDependencies": {
     "@bytechef-embedded/library-svelte": "*",
     "@sveltejs/adapter-auto": "^2.0.0",
-    "@sveltejs/kit": "^1.27.4",
+    "@sveltejs/kit": "^2.8.3",
     "svelte": "^4.0.5",
     "vite": "^4.4.2"
   },
