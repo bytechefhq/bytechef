@@ -14,6 +14,7 @@ import SubPropertyPopover from './components/SubPropertyPopover';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
+    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
     path: string;
     property: PropertyAllType;
 }
@@ -23,7 +24,7 @@ const initialAvailablePropertyTypes = Object.keys(VALUE_PROPERTY_CONTROL_TYPES).
     value: type as string,
 }));
 
-const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
+const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [availablePropertyTypes, setAvailablePropertyTypes] =
         useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
@@ -31,7 +32,13 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const {additionalProperties, items, name} = property;
+    const {additionalProperties, name} = property;
+
+    let items = property.items;
+
+    if (!items?.length && parentArrayItems?.[0].items.length) {
+        items = parentArrayItems?.[0].items;
+    }
 
     const handleAddItemClick = () => {
         if (!currentComponent || !name) {
@@ -41,7 +48,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
         let matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
 
         if (!matchingItem) {
-            matchingItem = items?.find((item) => item.label === newPropertyType);
+            matchingItem = items?.find((item) => item.name === newPropertyType);
         }
 
         const controlType: ControlType = matchingItem
@@ -92,8 +99,8 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                 if (item.type) {
                     if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
-                            label: item.label ?? item.type,
-                            value: `${item.type}_${item.label}`,
+                            label: item.label,
+                            value: item.name,
                         });
                     } else {
                         types.push({
@@ -270,6 +277,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                                 index={index}
                                 key={`${(arrayItem as unknown as ArrayPropertyType).key}_${subItem.name}_${subItemIndex}`}
                                 onDeleteClick={handleDeleteClick}
+                                parentArrayItems={items}
                                 path={path}
                                 setArrayItems={setArrayItems}
                             />
@@ -282,6 +290,7 @@ const ArrayProperty = ({onDeleteClick, path, property}: ArrayPropertyProps) => {
                             index={index}
                             key={arrayItem.key || `${path}_${name}_${arrayItem.name}_${index}`}
                             onDeleteClick={handleDeleteClick}
+                            parentArrayItems={items}
                             path={`${path}[${index}]`}
                             setArrayItems={setArrayItems}
                         />
