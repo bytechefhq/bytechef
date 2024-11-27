@@ -5,15 +5,15 @@ graalvm = "24.1.1"
 jackson = "2.17.2"
 jacoco = "0.8.12"
 java = "21"
-org-mapstruct = "1.6.2"
+org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "1.1.2"
 org-springdoc = "2.6.0"
 pmd = "7.5.0"
 spotbugs = "4.8.6"
 spring-ai = "1.0.0-M4"
 spring-boot = "3.3.6"
-spring-cloud-dependencies = "2023.0.3"
 spring-cloud-aws = "3.2.1"
+spring-cloud-dependencies = "2023.0.3"
 spring-shell = "3.3.3"
 
 [libraries]
@@ -24,9 +24,9 @@ com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 commons-validator = "commons-validator:commons-validator:1.9.0"
-io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.25"
-io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.22"
-org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.37.0"
+io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.26"
+io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.24"
+org-apache-activemq-artemis-jakarta-server = "org.apache.activemq:artemis-jakarta-server:2.38.0"
 org-apache-poi-poi-ooxml = "org.apache.poi:poi-ooxml:5.3.0"
 org-eclipse-jgit-org-eclipse-jgit = "org.eclipse.jgit:org.eclipse.jgit:7.0.0.202409031743-r"
 org-graalvm-polyglot-java = { module = "org.graalvm.polyglot:java", version.ref = "graalvm" }
@@ -42,16 +42,16 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.6"
 org-springdoc-springdoc-openapi-starter-common = { module = "org.springdoc:springdoc-openapi-starter-common", version.ref = "org-springdoc" }
 org-springdoc-springdoc-openapi-starter-webmvc-ui = { module = "org.springdoc:springdoc-openapi-starter-webmvc-ui", version.ref = "org-springdoc" }
-org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.9.1"
+org-wiremock-wiremock = "org.wiremock:wiremock-standalone:3.9.2"
 org-zeroturnaround-zt-exec = "org.zeroturnaround:zt-exec:1.12"
 
 [plugins]
 com-github-ben-manes-versions = "com.github.ben-manes.versions:0.51.0"
 gradle-git-properties = "com.gorylenko.gradle-git-properties:2.4.2"
 jib = "com.google.cloud.tools.jib:3.4.3"
-nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.4"
+nl-littlerobots-version-catalog-update = "nl.littlerobots.version-catalog-update:0.8.5"
 org-graalvm-buildtools-native = "org.graalvm.buildtools.native:0.10.3"
-org-openapi-generator = "org.openapi.generator:7.9.0"
-org-sonarqube = "org.sonarqube:5.1.0.4882"
-spotbugs = "com.github.spotbugs:6.0.22"
-spotless = "com.diffplug.gradle.spotless:7.0.0.BETA2"
+org-openapi-generator = "org.openapi.generator:7.10.0"
+org-sonarqube = "org.sonarqube:6.0.0.5145"
+spotbugs = "com.github.spotbugs:6.0.26"
+spotless = "com.diffplug.gradle.spotless:7.0.0.BETA4"

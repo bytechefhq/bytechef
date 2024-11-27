@@ -8,6 +8,7 @@ plugins {
 versionCatalogUpdate {
     keep {
         versions.addAll("checkstyle", "gradle-git-properties", "jackson", "jacoco", "java", "jib-gradle-plugin", "pmd", "spotbugs", "spring-ai", "spring-boot", "spring-cloud-aws", "spring-cloud-dependencies", "spring-shell")
+        plugins.addAll(libs.plugins.gradle.git.properties, libs.plugins.jib, libs.plugins.spotbugs, libs.plugins.spotless)
     }
 }
 
