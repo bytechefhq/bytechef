@@ -9,7 +9,7 @@ interface ArrayPropertyItemProps {
     currentComponent?: ComponentType;
     index: number;
     onDeleteClick: (path: string) => void;
-    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
+    parentArrayItems?: Array<ArrayPropertyType>;
     path: string;
     setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
 }
