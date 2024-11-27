@@ -12,11 +12,26 @@ image:
 
 env:
   normal:
-    SERVER_PORT: 9555
-    SPRING_PROFILES_ACTIVE: "dev,docker"
-    BYTECHEF_RESOURCES_WEB: "file:///opt/bytechef/client/"
-    BYTECHEF_SECURITY_REMEMBER-ME_KEY: "KEYTOBEREPLACED"
-  secret: {}
+    BYTECHEF_ENCRYPTION_PROVIDER: property
+    BYTECHEF_FEATURE_FLAGS_0: ff-1057
+    BYTECHEF_PUBLIC_URL: "" ## Place your public endpoint here if using ingress
+    BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED: false
+
+    ## Optional env for smtp setup
+    BYTECHEF_MAIL_SMTP_AUTH: false
+    BYTECHEF_MAIL_SMTP_STARTTLS_ENABLE: false
+    BYTECHEF_MAIL_SMTP_STARTTLS_REQUIRED: false
+
+  secret:
+    BYTECHEF_DATASOURCE_PASSWORD: "" ## Place your postgresql password here
+    BYTECHEF_DATASOURCE_URL: "" ## Place your jdbc postgresql endpoint here
+    BYTECHEF_DATASOURCE_USERNAME: "" ## Place your postgresql username here
+    BYTECHEF_ENCRYPTION_PROPERTY_KEY: "" ## Place your encryption value here
+    BYTECHEF_SECURITY_REMEMBER_ME_KEY: "" ## Place your remember me key here
+    BYTECHEF_MAIL_USERNAME: ""
+    BYTECHEF_MAIL_HOST: ""
+    BYTECHEF_MAIL_PASSWORD: ""
+    BYTECHEF_MAIL_PORT: 22
 
 
 imagePullSecrets: []
@@ -50,7 +65,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 9555
+  port: 8080
 
 ingress:
   enabled: false
@@ -84,12 +99,22 @@ livenessProbe:
   httpGet:
     path: /actuator/health/liveness
     port: 9555
-  initialDelaySeconds: 80
+  initialDelaySeconds: 30
+  timeoutSeconds: 20
+  periodSeconds: 30
+  failureThreshold: 6
 readinessProbe:
   httpGet:
     path: /actuator/health/readiness/
     port: 9555
-  initialDelaySeconds: 80
+  initialDelaySeconds: 30
+  timeoutSeconds: 20
+  periodSeconds: 30
+  failureThreshold: 6
+startupProbe:
+  failureThreshold: 180
+  periodSeconds: 20
+  timeoutSeconds: 60
 
 autoscaling:
   enabled: false
