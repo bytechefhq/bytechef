@@ -225,8 +225,10 @@ export type ArrayPropertyType = Property & {
     custom?: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultValue?: any;
+    items?: Array<Property>;
     key?: string;
     label?: string;
+    placeholder?: string;
     properties?: Array<PropertyAllType>;
 };
 

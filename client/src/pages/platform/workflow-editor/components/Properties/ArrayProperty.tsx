@@ -14,7 +14,7 @@ import SubPropertyPopover from './components/SubPropertyPopover';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
-    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
+    parentArrayItems?: Array<ArrayPropertyType>;
     path: string;
     property: PropertyAllType;
 }
@@ -36,7 +36,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     let items = property.items;
 
-    if (!items?.length && parentArrayItems?.[0].items.length) {
+    if (!items?.length && parentArrayItems?.[0].items?.length) {
         items = parentArrayItems?.[0].items;
     }
 
@@ -99,8 +99,8 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 if (item.type) {
                     if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
-                            label: item.label,
-                            value: item.name,
+                            label: item.label!,
+                            value: item.name!,
                         });
                     } else {
                         types.push({
@@ -158,7 +158,36 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             return;
         }
 
-        if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
+        if (
+            items &&
+            items.length > 1 &&
+            items.every((item) => item.type === 'OBJECT') &&
+            Array.isArray(parameterValue)
+        ) {
+            const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
+                const matchingItem = items?.find((item) => item.name === parameterItem.type);
+
+                const subProperties = (matchingItem as ObjectProperty).properties?.map((property) =>
+                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                        ? {
+                              ...property,
+                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                          }
+                        : property
+                );
+
+                return {
+                    ...matchingItem,
+                    custom: true,
+                    name: index.toString(),
+                    properties: subProperties,
+                };
+            });
+
+            if (parameterArrayItems?.length) {
+                setArrayItems(parameterArrayItems as Array<ArrayPropertyType>);
+            }
+        } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
                 const subProperties = (items[0] as ObjectProperty).properties?.map((property) =>
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
