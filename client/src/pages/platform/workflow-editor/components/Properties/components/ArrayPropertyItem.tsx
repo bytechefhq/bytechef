@@ -9,6 +9,7 @@ interface ArrayPropertyItemProps {
     currentComponent?: ComponentType;
     index: number;
     onDeleteClick: (path: string) => void;
+    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
     path: string;
     setArrayItems: React.Dispatch<React.SetStateAction<Array<ArrayPropertyType | Array<ArrayPropertyType>>>>;
 }
@@ -19,6 +20,7 @@ const ArrayPropertyItem = ({
     currentComponent,
     index,
     onDeleteClick,
+    parentArrayItems,
     path,
     setArrayItems,
 }: ArrayPropertyItemProps) => {
@@ -47,6 +49,7 @@ const ArrayPropertyItem = ({
                 }
                 key={`${arrayName}_${arrayItem.name}_${arrayItem.key}_property`}
                 parameterValue={arrayItem.defaultValue}
+                parentArrayItems={parentArrayItems}
                 path={path}
                 property={arrayItem as ArrayPropertyType}
             />

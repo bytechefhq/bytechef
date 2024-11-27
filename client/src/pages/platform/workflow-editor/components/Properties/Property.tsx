@@ -23,7 +23,7 @@ import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTM
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {Option} from '@/shared/middleware/platform/configuration';
-import {PropertyAllType} from '@/shared/types';
+import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {usePrevious} from '@uidotdev/usehooks';
@@ -70,6 +70,7 @@ interface PropertyProps {
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     parameterValue?: any;
+    parentArrayItems?: Array<ArrayPropertyType | Array<ArrayPropertyType>>;
     path?: string;
     property: PropertyAllType;
 }
@@ -85,6 +86,7 @@ const Property = ({
     objectName,
     operationName,
     parameterValue,
+    parentArrayItems,
     path,
     property,
 }: PropertyProps) => {
@@ -962,6 +964,7 @@ const Property = ({
                     {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && path && (
                         <ArrayProperty
                             onDeleteClick={handleDeleteCustomPropertyClick}
+                            parentArrayItems={parentArrayItems}
                             path={path}
                             property={property}
                         />
