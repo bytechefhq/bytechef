@@ -38,4 +38,4 @@ bytechef:
     enabled: true
     command-bar:
       orgId: 3816ef6c
-
+  webhookUrl: ${bytechef.public-url}/webhooks/{id}
