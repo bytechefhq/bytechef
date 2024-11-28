@@ -10,20 +10,22 @@ springdoc:
 ---
 
 info:
+  ai:
+    enabled: ${bytechef.ai.enabled:false}
   analytics:
-    enabled: ${bytechef.analytics.enabled}
+    enabled: ${bytechef.analytics.enabled:false}
     postHog:
-      apiKey: ${bytechef.analytics.post-hog.api-key}
-      host: ${bytechef.analytics.post-hog.host}
+      apiKey: ${bytechef.analytics.postHog.apiKey:}
+      host: ${bytechef.analytics.postHog.host:}
   application:
-    edition: ${bytechef.edition}
+    edition: ${bytechef.edition:}
   featureFlags: ${bytechef.featureFlags}
   helpHub:
-    enabled: ${bytechef.helpHub.enabled}
+    enabled: ${bytechef.helpHub.enabled:false}
     commandBar:
-      orgId: ${bytechef.helpHub.command-bar.orgId}
+      orgId: ${bytechef.helpHub.commandBar.orgId:}
   signUp:
-    activationRequired: ${bytechef.signUp.activationRequired}
+    activationRequired: ${bytechef.signUp.activationRequired:false}
     enabled: ${bytechef.signUp.enabled}
 
 management:
@@ -112,6 +114,11 @@ spring:
 #####
 
 bytechef:
+  ai:
+    openai:
+      chat:
+        options:
+          model: gpt-4o
   cache:
     # Cache provider (redis) default: redis
     provider: redis
@@ -125,7 +132,7 @@ bytechef:
     provider: jdbc
   # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
   edition: ee
-  # Encryption key provider (aws - the key generated on aws, filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
   encryption:
     provider: filesystem
   file-storage:
@@ -136,9 +143,6 @@ bytechef:
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
-    host:
-    port: 25
-    temp-domain-list-url: #https://gist.githubusercontent.com/SimonHoiberg/f5a23b1fa3762330c8af1e9090918b63/raw/53963d0dbdd93c594fbc067cee95966156ee066b/temp-email-list.txt
   message-broker:
     # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: redis
     provider: redis
@@ -152,9 +156,9 @@ bytechef:
   resources:
     web: file:///opt/bytechef/client/
   security:
-    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:"
-    remember-me:
-      key:
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' data:; script-src: https://*.command.ai; frame-src: https://*.command.ai; img-src: https://*.command.ai; media-src: https://*.command.ai; connect-src: https://*.command.ai; style-src: https://*.command.ai;"
+  sign-up:
+    temp-domain-list-url: #https://gist.githubusercontent.com/SimonHoiberg/f5a23b1fa3762330c8af1e9090918b63/raw/53963d0dbdd93c594fbc067cee95966156ee066b/temp-email-list.txt
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
