@@ -866,15 +866,21 @@ const Property = ({
             updateWorkflowNodeParameterMutation &&
             resolvePath(currentComponent.parameters, path) !== defaultValue
         ) {
-            saveProperty({
-                currentComponent,
-                path,
-                setCurrentComponent,
-                type,
-                updateWorkflowNodeParameterMutation,
-                value: defaultValue,
-                workflowId: workflow.id!,
-            });
+            const saveDefaultValue = () => {
+                saveProperty({
+                    currentComponent,
+                    path,
+                    setCurrentComponent,
+                    type,
+                    updateWorkflowNodeParameterMutation,
+                    value: defaultValue,
+                    workflowId: workflow.id!,
+                });
+            };
+
+            const timeoutId = setTimeout(saveDefaultValue, 200);
+
+            return () => clearTimeout(timeoutId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
