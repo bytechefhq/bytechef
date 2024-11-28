@@ -107,7 +107,9 @@ public class HttpClientComponentConstants {
 
             string(URI)
                 .label("URI")
-                .description("The URI to make the request to")
+                .description(
+                    "The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.")
+                .exampleValue("/")
                 .placeholder("https://example.com/index.html")
                 .defaultValue("")
                 .required(true),
