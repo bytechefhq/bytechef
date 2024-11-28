@@ -18,10 +18,15 @@ package com.bytechef.component.microsoft.outlook.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CALENDAR_ID_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CUSTOM_EVENT_OUTPUT_PROPERTY;
-import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getCustomEvents;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_RANGE;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.retrieveCustomEvents;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -37,7 +42,21 @@ public class MicrosoftOutlook365GetEventsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getEvents")
         .title("Get Events")
         .description("Gets a list of events in specified calendar.")
-        .properties(CALENDAR_ID_PROPERTY)
+        .properties(
+            CALENDAR_ID_PROPERTY,
+            object(DATE_RANGE)
+                .label("Date Range")
+                .description("Date range to find events that exist in this range.")
+                .properties(
+                    dateTime(FROM)
+                        .label("From")
+                        .description("Start of the time range.")
+                        .required(false),
+                    dateTime(TO)
+                        .label("To")
+                        .description("End of the time range.")
+                        .required(false))
+                .required(false))
         .output(outputSchema(array().items(CUSTOM_EVENT_OUTPUT_PROPERTY)))
         .perform(MicrosoftOutlook365GetEventsAction::perform);
 
@@ -47,6 +66,6 @@ public class MicrosoftOutlook365GetEventsAction {
     public static List<CustomEvent> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return getCustomEvents(inputParameters, actionContext);
+        return retrieveCustomEvents(inputParameters, actionContext);
     }
 }
