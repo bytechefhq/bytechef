@@ -80,6 +80,122 @@ Type: ARRAY
 ## Actions
 
 
+### Create Event
+Creates an event in the specified calendar.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Calendar | STRING | SELECT  |  |
+| Subject | STRING | TEXT  |  The subject of the event.  |
+| All Day Event? | BOOLEAN | SELECT  |  |
+| Start Date | DATE | DATE  |  The start date of the event.  |
+| End Date | DATE | DATE  |  The end date of the event.  |
+| Start Date Time | DATE_TIME | DATE_TIME  |  The start time of the event.  |
+| End Date Time | DATE_TIME | DATE_TIME  |  The end time of the event.  |
+| Attendees | [STRING\($emailAddress)] | ARRAY_BUILDER  |  The attendees of the event.  |
+| Is Online Meeting? | BOOLEAN | SELECT  |  Is the event an online meeting?  |
+| Reminder Minutes Before Start | INTEGER | INTEGER  |  The number of minutes before the event start time that the reminder alert occurs.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| DATE_TIME | DATE_TIME  |
+| DATE_TIME | DATE_TIME  |
+| [STRING] | ARRAY_BUILDER  |
+| BOOLEAN | SELECT  |
+| STRING | TEXT  |
+| BOOLEAN | SELECT  |
+
+
+
+
+
+
+### Delete Event
+Deletes an event from the specified calendar.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Calendar | STRING | SELECT  |  |
+| Event | STRING | SELECT  |  Event to delete.  |
+
+
+
+
+### Get Events
+Gets a list of events in specified calendar.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Calendar | STRING | SELECT  |  |
+| Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find events that exist in this range.  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(iCalUId), STRING\(id), STRING\(subject), DATE_TIME\(startTime), DATE_TIME\(endTime), [STRING]\(attendees), BOOLEAN\(isOnlineMeeting), STRING\(onlineMeetingUrl), BOOLEAN\(reminderMinutesBeforeStart)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Free Time Slots
+Get free time slots from the Microsoft Outlook 365 calendar.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Calendar | STRING | SELECT  |  |
+| Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find free time.  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {DATE_TIME\(startTime), DATE_TIME\(endTime)} | OBJECT_BUILDER  |
+
+
+
+
+
+
 ### Get Mail
 Get a specific message
 
@@ -108,6 +224,19 @@ Type: OBJECT
 | {{STRING\(name), STRING\(address)}\(emailAddress)} | OBJECT_BUILDER  |
 
 
+
+
+
+
+### Reply to Email
+Creates a new reply to email.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Message ID | STRING | SELECT  |  Id of the message to reply to.  |
+| Comment | STRING | TEXT  |  Content of the reply to the email.  |
 
 
 
