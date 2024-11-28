@@ -127,9 +127,6 @@ spring:
             required: ${bytechef.mail.smtp.starttls.required:false}
   liquibase:
     contexts: mono, #spring.profiles.active#
-  output:
-    ansi:
-      console-available: true
   profiles:
     active: #spring.profiles.active#
     group:
