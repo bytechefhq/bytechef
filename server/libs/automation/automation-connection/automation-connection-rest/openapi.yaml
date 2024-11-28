@@ -4,12 +4,12 @@ info:
   title: "The Automation Connection Internal API"
   version: "1"
 servers:
-- url: "/api/automation/internal"
+  - url: "/api/automation/internal"
 tags:
-- name: "connection-tag"
-  description: "The Automation Connection Tag Internal API"
-- name: "connection"
-  description: "The Automation Connection Internal API"
+  - name: "connection-tag"
+    description: "The Automation Connection Tag Internal API"
+  - name: "connection"
+    description: "The Automation Connection Internal API"
 paths:
   /connections:
     post:

@@ -4,10 +4,10 @@ info:
   title: "The Embedded Connected User Internal API"
   version: "1"
 servers:
-- url: "/api/embedded/internal"
+  - url: "/api/embedded/internal"
 tags:
-- name: "connected-user"
-  description: "The Embedded Connected User Internal API"
+  - name: "connected-user"
+    description: "The Embedded Connected User Internal API"
 paths:
   /connected-users:
     get:

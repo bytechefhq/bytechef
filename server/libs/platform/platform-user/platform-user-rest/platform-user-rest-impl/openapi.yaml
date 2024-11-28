@@ -4,7 +4,7 @@ info:
   title: "The Platform User Internal API"
   version: "1"
 servers:
-- url: "/api/platform/internal"
+  - url: "/api/platform/internal"
 tags:
   - name: "api-key"
     description: "The Platform User API Key Internal API"
