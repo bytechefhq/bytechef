@@ -39,6 +39,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TIME_ZONE;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createCustomEvent;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getMailboxTimeZone;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -48,7 +49,6 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.CustomEvent;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 
@@ -133,6 +133,8 @@ public class MicrosoftOutlook365CreateEventAction {
             .map(attendee -> Map.of(EMAIL_ADDRESS, Map.of(ADDRESS, attendee)))
             .toList();
 
+        String zone = getMailboxTimeZone(actionContext);
+
         Map<String, Object> body =
             actionContext
                 .http(http -> http.post("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
@@ -140,8 +142,8 @@ public class MicrosoftOutlook365CreateEventAction {
                 .body(
                     Http.Body.of(
                         SUBJECT, inputParameters.getString(SUBJECT),
-                        START, Map.of(DATE_TIME, startTime, TIME_ZONE, ZoneId.systemDefault()),
-                        END, Map.of(DATE_TIME, endTime, TIME_ZONE, ZoneId.systemDefault()),
+                        START, Map.of(DATE_TIME, startTime, TIME_ZONE, zone),
+                        END, Map.of(DATE_TIME, endTime, TIME_ZONE, zone),
                         ATTENDEES, attendees,
                         IS_ONLINE_MEETING, inputParameters.getBoolean(IS_ONLINE_MEETING),
                         REMINDER_MINUTES_BEFORE_START, inputParameters.getInteger(REMINDER_MINUTES_BEFORE_START)))

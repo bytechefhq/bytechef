@@ -38,8 +38,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -75,21 +73,17 @@ public class MicrosoftOutlook365Utils {
         return otherItems;
     }
 
-    public static CustomEvent createCustomEvent(Map<?, ?> map) {
+    public static CustomEvent createCustomEvent(Map<?, ?> eventMap) {
         DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.S");
-        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
-        boolean isOnlineMeeting = (Boolean) map.get(IS_ONLINE_MEETING);
+        boolean isOnlineMeeting = (Boolean) eventMap.get(IS_ONLINE_MEETING);
 
-        String onlineMeetingUrl = "";
-        if (isOnlineMeeting && map.get("onlineMeeting") instanceof Map<?, ?> onlineMeetingMap) {
-            onlineMeetingUrl = (String) onlineMeetingMap.get("joinUrl");
-        }
-
-        int reminderMinutesBeforeStart = (Integer) map.get(REMINDER_MINUTES_BEFORE_START);
+        String onlineMeetingUrl = isOnlineMeeting && eventMap.get("onlineMeeting") instanceof Map<?, ?> onlineMeetingMap
+            ? (String) onlineMeetingMap.get("joinUrl")
+            : "";
 
         List<String> attendees = new ArrayList<>();
-        if (map.get(ATTENDEES) instanceof List<?> list) {
+        if (eventMap.get(ATTENDEES) instanceof List<?> list) {
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map1 && map1.get(EMAIL_ADDRESS) instanceof Map<?, ?> map2) {
                     attendees.add((String) map2.get(ADDRESS));
@@ -97,31 +91,20 @@ public class MicrosoftOutlook365Utils {
             }
         }
 
-        Map<?, ?> start = (Map<?, ?>) map.get(START);
-        String startDateTime = (String) start.get(DATE_TIME);
-
-        Map<?, ?> end = (Map<?, ?>) map.get(END);
-        String endDateTime = (String) end.get(DATE_TIME);
-
-        ZonedDateTime startZonedDateTime =
-            LocalDateTime.parse(inputFormatter.format(LocalDateTime.parse(startDateTime)))
-                .atZone(ZoneId.of((String) map.get("originalStartTimeZone")));
-        ZonedDateTime endZonedDateTime =
-            LocalDateTime.parse(inputFormatter.format(LocalDateTime.parse(endDateTime)))
-                .atZone(ZoneId.of((String) map.get("originalEndTimeZone")));
-
-        String formattedStart = startZonedDateTime.format(outputFormatter);
-        String formattedEnd = endZonedDateTime.format(outputFormatter);
+        Map<?, ?> start = (Map<?, ?>) eventMap.get(START);
+        Map<?, ?> end = (Map<?, ?>) eventMap.get(END);
 
         return new CustomEvent(
-            (String) map.get(I_CAL_UID), (String) map.get(ID), (String) map.get(SUBJECT),
-            LocalDateTime.parse(formattedStart, outputFormatter), LocalDateTime.parse(formattedEnd, outputFormatter),
-            attendees, isOnlineMeeting, onlineMeetingUrl, reminderMinutesBeforeStart);
+            (String) eventMap.get(I_CAL_UID), (String) eventMap.get(ID), (String) eventMap.get(SUBJECT),
+            LocalDateTime.parse(inputFormatter.format(LocalDateTime.parse((String) start.get(DATE_TIME)))),
+            LocalDateTime.parse(inputFormatter.format(LocalDateTime.parse((String) end.get(DATE_TIME)))),
+            attendees, isOnlineMeeting, onlineMeetingUrl, (Integer) eventMap.get(REMINDER_MINUTES_BEFORE_START));
     }
 
     public static List<CustomEvent> getCustomEvents(Parameters inputParameters, ActionContext actionContext) {
         Map<String, Object> body = actionContext
             .http(http -> http.get("/calendars/" + inputParameters.getRequiredString(CALENDAR) + "/events"))
+            .header("Prefer", "outlook.timezone=\"" + getMailboxTimeZone(actionContext) + "\"")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
@@ -143,6 +126,15 @@ public class MicrosoftOutlook365Utils {
         return events.stream()
             .map(MicrosoftOutlook365Utils::createCustomEvent)
             .toList();
+    }
+
+    public static String getMailboxTimeZone(ActionContext actionContext) {
+        Map<String, String> body = actionContext.http(http -> http.get("/mailboxSettings/timeZone"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return body.get(VALUE);
     }
 
     @SuppressFBWarnings("EI")
