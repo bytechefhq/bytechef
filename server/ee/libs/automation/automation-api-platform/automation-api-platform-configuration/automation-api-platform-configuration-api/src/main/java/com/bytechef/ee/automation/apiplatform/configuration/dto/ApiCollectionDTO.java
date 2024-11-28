@@ -12,7 +12,7 @@ import com.bytechef.automation.configuration.domain.ProjectInstance;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -22,8 +22,8 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ApiCollectionDTO(
-    int collectionVersion, String createdBy, LocalDateTime createdDate, String description, boolean enabled,
-    List<ApiCollectionEndpointDTO> endpoints, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    int collectionVersion, String createdBy, Instant createdDate, String description, boolean enabled,
+    List<ApiCollectionEndpointDTO> endpoints, Long id, String lastModifiedBy, Instant lastModifiedDate,
     String name, Project project, long projectId, ProjectInstance projectInstance, long projectInstanceId,
     int projectVersion, List<Tag> tags, int version) {
 

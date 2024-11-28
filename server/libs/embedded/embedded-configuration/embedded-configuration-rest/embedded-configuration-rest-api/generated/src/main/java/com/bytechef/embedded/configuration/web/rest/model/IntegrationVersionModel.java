@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -25,13 +25,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:58.475444+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-27T19:49:57.805122+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class IntegrationVersionModel {
 
   private String description;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime publishedDate;
+  private OffsetDateTime publishedDate;
 
   private Integer version;
 
@@ -57,7 +57,7 @@ public class IntegrationVersionModel {
     this.description = description;
   }
 
-  public IntegrationVersionModel publishedDate(LocalDateTime publishedDate) {
+  public IntegrationVersionModel publishedDate(OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
     return this;
   }
@@ -69,11 +69,11 @@ public class IntegrationVersionModel {
   @Valid 
   @Schema(name = "publishedDate", description = "The published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("publishedDate")
-  public LocalDateTime getPublishedDate() {
+  public OffsetDateTime getPublishedDate() {
     return publishedDate;
   }
 
-  public void setPublishedDate(LocalDateTime publishedDate) {
+  public void setPublishedDate(OffsetDateTime publishedDate) {
     this.publishedDate = publishedDate;
   }
 

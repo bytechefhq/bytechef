@@ -16,7 +16,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.domain;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -47,7 +47,7 @@ public class ApiClient {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -55,10 +55,10 @@ public class ApiClient {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("last_used_date")
-    private LocalDateTime lastUsedDate;
+    private Instant lastUsedDate;
 
     public ApiClient() {
     }
@@ -97,7 +97,7 @@ public class ApiClient {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -105,11 +105,11 @@ public class ApiClient {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public LocalDateTime getLastUsedDate() {
+    public Instant getLastUsedDate() {
         return lastUsedDate;
     }
 

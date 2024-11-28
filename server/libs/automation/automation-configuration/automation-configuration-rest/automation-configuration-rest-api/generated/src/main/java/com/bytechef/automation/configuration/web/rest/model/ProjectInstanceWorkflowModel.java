@@ -6,7 +6,7 @@ import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkf
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,13 +29,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.797159+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-27T19:49:57.121090+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ProjectInstanceWorkflowModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
@@ -48,12 +48,12 @@ public class ProjectInstanceWorkflowModel {
   private Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
+  private OffsetDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private Long projectInstanceId;
 
@@ -85,7 +85,7 @@ public class ProjectInstanceWorkflowModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectInstanceWorkflowModel createdDate(LocalDateTime createdDate) {
+  public ProjectInstanceWorkflowModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -97,11 +97,11 @@ public class ProjectInstanceWorkflowModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -201,7 +201,7 @@ public class ProjectInstanceWorkflowModel {
     this.id = id;
   }
 
-  public ProjectInstanceWorkflowModel lastExecutionDate(LocalDateTime lastExecutionDate) {
+  public ProjectInstanceWorkflowModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -213,11 +213,11 @@ public class ProjectInstanceWorkflowModel {
   @Valid 
   @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
+  public OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
+  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
@@ -241,7 +241,7 @@ public class ProjectInstanceWorkflowModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectInstanceWorkflowModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ProjectInstanceWorkflowModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -253,11 +253,11 @@ public class ProjectInstanceWorkflowModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

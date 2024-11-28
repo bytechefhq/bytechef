@@ -19,7 +19,8 @@ package com.bytechef.component.definition.unified.accounting.model;
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.Objects;
 
@@ -34,8 +35,8 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     private String id;
     private String remoteId;
     private Map<String, ?> remoteData;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
+    private Instant createdDate;
+    private Instant lastModifiedDate;
 
     private AccountUnifiedOutputModel() {
     }
@@ -43,8 +44,7 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     public AccountUnifiedOutputModel(
         String accountNumber, String companyInfoId, String classification, BigDecimal currentBalance, String currency,
         String description, String name, String parentAccountId, String status, String typ, Map<String, ?> customFields,
-        String id, String remoteId, Map<String, ?> remoteData, LocalDateTime createdDate,
-        LocalDateTime lastModifiedDate) {
+        String id, String remoteId, Map<String, ?> remoteData, Instant createdDate, Instant lastModifiedDate) {
 
         super(
             accountNumber, companyInfoId, classification, currentBalance, currency, description, name, parentAccountId,
@@ -73,12 +73,12 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     }
 
     @Override
-    public LocalDateTime getCreatedDate() {
+    public OffsetDateTime getCreatedDate() {
         return null;
     }
 
     @Override
-    public LocalDateTime getLastModifiedDate() {
+    public OffsetDateTime getLastModifiedDate() {
         return null;
     }
 

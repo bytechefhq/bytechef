@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("contact")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.351813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-27T22:14:32.959163+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ContactModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -50,7 +50,7 @@ public class ContactModel {
   private String id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> lastActivityDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> lastActivityDate = JsonNullable.<OffsetDateTime>undefined();
 
   private JsonNullable<String> lastName = JsonNullable.<String>undefined();
 
@@ -60,10 +60,10 @@ public class ContactModel {
   private JsonNullable<LifecycleStageModel> lifecycleStage = JsonNullable.<LifecycleStageModel>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> createdDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> createdDate = JsonNullable.<OffsetDateTime>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   @Valid
   private Map<String, Object> rawData = new HashMap<>();
@@ -75,7 +75,7 @@ public class ContactModel {
   /**
    * Constructor with only required parameters
    */
-  public ContactModel(String accountId, String ownerId, List<@Valid AddressesInnerModel> addresses, List<@Valid EmailsInnerModel> emails, String firstName, String id, LocalDateTime lastActivityDate, String lastName, LifecycleStageModel lifecycleStage, LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
+  public ContactModel(String accountId, String ownerId, List<@Valid AddressesInnerModel> addresses, List<@Valid EmailsInnerModel> emails, String firstName, String id, OffsetDateTime lastActivityDate, String lastName, LifecycleStageModel lifecycleStage, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate) {
     this.accountId = JsonNullable.of(accountId);
     this.ownerId = JsonNullable.of(ownerId);
     this.addresses = addresses;
@@ -225,7 +225,7 @@ public class ContactModel {
     this.id = id;
   }
 
-  public ContactModel lastActivityDate(LocalDateTime lastActivityDate) {
+  public ContactModel lastActivityDate(OffsetDateTime lastActivityDate) {
     this.lastActivityDate = JsonNullable.of(lastActivityDate);
     return this;
   }
@@ -237,11 +237,11 @@ public class ContactModel {
   @NotNull @Valid 
   @Schema(name = "lastActivityDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastActivityDate")
-  public JsonNullable<LocalDateTime> getLastActivityDate() {
+  public JsonNullable<OffsetDateTime> getLastActivityDate() {
     return lastActivityDate;
   }
 
-  public void setLastActivityDate(JsonNullable<LocalDateTime> lastActivityDate) {
+  public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
 
@@ -313,7 +313,7 @@ public class ContactModel {
     this.lifecycleStage = lifecycleStage;
   }
 
-  public ContactModel createdDate(LocalDateTime createdDate) {
+  public ContactModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = JsonNullable.of(createdDate);
     return this;
   }
@@ -325,15 +325,15 @@ public class ContactModel {
   @NotNull @Valid 
   @Schema(name = "createdDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
-  public JsonNullable<LocalDateTime> getCreatedDate() {
+  public JsonNullable<OffsetDateTime> getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(JsonNullable<LocalDateTime> createdDate) {
+  public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
 
-  public ContactModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ContactModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -345,11 +345,11 @@ public class ContactModel {
   @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

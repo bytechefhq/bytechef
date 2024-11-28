@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.351813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-27T22:14:32.959163+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class CreateUpdateOpportunityModel {
 
   private JsonNullable<Integer> amount = JsonNullable.<Integer>undefined();
@@ -41,7 +41,7 @@ public class CreateUpdateOpportunityModel {
   private String stage;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> lastActivityDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> lastActivityDate = JsonNullable.<OffsetDateTime>undefined();
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
 
@@ -152,7 +152,7 @@ public class CreateUpdateOpportunityModel {
     this.stage = stage;
   }
 
-  public CreateUpdateOpportunityModel lastActivityDate(LocalDateTime lastActivityDate) {
+  public CreateUpdateOpportunityModel lastActivityDate(OffsetDateTime lastActivityDate) {
     this.lastActivityDate = JsonNullable.of(lastActivityDate);
     return this;
   }
@@ -164,11 +164,11 @@ public class CreateUpdateOpportunityModel {
   @Valid 
   @Schema(name = "lastActivityDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastActivityDate")
-  public JsonNullable<LocalDateTime> getLastActivityDate() {
+  public JsonNullable<OffsetDateTime> getLastActivityDate() {
     return lastActivityDate;
   }
 
-  public void setLastActivityDate(JsonNullable<LocalDateTime> lastActivityDate) {
+  public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
 

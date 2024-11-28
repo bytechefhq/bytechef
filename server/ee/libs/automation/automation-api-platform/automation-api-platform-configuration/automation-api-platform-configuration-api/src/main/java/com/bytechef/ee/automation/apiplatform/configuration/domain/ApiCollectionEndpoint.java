@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.configuration.domain;
 
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,7 +41,7 @@ public class ApiCollectionEndpoint {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("http_method")
     private int httpMethod;
@@ -55,7 +55,7 @@ public class ApiCollectionEndpoint {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -102,7 +102,7 @@ public class ApiCollectionEndpoint {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -114,7 +114,7 @@ public class ApiCollectionEndpoint {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

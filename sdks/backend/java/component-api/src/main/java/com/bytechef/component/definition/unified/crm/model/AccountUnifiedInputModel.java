@@ -22,7 +22,7 @@ import com.bytechef.component.definition.unified.crm.model.common.Email;
 import com.bytechef.component.definition.unified.crm.model.common.LifecycleStage;
 import com.bytechef.component.definition.unified.crm.model.common.Phone;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
     private String industry; // Industry
     private int numberOfEmployees;
     private LifecycleStage lifecycleStage;
-    private LocalDateTime lastActivityDate;
+    private OffsetDateTime lastActivityDate;
     private String website;
     private String ownerId;
     private List<Address> addresses;
@@ -53,7 +53,7 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
 
     public AccountUnifiedInputModel(
         String name, String description, String industry, int numberOfEmployees, LifecycleStage lifecycleStage,
-        LocalDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
+        OffsetDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
         List<Phone> phones, Map<String, ?> customFields) {
 
         this.name = name;
@@ -90,7 +90,7 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
         return lifecycleStage;
     }
 
-    public LocalDateTime getLastActivityDate() {
+    public OffsetDateTime getLastActivityDate() {
         return lastActivityDate;
     }
 

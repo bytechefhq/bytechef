@@ -22,7 +22,7 @@ import com.bytechef.component.definition.unified.crm.model.common.Email;
 import com.bytechef.component.definition.unified.crm.model.common.LifecycleStage;
 import com.bytechef.component.definition.unified.crm.model.common.Phone;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -38,17 +38,17 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     private String id;
     private String remoteId;
     private Map<String, ?> remoteData;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
+    private OffsetDateTime createdDate;
+    private OffsetDateTime lastModifiedDate;
 
     private AccountUnifiedOutputModel() {
     }
 
     public AccountUnifiedOutputModel(
         String name, String description, String industry, int numberOfEmployees, LifecycleStage lifecycleStage,
-        LocalDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
+        OffsetDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
         List<Phone> phoneNumbers, Map<String, ?> customFields, String id, String remoteId, Map<String, ?> remoteData,
-        LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
+        OffsetDateTime createdDate, OffsetDateTime lastModifiedDate) {
 
         super(
             name, description, industry, numberOfEmployees, lifecycleStage, lastActivityDate, website, ownerId,
@@ -77,12 +77,12 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     }
 
     @Override
-    public LocalDateTime getCreatedDate() {
+    public OffsetDateTime getCreatedDate() {
         return createdDate;
     }
 
     @Override
-    public LocalDateTime getLastModifiedDate() {
+    public OffsetDateTime getLastModifiedDate() {
         return lastModifiedDate;
     }
 
