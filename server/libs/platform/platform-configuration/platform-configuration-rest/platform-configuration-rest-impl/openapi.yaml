@@ -1606,9 +1606,11 @@ components:
           defaultValue:
             description: "The property default value."
             type: "object"
+            additionalProperties: true
           exampleValue:
             description: "The property sample value."
             type: "object"
+            additionalProperties: true
           multipleValues:
             description: "If the object can contain multiple additional properties."
             type: "boolean"
