@@ -15,18 +15,18 @@ info:
   analytics:
     enabled: ${bytechef.analytics.enabled:false}
     postHog:
-      apiKey: ${bytechef.analytics.post-hog.api-key}
-      host: ${bytechef.analytics.post-hog.host}
+      apiKey: ${bytechef.analytics.postHog.apiKey:}
+      host: ${bytechef.analytics.postHog.host:}
   application:
-    edition: ${bytechef.edition}
+    edition: ${bytechef.edition:}
   featureFlags: ${bytechef.featureFlags}
   helpHub:
     enabled: ${bytechef.helpHub.enabled:false}
     commandBar:
-      orgId: ${bytechef.helpHub.command-bar.orgId}
+      orgId: ${bytechef.helpHub.commandBar.orgId:}
   signUp:
-    activationRequired: ${bytechef.signUp.activationRequired}
-    enabled: ${bytechef.signUp.enabled:false}
+    activationRequired: ${bytechef.signUp.activationRequired:false}
+    enabled: ${bytechef.signUp.enabled}
 
 management:
   endpoints:
