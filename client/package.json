@@ -83,6 +83,7 @@
     "d3-timer": "^3.0.1",
     "date-fns": "^4.1.0",
     "fetch-intercept": "^2.4.0",
+    "html-entities": "^2.5.2",
     "i18next": "^24.0.2",
     "lucide-react": "^0.461.0",
     "monaco-editor": "^0.52.0",
