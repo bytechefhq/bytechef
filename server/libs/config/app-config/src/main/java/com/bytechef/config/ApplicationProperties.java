@@ -45,7 +45,7 @@ public class ApplicationProperties {
     private Datasource datasource = new Datasource();
     private DataStorage dataStorage;
     private DiscoveryService discoveryService = new DiscoveryService();
-    private Edition edition;
+    private Edition edition = Edition.EE;
     private Encryption encryption;
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
@@ -780,7 +780,7 @@ public class ApplicationProperties {
             AWS, FILESYSTEM, JDBC
         }
 
-        private Provider provider;
+        private Provider provider = Provider.JDBC;
 
         public Provider getProvider() {
             return provider;
