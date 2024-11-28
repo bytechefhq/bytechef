@@ -41,7 +41,8 @@ import com.bytechef.component.definition.Property;
 public class HttpClientConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .properties(string(BASE_URI).label("Base URI"))
+        .properties(string(BASE_URI).label("Base URI")
+            .description("If set, it will be combined HTTP Client Component URI attribute value."))
         .authorizationRequired(false)
         .authorizations(
             authorization(Authorization.AuthorizationType.API_KEY)
