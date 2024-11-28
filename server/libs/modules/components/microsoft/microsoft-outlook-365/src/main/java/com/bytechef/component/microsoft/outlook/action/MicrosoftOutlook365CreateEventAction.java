@@ -38,7 +38,7 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.START;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TIME_ZONE;
-import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.createCustomEvent;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.createCustomEvent;
 import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.getMailboxTimeZone;
 
 import com.bytechef.component.definition.ActionContext;
@@ -46,7 +46,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.CustomEvent;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
