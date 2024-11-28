@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
@@ -42,6 +44,8 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEeVersion
 @ConditionalOnMultiTenant
 public class MultiTenantService implements TenantService, ResourceLoaderAware {
+
+    private static final Log log = LogFactory.getLog(MultiTenantService.class);
 
     private final TenantRepository tenantRepository;
     private final DataSource dataSource;
@@ -69,6 +73,8 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
         initTenant(tenantId, "multitenant");
 
+        log.info("Tenant created: " + tenantId);
+
         return tenantId;
     }
 
@@ -79,6 +85,8 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
     @Override
     public void deleteTenant(String tenantId) {
         tenantRepository.deleteTenant(tenantId);
+
+        log.info("Tenant deleted: " + tenantId);
     }
 
     @Override
