@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.tag.web.rest.mapper.config;
+package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.tag.web.rest.adapter.TagConversionServiceAdapter;
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
-import org.mapstruct.MapperConfig;
-import org.mapstruct.extensions.spring.SpringMapperConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import org.mapstruct.Mapper;
+import org.openapitools.jackson.nullable.JsonNullable;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, TagConversionServiceAdapter.class
-})
-@SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.platform.tag.web.rest.adapter",
-    conversionServiceAdapterClassName = "TagConversionServiceAdapter")
-public interface TagMapperSpringConfig {
+@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+public interface JsonNullableMapper {
+
+    default JsonNullable<Object> mapToJsonNullable(Object value) {
+        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
+    }
 }

@@ -36,7 +36,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -138,7 +138,7 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
         }
         // no more tasks to execute -- complete the branch
         else {
-            branchTaskExecution.setEndDate(LocalDateTime.now());
+            branchTaskExecution.setEndDate(Instant.now());
 
             taskCompletionHandler.handle(branchTaskExecution);
         }

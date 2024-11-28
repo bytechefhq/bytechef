@@ -17,7 +17,7 @@
 package com.bytechef.message.event;
 
 import com.bytechef.message.route.MessageRoute;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Ivica Cardic
@@ -26,7 +26,7 @@ public interface MessageEvent<T extends MessageRoute> {
 
     Object getMetadata(String name);
 
-    LocalDateTime getCreateDate();
+    Instant getCreateDate();
 
     T getRoute();
 

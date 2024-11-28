@@ -33,7 +33,7 @@ import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -167,7 +167,7 @@ public class TriggerWorker {
             }
         }
 
-        triggerExecution.setEndDate(LocalDateTime.now());
+        triggerExecution.setEndDate(Instant.now());
         triggerExecution.setExecutionTime(System.currentTimeMillis() - startTime);
         triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
 

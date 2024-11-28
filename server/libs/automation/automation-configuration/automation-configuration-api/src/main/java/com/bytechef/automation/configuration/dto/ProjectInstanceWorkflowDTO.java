@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.dto;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -28,14 +28,14 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceWorkflowDTO(
-    List<ProjectInstanceWorkflowConnection> connections, String createdBy, LocalDateTime createdDate,
-    Map<String, ?> inputs, boolean enabled, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Long projectInstanceId, String staticWebhookUrl, int version, String workflowId,
+    List<ProjectInstanceWorkflowConnection> connections, String createdBy, Instant createdDate,
+    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
+    Instant lastModifiedDate, Long projectInstanceId, String staticWebhookUrl, int version, String workflowId,
     String workflowReferenceCode)
     implements Comparable<ProjectInstanceWorkflowDTO> {
 
     public ProjectInstanceWorkflowDTO(
-        ProjectInstanceWorkflow projectInstanceWorkflow, LocalDateTime lastExecutionDate, String staticWebhookUrl,
+        ProjectInstanceWorkflow projectInstanceWorkflow, Instant lastExecutionDate, String staticWebhookUrl,
         String workflowReferenceCode) {
 
         this(

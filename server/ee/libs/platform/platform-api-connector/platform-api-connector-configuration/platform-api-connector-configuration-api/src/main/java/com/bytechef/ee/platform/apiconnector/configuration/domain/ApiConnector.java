@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.apiconnector.configuration.domain;
 
 import com.bytechef.file.storage.domain.FileEntry;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -36,7 +36,7 @@ public class ApiConnector {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private FileEntry definition;
@@ -59,7 +59,7 @@ public class ApiConnector {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -99,7 +99,7 @@ public class ApiConnector {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -131,7 +131,7 @@ public class ApiConnector {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

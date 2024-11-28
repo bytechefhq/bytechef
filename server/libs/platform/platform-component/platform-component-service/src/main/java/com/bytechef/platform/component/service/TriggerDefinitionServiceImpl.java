@@ -66,6 +66,7 @@ import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -170,7 +171,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 output -> eventPublisher.publishEvent(
                     new TriggerListenerEvent(
                         new TriggerListenerEvent.ListenerParameters(
-                            WorkflowExecutionId.parse(workflowExecutionId), LocalDateTime.now(), output))),
+                            WorkflowExecutionId.parse(workflowExecutionId), Instant.now(), output))),
                 context);
         } catch (Exception e) {
             throw new ComponentExecutionException(e, inputParameters,

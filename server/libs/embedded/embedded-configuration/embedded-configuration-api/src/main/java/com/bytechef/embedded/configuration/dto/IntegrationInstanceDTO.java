@@ -20,7 +20,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -28,15 +28,15 @@ import java.util.Set;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceDTO(
-    long connectedUserId, long connectionId, String createdBy, LocalDateTime createdDate, boolean enabled,
+    long connectedUserId, long connectionId, String createdBy, Instant createdDate, boolean enabled,
     Environment environment, Long id, long integrationInstanceConfigurationId,
     IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, LocalDateTime lastExecutionDate,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, int version) {
+    Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, Instant lastExecutionDate,
+    String lastModifiedBy, Instant lastModifiedDate, int version) {
 
     public IntegrationInstanceDTO(
         IntegrationInstance integrationInstance, IntegrationInstanceConfiguration integrationInstanceConfiguration,
-        Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, LocalDateTime lastExecutionDate) {
+        Set<IntegrationInstanceWorkflowDTO> integrationInstanceWorkflows, Instant lastExecutionDate) {
 
         this(
             integrationInstance.getConnectedUserId(), integrationInstance.getConnectionId(),

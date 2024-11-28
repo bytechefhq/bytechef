@@ -34,7 +34,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -153,7 +153,7 @@ public class ForkJoinTaskCompletionHandler implements TaskCompletionHandler {
             long branchesLeft = counterService.decrement(Validate.notNull(taskExecution.getParentId(), "id"));
 
             if (branchesLeft == 0) {
-                forkJoinTaskExecution.setEndDate(LocalDateTime.now());
+                forkJoinTaskExecution.setEndDate(Instant.now());
 
                 taskCompletionHandler.handle(forkJoinTaskExecution);
             }

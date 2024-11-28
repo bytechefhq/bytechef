@@ -65,7 +65,7 @@ import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -736,7 +736,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfiguration.getIntegrationVersion());
     }
 
-    private LocalDateTime getWorkflowLastExecutionDate(String workflowId) {
+    private Instant getWorkflowLastExecutionDate(String workflowId) {
         return OptionalUtils.mapOrElse(
             jobService.fetchLastWorkflowJob(workflowId),
             Job::getEndDate,

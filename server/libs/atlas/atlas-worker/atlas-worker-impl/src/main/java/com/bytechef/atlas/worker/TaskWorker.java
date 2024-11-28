@@ -34,7 +34,7 @@ import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.event.MessageEvent;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -195,7 +195,7 @@ public class TaskWorker {
                         Validate.notNull(taskExecution.getId(), "id"), output));
             }
 
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
             taskExecution.setStatus(Status.COMPLETED);
@@ -225,7 +225,7 @@ public class TaskWorker {
 
             Object output = taskHandler.handle(taskExecution.clone());
 
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
             taskExecution.setStatus(Status.COMPLETED);

@@ -55,7 +55,7 @@ import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -149,7 +149,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
-        Environment environment, Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate,
+        Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long integrationId, Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();

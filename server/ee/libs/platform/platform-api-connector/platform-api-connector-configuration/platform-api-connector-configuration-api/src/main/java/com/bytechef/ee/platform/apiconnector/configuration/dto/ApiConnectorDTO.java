@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.apiconnector.configuration.dto;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEndpoint;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -20,9 +20,9 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ApiConnectorDTO(
-    int connectorVersion, String createdBy, LocalDateTime createdDate, String definition, String description,
+    int connectorVersion, String createdBy, Instant createdDate, String definition, String description,
     boolean enabled, List<ApiConnectorEndpoint> endpoints, String icon, Long id, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, String name, String specification, String title, int version) {
+    Instant lastModifiedDate, String name, String specification, String title, int version) {
 
     public ApiConnectorDTO(
         ApiConnector apiConnector, String definition, String specification, List<ApiConnectorEndpoint> endpoints) {

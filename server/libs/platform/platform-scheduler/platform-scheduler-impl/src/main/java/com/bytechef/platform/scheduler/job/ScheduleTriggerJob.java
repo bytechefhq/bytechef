@@ -17,7 +17,6 @@
 package com.bytechef.platform.scheduler.job;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -45,7 +44,7 @@ public class ScheduleTriggerJob implements Job {
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
-                    LocalDateTimeUtils.toLocalDateTime(fireTime),
+                    fireTime.toInstant(),
                     MapUtils.concat(
                         Map.of("datetime", fireTime.toString()),
                         JsonUtils.readMap(jobDataMap.getString("output"), String.class)))));

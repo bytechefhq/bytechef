@@ -18,7 +18,7 @@ package com.bytechef.embedded.connected.user.domain;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.constant.Environment;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public class ConnectedUser {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String email;
@@ -72,7 +72,7 @@ public class ConnectedUser {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -124,7 +124,7 @@ public class ConnectedUser {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -165,7 +165,7 @@ public class ConnectedUser {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

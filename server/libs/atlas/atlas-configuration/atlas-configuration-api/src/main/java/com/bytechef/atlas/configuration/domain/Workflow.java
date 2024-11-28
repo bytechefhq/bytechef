@@ -25,7 +25,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,7 +82,7 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String definition;
@@ -114,7 +114,7 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Transient
     private Map<String, Object> metadata = new HashMap<>();
@@ -144,8 +144,7 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     @SuppressWarnings("unchecked")
     public Workflow(
-        String id, String definition, Format format, LocalDateTime lastModifiedDate,
-        Map<String, Object> metadata) {
+        String id, String definition, Format format, Instant lastModifiedDate, Map<String, Object> metadata) {
 
         Validate.notNull(definition, "'definition' must not be null");
         Validate.notNull(format, "'format' must not be null");
@@ -196,9 +195,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     @PersistenceCreator
-    public Workflow(String id, String definition, Format format, LocalDateTime lastModifiedDate)
-        throws Exception {
-
+    public Workflow(String id, String definition, Format format, Instant lastModifiedDate) throws Exception {
         this(id, definition, format, lastModifiedDate, Map.of());
     }
 
@@ -241,7 +238,7 @@ public final class Workflow implements Persistable<String>, Serializable {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -276,7 +273,7 @@ public final class Workflow implements Persistable<String>, Serializable {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
@@ -408,7 +405,7 @@ public final class Workflow implements Persistable<String>, Serializable {
 
                         if (firstItem instanceof WorkflowTask) {
                             List<WorkflowTask> curWorkflowTasks = curList.stream()
-                                .map(item -> ((WorkflowTask) item))
+                                .map(item -> (WorkflowTask) item)
                                 .toList();
 
                             returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));

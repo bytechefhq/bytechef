@@ -22,7 +22,7 @@ import com.bytechef.platform.workflow.coordinator.event.TriggerExecutionErrorEve
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +54,7 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
 
             // set task status to FAILED and persist
 
-            triggerExecution.setEndDate(LocalDateTime.now());
+            triggerExecution.setEndDate(Instant.now());
             triggerExecution.setStatus(TriggerExecution.Status.FAILED);
 
             triggerExecutionService.update(triggerExecution);

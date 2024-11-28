@@ -48,7 +48,7 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -329,12 +329,12 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             .orElse(null);
     }
 
-    private LocalDateTime getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
+    private Instant getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
         return OptionalUtils.mapOrElse(
             instanceJobService.fetchLastJobId(integrationInstanceId, ModeType.EMBEDDED), this::getJobEndDate, null);
     }
 
-    private LocalDateTime getJobEndDate(Long jobId) {
+    private Instant getJobEndDate(Long jobId) {
         Job job = jobService.getJob(jobId);
 
         return job.getEndDate();

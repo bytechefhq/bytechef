@@ -17,6 +17,7 @@
 package com.bytechef.platform.workflow.execution.web.rest.mapper.config;
 
 import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -25,7 +26,8 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    WorkflowConfigurationConversionServiceAdapter.class, WorkflowExecutionConversionServiceAdapter.class
+    DateTimeMapper.class, WorkflowConfigurationConversionServiceAdapter.class,
+    WorkflowExecutionConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.workflow.execution.web.rest.adapter",

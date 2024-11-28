@@ -34,7 +34,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -143,7 +143,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             workflow.getOutputs(), Workflow.Output::name, Workflow.Output::value);
 
         job.setCurrentTask(-1);
-        job.setEndDate(LocalDateTime.now());
+        job.setEndDate(Instant.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
             taskFileStorage.storeJobOutputs(

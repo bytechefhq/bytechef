@@ -35,7 +35,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +126,7 @@ public class LoopTaskCompletionHandler implements TaskCompletionHandler {
         if (loopForever || index < items.size()) {
             handleNewIterationFirstChildTaskExecution(loopTaskExecution, iterateeWorkflowTasks, items, index);
         } else {
-            loopTaskExecution.setEndDate(LocalDateTime.now());
+            loopTaskExecution.setEndDate(Instant.now());
 
             taskCompletionHandler.handle(loopTaskExecution);
         }

@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +29,7 @@ import java.util.Objects;
 public class WorkflowDTO {
 
     private final String createdBy;
-    private final LocalDateTime createdDate;
+    private final Instant createdDate;
     private final String definition;
     private final String description;
     private final Workflow.Format format;
@@ -37,7 +37,7 @@ public class WorkflowDTO {
     private final List<Workflow.Input> inputs;
     private final String label;
     private final String lastModifiedBy;
-    private final LocalDateTime lastModifiedDate;
+    private final Instant lastModifiedDate;
     private final List<Workflow.Output> outputs;
     private final Workflow.SourceType sourceType;
     private final int maxRetries;
@@ -50,8 +50,8 @@ public class WorkflowDTO {
      *
      */
     public WorkflowDTO(
-        String createdBy, LocalDateTime createdDate, String definition, String description, Workflow.Format format,
-        String id, List<Workflow.Input> inputs, String label, String lastModifiedBy, LocalDateTime lastModifiedDate,
+        String createdBy, Instant createdDate, String definition, String description, Workflow.Format format,
+        String id, List<Workflow.Input> inputs, String label, String lastModifiedBy, Instant lastModifiedDate,
         List<Workflow.Output> outputs, Workflow.SourceType sourceType, int maxRetries, List<WorkflowTaskDTO> tasks,
         List<WorkflowTriggerDTO> triggers, int version, Workflow workflow) {
 
@@ -86,7 +86,7 @@ public class WorkflowDTO {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -118,7 +118,7 @@ public class WorkflowDTO {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

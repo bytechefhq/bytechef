@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -46,7 +46,7 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private MapWrapper inputs = new MapWrapper();
@@ -60,7 +60,7 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @MappedCollection(idColumn = "workflow_test_configuration_id")
     private Set<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = Collections.emptySet();
@@ -114,7 +114,7 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -131,7 +131,7 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

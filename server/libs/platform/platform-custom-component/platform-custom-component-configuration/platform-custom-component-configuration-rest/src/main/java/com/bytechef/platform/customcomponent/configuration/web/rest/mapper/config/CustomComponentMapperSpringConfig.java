@@ -17,6 +17,7 @@
 package com.bytechef.platform.customcomponent.configuration.web.rest.mapper.config;
 
 import com.bytechef.platform.customcomponent.configuration.web.rest.adapter.CustomComponentConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,7 +25,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    CustomComponentConversionServiceAdapter.class
+    DateTimeMapper.class, CustomComponentConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.customcomponent.configuration.web.rest.adapter",

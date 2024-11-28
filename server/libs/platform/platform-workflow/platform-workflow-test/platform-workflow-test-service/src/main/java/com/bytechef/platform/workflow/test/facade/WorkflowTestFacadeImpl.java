@@ -40,7 +40,7 @@ import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecution;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +125,8 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             if (sampleOutput != null) {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
                     .id(-RANDOM.nextLong())
-                    .startDate(LocalDateTime.now())
-                    .endDate(LocalDateTime.now())
+                    .startDate(Instant.now())
+                    .endDate(Instant.now())
                     .status(Status.COMPLETED)
                     .workflowTrigger(workflowTrigger)
                     .build();

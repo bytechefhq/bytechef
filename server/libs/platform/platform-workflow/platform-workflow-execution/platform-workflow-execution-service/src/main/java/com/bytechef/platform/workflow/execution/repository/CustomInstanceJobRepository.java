@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.execution.repository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +28,6 @@ import org.springframework.lang.NonNull;
 public interface CustomInstanceJobRepository {
 
     Page<Long> findAllJobIds(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
+        Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
         @NonNull List<String> workflowIds, Pageable pageable);
 }

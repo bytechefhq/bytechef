@@ -17,7 +17,7 @@
 package com.bytechef.platform.codeworkflow.configuration.domain;
 
 import com.bytechef.file.storage.domain.FileEntry;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -80,7 +80,7 @@ public class CodeWorkflowContainer {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("external_version")
     private String externalVersion;
@@ -94,7 +94,7 @@ public class CodeWorkflowContainer {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private int language;
@@ -153,7 +153,7 @@ public class CodeWorkflowContainer {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -165,7 +165,7 @@ public class CodeWorkflowContainer {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

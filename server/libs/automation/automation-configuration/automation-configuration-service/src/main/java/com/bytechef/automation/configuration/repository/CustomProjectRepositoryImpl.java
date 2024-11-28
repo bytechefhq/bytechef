@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Project;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -140,7 +140,7 @@ public class CustomProjectRepositoryImpl implements CustomProjectRepository {
         return projects;
     }
 
-    private record ProjectVersion(int version, int status, LocalDateTime publishedDate, String description) {
+    private record ProjectVersion(int version, int status, Instant publishedDate, String description) {
     }
 
     private record ProjectWorkflow(String workflow_id, int project_version) {

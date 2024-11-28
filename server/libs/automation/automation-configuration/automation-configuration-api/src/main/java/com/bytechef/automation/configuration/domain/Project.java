@@ -22,7 +22,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -57,7 +57,7 @@ public final class Project {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String description;
@@ -74,7 +74,7 @@ public final class Project {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @MappedCollection(idColumn = "project_id")
     private Set<ProjectTag> projectTags = new HashSet<>();
@@ -138,7 +138,7 @@ public final class Project {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -158,12 +158,12 @@ public final class Project {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
     @Nullable
-    public LocalDateTime getLastPublishedDate() {
+    public Instant getLastPublishedDate() {
         return projectVersions.stream()
             .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
             .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
@@ -208,7 +208,7 @@ public final class Project {
         ProjectVersion projectVersion = getMaxProjectVersion();
 
         projectVersion.setDescription(description);
-        projectVersion.setPublishedDate(LocalDateTime.now());
+        projectVersion.setPublishedDate(Instant.now());
         projectVersion.setStatus(Status.PUBLISHED);
 
         int newVersion = projectVersion.getVersion() + 1;

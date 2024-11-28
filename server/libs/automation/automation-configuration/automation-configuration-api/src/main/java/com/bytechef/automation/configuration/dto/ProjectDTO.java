@@ -22,7 +22,7 @@ import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -30,8 +30,8 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectDTO(
-    Category category, String createdBy, LocalDateTime createdDate, String description, Long id, String name,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, LocalDateTime lastPublishedDate, Status lastStatus,
+    Category category, String createdBy, Instant createdDate, String description, Long id, String name,
+    String lastModifiedBy, Instant lastModifiedDate, Instant lastPublishedDate, Status lastStatus,
     int lastProjectVersion, List<ProjectVersion> projectVersions, List<Long> projectWorkflowIds,
     List<Tag> tags, int version, Long workspaceId) {
 
@@ -66,13 +66,13 @@ public record ProjectDTO(
     public static final class Builder {
         private Category category;
         private String createdBy;
-        private LocalDateTime createdDate;
+        private Instant createdDate;
         private String description;
         private Long id;
         private String name;
         private String lastModifiedBy;
-        private LocalDateTime lastModifiedDate;
-        private LocalDateTime lastPublishedDate;
+        private Instant lastModifiedDate;
+        private Instant lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
         private int lastProjectVersion;
         private List<Tag> tags;
@@ -96,7 +96,7 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder createdDate(LocalDateTime createdDate) {
+        public Builder createdDate(Instant createdDate) {
             this.createdDate = createdDate;
 
             return this;
@@ -126,7 +126,7 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
+        public Builder lastModifiedDate(Instant lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
 
             return this;
@@ -138,7 +138,7 @@ public record ProjectDTO(
             return this;
         }
 
-        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
+        public Builder lastPublishedDate(Instant lastPublishedDate) {
             this.lastPublishedDate = lastPublishedDate;
 
             return this;

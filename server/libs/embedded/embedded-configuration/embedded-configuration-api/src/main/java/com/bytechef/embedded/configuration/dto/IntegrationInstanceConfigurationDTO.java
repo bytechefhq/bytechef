@@ -21,7 +21,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurati
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +31,8 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationDTO(
     Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
-    Map<String, ?> connectionParameters, String createdBy, LocalDateTime createdDate, String description,
-    boolean enabled, Environment environment, Long id, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    Map<String, ?> connectionParameters, String createdBy, Instant createdDate, String description,
+    boolean enabled, Environment environment, Long id, String lastModifiedBy, Instant lastModifiedDate,
     IntegrationDTO integration, long integrationId, Integer integrationVersion, String name,
     List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
     int version) {
@@ -79,13 +79,13 @@ public record IntegrationInstanceConfigurationDTO(
     public static final class Builder {
         private Map<String, ?> connectionParameters;
         private String createdBy;
-        private LocalDateTime createdDate;
+        private Instant createdDate;
         private String description;
         private boolean enabled;
         private Environment environment;
         private Long id;
         private String lastModifiedBy;
-        private LocalDateTime lastModifiedDate;
+        private Instant lastModifiedDate;
         private IntegrationDTO integration;
         private long integrationId;
         private int integrationVersion;
@@ -109,7 +109,7 @@ public record IntegrationInstanceConfigurationDTO(
             return this;
         }
 
-        public Builder createdDate(LocalDateTime createdDate) {
+        public Builder createdDate(Instant createdDate) {
             this.createdDate = createdDate;
 
             return this;
@@ -145,7 +145,7 @@ public record IntegrationInstanceConfigurationDTO(
             return this;
         }
 
-        public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
+        public Builder lastModifiedDate(Instant lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
 
             return this;

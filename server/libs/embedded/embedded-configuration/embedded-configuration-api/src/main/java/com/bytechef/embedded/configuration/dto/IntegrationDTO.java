@@ -23,7 +23,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,9 +33,9 @@ import org.apache.commons.lang3.StringUtils;
 @SuppressFBWarnings("EI")
 public record IntegrationDTO(
     boolean allowMultipleInstances, Category category, String componentName, String createdBy,
-    LocalDateTime createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
-    List<Long> integrationWorkflowIds, String lastModifiedBy, LocalDateTime lastModifiedDate,
-    LocalDateTime lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, String name, List<Tag> tags,
+    Instant createdDate, String description, String icon, Long id, List<IntegrationVersion> integrationVersions,
+    List<Long> integrationWorkflowIds, String lastModifiedBy, Instant lastModifiedDate,
+    Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, String name, List<Tag> tags,
     String title, int version) {
 
     public IntegrationDTO(
@@ -77,14 +77,14 @@ public record IntegrationDTO(
         private Category category;
         private String componentName;
         private String createdBy;
-        private LocalDateTime createdDate;
+        private Instant createdDate;
         private String description;
         private Long id;
         private List<IntegrationVersion> integrationVersions;
         private List<Long> integrationWorkflowIds;
         private String lastModifiedBy;
-        private LocalDateTime lastModifiedDate;
-        private LocalDateTime lastPublishedDate;
+        private Instant lastModifiedDate;
+        private Instant lastPublishedDate;
         private Status lastStatus = Status.DRAFT;
         private int lastIntegrationVersion;
         private String name;
@@ -118,7 +118,7 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder createdDate(LocalDateTime createdDate) {
+        public Builder createdDate(Instant createdDate) {
             this.createdDate = createdDate;
 
             return this;
@@ -154,13 +154,13 @@ public record IntegrationDTO(
             return this;
         }
 
-        public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
+        public Builder lastModifiedDate(Instant lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
 
             return this;
         }
 
-        public Builder lastPublishedDate(LocalDateTime lastPublishedDate) {
+        public Builder lastPublishedDate(Instant lastPublishedDate) {
             this.lastPublishedDate = lastPublishedDate;
 
             return this;

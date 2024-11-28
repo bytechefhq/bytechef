@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.domain;
 
 import com.bytechef.platform.connection.domain.Connection;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
@@ -48,7 +48,7 @@ public class IntegrationInstance {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private boolean enabled;
@@ -62,7 +62,7 @@ public class IntegrationInstance {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("integration_instance_configuration_id")
     private AggregateReference<IntegrationInstanceConfiguration, Long> integrationInstanceConfigurationId;
@@ -105,7 +105,7 @@ public class IntegrationInstance {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -121,7 +121,7 @@ public class IntegrationInstance {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

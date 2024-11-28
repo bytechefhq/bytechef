@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.execution.service;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -42,6 +42,6 @@ public interface InstanceJobService {
     List<Long> getJobIds(long instanceId, ModeType type);
 
     Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds,
+        Status status, Instant startDate, Instant endDate, List<Long> instanceIds,
         ModeType type, List<String> workflowIds, int pageNumber);
 }

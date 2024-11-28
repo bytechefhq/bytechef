@@ -22,7 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParameters;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -124,7 +124,7 @@ public class JobServiceImpl implements JobService {
         Job job = OptionalUtils.get(jobRepository.findById(id));
 
         job.setCurrentTask(0);
-        job.setStartDate(LocalDateTime.now());
+        job.setStartDate(Instant.now());
         job.setStatus(Job.Status.STARTED);
 
         jobRepository.save(job);

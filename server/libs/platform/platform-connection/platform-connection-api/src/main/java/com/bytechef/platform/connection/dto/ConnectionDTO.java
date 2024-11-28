@@ -21,7 +21,7 @@ import com.bytechef.platform.connection.domain.Connection.CredentialStatus;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +31,9 @@ import java.util.Map;
 @SuppressFBWarnings("EI")
 public record ConnectionDTO(
     boolean active, String authorizationName, Map<String, ?> authorizationParameters, String componentName,
-    Map<String, ?> connectionParameters, int connectionVersion, String createdBy, LocalDateTime createdDate,
+    Map<String, ?> connectionParameters, int connectionVersion, String createdBy, Instant createdDate,
     CredentialStatus credentialStatus, ConnectionEnvironment environment, Long id, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
+    Instant lastModifiedDate, String name, Map<String, ?> parameters, List<Tag> tags, int version) {
 
     public ConnectionDTO(
         boolean active, Map<String, ?> authorizationParameters, Connection connection,
@@ -73,12 +73,12 @@ public record ConnectionDTO(
         private String componentName;
         private int connectionVersion;
         private String createdBy;
-        private LocalDateTime createdDate;
+        private Instant createdDate;
         private CredentialStatus credentialStatus;
         private ConnectionEnvironment environment;
         private Long id;
         private String lastModifiedBy;
-        private LocalDateTime lastModifiedDate;
+        private Instant lastModifiedDate;
         private String name;
         private Map<String, Object> parameters;
         private List<Tag> tags;
@@ -116,7 +116,7 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder createdDate(LocalDateTime createdDate) {
+        public Builder createdDate(Instant createdDate) {
             this.createdDate = createdDate;
 
             return this;
@@ -146,7 +146,7 @@ public record ConnectionDTO(
             return this;
         }
 
-        public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
+        public Builder lastModifiedDate(Instant lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
 
             return this;

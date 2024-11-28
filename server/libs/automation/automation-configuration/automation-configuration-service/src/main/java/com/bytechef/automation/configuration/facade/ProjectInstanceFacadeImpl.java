@@ -57,7 +57,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -543,13 +543,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .orElse(null);
     }
 
-    private LocalDateTime getJobEndDate(Long jobId) {
+    private Instant getJobEndDate(Long jobId) {
         Job job = jobService.getJob(jobId);
 
         return job.getEndDate();
     }
 
-    private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
+    private Instant getProjectInstanceLastExecutionDate(long projectInstanceId) {
         return OptionalUtils.mapOrElse(
             instanceJobService.fetchLastJobId(projectInstanceId, ModeType.AUTOMATION), this::getJobEndDate, null);
     }
@@ -647,7 +647,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private LocalDateTime getWorkflowLastExecutionDate(String workflowId) {
+    private Instant getWorkflowLastExecutionDate(String workflowId) {
         return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
     }
 

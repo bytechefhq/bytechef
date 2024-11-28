@@ -29,7 +29,6 @@ import com.bytechef.platform.user.repository.UserRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
@@ -233,7 +232,7 @@ class UserServiceIntTest {
 
         User dbUser = userRepository.save(user);
 
-        dbUser.setCreatedDate(LocalDateTime.ofInstant(now.minus(4, ChronoUnit.DAYS), ZoneOffset.UTC));
+        dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
 
         userRepository.save(user);
 
@@ -263,7 +262,7 @@ class UserServiceIntTest {
 
         User dbUser = userRepository.save(user);
 
-        dbUser.setCreatedDate(LocalDateTime.ofInstant(now.minus(4, ChronoUnit.DAYS), ZoneOffset.UTC));
+        dbUser.setCreatedDate(now.minus(4, ChronoUnit.DAYS));
 
         userRepository.save(user);
 

@@ -40,7 +40,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -173,7 +173,7 @@ public class TaskCoordinator {
         if (!taskExecutions.isEmpty()) {
             TaskExecution currentTaskExecution = taskExecutions.get(taskExecutions.size() - 1);
 
-            currentTaskExecution.setEndDate(LocalDateTime.now());
+            currentTaskExecution.setEndDate(Instant.now());
             currentTaskExecution.setStatus(TaskExecution.Status.CANCELLED);
 
             taskExecutionService.update(currentTaskExecution);

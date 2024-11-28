@@ -17,13 +17,17 @@
 package com.bytechef.platform.configuration.web.rest.mapper.config;
 
 import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
+import com.bytechef.platform.web.rest.mapper.JsonNullableMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = WorkflowConfigurationConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    DateTimeMapper.class, JsonNullableMapper.class, WorkflowConfigurationConversionServiceAdapter.class
+})
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.configuration.web.rest.adapter",
     conversionServiceAdapterClassName = "WorkflowConfigurationConversionServiceAdapter")

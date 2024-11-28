@@ -18,15 +18,12 @@ package com.bytechef.embedded.unified.web.rest.crm.mapper;
 
 import com.bytechef.component.definition.unified.crm.model.common.LifecycleStage;
 import com.bytechef.embedded.unified.web.rest.crm.model.LifecycleStageModel;
-import com.bytechef.embedded.unified.web.rest.mapper.JsonNullableMapper;
 import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.core.convert.converter.Converter;
 
-@Mapper(config = UnifiedConfigurationMapperSpringConfig.class, uses = {
-    JsonNullableMapper.class
-})
+@Mapper(config = UnifiedConfigurationMapperSpringConfig.class)
 public interface CrmLifecycleStageMapper extends Converter<LifecycleStage, LifecycleStageModel> {
 
     @Override

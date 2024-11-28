@@ -30,9 +30,9 @@ import org.springframework.core.convert.converter.Converter;
 @Mapper(config = TagMapperSpringConfig.class)
 public interface TagMapper extends Converter<Tag, TagModel> {
 
-    TagModel convert(Tag category);
+    TagModel convert(Tag tag);
 
     @InheritInverseConfiguration
     @DelegatingConverter
-    Tag invertConvert(TagModel categoryModel);
+    Tag invertConvert(TagModel tagModel);
 }

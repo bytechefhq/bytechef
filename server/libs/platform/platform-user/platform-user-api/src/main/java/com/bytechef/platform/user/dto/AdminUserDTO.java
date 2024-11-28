@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -66,11 +66,11 @@ public class AdminUserDTO {
 
     private String createdBy;
 
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     private String lastModifiedBy;
 
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     private Set<String> authorities;
 
@@ -140,7 +140,7 @@ public class AdminUserDTO {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -148,7 +148,7 @@ public class AdminUserDTO {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
@@ -192,7 +192,7 @@ public class AdminUserDTO {
         this.createdBy = createdBy;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
+    public void setCreatedDate(Instant createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -200,7 +200,7 @@ public class AdminUserDTO {
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+    public void setLastModifiedDate(Instant lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 

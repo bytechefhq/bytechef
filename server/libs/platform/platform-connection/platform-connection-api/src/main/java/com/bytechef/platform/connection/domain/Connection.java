@@ -22,7 +22,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +72,7 @@ public final class Connection {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Id
     private Long id;
@@ -83,7 +83,7 @@ public final class Connection {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -157,9 +157,9 @@ public final class Connection {
     /**
      * Return the time when the connection was originally created.
      *
-     * @return {@link LocalDateTime}
+     * @return {@link Instant}
      */
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -185,9 +185,9 @@ public final class Connection {
     /**
      * Return the time when the connection was updated.
      *
-     * @return {@link LocalDateTime}
+     * @return {@link Instant}
      */
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

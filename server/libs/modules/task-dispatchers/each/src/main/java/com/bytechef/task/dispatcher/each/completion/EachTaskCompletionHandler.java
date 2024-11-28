@@ -25,7 +25,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -74,7 +74,7 @@ public class EachTaskCompletionHandler implements TaskCompletionHandler {
         if (subTasksLeft == 0) {
             TaskExecution eachTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-            eachTaskExecution.setEndDate(LocalDateTime.now());
+            eachTaskExecution.setEndDate(Instant.now());
 
             taskCompletionHandler.handle(eachTaskExecution);
             counterService.delete(taskExecution.getParentId());
