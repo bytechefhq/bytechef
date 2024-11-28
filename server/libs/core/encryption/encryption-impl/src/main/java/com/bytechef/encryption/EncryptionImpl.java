@@ -17,9 +17,11 @@
 package com.bytechef.encryption;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.encryption.exception.InvalidEncryptionKeyException;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Arrays;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.stereotype.Component;
@@ -42,6 +44,8 @@ public class EncryptionImpl implements Encryption {
             Cipher cipher = getCipher(Cipher.DECRYPT_MODE);
 
             return new String(cipher.doFinal(EncodingUtils.base64Decode(encryptedString)), StandardCharsets.UTF_8);
+        } catch (BadPaddingException bpe) {
+            throw new InvalidEncryptionKeyException(bpe);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

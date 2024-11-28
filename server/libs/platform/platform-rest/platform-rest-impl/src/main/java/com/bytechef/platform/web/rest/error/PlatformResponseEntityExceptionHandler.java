@@ -16,8 +16,9 @@
 
 package com.bytechef.platform.web.rest.error;
 
+import com.bytechef.encryption.exception.InvalidEncryptionKeyException;
 import com.bytechef.platform.exception.PlatformException;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.platform.web.rest.exception.InvalidEncryptionKeyPlatformException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,11 +38,19 @@ public class PlatformResponseEntityExceptionHandler extends AbstractResponseEnti
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(PlatformException.class)
-    @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handlePlatformException(
         final PlatformException exception, final WebRequest request) {
 
         return ResponseEntity.of(createProblemDetail(exception, HttpStatus.BAD_REQUEST, null, request))
             .build();
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(InvalidEncryptionKeyException.class)
+    public ResponseEntity<ProblemDetail> handleInvalidEncryptionKeyException(
+        final InvalidEncryptionKeyException exception, final WebRequest request) {
+
+        return handlePlatformException(
+            InvalidEncryptionKeyPlatformException.toInvalidEncryptionKeyPlatformException(exception), request);
     }
 }
