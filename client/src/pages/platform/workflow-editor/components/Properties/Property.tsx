@@ -27,6 +27,7 @@ import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {usePrevious} from '@uidotdev/usehooks';
+import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
 import {ChangeEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
@@ -322,6 +323,10 @@ const Property = ({
                       allowedTags: [],
                   })
                 : strippedValue;
+
+        if (typeof strippedValue === 'string') {
+            strippedValue = decode(strippedValue);
+        }
 
         saveProperty({
             currentComponent,
