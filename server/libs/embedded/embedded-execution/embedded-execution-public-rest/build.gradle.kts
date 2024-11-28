@@ -6,7 +6,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     apiPackage.set("com.bytechef.embedded.execution.public_.web.rest")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useEnumCaseInsensitive" to "true",
             "useSpringBoot3" to "true",
@@ -31,11 +30,6 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //    generatorName.set("typescript-fetch")
 //    inputSpec.set("$projectDir/openapi.yaml")
 //    outputDir.set("$rootDir/client/src/shared/middleware/embedded/connectivity")
-//    typeMappings.set(
-//        mapOf(
-//            "DateTime" to "Date"
-//        )
-//    )
 //}
 
 tasks.register("generateOpenAPI") {
@@ -50,7 +44,6 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
@@ -69,6 +62,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-rest:platform-webhook-rest-api"))
