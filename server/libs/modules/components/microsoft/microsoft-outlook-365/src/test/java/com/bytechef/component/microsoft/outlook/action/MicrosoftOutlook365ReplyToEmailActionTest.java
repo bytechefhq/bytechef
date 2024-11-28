@@ -14,65 +14,52 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.microsoft.outlook.util;
+package com.bytechef.component.microsoft.outlook.action;
 
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.COMMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.TypeReference;
-import java.util.List;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class MicrosoftOutlook365UtilsTest {
+class MicrosoftOutlook365ReplyToEmailActionTest {
 
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Context mockedContext = mock(Context.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(COMMENT, "com"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
-    void testGetItemsFromNextPage() {
-        List<Map<String, String>> items = List.of(Map.of("displayName", "abc"));
-
-        Map<String, Object> body = Map.of(VALUE, items);
-
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(body);
-
-        List<Map<?, ?>> result = MicrosoftOutlook365Utils.getItemsFromNextPage("link", mockedContext);
-
-        assertEquals(items, result);
-    }
-
-    @Test
-    void testGetMailboxTImeZone() {
+    void testPerform() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(VALUE, "zone"));
 
-        String result = MicrosoftOutlook365Utils.getMailboxTimeZone(mockedActionContext);
+        Object result =
+            MicrosoftOutlook365ReplyToEmailAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals("zone", result);
+        assertNull(result);
+
+        Http.Body body = bodyArgumentCaptor.getValue();
+
+        assertEquals(Map.of(COMMENT, "com"), body.getContent());
     }
 }
