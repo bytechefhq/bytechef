@@ -23,6 +23,7 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -195,7 +196,7 @@ class HttpClientExecutor {
         }
 
         if (!configuration.isDisableAuthorization() && (componentConnection != null) &&
-            componentConnection.authorizationName() != null) {
+            Authorization.AuthorizationType.isApplicable(componentConnection.authorizationName())) {
 
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 
@@ -401,6 +402,18 @@ class HttpClientExecutor {
         });
     }
 
+    /**
+     * Gets interceptor that scans valid response bodyContent for information on token refresh errors.
+     *
+     * @param componentName
+     * @param componentVersion
+     * @param componentOperationName
+     * @param connectionVersion
+     * @param authorizationName
+     * @param credentialsBeRefreshed
+     * @param isAction
+     * @return
+     */
     private Methanol.Interceptor getInterceptor(
         String componentName, int componentVersion, String componentOperationName, int connectionVersion,
         String authorizationName, boolean credentialsBeRefreshed, boolean isAction) {
