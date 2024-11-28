@@ -25,12 +25,12 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.DATE_RANGE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO;
-import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.retrieveCustomEvents;
+import static com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.retrieveCustomEvents;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.CustomEvent;
+import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365CustomEventUtils.CustomEvent;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
