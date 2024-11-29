@@ -32,7 +32,9 @@ import org.junit.jupiter.api.Test;
  * @author Arina Kolodeznikova
  */
 class GoogleDriveGetFileActionTest extends AbstractGoogleDriveActionTest {
+
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "testId"));
+
     private final File testFile = new File()
         .setId("testFileId")
         .setName("fileName")
@@ -50,9 +52,7 @@ class GoogleDriveGetFileActionTest extends AbstractGoogleDriveActionTest {
 
         verify(mockedDrive.files()).get("testId");
 
-        assertEquals("fileName", retrievedFile.getName());
-        assertEquals("testFileId", retrievedFile.getId());
-        assertEquals("application/pdf", retrievedFile.getMimeType());
-        assertEquals("drive#file", retrievedFile.getKind());
+        assertEquals(testFile, retrievedFile);
+        assertEquals("testId", fileIdArgumentCaptor.getValue());
     }
 }
