@@ -26,8 +26,8 @@ import com.bytechef.component.google.drive.action.GoogleDriveCopyFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveCreateNewFolderAction;
 import com.bytechef.component.google.drive.action.GoogleDriveCreateNewTextFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveDeleteFileAction;
+import com.bytechef.component.google.drive.action.GoogleDriveDownloadFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveGetFileAction;
-import com.bytechef.component.google.drive.action.GoogleDriveReadFileAction;
 import com.bytechef.component.google.drive.action.GoogleDriveUploadFileAction;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFileTrigger;
 import com.bytechef.component.google.drive.trigger.GoogleDriveNewFolderTrigger;
@@ -54,8 +54,8 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             GoogleDriveCreateNewFolderAction.ACTION_DEFINITION,
             GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION,
             GoogleDriveDeleteFileAction.ACTION_DEFINITION,
+            GoogleDriveDownloadFileAction.ACTION_DEFINITION,
             GoogleDriveGetFileAction.ACTION_DEFINITION,
-            GoogleDriveReadFileAction.ACTION_DEFINITION,
             GoogleDriveUploadFileAction.ACTION_DEFINITION)
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
