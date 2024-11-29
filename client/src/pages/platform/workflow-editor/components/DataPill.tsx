@@ -2,6 +2,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyAllType} from '@/shared/types';
+import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -24,7 +25,7 @@ const DataPill = ({
     /* eslint-disable  @typescript-eslint/no-explicit-any */
     sampleOutput?: any;
 }) => {
-    const {focusedInput} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore();
 
     const mentionInput = focusedInput?.getEditor().getModule('mention');
 
@@ -51,6 +52,16 @@ const DataPill = ({
         const value = propertyName
             ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.').replaceAll('.[index]', '[index]')}`
             : workflowNodeName;
+
+        const parameters = currentComponent?.parameters || {};
+
+        if (Object.keys(parameters).length) {
+            const paramValue = resolvePath(parameters, mentionInput.options.path);
+
+            if (mentionInput.options.singleMention && paramValue) {
+                return;
+            }
+        }
 
         mentionInput.insertItem(
             {

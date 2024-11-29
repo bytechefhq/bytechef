@@ -915,6 +915,7 @@ const Property = ({
                             event.preventDefault();
                         }
                     }}
+                    path={path}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}

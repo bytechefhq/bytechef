@@ -53,6 +53,7 @@ interface PropertyMentionsInputProps {
     onChange?: (value: string) => void;
     onKeyPress?: (event: KeyboardEvent) => void;
     overriddenDataPills?: Array<DataPillType>;
+    path?: string;
     placeholder?: string;
     required?: boolean;
     singleMention?: boolean;
@@ -74,6 +75,7 @@ const PropertyMentionsInput = forwardRef(
             onChange,
             onKeyPress,
             overriddenDataPills,
+            path,
             placeholder,
             required = false,
             showInputTypeSwitchButton = false,
@@ -148,8 +150,10 @@ const PropertyMentionsInput = forwardRef(
                         }
                     );
                 },
+                path,
                 renderItem: (item: DataPillType) => MentionInputListItem(item),
                 showDenotationChar: false,
+                singleMention,
                 source: (searchTerm: string, renderList: (arg1: Array<object>, arg2: string) => void) => {
                     if (overriddenDataPills) {
                         dataPills = overriddenDataPills;
