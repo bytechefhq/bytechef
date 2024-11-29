@@ -54,9 +54,9 @@ public class GoogleDriveComponentHandler implements ComponentHandler {
             GoogleDriveCreateNewFolderAction.ACTION_DEFINITION,
             GoogleDriveCreateNewTextFileAction.ACTION_DEFINITION,
             GoogleDriveDeleteFileAction.ACTION_DEFINITION,
+            GoogleDriveGetFileAction.ACTION_DEFINITION,
             GoogleDriveReadFileAction.ACTION_DEFINITION,
-            GoogleDriveUploadFileAction.ACTION_DEFINITION,
-            GoogleDriveGetFileAction.ACTION_DEFINITION)
+            GoogleDriveUploadFileAction.ACTION_DEFINITION)
         .triggers(
             GoogleDriveNewFileTrigger.TRIGGER_DEFINITION,
             GoogleDriveNewFolderTrigger.TRIGGER_DEFINITION);
