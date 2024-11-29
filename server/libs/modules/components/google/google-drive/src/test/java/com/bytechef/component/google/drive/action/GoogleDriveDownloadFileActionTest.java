@@ -39,7 +39,7 @@ import org.mockito.ArgumentCaptor;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveDownloadFileActionTest extends AbstractGoogleDriveActionTest {
 
     private final InputStream mockedInputStream = mock(InputStream.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
@@ -68,7 +68,7 @@ class GoogleDriveReadFileActionTest extends AbstractGoogleDriveActionTest {
         when(mockedContext.file(any()))
             .thenReturn(mockedFileEntry);
 
-        FileEntry result = GoogleDriveReadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        FileEntry result = GoogleDriveDownloadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedFileEntry, result);
 

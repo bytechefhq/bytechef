@@ -39,11 +39,11 @@ import java.io.InputStream;
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-public class GoogleDriveReadFileAction {
+public class GoogleDriveDownloadFileAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("readFile")
-        .title("Read File")
-        .description("Read a selected file from Google Drive file.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("downloadFile")
+        .title("Download File")
+        .description("Download selected file from Google Drive.")
         .properties(
             string(FILE_ID)
                 .label("File")
@@ -51,9 +51,9 @@ public class GoogleDriveReadFileAction {
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
                 .required(true))
         .output(outputSchema(fileEntry()))
-        .perform(GoogleDriveReadFileAction::perform);
+        .perform(GoogleDriveDownloadFileAction::perform);
 
-    private GoogleDriveReadFileAction() {
+    private GoogleDriveDownloadFileAction() {
     }
 
     public static FileEntry perform(
