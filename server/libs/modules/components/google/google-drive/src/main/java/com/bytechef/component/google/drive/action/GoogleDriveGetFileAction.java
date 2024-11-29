@@ -66,11 +66,10 @@ public class GoogleDriveGetFileAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
-        String fileId = inputParameters.getRequiredString(FILE_ID);
 
         return drive
             .files()
-            .get(fileId)
+            .get(inputParameters.getRequiredString(FILE_ID))
             .execute();
     }
 }
