@@ -27,6 +27,7 @@ import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.util.AuthorizationUtils;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -75,7 +76,7 @@ public class TokenRefreshHelper {
             return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
             if (componentConnection == null ||
-                Authorization.AuthorizationType.isApplicable(componentConnection.authorizationName())) {
+                AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
 
                 throw exception;
             }

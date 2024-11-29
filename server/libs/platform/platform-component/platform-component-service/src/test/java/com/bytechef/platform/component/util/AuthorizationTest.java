@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.definition;
+package com.bytechef.platform.component.util;
 
+import com.bytechef.component.definition.Authorization;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -27,22 +28,22 @@ import org.junit.jupiter.api.Test;
  */
 public class AuthorizationTest {
 
+    private static final Random RANDOM = new Random();
+
     @Test
     public void testAuthorizationAuthorizationTypeIsApplicable() {
 
         for (String applicableValue : getRandomApplicableValues()) {
             Assertions.assertTrue(
-                Authorization.AuthorizationType.isApplicable(applicableValue), applicableValue + " is valid");
+                AuthorizationUtils.isApplicable(applicableValue), applicableValue + " is valid");
         }
 
         for (String nonApplicableValue : getRandomNonApplicableValues()) {
             Assertions.assertFalse(
-                Authorization.AuthorizationType.isApplicable(nonApplicableValue), nonApplicableValue + " is valid");
+                AuthorizationUtils.isApplicable(nonApplicableValue), nonApplicableValue + " is valid");
         }
 
     }
-
-    private static Random random = new Random();
 
     private List<String> getRandomApplicableValues() {
         Authorization.AuthorizationType[] values = Authorization.AuthorizationType.values();
@@ -56,14 +57,14 @@ public class AuthorizationTest {
 
             String name = value.getName();
 
-            if (random.nextBoolean()) {
+            if (RANDOM.nextBoolean()) {
                 names.add(name.toLowerCase());
 
                 continue;
             }
 
-            if (random.nextBoolean()) {
-                char charToReplace = name.charAt(random.nextInt(name.length()));
+            if (RANDOM.nextBoolean()) {
+                char charToReplace = name.charAt(RANDOM.nextInt(name.length()));
 
                 if (charToReplace == 95) {
                     continue;
