@@ -158,7 +158,7 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -196,7 +196,7 @@ Creates a new text file in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
@@ -228,14 +228,14 @@ Delete a selected file from Google Drive.
 
 
 
-### Read File
-Read a selected file from Google Drive file.
+### Download File
+Download selected file from Google Drive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | STRING | SELECT  |  The id of a file to read.  |
+| File | STRING | SELECT  |  File to download.  |
 
 
 ### Output
@@ -243,6 +243,37 @@ Read a selected file from Google Drive file.
 
 
 Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
+### Get File
+Retrieve a specified file from your Google Drive.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File | STRING | SELECT  |  File to be retrieved.  |
+
+
+### Output
+
+
+
+Type: OBJECT
 
 
 #### Properties
@@ -275,7 +306,7 @@ Uploads a file in your Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
+```{id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, name=new-file.txt, mimeType=plain/text}```
 
 
 
