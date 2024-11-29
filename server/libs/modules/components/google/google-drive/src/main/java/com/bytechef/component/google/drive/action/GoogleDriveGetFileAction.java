@@ -46,7 +46,7 @@ public class GoogleDriveGetFileAction {
         .properties(
             string(FILE_ID)
                 .label("File")
-                .description("The id of a file to be retrieved.")
+                .description("File to be retrieved.")
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
                 .required(true))
         .output(
