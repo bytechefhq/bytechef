@@ -261,7 +261,7 @@ public class GoogleMailUtils {
     }
 
     public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
-        String format = inputParameters.getString(FORMAT);
+        String format = inputParameters.getString(FORMAT, SIMPLE);
 
         return service.users()
             .messages()
