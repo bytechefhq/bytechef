@@ -989,7 +989,7 @@ const Property = ({
                         />
                     )}
 
-                    {controlType === 'OBJECT_BUILDER' && (
+                    {(controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') && (
                         <ObjectProperty
                             arrayIndex={arrayIndex}
                             arrayName={arrayName}
@@ -999,8 +999,6 @@ const Property = ({
                             property={property}
                         />
                     )}
-
-                    {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
                     {control && (isValidControlType || isNumericalInput) && path && (
                         <>
