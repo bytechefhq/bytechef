@@ -65,7 +65,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
                 workflowTestConfiguration.setInputs(getInputs(workflow, workflowTestConfiguration));
 
                 List<WorkflowConnection> taskWorkflowConnections = CollectionUtils.flatMap(
-                    workflow.getAllTasks(), workflowConnectionFacade::getWorkflowConnections);
+                    workflow.getTasks(true), workflowConnectionFacade::getWorkflowConnections);
                 List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(
                     WorkflowTrigger.of(workflow), workflowConnectionFacade::getWorkflowConnections);
 

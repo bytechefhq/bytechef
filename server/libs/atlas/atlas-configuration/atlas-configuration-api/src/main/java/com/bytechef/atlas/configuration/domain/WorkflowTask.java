@@ -22,6 +22,7 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -47,6 +48,8 @@ public class WorkflowTask implements Task, Serializable {
     private String name;
     private String node;
     private Map<String, ?> parameters = Collections.emptyMap();
+    @JsonIgnore
+    private String parentName;
     private List<WorkflowTask> post = Collections.emptyList();
     private List<WorkflowTask> pre = Collections.emptyList();
     private int taskNumber;
@@ -214,6 +217,10 @@ public class WorkflowTask implements Task, Serializable {
         return Collections.unmodifiableMap(parameters);
     }
 
+    public String getParentName() {
+        return parentName;
+    }
+
     /**
      * The (optional) list of tasks that are to be executed after the succesful execution of this task.
      *
@@ -252,6 +259,10 @@ public class WorkflowTask implements Task, Serializable {
 
     public String getType() {
         return type;
+    }
+
+    public void setParentName(String parentName) {
+        this.parentName = parentName;
     }
 
     public Map<String, Object> toMap() {

@@ -122,7 +122,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
             workflowNodeOutputDTOs.add(getWorkflowNodeOutputDTO(workflowId, workflowTrigger));
         }
 
-        List<WorkflowTask> workflowTasks = workflow.getTasks();
+        List<WorkflowTask> workflowTasks = workflow.getTasks(lastWorkflowNodeName);
 
         for (WorkflowTask workflowTask : workflowTasks) {
             if (lastWorkflowNodeName != null && Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {

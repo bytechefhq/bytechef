@@ -237,10 +237,6 @@ public final class Workflow implements Persistable<String>, Serializable {
         return getClass().hashCode();
     }
 
-    public List<WorkflowTask> getAllTasks() {
-        return getAllTasks(tasks);
-    }
-
     public String getCreatedBy() {
         return createdBy;
     }
@@ -311,7 +307,7 @@ public final class Workflow implements Persistable<String>, Serializable {
     }
 
     public WorkflowTask getTask(String workflowNodeName) {
-        for (WorkflowTask workflowTask : getAllTasks(tasks)) {
+        for (WorkflowTask workflowTask : getTasks(tasks, null)) {
             if (Objects.equals(workflowTask.getName(), workflowNodeName)) {
                 return workflowTask;
             }
@@ -322,7 +318,19 @@ public final class Workflow implements Persistable<String>, Serializable {
 
     /** Returns the steps that make up the workflow. */
     public List<WorkflowTask> getTasks() {
+        return getTasks(false);
+    }
+
+    public List<WorkflowTask> getTasks(boolean flatten) {
+        if (flatten) {
+            return getTasks(tasks, null);
+        }
+
         return Collections.unmodifiableList(tasks);
+    }
+
+    public List<WorkflowTask> getTasks(String lastWorkflowNodeName) {
+        return getTasks(tasks, lastWorkflowNodeName);
     }
 
     public int getVersion() {
@@ -383,46 +391,80 @@ public final class Workflow implements Persistable<String>, Serializable {
             '}';
     }
 
-    private static List<WorkflowTask> getAllTasks(List<WorkflowTask> workflowTasks) {
-        List<WorkflowTask> allWorkflowTasks = new ArrayList<>();
+    @SuppressWarnings("unchecked")
+    private static List<WorkflowTask> getTasks(List<WorkflowTask> workflowTasks, String lastWorkflowNodeName) {
+        List<WorkflowTask> resultWorkflowTasks = new ArrayList<>();
 
         for (WorkflowTask workflowTask : workflowTasks) {
-            allWorkflowTasks.add(workflowTask);
-
+            List<WorkflowTask> returnedWorkflowTasks = new ArrayList<>();
             Map<String, ?> parameters = workflowTask.getParameters();
 
             for (Map.Entry<String, ?> entry : parameters.entrySet()) {
                 if (entry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                    allWorkflowTasks.addAll(getAllTasks(List.of(curWorkflowTask)));
+                    returnedWorkflowTasks.addAll(getTasks(List.of(curWorkflowTask), lastWorkflowNodeName));
                 } else if (entry.getValue() instanceof List<?> curList) {
                     if (!curList.isEmpty()) {
                         Object firstItem = curList.getFirst();
 
                         if (firstItem instanceof WorkflowTask) {
-                            for (Object item : curList) {
-                                allWorkflowTasks.addAll(getAllTasks(List.of((WorkflowTask) item)));
-                            }
+                            List<WorkflowTask> curWorkflowTasks = curList.stream()
+                                .map(item -> ((WorkflowTask) item))
+                                .toList();
+
+                            returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                         }
 
                         if (firstItem instanceof Map<?, ?> map && map.containsKey(WorkflowConstants.PARAMETERS) &&
                             map.containsKey(WorkflowConstants.TYPE)) {
 
-                            for (Object item : curList) {
-                                allWorkflowTasks.addAll(getAllTasks(List.of(new WorkflowTask((Map<String, ?>) item))));
-                            }
+                            List<WorkflowTask> curWorkflowTasks = curList.stream()
+                                .map(item -> new WorkflowTask((Map<String, ?>) item))
+                                .toList();
+
+                            returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
                         }
                     }
                 } else if (entry.getValue() instanceof Map<?, ?> curMap) {
                     for (Map.Entry<?, ?> curMapEntry : curMap.entrySet()) {
                         if (curMapEntry.getValue() instanceof WorkflowTask curWorkflowTask) {
-                            allWorkflowTasks.addAll(getAllTasks(List.of(curWorkflowTask)));
+                            returnedWorkflowTasks.addAll(getTasks(List.of(curWorkflowTask), lastWorkflowNodeName));
                         }
                     }
                 }
             }
+
+            if (lastWorkflowNodeName == null) {
+                resultWorkflowTasks.add(workflowTask);
+                resultWorkflowTasks.addAll(returnedWorkflowTasks);
+            } else {
+                if (!returnedWorkflowTasks.isEmpty() ||
+                    Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
+
+                    resultWorkflowTasks.addAll(getPrevious(workflowTasks, workflowTask.getName()));
+                    resultWorkflowTasks.addAll(returnedWorkflowTasks);
+                }
+
+                if (Objects.equals(workflowTask.getName(), lastWorkflowNodeName)) {
+                    return resultWorkflowTasks;
+                }
+            }
         }
 
-        return allWorkflowTasks;
+        return resultWorkflowTasks;
+    }
+
+    private static List<WorkflowTask> getPrevious(List<WorkflowTask> workflowTasks, String workflowTaskName) {
+        List<WorkflowTask> previousWorkflowTasks = new ArrayList<>();
+
+        for (WorkflowTask curWorkflowTask : workflowTasks) {
+            previousWorkflowTasks.add(curWorkflowTask);
+
+            if (Objects.equals(curWorkflowTask.getName(), workflowTaskName)) {
+                break;
+            }
+        }
+
+        return previousWorkflowTasks;
     }
 
     private static Map<String, ?> readWorkflowMap(String definition, String id, Format format) {
