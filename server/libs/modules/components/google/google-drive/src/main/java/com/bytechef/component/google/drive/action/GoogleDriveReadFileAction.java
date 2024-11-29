@@ -47,7 +47,7 @@ public class GoogleDriveReadFileAction {
         .properties(
             string(FILE_ID)
                 .label("File")
-                .description("The id of a file to read.")
+                .description("File to download.")
                 .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
                 .required(true))
         .output(outputSchema(fileEntry()))
