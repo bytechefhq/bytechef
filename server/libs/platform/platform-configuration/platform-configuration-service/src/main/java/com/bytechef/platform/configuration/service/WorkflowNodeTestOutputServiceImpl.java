@@ -62,14 +62,12 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public void removeUnusedNodeTestOutputs(Workflow workflow) {
-        List<String> workflowTaskNames = workflow
-            .getAllTasks()
+        List<String> workflowTaskNames = workflow.getTasks(true)
             .stream()
             .map(WorkflowTask::getName)
             .toList();
 
-        List<String> workflowTriggerNames = WorkflowTrigger
-            .of(workflow)
+        List<String> workflowTriggerNames = WorkflowTrigger.of(workflow)
             .stream()
             .map(WorkflowTrigger::getName)
             .toList();

@@ -619,7 +619,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                         workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
                     .filter(WorkflowConnection::required)
                     .toList(),
-                workflow.getAllTasks()
+                workflow.getTasks(true)
                     .stream()
                     .flatMap(workflowTask -> CollectionUtils.stream(
                         workflowConnectionFacade.getWorkflowConnections(workflowTask)))
