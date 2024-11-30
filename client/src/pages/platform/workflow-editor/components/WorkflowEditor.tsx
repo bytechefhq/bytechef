@@ -2,6 +2,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ClickedDefinitionType} from '@/shared/types';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
@@ -78,9 +79,20 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             droppedNodeName = droppedNodeData;
         }
 
-        const droppedNode = [...componentDefinitions, ...taskDispatcherDefinitions].find(
-            (node) => node.name === droppedNodeName
-        );
+        let droppedNode = componentDefinitions.find((node) => node.name === droppedNodeName) as
+            | ClickedDefinitionType
+            | undefined;
+
+        if (!droppedNode) {
+            const taskDispatcherNode = taskDispatcherDefinitions.find((node) => node.name === droppedNodeName);
+
+            if (taskDispatcherNode) {
+                droppedNode = {
+                    ...taskDispatcherNode,
+                    taskDispatcher: true,
+                } as ClickedDefinitionType;
+            }
+        }
 
         if (!droppedNode) {
             return;
