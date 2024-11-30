@@ -51,7 +51,6 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * @author Ivica Cardic
  */
-// TODO add support for task dispatchers
 @Service
 @Transactional
 public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
