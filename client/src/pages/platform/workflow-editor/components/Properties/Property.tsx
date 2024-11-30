@@ -1041,6 +1041,7 @@ const Property = ({
                                         setSelectValue(value);
                                     }}
                                     options={options as Array<SelectOptionType>}
+                                    required={required}
                                     value={selectValue}
                                 />
                             )}
