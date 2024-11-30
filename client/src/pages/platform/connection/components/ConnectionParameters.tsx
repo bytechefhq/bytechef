@@ -41,7 +41,7 @@ const ConnectionParameters = ({
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
             </h2>
 
-            <ul className="flex w-full flex-col text-sm">
+            <ul className="flex w-full flex-col space-y-1 text-sm">
                 {hasConnectionParameters &&
                     connectionProperties!
                         .filter((property) => !!connectionParameters![property.name!])
