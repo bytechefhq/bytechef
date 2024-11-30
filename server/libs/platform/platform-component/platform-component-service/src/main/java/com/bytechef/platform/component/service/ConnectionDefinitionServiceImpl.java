@@ -387,7 +387,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     Authorization.AUTHORIZATION,
                     List.of(
                         Authorization.BEARER + " " + MapUtils.getString(connectionParameters, Authorization.TOKEN))));
-            case CUSTOM, NONE -> (Parameters connectionParameters, Context context) -> null;
+            case CUSTOM -> (Parameters connectionParameters, Context context) -> null;
             case OAUTH2_AUTHORIZATION_CODE, OAUTH2_AUTHORIZATION_CODE_PKCE, OAUTH2_CLIENT_CREDENTIALS,
                 OAUTH2_IMPLICIT_CODE, OAUTH2_RESOURCE_OWNER_PASSWORD -> (
                     Parameters connectionParameters, Context context) -> ApplyResponse.ofHeaders(

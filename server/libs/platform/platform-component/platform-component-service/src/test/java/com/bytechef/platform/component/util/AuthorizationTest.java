@@ -51,10 +51,6 @@ public class AuthorizationTest {
         List<String> names = new ArrayList<>();
 
         for (Authorization.AuthorizationType value : values) {
-            if (value == Authorization.AuthorizationType.NONE) {
-                continue;
-            }
-
             String name = value.getName();
 
             if (RANDOM.nextBoolean()) {
