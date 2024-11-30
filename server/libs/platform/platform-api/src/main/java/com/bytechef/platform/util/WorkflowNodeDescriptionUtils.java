@@ -84,7 +84,7 @@ public class WorkflowNodeDescriptionUtils {
 
             sb.append("""
                 <tr>%n\
-                    <td class="text-muted-foreground pr-4 pt-0.5 pb-0.5">%s:</td>%n\
+                    <td class="text-muted-foreground pr-4 pb-1">%s:</td>%n\
                     <td>%s</td>%n\
                 </tr>%n\
                 """.formatted(name, value));
