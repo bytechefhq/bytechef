@@ -176,14 +176,14 @@ const Integration = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integration(parseInt(integrationId!)),
-            });
-
-            queryClient.invalidateQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflow(
                     parseInt(integrationId!),
                     parseInt(integrationWorkflowId!)
                 ),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: IntegrationWorkflowKeys.integrationWorkflows(parseInt(integrationId!)),
             });
 
             setShowEditWorkflowDialog(false);
