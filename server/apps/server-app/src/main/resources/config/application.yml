@@ -11,7 +11,8 @@ springdoc:
 
 info:
   ai:
-    enabled: ${bytechef.ai.enabled:false}
+    copilot:
+      enabled: ${bytechef.ai.copilot.enabled:false}
   analytics:
     enabled: ${bytechef.analytics.enabled:false}
     postHog:
@@ -83,10 +84,10 @@ openapi:
 spring:
   ai:
     openai:
-      api-key: ${bytechef.ai.openai.api-key}
+      api-key: ${bytechef.ai.copilot.openai.api-key}
       chat:
         options:
-          model: ${bytechef.ai.openai.chat.options.model}
+          model: ${bytechef.ai.copilot.openai.chat.options.model}
   autoconfigure:
     exclude:
       org.springframework.ai.autoconfigure.anthropic.AnthropicAutoConfiguration,
@@ -181,10 +182,12 @@ springdoc:
 
 bytechef:
   ai:
-    openai:
-      chat:
-        options:
-          model: gpt-4o
+    copilot:
+      provider: openai
+      openai:
+        chat:
+          options:
+            model: gpt-4o
   cache:
     # Cache provider (redis | simple) default: simple
     provider: simple

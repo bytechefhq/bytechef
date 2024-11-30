@@ -18,7 +18,7 @@ package com.bytechef.platform.ai.config;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+import java.util.Objects;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -28,19 +28,26 @@ import org.springframework.core.env.MutablePropertySources;
 /**
  * @author Ivica Cardic
  */
-public class AiPostProcessor implements EnvironmentPostProcessor {
+public class AiCopilotPostProcessor implements EnvironmentPostProcessor {
 
     @Override
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (StringUtils.isBlank(environment.getProperty("bytechef.ai.openai.api-key", String.class))) {
+        if (!environment.getProperty("bytechef.ai.copilot.enabled", Boolean.class, false)) {
             source.put("spring.ai.chat.client.enabled", false);
-            source.put(
-                "spring.autoconfigure.exclude",
-                environment.getProperty("spring.autoconfigure.exclude") +
-                    ",org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration" +
-                    ",org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration");
+
+            if (!Objects.equals(
+                environment.getProperty("bytechef.ai.copilot.provider", String.class, "openai"), "openai")) {
+
+                source.put(
+                    "spring.autoconfigure.exclude",
+                    environment.getProperty("spring.autoconfigure.exclude") +
+                        ",org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration" +
+                        ",org.springframework.ai.autoconfigure.vectorstore.pgvector.PgVectorStoreAutoConfiguration");
+            }
+
+            // TODO Add support for other providers
         }
 
         MapPropertySource mapPropertySource = new MapPropertySource("Custom AI Config", source);

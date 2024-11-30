@@ -34,12 +34,12 @@ import reactor.core.publisher.Flux;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
-@ConditionalOnProperty(prefix = "bytechef.ai", name = "enabled", havingValue = "true")
-public class ChatApiController {
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
+public class AiCopilotApiController {
 
     private final ChatService chatService;
 
-    public ChatApiController(ChatService chatService) {
+    public AiCopilotApiController(ChatService chatService) {
         this.chatService = chatService;
     }
 

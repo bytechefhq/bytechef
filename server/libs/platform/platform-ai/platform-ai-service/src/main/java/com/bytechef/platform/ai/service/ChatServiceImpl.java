@@ -28,7 +28,7 @@ import reactor.core.publisher.Flux;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(prefix = "bytechef.ai", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class ChatServiceImpl implements ChatService {
 
     private final ChatClient chatClient;

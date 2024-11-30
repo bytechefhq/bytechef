@@ -267,23 +267,49 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
-        private boolean enabled;
-        private OpenAi openAi = new OpenAi();
+        private Copilot copilot = new Copilot();
 
-        public boolean isEnabled() {
-            return enabled;
+        public Copilot getCopilot() {
+            return copilot;
         }
 
-        public OpenAi getOpenAi() {
-            return openAi;
+        public void setCopilot(Copilot copilot) {
+            this.copilot = copilot;
         }
 
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
+        public static class Copilot {
 
-        public void setOpenAi(OpenAi openAi) {
-            this.openAi = openAi;
+            public enum Provider {
+                OPENAI, ANTHROPIC
+            }
+
+            private boolean enabled;
+            private OpenAi openAi = new OpenAi();
+            private Provider provider = Provider.OPENAI;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
         }
 
         public static class OpenAi {
