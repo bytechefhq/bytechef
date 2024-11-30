@@ -172,9 +172,11 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
     if (leftSidebarOpen) {
         canvasWidth -= 384;
     }
+
     if (rightSidebarOpen) {
         canvasWidth -= 384;
     }
+
     if (workflowNodeDetailsPanelOpen) {
         canvasWidth -= 460;
     }
