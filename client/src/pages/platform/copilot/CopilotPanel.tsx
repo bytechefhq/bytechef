@@ -9,7 +9,7 @@ import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 export type MessageType = {text: string; sender: 'ai' | 'user'};
 
 const CopilotPanel = () => {
-    const {setShowCopilot} = useCopilotStore();
+    const {setCopilotPanelOpen} = useCopilotStore();
 
     const runtime = useAssistantRuntime();
 
@@ -31,7 +31,7 @@ const CopilotPanel = () => {
                         <TooltipContent>Clean messages</TooltipContent>
                     </Tooltip>
 
-                    <Button onClick={() => setShowCopilot(false)} size="icon" variant="ghost">
+                    <Button onClick={() => setCopilotPanelOpen(false)} size="icon" variant="ghost">
                         <Cross2Icon />
                     </Button>
                 </div>

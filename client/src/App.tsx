@@ -111,7 +111,7 @@ function App() {
         showLogin,
     } = useAuthenticationStore();
 
-    const {showCopilot} = useCopilotStore();
+    const {copilotPanelOpen} = useCopilotStore();
 
     const analytics = useAnalytics();
 
@@ -230,7 +230,7 @@ function App() {
                 <div className="flex size-full">
                     <Outlet />
 
-                    {ai.copilot.enabled && showCopilot && (
+                    {ai.copilot.enabled && copilotPanelOpen && (
                         <aside className="border-l border-l-border/70">
                             <CopilotRuntimeProvider>
                                 <CopilotPanel />

@@ -1,3 +1,4 @@
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -31,8 +32,9 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             workflow: state.workflow,
         }))
     );
-    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {copilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen} = useRightSidebarStore();
+    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
 
     const {getEdge, getNode, setViewport} = useReactFlow();
 
@@ -169,6 +171,9 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
     let canvasWidth = window.innerWidth - 120;
 
+    if (copilotPanelOpen) {
+        canvasWidth -= 450;
+    }
     if (leftSidebarOpen) {
         canvasWidth -= 384;
     }

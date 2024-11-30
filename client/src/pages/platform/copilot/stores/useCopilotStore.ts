@@ -2,25 +2,25 @@ import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
 interface CopilotStateI {
-    showCopilot: boolean;
-    setShowCopilot: (showCopilot: boolean) => void;
+    copilotPanelOpen: boolean;
+    setCopilotPanelOpen: (showCopilot: boolean) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
     devtools(
         persist(
             (set) => ({
-                setShowCopilot: (showCopilot) =>
+                copilotPanelOpen: false,
+                setCopilotPanelOpen: (copilotPanelOpen) =>
                     set((state) => {
                         return {
                             ...state,
-                            showCopilot,
+                            copilotPanelOpen,
                         };
                     }),
-                showCopilot: false,
             }),
             {
-                name: 'bytechef.copilot',
+                name: 'bytechef.copilot-panel',
             }
         )
     )

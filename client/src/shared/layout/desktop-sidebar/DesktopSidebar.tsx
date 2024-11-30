@@ -27,7 +27,7 @@ export function DesktopSidebar({
     const {pathname} = useLocation();
 
     const {ai} = useApplicationInfoStore();
-    const {setShowCopilot, showCopilot} = useCopilotStore();
+    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
@@ -67,7 +67,7 @@ export function DesktopSidebar({
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
                         {ai.copilot.enabled && ff_1570 && (
-                            <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
+                            <Button onClick={() => setCopilotPanelOpen(!copilotPanelOpen)} size="icon" variant="ghost">
                                 <BotMessageSquareIcon className="size-6" />
                             </Button>
                         )}
