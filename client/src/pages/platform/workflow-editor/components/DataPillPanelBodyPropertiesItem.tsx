@@ -125,9 +125,10 @@ const DataPillPanelBodyPropertiesItem = ({
 
                         <p className="text-sm">
                             <span className="font-semibold">{currentComponentAction?.workflowNodeName} </span>
-                            needs to be tested to generate an output schema. Please go to the &quot;Output&quot; tab of
-                            the
-                            <span className="font-semibold"> {currentComponentAction?.workflowNodeName} </span>{' '}
+                            needs to be tested to generate an output schema. Please go to the
+                            <span className="font-semibold"> &quot;Output&quot; </span>
+                            tab of the
+                            <span className="font-semibold"> {currentComponentAction?.workflowNodeName} </span>
                             component.
                         </p>
 
