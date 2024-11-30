@@ -76,7 +76,7 @@ public class TokenRefreshHelper {
             return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
             if (componentConnection == null ||
-                AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
+                !AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
 
                 throw exception;
             }
