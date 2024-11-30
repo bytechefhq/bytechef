@@ -210,7 +210,7 @@ public class HttpClientExecutorTest {
             new HashMap<>(), new HashMap<>(), Http.allowUnauthorizedCerts(true)
                 .build(),
             "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertTrue(httpClient.authenticator()
@@ -235,7 +235,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             headers, new HashMap<>(), configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), headers);
@@ -256,7 +256,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             new HashMap<>(), queryParameters, configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(Map.of(Authorization.API_TOKEN, List.of("token_value")), queryParameters);
@@ -274,7 +274,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             headers, new HashMap<>(), configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(
@@ -297,7 +297,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             headers, new HashMap<>(), configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(Map.of("Authorization", List.of("Bearer token")), headers);
@@ -317,7 +317,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             headers, new HashMap<>(), configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(
@@ -339,7 +339,7 @@ public class HttpClientExecutorTest {
 
         httpClientExecutor.createHttpClient(
             headers, new HashMap<>(), configuration, "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(Map.of("Authorization", List.of("Bearer access_token")), headers);
@@ -350,7 +350,7 @@ public class HttpClientExecutorTest {
             new HashMap<>(), new HashMap<>(), Http.followRedirect(true)
                 .build(),
             "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertNotNull(httpClient.followRedirects());
@@ -361,7 +361,7 @@ public class HttpClientExecutorTest {
             new HashMap<>(), new HashMap<>(), Http.followAllRedirects(true)
                 .build(),
             "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertNotNull(httpClient.followRedirects());
@@ -372,7 +372,7 @@ public class HttpClientExecutorTest {
             new HashMap<>(), new HashMap<>(), Http.proxy("10.11.12.13:30")
                 .build(),
             "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertTrue(httpClient.proxy()
@@ -385,7 +385,7 @@ public class HttpClientExecutorTest {
                 .timeout(Duration.ofMillis(2000))
                 .build(),
             "componentName", 1, "componentOperationName",
-            new ComponentConnection("componentName", 1, -1L, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1L, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(
@@ -398,7 +398,7 @@ public class HttpClientExecutorTest {
         HttpRequest httpRequest = httpClientExecutor.createHTTPRequest(
             "http://localhost:8080", Http.RequestMethod.DELETE, Map.of("header1", List.of("value1")),
             Map.of("param1", List.of("value1")), null, "componentName",
-            new ComponentConnection("componentName", 1, -1L, Map.of(), Authorization.AuthorizationType.NONE.name()),
+            new ComponentConnection("componentName", 1, -1L, Map.of(), null),
             Mockito.mock(Context.class));
 
         assertEquals(Http.RequestMethod.DELETE.name(), httpRequest.method());

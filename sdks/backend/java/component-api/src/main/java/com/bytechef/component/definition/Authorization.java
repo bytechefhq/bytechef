@@ -162,11 +162,6 @@ public interface Authorization {
         DIGEST_AUTH,
 
         /**
-         * TODO Do we still need this type
-         */
-        NONE,
-
-        /**
          *
          */
         OAUTH2_AUTHORIZATION_CODE,
