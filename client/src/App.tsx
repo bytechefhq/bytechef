@@ -230,7 +230,7 @@ function App() {
                 <div className="flex size-full">
                     <Outlet />
 
-                    {ai.enabled && showCopilot && (
+                    {ai.copilot.enabled && showCopilot && (
                         <aside className="border-l border-l-border/70">
                             <CopilotRuntimeProvider>
                                 <CopilotPanel />

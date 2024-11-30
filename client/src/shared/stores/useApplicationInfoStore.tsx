@@ -7,7 +7,9 @@ export type EditionType = 'ce' | 'ee';
 
 export interface ApplicationInfoI {
     ai: {
-        enabled: boolean;
+        copilot: {
+            enabled: boolean;
+        };
     };
     analytics: {
         enabled: boolean;
@@ -46,7 +48,9 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
         (set, get) => {
             return {
                 ai: {
-                    enabled: false,
+                    copilot: {
+                        enabled: false,
+                    },
                 },
                 analytics: {
                     enabled: false,
@@ -87,7 +91,9 @@ export const useApplicationInfoStore = create<ApplicationInfoI>()(
                         set((state) => ({
                             ...state,
                             ai: {
-                                enabled: json.ai.enabled === 'true',
+                                copilot: {
+                                    enabled: json.ai.copilot.enabled === 'true',
+                                },
                             },
                             analytics: {
                                 enabled: json.analytics.enabled === 'true',

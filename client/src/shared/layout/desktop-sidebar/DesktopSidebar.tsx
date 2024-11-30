@@ -66,7 +66,7 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
-                        {ai.enabled && ff_1570 && (
+                        {ai.copilot.enabled && ff_1570 && (
                             <Button onClick={() => setShowCopilot(!showCopilot)} size="icon" variant="ghost">
                                 <BotMessageSquareIcon className="size-6" />
                             </Button>
