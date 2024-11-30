@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import PropertyCodeEditorSheetConnectionsSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
@@ -9,6 +10,7 @@ import Editor from '@monaco-editor/react';
 import {Link2Icon, PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
+import {twMerge} from 'tailwind-merge';
 
 const workflowNodeScriptApi: WorkflowNodeScriptApi = new WorkflowNodeScriptApi();
 
@@ -34,6 +36,8 @@ const PropertyCodeEditorSheet = ({
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
     const [showConnections, setShowConnections] = useState(false);
+
+    const {copilotPanelOpen} = useCopilotStore();
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
 
@@ -64,9 +68,12 @@ const PropertyCodeEditorSheet = ({
 
     return (
         <>
-            <Sheet onOpenChange={onClose} open={true}>
+            <Sheet modal={!copilotPanelOpen} onOpenChange={onClose} open={true}>
                 <SheetContent
-                    className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
+                    className={twMerge(
+                        'flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg',
+                        copilotPanelOpen && 'mr-[450px]'
+                    )}
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
@@ -111,7 +118,7 @@ const PropertyCodeEditorSheet = ({
                         </div>
                     </SheetHeader>
 
-                    <div className="flex h-full border">
+                    <div className="flex h-full border-y border-y-border/50">
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel defaultSize={75}>
                                 <Editor
