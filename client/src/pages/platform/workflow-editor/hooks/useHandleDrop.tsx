@@ -4,12 +4,14 @@ import {
     ActionDefinitionApi,
     ComponentDefinitionApi,
     ComponentDefinitionBasic,
+    TaskDispatcherDefinitionApi,
     TaskDispatcherDefinitionBasic,
     TriggerDefinitionApi,
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
+import {ClickedDefinitionType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlayIcon} from 'lucide-react';
@@ -22,9 +24,9 @@ import getParametersWithDefaultValues from '../utils/getParametersWithDefaultVal
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 export default function useHandleDrop(): [
-    (targetNode: Node, droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
-    (targetEdge: Edge, droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
-    (droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) => void,
+    (targetNode: Node, droppedNode: ClickedDefinitionType) => void,
+    (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
+    (droppedNode: ClickedDefinitionType) => void,
 ] {
     const {workflow} = useWorkflowDataStore();
 
@@ -42,27 +44,7 @@ export default function useHandleDrop(): [
 
     const queryClient = useQueryClient();
 
-    async function handleDropOnPlaceholderNode(
-        targetNode: Node,
-        droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic
-    ) {
-        const newWorkflowNode = {
-            ...targetNode,
-            data: {
-                componentName: droppedNode.name,
-                icon: droppedNode?.icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={droppedNode?.icon} />
-                ) : (
-                    <PlayIcon className="size-9 text-gray-700" />
-                ),
-                label: droppedNode?.title,
-                name: getFormattedName(droppedNode.name!, nodes),
-                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
-            },
-            name: droppedNode.name,
-            type: 'workflow',
-        };
-
+    async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
         const sourceEdge = edges.find((edge) => edge.target === targetNode.id);
 
         if (!sourceEdge) {
@@ -89,52 +71,108 @@ export default function useHandleDrop(): [
 
         setEdges([...edges, newPlaceholderEdge]);
 
-        const draggedComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({
-                    componentName: newWorkflowNode.data.componentName,
-                }),
-            queryKey: ComponentDefinitionKeys.componentDefinition({
-                componentName: newWorkflowNode.data.componentName,
-            }),
-        });
-
-        const getActionDefinitionRequest = {
-            actionName: draggedComponentDefinition.actions?.[0].name as string,
-            componentName: newWorkflowNode.data.componentName,
-            componentVersion: draggedComponentDefinition.version,
+        const newWorkflowNode = {
+            ...targetNode,
+            data: {
+                componentName: droppedNode.name,
+                icon: droppedNode?.icon ? (
+                    <InlineSVG className="size-9 text-gray-700" src={droppedNode?.icon} />
+                ) : (
+                    <PlayIcon className="size-9 text-gray-700" />
+                ),
+                label: droppedNode?.title,
+                name: getFormattedName(droppedNode.name!, nodes),
+                taskDispatcher: droppedNode.taskDispatcher,
+                version: droppedNode.version,
+                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
+            },
+            name: droppedNode.name,
+            type: 'workflow',
         };
 
-        const draggedComponentActionDefinition = await queryClient.fetchQuery({
-            queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
-            queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
-        });
+        let parameters;
 
-        captureComponentUsed(
-            newWorkflowNode.data.componentName,
-            draggedComponentDefinition.actions?.[0].name,
-            undefined
-        );
+        if (newWorkflowNode.data.taskDispatcher) {
+            const draggedTaskDispatcherDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
+                        taskDispatcherName: newWorkflowNode.data.componentName,
+                        taskDispatcherVersion: newWorkflowNode.data.version ?? 1,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
+                    componentName: newWorkflowNode.data.componentName,
+                }),
+            });
 
-        saveWorkflowDefinition({
-            nodeData: {
+            captureComponentUsed(newWorkflowNode.data.componentName);
+
+            parameters = {
+                ...getParametersWithDefaultValues({
+                    properties: draggedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                }),
+                caseFalse: [],
+                caseTrue: [],
+            };
+        } else {
+            const draggedComponentDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ComponentDefinitionApi().getComponentDefinition({
+                        componentName: newWorkflowNode.data.componentName,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
+                    componentName: newWorkflowNode.data.componentName,
+                }),
+            });
+
+            const getActionDefinitionRequest = {
+                actionName: draggedComponentDefinition.actions?.[0].name as string,
+                componentName: newWorkflowNode.data.componentName,
+                componentVersion: draggedComponentDefinition.version,
+            };
+
+            const draggedComponentActionDefinition = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+            });
+
+            captureComponentUsed(
+                newWorkflowNode.data.componentName,
+                draggedComponentDefinition.actions?.[0].name,
+                undefined
+            );
+
+            parameters = {
                 ...newWorkflowNode.data,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
+            };
+        }
+
+        let taskNodeIndex: number | undefined = undefined;
+
+        if (targetNode.id.includes('bottom-placeholder')) {
+            const targetNodeIndex = getNodes().findIndex((node) => node.id === targetNode.id);
+
+            const nextNode = getNodes()[targetNodeIndex + 1];
+
+            taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
+        }
+
+        saveWorkflowDefinition({
+            nodeData: {
+                ...newWorkflowNode.data,
+                parameters,
             },
+            nodeIndex: taskNodeIndex,
             queryClient,
             updateWorkflowMutation,
             workflow,
         });
     }
 
-    async function handleDropOnWorkflowEdge(
-        targetEdge: Edge,
-        droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic
-    ) {
+    async function handleDropOnWorkflowEdge(targetEdge: Edge, droppedNode: ClickedDefinitionType) {
         const previousNode = nodes.find((node) => node.id === targetEdge.source);
-
         const nextNode = nodes.find((node) => node.id === targetEdge.target);
 
         if (!nextNode || !previousNode) {
@@ -147,12 +185,14 @@ export default function useHandleDrop(): [
             data: {
                 componentName: droppedNode.name,
                 icon: droppedNode?.icon ? (
-                    <InlineSVG className="size-9 text-gray-700" src={droppedNode.icon} />
+                    <InlineSVG className="size-9 text-gray-700" src={droppedNode?.icon} />
                 ) : (
                     <PlayIcon className="size-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
                 name: getFormattedName(droppedNode.name!, nodes),
+                taskDispatcher: droppedNode.taskDispatcher,
+                version: droppedNode.version,
                 workflowNodeName: getFormattedName(droppedNode.name!, nodes),
             },
             id: getRandomId(),
@@ -181,39 +221,69 @@ export default function useHandleDrop(): [
 
         setEdges(edges);
 
-        const draggedComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({
+        let parameters;
+
+        if (newWorkflowNode.data.taskDispatcher) {
+            const draggedTaskDispatcherDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
+                        taskDispatcherName: newWorkflowNode.data.componentName,
+                        taskDispatcherVersion: newWorkflowNode.data.version ?? 1,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
                     componentName: newWorkflowNode.data.componentName,
                 }),
-            queryKey: ComponentDefinitionKeys.componentDefinition({
+            });
+
+            captureComponentUsed(newWorkflowNode.data.componentName);
+
+            parameters = {
+                ...getParametersWithDefaultValues({
+                    properties: draggedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                }),
+                caseFalse: [],
+                caseTrue: [],
+            };
+        } else {
+            const draggedComponentDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ComponentDefinitionApi().getComponentDefinition({
+                        componentName: newWorkflowNode.data.componentName,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
+                    componentName: newWorkflowNode.data.componentName,
+                }),
+            });
+
+            const getActionDefinitionRequest = {
+                actionName: draggedComponentDefinition.actions?.[0].name as string,
                 componentName: newWorkflowNode.data.componentName,
-            }),
-        });
+                componentVersion: draggedComponentDefinition.version,
+            };
 
-        const getActionDefinitionRequest = {
-            actionName: draggedComponentDefinition.actions?.[0].name as string,
-            componentName: newWorkflowNode.data.componentName,
-            componentVersion: draggedComponentDefinition?.version,
-        };
+            const draggedComponentActionDefinition = await queryClient.fetchQuery({
+                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
+                queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
+            });
 
-        const draggedComponentActionDefinition = await queryClient.fetchQuery({
-            queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(getActionDefinitionRequest),
-            queryKey: ActionDefinitionKeys.actionDefinition(getActionDefinitionRequest),
-        });
+            captureComponentUsed(
+                newWorkflowNode.data.componentName,
+                draggedComponentDefinition.actions?.[0].name,
+                undefined
+            );
 
-        captureComponentUsed(
-            newWorkflowNode.data.componentName,
-            draggedComponentDefinition.actions?.[0].name,
-            undefined
-        );
-
-        saveWorkflowDefinition({
-            nodeData: {
+            parameters = {
                 ...newWorkflowNode.data,
                 parameters: getParametersWithDefaultValues({
                     properties: draggedComponentActionDefinition.properties || [],
                 }),
+            };
+        }
+
+        saveWorkflowDefinition({
+            nodeData: {
+                ...newWorkflowNode.data,
+                parameters,
             },
             nodeIndex: targetEdgeIndex,
             queryClient,

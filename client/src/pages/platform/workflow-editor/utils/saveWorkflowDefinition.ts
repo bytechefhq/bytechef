@@ -79,9 +79,9 @@ export default async function saveWorkflowDefinition({
         return;
     }
 
-    const {componentName, description, label, metadata, name, parameters, taskDispatcher, type} = nodeData;
+    const {componentName, description, label, metadata, name, parameters, taskDispatcher} = nodeData;
 
-    let {operationName, version} = nodeData;
+    let {operationName, type, version} = nodeData;
 
     if (taskDispatcher && componentName && version) {
         const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
@@ -118,13 +118,21 @@ export default async function saveWorkflowDefinition({
         operationName = newNodeComponentDefinition.actions?.[0].name;
     }
 
+    if (!type && !nodeData.trigger) {
+        if (taskDispatcher) {
+            type = `${componentName}/v${version}`;
+        } else {
+            type = `${componentName}/v${version}/${operationName}`;
+        }
+    }
+
     const newTask: WorkflowTask = {
         description,
         label,
         metadata,
         name,
         parameters,
-        type: type ? type : `${componentName}/v${version}/${operationName}`,
+        type: type ?? `${componentName}/v${version}/${operationName}`,
     };
 
     const existingWorkflowTask = workflowDefinition.tasks?.find((task) => task.name === newTask.name);
