@@ -131,6 +131,7 @@ const Property = ({
         controlType,
         custom,
         description,
+        expressionEnabled,
         hidden,
         label,
         languageId,
@@ -737,18 +738,20 @@ const Property = ({
             setShowInputTypeSwitchButton(false);
         }
 
-        if (controlType === 'JSON_SCHEMA_BUILDER') {
-            setShowInputTypeSwitchButton(true);
-        }
+        if (expressionEnabled) {
+            if (controlType === 'JSON_SCHEMA_BUILDER') {
+                setShowInputTypeSwitchButton(true);
+            }
 
-        if (controlType === 'SELECT') {
-            setShowInputTypeSwitchButton(true);
+            if (controlType === 'SELECT') {
+                setShowInputTypeSwitchButton(true);
+            }
         }
 
         if (controlType === 'NULL') {
             setShowInputTypeSwitchButton(false);
         }
-    }, [controlType]);
+    }, [controlType, expressionEnabled]);
 
     // update propertyParameterValue when workflow definition changes
     useEffect(() => {
