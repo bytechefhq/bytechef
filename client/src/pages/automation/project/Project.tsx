@@ -184,7 +184,7 @@ const Project = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
+                queryKey: ProjectWorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
             setShowEditWorkflowDialog(false);

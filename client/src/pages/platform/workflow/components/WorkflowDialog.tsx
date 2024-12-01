@@ -13,9 +13,11 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
+import {useParams} from 'react-router-dom';
 
 const SPACE = 4;
 
@@ -42,7 +44,11 @@ const WorkflowDialog = ({
 }: WorkflowDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const {projectId} = useParams();
+
     const {data: workflow} = useGetWorkflowQuery(workflowId ?? '', !!workflowId);
+
+    const queryClient = useQueryClient();
 
     const form = useForm({
         defaultValues: {
@@ -83,6 +89,10 @@ const WorkflowDialog = ({
                     ),
                     version: workflow.version,
                 },
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(workflow.id!)),
             });
         } else {
             mutate({
