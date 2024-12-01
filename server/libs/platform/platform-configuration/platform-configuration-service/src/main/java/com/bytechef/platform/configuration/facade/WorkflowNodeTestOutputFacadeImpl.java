@@ -125,7 +125,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
-        Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflow.getId(), workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(

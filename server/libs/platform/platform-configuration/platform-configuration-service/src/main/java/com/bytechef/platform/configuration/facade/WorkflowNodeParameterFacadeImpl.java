@@ -229,7 +229,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                     workflow.getId(), workflowTask.getName());
 
                 result = evaluate(

@@ -37,6 +37,8 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
+    private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
@@ -65,12 +68,14 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     @SuppressFBWarnings("EI")
     public WorkflowNodeOutputFacadeImpl(
         ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowService workflowService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
+        this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.workflowService = workflowService;
         this.triggerDefinitionService = triggerDefinitionService;
@@ -136,7 +141,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
-    public Map<String, ?> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
+    public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName) {
         return getPreviousWorkflowNodeOutputs(workflowId, lastWorkflowNodeName)
             .stream()
             .filter(workflowNodeOutputDTO -> workflowNodeOutputDTO.sampleOutput() != null)
@@ -148,7 +153,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
         String workflowId, WorkflowTask workflowTask, WorkflowTrigger workflowTrigger, OutputResponse outputResponse) {
 
         if (outputResponse != null) {
-            // Force UI to test component to get real fileEntry instance
+            // Force UI to test component to get the real fileEntry instance
 
             if (outputResponse.outputSchema() instanceof FileEntryProperty) {
                 return null;
@@ -178,7 +183,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
                 return null;
             }
 
-            Map<String, ?> outputs = getWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
+            Map<String, ?> outputs = getPreviousWorkflowNodeSampleOutputs(workflowId, workflowTask.getName());
 
             Map<String, ?> inputParameters = workflowTask.evaluateParameters(
                 MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
@@ -214,17 +219,32 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTask workflowTask) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
-        ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-            workflowNodeType.componentOperationName());
+        ActionDefinition actionDefinition = null;
+        TaskDispatcherDefinition taskDispatcherDefinition = null;
+        OutputResponse outputResponse;
 
-        OutputResponse outputResponse = workflowNodeTestOutputService
+        if (workflowNodeType.componentOperationName() == null) {
+            taskDispatcherDefinition = taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+            outputResponse = taskDispatcherDefinition.getOutputResponse();
+        } else {
+            actionDefinition = actionDefinitionService.getActionDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                workflowNodeType.componentOperationName());
+
+            outputResponse = actionDefinition.getOutputResponse();
+        }
+
+        OutputResponse finalOutputResponse = outputResponse;
+
+        outputResponse = workflowNodeTestOutputService
             .fetchWorkflowTestNodeOutput(workflowId, workflowTask.getName())
             .map(WorkflowNodeTestOutput::getOutput)
-            .orElseGet(() -> checkOutput(workflowId, workflowTask, null, actionDefinition.getOutputResponse()));
+            .orElseGet(() -> checkOutput(workflowId, workflowTask, null, finalOutputResponse));
 
         return new WorkflowNodeOutputDTO(
-            actionDefinition, outputResponse, null, null, workflowTask.getName());
+            workflowTask.getName(), outputResponse, null, actionDefinition, taskDispatcherDefinition);
     }
 
     private WorkflowNodeOutputDTO getWorkflowNodeOutputDTO(String workflowId, WorkflowTrigger workflowTrigger) {
@@ -241,6 +261,6 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
         outputResponse = checkTriggerOutput(outputResponse, triggerDefinition);
 
-        return new WorkflowNodeOutputDTO(null, outputResponse, null, triggerDefinition, workflowTrigger.getName());
+        return new WorkflowNodeOutputDTO(workflowTrigger.getName(), outputResponse, triggerDefinition, null, null);
     }
 }

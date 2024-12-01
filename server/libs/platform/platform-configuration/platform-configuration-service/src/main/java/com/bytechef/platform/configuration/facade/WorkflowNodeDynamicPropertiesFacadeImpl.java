@@ -82,7 +82,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                     workflowId, workflowTask.getName());
                 WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
