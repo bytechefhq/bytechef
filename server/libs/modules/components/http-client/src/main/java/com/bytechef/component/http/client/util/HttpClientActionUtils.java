@@ -74,8 +74,7 @@ public class HttpClientActionUtils {
                     option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
                     option("Raw", Http.BodyContentType.RAW.name()),
                     option("Binary", Http.BodyContentType.BINARY.name()))
-                .defaultValue("")
-                .advancedOption(true));
+                .defaultValue(""));
 
             //
             // Body Content properties
@@ -91,8 +90,7 @@ public class HttpClientActionUtils {
                         Http.BodyContentType.BINARY.name(), BODY_CONTENT_TYPE,
                         Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                 .defaultValue("text/plain")
-                .placeholder("text/plain")
-                .advancedOption(true));
+                .placeholder("text/plain"));
         }
 
         properties.addAll(List.of(

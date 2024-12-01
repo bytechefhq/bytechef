@@ -65,38 +65,32 @@ public class HttpClientComponentConstants {
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add Parameter")
-                .advancedOption(true),
+                .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Body Content - XML")
                 .description("XML content to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
-                .placeholder("Add Parameter")
-                .advancedOption(true),
+                .placeholder("Add Parameter"),
             object(BODY_CONTENT)
                 .label("Body Content - Form Data")
                 .description("Body parameters to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(string(), fileEntry())
-                .advancedOption(true),
+                .additionalProperties(string(), fileEntry()),
             object(BODY_CONTENT)
                 .label("Body Content - Form URL-Encoded")
                 .description("Body parameters to send.")
                 .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
                 .placeholder("Add Parameter")
-                .additionalProperties(string())
-                .advancedOption(true),
+                .additionalProperties(string()),
             string(BODY_CONTENT)
                 .label("Body Content - Raw")
                 .description("The raw text to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
-                .advancedOption(true),
+                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
             fileEntry(BODY_CONTENT)
                 .label("Body Content - Binary")
                 .description("The object property which contains a reference to the file to upload.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
-                .advancedOption(true)));
+                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))));
 
     public static final List<? extends Property> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
@@ -116,7 +110,8 @@ public class HttpClientComponentConstants {
             bool(ALLOW_UNAUTHORIZED_CERTS)
                 .label("Allow Unauthorized Certs")
                 .description("Download the response even if SSL certificate validation is not possible.")
-                .defaultValue(false),
+                .defaultValue(false)
+                .advancedOption(true),
             string(RESPONSE_FORMAT)
                 .label("Response Format")
                 .description("The format in which the data gets returned from the URL.")
