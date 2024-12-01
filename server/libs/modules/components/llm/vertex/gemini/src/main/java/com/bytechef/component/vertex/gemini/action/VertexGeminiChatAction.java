@@ -43,6 +43,7 @@ import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstant
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
@@ -61,6 +62,13 @@ import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
  * @author Marko Kriskovic
  */
 public class VertexGeminiChatAction {
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    VertexAiGeminiChatModel.ChatModel::getValue,
+                    VertexAiGeminiChatModel.ChatModel::getValue,
+                    (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask Gemini")
@@ -70,15 +78,7 @@ public class VertexGeminiChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(
-                            VertexAiGeminiChatModel.ChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    VertexAiGeminiChatModel.ChatModel::getValue,
-                                    VertexAiGeminiChatModel.ChatModel::getValue,
-                                    (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,

@@ -47,12 +47,14 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatModel;
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatOptions;
@@ -66,6 +68,13 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  */
 public class AmazonBedrockCohereChatAction {
 
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(CohereChatBedrockApi.CohereChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    CohereChatBedrockApi.CohereChatModel::getName,
+                    CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askCohere")
         .title("Ask Cohere")
         .description("Ask anything you want.")
@@ -74,14 +83,7 @@ public class AmazonBedrockCohereChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(
-                            CohereChatBedrockApi.CohereChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    CohereChatBedrockApi.CohereChatModel::getName,
-                                    CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,

@@ -75,7 +75,7 @@ public class AmazonBedrockAnthropic2ChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")

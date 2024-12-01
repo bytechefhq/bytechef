@@ -47,6 +47,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
@@ -66,7 +67,11 @@ import org.springframework.ai.openai.api.OpenAiApi;
  * @author Marko Kriskovic
  */
 public class OpenAIChatAction {
-
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(OpenAiApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -75,12 +80,7 @@ public class OpenAIChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiApi.ChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,

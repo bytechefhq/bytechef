@@ -36,13 +36,17 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
 import org.springframework.ai.bedrock.titan.BedrockTitanChatModel;
 import org.springframework.ai.bedrock.titan.BedrockTitanChatOptions;
 import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi;
@@ -54,6 +58,13 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  * @author Marko Kriskovic
  */
 public class AmazonBedrockTitanChatAction {
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(TitanChatBedrockApi.TitanChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    TitanChatBedrockApi.TitanChatModel::getName,
+                    TitanChatBedrockApi.TitanChatModel::getName,
+                    (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askTitan")
         .title("Ask Titan")
@@ -63,14 +74,7 @@ public class AmazonBedrockTitanChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(TitanChatBedrockApi.TitanChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    TitanChatBedrockApi.TitanChatModel::getName,
-                                    TitanChatBedrockApi.TitanChatModel::getName,
-                                    (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,

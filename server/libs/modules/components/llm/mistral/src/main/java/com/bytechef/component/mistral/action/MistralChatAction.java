@@ -42,6 +42,7 @@ import static com.bytechef.component.mistral.constant.MistralConstants.SAFE_PROM
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
@@ -60,7 +61,11 @@ import org.springframework.ai.mistralai.api.MistralAiApi;
  * @author Marko Kriskovic
  */
 public class MistralChatAction {
-
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(MistralAiApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)));
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -69,12 +74,7 @@ public class MistralChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(LLMUtils.getEnumOptions(
-                    Arrays.stream(
-                        MistralAiApi.ChatModel.values())
-                        .collect(
-                            Collectors.toMap(
-                                MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGE_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
