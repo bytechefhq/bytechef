@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.analysis.action.SummarizeTextAction;
-import com.bytechef.component.ai.text.analysis.connection.AiTextAnalysisConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.google.auto.service.AutoService;
@@ -36,7 +35,6 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
         .description("AI Helper component for text analysis.")
         .icon("path:assets/ai-text-analysis.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .connection(AiTextAnalysisConnection.CONNECTION_DEFINITION)
         .actions(SummarizeTextAction.ACTION_DEFINITION);
 
     @Override
