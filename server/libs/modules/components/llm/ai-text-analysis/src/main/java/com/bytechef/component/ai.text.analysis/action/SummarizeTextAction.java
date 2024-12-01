@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisCon
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.PROMPT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -38,6 +39,7 @@ import com.bytechef.component.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.llm.Chat;
 import com.bytechef.component.mistral.action.MistralChatAction;
 import com.bytechef.component.openai.action.OpenAIChatAction;
 import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
@@ -166,9 +168,13 @@ public class SummarizeTextAction {
 
     public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        Chat chat = OpenAIChatAction.CHAT;
 
+        //connectionParameters.put("token", );
 
-        return null;
+        Object response = Chat.getResponse(chat, inputParameters, connectionParameters);
+
+        return response.toString();
     }
 
 }
