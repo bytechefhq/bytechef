@@ -7,7 +7,7 @@
   "properties" : [ {
     "advancedOption" : null,
     "displayCondition" : null,
-    "expressionEnabled" : null,
+    "expressionEnabled" : false,
     "hidden" : null,
     "metadata" : { },
     "required" : null,
@@ -492,7 +492,7 @@
           "minLength" : null
         }, {
           "advancedOption" : null,
-          "displayCondition" : "!{'EMPTY','REGEX'}.contains('operation')",
+          "displayCondition" : "!{'EMPTY','REGEX'}.contains(operation)",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },

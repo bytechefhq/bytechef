@@ -60,6 +60,7 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
             bool(RAW_EXPRESSION)
                 .label("Raw expression")
                 .description("Set condition as raw expression or list of conditions.")
+                .expressionEnabled(false)
                 .defaultValue(false),
             array(CONDITIONS)
                 .label("OR Conditions")
@@ -192,10 +193,11 @@ public class ConditionTaskDispatcherDefinitionFactory implements TaskDispatcherD
                                         .description(
                                             "The string value to compare with the first one.")
                                         .defaultValue("")
-                                        .displayCondition("!{'%s','%s'}.contains('%s')".formatted(
-                                            Operation.EMPTY.name(),
-                                            Operation.REGEX.name(),
-                                            OPERATION)),
+                                        .displayCondition(
+                                            "!{'%s','%s'}.contains(%s)".formatted(
+                                                Operation.EMPTY.name(),
+                                                Operation.REGEX.name(),
+                                                OPERATION)),
                                     string(VALUE_2)
                                         .label("Regex")
                                         .description(
