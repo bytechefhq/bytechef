@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +25,18 @@ import org.junit.jupiter.api.Test;
  * @author Igor Beslic
  */
 public class WorkflowNodeParameterFacadeTest {
+
+    @Test
+    public void testFindIndexes() {
+        Map<String, Object> parametersMap = Map.of(
+            "conditions",
+            List.of(
+                List.of(Map.of("operation", "EMPTY"), Map.of("operation", "REGEX")),
+                List.of(Map.of("operation", "REGEX"))));
+
+//        List<List<Integer>> indexesList = WorkflowNodeParameterFacadeImpl.getIndexDisplayConditionMap(
+//            map, "conditions[index][index].operation != 'EMPTY'");
+    }
 
     @Test
     public void testHasExpressionVariable() {
@@ -50,5 +64,4 @@ public class WorkflowNodeParameterFacadeTest {
                 noVariableExpression + " doesn't contain variableName");
         }
     }
-
 }
