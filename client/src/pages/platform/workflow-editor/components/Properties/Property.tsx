@@ -388,9 +388,11 @@ const Property = ({
     }, 200);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        const {value} = event.target;
+
         if (isNumericalInput) {
-            const valueTooLow = minValue && parseFloat(numericValue) < minValue;
-            const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
+            const valueTooLow = minValue && parseFloat(value) < minValue;
+            const valueTooHigh = maxValue && parseFloat(value) > maxValue;
 
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
@@ -399,17 +401,6 @@ const Property = ({
             } else {
                 setHasError(false);
             }
-        } else {
-            const valueTooShort = minLength && inputValue.length < minLength;
-            const valueTooLong = maxLength && inputValue.length > maxLength;
-
-            setHasError(!!valueTooShort || !!valueTooLong);
-
-            setErrorMessage('Incorrect value');
-        }
-
-        if (isNumericalInput) {
-            const {value} = event.target;
 
             const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
 
@@ -419,6 +410,13 @@ const Property = ({
 
             setNumericValue(onlyNumericValue);
         } else {
+            const valueTooShort = minLength && inputValue.length < minLength;
+            const valueTooLong = maxLength && inputValue.length > maxLength;
+
+            setHasError(!!valueTooShort || !!valueTooLong);
+
+            setErrorMessage('Incorrect value');
+
             setInputValue(event.target.value);
         }
 
