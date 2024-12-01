@@ -738,7 +738,7 @@ const Property = ({
             setShowInputTypeSwitchButton(false);
         }
 
-        if (property.expressionEnabled) {
+        if (expressionEnabled) {
             if (controlType === 'JSON_SCHEMA_BUILDER') {
                 setShowInputTypeSwitchButton(true);
             }
