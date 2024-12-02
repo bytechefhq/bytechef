@@ -54,8 +54,10 @@ const WorkflowEditorLayout = ({
 
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
+    let filteredWorkflowNodeOutputs;
+
     if (!currentNode?.trigger && workflowNodeOutputs) {
-        const filteredWorkflowNodeOutputs = workflowNodeOutputs.filter(
+        filteredWorkflowNodeOutputs = workflowNodeOutputs.filter(
             (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
         );
 
@@ -112,15 +114,15 @@ const WorkflowEditorLayout = ({
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflowNodeOutputs={workflowNodeOutputs ?? []}
+                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
             )}
 
-            {(workflowNodeOutputs || (!workflowNodeOutputs && currentNode?.trigger)) &&
+            {(filteredWorkflowNodeOutputs || (!filteredWorkflowNodeOutputs && currentNode?.trigger)) &&
                 previousComponentDefinitions && (
                     <DataPillPanel
                         previousComponentDefinitions={previousComponentDefinitions}
-                        workflowNodeOutputs={workflowNodeOutputs ?? []}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
                 )}
         </ReactFlowProvider>

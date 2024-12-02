@@ -5,6 +5,7 @@ import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {
     ActionDefinitionApi,
     ComponentDefinition,
@@ -374,7 +375,28 @@ const WorkflowNodeDetailsPanel = ({
             return;
         }
 
-        const dataPills = getDataPillsFromProperties(previousComponentProperties!, workflow, previousNodeNames);
+        let filteredNodeNames = previousNodeNames;
+
+        if (currentNode?.conditionData) {
+            const parentConditionTask = workflow.tasks?.find(
+                (task) => task.name === currentNode.conditionData?.conditionId
+            );
+
+            const {conditionCase} = currentNode.conditionData;
+
+            const oppositeConditionCase =
+                conditionCase === CONDITION_CASE_TRUE ? CONDITION_CASE_FALSE : CONDITION_CASE_TRUE;
+
+            const oppositeConditionCaseNodeNames = parentConditionTask?.parameters?.[oppositeConditionCase].map(
+                (task: WorkflowTask) => task.name
+            );
+
+            filteredNodeNames = previousNodeNames.filter(
+                (nodeName) => !oppositeConditionCaseNodeNames?.includes(nodeName)
+            );
+        }
+
+        const dataPills = getDataPillsFromProperties(previousComponentProperties!, workflow, filteredNodeNames);
 
         setAvailableDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps
