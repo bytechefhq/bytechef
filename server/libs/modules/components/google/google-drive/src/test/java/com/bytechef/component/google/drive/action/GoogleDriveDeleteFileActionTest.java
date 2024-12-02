@@ -49,7 +49,7 @@ class GoogleDriveDeleteFileActionTest extends AbstractGoogleDriveActionTest {
             .when(mockedDelete)
             .execute();
 
-        GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals("testId", fileIdArgumentCaptor.getValue());
 
@@ -66,7 +66,7 @@ class GoogleDriveDeleteFileActionTest extends AbstractGoogleDriveActionTest {
             .execute();
 
         assertThrows(IOException.class,
-            () -> GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedContext));
+            () -> GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext));
 
         assertEquals("testId", fileIdArgumentCaptor.getValue());
     }

@@ -46,7 +46,7 @@ class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveActionTest
         when(mockedCreate.execute())
             .thenReturn(mockedGoogleFile);
 
-        File result = GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
+        File result = GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedGoogleFile, result);
 
