@@ -30,7 +30,11 @@ export default function getDataPillsFromProperties(
 
         const existingProperties = getExistingProperties(componentProperty.properties);
 
-        const nodeName = workflow.triggers?.length ? previousNodeNames[index] : previousNodeNames[index + 1];
+        const filteredNodeNames = previousNodeNames.filter(
+            (name) => name !== 'manual' && name !== 'trigger_1' && !name.includes('condition')
+        );
+
+        const nodeName = filteredNodeNames[index];
 
         dataPills.push({
             componentIcon: componentDefinition.icon,
