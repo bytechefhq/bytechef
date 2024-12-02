@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.figma.action.FigmaGetCommentsAction;
 import com.bytechef.component.figma.action.FigmaPostCommentAction;
 import com.bytechef.component.figma.connection.FigmaConnection;
 
@@ -34,7 +35,8 @@ public abstract class AbstractFigmaComponentHandler implements OpenApiComponentH
             .title("Figma")
             .description(
                 "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."))
-                    .actions(modifyActions(FigmaPostCommentAction.ACTION_DEFINITION))
+                    .actions(modifyActions(FigmaGetCommentsAction.ACTION_DEFINITION,
+                        FigmaPostCommentAction.ACTION_DEFINITION))
                     .connection(modifyConnection(FigmaConnection.CONNECTION_DEFINITION))
                     .triggers(getTriggers());
 

@@ -8,6 +8,48 @@ servers:
   - url: "https://api.figma.com"
 paths:
   /v1/files/{fileKey}/comments:
+    get:
+      summary: "Get Comments"
+      description: "Gets a list of comments left on the file."
+      operationId: "getComments"
+      parameters:
+        - name: "fileKey"
+          in: "path"
+          description: "File to get comments from. Figma file key copy from Figma file URL."
+          required: true
+          schema:
+            type: "string"
+            title: "File Key"
+      responses:
+        200:
+          description: "Successful response."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        id:
+                          type: "string"
+                        file_key:
+                          type: "string"
+                        parent_id:
+                          type: "string"
+                        user:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "string"
+                            handle:
+                              type: "string"
+                            img_url:
+                              type: "string"
+                            email:
+                              type: "string"
     post:
       summary: "Post Comment"
       description: "Posts a new comment on the file."
@@ -64,3 +106,4 @@ components:
           refreshUrl: "https://www.figma.com/api/oauth/refresh"
           scopes:
             file_comments:write: " "
+            files:read: ""
