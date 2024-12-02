@@ -187,10 +187,6 @@ const Project = () => {
                 queryKey: ProjectWorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflows(parseInt(projectId!)),
-            });
-
             setShowEditWorkflowDialog(false);
         },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
