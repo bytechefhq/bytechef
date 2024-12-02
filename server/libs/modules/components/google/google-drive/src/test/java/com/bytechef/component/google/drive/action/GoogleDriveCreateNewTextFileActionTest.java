@@ -53,7 +53,8 @@ class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveActionTe
         when(mockedCreate.execute())
             .thenReturn(mockedGoogleFile);
 
-        File result = GoogleDriveCreateNewTextFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        File result =
+            GoogleDriveCreateNewTextFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedGoogleFile, result);
 

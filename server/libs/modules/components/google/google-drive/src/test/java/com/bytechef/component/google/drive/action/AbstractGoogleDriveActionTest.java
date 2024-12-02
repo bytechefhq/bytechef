@@ -43,7 +43,7 @@ public abstract class AbstractGoogleDriveActionTest {
     protected ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
     protected ArgumentCaptor<String> fileIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected MockedStatic<GoogleServices> googleServicesMockedStatic;
-    protected ActionContext mockedContext = mock(ActionContext.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
     protected Drive.Files.Copy mockedCopy = mock(Drive.Files.Copy.class);
     protected Drive mockedDrive = mock(Drive.class);
