@@ -261,10 +261,6 @@ public class WorkflowTask implements Task, Serializable {
         return type;
     }
 
-    public void setParentName(String parentName) {
-        this.parentName = parentName;
-    }
-
     public Map<String, Object> toMap() {
         Map<String, Object> map = new HashMap<>();
 
