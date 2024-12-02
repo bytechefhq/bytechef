@@ -83,7 +83,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             <div className={twMerge([label && type !== 'hidden' && 'mt-1', leadingIcon && 'relative'])} title={title}>
                 <div
                     className={twMerge(
-                        'ring-2 ring-blue-500 focus-visible:outline-none',
+                        'focus:ring-2 focus:ring-blue-500 focus-visible:outline-none',
                         leadingIcon && 'relative rounded-md',
                         type === 'hidden' && 'border-0',
                         error && 'ring-rose-300'
@@ -102,7 +102,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
 
                     <Input
                         className={twMerge(
-                            'outline-none ring-2 ring-blue-500 focus-visible:outline-none focus-visible:ring-blue-500',
+                            'outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
                             error &&
                                 'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                             disabled && 'bg-gray-100 text-gray-500',
