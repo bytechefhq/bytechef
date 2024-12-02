@@ -75,6 +75,10 @@ export default defineConfig({
                                 {
                                     label: 'Create Action',
                                     link: '/developer_guide/build_component/create_action'
+                                },
+                                {
+                                    label: 'Create Trigger',
+                                    link: '/developer_guide/build_component/create_trigger'
                                 }
                             ],
                             collapsed: true,
@@ -92,6 +96,10 @@ export default defineConfig({
                                     label: 'Customize Component',
                                     link: '/developer_guide/generate_component/customize_component'
                                 },
+                                {
+                                    label: 'Create Trigger',
+                                    link: '/developer_guide/generate_component/create_trigger'
+                                }
                             ],
                             collapsed: true,
                         },
@@ -108,6 +116,7 @@ export default defineConfig({
                                 {label: 'Component', link: '/developer_guide/component_specification/component'},
                                 {label: 'Connection', link: '/developer_guide/component_specification/connection'},
                                 {label: 'Action', link: '/developer_guide/component_specification/action'},
+                                {label: 'Trigger', link: '/developer_guide/component_specification/trigger'},
                                 {label: 'Property', link: '/developer_guide/component_specification/property'}
                             ],
                             collapsed: true,
