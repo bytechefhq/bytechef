@@ -66,6 +66,14 @@ public interface Context {
 
     /**
      *
+     * @param mimeTypeContextFunction
+     * @return
+     * @param <R>
+     */
+    <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction);
+
+    /**
+     *
      * @param outputSchemaFunction
      * @return
      * @param <R>
@@ -1125,6 +1133,22 @@ public interface Context {
          * @param exception
          */
         void trace(String message, Exception exception);
+    }
+
+    interface MimeType {
+
+        /**
+         *
+         * @param ext
+         */
+        String lookupMimeType(String ext);
+
+        /**
+         *
+         * @param mimeType
+         */
+        String lookupExt(String mimeType);
+
     }
 
     interface OutputSchema {

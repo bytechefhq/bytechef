@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
@@ -52,6 +53,7 @@ class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
+    private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final Xml xml;
 
@@ -65,6 +67,7 @@ class ContextImpl implements Context {
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
     }
@@ -100,6 +103,15 @@ class ContextImpl implements Context {
     public void logger(ContextConsumer<Logger> loggerConsumer) {
         try {
             loggerConsumer.accept(logger);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction) {
+        try {
+            return mimeTypeContextFunction.apply(mimeType);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -617,6 +629,18 @@ class ContextImpl implements Context {
         public BaseProperty.BaseValueProperty<?> getOutputSchema(Object value) {
             return (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
                 value, PropertyFactory.PROPERTY_FACTORY);
+        }
+    }
+
+    private record MimeTypeImpl() implements MimeType {
+        @Override
+        public String lookupMimeType(String ext) {
+            return MimeTypeUtils.lookupMimeType(ext);
+        }
+
+        @Override
+        public String lookupExt(String mimeType) {
+            return MimeTypeUtils.lookupExt(mimeType);
         }
     }
 
