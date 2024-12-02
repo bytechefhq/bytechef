@@ -50,6 +50,34 @@ Version: 1
 ## Actions
 
 
+### Get Comments
+Gets a list of comments left on the file.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| File Key | STRING | TEXT  |  File to get comments from. Figma file key copy from Figma file URL.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| [{STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)}] | ARRAY_BUILDER  |
+
+
+
+
+
+
 ### Post Comment
 Posts a new comment on the file.
 
