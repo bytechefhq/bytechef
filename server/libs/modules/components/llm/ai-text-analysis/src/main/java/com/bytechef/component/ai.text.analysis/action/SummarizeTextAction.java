@@ -29,6 +29,8 @@ import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPER
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 
+import com.bytechef.component.ai.text.analysis.AiTextAnalysisConfiguration;
+import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockCohereChatAction;
@@ -43,6 +45,7 @@ import com.bytechef.component.llm.Chat;
 import com.bytechef.component.mistral.action.MistralChatAction;
 import com.bytechef.component.openai.action.OpenAIChatAction;
 import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
+import com.bytechef.config.ApplicationProperties;
 
 
 /**
@@ -163,14 +166,18 @@ public class SummarizeTextAction {
         .output()
         .perform(SummarizeTextAction::perform);
 
-    private SummarizeTextAction() {
+    private static ApplicationProperties.Ai.Component component;
+
+    //??? not static, how even work??
+    public SummarizeTextAction(ApplicationProperties.Ai.Component component) {
+        this.component = component;
     }
 
     public static String perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Chat chat = OpenAIChatAction.CHAT;
 
-        //connectionParameters.put("token", );
+        connectionParameters.put("token", component.getOpenAi().getApiKey());
 
         Object response = Chat.getResponse(chat, inputParameters, connectionParameters);
 

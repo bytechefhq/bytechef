@@ -269,6 +269,7 @@ public class ApplicationProperties {
 
         private boolean enabled;
         private OpenAi openAi = new OpenAi();
+        private Component component = new Component();
 
         public boolean isEnabled() {
             return enabled;
@@ -278,12 +279,20 @@ public class ApplicationProperties {
             return openAi;
         }
 
+        public Component getComponent() {
+            return component;
+        }
+
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
         }
 
         public void setOpenAi(OpenAi openAi) {
             this.openAi = openAi;
+        }
+
+        public void setComponent(Component component) {
+            this.component = component;
         }
 
         public static class OpenAi {
@@ -330,6 +339,31 @@ public class ApplicationProperties {
                     public void setModel(String model) {
                         this.model = model;
                     }
+                }
+            }
+        }
+
+        public static class Component {
+            private OpenAi openAi = new OpenAi();
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public static class OpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
                 }
             }
         }
