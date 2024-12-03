@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.text.analysis;
-
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+package com.bytechef.platform.component.definition;
 
 /**
- * @author Marko Krišković
+ * @author Ivica Cardic
  */
-class AiTextAnalysisComponentHandlerTest {
+public interface AIComponentDefinition extends PlatformComponentDefinition {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/ai_text_analysis_v1.json", new AiTextAnalysisComponentHandler(applicationProperties.getAi().getComponent()).getDefinition());
-    }
+    /**
+     *
+     */
+    String AI_TEXT_ANALYSIS = "aiTextAnalysis";
 }

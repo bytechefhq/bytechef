@@ -12,7 +12,7 @@ public class AiTextAnalysisConfiguration {
     private ApplicationProperties applicationProperties;
     AiTextAnalysisConfiguration(ApplicationProperties applicationProperties){}
     @Bean
-    SummarizeTextAction summarizeTextAction(){
-        return new SummarizeTextAction(applicationProperties.getAi().getComponent());
+    AiTextAnalysisComponentHandler aiTextAnalysisComponentHandler(){
+        return new AiTextAnalysisComponentHandler(applicationProperties);
     }
 }

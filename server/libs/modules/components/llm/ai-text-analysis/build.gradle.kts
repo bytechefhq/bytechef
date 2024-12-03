@@ -1,9 +1,10 @@
 version="1.0"
 
 dependencies {
-    implementation(project(":server:libs:config:app-config"))
-
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+
+    implementation(project(":server:libs:config:app-config"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
 
     implementation(project(":server:libs:modules:components:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:llm:anthropic"))

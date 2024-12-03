@@ -17,28 +17,46 @@
 package com.bytechef.component.ai.text.analysis;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.platform.component.definition.AIComponentDefinition.AI_TEXT_ANALYSIS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.analysis.action.SummarizeTextAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.google.auto.service.AutoService;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.AIComponentDefinition;
+import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import org.springframework.stereotype.Component;
 
 /**
  * @author Marko Kriskovic
  */
-@AutoService(ComponentHandler.class)
+@Component(AI_TEXT_ANALYSIS + "_v1_ComponentHandler")
 public class AiTextAnalysisComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("aiTextAnalysis")
-        .title("AI Text Analysis")
-        .description("AI Helper component for text analysis.")
-        .icon("path:assets/ai-text-analysis.svg")
-        .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .actions(SummarizeTextAction.ACTION_DEFINITION);
+    private final AIComponentDefinition componentDefinition;
+
+    public AiTextAnalysisComponentHandler(ApplicationProperties applicationProperties) {
+        this.componentDefinition = new AiTextAnalysisComponentDefinitionImpl(applicationProperties.getAi().getComponent());
+    }
 
     @Override
     public ComponentDefinition getDefinition() {
-        return COMPONENT_DEFINITION;
+        return componentDefinition;
     }
+
+    private static class AiTextAnalysisComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
+        implements AIComponentDefinition {
+        private AiTextAnalysisComponentDefinitionImpl(ApplicationProperties.Ai.Component component){
+            super(
+                component(AI_TEXT_ANALYSIS)
+                    .title("AI Text Analysis")
+                    .description("AI Helper component for text analysis.")
+                    .icon("path:assets/ai-text-analysis.svg")
+                    .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+                    .actions(new SummarizeTextAction(component).ACTION_DEFINITION)
+            );
+        }
+    }
+
 }
