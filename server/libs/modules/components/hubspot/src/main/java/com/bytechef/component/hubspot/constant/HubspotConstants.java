@@ -21,7 +21,10 @@ package com.bytechef.component.hubspot.constant;
  */
 public class HubspotConstants {
 
+    public static final String APP_ID = "appId";
     public static final String ID = "id";
+    public static final String EVENT_TYPE = "eventType";
+    public static final String HAPIKEY = "hapikey";
     public static final String LABEL = "label";
     public static final String RESULTS = "results";
 

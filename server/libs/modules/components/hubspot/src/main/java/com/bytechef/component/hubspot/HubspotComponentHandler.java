@@ -34,7 +34,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
-import com.bytechef.component.hubspot.trigger.HubspotSubscribeTrigger;
+import com.bytechef.component.hubspot.trigger.HubspotNewContactTrigger;
+import com.bytechef.component.hubspot.trigger.HubspotNewDealTrigger;
 import com.bytechef.component.hubspot.unified.HubspotUnifiedApi;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import com.bytechef.definition.BaseProperty;
@@ -52,7 +53,7 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
 
     @Override
     public List<ModifiableTriggerDefinition> getTriggers() {
-        return List.of(HubspotSubscribeTrigger.TRIGGER_DEFINITION);
+        return List.of(HubspotNewContactTrigger.TRIGGER_DEFINITION, HubspotNewDealTrigger.TRIGGER_DEFINITION);
     }
 
     @Override
