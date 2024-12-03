@@ -16,19 +16,37 @@
 
 package com.bytechef.platform.component.definition;
 
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
-public class InMemoryFilesFileStorage implements FilesFileStorage {
+public final class TempFilesFileStorage implements FilesFileStorage {
 
-    private final FilesFileStorage filesFileStorage = new FilesFileStorageImpl(new Base64FileStorageService());
+    private final FilesFileStorage filesFileStorage;
+
+    public TempFilesFileStorage() {
+        Path tempDirPath;
+
+        try {
+            tempDirPath = Files.createTempDirectory("files_file_storage");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        File tempDir = tempDirPath.toFile();
+
+        this.filesFileStorage = new FilesFileStorageImpl(new FilesystemFileStorageService(tempDir.getAbsolutePath()));
+    }
 
     @Override
     public InputStream getFileStream(@NonNull FileEntry fileEntry) {

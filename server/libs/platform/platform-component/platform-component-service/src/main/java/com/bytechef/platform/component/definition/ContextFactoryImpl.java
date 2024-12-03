@@ -93,7 +93,7 @@ class ContextFactoryImpl implements ContextFactory {
 
     private FilesFileStorage getFilesFileStorage(boolean devEnvironment) {
         if (devEnvironment) {
-            return new InMemoryFilesFileStorage();
+            return new TempFilesFileStorage();
         }
 
         return filesFileStorage;
