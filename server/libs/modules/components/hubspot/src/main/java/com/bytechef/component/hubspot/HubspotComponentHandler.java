@@ -16,10 +16,18 @@
 
 package com.bytechef.component.hubspot;
 
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.hubspot.constant.HubspotConstants.HAPIKEY;
+
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
@@ -54,6 +62,33 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
             .icon("path:assets/hubspot.svg")
             .categories(ComponentCategory.MARKETING_AUTOMATION)
             .unifiedApi(HubspotUnifiedApi.UNIFIED_API_DEFINITION);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .baseUri((connectionParameters, context) -> "https://api.hubapi.com")
+            .authorizations(authorization(Authorization.AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                .title("OAuth2 Authorization Code")
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client Id")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true),
+                    string(HAPIKEY)
+                        .label("Hubspot API Key")
+                        .description("API Key is used for registering webhooks.")
+                        .required(false))
+                .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
+                .scopes((connection, context) -> List.of("crm.objects.contacts.read", "crm.objects.contacts.write",
+                    "crm.objects.deals.read", "crm.objects.deals.write", "crm.schemas.deals.read",
+                    "crm.objects.owners.read"))
+                .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
+                .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
     }
 
     @Override
