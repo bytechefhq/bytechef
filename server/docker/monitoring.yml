@@ -1,0 +1,12 @@
+# This configuration is intended for development purpose
+name: bytechef-monitoring
+services:
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - --config.file=/etc/prometheus/prometheus-${profile:-dev}.yml
+    ports:
+      - 9090:9090
