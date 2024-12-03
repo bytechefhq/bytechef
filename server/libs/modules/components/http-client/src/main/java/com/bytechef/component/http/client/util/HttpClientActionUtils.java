@@ -16,15 +16,23 @@
 
 package com.bytechef.component.http.client.util;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.nullable;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.ALLOW_UNAUTHORIZED_CERTS;
+import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT_MIME_TYPE;
-import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT_PROPERTIES;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.BODY_CONTENT_TYPE;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.FOLLOW_ALL_REDIRECTS;
 import static com.bytechef.component.http.client.constant.HttpClientComponentConstants.FOLLOW_REDIRECT;
@@ -63,70 +71,109 @@ public class HttpClientActionUtils {
         List<Property> properties = new ArrayList<>();
 
         if (includeBodyContentProperties) {
-            properties.add(string(BODY_CONTENT_TYPE)
-                .label("Body Content Type")
-                .description("Content-Type to use when sending body parameters.")
-                .options(
-                    option("None", ""),
-                    option("JSON", Http.BodyContentType.JSON.name()),
-                    option("XML", Http.BodyContentType.XML.name()),
-                    option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
-                    option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
-                    option("Raw", Http.BodyContentType.RAW.name()),
-                    option("Binary", Http.BodyContentType.BINARY.name()))
-                .defaultValue(""));
-
-            //
-            // Body Content properties
-            //
-
-            properties.addAll(BODY_CONTENT_PROPERTIES);
-
-            properties.add(string(BODY_CONTENT_MIME_TYPE)
-                .label("Content Type")
-                .description("Mime-Type to use when sending raw body content.")
-                .displayCondition(
-                    "'%s' == %s or '%s' == %s".formatted(
-                        Http.BodyContentType.BINARY.name(), BODY_CONTENT_TYPE,
-                        Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
-                .defaultValue("text/plain")
-                .placeholder("text/plain"));
+            properties.add(
+                object(BODY)
+                    .label("Body")
+                    .description("The body of the request.")
+                    .properties(
+                        string(BODY_CONTENT_TYPE)
+                            .label("Body Content Type")
+                            .description("Content-Type to use when sending body parameters.")
+                            .options(
+                                option("None", ""),
+                                option("JSON", Http.BodyContentType.JSON.name()),
+                                option("XML", Http.BodyContentType.XML.name()),
+                                option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
+                                option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
+                                option("Raw", Http.BodyContentType.RAW.name()),
+                                option("Binary", Http.BodyContentType.BINARY.name()))
+                            .defaultValue(""),
+                        object(BODY_CONTENT)
+                            .label("Body Content - JSON")
+                            .description("Body Parameters to send.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
+                            .additionalProperties(
+                                array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(),
+                                string(), time())
+                            .placeholder("Add Parameter"),
+                        object(BODY_CONTENT)
+                            .label("Body Content - XML")
+                            .description("XML content to send.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.XML.name()))
+                            .placeholder("Add Parameter"),
+                        object(BODY_CONTENT)
+                            .label("Body Content - Form Data")
+                            .description("Body parameters to send.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
+                            .placeholder("Add Parameter")
+                            .additionalProperties(string(), fileEntry()),
+                        object(BODY_CONTENT)
+                            .label("Body Content - Form URL-Encoded")
+                            .description("Body parameters to send.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(
+                                    BODY, BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
+                            .placeholder("Add Parameter")
+                            .additionalProperties(string()),
+                        string(BODY_CONTENT)
+                            .label("Body Content - Raw")
+                            .description("The raw text to send.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.RAW.name())),
+                        fileEntry(BODY_CONTENT)
+                            .label("Body Content - Binary")
+                            .description("The object property which contains a reference to the file to upload.")
+                            .displayCondition(
+                                "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.BINARY.name())),
+                        string(BODY_CONTENT_MIME_TYPE)
+                            .label("Content Type")
+                            .description("Mime-Type to use when sending raw body content.")
+                            .displayCondition(
+                                "'%s' == %s.%s or '%s' == %s.%s".formatted(
+                                    Http.BodyContentType.BINARY.name(), BODY, BODY_CONTENT_TYPE,
+                                    Http.BodyContentType.RAW.name(), BODY, BODY_CONTENT_TYPE))
+                            .defaultValue("text/plain")
+                            .placeholder("text/plain")));
         }
 
-        properties.addAll(List.of(
-            bool(FULL_RESPONSE)
-                .label("Full Response")
-                .description("Returns the full response data instead of only the body.")
-                .defaultValue(false)
-                .advancedOption(true),
-            bool(FOLLOW_ALL_REDIRECTS)
-                .label("Follow All Redirects")
-                .description("Follow non-GET HTTP 3xx redirects.")
-                .defaultValue(false)
-                .advancedOption(true),
-            bool(FOLLOW_REDIRECT)
-                .label("Follow GET Redirect")
-                .description("Follow GET HTTP 3xx redirects.")
-                .defaultValue(false)
-                .advancedOption(true),
-            bool(IGNORE_RESPONSE_CODE)
-                .label("Ignore Response Code")
-                .description("Succeeds also when the status code is not 2xx.")
-                .defaultValue(false)
-                .advancedOption(true),
-            string(PROXY)
-                .label("Proxy")
-                .description("HTTP proxy to use.")
-                .placeholder("https://myproxy:3128")
-                .defaultValue("")
-                .advancedOption(true),
-            integer(TIMEOUT)
-                .label("Timeout")
-                .description(
-                    "Time in ms to wait for the server to send a response before aborting the request.")
-                .defaultValue(1000)
-                .minValue(1)
-                .advancedOption(true)));
+        properties.addAll(
+            List.of(
+                bool(FULL_RESPONSE)
+                    .label("Full Response")
+                    .description("Returns the full response data instead of only the body.")
+                    .defaultValue(false)
+                    .advancedOption(true),
+                bool(FOLLOW_ALL_REDIRECTS)
+                    .label("Follow All Redirects")
+                    .description("Follow non-GET HTTP 3xx redirects.")
+                    .defaultValue(false)
+                    .advancedOption(true),
+                bool(FOLLOW_REDIRECT)
+                    .label("Follow GET Redirect")
+                    .description("Follow GET HTTP 3xx redirects.")
+                    .defaultValue(false)
+                    .advancedOption(true),
+                bool(IGNORE_RESPONSE_CODE)
+                    .label("Ignore Response Code")
+                    .description("Succeeds also when the status code is not 2xx.")
+                    .defaultValue(false)
+                    .advancedOption(true),
+                string(PROXY)
+                    .label("Proxy")
+                    .description("HTTP proxy to use.")
+                    .placeholder("https://myproxy:3128")
+                    .defaultValue("")
+                    .advancedOption(true),
+                integer(TIMEOUT)
+                    .label("Timeout")
+                    .description(
+                        "Time in ms to wait for the server to send a response before aborting the request.")
+                    .defaultValue(1000)
+                    .minValue(1)
+                    .advancedOption(true)));
 
         return properties;
     }
