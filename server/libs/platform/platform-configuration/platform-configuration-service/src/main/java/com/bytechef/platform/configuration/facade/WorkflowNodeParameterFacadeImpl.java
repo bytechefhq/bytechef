@@ -31,7 +31,6 @@ import com.bytechef.platform.component.domain.PropertiesDataSource;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.component.util.PropertyUtils;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -167,6 +166,19 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return new UpdateParameterResultDTO(displayConditionMap, metadataMap, result.parameterMap);
     }
 
+    protected static boolean hasExpressionVariable(String expression, String variableName) {
+        if ((expression == null) || expression.isEmpty()) {
+            return false;
+        }
+
+        String regex = "(^|.*\\W)" + variableName + "(\\W.*|$)";
+
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(expression);
+
+        return matcher.find();
+    }
+
     private void checkDependOn(
         String name, List<? extends BaseProperty> properties, Map<String, ?> parameterMap,
         Map<String, ?> dynamicPropertyTypesMap) {
@@ -216,7 +228,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             String displayCondition = property.getDisplayCondition();
 
-            if (PropertyUtils.hasExpressionVariable(displayCondition, name)) {
+            if (hasExpressionVariable(displayCondition, name)) {
                 parameterMap.remove(property.getName());
 
                 checkDynamicPropertyTypeItem(property.getName(), dynamicPropertyTypeMap);

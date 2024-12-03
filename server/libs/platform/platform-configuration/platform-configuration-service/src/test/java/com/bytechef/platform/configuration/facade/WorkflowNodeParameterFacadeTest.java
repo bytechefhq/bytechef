@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.util;
+package com.bytechef.platform.configuration.facade;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Igor Beslic
  */
-public class PropertyUtilsTest {
+public class WorkflowNodeParameterFacadeTest {
 
     @Test
     public void testHasExpressionVariable() {
@@ -33,7 +33,9 @@ public class PropertyUtilsTest {
 
         for (String expression : expressions) {
             Assertions.assertTrue(
-                PropertyUtils.hasExpressionVariable(expression, "variableName"), expression + " contains variableName");
+                WorkflowNodeParameterFacadeImpl.hasExpressionVariable(
+                    expression, "variableName"),
+                expression + " contains variableName");
         }
 
         String[] noVariableNameExpressions = {
@@ -43,7 +45,8 @@ public class PropertyUtilsTest {
 
         for (String noVariableExpression : noVariableNameExpressions) {
             Assertions.assertFalse(
-                PropertyUtils.hasExpressionVariable(noVariableExpression, "variableName"),
+                WorkflowNodeParameterFacadeImpl.hasExpressionVariable(
+                    noVariableExpression, "variableName"),
                 noVariableExpression + " doesn't contain variableName");
         }
     }
