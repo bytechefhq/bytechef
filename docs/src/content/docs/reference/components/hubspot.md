@@ -30,6 +30,7 @@ Version: 1
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Client Id | STRING | TEXT  |  |
 | Client Secret | STRING | TEXT  |  |
+| Hubspot API Key | STRING | TEXT  |  API Key is used for registering webhooks.  |
 
 
 
@@ -42,51 +43,65 @@ Version: 1
 ## Triggers
 
 
-### Subscribe
-Triggers when an event of the subscribed type happens inside HubSpot.
+### New Contact
+Triggers when new contact is created.
 
 #### Type: DYNAMIC_WEBHOOK
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| App Id | STRING | TEXT  |  The id of a Hubspot app used to register this trigger to. See the <a href="https://legacydocs.hubspot.com/docs/faq/integration-platform-api-requirements">prerequisites documentation</a> for more details about creating an app  |
-| Event Type | STRING | SELECT  |  The list of available event types for which you want to receive events.  |
-| Property Name | STRING | TEXT  |  The name of property to listen for change events.  |
+| App Id | STRING | TEXT  |  The id of a Hubspot app used to register this trigger to.  |
 
 
 ### Output
 
 
-___Sample Output:___
 
-```[
-    {
-        "objectId": 1246965,
-        "propertyName": "lifecyclestage",
-        "propertyValue": "subscriber",
-        "changeSource": "ACADEMY",
-        "eventId": 3816279340,
-        "subscriptionId": 25,
-        "portalId": 33,
-        "appId": 1160452,
-        "occurredAt": 1462216307945,
-        "eventType":"contact.propertyChange",
-        "attemptNumber": 0
-   }
-]
-```
-
-
-
-Type: ARRAY
+Type: OBJECT
 
 
 #### Properties
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {{INTEGER\(objectId), STRING\(propertyName), STRING\(propertyValue), STRING\(changeSource), INTEGER\(eventId), INTEGER\(subscriptionId), INTEGER\(portalId), INTEGER\(appId), INTEGER\(occurredAt), STRING\(eventType), INTEGER\(attemptNumber), INTEGER\(messageId), STRING\(messageType)}\(data)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
+
+### New Deal
+Triggers when a new deal is added.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| App Id | STRING | TEXT  |  The id of a Hubspot app used to register this trigger to.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
 
 
 
