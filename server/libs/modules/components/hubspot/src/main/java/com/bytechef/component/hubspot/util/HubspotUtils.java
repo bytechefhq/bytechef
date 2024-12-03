@@ -17,6 +17,8 @@
 package com.bytechef.component.hubspot.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.hubspot.constant.HubspotConstants.EVENT_TYPE;
+import static com.bytechef.component.hubspot.constant.HubspotConstants.HAPIKEY;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.ID;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.LABEL;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.RESULTS;
@@ -25,6 +27,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +40,12 @@ import java.util.Map;
 public class HubspotUtils {
 
     private HubspotUtils() {
+    }
+
+    public static Map<String, Object> extractFirstContentMap(WebhookBody body) {
+        List<Map<String, Object>> content = body.getContent(new TypeReference<>() {});
+
+        return content.getFirst();
     }
 
     public static List<Option<String>> getContactsOptions(
@@ -104,6 +114,47 @@ public class HubspotUtils {
                 .getBody(new TypeReference<>() {});
 
         return getOptions(body, LABEL);
+    }
+
+    public static String subscribeWebhook(
+        String eventType, String appId, String hapikey, String webhookUrl, TriggerContext triggerContext) {
+
+        triggerContext
+            .http(http -> http.put("/webhooks/v3/%s/settings".formatted(appId)))
+            .queryParameter(HAPIKEY, hapikey)
+            .body(Http.Body.of(
+                "throttling", Map.of(
+                    "period", "SECONDLY",
+                    "maxConcurrentRequests", 10),
+                "targetUrl", webhookUrl))
+            .configuration(
+                Http.responseType(Http.ResponseType.JSON)
+                    .disableAuthorization(true))
+            .execute();
+
+        Map<String, Object> body = triggerContext
+            .http(http -> http.post("/webhooks/v3/%s/subscriptions".formatted(appId)))
+            .queryParameter(HAPIKEY, hapikey)
+            .body(Http.Body.of(
+                EVENT_TYPE, eventType,
+                "active", true))
+            .configuration(
+                Http.responseType(Http.ResponseType.JSON)
+                    .disableAuthorization(true))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return (String) body.get(ID);
+    }
+
+    public static void unsubscribeWebhook(String appId, String subscriptionId, String hapikey, TriggerContext context) {
+        context
+            .http(http -> http.delete("/webhooks/v3/%s/subscriptions/%s".formatted(appId, subscriptionId)))
+            .queryParameter(HAPIKEY, hapikey)
+            .configuration(
+                Http.responseType(Http.ResponseType.JSON)
+                    .disableAuthorization(true))
+            .execute();
     }
 
     private static List<Option<String>> getOptions(Map<String, Object> body, String label) {
