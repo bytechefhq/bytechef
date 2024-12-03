@@ -78,7 +78,12 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
             } else if (contentType == ContentType.FORM_URL_ENCODED || contentType == ContentType.JSON ||
                 contentType == ContentType.XML) {
 
-                content = MapUtils.getRequiredMap(bodyMap, CONTENT);
+                if (bodyMap.get(CONTENT) instanceof List<?> list) {
+                    content = list;
+                } else {
+                    content = MapUtils.getRequiredMap(bodyMap, CONTENT);
+                }
+
             } else {
                 content = MapUtils.getRequiredString(bodyMap, CONTENT);
             }
