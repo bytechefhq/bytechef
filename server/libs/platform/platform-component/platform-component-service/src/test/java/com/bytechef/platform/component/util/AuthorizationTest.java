@@ -66,7 +66,7 @@ public class AuthorizationTest {
             if (RANDOM.nextBoolean()) {
                 char charToReplace = name.charAt(RANDOM.nextInt(name.length()));
 
-                if (charToReplace == 95) {
+                if ((charToReplace == 95) || ((charToReplace > 47) && (charToReplace < 58))) {
                     continue;
                 }
 
