@@ -182,6 +182,19 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return matcher.find();
     }
 
+    protected static boolean evaluate(
+        String displayCondition, Map<String, Object> inputMap, Map<String, Object> outputs,
+        Map<String, ?> parameterMap) {
+
+        return evaluate(
+            displayCondition,
+            MapUtils.concat(
+                MapUtils.concat(inputMap, outputs),
+                MapUtils.toMap(
+                    Evaluator.evaluate(parameterMap, outputs),
+                    Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
+    }
+
     protected static Map<String, Boolean> evaluateArray(
         String displayCondition, Map<String, Object> inputMap, Map<String, Object> outputs,
         Map<String, ?> parameterMap) {
@@ -340,19 +353,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Object displayConditionResult = result.get("displayCondition");
 
         return !(displayConditionResult instanceof String) && (boolean) displayConditionResult;
-    }
-
-    private static boolean evaluate(
-        String displayCondition, Map<String, Object> inputMap, Map<String, Object> outputs,
-        Map<String, ?> parameterMap) {
-
-        return evaluate(
-            displayCondition,
-            MapUtils.concat(
-                MapUtils.concat(inputMap, outputs),
-                MapUtils.toMap(
-                    Evaluator.evaluate(parameterMap, outputs),
-                    Map.Entry::getKey, entry -> entry.getValue() == null ? "" : entry.getValue())));
     }
 
     private static List<List<Integer>> findIndexes(Map<String, ?> map, String expression) {
@@ -631,7 +631,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return dynamicPropertyTypesMap;
     }
 
-    public static String replaceIndexes(String expression, List<Integer> indexes) {
+    private static String replaceIndexes(String expression, List<Integer> indexes) {
         for (Integer index : indexes) {
             expression = expression.replaceFirst("\\[index]", "[" + index + "]");
         }
