@@ -297,8 +297,36 @@ public class MapUtils {
         return get(map, key, Float.class, defaultValue);
     }
 
-    public static <T> T getFromPath(Map<String, ?> map, String path) {
-        return JsonPath.read(map, path);
+    public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType) {
+        Object value = JsonPath.read(map, path);
+
+        return convert(value, elementType);
+    }
+
+    public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType, T defaultValue) {
+        Object value = JsonPath.read(map, path);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return convert(value, elementType);
+    }
+
+    public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference) {
+        Object value = JsonPath.read(map, path);
+
+        return convert(value, typeReference);
+    }
+
+    public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference, T defaultValue) {
+        Object value = JsonPath.read(map, path);
+
+        if (value == null) {
+            return defaultValue;
+        }
+
+        return convert(value, typeReference);
     }
 
     public static <K> Integer getInteger(Map<K, ?> map, K key) {
@@ -530,6 +558,30 @@ public class MapUtils {
         return mapValue;
     }
 
+    public static <K1, K2> Map<K2, ?> getMapFromPath(Map<K1, ?> map, String path, List<Class<?>> valueTypes) {
+        Map<K2, ?> mapValue = getFromPath(map, path, new TypeReference<>() {});
+
+        if (mapValue != null) {
+            mapValue = toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
+        }
+
+        return mapValue;
+    }
+
+    public static <K1, K2> Map<K2, ?> getMapFromPath(
+        Map<K1, ?> map, String path, List<Class<?>> valueTypes, Map<K2, ?> defaultValue) {
+
+        Map<K2, ?> mapValue = getFromPath(map, path, new TypeReference<>() {});
+
+        if (mapValue == null) {
+            mapValue = Collections.unmodifiableMap(defaultValue);
+        } else {
+            mapValue = toMap(mapValue, Map.Entry::getKey, entry -> convert(entry.getValue(), valueTypes));
+        }
+
+        return mapValue;
+    }
+
     public static <K> Object getRequired(Map<K, ?> map, K key) {
         Object value = get(map, key);
 
@@ -594,12 +646,18 @@ public class MapUtils {
         return value;
     }
 
-    public static <T> T getRequiredFromPath(Map<String, ?> map, String path) {
-        T value = JsonPath.read(map, path);
+    public static <T> T getRequiredFromPath(Map<String, ?> map, String path, Class<T> elementType) {
+        Object value = JsonPath.read(map, path);
 
         Validate.notNull(value, "Unknown value for : " + path);
 
-        return value;
+        return convert(value, elementType);
+    }
+
+    public static <T> T getRequiredFromPath(Map<String, ?> map, String path, TypeReference<T> typeReference) {
+        Object value = JsonPath.read(map, path);
+
+        return convert(value, typeReference);
     }
 
     public static <K> Integer getRequiredInteger(Map<K, ?> map, K key) {
