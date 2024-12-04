@@ -228,6 +228,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:typeform"))
     implementation(project(":server:libs:modules:components:var"))
     implementation(project(":server:libs:modules:components:vtiger"))
+    implementation(project(":server:libs:modules:components:webflow"))
     implementation(project(":server:libs:modules:components:webhook"))
     implementation(project(":server:libs:modules:components:whatsapp"))
     implementation(project(":server:libs:modules:components:xero"))
