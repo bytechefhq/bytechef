@@ -42,6 +42,37 @@ Version: 1
 ## Triggers
 
 
+### Project Note
+Triggers when new note is created, deleted or updated in specified project.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project | STRING | SELECT  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(type), {STRING\(id), STRING\(status), [{STRING\(id), {STRING\(id), STRING\(email), STRING\(username)}\(author), STRING\(content)}]\(comments)}\(data)} | OBJECT_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
 
 <hr />
 
