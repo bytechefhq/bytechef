@@ -55,6 +55,7 @@ import com.bytechef.component.definition.Context.Http.RequestMethod;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TypeReference;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -222,7 +223,7 @@ public class HttpClientActionUtils {
     }
 
     private static BodyContentType getBodyContentType(Parameters inputParameters) {
-        String bodyContentTypeParameter = inputParameters.getString(BODY_CONTENT_TYPE);
+        String bodyContentTypeParameter = inputParameters.getFromPath(BODY + "." + BODY_CONTENT_TYPE, String.class);
 
         return bodyContentTypeParameter == null
             ? null
@@ -232,22 +233,30 @@ public class HttpClientActionUtils {
     private static Body getBody(Parameters inputParameters, BodyContentType bodyContentType) {
         Body body = null;
 
-        if (inputParameters.containsKey(BODY_CONTENT)) {
+        if (inputParameters.containsKey(BODY)) {
+            String bodyContentPath = BODY + "." + BODY_CONTENT;
+            String bodyContentMimeTypePath = BODY + "." + BODY_CONTENT_MIME_TYPE;
+
             if (bodyContentType == Http.BodyContentType.BINARY) {
                 body = Http.Body.of(
-                    inputParameters.getRequired(BODY_CONTENT, FileEntry.class),
-                    inputParameters.getString(BODY_CONTENT_MIME_TYPE));
+                    inputParameters.getRequiredFromPath(bodyContentPath, FileEntry.class),
+                    inputParameters.getFromPath(bodyContentMimeTypePath, String.class));
             } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
                 body = Http.Body.of(
-                    inputParameters.getMap(BODY_CONTENT, List.of(FileEntry.class), Map.of()), bodyContentType);
+                    inputParameters.getMapFromPath(bodyContentPath, List.of(FileEntry.class), Map.of()),
+                    bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
-                body = Http.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                body = Http.Body.of(
+                    inputParameters.getFromPath(bodyContentPath, new TypeReference<Map<String, ?>>() {}, Map.of()),
+                    bodyContentType);
             } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
-                body = Http.Body.of(inputParameters.getMap(BODY_CONTENT, Map.of()), bodyContentType);
+                body = Http.Body.of(
+                    inputParameters.getFromPath(bodyContentPath, new TypeReference<Map<String, ?>>() {}, Map.of()),
+                    bodyContentType);
             } else {
                 body = Http.Body.of(
-                    inputParameters.getString(BODY_CONTENT),
-                    inputParameters.getString(BODY_CONTENT_MIME_TYPE, "text/plain"));
+                    inputParameters.getFromPath(bodyContentPath, String.class),
+                    inputParameters.getFromPath(bodyContentMimeTypePath, String.class, "text/plain"));
             }
         }
 

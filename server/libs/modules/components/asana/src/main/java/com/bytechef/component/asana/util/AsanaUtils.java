@@ -80,7 +80,8 @@ public class AsanaUtils {
 
         Map<String, List<Map<String, String>>> body = context
             .http(http -> http.get(
-                "/workspaces/" + inputParameters.getRequiredFromPath("__item.data." + WORKSPACE) + "/teams"))
+                "/workspaces/" + inputParameters.getRequiredFromPath(
+                    "__item.data." + WORKSPACE, String.class) + "/teams"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

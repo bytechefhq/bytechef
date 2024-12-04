@@ -27,15 +27,42 @@ import org.junit.jupiter.api.Test;
 public class WorkflowNodeParameterFacadeTest {
 
     @Test
-    public void testFindIndexes() {
+    public void testEvaluate() {
+        Map<String, Object> parametersMap = Map.of(
+            "body", Map.of("bodyContentType", "JSON"));
+
+        boolean result = WorkflowNodeParameterFacadeImpl.evaluate(
+            "body.bodyContentType == 'JSON'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertTrue(result);
+
+        result = WorkflowNodeParameterFacadeImpl.evaluate(
+            "body.bodyContentType == 'XML'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    public void testEvaluateArray() {
         Map<String, Object> parametersMap = Map.of(
             "conditions",
             List.of(
-                List.of(Map.of("operation", "EMPTY"), Map.of("operation", "REGEX")),
+                List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
                 List.of(Map.of("operation", "REGEX"))));
 
-//        List<List<Integer>> indexesList = WorkflowNodeParameterFacadeImpl.getIndexDisplayConditionMap(
-//            map, "conditions[index][index].operation != 'EMPTY'");
+        Map<String, Boolean> displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation != 'EMPTY'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertEquals(2, displayConditionMap.size());
+        Assertions.assertEquals(
+            Map.of("conditions[0][0].operation != 'EMPTY'", true, "conditions[1][0].operation != 'EMPTY'", true),
+            displayConditionMap);
+
+        displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation == 'EMPTY'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertEquals(1, displayConditionMap.size());
+        Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
     }
 
     @Test

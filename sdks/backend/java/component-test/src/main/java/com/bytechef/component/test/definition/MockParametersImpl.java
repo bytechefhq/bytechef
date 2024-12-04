@@ -163,8 +163,39 @@ public final class MockParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> T getFromPath(String path) {
-        return MapUtils.getFromPath(map, path);
+    public <T> T getFromPath(String path, Class<T> elementType) {
+        return MapUtils.getFromPath(map, path, elementType);
+    }
+
+    @Override
+    public <T> T getFromPath(String path, Class<T> elementType, T defaultValue) {
+        return MapUtils.getFromPath(map, path, elementType, defaultValue);
+    }
+
+    @Override
+    public <T> T getFromPath(String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
+        return MapUtils.getFromPath(map, path, new TypeReference<>() {
+
+            @Override
+            @Nonnull
+            public Type getType() {
+                return elementTypeReference.getType();
+            }
+        });
+    }
+
+    @Override
+    public <T> T getFromPath(
+        String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference, T defaultValue) {
+
+        return MapUtils.getFromPath(map, path, new TypeReference<>() {
+
+            @Override
+            @Nonnull
+            public Type getType() {
+                return elementTypeReference.getType();
+            }
+        }, defaultValue);
     }
 
     @Override
@@ -326,10 +357,18 @@ public final class MockParametersImpl implements Parameters {
     }
 
     @Override
-    public Map<String, ?> getMap(
-        String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
-
+    public Map<String, ?> getMap(String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
         return MapUtils.getMap(map, key, valueTypes, defaultValue);
+    }
+
+    @Override
+    public Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes) {
+        return MapUtils.getMapFromPath(map, path, valueTypes);
+    }
+
+    @Override
+    public Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
+        return MapUtils.getMapFromPath(map, path, valueTypes, defaultValue);
     }
 
     @Override
@@ -378,8 +417,14 @@ public final class MockParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> T getRequiredFromPath(String path) {
-        return MapUtils.getRequiredFromPath(map, path);
+    public <T> T getRequiredFromPath(String path, Class<T> elementType) {
+        return MapUtils.getRequiredFromPath(map, path, elementType);
+    }
+
+    @Override
+    public <T> T
+        getRequiredFromPath(String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
+        return null;
     }
 
     @Override
