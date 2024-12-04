@@ -38,7 +38,7 @@ public class AuthorizationTest {
                 AuthorizationUtils.isApplicable(applicableValue), applicableValue + " is valid");
         }
 
-        for (String nonApplicableValue : getRandomNonApplicableValues()) {
+        for (String nonApplicableValue : getNonApplicableValues()) {
             Assertions.assertFalse(
                 AuthorizationUtils.isApplicable(nonApplicableValue), nonApplicableValue + " is valid");
         }
@@ -82,7 +82,7 @@ public class AuthorizationTest {
         return names;
     }
 
-    private List<String> getRandomNonApplicableValues() {
+    private List<String> getNonApplicableValues() {
         List<String> randomApplicableValues = getRandomApplicableValues();
 
         List<String> nonApplicableValues = new ArrayList<>();
