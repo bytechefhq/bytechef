@@ -17,6 +17,7 @@
 package com.bytechef.component.zeplin.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.zeplin.constant.ZeplinConstants.ID;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -48,7 +49,7 @@ public class ZeplinUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : body) {
-            options.add(option((String) map.get("name"), (String) map.get("id")));
+            options.add(option((String) map.get("name"), (String) map.get(ID)));
         }
 
         return options;
