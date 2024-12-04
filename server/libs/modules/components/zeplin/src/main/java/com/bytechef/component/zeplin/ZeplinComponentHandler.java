@@ -16,15 +16,20 @@
 
 package com.bytechef.component.zeplin;
 
+import static com.bytechef.component.zeplin.constant.ZeplinConstants.PROJECT_ID;
+
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.zeplin.trigger.ZeplinProjectNoteTrigger;
 import com.bytechef.component.zeplin.util.ZeplinUtils;
 import com.google.auto.service.AutoService;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,6 +37,11 @@ import java.util.Objects;
  */
 @AutoService(OpenApiComponentHandler.class)
 public class ZeplinComponentHandler extends AbstractZeplinComponentHandler {
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(ZeplinProjectNoteTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
@@ -45,7 +55,7 @@ public class ZeplinComponentHandler extends AbstractZeplinComponentHandler {
     public ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
 
-        if (Objects.equals(modifiableProperty.getName(), "project_id")) {
+        if (Objects.equals(modifiableProperty.getName(), PROJECT_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options((ActionOptionsFunction<String>) ZeplinUtils::getProjectIdOptions);
         }
