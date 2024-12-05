@@ -7,6 +7,9 @@ import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
+import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
+import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
+import saveProperty from '../../utils/saveProperty';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
 import SubPropertyPopover from './components/SubPropertyPopover';
@@ -27,7 +30,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
 
-    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {workflow} = useWorkflowDataStore();
+
+    const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
     const {additionalProperties, label, name, properties} = property;
 
@@ -174,6 +180,38 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [properties]);
 
+    // set default values for subProperties when they are created
+    useEffect(() => {
+        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
+            return;
+        }
+
+        const existingObject = resolvePath(currentComponent.parameters, path);
+
+        if (existingObject && isObject(existingObject)) {
+            return;
+        }
+
+        const defaultValueObject = subProperties.reduce<Record<string, unknown>>((acc, subProperty) => {
+            if (subProperty.name) {
+                acc[subProperty.name] = subProperty.defaultValue;
+            }
+
+            return acc;
+        }, {});
+
+        saveProperty({
+            currentComponent,
+            path,
+            setCurrentComponent,
+            type: 'OBJECT',
+            updateWorkflowNodeParameterMutation,
+            value: defaultValueObject,
+            workflowId: workflow.id,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [subProperties]);
+
     return (
         <Fragment key={name}>
             <ul
@@ -205,10 +243,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                         objectName={arrayName ? '' : name}
                         operationName={operationName}
                         path={`${path}.${subProperty.name}`}
-                        property={{
-                            ...subProperty,
-                            name: subProperty.name,
-                        }}
+                        property={subProperty}
                     />
                 ))}
             </ul>
