@@ -65,8 +65,8 @@ interface PropertyProps {
     control?: Control<any, any>;
     controlPath?: string;
     customClassName?: string;
-    formState?: FormState<FieldValues>;
     deletePropertyButton?: ReactNode;
+    formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -101,7 +101,9 @@ const Property = ({
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
-    const [selectValue, setSelectValue] = useState(property.defaultValue || '' || 'null');
+    const [selectValue, setSelectValue] = useState(
+        property.defaultValue !== undefined ? property.defaultValue : 'null'
+    );
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
@@ -125,7 +127,7 @@ const Property = ({
     const previousOperationName = usePrevious(currentNode?.operationName);
     const previousMentionInputValue = usePrevious(mentionInputValue);
 
-    const defaultValue = property.defaultValue || '';
+    const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
     const {
         controlType,
@@ -778,7 +780,7 @@ const Property = ({
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
-        const parameterDefaultValue = property.defaultValue ?? '';
+        const parameterDefaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
         if (previousOperationName) {
             setPropertyParameterValue(parameterDefaultValue);
@@ -836,6 +838,7 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mentionInputValue]);
 
+    // handle NULL type property saving
     useEffect(() => {
         if (
             type === 'NULL' &&
@@ -844,16 +847,22 @@ const Property = ({
             path &&
             updateWorkflowNodeParameterMutation
         ) {
-            saveProperty({
-                currentComponent,
-                includeInMetadata: custom,
-                path,
-                setCurrentComponent,
-                type,
-                updateWorkflowNodeParameterMutation,
-                value: null,
-                workflowId: workflow.id!,
-            });
+            const saveDefaultValue = () => {
+                saveProperty({
+                    currentComponent,
+                    includeInMetadata: custom,
+                    path,
+                    setCurrentComponent,
+                    type,
+                    updateWorkflowNodeParameterMutation,
+                    value: null,
+                    workflowId: workflow.id!,
+                });
+            };
+
+            const timeoutId = setTimeout(saveDefaultValue, 200);
+
+            return () => clearTimeout(timeoutId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
