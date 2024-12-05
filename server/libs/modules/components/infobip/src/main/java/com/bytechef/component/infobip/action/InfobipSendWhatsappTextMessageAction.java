@@ -44,7 +44,7 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class InfobipSendWhatsappTextMesageAction {
+public class InfobipSendWhatsappTextMessageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendWhatsappTextMessage")
         .title("Send Whatsapp Text Message")
@@ -81,9 +81,9 @@ public class InfobipSendWhatsappTextMesageAction {
                                 integer(ID),
                                 string(NAME),
                                 string(DESCRIPTION)))))
-        .perform(InfobipSendWhatsappTextMesageAction::perform);
+        .perform(InfobipSendWhatsappTextMessageAction::perform);
 
-    private InfobipSendWhatsappTextMesageAction() {
+    private InfobipSendWhatsappTextMessageAction() {
     }
 
     public static Map<String, Object> perform(
