@@ -23,7 +23,7 @@ import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.llm.converter.JsonSchemaConverter;
+import com.bytechef.component.llm.converter.JsonSchemaStructuredOutputConverter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -79,7 +79,7 @@ public interface Chat {
                 .getOutput()
                 .getContent();
         } else {
-            return call.entity(new JsonSchemaConverter(parameters.getRequiredString(RESPONSE_SCHEMA)));
+            return call.entity(new JsonSchemaStructuredOutputConverter(parameters.getRequiredString(RESPONSE_SCHEMA)));
         }
     }
 

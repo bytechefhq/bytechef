@@ -37,9 +37,9 @@ import org.springframework.lang.NonNull;
  * JSON schema. This converter works by generating a JSON schema based on a given Java class or parameterized type
  * reference, which is then used to validate and transform the LLM output into the desired type.
  */
-public class JsonSchemaConverter implements StructuredOutputConverter<Object> {
+public class JsonSchemaStructuredOutputConverter implements StructuredOutputConverter<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonSchemaConverter.class);
+    private static final Logger logger = LoggerFactory.getLogger(JsonSchemaStructuredOutputConverter.class);
 
     private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
         .addModules(JacksonUtils.instantiateAvailableModules())
@@ -49,7 +49,7 @@ public class JsonSchemaConverter implements StructuredOutputConverter<Object> {
     private final String jsonSchema;
     private final Type type;
 
-    public JsonSchemaConverter(String jsonSchema) {
+    public JsonSchemaStructuredOutputConverter(String jsonSchema) {
         this.jsonSchema = jsonSchema;
 
         Map<String, ?> jsonSchemaMap = JsonUtils.readMap(jsonSchema);
