@@ -17,11 +17,21 @@
 package com.bytechef.component.webflow;
 
 import com.bytechef.component.OpenApiComponentHandler;
+import com.bytechef.component.definition.ComponentCategory;
+import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.google.auto.service.AutoService;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * @author Monika Kušter
  */
 @AutoService(OpenApiComponentHandler.class)
 public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
+
+    @Override
+    public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
+        return modifiableComponentDefinition
+            .customAction(true)
+            .icon("path:assets/webflow.svg")
+            .categories(ComponentCategory.DEVELOPER_TOOLS);
+    }
 }
