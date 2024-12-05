@@ -89,25 +89,11 @@ public class AmazonBedrockAnthropic3ChatAction {
     private AmazonBedrockAnthropic3ChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
-            return Anthropic3ChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withAnthropicVersion("bedrock-2023-05-31")
-                .build();
-        }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
@@ -119,6 +105,17 @@ public class AmazonBedrockAnthropic3ChatAction {
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
                     connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (Anthropic3ChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
+            return Anthropic3ChatOptions.builder()
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .withTopP(inputParameters.getDouble(TOP_P))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withTopK(inputParameters.getInteger(TOP_K))
+                .withAnthropicVersion("bedrock-2023-05-31")
+                .build();
         }
     };
 }

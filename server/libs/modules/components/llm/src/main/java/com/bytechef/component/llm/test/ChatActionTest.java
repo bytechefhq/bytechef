@@ -45,7 +45,7 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
 
     protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
         try (MockedStatic<Chat> mockedChat = Mockito.mockStatic(Chat.class)) {
-            mockedChat.when(() -> Chat.getResponse(any(Chat.class), eq(mockedParameters), eq(mockedParameters)))
+            mockedChat.when(() -> any(Chat.class).getResponse(eq(mockedParameters), eq(mockedParameters)))
                 .thenReturn(ANSWER);
 
             String result = (String) perform.apply(mockedParameters, mockedParameters, mockedContext);
@@ -67,7 +67,7 @@ public abstract class ChatActionTest extends AbstractLLMActionTest {
         when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModel);
         when(mockedChatModel.call(any(Prompt.class))).thenReturn(mockedChatResponse);
 
-        Object response = Chat.getResponse(mockedChat, mockedParameters, mockedParameters);
+        Object response = mockedChat.getResponse(mockedParameters, mockedParameters);
 
         assertEquals(ANSWER, response);
     }

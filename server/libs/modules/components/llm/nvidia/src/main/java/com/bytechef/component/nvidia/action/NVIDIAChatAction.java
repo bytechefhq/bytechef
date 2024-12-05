@@ -91,15 +91,20 @@ public class NVIDIAChatAction {
     private NVIDIAChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new OpenAiChatModel(
+                new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
+                (OpenAiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
@@ -119,13 +124,6 @@ public class NVIDIAChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(
-                new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
-                (OpenAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

@@ -101,16 +101,20 @@ public class VertexGeminiChatAction {
     private VertexGeminiChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new VertexAiGeminiChatModel(
+                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
+                (VertexAiGeminiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
             String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
@@ -132,13 +136,6 @@ public class VertexGeminiChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new VertexAiGeminiChatModel(
-                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
-                (VertexAiGeminiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

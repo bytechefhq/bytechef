@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.llm.Chat;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.huggingface.HuggingfaceChatModel;
 
 /**
@@ -54,17 +53,11 @@ public class HuggingFaceChatAction {
     private HuggingFaceChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
-            return null;
-        }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {

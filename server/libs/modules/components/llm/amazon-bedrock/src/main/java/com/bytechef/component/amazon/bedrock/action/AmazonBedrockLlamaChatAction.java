@@ -80,21 +80,11 @@ public class AmazonBedrockLlamaChatAction {
     private AmazonBedrockLlamaChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     public static final Chat CHAT = new Chat() {
-        @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
-            return BedrockLlamaChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxGenLen(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .build();
-        }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
@@ -106,6 +96,14 @@ public class AmazonBedrockLlamaChatAction {
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
                     connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (BedrockLlamaChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
+            return BedrockLlamaChatOptions.builder()
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withMaxGenLen(inputParameters.getInteger(MAX_TOKENS))
+                .withTopP(inputParameters.getDouble(TOP_P))
+                .build();
         }
     };
 }

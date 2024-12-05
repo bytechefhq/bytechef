@@ -90,15 +90,20 @@ public class AnthropicChatAction {
     private AnthropicChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new AnthropicChatModel(
+                new AnthropicApi(connectionParameters.getString(TOKEN)),
+                (AnthropicChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             AnthropicChatOptions.Builder builder = AnthropicChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
@@ -114,13 +119,6 @@ public class AnthropicChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new AnthropicChatModel(
-                new AnthropicApi(connectionParameters.getString(TOKEN)),
-                (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };
 }

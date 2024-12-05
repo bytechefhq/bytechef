@@ -232,16 +232,25 @@ public class OllamaChatAction {
     private OllamaChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            String url = connectionParameters.getString(URL);
+
+            OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
+
+            return OllamaChatModel.builder()
+                .withOllamaApi(ollamaApi)
+                .withDefaultOptions((OllamaOptions) createChatOptions(inputParameters))
+                .build();
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             OllamaOptions builder = OllamaOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
@@ -284,18 +293,6 @@ public class OllamaChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            String url = connectionParameters.getString(URL);
-
-            OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
-
-            return OllamaChatModel.builder()
-                .withOllamaApi(ollamaApi)
-                .withDefaultOptions((OllamaOptions) createChatOptions(inputParameters))
-                .build();
         }
     };
 }

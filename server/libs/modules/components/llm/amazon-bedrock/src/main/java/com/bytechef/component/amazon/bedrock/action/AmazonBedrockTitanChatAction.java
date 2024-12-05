@@ -84,22 +84,11 @@ public class AmazonBedrockTitanChatAction {
     private AmazonBedrockTitanChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
-        @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
-            return BedrockTitanChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokenCount(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .build();
-        }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
@@ -110,6 +99,15 @@ public class AmazonBedrockTitanChatAction {
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
                     connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (BedrockTitanChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
+            return BedrockTitanChatOptions.builder()
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withMaxTokenCount(inputParameters.getInteger(MAX_TOKENS))
+                .withTopP(inputParameters.getDouble(TOP_P))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .build();
         }
     };
 }

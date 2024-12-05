@@ -129,15 +129,25 @@ public class AmazonBedrockCohereChatAction {
     private AmazonBedrockCohereChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new BedrockCohereChatModel(
+                new CohereChatBedrockApi(
+                    inputParameters.getRequiredString(MODEL),
+                    () -> AwsBasicCredentials.create(
+                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+                (BedrockCohereChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             return BedrockCohereChatOptions.builder()
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
@@ -152,18 +162,6 @@ public class AmazonBedrockCohereChatAction {
                 .withTruncate(inputParameters.get(TRUNCATE,
                     CohereChatBedrockApi.CohereChatRequest.Truncate.class))
                 .build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockCohereChatModel(
-                new CohereChatBedrockApi(
-                    inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (BedrockCohereChatOptions) createChatOptions(inputParameters));
         }
     };
 }

@@ -95,16 +95,20 @@ public class MistralChatAction {
     private MistralChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new MistralAiChatModel(
+                new MistralAiApi(connectionParameters.getString(TOKEN)),
+                (MistralAiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
             String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
 
@@ -125,13 +129,6 @@ public class MistralChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MistralAiChatModel(
-                new MistralAiApi(connectionParameters.getString(TOKEN)),
-                (MistralAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

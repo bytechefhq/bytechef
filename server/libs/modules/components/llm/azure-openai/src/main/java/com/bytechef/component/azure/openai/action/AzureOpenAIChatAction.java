@@ -95,15 +95,24 @@ public class AzureOpenAIChatAction {
     private AzureOpenAIChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
+        return CHAT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Chat CHAT = new Chat() {
+
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT));
+
+            return new AzureOpenAiChatModel(
+                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
             AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
                 ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
@@ -128,16 +137,6 @@ public class AzureOpenAIChatAction {
             }
 
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT));
-
-            return new AzureOpenAiChatModel(
-                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }
