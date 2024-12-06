@@ -58,7 +58,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFacade {
 
-    private static final Pattern ARRAY_INDEXES_PATTERN = Pattern.compile("^(.*?)((\\[index])+)(\\.?.*)$");
+    private static final Pattern ARRAY_INDEXES_PATTERN =
+        Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
     private static final String METADATA = "metadata";
     private static final String UI = "ui";
@@ -394,7 +395,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                             currentIndexes.removeLast();
                         }
                     } else {
-                        findIndexes(next, (indexGroup + remainingExpression), currentIndexes, allIndexes);
+                        findIndexes(next, indexGroup + remainingExpression, currentIndexes, allIndexes);
                     }
                 }
             } else if (current instanceof List<?> currentList) {
