@@ -32,13 +32,9 @@ const Properties = ({
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
     const advancedProperties = properties.filter((property) => {
-        const {advancedOption, displayCondition, hidden, name} = property;
+        const {advancedOption, hidden, name} = property;
 
         if (!name || !advancedOption || hidden) {
-            return false;
-        }
-
-        if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
             return false;
         }
 
@@ -55,25 +51,17 @@ const Properties = ({
                 className={twMerge('space-y-4', customClassName)}
                 key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_properties`}
             >
-                {simpleProperties.map((property, index) => {
-                    const {displayCondition, name} = property;
-
-                    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
-                        return <Fragment key={`${name}_${index}`}></Fragment>;
-                    }
-
-                    return (
-                        <Property
-                            control={control}
-                            controlPath={controlPath}
-                            formState={formState}
-                            key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_${name}_${index}`}
-                            operationName={operationName}
-                            path={path}
-                            property={property}
-                        />
-                    );
-                })}
+                {simpleProperties.map((property, index) => (
+                    <Property
+                        control={control}
+                        controlPath={controlPath}
+                        formState={formState}
+                        key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_${property.name}_${index}`}
+                        operationName={operationName}
+                        path={path}
+                        property={property}
+                    />
+                ))}
             </ul>
 
             {!!advancedProperties.length && (
@@ -86,25 +74,17 @@ const Properties = ({
 
                     <CollapsibleContent>
                         <ul className="space-y-4 p-4" key={`${currentComponent?.operationName}_advancedProperties`}>
-                            {advancedProperties.map((property, index) => {
-                                const {displayCondition, name} = property;
-
-                                if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
-                                    return <Fragment key={`${name}_${index}`}></Fragment>;
-                                }
-
-                                return (
-                                    <Property
-                                        control={control}
-                                        controlPath={controlPath}
-                                        formState={formState}
-                                        key={`${name}_${currentComponent?.operationName}_${index}`}
-                                        operationName={operationName}
-                                        path={path}
-                                        property={property}
-                                    />
-                                );
-                            })}
+                            {advancedProperties.map((property, index) => (
+                                <Property
+                                    control={control}
+                                    controlPath={controlPath}
+                                    formState={formState}
+                                    key={`${property.name}_${currentComponent?.operationName}_${index}`}
+                                    operationName={operationName}
+                                    path={path}
+                                    property={property}
+                                />
+                            ))}
                         </ul>
                     </CollapsibleContent>
                 </Collapsible>

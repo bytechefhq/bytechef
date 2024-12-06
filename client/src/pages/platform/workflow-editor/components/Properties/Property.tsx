@@ -151,6 +151,8 @@ const Property = ({
         type,
     } = property;
 
+    let {displayCondition} = property;
+
     const formattedOptions = options
         ?.map((option) => {
             if (option.value === '') {
@@ -199,6 +201,24 @@ const Property = ({
             .split('.')
             .map((step) => (step.match(/^\d/) ? `${PATH_DIGIT_PREFIX}${step}` : step))
             .join('.');
+    }
+
+    if (objectName && !path?.includes(objectName)) {
+        path = `${objectName}.${path}`;
+    }
+
+    if (displayCondition) {
+        const displayConditionIndexes: number[] = [];
+        const bracketedNumberRegex = /\[(\d+)\]/g;
+        let match;
+
+        while ((match = bracketedNumberRegex.exec(path!)) !== null) {
+            displayConditionIndexes.push(parseInt(match[1], 10));
+        }
+
+        displayConditionIndexes.forEach((index) => {
+            displayCondition = displayCondition!.replace(`[index]`, `[${index}]`);
+        });
     }
 
     const getComponentIcon = (mentionValue: string) => {
@@ -899,6 +919,10 @@ const Property = ({
         return <></>;
     }
 
+    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+        return <></>;
+    }
+
     return (
         <li
             className={twMerge(
@@ -1149,6 +1173,7 @@ const Property = ({
                             name={name}
                             onValueChange={(value) => handleSelectChange(value, name!)}
                             options={options as Array<SelectOptionType>}
+                            required={required}
                             value={selectValue}
                         />
                     )}
@@ -1170,6 +1195,7 @@ const Property = ({
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                         <PropertyComboBox
                             arrayIndex={arrayIndex}
+                            defaultValue={defaultValue}
                             deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
@@ -1207,6 +1233,7 @@ const Property = ({
                                 {label: 'True', value: 'true'},
                                 {label: 'False', value: 'false'},
                             ]}
+                            required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             value={selectValue}
                         />
