@@ -39,9 +39,7 @@ public class AuthorizationUtils {
         for (Authorization.AuthorizationType authorizationType : Authorization.AuthorizationType.values()) {
             String name = authorizationType.getName();
 
-            if ((authorizationType != Authorization.AuthorizationType.NONE) &&
-                Objects.equals(value.toLowerCase(), name.toLowerCase())) {
-
+            if (Objects.equals(value.toLowerCase(), name.toLowerCase())) {
                 return true;
             }
         }

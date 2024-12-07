@@ -168,7 +168,9 @@ const ConnectionDialog = ({
         () =>
             connectionDefinition && connectionDefinition.authorizations
                 ? [
-                      ...(connectionDefinition.authorizationRequired === false ? [{label: 'None', value: 'none'}] : []),
+                      ...(connectionDefinition.authorizationRequired === false
+                          ? [{label: 'None', value: undefined}]
+                          : []),
                       ...connectionDefinition.authorizations.map((authorization) => ({
                           label: authorization?.title as string,
                           value: authorization.name as string,
