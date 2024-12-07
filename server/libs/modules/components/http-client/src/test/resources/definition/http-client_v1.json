@@ -101,8 +101,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -142,8 +142,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -203,8 +203,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -264,8 +264,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -405,8 +405,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -526,8 +526,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     }, {
       "detectOn" : null,
       "description" : null,
@@ -647,8 +647,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : [ {
       "advancedOption" : null,
@@ -1877,8 +1877,28 @@
         "controlType" : "FILE_ENTRY"
       }, {
         "advancedOption" : null,
+        "description" : "Mime-Type to use when sending binary body content.",
+        "displayCondition" : "'BINARY' == body.bodyContentType",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "bodyContentMimeType",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Content Type",
+        "placeholder" : "text/plain",
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
         "description" : "Mime-Type to use when sending raw body content.",
-        "displayCondition" : "'BINARY' == body.bodyContentType or 'RAW' == body.bodyContentType",
+        "displayCondition" : "'RAW' == body.bodyContentType",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -2864,8 +2884,28 @@
         "controlType" : "FILE_ENTRY"
       }, {
         "advancedOption" : null,
+        "description" : "Mime-Type to use when sending binary body content.",
+        "displayCondition" : "'BINARY' == body.bodyContentType",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "bodyContentMimeType",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Content Type",
+        "placeholder" : "text/plain",
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
         "description" : "Mime-Type to use when sending raw body content.",
-        "displayCondition" : "'BINARY' == body.bodyContentType or 'RAW' == body.bodyContentType",
+        "displayCondition" : "'RAW' == body.bodyContentType",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -3851,8 +3891,28 @@
         "controlType" : "FILE_ENTRY"
       }, {
         "advancedOption" : null,
+        "description" : "Mime-Type to use when sending binary body content.",
+        "displayCondition" : "'BINARY' == body.bodyContentType",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "bodyContentMimeType",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Content Type",
+        "placeholder" : "text/plain",
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
         "description" : "Mime-Type to use when sending raw body content.",
-        "displayCondition" : "'BINARY' == body.bodyContentType or 'RAW' == body.bodyContentType",
+        "displayCondition" : "'RAW' == body.bodyContentType",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
