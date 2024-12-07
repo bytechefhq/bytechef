@@ -273,7 +273,7 @@ const Property = ({
 
         strippedValue = strippedValue.replace(/<\/p><p>/g, '\n');
 
-        if (propertyParameterValue?.includes('\n')) {
+        if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('\n')) {
             const equal =
                 sanitizeHtml(propertyParameterValue, {allowedTags: []}).trim() ===
                 sanitizeHtml(mentionInputValue, {allowedTags: []}).trim();
