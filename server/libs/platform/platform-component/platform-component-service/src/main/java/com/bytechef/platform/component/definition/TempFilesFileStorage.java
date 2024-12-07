@@ -64,7 +64,7 @@ public final class TempFilesFileStorage implements FilesFileStorage {
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String submittedFileName, @NonNull InputStream inputStream) {
-        return filesFileStorage.storeFileContent(submittedFileName, inputStream);
+    public FileEntry storeFileContent(@NonNull String fileName, @NonNull InputStream inputStream) {
+        return filesFileStorage.storeFileContent(fileName, inputStream);
     }
 }
