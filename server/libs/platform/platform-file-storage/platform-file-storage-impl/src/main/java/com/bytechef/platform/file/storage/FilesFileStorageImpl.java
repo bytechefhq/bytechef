@@ -52,7 +52,7 @@ public class FilesFileStorageImpl implements FilesFileStorage {
     }
 
     @Override
-    public FileEntry storeFileContent(@NonNull String submittedFileName, @NonNull InputStream inputStream) {
-        return fileStorageService.storeFileContent(FILES_DIR, submittedFileName, inputStream);
+    public FileEntry storeFileContent(@NonNull String fileName, @NonNull InputStream inputStream) {
+        return fileStorageService.storeFileContent(FILES_DIR, fileName, inputStream);
     }
 }

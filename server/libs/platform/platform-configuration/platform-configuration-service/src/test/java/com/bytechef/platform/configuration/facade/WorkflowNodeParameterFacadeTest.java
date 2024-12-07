@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,6 +25,58 @@ import org.junit.jupiter.api.Test;
  * @author Igor Beslic
  */
 public class WorkflowNodeParameterFacadeTest {
+
+    @Test
+    public void testEvaluate() {
+        Map<String, Object> parametersMap = Map.of(
+            "body", Map.of("bodyContentType", "JSON"));
+
+        boolean result = WorkflowNodeParameterFacadeImpl.evaluate(
+            "body.bodyContentType == 'JSON'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertTrue(result);
+
+        result = WorkflowNodeParameterFacadeImpl.evaluate(
+            "body.bodyContentType == 'XML'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    public void testEvaluateArray() {
+        Map<String, Object> parametersMap = Map.of(
+            "conditions",
+            List.of(
+                List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
+                List.of(Map.of("operation", "REGEX"))));
+
+        Map<String, Boolean> displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation != 'EMPTY'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertEquals(2, displayConditionMap.size());
+        Assertions.assertEquals(
+            Map.of("conditions[0][0].operation != 'EMPTY'", true, "conditions[1][0].operation != 'EMPTY'", true),
+            displayConditionMap);
+
+        displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation == 'EMPTY'", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertEquals(1, displayConditionMap.size());
+        Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
+
+        parametersMap = Map.of(
+            "conditions",
+            List.of(
+                List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
+                List.of(Map.of("operation", "NOT_CONTAINS"))));
+
+        displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", Map.of(), Map.of(), parametersMap);
+
+        Assertions.assertEquals(1, displayConditionMap.size());
+        Assertions.assertEquals(
+            Map.of("!{'EMPTY','REGEX'}.contains(conditions[1][0].operation)", true), displayConditionMap);
+    }
 
     @Test
     public void testHasExpressionVariable() {
@@ -50,5 +104,4 @@ public class WorkflowNodeParameterFacadeTest {
                 noVariableExpression + " doesn't contain variableName");
         }
     }
-
 }

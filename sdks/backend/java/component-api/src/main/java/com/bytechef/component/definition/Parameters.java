@@ -65,7 +65,13 @@ public interface Parameters extends Map<String, Object> {
 
     float getFloat(String key, float defaultValue);
 
-    <T> T getFromPath(String path);
+    <T> T getFromPath(String path, Class<T> elementType);
+
+    <T> T getFromPath(String path, Class<T> elementType, T defaultValue);
+
+    <T> T getFromPath(String path, TypeReference<T> elementTypeReference);
+
+    <T> T getFromPath(String path, TypeReference<T> elementTypeReference, T defaultValue);
 
     Integer getInteger(String key);
 
@@ -119,6 +125,10 @@ public interface Parameters extends Map<String, Object> {
 
     Map<String, ?> getMap(String key, List<Class<?>> valueTypes, Map<String, ?> defaultValue);
 
+    Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes);
+
+    Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes, Map<String, ?> defaultValue);
+
     Object getRequired(String key);
 
     <T> T getRequired(String key, Class<T> returnType);
@@ -137,7 +147,9 @@ public interface Parameters extends Map<String, Object> {
 
     float getRequiredFloat(String key);
 
-    <T> T getRequiredFromPath(String path);
+    <T> T getRequiredFromPath(String path, Class<T> elementType);
+
+    <T> T getRequiredFromPath(String path, TypeReference<T> elementTypeReference);
 
     int getRequiredInteger(String key);
 

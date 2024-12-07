@@ -65,8 +65,8 @@ interface PropertyProps {
     control?: Control<any, any>;
     controlPath?: string;
     customClassName?: string;
-    formState?: FormState<FieldValues>;
     deletePropertyButton?: ReactNode;
+    formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -101,7 +101,9 @@ const Property = ({
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
-    const [selectValue, setSelectValue] = useState(property.defaultValue || '' || 'null');
+    const [selectValue, setSelectValue] = useState(
+        property.defaultValue !== undefined ? property.defaultValue : 'null'
+    );
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
@@ -125,7 +127,7 @@ const Property = ({
     const previousOperationName = usePrevious(currentNode?.operationName);
     const previousMentionInputValue = usePrevious(mentionInputValue);
 
-    const defaultValue = property.defaultValue || '';
+    const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
     const {
         controlType,
@@ -148,6 +150,8 @@ const Property = ({
         required = false,
         type,
     } = property;
+
+    let {displayCondition} = property;
 
     const formattedOptions = options
         ?.map((option) => {
@@ -197,6 +201,24 @@ const Property = ({
             .split('.')
             .map((step) => (step.match(/^\d/) ? `${PATH_DIGIT_PREFIX}${step}` : step))
             .join('.');
+    }
+
+    if (objectName && !path?.includes(objectName)) {
+        path = `${objectName}.${path}`;
+    }
+
+    if (displayCondition) {
+        const displayConditionIndexes: number[] = [];
+        const bracketedNumberRegex = /\[(\d+)\]/g;
+        let match;
+
+        while ((match = bracketedNumberRegex.exec(path!)) !== null) {
+            displayConditionIndexes.push(parseInt(match[1], 10));
+        }
+
+        displayConditionIndexes.forEach((index) => {
+            displayCondition = displayCondition!.replace(`[index]`, `[${index}]`);
+        });
     }
 
     const getComponentIcon = (mentionValue: string) => {
@@ -251,7 +273,7 @@ const Property = ({
 
         strippedValue = strippedValue.replace(/<\/p><p>/g, '\n');
 
-        if (propertyParameterValue?.includes('\n')) {
+        if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('\n')) {
             const equal =
                 sanitizeHtml(propertyParameterValue, {allowedTags: []}).trim() ===
                 sanitizeHtml(mentionInputValue, {allowedTags: []}).trim();
@@ -526,10 +548,6 @@ const Property = ({
             return;
         }
 
-        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
-            setMentionInput(true);
-        }
-
         if (propertyParameterValue) {
             setMentionInput(false);
 
@@ -541,6 +559,10 @@ const Property = ({
             ) {
                 setMentionInput(true);
             }
+        }
+
+        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
+            setMentionInput(true);
         }
 
         if (controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER' || controlType === 'OBJECT_BUILDER') {
@@ -778,7 +800,7 @@ const Property = ({
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
-        const parameterDefaultValue = property.defaultValue ?? '';
+        const parameterDefaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
         if (previousOperationName) {
             setPropertyParameterValue(parameterDefaultValue);
@@ -836,6 +858,7 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [mentionInputValue]);
 
+    // handle NULL type property saving
     useEffect(() => {
         if (
             type === 'NULL' &&
@@ -844,16 +867,22 @@ const Property = ({
             path &&
             updateWorkflowNodeParameterMutation
         ) {
-            saveProperty({
-                currentComponent,
-                includeInMetadata: custom,
-                path,
-                setCurrentComponent,
-                type,
-                updateWorkflowNodeParameterMutation,
-                value: null,
-                workflowId: workflow.id!,
-            });
+            const saveDefaultValue = () => {
+                saveProperty({
+                    currentComponent,
+                    includeInMetadata: custom,
+                    path,
+                    setCurrentComponent,
+                    type,
+                    updateWorkflowNodeParameterMutation,
+                    value: null,
+                    workflowId: workflow.id!,
+                });
+            };
+
+            const timeoutId = setTimeout(saveDefaultValue, 200);
+
+            return () => clearTimeout(timeoutId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
@@ -887,6 +916,10 @@ const Property = ({
     }, []);
 
     if (hidden) {
+        return <></>;
+    }
+
+    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
         return <></>;
     }
 
@@ -1140,6 +1173,7 @@ const Property = ({
                             name={name}
                             onValueChange={(value) => handleSelectChange(value, name!)}
                             options={options as Array<SelectOptionType>}
+                            required={required}
                             value={selectValue}
                         />
                     )}
@@ -1161,6 +1195,7 @@ const Property = ({
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                         <PropertyComboBox
                             arrayIndex={arrayIndex}
+                            defaultValue={defaultValue}
                             deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
@@ -1198,6 +1233,7 @@ const Property = ({
                                 {label: 'True', value: 'true'},
                                 {label: 'False', value: 'false'},
                             ]}
+                            required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             value={selectValue}
                         />

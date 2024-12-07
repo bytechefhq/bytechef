@@ -128,10 +128,10 @@ public class ActionApiController implements ActionApi {
         }
 
         public FileEntryImpl(String extension, String mimeType, String name, String url) {
-            this.extension = extension;
-            this.mimeType = mimeType;
-            this.name = name;
-            this.url = url;
+            this.extension = Objects.requireNonNull(extension);
+            this.mimeType = Objects.requireNonNull(mimeType);
+            this.name = Objects.requireNonNull(name);
+            this.url = Objects.requireNonNull(url);
         }
 
         @Override

@@ -77,7 +77,7 @@ public class Evaluator {
         METHOD_EXECUTOR_MAP.put("uuid", new Uuid());
     }
 
-    public static Map<String, Object> evaluate(Map<String, Object> map, Map<String, ?> context) {
+    public static Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
         return evaluateInternal(map, context);
     }
 

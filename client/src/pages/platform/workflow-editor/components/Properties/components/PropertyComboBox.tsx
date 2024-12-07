@@ -27,6 +27,7 @@ type ComboBoxItemType = {
 
 interface PropertyComboBoxProps {
     arrayIndex?: number;
+    defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
@@ -50,6 +51,7 @@ interface PropertyComboBoxProps {
 
 const PropertyComboBox = ({
     arrayIndex,
+    defaultValue,
     deletePropertyButton,
     description,
     handleInputTypeSwitchButtonClick,
@@ -112,6 +114,10 @@ const PropertyComboBox = ({
             label: option.label ?? option.value,
             value: option.value.toString(),
         }));
+    }
+
+    if (defaultValue && !value) {
+        value = defaultValue;
     }
 
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
