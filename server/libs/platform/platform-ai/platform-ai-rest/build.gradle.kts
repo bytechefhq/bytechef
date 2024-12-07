@@ -1,4 +1,6 @@
 dependencies {
+    compileOnly("jakarta.servlet:jakarta.servlet-api")
+
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
