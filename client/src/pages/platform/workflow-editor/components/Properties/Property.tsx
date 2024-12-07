@@ -548,10 +548,6 @@ const Property = ({
             return;
         }
 
-        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
-            setMentionInput(true);
-        }
-
         if (propertyParameterValue) {
             setMentionInput(false);
 
@@ -563,6 +559,10 @@ const Property = ({
             ) {
                 setMentionInput(true);
             }
+        }
+
+        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
+            setMentionInput(true);
         }
 
         if (controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER' || controlType === 'OBJECT_BUILDER') {
