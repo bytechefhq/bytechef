@@ -131,11 +131,15 @@ public class HttpClientActionUtils {
                                 "%s.%s == '%s'".formatted(BODY, BODY_CONTENT_TYPE, BodyContentType.BINARY.name())),
                         string(BODY_CONTENT_MIME_TYPE)
                             .label("Content Type")
+                            .description("Mime-Type to use when sending binary body content.")
+                            .displayCondition(
+                                "'%s' == %s.%s".formatted(Http.BodyContentType.BINARY.name(), BODY, BODY_CONTENT_TYPE))
+                            .placeholder("text/plain"),
+                        string(BODY_CONTENT_MIME_TYPE)
+                            .label("Content Type")
                             .description("Mime-Type to use when sending raw body content.")
                             .displayCondition(
-                                "'%s' == %s.%s or '%s' == %s.%s".formatted(
-                                    Http.BodyContentType.BINARY.name(), BODY, BODY_CONTENT_TYPE,
-                                    Http.BodyContentType.RAW.name(), BODY, BODY_CONTENT_TYPE))
+                                "'%s' == %s.%s".formatted(Http.BodyContentType.RAW.name(), BODY, BODY_CONTENT_TYPE))
                             .defaultValue("text/plain")
                             .placeholder("text/plain")));
         }
