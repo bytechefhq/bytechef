@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.datastream.handler;
+package com.bytechef.component.datastream.task.handler;
 
 import static com.bytechef.platform.component.definition.DataStreamComponentDefinition.DATA_STREAM;
 
