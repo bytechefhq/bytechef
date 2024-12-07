@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Objects;
 
 /**
  * @author Ivica Cardic
@@ -37,10 +38,10 @@ public class FileEntryImpl implements com.bytechef.component.definition.FileEntr
     }
 
     public FileEntryImpl(String extension, String mimeType, String name, String url) {
-        this.extension = extension;
-        this.mimeType = mimeType;
-        this.name = name;
-        this.url = url;
+        this.extension = Objects.requireNonNull(extension);
+        this.mimeType = Objects.requireNonNull(mimeType);
+        this.name = Objects.requireNonNull(name);
+        this.url = Objects.requireNonNull(url);
     }
 
     @Override
