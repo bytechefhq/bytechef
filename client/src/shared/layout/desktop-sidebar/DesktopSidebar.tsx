@@ -3,13 +3,8 @@ import {Link, useLocation} from 'react-router-dom';
 
 import './DesktopSidebar.css';
 
-import {Button} from '@/components/ui/button';
-import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import DesktopSidebarBottomMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarBottomMenu';
 import DesktopSidebarTopMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarTopMenu';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {BotMessageSquareIcon} from 'lucide-react';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -25,11 +20,6 @@ export function DesktopSidebar({
     }[];
 }) {
     const {pathname} = useLocation();
-
-    const {ai} = useApplicationInfoStore();
-    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
-
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     return (
         <aside className={twMerge('hidden bg-muted lg:flex lg:shrink-0', className)}>
@@ -66,12 +56,6 @@ export function DesktopSidebar({
                     </div>
 
                     <div className="flex shrink-0 flex-col items-center justify-center gap-4 py-4">
-                        {ai.copilot.enabled && ff_1570 && (
-                            <Button onClick={() => setCopilotPanelOpen(!copilotPanelOpen)} size="icon" variant="ghost">
-                                <BotMessageSquareIcon className="size-6" />
-                            </Button>
-                        )}
-
                         <DesktopSidebarBottomMenu />
                     </div>
                 </div>
