@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.test;
+package com.bytechef.component.llm;
 
 import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,12 +24,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.llm.Image;
 import java.util.List;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
@@ -39,39 +37,38 @@ import org.springframework.ai.image.ImageResponse;
 /**
  * @author Marko Kriskovic
  */
-public abstract class ImageActionTest extends AbstractLLMActionTest {
+public class ImageActionTest extends AbstractActionTest {
 
     private static final org.springframework.ai.image.Image ANSWER =
         new org.springframework.ai.image.Image("url", "b64JSON");
 
-    protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
-        try (MockedStatic<Image> mockedImage = Mockito.mockStatic(Image.class)) {
-            mockedImage.when(() -> Image.getResponse(any(Image.class), eq(mockedParameters), eq(mockedParameters)))
-                .thenReturn(ANSWER);
-
-            org.springframework.ai.image.Image result =
-                (org.springframework.ai.image.Image) perform.apply(mockedParameters, mockedParameters, mockedContext);
-
-            assertEquals(ANSWER, result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected void getResponseTest(ImageModel mockedImageModel) {
+    @Test
+    public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new ImageMessage("PROMPT", 1f)));
 
-        Image mockedImage = mock(Image.class);
-        ImageResponse imageResponse = new ImageResponse(List.of(new ImageGeneration(ANSWER)));
-        ImageResponse mockedImageResponse = spy(imageResponse);
+        Image mockedImage = spy(new MockImage());
+        ImageModel mockedImageModel = mock(ImageModel.class);
 
         when(mockedImage.createImageModel(mockedParameters, mockedParameters)).thenReturn(mockedImageModel);
+
+        ImageResponse imageResponse = new ImageResponse(List.of(new ImageGeneration(ANSWER)));
+
+        ImageResponse mockedImageResponse = spy(imageResponse);
+
         when(mockedImageModel.call(any(ImagePrompt.class))).thenReturn(mockedImageResponse);
 
-        org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) Image.getResponse(
-            mockedImage, mockedParameters, mockedParameters);
+        org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) mockedImage.getResponse(
+            mockedParameters, mockedParameters);
 
         assertEquals(ANSWER, response);
+    }
+
+    private static class MockImage implements Image {
+
+        @Override
+        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+            return null;
+        }
     }
 }

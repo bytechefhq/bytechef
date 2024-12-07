@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.llm.test;
+package com.bytechef.component.llm;
 
 import static com.bytechef.component.llm.constant.LLMConstants.FILE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.llm.Transcript;
+import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
-import org.mockito.MockedStatic;
-import org.mockito.Mockito;
+import org.junit.jupiter.api.Test;
 import org.springframework.ai.audio.transcription.AudioTranscription;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
@@ -38,26 +35,12 @@ import org.springframework.ai.model.Model;
 /**
  * @author Marko Kriskovic
  */
-public abstract class TranscriptActionTest extends AbstractLLMActionTest {
+public class TranscriptActionTest extends AbstractActionTest {
 
     private static final String ANSWER = "ANSWER";
 
-    protected void performTest(ActionDefinition.SingleConnectionPerformFunction perform) {
-        try (MockedStatic<Transcript> mockedTranscript = Mockito.mockStatic(Transcript.class)) {
-            mockedTranscript
-                .when(() -> Transcript.getResponse(any(Transcript.class), eq(mockedParameters), eq(mockedParameters)))
-                .thenReturn(ANSWER);
-
-            String result = (String) perform.apply(mockedParameters, mockedParameters, mockedContext);
-
-            assertEquals(ANSWER, result);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    protected void getResponseTest(
-        Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel)
+    @Test
+    public void testGetResponse()
         throws MalformedURLException {
 
         when(mockedParameters.getFileEntry(FILE))
@@ -83,17 +66,30 @@ public abstract class TranscriptActionTest extends AbstractLLMActionTest {
                 }
             });
 
-        Transcript mockedTranscription = mock(Transcript.class);
-        AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
-            new AudioTranscription(ANSWER));
-        AudioTranscriptionResponse mockedTranscriptionResponse = spy(transcriptionResponse);
+        Transcript mockedTranscription = spy(new MockTranscript());
+        Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel = mock(Model.class);
 
         when(mockedTranscription.createTranscriptionModel(mockedParameters, mockedParameters))
             .thenReturn(mockedTranscriptModel);
+
+        AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
+            new AudioTranscription(ANSWER));
+
+        AudioTranscriptionResponse mockedTranscriptionResponse = spy(transcriptionResponse);
+
         when(mockedTranscriptModel.call(any(AudioTranscriptionPrompt.class))).thenReturn(mockedTranscriptionResponse);
 
-        String response = Transcript.getResponse(mockedTranscription, mockedParameters, mockedParameters);
+        String response = mockedTranscription.getResponse(mockedParameters, mockedParameters);
 
         assertEquals(ANSWER, response);
+    }
+
+    private static class MockTranscript implements Transcript {
+
+        @Override
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+            Parameters inputParameters, Parameters connectionParameters) {
+            return null;
+        }
     }
 }

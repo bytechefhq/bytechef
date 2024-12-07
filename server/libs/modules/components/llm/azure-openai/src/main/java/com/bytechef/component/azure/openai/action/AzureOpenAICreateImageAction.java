@@ -136,16 +136,24 @@ public class AzureOpenAICreateImageAction {
     private AzureOpenAICreateImageAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Image.getResponse(IMAGE, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return IMAGE.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Image IMAGE = new Image() {
 
         @Override
-        public ImageOptions createImageOptions(Parameters inputParameters) {
+        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+            OpenAIClient openAIClient = new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT))
+                .buildClient();
+
+            return new AzureOpenAiImageModel(
+                openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
+        }
+
+        private ImageOptions createImageOptions(Parameters inputParameters) {
             Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
             return AzureOpenAiImageOptions.builder()
@@ -157,17 +165,6 @@ public class AzureOpenAICreateImageAction {
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
                 .build();
-        }
-
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClient openAIClient = new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT))
-                .buildClient();
-
-            return new AzureOpenAiImageModel(
-                openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
         }
     };
 }

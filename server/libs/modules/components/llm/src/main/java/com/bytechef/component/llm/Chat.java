@@ -51,9 +51,7 @@ public interface Chat {
         return returnChatEntity(inputParameters, call);
     }
 
-    private List<org.springframework.ai.chat.messages.Message> getMessages(
-        Parameters inputParameters) {
-
+    private List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
         List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(messages.stream()

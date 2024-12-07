@@ -23,7 +23,6 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import org.springframework.ai.image.ImageGeneration;
 import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
@@ -32,8 +31,10 @@ import org.springframework.ai.image.ImageResponse;
  */
 public interface Image {
 
-    static Object getResponse(Image image, Parameters inputParameters, Parameters connectionParameters) {
-        ImageModel imageModel = image.createImageModel(inputParameters, connectionParameters);
+    ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters);
+
+    default Object getResponse(Parameters inputParameters, Parameters connectionParameters) {
+        ImageModel imageModel = createImageModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.image.ImageMessage> messages = getMessages(inputParameters);
 
@@ -43,11 +44,7 @@ public interface Image {
         return result.getOutput();
     }
 
-    ImageOptions createImageOptions(Parameters inputParameters);
-
-    ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters);
-
-    private static List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
+    private List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
 
         List<ImageMessage> imageMessages =
             inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});

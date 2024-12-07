@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.amazon.bedrock.action;
+package com.bytechef.component.llm;
 
+import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.llm.test.ChatActionTest;
-import org.junit.jupiter.api.Test;
-import org.springframework.ai.bedrock.anthropic.BedrockAnthropicChatModel;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
+import org.junit.jupiter.api.BeforeEach;
 
 /**
+ * @author Monika Domiter
  * @author Marko Kriskovic
  */
-class AmazonBedrockJurassic2ChatActionTest extends ChatActionTest {
-    @Test
-    void testPerform() {
-        performTest(
-            (ActionDefinition.SingleConnectionPerformFunction) AmazonBedrockJurassic2ChatAction.ACTION_DEFINITION
-                .getPerform()
-                .get());
-    }
+public abstract class AbstractActionTest {
 
-    @Test
-    void testGetResponse() {
-        getResponseTest(mock(BedrockAnthropicChatModel.class));
+    protected Parameters mockedParameters = mock(Parameters.class);
+    protected ActionContext mockedContext = mock(ActionContext.class);
+
+    @BeforeEach
+    public void beforeEach() {
+        when(mockedParameters.getString(TOKEN)).thenReturn("TOKEN");
     }
 }

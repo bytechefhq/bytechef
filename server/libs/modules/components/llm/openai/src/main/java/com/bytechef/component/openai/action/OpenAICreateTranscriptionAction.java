@@ -109,21 +109,10 @@ public class OpenAICreateTranscriptionAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
-        return Transcript.getResponse(TRANSCRIPT, inputParameters, connectionParameters);
+        return TRANSCRIPT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Transcript TRANSCRIPT = new Transcript() {
-
-        @Override
-        public AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
-            return OpenAiAudioTranscriptionOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withPrompt(inputParameters.getString(PROMPT))
-                .withLanguage(inputParameters.getString(LANGUAGE))
-                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
-                .build();
-        }
 
         @Override
         public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
@@ -132,6 +121,16 @@ public class OpenAICreateTranscriptionAction {
             return new OpenAiAudioTranscriptionModel(
                 new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
                 (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
+        }
+
+        private AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
+            return OpenAiAudioTranscriptionOptions.builder()
+                .withModel(inputParameters.getRequiredString(MODEL))
+                .withPrompt(inputParameters.getString(PROMPT))
+                .withLanguage(inputParameters.getString(LANGUAGE))
+                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
+                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .build();
         }
     };
 }

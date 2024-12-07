@@ -157,16 +157,20 @@ public class StabilityCreateImageAction {
     private StabilityCreateImageAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Image.getResponse(IMAGE, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return IMAGE.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Image IMAGE = new Image() {
 
         @Override
-        public ImageOptions createImageOptions(Parameters inputParameters) {
+        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new StabilityAiImageModel(
+                new StabilityAiApi(connectionParameters.getString(TOKEN)),
+                (StabilityAiImageOptions) createImageOptions(inputParameters));
+        }
+
+        private ImageOptions createImageOptions(Parameters inputParameters) {
             return StabilityAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
@@ -179,13 +183,6 @@ public class StabilityCreateImageAction {
                 .withSampler(inputParameters.getString(SAMPLER))
                 .withSeed(inputParameters.getLong(SEED))
                 .build();
-        }
-
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new StabilityAiImageModel(
-                new StabilityAiApi(connectionParameters.getString(TOKEN)),
-                (StabilityAiImageOptions) createImageOptions(inputParameters));
         }
     };
 }

@@ -110,16 +110,14 @@ public class AzureOpenAICreateTranscriptionAction {
     private AzureOpenAICreateTranscriptionAction() {
     }
 
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
-        return Transcript.getResponse(TRANSCRIPT, inputParameters, connectionParameters);
+        return TRANSCRIPT.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Transcript TRANSCRIPT = new Transcript() {
 
-        @Override
         public AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
             return AzureOpenAiAudioTranscriptionOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))

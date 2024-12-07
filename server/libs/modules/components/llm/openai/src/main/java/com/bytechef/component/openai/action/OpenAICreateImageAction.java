@@ -142,16 +142,20 @@ public class OpenAICreateImageAction {
     private OpenAICreateImageAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return Image.getResponse(IMAGE, inputParameters, connectionParameters);
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return IMAGE.getResponse(inputParameters, connectionParameters);
     }
 
     private static final Image IMAGE = new Image() {
 
         @Override
-        public ImageOptions createImageOptions(Parameters inputParameters) {
+        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new OpenAiImageModel(
+                new OpenAiImageApi(connectionParameters.getString(TOKEN)),
+                (OpenAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
+        }
+
+        private ImageOptions createImageOptions(Parameters inputParameters) {
             Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
             return OpenAiImageOptions.builder()
@@ -164,13 +168,6 @@ public class OpenAICreateImageAction {
                 .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
                 .withQuality(inputParameters.getString(QUALITY))
                 .build();
-        }
-
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiImageModel(
-                new OpenAiImageApi(connectionParameters.getString(TOKEN)),
-                (OpenAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
         }
     };
 }
