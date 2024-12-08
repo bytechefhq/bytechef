@@ -99,7 +99,7 @@ public class AmazonBedrockAnthropic2ChatAction {
         return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    private static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = new Chat() {
         @Override
         public ChatOptions createChatOptions(Parameters inputParameters) {
             return AnthropicChatOptions.builder()
