@@ -17,7 +17,6 @@
 package com.bytechef.ee.component.apiplatform;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 public class ApiPlatformComponentHandlerTest {
@@ -26,23 +25,5 @@ public class ApiPlatformComponentHandlerTest {
     public void testGetComponentDefinition() {
         JsonFileAssert.assertEquals("definition/api-platform_v1.json",
             new ApiPlatformComponentHandler().getDefinition());
-    }
-
-    @Test
-    @Disabled
-    public void testAutoRespondWithHTTP200Trigger() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testAwaitWorkflowAndRespondTrigger() {
-        // TODO
-    }
-
-    @Test
-    @Disabled
-    public void testValidateAndRespondTrigger() {
-        // TODO
     }
 }
