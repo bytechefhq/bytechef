@@ -40,24 +40,20 @@ public class ApiPlatformUtils {
         if (body == null) {
             return Map.of(
                 METHOD, method,
-                HEADERS, headerMap
-                    .entrySet()
+                HEADERS, headerMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, ApiPlatformUtils::checkList)),
-                PARAMETERS, parameterMap
-                    .entrySet()
+                PARAMETERS, parameterMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, ApiPlatformUtils::checkList)));
         } else {
             return Map.of(
                 BODY, body.getContent(),
                 METHOD, method,
-                HEADERS, headerMap
-                    .entrySet()
+                HEADERS, headerMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, ApiPlatformUtils::checkList)),
-                PARAMETERS, parameterMap
-                    .entrySet()
+                PARAMETERS, parameterMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, ApiPlatformUtils::checkList)));
         }
