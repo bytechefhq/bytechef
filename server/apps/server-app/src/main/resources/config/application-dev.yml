@@ -2,6 +2,9 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
+  loki:
+    enabled: true
+    url: localhost
 
 server:
   port: 9555
