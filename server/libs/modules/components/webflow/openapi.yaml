@@ -40,7 +40,7 @@ paths:
                         type: "string"
                       status:
                         type: "string"
-  /collections/{collectionId}/item/{itemId}:
+  /collections/{collectionId}/items/{itemId}:
     get:
       summary: "Get Collection Item"
       description: "Get collection item in a collection."
