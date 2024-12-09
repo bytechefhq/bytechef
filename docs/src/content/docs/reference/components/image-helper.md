@@ -23,6 +23,39 @@ Version: 1
 ## Actions
 
 
+### Compress Image
+Compress image with specified quality.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Image | FILE_ENTRY | FILE_ENTRY  |  |
+| Quality | NUMBER | NUMBER  |  Compression quality of the image.  |
+| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+
+
+### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
 ### Crop Image
 Crops an image to the specified dimensions.
 
@@ -55,6 +88,19 @@ Type: FILE_ENTRY
 | STRING | TEXT  |
 
 
+
+
+
+
+### Get Image Metadata
+Get metadata of the image.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Image | FILE_ENTRY | FILE_ENTRY  |  |
+| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
 
 
 
