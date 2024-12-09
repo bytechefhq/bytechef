@@ -38,7 +38,7 @@ public class WebflowGetCollectionItemAction {
         .metadata(
             Map.of(
                 "method", "GET",
-                "path", "/collections/{collectionId}/item/{itemId}"
+                "path", "/collections/{collectionId}/items/{itemId}"
 
             ))
         .properties(string("collectionId").label("Collection")
