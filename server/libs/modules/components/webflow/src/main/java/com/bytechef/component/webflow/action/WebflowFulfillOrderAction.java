@@ -38,7 +38,7 @@ public class WebflowFulfillOrderAction {
         .metadata(
             Map.of(
                 "method", "POST",
-                "path", "/v2/sites/{siteId}/orders/{orderId}/fulfill"
+                "path", "/sites/{siteId}/orders/{orderId}/fulfill"
 
             ))
         .properties(string("siteId").label("Site")

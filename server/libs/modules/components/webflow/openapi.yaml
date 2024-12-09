@@ -5,9 +5,9 @@ info:
   description: "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code."
   version: "v1"
 servers:
-  - url: "https://api.webflow.com"
+  - url: "https://api.webflow.com/v2"
 paths:
-  /v2/sites/{siteId}/orders/{orderId}/fulfill:
+  /sites/{siteId}/orders/{orderId}/fulfill:
     post:
       summary: "Fulfill Order"
       description: "Updates an order's status to fulfilled."
@@ -40,7 +40,7 @@ paths:
                         type: "string"
                       status:
                         type: "string"
-  /v2/collections/{collectionId}/item/{itemId}:
+  /collections/{collectionId}/item/{itemId}:
     get:
       summary: "Get Collection Item"
       description: "Get collection item in a collection."
