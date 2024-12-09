@@ -6,9 +6,26 @@
     <conversionRule conversionWord="crlf" converterClass="com.bytechef.logback.config.CRLFLogConverter" />
     <property name="CONSOLE_LOG_PATTERN" value="${CONSOLE_LOG_PATTERN:-%clr(%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %crlf(%m){red} %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
     <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
-    <!--
     <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } &#45;&#45;&#45; [%t] %-40.40logger{39} : %crlf(%m) %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
-    -->
+
+    <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
+    <springProperty name="loki.enabled" source="logging.loki.enabled" defaultValue="false" />
+    <springProperty name="loki.url" source="logging.loki.url" defaultValue="localhost" />
+
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <http>
+            <url>http://${loki.url}:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${appName},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </message>
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
@@ -61,9 +78,12 @@
     <logger name="liquibase" level="WARN"/>
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
 
-    <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
-
     <root level="${log.level}">
+        <if condition="${loki.enabled}">
+            <then>
+                <appender-ref ref="LOKI" />
+            </then>
+        </if>
         <appender-ref ref="CONSOLE" />
     </root>
 
