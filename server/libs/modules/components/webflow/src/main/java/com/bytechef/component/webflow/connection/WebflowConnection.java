@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class WebflowConnection {
     public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.webflow.com")
+        .baseUri((connectionParameters, context) -> "https://api.webflow.com/v2")
         .authorizations(authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
             .title("OAuth2 Authorization Code")
             .properties(
