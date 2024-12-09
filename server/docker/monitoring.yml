@@ -10,3 +10,11 @@ services:
       - --config.file=/etc/prometheus/prometheus-${profile:-dev}.yml
     ports:
       - 9090:9090
+
+  loki:
+    image: grafana/loki:3.2.2
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    command:
+      - --config.file=/etc/loki/${profile:-dev}.yml
+    ports:
+      - 3100:3100
