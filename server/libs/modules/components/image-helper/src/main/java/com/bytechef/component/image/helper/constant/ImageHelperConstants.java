@@ -30,6 +30,7 @@ public class ImageHelperConstants {
     public static final String DEGREE = "degree";
     public static final String HEIGHT = "height";
     public static final String IMAGE = "image";
+    public static final String QUALITY = "quality";
     public static final String RESULT_FILE_NAME = "resultFileName";
     public static final String WIDTH = "width";
     public static final String X_COORDINATE = "x";
