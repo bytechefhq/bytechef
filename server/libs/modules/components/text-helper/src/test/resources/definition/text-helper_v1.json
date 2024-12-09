@@ -23,8 +23,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -112,7 +112,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -133,7 +132,8 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -174,8 +174,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The text that separates the texts you want to concatenate.",
@@ -211,8 +211,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -372,7 +372,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -397,7 +396,8 @@
           "value" : false
         } ],
         "controlType" : "SELECT"
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -447,6 +447,168 @@
   }, {
     "batch" : null,
     "deprecated" : null,
+    "description" : "Converts HTML to markdown.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "HTMLToMarkdown",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "HTML content to be converted to markdown.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "html",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "HTML Content",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "HTML to Markdown",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Converts markdown to HTML.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "markdownToHTML",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Markdown content to convert to HTML.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "markdown",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Markdown content",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    } ],
+    "title" : "Markdown to HTML",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
     "description" : "Replace all instances of any word, character, or phrase in text with another.",
     "help" : null,
     "metadata" : null,
@@ -477,7 +639,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -498,7 +659,8 @@
         "minLength" : null,
         "options" : null,
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -638,12 +800,11 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -683,9 +844,10 @@
         "minItems" : null,
         "multipleValues" : null,
         "options" : null,
-        "controlType" : "ARRAY_BUILDER",
-        "optionsDataSource" : null
-      }
+        "optionsDataSource" : null,
+        "controlType" : "ARRAY_BUILDER"
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
