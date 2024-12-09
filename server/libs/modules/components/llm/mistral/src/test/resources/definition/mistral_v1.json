@@ -43,6 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -52,9 +54,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -140,7 +140,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -153,7 +153,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -188,7 +188,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -198,19 +198,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -241,7 +241,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -377,47 +377,6 @@
       "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
-      "description" : "Enter the names of functions you want to use.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "functions",
-      "type" : "ARRAY",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Functions",
-      "placeholder" : null,
-      "items" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "maxItems" : null,
-      "minItems" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
-    }, {
-      "advancedOption" : true,
       "description" : "Keeping the same seed would output the same response.",
       "displayCondition" : null,
       "expressionEnabled" : null,
@@ -461,9 +420,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Ask",
-    "perform" : { },
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,

@@ -30,7 +30,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.N;
 import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
@@ -82,7 +82,7 @@ public class AmazonBedrockCohereChatAction {
                                 Collectors.toMap(
                                     CohereChatBedrockApi.CohereChatModel::getName,
                                     CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)))),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,

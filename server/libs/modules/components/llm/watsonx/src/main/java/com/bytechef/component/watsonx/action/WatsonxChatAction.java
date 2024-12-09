@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
@@ -72,7 +72,7 @@ public class WatsonxChatAction {
                 .description("Model is the identifier of the LLM Model to be used.")
                 .exampleValue("google/flan-ul2")
                 .required(false),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             string(DECODING_METHOD)

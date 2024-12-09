@@ -228,7 +228,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -241,7 +241,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -276,7 +276,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -286,19 +286,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -348,7 +348,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -545,7 +545,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -558,7 +558,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -593,7 +593,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -603,19 +603,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -665,7 +665,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -858,7 +858,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -871,7 +871,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -906,7 +906,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -916,19 +916,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -959,7 +959,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -1316,7 +1316,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -1329,7 +1329,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -1364,7 +1364,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -1374,19 +1374,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -1417,7 +1417,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -1789,7 +1789,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -1802,7 +1802,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -1837,7 +1837,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -1847,19 +1847,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -1890,7 +1890,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -2046,7 +2046,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -2059,7 +2059,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -2094,7 +2094,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -2104,19 +2104,19 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
@@ -2147,7 +2147,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -2287,7 +2287,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

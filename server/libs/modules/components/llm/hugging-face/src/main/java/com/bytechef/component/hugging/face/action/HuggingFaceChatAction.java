@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.hugging.face.constant.HuggingFaceConstants.URL;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 
@@ -44,7 +44,7 @@ public class HuggingFaceChatAction {
             string(URL)
                 .label("URL")
                 .description("Url of the inference endpoint"),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY)
         .output()

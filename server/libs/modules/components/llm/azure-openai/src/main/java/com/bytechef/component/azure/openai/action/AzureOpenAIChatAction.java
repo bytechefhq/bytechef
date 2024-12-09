@@ -23,13 +23,11 @@ import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.N;
 import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
@@ -54,8 +52,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import java.util.HashSet;
-import java.util.List;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
@@ -76,7 +72,7 @@ public class AzureOpenAIChatAction {
                 .description("Deployment name, written in string.")
                 .exampleValue("gpt-4o")
                 .required(true),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -87,7 +83,6 @@ public class AzureOpenAIChatAction {
             LOGIT_BIAS_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROPERTY,
             USER_PROPERTY)
         .output()
         .perform(AzureOpenAIChatAction::perform);
@@ -129,12 +124,6 @@ public class AzureOpenAIChatAction {
                 .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(format);
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }

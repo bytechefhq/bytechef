@@ -29,7 +29,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.N;
 import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
@@ -80,7 +80,7 @@ public class AmazonBedrockJurassic2ChatAction {
                                 Collectors.toMap(
                                     Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
                                     Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)))),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             integer(MIN_TOKENS)

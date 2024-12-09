@@ -70,7 +70,6 @@ public class LLMConstants {
     public static final String VOICE = "voice";
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
-    public static final String FUNCTIONS = "functions";
 
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
@@ -82,110 +81,14 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ModifiableArrayProperty FUNCTIONS_PROPERTY = array(FUNCTIONS)
-        .label("Functions")
-        .description("Enter the names of functions you want to use.")
-        .items(string())
-        .advancedOption(true);
-
     public static final ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
         .label("Response Format")
         .description("In which format do you want the response to be in?")
         .options(
-            option("Text", 0),
+            option("Text", 0, "Text response."),
             option("JSON", 1, "JSON response with key-value pairs."))
         .defaultValue(0)
         .required(false);
-
-    public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
-        .label("Logit Bias")
-        .description("Modify the likelihood of specified tokens appearing in the completion.")
-        .additionalProperties(number())
-        .advancedOption(true);
-
-    public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
-        .label("Max Tokens")
-        .description("The maximum number of tokens to generate in the chat completion.")
-        .advancedOption(true);
-
-    public static final ModifiableIntegerProperty N_PROPERTY = integer(N)
-        .label("Number of Chat Completion Choices")
-        .description("How many chat completion choices to generate for each input message.")
-        .defaultValue(1)
-        .advancedOption(true);
-
-    public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
-        .label("Top K")
-        .description("Specify the number of token choices the generative uses to generate the next token.")
-        .defaultValue(1)
-        .advancedOption(true);
-
-    public static final ComponentDsl.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
-        .label("Presence Penalty")
-        .description(
-            "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the " +
-                "text so far, increasing the model's likelihood to talk about new topics.")
-        .defaultValue(0)
-        .minValue(-2)
-        .maxValue(2)
-        .advancedOption(true);
-
-    public static final ModifiableArrayProperty STOP_PROPERTY = array(STOP)
-        .label("Stop")
-        .description("Up to 4 sequences where the API will stop generating further tokens.")
-        .items(string())
-        .advancedOption(true);
-
-    public static final ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
-        .label("Temperature")
-        .description(
-            "Controls randomness:  Higher values will make the output more random, while lower values like will make " +
-                "it more focused and deterministic.")
-        .defaultValue(1)
-        .minValue(0)
-        .maxValue(2)
-        .advancedOption(true);
-
-    public static final ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
-        .label("Top P")
-        .description(
-            "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the " +
-                "results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top " +
-                "10% probability mass are considered.")
-        .defaultValue(1)
-        .advancedOption(true);
-
-    public static final ModifiableStringProperty USER_PROPERTY = string(USER)
-        .label("User")
-        .description(
-            "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.")
-        .required(false)
-        .advancedOption(true);
-
-    public static final ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
-        .label("Seed")
-        .description("Keeping the same seed would output the same response.")
-        .advancedOption(true);
-
-    public static final ModifiableArrayProperty MESSAGE_PROPERTY = array(MESSAGES)
-        .label("Messages")
-        .description("A list of messages comprising the conversation so far.")
-        .items(
-            object().properties(
-                string(CONTENT)
-                    .label("Content")
-                    .description("The contents of the message.")
-                    .required(true),
-                string(ROLE)
-                    .label("Role")
-                    .description("The role of the messages author")
-                    .options(
-                        option("system", "system"),
-                        option("user", "user"),
-                        option("assistant", "assistant"),
-                        option("tool", "tool"))
-                    .required(true)))
-        .required(true);
 
     public static final ModifiableArrayProperty IMAGE_MESSAGE_PROPERTY = array(IMAGE_MESSAGES)
         .label("Messages")
@@ -266,12 +169,106 @@ public class LLMConstants {
                 option("Welsh", "cy")))
         .required(false);
 
+    public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
+        .label("Logit Bias")
+        .description("Modify the likelihood of specified tokens appearing in the completion.")
+        .additionalProperties(number())
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
+        .label("Max Tokens")
+        .description("The maximum number of tokens to generate in the chat completion.")
+        .advancedOption(true);
+
+    public static final ModifiableArrayProperty MESSAGES_PROPERTY = array(MESSAGES)
+        .label("Messages")
+        .description("A list of messages comprising the conversation so far.")
+        .placeholder("Add message")
+        .items(
+            object()
+                .label("Message")
+                .properties(
+                    string(CONTENT)
+                        .label("Content")
+                        .description("The contents of the message.")
+                        .required(true),
+                    string(ROLE)
+                        .label("Role")
+                        .description("The role of the messages author")
+                        .options(
+                            option("System", "system"),
+                            option("User", "user"),
+                            option("Assistant", "assistant"),
+                            option("Tool", "tool"))
+                        .defaultValue("user")
+                        .required(true)))
+        .required(true);
+
+    public static final ModifiableIntegerProperty N_PROPERTY = integer(N)
+        .label("Number of Chat Completion Choices")
+        .description("How many chat completion choices to generate for each input message.")
+        .defaultValue(1)
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty TOP_K_PROPERTY = integer(TOP_K)
+        .label("Top K")
+        .description("Specify the number of token choices the generative uses to generate the next token.")
+        .defaultValue(1)
+        .advancedOption(true);
+
+    public static final ComponentDsl.ModifiableNumberProperty PRESENCE_PENALTY_PROPERTY = number(PRESENCE_PENALTY)
+        .label("Presence Penalty")
+        .description(
+            "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the " +
+                "text so far, increasing the model's likelihood to talk about new topics.")
+        .defaultValue(0)
+        .minValue(-2)
+        .maxValue(2)
+        .advancedOption(true);
+
     public static final ModifiableStringProperty RESPONSE_SCHEMA_PROPERTY = string(RESPONSE_SCHEMA)
         .label("Response Schema")
         .description("Define the JSON schema for the response.")
         .controlType(ControlType.JSON_SCHEMA_BUILDER)
         .displayCondition("responseFormat != 0")
         .required(false);
+
+    public static final ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)
+        .label("Seed")
+        .description("Keeping the same seed would output the same response.")
+        .advancedOption(true);
+
+    public static final ModifiableArrayProperty STOP_PROPERTY = array(STOP)
+        .label("Stop")
+        .description("Up to 4 sequences where the API will stop generating further tokens.")
+        .items(string())
+        .advancedOption(true);
+
+    public static final ModifiableNumberProperty TEMPERATURE_PROPERTY = number(TEMPERATURE)
+        .label("Temperature")
+        .description(
+            "Controls randomness:  Higher values will make the output more random, while lower values like will make " +
+                "it more focused and deterministic.")
+        .defaultValue(1)
+        .minValue(0)
+        .maxValue(2)
+        .advancedOption(true);
+
+    public static final ModifiableNumberProperty TOP_P_PROPERTY = number(TOP_P)
+        .label("Top P")
+        .description(
+            "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the " +
+                "results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top " +
+                "10% probability mass are considered.")
+        .defaultValue(1)
+        .advancedOption(true);
+
+    public static final ModifiableStringProperty USER_PROPERTY = string(USER)
+        .label("User")
+        .description(
+            "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.")
+        .required(false)
+        .advancedOption(true);
 
     private LLMConstants() {
     }

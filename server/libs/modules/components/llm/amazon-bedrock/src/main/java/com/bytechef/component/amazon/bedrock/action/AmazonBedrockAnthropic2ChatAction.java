@@ -23,7 +23,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
@@ -72,7 +72,7 @@ public class AmazonBedrockAnthropic2ChatAction {
                                 Collectors.toMap(
                                     AnthropicChatBedrockApi.AnthropicChatModel::getName,
                                     AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)))),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")
                 .description("The maximum number of tokens to generate in the chat completion.")

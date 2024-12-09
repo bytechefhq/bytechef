@@ -21,11 +21,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
@@ -47,8 +45,6 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -75,14 +71,13 @@ public class MistralChatAction {
                         .collect(
                             Collectors.toMap(
                                 MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)))),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROPERTY,
             SEED_PROPERTY,
             bool(SAFE_PROMPT)
                 .label("Safe prompt")
@@ -121,12 +116,6 @@ public class MistralChatAction {
                 .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                 .withRandomSeed(inputParameters.getInteger(SEED))
                 .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type));
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }

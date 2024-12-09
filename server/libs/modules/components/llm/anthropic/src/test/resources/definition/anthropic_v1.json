@@ -43,9 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -53,8 +52,9 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -136,7 +136,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -149,7 +149,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -184,7 +184,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -194,32 +194,32 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -237,8 +237,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "In which format do you want the response to be in?",
@@ -256,7 +256,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -264,8 +264,8 @@
         "label" : "JSON",
         "value" : 1
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Define the JSON schema for the response.",
@@ -306,8 +306,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -328,8 +328,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Specify the number of token choices the generative uses to generate the next token.",
@@ -347,8 +347,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -388,56 +388,15 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
-    }, {
-      "advancedOption" : true,
-      "description" : "Enter the names of functions you want to use.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : null,
-      "name" : "functions",
-      "type" : "ARRAY",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Functions",
-      "placeholder" : null,
-      "items" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : null,
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : null,
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "maxItems" : null,
-      "minItems" : null,
-      "multipleValues" : null,
-      "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

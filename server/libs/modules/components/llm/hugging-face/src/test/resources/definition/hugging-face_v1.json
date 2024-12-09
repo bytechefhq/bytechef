@@ -43,9 +43,6 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -53,8 +50,11 @@
       "refreshUrl" : null,
       "scopes" : null,
       "tokenUrl" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -108,7 +108,7 @@
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Messages",
-      "placeholder" : null,
+      "placeholder" : "Add message",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -121,7 +121,7 @@
         "type" : "OBJECT",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : null,
+        "label" : "Message",
         "placeholder" : null,
         "additionalProperties" : null,
         "multipleValues" : null,
@@ -156,7 +156,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : null,
+          "defaultValue" : "user",
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -166,32 +166,32 @@
           "minLength" : null,
           "options" : [ {
             "description" : null,
-            "label" : "system",
+            "label" : "System",
             "value" : "system"
           }, {
             "description" : null,
-            "label" : "user",
+            "label" : "User",
             "value" : "user"
           }, {
             "description" : null,
-            "label" : "assistant",
+            "label" : "Assistant",
             "value" : "assistant"
           }, {
             "description" : null,
-            "label" : "tool",
+            "label" : "Tool",
             "value" : "tool"
           } ],
           "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "In which format do you want the response to be in?",
@@ -209,7 +209,7 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : [ {
-        "description" : null,
+        "description" : "Text response.",
         "label" : "Text",
         "value" : 0
       }, {
@@ -217,8 +217,8 @@
         "label" : "JSON",
         "value" : 1
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Define the JSON schema for the response.",

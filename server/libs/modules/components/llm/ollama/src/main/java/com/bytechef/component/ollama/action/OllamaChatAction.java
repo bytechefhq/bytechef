@@ -25,10 +25,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS;
-import static com.bytechef.component.llm.constant.LLMConstants.FUNCTIONS_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.llm.constant.LLMConstants.MESSAGE_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
@@ -77,8 +75,6 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -106,7 +102,7 @@ public class OllamaChatAction {
                             .collect(
                                 Collectors.toMap(
                                     OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
-            MESSAGE_PROPERTY,
+            MESSAGES_PROPERTY,
             integer(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("In which format do you want the response to be in?")
@@ -130,7 +126,6 @@ public class OllamaChatAction {
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY,
-            FUNCTIONS_PROPERTY,
             SEED_PROPERTY,
             bool(USE_NUMA)
                 .label("Use NUMA")
@@ -285,12 +280,6 @@ public class OllamaChatAction {
                 .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
                 .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
                 .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }
