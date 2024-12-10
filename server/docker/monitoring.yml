@@ -30,7 +30,7 @@ services:
       - GF_AUTH_DISABLE_LOGIN_FORM=true
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/provisioning/grafana-datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/grafana-dashboards:/etc/grafana/provisioning/dashboards
     ports:
       - 3000:3000
