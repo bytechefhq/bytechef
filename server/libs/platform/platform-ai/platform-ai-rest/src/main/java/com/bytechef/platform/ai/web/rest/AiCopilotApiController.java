@@ -19,12 +19,12 @@ package com.bytechef.platform.ai.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.ai.service.ChatService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import jakarta.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
@@ -45,10 +45,12 @@ public class AiCopilotApiController {
     }
 
     @PostMapping("/ai/chat")
-    public Flux<Map<String, ?>> chat(@RequestBody Request request, HttpSession httpSession) {
+    public Flux<Map<String, ?>> chat(
+        @RequestBody Request request, @RequestHeader("X-Copilot-Conversation-Id") String conversationId) {
+
         Content lastContent = request.message.content.getLast();
 
-        return chatService.chat(lastContent.text, httpSession.getId());
+        return chatService.chat(lastContent.text, conversationId);
     }
 
     public record Request(Message message) {
