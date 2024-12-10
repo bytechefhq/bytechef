@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration>
+
+<configuration scan="true">
+    <include resource="logback-spring.xml"/>
+
+    <root level="${log.level}">
+        <appender-ref ref="CONSOLE" />
+    </root>
+</configuration>
