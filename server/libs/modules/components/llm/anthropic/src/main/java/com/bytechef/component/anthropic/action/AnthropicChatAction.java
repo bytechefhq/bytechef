@@ -37,11 +37,13 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
@@ -53,6 +55,11 @@ import org.springframework.ai.chat.prompt.ChatOptions;
  * @author Marko Kriskovic
  */
 public class AnthropicChatAction {
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(AnthropicApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
@@ -62,12 +69,7 @@ public class AnthropicChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(AnthropicApi.ChatModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)))),
+                .options(MODELS_ENUM),
             MESSAGES_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")
@@ -85,20 +87,15 @@ public class AnthropicChatAction {
     private AnthropicChatAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters);
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
-    private static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new AnthropicChatModel(
-                new AnthropicApi(connectionParameters.getString(TOKEN)),
-                (AnthropicChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatOptions createChatOptions(Parameters inputParameters) {
             AnthropicChatOptions.Builder builder = AnthropicChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
@@ -108,6 +105,13 @@ public class AnthropicChatAction {
                 .withTopK(inputParameters.getInteger(TOP_K));
 
             return builder.build();
+        }
+
+        @Override
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new AnthropicChatModel(
+                new AnthropicApi(connectionParameters.getString(TOKEN)),
+                (AnthropicChatOptions) createChatOptions(inputParameters));
         }
     };
 }

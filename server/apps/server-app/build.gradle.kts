@@ -175,6 +175,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:json-file"))
     implementation(project(":server:libs:modules:components:json-helper"))
     implementation(project(":server:libs:modules:components:keap"))
+    implementation(project(":server:libs:modules:components:llm:ai-text-analysis"))
     implementation(project(":server:libs:modules:components:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:llm:anthropic"))
     implementation(project(":server:libs:modules:components:llm:azure-openai"))

@@ -32,6 +32,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chat.prompt.Prompt;
 
 /**
@@ -54,12 +55,17 @@ public class ChatActionTest extends AbstractActionTest {
         when(mockedChatModel.call(any(Prompt.class))).thenReturn(
             new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));
 
-        Object response = mockedChat.getResponse(mockedParameters, mockedParameters);
+        Object response = Chat.getResponse(mockedChat, mockedParameters, mockedParameters);
 
         assertEquals(ANSWER, response);
     }
 
     private static class MockChat implements Chat {
+
+        @Override
+        public ChatOptions createChatOptions(Parameters inputParameters) {
+            return null;
+        }
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
