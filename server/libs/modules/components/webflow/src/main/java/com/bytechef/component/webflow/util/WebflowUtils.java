@@ -44,7 +44,7 @@ public class WebflowUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, List<Map<String, Object>>> body = context
+        Map<String, Object> body = context
             .http(http -> http.get("/collections/" + inputParameters.getRequiredString(COLLECTION_ID) + "/items"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
@@ -52,9 +52,11 @@ public class WebflowUtils {
 
         List<Option<String>> options = new ArrayList<>();
 
-        for (Map<String, Object> map : body.get("items")) {
-            if (map.get("fieldData") instanceof Map<?, ?> fieldDataMap) {
-                options.add(option((String) fieldDataMap.get("name"), (String) map.get(ID)));
+        if (body.get("items") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> itemMap && (itemMap.get("fieldData") instanceof Map<?, ?> fieldData)) {
+                    options.add(option((String) fieldData.get("name"), (String) itemMap.get(ID)));
+                }
             }
         }
 
