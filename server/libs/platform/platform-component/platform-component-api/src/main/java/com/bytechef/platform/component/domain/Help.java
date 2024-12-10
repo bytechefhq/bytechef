@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.domain;
 
-import com.bytechef.platform.registry.domain.BaseHelp;
+import com.bytechef.platform.domain.BaseHelp;
 
 /**
  * @author Ivica Cardic

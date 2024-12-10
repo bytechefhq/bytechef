@@ -37,9 +37,9 @@ import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.platform.configuration.dto.UpdateParameterResultDTO;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.registry.domain.BaseProperty;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -276,7 +276,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     workflowNodeName, name, arrayProperty.getItems(), workflow, parameterMap, inputMap,
                     parameterType, dynamicPropertyTypesMap, displayConditionMap);
             }
-            if (property instanceof com.bytechef.platform.workflow.task.dispatcher.registry.domain.ArrayProperty arrayProperty) {
+            if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty) {
                 checkDisplayConditionsParameters(
                     workflowNodeName, name, arrayProperty.getItems(), workflow, parameterMap, inputMap,
                     parameterType, dynamicPropertyTypesMap, displayConditionMap);
@@ -284,7 +284,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 checkDisplayConditionsParameters(
                     workflowNodeName, name, objectProperty.getProperties(), workflow, parameterMap, inputMap,
                     parameterType, dynamicPropertyTypesMap, displayConditionMap);
-            } else if (property instanceof com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty) {
+            } else if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
                 checkDisplayConditionsParameters(
                     workflowNodeName, name, objectProperty.getProperties(), workflow, parameterMap, inputMap,
                     parameterType, dynamicPropertyTypesMap, displayConditionMap);

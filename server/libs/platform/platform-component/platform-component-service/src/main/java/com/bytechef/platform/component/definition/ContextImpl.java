@@ -26,7 +26,7 @@ import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;

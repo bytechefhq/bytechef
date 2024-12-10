@@ -47,6 +47,7 @@ import com.bytechef.platform.configuration.web.rest.model.PropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.StringPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TaskPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.TimePropertyModel;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskProperty;
 import java.util.Collections;
 import java.util.List;
 import org.mapstruct.Mapper;
@@ -167,143 +168,143 @@ public class PropertyMapper {
         JsonNullableMapper.class
     })
     public interface TaskDispatcherPropertyMapper
-        extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property, PropertyModel>,
-        com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property.PropertyVisitor {
+        extends Converter<com.bytechef.platform.workflow.task.dispatcher.domain.Property, PropertyModel>,
+        com.bytechef.platform.workflow.task.dispatcher.domain.Property.PropertyVisitor {
 
         @Override
         default PropertyModel convert(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property property) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.Property property) {
 
             return (PropertyModel) property.accept(this);
         }
 
         @Override
         default ArrayPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ArrayProperty arrayProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty) {
 
             return map(arrayProperty);
         }
 
         @Override
         default BooleanPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.BooleanProperty booleanProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty booleanProperty) {
 
             return map(booleanProperty);
         }
 
         @Override
         default DatePropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty dateProperty) {
 
             return map(dateProperty);
         }
 
         @Override
         default DateTimePropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty dateTimeProperty) {
 
             return map(dateTimeProperty);
         }
 
         @Override
         default FileEntryPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.FileEntryProperty fileEntryProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty fileEntryProperty) {
 
             return map(fileEntryProperty);
         }
 
         @Override
         default IntegerPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.IntegerProperty integerProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty integerProperty) {
 
             return map(integerProperty);
         }
 
         @Override
         default NullPropertyModel
-            visit(com.bytechef.platform.workflow.task.dispatcher.registry.domain.NullProperty nullProperty) {
+            visit(com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty nullProperty) {
             return map(nullProperty);
         }
 
         @Override
         default NumberPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.NumberProperty numberProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty numberProperty) {
 
             return map(numberProperty);
         }
 
         @Override
         default ObjectPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
 
             return map(objectProperty);
         }
 
         @Override
         default StringPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty stringProperty) {
 
             return map(stringProperty);
         }
 
         @Override
         default TaskPropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty taskProperty) {
+            TaskProperty taskProperty) {
 
             return map(taskProperty);
         }
 
         @Override
         default TimePropertyModel visit(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty) {
+            com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty timeProperty) {
 
             return map(timeProperty);
         }
 
         @Mapping(target = "optionsDataSource", ignore = true)
         ArrayPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ArrayProperty arrayProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty);
 
         BooleanPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.BooleanProperty booleanProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.BooleanProperty booleanProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         DatePropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateProperty dateProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.DateProperty dateProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         DateTimePropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.DateTimeProperty dateTimeProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.DateTimeProperty dateTimeProperty);
 
         FileEntryPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.FileEntryProperty fileEntryProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.FileEntryProperty fileEntryProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         IntegerPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.IntegerProperty integerProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.IntegerProperty integerProperty);
 
-        NullPropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.NullProperty nullProperty);
+        NullPropertyModel map(com.bytechef.platform.workflow.task.dispatcher.domain.NullProperty nullProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         NumberPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.NumberProperty numberProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.NumberProperty numberProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
         ObjectPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.ObjectProperty objectProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty);
 
         @Mapping(target = "languageId", ignore = true)
         @Mapping(target = "optionsDataSource", ignore = true)
         StringPropertyModel map(
-            com.bytechef.platform.workflow.task.dispatcher.registry.domain.StringProperty stringProperty);
+            com.bytechef.platform.workflow.task.dispatcher.domain.StringProperty stringProperty);
 
-        TaskPropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskProperty taskProperty);
+        TaskPropertyModel map(TaskProperty taskProperty);
 
         @Mapping(target = "optionsDataSource", ignore = true)
-        TimePropertyModel map(com.bytechef.platform.workflow.task.dispatcher.registry.domain.TimeProperty timeProperty);
+        TimePropertyModel map(com.bytechef.platform.workflow.task.dispatcher.domain.TimeProperty timeProperty);
 
         default List<PropertyModel> map(
-            List<? extends com.bytechef.platform.workflow.task.dispatcher.registry.domain.Property> properties) {
+            List<? extends com.bytechef.platform.workflow.task.dispatcher.domain.Property> properties) {
 
             if (CollectionUtils.isEmpty(properties)) {
                 return Collections.emptyList();

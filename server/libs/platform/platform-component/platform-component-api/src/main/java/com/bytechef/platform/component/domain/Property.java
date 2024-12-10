@@ -17,7 +17,7 @@
 package com.bytechef.platform.component.domain;
 
 import com.bytechef.component.definition.Property.Type;
-import com.bytechef.platform.registry.domain.BaseProperty;
+import com.bytechef.platform.domain.BaseProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

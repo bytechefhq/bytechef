@@ -40,7 +40,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
 import com.bytechef.platform.component.handler.ComponentHandlerFactory;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
-import com.bytechef.platform.registry.util.PropertyUtils;
+import com.bytechef.platform.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
