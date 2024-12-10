@@ -50,6 +50,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
+import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
@@ -68,6 +69,7 @@ public class OpenAIChatAction {
             .collect(
                 Collectors.toMap(
                     OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -116,12 +118,6 @@ public class OpenAIChatAction {
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER));
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }

@@ -46,6 +46,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -62,6 +63,7 @@ public class MistralChatAction {
             .collect(
                 Collectors.toMap(
                     MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -112,12 +114,6 @@ public class MistralChatAction {
                 .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                 .withRandomSeed(inputParameters.getInteger(SEED))
                 .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type));
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }

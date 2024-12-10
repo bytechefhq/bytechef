@@ -116,12 +116,6 @@ public class AzureOpenAIChatAction {
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(format);
 
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
-
             return builder.build();
         }
 

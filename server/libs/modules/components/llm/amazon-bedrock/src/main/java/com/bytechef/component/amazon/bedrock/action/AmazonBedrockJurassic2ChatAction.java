@@ -82,8 +82,7 @@ public class AmazonBedrockJurassic2ChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(
-                    ),
+                .options(MODELS_ENUM),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,

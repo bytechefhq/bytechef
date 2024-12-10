@@ -101,24 +101,16 @@ public class WatsonxChatAction {
     private WatsonxChatAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters);
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return Chat.getResponse(CHAT, inputParameters, connectionParameters);
     }
 
     public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new WatsonxAiChatModel(
-                new WatsonxAiApi(
-                    connectionParameters.getString(URL),
-                    connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
-                    null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
-                    RestClient.builder()),
-                (WatsonxAiChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatOptions createChatOptions(Parameters inputParameters) {
             return WatsonxAiChatOptions.builder()
                 .withModel(inputParameters.getString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
@@ -131,6 +123,17 @@ public class WatsonxChatAction {
                 .withRepetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
                 .withDecodingMethod(inputParameters.getString(DECODING_METHOD))
                 .build();
+        }
+
+        @Override
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new WatsonxAiChatModel(
+                new WatsonxAiApi(
+                    connectionParameters.getString(URL),
+                    connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
+                    null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
+                    RestClient.builder()),
+                (WatsonxAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

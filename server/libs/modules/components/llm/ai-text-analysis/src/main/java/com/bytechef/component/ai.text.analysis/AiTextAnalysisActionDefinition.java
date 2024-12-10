@@ -84,7 +84,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
             }
             case 7 -> {
                 maliciousMap.put(TOKEN, component.getAzureOpenAi().getApiKey());
-                yield AzureOpenAIChatAction.CHAT;
+                yield null;
             }
             case 8 -> {
                 maliciousMap.put(TOKEN, component.getGroq().getApiKey());

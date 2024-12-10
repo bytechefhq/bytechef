@@ -48,7 +48,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
 import org.springframework.ai.bedrock.anthropic3.Anthropic3ChatOptions;
 import org.springframework.ai.bedrock.anthropic3.BedrockAnthropic3ChatModel;
 import org.springframework.ai.bedrock.anthropic3.api.Anthropic3ChatBedrockApi;
@@ -60,6 +59,13 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
  * @author Marko Kriskovic
  */
 public class AmazonBedrockAnthropic3ChatAction {
+
+    public static final List<Option<String>> MODELS_ENUM = LLMUtils
+        .getEnumOptions(Arrays.stream(Anthropic3ChatBedrockApi.AnthropicChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName,
+                    Anthropic3ChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askAnthropic3")
         .title("Ask Anthropic3")

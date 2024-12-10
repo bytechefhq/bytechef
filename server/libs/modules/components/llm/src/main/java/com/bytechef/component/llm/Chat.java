@@ -30,16 +30,17 @@ import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
 
 /**
  * @author Marko Kriskovic
  */
 public interface Chat {
 
-    ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
+    static Object getResponse(
+        Chat chat, Parameters inputParameters, Parameters connectionParameters) {
 
-    default Object getResponse(Parameters inputParameters, Parameters connectionParameters) {
-        ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
+        ChatModel chatModel = chat.createChatModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters);
 
@@ -51,7 +52,13 @@ public interface Chat {
         return returnChatEntity(inputParameters, call);
     }
 
-    private List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
+    ChatOptions createChatOptions(Parameters inputParameters);
+
+    ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
+
+    private static List<org.springframework.ai.chat.messages.Message> getMessages(
+        Parameters inputParameters) {
+
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
         List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(messages.stream()
@@ -68,7 +75,7 @@ public interface Chat {
     }
 
     @SuppressFBWarnings("NP")
-    private Object returnChatEntity(Parameters parameters, ChatClient.CallResponseSpec call) {
+    private static Object returnChatEntity(Parameters parameters, ChatClient.CallResponseSpec call) {
         int responseFormat = parameters.getInteger(RESPONSE_FORMAT, 0);
 
         if (responseFormat == 0) {

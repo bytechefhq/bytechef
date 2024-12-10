@@ -47,6 +47,7 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.llm.util.LLMUtils;
 import com.google.cloud.vertexai.VertexAI;
+import java.util.List;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
@@ -119,12 +120,6 @@ public class VertexGeminiChatAction {
                 .withTopK(inputParameters.getFloat(TOP_K))
                 .withCandidateCount(inputParameters.getInteger(N))
                 .withResponseMimeType(type);
-
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
 
             return builder.build();
         }
