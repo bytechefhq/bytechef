@@ -2,9 +2,7 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
-  loki:
-    enabled: true
-    url: localhost
+  config: "classpath:logback-spring-dev.xml"
 
 server:
   port: 9555
