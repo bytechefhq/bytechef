@@ -20,7 +20,7 @@
     "help" : null,
     "metadata" : {
       "method" : "POST",
-      "path" : "/v2/sites/{siteId}/orders/{orderId}/fulfill"
+      "path" : "/sites/{siteId}/orders/{orderId}/fulfill"
     },
     "name" : "fulfillOrder",
     "outputDefinition" : {
@@ -258,7 +258,7 @@
     "help" : null,
     "metadata" : {
       "method" : "GET",
-      "path" : "/v2/collections/{collectionId}/item/{itemId}"
+      "path" : "/collections/{collectionId}/items/{itemId}"
     },
     "name" : "getCollectionItem",
     "outputDefinition" : {
