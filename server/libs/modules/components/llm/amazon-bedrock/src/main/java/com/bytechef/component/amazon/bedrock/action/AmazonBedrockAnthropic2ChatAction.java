@@ -61,10 +61,10 @@ public class AmazonBedrockAnthropic2ChatAction {
 
     public static final List<Option<String>> MODELS_ENUM = LLMUtils
         .getEnumOptions(Arrays.stream(AnthropicChatBedrockApi.AnthropicChatModel.values())
-        .collect(
-            Collectors.toMap(
-                AnthropicChatBedrockApi.AnthropicChatModel::getName,
-                AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
+            .collect(
+                Collectors.toMap(
+                    AnthropicChatBedrockApi.AnthropicChatModel::getName,
+                    AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("askAnthropic2")
         .title("Ask Anthropic2")

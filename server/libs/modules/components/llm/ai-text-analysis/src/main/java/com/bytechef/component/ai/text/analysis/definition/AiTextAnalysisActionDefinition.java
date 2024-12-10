@@ -1,4 +1,22 @@
-package com.bytechef.component.ai.text.analysis;
+/*
+ * Copyright 2023-present ByteChef Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.bytechef.component.ai.text.analysis.definition;
+
+import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
@@ -7,7 +25,6 @@ import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAc
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.anthropic.action.AnthropicChatAction;
-import com.bytechef.component.azure.openai.action.AzureOpenAIChatAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -23,13 +40,11 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParameterConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
-
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import static com.bytechef.component.definition.Authorization.TOKEN;
 
 /**
  * @author Marko Kriskovic
@@ -37,7 +52,10 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrapper {
 
     private final ApplicationProperties.Ai.Component component;
-    public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition, ApplicationProperties.Ai.Component component) {
+
+    @SuppressFBWarnings("EI")
+    public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition,
+        ApplicationProperties.Ai.Component component) {
         super(actionDefinition);
 
         this.component = component;
@@ -49,65 +67,80 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
     }
 
     protected String perform(
-        Parameters inputParameters, Map<String,? extends ParameterConnection> connectionParameters, Parameters extensions, ActionContext context) {
+        Parameters inputParameters, Map<String, ? extends ParameterConnection> connectionParameters,
+        Parameters extensions, ActionContext context) {
         Map<String, String> maliciousMap = new HashMap<>();
 
         Integer connectionProvider = inputParameters.getInteger("connectionProvider");
         Chat chat = switch (connectionProvider) {
             case 0 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockAnthropic2ChatAction.CHAT;
             }
             case 1 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockAnthropic3ChatAction.CHAT;
             }
             case 2 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockCohereChatAction.CHAT;
             }
             case 3 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockJurassic2ChatAction.CHAT;
             }
             case 4 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockLlamaChatAction.CHAT;
             }
             case 5 -> {
-                maliciousMap.put(TOKEN, component.getAmazonBedrock().getApiKey());
+                maliciousMap.put(TOKEN, component.getAmazonBedrock()
+                    .getApiKey());
                 yield AmazonBedrockTitanChatAction.CHAT;
             }
             case 6 -> {
-                maliciousMap.put(TOKEN, component.getAnthropic().getApiKey());
+                maliciousMap.put(TOKEN, component.getAnthropic()
+                    .getApiKey());
                 yield AnthropicChatAction.CHAT;
             }
             case 7 -> {
-                maliciousMap.put(TOKEN, component.getAzureOpenAi().getApiKey());
+                maliciousMap.put(TOKEN, component.getAzureOpenAi()
+                    .getApiKey());
                 yield null;
             }
             case 8 -> {
-                maliciousMap.put(TOKEN, component.getGroq().getApiKey());
+                maliciousMap.put(TOKEN, component.getGroq()
+                    .getApiKey());
                 yield GroqChatAction.CHAT;
             }
             case 9 -> {
-                maliciousMap.put(TOKEN, component.getNVIDIA().getApiKey());
+                maliciousMap.put(TOKEN, component.getNVIDIA()
+                    .getApiKey());
                 yield NVIDIAChatAction.CHAT;
             }
             case 10 -> {
-                maliciousMap.put(TOKEN, component.getHuggingFace().getApiKey());
+                maliciousMap.put(TOKEN, component.getHuggingFace()
+                    .getApiKey());
                 yield HuggingFaceChatAction.CHAT;
             }
             case 11 -> {
-                maliciousMap.put(TOKEN, component.getMistral().getApiKey());
+                maliciousMap.put(TOKEN, component.getMistral()
+                    .getApiKey());
                 yield MistralChatAction.CHAT;
             }
             case 12 -> {
-                maliciousMap.put(TOKEN, component.getOpenAi().getApiKey());
+                maliciousMap.put(TOKEN, component.getOpenAi()
+                    .getApiKey());
                 yield OpenAIChatAction.CHAT;
             }
             case 13 -> {
-                maliciousMap.put(TOKEN, component.getVertexGemini().getApiKey());
+                maliciousMap.put(TOKEN, component.getVertexGemini()
+                    .getApiKey());
                 yield VertexGeminiChatAction.CHAT;
             }
             default -> null;
@@ -132,7 +165,6 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
         suspiciousMap.put("model", inputParameters.getString("model"));
 
         Parameters myInputParameters = ParametersFactory.createParameters(suspiciousMap);
-
 
         Object response = Chat.getResponse(chat, myInputParameters, myConnectionParameters);
 

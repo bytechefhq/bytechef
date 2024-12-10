@@ -16,11 +16,9 @@
 
 package com.bytechef.component.ai.text.analysis.action;
 
-
 /**
  * @author Marko Kriskovic
  */
-class SummarizeTextActionTest{
-
+class SummarizeTextActionTest {
 
 }

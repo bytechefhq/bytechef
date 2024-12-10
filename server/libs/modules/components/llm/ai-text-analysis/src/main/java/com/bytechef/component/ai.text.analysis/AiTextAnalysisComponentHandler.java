@@ -36,8 +36,8 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
 
     private final AIComponentDefinition componentDefinition;
 
-    public AiTextAnalysisComponentHandler(ApplicationProperties applicationProperties) {
-        this.componentDefinition = new AiTextAnalysisComponentDefinitionImpl(applicationProperties.getAi().getComponent());
+    public AiTextAnalysisComponentHandler(ApplicationProperties.Ai.Component component) {
+        this.componentDefinition = new AiTextAnalysisComponentDefinitionImpl(component);
     }
 
     @Override
@@ -47,15 +47,14 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
 
     private static class AiTextAnalysisComponentDefinitionImpl extends AbstractComponentDefinitionWrapper
         implements AIComponentDefinition {
-        private AiTextAnalysisComponentDefinitionImpl(ApplicationProperties.Ai.Component component){
+        private AiTextAnalysisComponentDefinitionImpl(ApplicationProperties.Ai.Component component) {
             super(
                 component(AI_TEXT_ANALYSIS)
                     .title("AI Text Analysis")
                     .description("AI Helper component for text analysis.")
                     .icon("path:assets/ai-text-analysis.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                    .actions(new SummarizeTextAction(component).ACTION_DEFINITION)
-            );
+                    .actions(new SummarizeTextAction(component).actionDefinition));
         }
     }
 

@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.springframework.ai.bedrock.anthropic3.Anthropic3ChatOptions;
 import org.springframework.ai.bedrock.anthropic3.BedrockAnthropic3ChatModel;
 import org.springframework.ai.bedrock.anthropic3.api.Anthropic3ChatBedrockApi;

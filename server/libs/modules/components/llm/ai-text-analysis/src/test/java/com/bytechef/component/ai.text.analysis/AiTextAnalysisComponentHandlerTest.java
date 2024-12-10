@@ -26,6 +26,7 @@ class AiTextAnalysisComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/ai_text_analysis_v1.json", new AiTextAnalysisComponentHandler(applicationProperties.getAi().getComponent()).getDefinition());
+        JsonFileAssert.assertEquals("definition/ai_text_analysis_v1.json",
+            new AiTextAnalysisComponentHandler(null).getDefinition());
     }
 }

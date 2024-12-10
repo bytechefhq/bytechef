@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisCon
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.PROMPT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
-import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
@@ -29,9 +28,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPER
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 
-import com.bytechef.component.ai.text.analysis.AiTextAnalysisActionDefinition;
-import com.bytechef.component.ai.text.analysis.AiTextAnalysisConfiguration;
-import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
+import com.bytechef.component.ai.text.analysis.definition.AiTextAnalysisActionDefinition;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockCohereChatAction;
@@ -39,27 +36,20 @@ import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAc
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.anthropic.action.AnthropicChatAction;
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.Chat;
 import com.bytechef.component.mistral.action.MistralChatAction;
 import com.bytechef.component.openai.action.OpenAIChatAction;
 import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
-
 
 /**
  * @author Marko Kriskovic
  */
 public class SummarizeTextAction {
 
-    public final AiTextAnalysisActionDefinition ACTION_DEFINITION;
-
+    public final AiTextAnalysisActionDefinition actionDefinition;
 
     public SummarizeTextAction(ApplicationProperties.Ai.Component component) {
-        this.ACTION_DEFINITION = new AiTextAnalysisActionDefinition(
+        this.actionDefinition = new AiTextAnalysisActionDefinition(
             action("summarizeText")
                 .title("Summarize Text")
                 .description("AI reads, analyzes and summarizes your text into a shorter format.")
@@ -170,8 +160,8 @@ public class SummarizeTextAction {
                         .displayCondition("format == 4"),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output()
-            , component);
+                .output(),
+            component);
     }
 
 }
