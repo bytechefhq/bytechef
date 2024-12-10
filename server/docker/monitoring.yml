@@ -14,7 +14,23 @@ services:
   loki:
     image: grafana/loki:3.2.2
     extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    volumes:
+      - ./loki/:/etc/loki/
     command:
-      - --config.file=/etc/loki/${profile:-dev}.yml
+      - --config.file=/etc/loki/loki-${profile:-dev}.yml
     ports:
       - 3100:3100
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - 3000:3000
