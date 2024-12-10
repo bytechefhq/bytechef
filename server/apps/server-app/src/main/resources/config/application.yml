@@ -102,6 +102,10 @@ spring:
     name: server-app
   cache:
     type: ${bytechef.cache.provider}
+  cloud:
+    aws:
+      secretsmanager:
+        enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     url: ${bytechef.datasource.url}
@@ -128,6 +132,9 @@ spring:
             required: ${bytechef.mail.smtp.starttls.required:false}
   liquibase:
     contexts: mono, #spring.profiles.active#
+  output:
+    ansi:
+      enabled: always
   profiles:
     active: #spring.profiles.active#
     group:
@@ -141,10 +148,6 @@ spring:
   shell:
     noninteractive:
       enabled: false
-  cloud:
-    aws:
-      secretsmanager:
-        enabled: false
   quartz:
     job-store-type: jdbc
     jdbc:
