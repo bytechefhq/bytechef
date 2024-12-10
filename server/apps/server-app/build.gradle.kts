@@ -10,6 +10,7 @@ dependencies {
     implementation("io.awspring.cloud:spring-cloud-aws-starter-secrets-manager")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation("io.micrometer:micrometer-registry-prometheus")
+    implementation(libs.loki.logback.appender)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter:${rootProject.libs.versions.spring.ai.get()}")
     implementation("org.springframework.ai:spring-ai-pgvector-store-spring-boot-starter:${rootProject.libs.versions.spring.ai.get()}")
