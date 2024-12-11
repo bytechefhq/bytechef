@@ -227,6 +227,10 @@ public class HttpClientActionUtils {
     }
 
     private static BodyContentType getBodyContentType(Parameters inputParameters) {
+        if (!inputParameters.containsKey(BODY)) {
+            return null;
+        }
+
         String bodyContentTypeParameter = inputParameters.getFromPath(BODY + "." + BODY_CONTENT_TYPE, String.class);
 
         return bodyContentTypeParameter == null
