@@ -5,8 +5,12 @@
     <include resource="logback-spring.xml"/>
 
     <springProperty name="applicationName" source="spring.application.name"/>
+    <springProperty name="loki.appender.level" source="bytechef.loki.appender.level" defaultValue="OFF" />
 
     <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${loki.appender.level}</level>
+        </filter>
         <http>
             <url>http://localhost:3100/loki/api/v1/push</url>
         </http>

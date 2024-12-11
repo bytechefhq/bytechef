@@ -50,6 +50,7 @@ public class ApplicationProperties {
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
     private HelpHub helpHub = new HelpHub();
+    private Loki loki = new Loki();
     private Mail mail = new Mail();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
@@ -116,6 +117,10 @@ public class ApplicationProperties {
 
     public HelpHub getHelpHub() {
         return helpHub;
+    }
+
+    public Loki getLoki() {
+        return loki;
     }
 
     public Mail getMail() {
@@ -218,6 +223,10 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
+    public void setLoki(Loki loki) {
+        this.loki = loki;
+    }
+
     public void setMail(Mail mail) {
         this.mail = mail;
     }
@@ -260,6 +269,34 @@ public class ApplicationProperties {
 
     public void setWorkflow(Workflow workflow) {
         this.workflow = workflow;
+    }
+
+    public static class Loki {
+        private Appender appender = new Appender();
+
+        public Appender getAppender() {
+            return appender;
+        }
+
+        public void setAppender(Appender appender) {
+            this.appender = appender;
+        }
+
+        public static class Appender {
+            private Level level = Level.OFF;
+
+            public enum Level {
+                DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
+            }
+
+            public Level getLevel() {
+                return level;
+            }
+
+            public void setLevel(Level level) {
+                this.level = level;
+            }
+        }
     }
 
     /**

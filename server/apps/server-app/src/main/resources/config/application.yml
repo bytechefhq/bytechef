@@ -212,6 +212,9 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+  loki:
+    appender:
+      level: "OFF"
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
