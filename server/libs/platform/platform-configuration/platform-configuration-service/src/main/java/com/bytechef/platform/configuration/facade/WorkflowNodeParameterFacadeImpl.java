@@ -653,7 +653,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                 List<Object> list;
 
-                if (map.containsKey(name)) {
+                if (Objects.nonNull(map.get(name))) {
                     list = (List<Object>) map.get(name);
                 } else {
                     list = new ArrayList<>();
