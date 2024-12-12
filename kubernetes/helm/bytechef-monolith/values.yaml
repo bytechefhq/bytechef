@@ -8,7 +8,7 @@ image:
   repository: docker.bytechef.io/bytechef/bytechef
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: "20241212_1400"
 
 env:
   normal:
