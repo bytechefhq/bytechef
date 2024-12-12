@@ -31,7 +31,7 @@ env:
     BYTECHEF_MAIL_USERNAME: ""
     BYTECHEF_MAIL_HOST: ""
     BYTECHEF_MAIL_PASSWORD: ""
-    BYTECHEF_MAIL_PORT: 22
+    BYTECHEF_MAIL_PORT: "22"
 
 
 imagePullSecrets: []
@@ -53,7 +53,7 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext: {}
-  # fsGroup: 2000
+# fsGroup: 2000
 
 securityContext: {}
   # capabilities:
@@ -61,7 +61,7 @@ securityContext: {}
   #   - ALL
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
-  # runAsUser: 1000
+# runAsUser: 1000
 
 service:
   type: ClusterIP
@@ -72,7 +72,7 @@ ingress:
   className: ""
   annotations: {}
     # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
+  # kubernetes.io/tls-acme: "true"
   hosts:
     - host: chart-example.local
       paths:
@@ -93,25 +93,28 @@ resources: {}
   #   memory: 128Mi
   # requests:
   #   cpu: 100m
-  #   memory: 128Mi
+#   memory: 128Mi
 
 livenessProbe:
   httpGet:
     path: /actuator/health/liveness
-    port: 9555
+    port: 8080
   initialDelaySeconds: 30
   timeoutSeconds: 20
   periodSeconds: 30
   failureThreshold: 6
 readinessProbe:
   httpGet:
-    path: /actuator/health/readiness/
-    port: 9555
+    path: /actuator/health/readiness
+    port: 8080
   initialDelaySeconds: 30
   timeoutSeconds: 20
   periodSeconds: 30
   failureThreshold: 6
 startupProbe:
+  httpGet:
+    path: /actuator/health/liveness
+    port: 8080
   failureThreshold: 180
   periodSeconds: 20
   timeoutSeconds: 60
