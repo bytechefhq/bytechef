@@ -8,7 +8,9 @@
     <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
     <property name="FILE_LOG_PATTERN" value="${FILE_LOG_PATTERN:-%d{${LOG_DATEFORMAT_PATTERN:-yyyy-MM-dd'T'HH:mm:ss.SSSXXX}} ${LOG_LEVEL_PATTERN:-%5p} ${PID:- } &#45;&#45;&#45; [%t] %-40.40logger{39} : %crlf(%m) %n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}"/>
 
+    <springProperty name="applicationName" source="spring.application.name"/>
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
+    <springProperty name="loki.appender.level" source="bytechef.loki.appender.level" defaultValue="OFF" />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
@@ -27,7 +29,23 @@
     </root>
     -->
 
-    <!--<logger name="com.bytechef" level="INFO"/>-->
+    <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>${loki.appender.level}</level>
+        </filter>
+        <http>
+            <url>http://localhost:3100/loki/api/v1/push</url>
+        </http>
+        <format>
+            <label>
+                <pattern>app=${applicationName},host=${HOSTNAME},traceID=%X{traceId:-NONE},level=%level</pattern>
+            </label>
+            <message>
+                <pattern>${FILE_LOG_PATTERN}</pattern>
+            </message>
+            <sortByTime>true</sortByTime>
+        </format>
+    </appender>
 
     <logger name="angus.activation" level="WARN"/>
     <logger name="ch.qos.logback" level="WARN"/>
@@ -60,6 +78,11 @@
     <logger name="_org.springframework.web.servlet.HandlerMapping.Mappings" level="INFO"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="LiquibaseSchemaResolver" level="INFO"/>
+
+    <root level="${log.level}">
+        <appender-ref ref="CONSOLE" />
+        <appender-ref ref="LOKI" />
+    </root>
 
     <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
         <resetJUL>true</resetJUL>

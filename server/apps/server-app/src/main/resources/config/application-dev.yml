@@ -2,7 +2,6 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: DEBUG
-  config: "classpath:logback-spring-dev.xml"
 
 server:
   port: 9555

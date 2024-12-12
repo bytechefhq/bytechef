@@ -2,7 +2,6 @@ logging:
   level:
     ROOT: INFO
     com.bytechef: INFO
-  config: "classpath:logback-spring-prod.xml"
 
 management:
   prometheus:
