@@ -231,7 +231,7 @@ bytechef:
   resources:
     web: file:///opt/bytechef/client/
   security:
-    content-security-policy: "default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://api.commandbar.com https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.command.ai; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src https://*.command.ai; connect-src https://*.command.ai https://eu.i.posthog.com;"
+    content-security-policy: "default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://api.commandbar.com https://cdn.jsdelivr.net https://storage.googleapis.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://*.command.ai; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://eu.i.posthog.com;"
 
   sign-up:
     temp-domain-list-url: #https://gist.githubusercontent.com/SimonHoiberg/f5a23b1fa3762330c8af1e9090918b63/raw/53963d0dbdd93c594fbc067cee95966156ee066b/temp-email-list.txt
