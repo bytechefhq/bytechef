@@ -20,16 +20,18 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import org.junit.jupiter.api.BeforeEach;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public abstract class AbstractActionTest {
 
     protected Parameters mockedParameters = mock(Parameters.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
 
     @BeforeEach
     public void beforeEach() {

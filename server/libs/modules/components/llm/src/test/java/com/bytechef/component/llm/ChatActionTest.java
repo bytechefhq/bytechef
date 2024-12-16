@@ -44,7 +44,7 @@ public class ChatActionTest extends AbstractActionTest {
     @Test
     public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
-            .thenReturn(List.of(new Chat.Message("QUESTION", "user")));
+            .thenReturn(List.of(new Chat.Message("QUESTION", null, "user")));
 
         Chat mockedChat = spy(new MockChat());
         ChatModel mockedChatModel = mock(ChatModel.class);
@@ -54,7 +54,7 @@ public class ChatActionTest extends AbstractActionTest {
         when(mockedChatModel.call(any(Prompt.class))).thenReturn(
             new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));
 
-        Object response = mockedChat.getResponse(mockedParameters, mockedParameters);
+        Object response = mockedChat.getResponse(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(ANSWER, response);
     }
