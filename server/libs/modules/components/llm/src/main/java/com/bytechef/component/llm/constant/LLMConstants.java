@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableNumberPro
 import static com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -192,6 +193,10 @@ public class LLMConstants {
                         .label("Content")
                         .description("The contents of the message.")
                         .required(true),
+                    fileEntry("image")
+                        .label("Image")
+                        .displayCondition("%s == '%s'".formatted("messages[index].role", "user"))
+                        .required(false),
                     string(ROLE)
                         .label("Role")
                         .description("The role of the messages author")
