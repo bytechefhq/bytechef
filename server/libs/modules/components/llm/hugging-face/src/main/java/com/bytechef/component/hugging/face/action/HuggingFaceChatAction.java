@@ -54,7 +54,7 @@ public class HuggingFaceChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters);
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
     }
 
     public static final Chat CHAT = new Chat() {

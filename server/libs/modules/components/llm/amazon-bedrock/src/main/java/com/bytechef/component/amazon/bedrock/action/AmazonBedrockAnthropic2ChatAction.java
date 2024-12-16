@@ -90,7 +90,7 @@ public class AmazonBedrockAnthropic2ChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters);
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
     }
 
     private static final Chat CHAT = new Chat() {

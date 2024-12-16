@@ -21,6 +21,8 @@ import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.llm.util.LLMUtils.createMessage;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.converter.JsonSchemaStructuredOutputConverter;
@@ -38,10 +40,12 @@ public interface Chat {
 
     ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
 
-    default Object getResponse(Parameters inputParameters, Parameters connectionParameters) {
+    default Object getResponse(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
         ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
 
-        List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters);
+        List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters, actionContext);
 
         ChatClient.CallResponseSpec call = ChatClient.create(chatModel)
             .prompt()
@@ -51,11 +55,13 @@ public interface Chat {
         return returnChatEntity(inputParameters, call);
     }
 
-    private List<org.springframework.ai.chat.messages.Message> getMessages(Parameters inputParameters) {
+    private List<org.springframework.ai.chat.messages.Message> getMessages(
+        Parameters inputParameters, ActionContext actionContext) {
+
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
         List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(messages.stream()
-            .map(message -> createMessage(message.role(), message.content()))
+            .map(message -> createMessage(message, actionContext))
             .toList());
 
         String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
@@ -81,6 +87,6 @@ public interface Chat {
         }
     }
 
-    record Message(String content, String role) {
+    record Message(String content, FileEntry image, String role) {
     }
 }

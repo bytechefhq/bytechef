@@ -18,7 +18,10 @@ package com.bytechef.component.llm.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.llm.Chat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,20 +30,37 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.ToolResponseMessage;
 import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.model.Media;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.util.MimeTypeUtils;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  * @author Marko Kriskovic
  */
 public class LLMUtils {
     private LLMUtils() {
     }
 
-    public static Message createMessage(String role, String content) {
-        return switch (role) {
-            case "system" -> new SystemMessage(content);
-            case "user" -> new UserMessage(content);
-            case "assistant" -> new AssistantMessage(content);
+    public static Message createMessage(Chat.Message message, ActionContext actionContext) {
+
+        return switch (message.role()) {
+            case "system" -> new SystemMessage(message.content());
+            case "user" -> {
+                FileEntry fileEntry = message.image();
+
+                if (fileEntry == null) {
+                    yield new UserMessage(message.content());
+                } else {
+                    byte[] encodedImageBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
+                    String mimeType = fileEntry.getMimeType();
+
+                    yield new UserMessage(
+                        message.content(), new Media(MimeTypeUtils.parseMimeType(mimeType),
+                            new ByteArrayResource(encodedImageBytes)));
+                }
+            }
+            case "assistant" -> new AssistantMessage(message.content());
             case "tool" -> new ToolResponseMessage(new ArrayList<>());
             default -> null;
         };
