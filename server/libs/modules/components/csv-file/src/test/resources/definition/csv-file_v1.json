@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "CSV File",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -365,7 +366,7 @@
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Writes the data to a csv file.",
+    "description" : "Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.",
     "help" : null,
     "metadata" : null,
     "name" : "write",
@@ -572,7 +573,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The array of objects to write to the file.",
+      "description" : "Define a sequence of fields that will form a line. The values for these fields will consistently repeat in the same order defined here across all lines.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -582,7 +583,7 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Rows",
+      "label" : "Line Structure Definition",
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
@@ -715,7 +716,7 @@
       "options" : null,
       "optionsDataSource" : null
     } ],
-    "title" : "Write to File",
+    "title" : "Write to CSV File",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -732,6 +733,5 @@
     }
   },
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }
