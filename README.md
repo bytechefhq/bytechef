@@ -88,14 +88,12 @@ NOTE: `-v` mount option is not mandatory. It mounts local DB storage to make eas
 ##### Start ByteChef Docker Container
 ```bashTaskHandler
 docker run --name bytechef -it -p 8080:8080 \
-    --env SERVER_PORT=8080 \
-    --env SPRING_PROFILES_ACTIVE=prod \
     --env BYTECHEF_DATASOURCE_URL=jdbc:postgresql://postgres:5432/bytechef \
     --env BYTECHEF_DATASOURCE_USERNAME=postgres \
     --env BYTECHEF_DATASOURCE_PASSWORD=postgres \
     --env BYTECHEF_SECURITY_REMEMBER_ME_KEY=e48612ba1fd46fa7089fe9f5085d8d164b53ffb2 \
     --network bytechef_network \
-    bytechef/bytechef:latest
+    docker.bytechef.io/bytechef/bytechef:latest
 ```
 NOTE: `-it` (interactive) flag may be replaced with `-d` (detached). Keep it interactive if you want to track logs which can be handy for troubleshooting. Use `-p 8080:8080` to customize port.
 
