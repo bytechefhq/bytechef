@@ -51,9 +51,9 @@ Ask anything you want.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | URL | STRING | TEXT  |  Url of the inference endpoint  |
-| Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Messages | [{STRING\(content), FILE_ENTRY\(image), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Response Format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
-| Response Schema | STRING | TEXT_AREA  |  Define the JSON schema for the response.  |
+| Response Schema | STRING | JSON_SCHEMA_BUILDER  |  Define the JSON schema for the response.  |
 
 
 
