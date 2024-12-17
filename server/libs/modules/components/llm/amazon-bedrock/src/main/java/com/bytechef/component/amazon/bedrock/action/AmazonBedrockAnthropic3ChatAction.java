@@ -36,19 +36,13 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_K_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import com.bytechef.component.llm.util.LLMUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
 import org.springframework.ai.bedrock.anthropic3.Anthropic3ChatOptions;
 import org.springframework.ai.bedrock.anthropic3.BedrockAnthropic3ChatModel;
 import org.springframework.ai.bedrock.anthropic3.api.Anthropic3ChatBedrockApi;
@@ -69,7 +63,7 @@ public class AmazonBedrockAnthropic3ChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(MODELS_ENUM),
+                .options(AmazonBedrockConstants.ANTHROPIC3_MODELS),
             MESSAGES_PROPERTY,
             integer(MAX_TOKENS)
                 .label("Max Tokens")
@@ -96,18 +90,6 @@ public class AmazonBedrockAnthropic3ChatAction {
     public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
-            return Anthropic3ChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withAnthropicVersion("bedrock-2023-05-31")
-                .build();
-        }
-
-        @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return new BedrockAnthropic3ChatModel(
                 new Anthropic3ChatBedrockApi(
@@ -117,6 +99,17 @@ public class AmazonBedrockAnthropic3ChatAction {
                         connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
                     connectionParameters.getRequiredString(REGION), new ObjectMapper()),
                 (Anthropic3ChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
+            return Anthropic3ChatOptions.builder()
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .withTopP(inputParameters.getDouble(TOP_P))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withTopK(inputParameters.getInteger(TOP_K))
+                .withAnthropicVersion("bedrock-2023-05-31")
+                .build();
         }
     };
 }

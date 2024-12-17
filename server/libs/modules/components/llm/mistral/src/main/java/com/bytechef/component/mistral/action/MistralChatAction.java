@@ -40,13 +40,10 @@ import static com.bytechef.component.mistral.constant.MistralConstants.SAFE_PROM
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import com.bytechef.component.llm.util.LLMUtils;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.bytechef.component.mistral.constant.MistralConstants;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.mistralai.MistralAiChatModel;
@@ -57,11 +54,7 @@ import org.springframework.ai.mistralai.api.MistralAiApi;
  * @author Marko Kriskovic
  */
 public class MistralChatAction {
-    public static final List<Option<String>> MODELS_ENUM = LLMUtils
-        .getEnumOptions(Arrays.stream(MistralAiApi.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -70,7 +63,7 @@ public class MistralChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(MODELS_ENUM),
+                .options(MistralConstants.MODELS),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
@@ -99,7 +92,13 @@ public class MistralChatAction {
     public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new MistralAiChatModel(
+                new MistralAiApi(connectionParameters.getString(TOKEN)),
+                (MistralAiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
             String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
 
@@ -113,20 +112,7 @@ public class MistralChatAction {
                 .withRandomSeed(inputParameters.getInteger(SEED))
                 .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type));
 
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
-
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MistralAiChatModel(
-                new MistralAiApi(connectionParameters.getString(TOKEN)),
-                (MistralAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }

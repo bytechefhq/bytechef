@@ -310,15 +310,19 @@ public class ApplicationProperties {
         public Copilot getCopilot() {
             return copilot;
         }
+
         public Component getComponent() {
             return component;
         }
+
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
+
         public void setComponent(Component component) {
             this.component = component;
         }
+
         public static class Copilot {
 
             public enum Provider {
@@ -425,6 +429,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private Anthropic anthropic = new Anthropic();
 
             public Anthropic getAnthropic() {
@@ -447,6 +452,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private AzureOpenAi azureOpenAi = new AzureOpenAi();
 
             public AzureOpenAi getAzureOpenAi() {
@@ -492,6 +498,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private NVIDIA NVIDIA = new NVIDIA();
 
             public NVIDIA getNVIDIA() {
@@ -514,6 +521,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private HuggingFace huggingFace = new HuggingFace();
 
             public HuggingFace getHuggingFace() {
@@ -536,6 +544,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private Mistral mistral = new Mistral();
 
             public Mistral getMistral() {
@@ -558,6 +567,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private OpenAi openAi = new OpenAi();
 
             public OpenAi getOpenAi() {
@@ -580,6 +590,7 @@ public class ApplicationProperties {
                     this.apiKey = apiKey;
                 }
             }
+
             private VertexGemini vertexGemini = new VertexGemini();
 
             public VertexGemini getVertexGemini() {

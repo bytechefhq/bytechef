@@ -45,13 +45,10 @@ import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import com.bytechef.component.llm.util.LLMUtils;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.bytechef.component.openai.constant.OpenAIConstants;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -63,11 +60,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
  * @author Marko Kriskovic
  */
 public class OpenAIChatAction {
-    public static final List<Option<String>> MODELS_ENUM = LLMUtils
-        .getEnumOptions(Arrays.stream(OpenAiApi.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
@@ -76,7 +69,7 @@ public class OpenAIChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(MODELS_ENUM),
+                .options(OpenAIConstants.MODELS),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
@@ -98,13 +91,19 @@ public class OpenAIChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT.getResponse(inputParameters, connectionParameters, actionContext);
     }
 
     public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new OpenAiChatModel(
+                new OpenAiApi(connectionParameters.getString(TOKEN)),
+                (OpenAiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
@@ -117,20 +116,7 @@ public class OpenAIChatAction {
                 .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER));
 
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
-
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(
-                new OpenAiApi(connectionParameters.getString(TOKEN)),
-                (OpenAiChatOptions) createChatOptions(inputParameters));
         }
     };
 }
