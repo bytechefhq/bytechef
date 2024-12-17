@@ -28,7 +28,7 @@ import {
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/embedded/connections.queries';
 import {
     ComponentDefinitionKeys,
-    useGetComponentDefinitionQuery,
+    useGetConnectionComponentDefinitionQuery,
 } from '@/shared/queries/platform/componentDefinitions.queries';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
@@ -47,8 +47,9 @@ const ConnectionListItem = ({connection, remainingTags}: ConnectionListItemProps
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    const {data: componentDefinition} = useGetComponentDefinitionQuery({
+    const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
         componentName: connection.componentName,
+        connectionVersion: connection.connectionVersion,
     });
 
     const queryClient = useQueryClient();
