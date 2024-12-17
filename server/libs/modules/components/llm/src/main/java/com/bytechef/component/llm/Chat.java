@@ -52,7 +52,7 @@ public interface Chat {
             .messages(messages)
             .call();
 
-        return returnChatEntity(inputParameters, call, context);
+        return returnChatEntity(inputParameters, call, actionContext);
     }
 
     private List<org.springframework.ai.chat.messages.Message> getMessages(
@@ -74,7 +74,9 @@ public interface Chat {
     }
 
     @SuppressFBWarnings("NP")
-    private Object returnChatEntity(Parameters parameters, ChatClient.CallResponseSpec call, Context context) {
+    private Object returnChatEntity(
+        Parameters parameters, ChatClient.CallResponseSpec call, ActionContext actionContext) {
+
         int responseFormat = parameters.getInteger(RESPONSE_FORMAT, 0);
 
         if (responseFormat == 0) {
@@ -84,7 +86,7 @@ public interface Chat {
                 .getContent();
         } else {
             return call.entity(
-                new JsonSchemaStructuredOutputConverter(parameters.getRequiredString(RESPONSE_SCHEMA), context));
+                new JsonSchemaStructuredOutputConverter(parameters.getRequiredString(RESPONSE_SCHEMA), actionContext));
         }
     }
 

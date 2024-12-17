@@ -52,12 +52,12 @@ public class LLMUtils {
                 if (fileEntry == null) {
                     yield new UserMessage(message.content());
                 } else {
-                    byte[] encodedImageBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
                     String mimeType = fileEntry.getMimeType();
+                    byte[] encodedImageBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
 
                     yield new UserMessage(
-                        message.content(), new Media(MimeTypeUtils.parseMimeType(mimeType),
-                            new ByteArrayResource(encodedImageBytes)));
+                        message.content(), new Media(
+                            MimeTypeUtils.parseMimeType(mimeType), new ByteArrayResource(encodedImageBytes)));
                 }
             }
             case "assistant" -> new AssistantMessage(message.content());
