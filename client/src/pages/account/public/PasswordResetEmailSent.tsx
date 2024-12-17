@@ -1,18 +1,20 @@
 import {Card, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
+import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordResetStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {MailCheck} from 'lucide-react';
 import {useEffect, useState} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 
-const VerifyEmail = () => {
-    const {register} = useRegisterStore();
+const PasswordResetEmailSent = () => {
+    const {reset, resetPasswordFailure, resetPasswordInit} = usePasswordResetStore();
 
     const [disabled, setDisabled] = useState(false);
 
     const [countdown, setCountdown] = useState(60);
 
     const location = useLocation();
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         let timer: ReturnType<typeof setInterval> | undefined;
@@ -35,10 +37,18 @@ const VerifyEmail = () => {
     }, [disabled]);
 
     function handleResendEmail() {
-        register(location.state.email, location.state.password);
+        resetPasswordInit(location.state.email);
 
         setDisabled(true);
     }
+
+    useEffect(() => {
+        if (resetPasswordFailure) {
+            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
+        }
+
+        reset();
+    }, [resetPasswordFailure, navigate, reset]);
 
     return (
         <PublicLayoutContainer>
@@ -47,11 +57,12 @@ const VerifyEmail = () => {
 
                 <CardHeader className="p-0">
                     <CardTitle className="self-center text-xl font-bold text-content-neutral-primary">
-                        Verify your email address
+                        Please check your email
                     </CardTitle>
 
                     <CardDescription className="self-center text-content-neutral-secondary">
-                        We sent an email to {location.state.email}
+                        We sent an email to {location.state.email}. <br /> If you can&apos;t find it check the spam
+                        folder
                     </CardDescription>
                 </CardHeader>
 
@@ -73,4 +84,4 @@ const VerifyEmail = () => {
     );
 };
 
-export default VerifyEmail;
+export default PasswordResetEmailSent;

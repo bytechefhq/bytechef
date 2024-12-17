@@ -26,7 +26,7 @@ import {
     ZapIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
-import {Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {Outlet, useLocation} from 'react-router-dom';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -108,7 +108,6 @@ function App() {
         getAccount,
         reset: resetAuthentication,
         sessionHasBeenFetched,
-        showLogin,
     } = useAuthenticationStore();
 
     const {copilotPanelOpen} = useCopilotStore();
@@ -118,8 +117,6 @@ function App() {
     const helpHub = useHelpHub();
 
     const location = useLocation();
-
-    const navigate = useNavigate();
 
     const queryClient = useQueryClient();
 
@@ -175,19 +172,6 @@ function App() {
     useEffect(() => {
         getApplicationInfo();
     }, [getApplicationInfo]);
-
-    useEffect(() => {
-        if (showLogin) {
-            navigate('/login');
-        }
-    }, [showLogin, navigate]);
-
-    useEffect(() => {
-        if (sessionHasBeenFetched && !authenticated) {
-            navigate('/login');
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authenticated, sessionHasBeenFetched]);
 
     useEffect(() => {
         if (!authenticated) {
