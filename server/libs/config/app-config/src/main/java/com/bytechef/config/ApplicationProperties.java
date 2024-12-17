@@ -283,7 +283,16 @@ public class ApplicationProperties {
         }
 
         public static class Appender {
+            private Http http;
             private Level level = Level.OFF;
+
+            public Http getHttp() {
+                return http;
+            }
+
+            public void setHttp(Http http) {
+                this.http = http;
+            }
 
             public enum Level {
                 DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
@@ -295,6 +304,18 @@ public class ApplicationProperties {
 
             public void setLevel(Level level) {
                 this.level = level;
+            }
+
+            public static class Http {
+                private String url;
+
+                public String getUrl() {
+                    return url;
+                }
+
+                public void setUrl(String url) {
+                    this.url = url;
+                }
             }
         }
     }
