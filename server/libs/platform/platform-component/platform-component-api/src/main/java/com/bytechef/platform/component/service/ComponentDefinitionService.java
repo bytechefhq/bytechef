@@ -45,6 +45,8 @@ public interface ComponentDefinitionService {
 
     List<ComponentDefinition> getComponentDefinitionVersions(@NonNull String name);
 
+    ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion);
+
     List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType);
 
     DataStreamItemReader getDataStreamItemReader(@NonNull String componentName, int componentVersion);
