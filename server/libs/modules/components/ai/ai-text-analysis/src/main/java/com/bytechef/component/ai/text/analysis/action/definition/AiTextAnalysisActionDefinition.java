@@ -43,6 +43,7 @@ import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
 
     private final ApplicationProperties.Ai.Component component;
 
+    @SuppressFBWarnings("EI")
     public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition,
         ApplicationProperties.Ai.Component component) {
         super(actionDefinition);
