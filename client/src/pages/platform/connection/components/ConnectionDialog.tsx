@@ -120,12 +120,10 @@ const ConnectionDialog = ({
         isLoading: connectionDefinitionLoading,
     } = useGetConnectionDefinitionQuery({
         componentName: (selectedComponentDefinition?.name as string) || (connection?.componentName as string),
-        componentVersion: 1,
     });
 
     const {data: connectionDefinitions} = useGetConnectionDefinitionsQuery({
         componentName: selectedComponentDefinition?.name as string,
-        componentVersion: 1,
     });
 
     const {
