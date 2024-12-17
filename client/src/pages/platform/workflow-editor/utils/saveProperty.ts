@@ -1,10 +1,11 @@
-import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {
     UpdateWorkflowNodeParameter200Response,
     UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
+
+import {decodePath} from './encodingUtils';
 
 interface SavePropertyProps {
     currentComponent: ComponentType;
@@ -37,20 +38,14 @@ export default function saveProperty({
 }: SavePropertyProps) {
     const {workflowNodeName} = currentComponent;
 
-    if (path.includes(PATH_SPACE_REPLACEMENT)) {
-        path = path.replace(new RegExp(PATH_SPACE_REPLACEMENT, 'g'), ' ');
-    }
-
-    if (path.includes(PATH_DIGIT_PREFIX)) {
-        path = path.replace(new RegExp(PATH_DIGIT_PREFIX, 'g'), '');
-    }
+    const decodedPath = decodePath(path);
 
     updateWorkflowNodeParameterMutation.mutate(
         {
             id: workflowId,
             updateWorkflowNodeParameterRequest: {
                 includeInMetadata,
-                path,
+                path: decodedPath,
                 type,
                 value,
                 workflowNodeName,
