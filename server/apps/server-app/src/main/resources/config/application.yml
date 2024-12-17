@@ -217,6 +217,8 @@ bytechef:
   loki:
     appender:
       level: "OFF"
+      http:
+        url: http://localhost:3100/loki/api/v1/push
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
