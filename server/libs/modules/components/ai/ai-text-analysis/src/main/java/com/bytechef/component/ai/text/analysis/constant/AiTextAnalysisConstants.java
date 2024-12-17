@@ -23,8 +23,14 @@ public class AiTextAnalysisConstants {
     public static final String TEXT = "text";
     public static final String FORMAT = "format";
     public static final String PROMPT = "prompt";
+    public static final String CATEGORIES = "categories";
+    public static final String EXAMPLES = "examples";
+    public static final String SAMPLE = "sample";
+    public static final String CATEGORY = "category";
+
     public static final String MODEL_PROVIDER = "modelProvider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
+    public static final String CLASSIFY_TEXT = "classifyText";
 
     private AiTextAnalysisConstants() {
     }
