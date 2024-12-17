@@ -30,6 +30,7 @@ import org.springframework.boot.jackson.JsonComponent;
  */
 @JsonComponent
 public class WorkflowTriggerModelJsonSerializer extends JsonSerializer<WorkflowTriggerModel> {
+
     @Override
     public void serialize(WorkflowTriggerModel value, JsonGenerator jsonGenerator, SerializerProvider serializers)
         throws IOException {
