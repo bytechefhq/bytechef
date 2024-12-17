@@ -1,3 +1,4 @@
+
 ${AnsiColor.BLUE}888888b.  ${AnsiColor.DEFAULT}          888            ${AnsiColor.BRIGHT_CYAN}  .d8888b.  ${AnsiColor.DEFAULT}888                .d888
 ${AnsiColor.BLUE}888  "88b ${AnsiColor.DEFAULT}          888            ${AnsiColor.BRIGHT_CYAN} d88P  Y88b ${AnsiColor.DEFAULT}888               d88P"
 ${AnsiColor.BLUE}888  .88P ${AnsiColor.DEFAULT}          888            ${AnsiColor.BRIGHT_CYAN} 888    888 ${AnsiColor.DEFAULT}888               888
@@ -9,4 +10,5 @@ ${AnsiColor.BLUE}8888888P" ${AnsiColor.DEFAULT}  "Y88888  "Y888  "Y8888 ${AnsiCo
 ${AnsiColor.BLUE}          ${AnsiColor.DEFAULT}      888
 ${AnsiColor.BLUE}          ${AnsiColor.DEFAULT} Y8b d88P
 ${AnsiColor.BLUE}          ${AnsiColor.DEFAULT}  "Y88P"
+
 ${AnsiColor.GREEN}Powered by Spring Boot v${spring-boot.version}
