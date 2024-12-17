@@ -35,7 +35,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     let items = property.items;
 
-    if (!items?.length && parentArrayItems?.[0].items?.length) {
+    if (!items?.length && parentArrayItems?.[0]?.items?.length) {
         items = parentArrayItems?.[0].items;
     }
 
@@ -93,7 +93,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
         const processItems = (items: Array<PropertyAllType>) =>
             items.reduce((types: Array<{label: string; value: string}>, item) => {
-                if (item.type) {
+                if (item && item.type) {
                     if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
                             label: item.label!,
@@ -334,7 +334,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
-                    buttonLabel={property.placeholder ?? parentArrayItems?.[0].placeholder}
+                    buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
                     condition={currentComponent?.componentName === 'condition'}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}
