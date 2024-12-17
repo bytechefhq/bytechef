@@ -2,7 +2,6 @@ import App from '@/App';
 import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
-import Activate from '@/pages/account/public/Activate';
 import Login from '@/pages/account/public/Login';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
 import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
@@ -41,6 +40,11 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {QueryClient} from '@tanstack/react-query';
 import {createBrowserRouter, redirect} from 'react-router-dom';
+
+import AccountErrorPage from './pages/account/public/AccountErrorPage';
+import PasswordResetEmailSent from './pages/account/public/PasswordResetEmailSent';
+import PasswordResetSuccessful from './pages/account/public/PasswordResetSuccessful';
+import RegisterSuccess from './pages/account/public/RegisterSuccess';
 
 const getAccountRoutes = (path: string) => ({
     children: [
@@ -136,8 +140,8 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             children: [
                 {
-                    element: <Activate />,
-                    path: 'activate',
+                    element: <RegisterSuccess />,
+                    path: '/activate',
                 },
                 {
                     element: <Login />,
@@ -157,12 +161,24 @@ export const getRouter = (queryClient: QueryClient) =>
                             element: <PasswordResetFinish />,
                             path: 'finish',
                         },
+                        {
+                            element: <PasswordResetEmailSent />,
+                            path: 'email',
+                        },
+                        {
+                            element: <PasswordResetSuccessful />,
+                            path: 'success',
+                        },
                     ],
                     path: 'password-reset',
                 },
                 {
                     element: <VerifyEmail />,
                     path: '/verify-email',
+                },
+                {
+                    element: <AccountErrorPage />,
+                    path: '/account-error',
                 },
                 {
                     children: [

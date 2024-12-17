@@ -1,4 +1,3 @@
-import {Alert, AlertDescription} from '@/components/ui/alert';
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
@@ -8,30 +7,35 @@ import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
 import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
+import {Link, useNavigate} from 'react-router-dom';
 import {z} from 'zod';
 
 const formSchema = z.object({
-    email: z.string().email().min(5, 'Email is required').max(254),
+    email: z.string().min(5, {message: 'Email is required'}).max(254),
 });
 
 export const PasswordResetInit = () => {
-    const {reset, resetPasswordInit, resetPasswordSuccess} = usePasswordResetStore();
+    const {reset, resetPasswordFailure, resetPasswordInit, resetPasswordSuccess} = usePasswordResetStore();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             email: '',
         },
+
         resolver: zodResolver(formSchema),
     });
 
-    useEffect(
-        () => () => {
-            reset();
-        },
+    const navigate = useNavigate();
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+    useEffect(() => {
+        if (resetPasswordSuccess) {
+            navigate('/password-reset/email', {state: {email: form.getValues().email}});
+        } else if (resetPasswordFailure) {
+            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
+        }
+
+        reset();
+    }, [form, navigate, reset, resetPasswordFailure, resetPasswordSuccess]);
 
     function handleSubmit({email}: z.infer<typeof formSchema>) {
         resetPasswordInit(email);
@@ -39,34 +43,34 @@ export const PasswordResetInit = () => {
 
     return (
         <PublicLayoutContainer>
-            <Card className="mx-auto w-full max-w-sm shadow-none">
-                <CardHeader>
-                    <CardTitle className="text-xl">Reset your password</CardTitle>
+            <Card className="mx-auto max-w-sm rounded-xl p-6 text-start shadow-none">
+                <CardHeader className="p-0 pb-10 text-center">
+                    <CardTitle className="text-xl font-bold text-content-neutral-primary">
+                        Forgot your password?
+                    </CardTitle>
 
-                    <CardDescription>
-                        Enter your email address. If an account exists, you’ll receive an email with a password reset
-                        link soon.
+                    <CardDescription className="text-content-neutral-secondary">
+                        No worries, we&apos;ll send you a link to reset your password.
                     </CardDescription>
                 </CardHeader>
 
-                <CardContent>
-                    {resetPasswordSuccess && (
-                        <Alert className="mb-4">
-                            <AlertDescription>Reset request has been sent successfully.</AlertDescription>
-                        </Alert>
-                    )}
-
+                <CardContent className="flex flex-col gap-6 p-0">
                     <Form {...form}>
-                        <form className="grid gap-4" onSubmit={form.handleSubmit(handleSubmit)}>
+                        <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(handleSubmit)}>
                             <FormField
                                 control={form.control}
                                 name="email"
                                 render={({field}) => (
                                     <FormItem>
-                                        <FormLabel>Email</FormLabel>
+                                        <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                         <FormControl>
-                                            <Input placeholder="m@example.com" type="email" {...field} />
+                                            <Input
+                                                className="h-10 py-2"
+                                                placeholder="m@example.com"
+                                                type="email"
+                                                {...field}
+                                            />
                                         </FormControl>
 
                                         <FormMessage />
@@ -74,11 +78,26 @@ export const PasswordResetInit = () => {
                                 )}
                             />
 
-                            <Button color="primary" data-cy="submit" type="submit">
-                                Reset password
+                            <Button
+                                className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                data-cy="submit"
+                                type="submit"
+                            >
+                                Send link to email
                             </Button>
                         </form>
                     </Form>
+
+                    <div className="flex justify-center gap-1 text-sm">
+                        <span className="text-content-neutral-secondary">Remember your password?</span>
+
+                        <Link
+                            className="font-semibold text-content-neutral-primary underline hover:text-content-neutral-secondary"
+                            to="/login"
+                        >
+                            Log in
+                        </Link>
+                    </div>
                 </CardContent>
             </Card>
         </PublicLayoutContainer>
