@@ -772,11 +772,11 @@ const Property = ({
             return;
         }
 
-        const currentWorkflowNode = [...workflow.triggers, ...workflow.tasks].find(
+        const currentWorkflowNode = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
             (node) => node.name === currentNode?.name
         );
 
-        setPropertyParameterValue(resolvePath(currentWorkflowNode.parameters, path));
+        setPropertyParameterValue(resolvePath(currentWorkflowNode?.parameters, path));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
