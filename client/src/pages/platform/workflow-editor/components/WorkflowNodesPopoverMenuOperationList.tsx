@@ -158,6 +158,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     metadata: {},
                     name: workflowNodeName,
                     type: clickedOperation.type,
+                    version,
                     workflowNodeName,
                 },
                 id: getRandomId(),
@@ -241,6 +242,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 label: clickedOperation.componentLabel,
                 name: workflowNodeName,
                 type: clickedOperation.type,
+                version,
                 workflowNodeName,
             };
 

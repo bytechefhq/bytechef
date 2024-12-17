@@ -35,7 +35,7 @@ export default function handleConditionChildOperationClick({
     updateWorkflowMutation,
     workflow,
 }: HandleConditionChildOperationClickProps) {
-    const {componentLabel, componentName, icon, type} = operation;
+    const {componentLabel, componentName, icon, type, version} = operation;
 
     const workflowNodeName = getFormattedName(componentName!, nodes);
 
@@ -46,6 +46,7 @@ export default function handleConditionChildOperationClick({
         label: componentLabel,
         name: workflowNodeName,
         type: type,
+        version,
         workflowNodeName,
     };
 
