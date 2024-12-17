@@ -787,9 +787,7 @@ const Property = ({
             return;
         }
 
-        const workflowDefinition = JSON.parse(workflow.definition);
-
-        const currentWorkflowNode = [...workflowDefinition.triggers, ...workflowDefinition.tasks].find(
+        const currentWorkflowNode = [...workflow.triggers, ...workflow.tasks].find(
             (node) => node.name === currentNode?.name
         );
 
