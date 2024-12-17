@@ -12,7 +12,7 @@ export interface ConnectionI {
     componentName: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     readonly connectionParameters?: {[key: string]: any};
-    connectionVersion?: number;
+    connectionVersion: number;
     readonly createdBy?: string;
     readonly createdDate?: Date;
     credentialStatus?: CredentialStatus;
