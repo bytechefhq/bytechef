@@ -30,7 +30,7 @@ import {
 
 export interface GetComponentDefinitionRequest {
     componentName: string;
-    componentVersion?: number;
+    componentVersion: number;
 }
 
 export interface GetComponentDefinitionVersionsRequest {
@@ -43,6 +43,11 @@ export interface GetComponentDefinitionsRequest {
     connectionDefinitions?: boolean;
     triggerDefinitions?: boolean;
     include?: Array<string>;
+}
+
+export interface GetConnectionComponentDefinitionRequest {
+    componentName: string;
+    connectionVersion: number;
 }
 
 export interface GetDataStreamComponentDefinitionsRequest {
@@ -70,16 +75,19 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
             );
         }
 
-        const queryParameters: any = {};
-
-        if (requestParameters['componentVersion'] != null) {
-            queryParameters['componentVersion'] = requestParameters['componentVersion'];
+        if (requestParameters['componentVersion'] == null) {
+            throw new runtime.RequiredError(
+                'componentVersion',
+                'Required parameter "componentVersion" was null or undefined when calling getComponentDefinition().'
+            );
         }
+
+        const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/component-definitions/{componentName}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))),
+            path: `/component-definitions/{componentName}/versions/{componentVersion}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -184,6 +192,48 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
      */
     async getComponentDefinitions(requestParameters: GetComponentDefinitionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ComponentDefinitionBasic>> {
         const response = await this.getComponentDefinitionsRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Get a connection component definition.
+     * Get a connection component definition
+     */
+    async getConnectionComponentDefinitionRaw(requestParameters: GetConnectionComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ComponentDefinition>> {
+        if (requestParameters['componentName'] == null) {
+            throw new runtime.RequiredError(
+                'componentName',
+                'Required parameter "componentName" was null or undefined when calling getConnectionComponentDefinition().'
+            );
+        }
+
+        if (requestParameters['connectionVersion'] == null) {
+            throw new runtime.RequiredError(
+                'connectionVersion',
+                'Required parameter "connectionVersion" was null or undefined when calling getConnectionComponentDefinition().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/component-definitions/{componentName}/connection-versions/{connectionVersion}`.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName']))).replace(`{${"connectionVersion"}}`, encodeURIComponent(String(requestParameters['connectionVersion']))),
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ComponentDefinitionFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a connection component definition.
+     * Get a connection component definition
+     */
+    async getConnectionComponentDefinition(requestParameters: GetConnectionComponentDefinitionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ComponentDefinition> {
+        const response = await this.getConnectionComponentDefinitionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
