@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation(libs.loki.logback.appender)
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-gateway-mvc")
     implementation(project(":server:libs:config:app-config"))

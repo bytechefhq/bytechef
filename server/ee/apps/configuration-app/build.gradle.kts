@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation(libs.loki.logback.appender)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
