@@ -16,12 +16,25 @@
 
 package com.bytechef.component.mistral.constant;
 
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.llm.util.LLMUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.ai.mistralai.api.MistralAiApi;
+
 /**
  * @author Monika Domiter
  */
 public final class MistralConstants {
 
     public static final String SAFE_PROMPT = "safePrompt";
+
+    public static final List<Option<String>> MODELS = LLMUtils
+        .getEnumOptions(Arrays.stream(MistralAiApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)));
 
     private MistralConstants() {
     }

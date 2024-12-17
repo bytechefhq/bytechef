@@ -16,6 +16,13 @@
 
 package com.bytechef.component.vertex.gemini.constant;
 
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.llm.util.LLMUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
+
 /**
  * @author Monika Domiter
  * @author Marko Kriskovic
@@ -24,6 +31,14 @@ public final class VertexGeminiConstants {
 
     public static final String LOCATION = "location";
     public static final String PROJECT_ID = "projectId";
+
+    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    VertexAiGeminiChatModel.ChatModel::getValue,
+                    VertexAiGeminiChatModel.ChatModel::getValue,
+                    (f, s) -> f)));
 
     private VertexGeminiConstants() {
     }

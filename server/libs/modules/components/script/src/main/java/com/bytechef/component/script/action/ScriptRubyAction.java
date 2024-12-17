@@ -31,7 +31,7 @@ import static com.bytechef.component.script.constant.ScriptConstants.INPUT;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.script.definition.ScriptActionDefinition;
+import com.bytechef.component.script.action.definition.ScriptActionDefinition;
 import com.bytechef.component.script.engine.PolyglotEngine;
 
 /**

@@ -16,6 +16,13 @@
 
 package com.bytechef.component.openai.constant;
 
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.llm.util.LLMUtils;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.ai.openai.api.OpenAiApi;
+
 /**
  * @author Monika Domiter
  * @author Marko Kriskovic
@@ -23,6 +30,12 @@ package com.bytechef.component.openai.constant;
 public final class OpenAIConstants {
 
     public static final String QUALITY = "quality";
+
+    public static final List<Option<String>> MODELS = LLMUtils
+        .getEnumOptions(Arrays.stream(OpenAiApi.ChatModel.values())
+            .collect(
+                Collectors.toMap(
+                    OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
 
     private OpenAIConstants() {
     }

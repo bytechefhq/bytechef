@@ -41,14 +41,11 @@ import static com.bytechef.component.vertex.gemini.constant.VertexGeminiConstant
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import com.bytechef.component.llm.util.LLMUtils;
+import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
 import com.google.cloud.vertexai.VertexAI;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
@@ -58,13 +55,6 @@ import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
  * @author Marko Kriskovic
  */
 public class VertexGeminiChatAction {
-    public static final List<Option<String>> MODELS_ENUM = LLMUtils
-        .getEnumOptions(Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    VertexAiGeminiChatModel.ChatModel::getValue,
-                    VertexAiGeminiChatModel.ChatModel::getValue,
-                    (f, s) -> f)));
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask Gemini")
@@ -74,7 +64,7 @@ public class VertexGeminiChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(MODELS_ENUM),
+                .options(VertexGeminiConstants.MODELS),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
@@ -105,7 +95,13 @@ public class VertexGeminiChatAction {
     public static final Chat CHAT = new Chat() {
 
         @Override
-        public ChatOptions createChatOptions(Parameters inputParameters) {
+        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+            return new VertexAiGeminiChatModel(
+                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
+                (VertexAiGeminiChatOptions) createChatOptions(inputParameters));
+        }
+
+        private ChatOptions createChatOptions(Parameters inputParameters) {
             Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
             String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
@@ -120,20 +116,7 @@ public class VertexGeminiChatAction {
                 .withCandidateCount(inputParameters.getInteger(N))
                 .withResponseMimeType(type);
 
-            List<String> functions = inputParameters.getList(FUNCTIONS, new TypeReference<>() {});
-
-            if (functions != null) {
-                builder.withFunctions(new HashSet<>(functions));
-            }
-
             return builder.build();
-        }
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new VertexAiGeminiChatModel(
-                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
-                (VertexAiGeminiChatOptions) createChatOptions(inputParameters));
         }
     };
 }
