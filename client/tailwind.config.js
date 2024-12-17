@@ -29,6 +29,7 @@ module.exports = {
                 lg: 'var(--radius)',
                 md: 'calc(var(--radius) - 2px)',
                 sm: 'calc(var(--radius) - 4px)',
+                xs: 'calc(var(--radius) - 6px)',
             },
             colors: {
                 accent: {
@@ -37,9 +38,24 @@ module.exports = {
                 },
                 background: 'hsl(var(--background))',
                 border: 'hsl(var(--border))',
+                button: 'hsl(var(--brand-500))',
                 card: {
                     DEFAULT: 'hsl(var(--card))',
                     foreground: 'hsl(var(--card-foreground))',
+                },
+                chart: {
+                    1: 'hsl(var(--chart-1))',
+                    2: 'hsl(var(--chart-2))',
+                    3: 'hsl(var(--chart-3))',
+                    4: 'hsl(var(--chart-4))',
+                    5: 'hsl(var(--chart-5))',
+                },
+                content: {
+                    neutral: {
+                        primary: 'hsl(var(--content-neutral-primary))',
+                        secondary: 'hsl(var(--content-neutral-secondary))',
+                        tertiary: 'hsl(var(--content-neutral-tertiary))',
+                    },
                 },
                 destructive: {
                     DEFAULT: 'hsl(var(--destructive))',
@@ -73,12 +89,12 @@ module.exports = {
                     DEFAULT: 'hsl(var(--success))',
                     foreground: 'hsl(var(--success-foreground))',
                 },
-                chart: {
-                    1: 'hsl(var(--chart-1))',
-                    2: 'hsl(var(--chart-2))',
-                    3: 'hsl(var(--chart-3))',
-                    4: 'hsl(var(--chart-4))',
-                    5: 'hsl(var(--chart-5))',
+                surface: {
+                    brand: {
+                        primary: 'hsl(var(--surface-brand-primary))',
+                        'primary-hover': 'hsl(var(--surface-brand-primary-hover))',
+                        'primary-pressed': 'hsl(var(--surface-brand-primary-pressed))',
+                    },
                 },
             },
             height: {
