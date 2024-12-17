@@ -1,5 +1,5 @@
 import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
-import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ClickedDefinitionType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -39,8 +39,9 @@ export default async function handleConditionClick({
                 taskDispatcherName: clickedItem.name,
                 taskDispatcherVersion: clickedItem.version,
             }),
-        queryKey: ComponentDefinitionKeys.componentDefinition({
-            componentName: clickedItem.name,
+        queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
+            taskDispatcherName: clickedItem.name,
+            taskDispatcherVersion: clickedItem.version,
         }),
     });
 
