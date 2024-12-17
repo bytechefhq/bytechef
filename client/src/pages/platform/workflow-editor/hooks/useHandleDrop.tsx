@@ -10,6 +10,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
+import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinitions.queries';
 import {ClickedDefinitionType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
@@ -99,8 +100,9 @@ export default function useHandleDrop(): [
                         taskDispatcherName: newWorkflowNode.data.componentName,
                         taskDispatcherVersion: newWorkflowNode.data.version ?? 1,
                     }),
-                queryKey: ComponentDefinitionKeys.componentDefinition({
-                    componentName: newWorkflowNode.data.componentName,
+                queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
+                    taskDispatcherName: newWorkflowNode.data.componentName,
+                    taskDispatcherVersion: newWorkflowNode.data.version,
                 }),
             });
 
@@ -230,8 +232,9 @@ export default function useHandleDrop(): [
                         taskDispatcherName: newWorkflowNode.data.componentName,
                         taskDispatcherVersion: newWorkflowNode.data.version ?? 1,
                     }),
-                queryKey: ComponentDefinitionKeys.componentDefinition({
-                    componentName: newWorkflowNode.data.componentName,
+                queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
+                    taskDispatcherName: newWorkflowNode.data.componentName,
+                    taskDispatcherVersion: newWorkflowNode.data.version,
                 }),
             });
 
