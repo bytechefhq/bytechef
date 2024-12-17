@@ -55,6 +55,16 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
     }
 
     @Override
+    public ResponseEntity<ComponentDefinitionModel> getConnectionComponentDefinition(
+        String componentName, Integer connectionVersion) {
+
+        return ResponseEntity.ok(
+            conversionService.convert(
+                componentDefinitionService.getConnectionComponentDefinition(componentName, connectionVersion),
+                ComponentDefinitionModel.class));
+    }
+
+    @Override
     public ResponseEntity<ComponentDefinitionModel> getComponentDefinition(
         String componentName, Integer componentVersion) {
 
