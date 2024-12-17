@@ -87,13 +87,69 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
-  /component-definitions/{componentName}:
+  /component-definitions/{componentName}/connection-definition:
     get:
-      description: "Get a component definition."
-      summary: "Get a component definition"
+      description: "Get connection definition for a component."
+      summary: "Get connection definition for a component"
+      tags:
+        - "connection-definition"
+      operationId: "getComponentConnectionDefinition"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of a component."
+          required: false
+          in: "query"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ConnectionDefinition"
+  /component-definitions/{componentName}/connection-definitions:
+    get:
+      description: "Get all compatible connection definitions for a component."
+      summary: "Get all compatible connection definitions for a component"
+      tags:
+        - "connection-definition"
+      operationId: "getComponentConnectionDefinitions"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of a component."
+          required: false
+          in: "query"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
+  /component-definitions/{componentName}/connection-versions/{connectionVersion}:
+    get:
+      description: "Get a connection component definition."
+      summary: "Get a connection component definition"
       tags:
         - "component-definition"
-      operationId: "getComponentDefinition"
+      operationId: "getConnectionComponentDefinition"
       parameters:
         - name: "componentName"
           description: "The name of a component to get."
@@ -101,11 +157,10 @@ paths:
           in: "path"
           schema:
             type: "string"
-        - name: "componentVersion"
-          description: "The version of a component to get. If not set, teh latest version\
-          \ is returned."
-          required: false
-          in: "query"
+        - name: "connectionVersion"
+          description: "The version of a component connection to get."
+          required: true
+          in: "path"
           schema:
             type: "integer"
       responses:
@@ -138,6 +193,33 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ComponentDefinitionBasic"
+  /component-definitions/{componentName}/versions/{componentVersion}:
+    get:
+      description: "Get a component definition."
+      summary: "Get a component definition"
+      tags:
+        - "component-definition"
+      operationId: "getComponentDefinition"
+      parameters:
+        - name: "componentName"
+          description: "The name of a component to get."
+          required: true
+          in: "path"
+          schema:
+            type: "string"
+        - name: "componentVersion"
+          description: "The version of a component to get."
+          required: true
+          in: "path"
+          schema:
+            type: "integer"
+      responses:
+        "200":
+          description: "Successful operation."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComponentDefinition"
   /component-definitions/{componentName}/versions/{componentVersion}/action-definitions:
     get:
       description: "Get a list of action definitions for a component."
@@ -200,62 +282,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ActionDefinition"
-  /component-definitions/{componentName}/versions/connection-definition:
-    get:
-      description: "Get connection definition for a component."
-      summary: "Get connection definition for a component"
-      tags:
-      - "connection-definition"
-      operationId: "getComponentConnectionDefinition"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: false
-        in: "query"
-        schema:
-          type: "integer"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ConnectionDefinition"
-  /component-definitions/{componentName}/versions/connection-definitions:
-    get:
-      description: "Get all compatible connection definitions for a component."
-      summary: "Get all compatible connection definitions for a component"
-      tags:
-      - "connection-definition"
-      operationId: "getComponentConnectionDefinitions"
-      parameters:
-      - name: "componentName"
-        description: "The name of a component."
-        required: true
-        in: "path"
-        schema:
-          type: "string"
-      - name: "componentVersion"
-        description: "The version of a component."
-        required: false
-        in: "query"
-        schema:
-          type: "integer"
-      responses:
-        "200":
-          description: "Successful operation."
-          content:
-            application/json:
-              schema:
-                type: "array"
-                items:
-                  $ref: "#/components/schemas/ConnectionDefinitionBasic"
   /component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions:
     get:
       description: "Get a list of trigger definitionss for a component."
@@ -1811,6 +1837,7 @@ components:
       type: "object"
       required:
       - "name"
+      - "version"
       properties:
         description:
           description: "The description."
@@ -1826,6 +1853,9 @@ components:
         title:
           description: "The title"
           type: "string"
+        version:
+          description: "The version of a task dispatcher."
+          type: "integer"
     TaskDispatcherOperationRequest:
       type: "object"
       required:
