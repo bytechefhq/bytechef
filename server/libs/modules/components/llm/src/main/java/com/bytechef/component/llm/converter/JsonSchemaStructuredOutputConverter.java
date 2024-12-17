@@ -16,51 +16,39 @@
 
 package com.bytechef.component.llm.converter;
 
-import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import java.lang.reflect.Type;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.converter.StructuredOutputConverter;
-import org.springframework.ai.util.JacksonUtils;
 import org.springframework.lang.NonNull;
 
 /**
  * An implementation of {@link StructuredOutputConverter} that transforms the LLM output to a specific object type using
  * JSON schema. This converter works by generating a JSON schema based on a given Java class or parameterized type
  * reference, which is then used to validate and transform the LLM output into the desired type.
+ *
+ * @author Ivica Cardic
  */
 public class JsonSchemaStructuredOutputConverter implements StructuredOutputConverter<Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsonSchemaStructuredOutputConverter.class);
-
-    private static final ObjectMapper OBJECT_MAPPER = JsonMapper.builder()
-        .addModules(JacksonUtils.instantiateAvailableModules())
-        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-        .build();
-
+    private final Context context;
     private final String jsonSchema;
-    private final Type type;
+    private final TypeReference<?> typeReference;
 
-    public JsonSchemaStructuredOutputConverter(String jsonSchema) {
+    public JsonSchemaStructuredOutputConverter(String jsonSchema, Context context) {
+        this.context = context;
         this.jsonSchema = jsonSchema;
 
-        Map<String, ?> jsonSchemaMap = JsonUtils.readMap(jsonSchema);
+        Map<String, ?> jsonSchemaMap = context.json(json -> json.readMap(jsonSchema));
 
-        String jsonSchemaType = MapUtils.getString(jsonSchemaMap, "type");
+        String jsonSchemaType = (String) jsonSchemaMap.get("type");
 
-        type = switch (jsonSchemaType) {
-            case "array" -> new TypeReference<List<Object>>() {}.getType();
+        typeReference = switch (jsonSchemaType) {
+            case "array" -> new TypeReference<List<Object>>() {};
             // For any other type, including primitives LLM returns JSON object, not sure how to force it to
             // return a primitive value
-            case null, default -> new TypeReference<Map<String, Object>>() {}.getType();
+            case null, default -> new TypeReference<Map<String, Object>>() {};
         };
     }
 
@@ -72,36 +60,32 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
      */
     @Override
     public Object convert(@NonNull String text) {
-        try {
-            // Remove leading and trailing whitespace
-            text = text.trim();
+        // Remove leading and trailing whitespace
+        text = text.trim();
 
-            // Check for and remove triple backticks and "json" identifier
-            if (text.startsWith("```") && text.endsWith("```")) {
-                // Remove the first line if it contains "```json"
-                String[] lines = text.split("\n", 2);
+        // Check for and remove triple backticks and "json" identifier
+        if (text.startsWith("```") && text.endsWith("```")) {
+            // Remove the first line if it contains "```json"
+            String[] lines = text.split("\n", 2);
 
-                String line = lines[0].trim();
+            String line = lines[0].trim();
 
-                if (line.equalsIgnoreCase("```json")) {
-                    text = lines.length > 1 ? lines[1] : "";
-                } else {
-                    text = text.substring(3); // Remove leading ```
-                }
-
-                // Remove trailing ```
-                text = text.substring(0, text.length() - 3);
-
-                // Trim again to remove any potential whitespace
-                text = text.trim();
+            if (line.equalsIgnoreCase("```json")) {
+                text = lines.length > 1 ? lines[1] : "";
+            } else {
+                text = text.substring(3); // Remove leading ```
             }
 
-            return OBJECT_MAPPER.readValue(text, OBJECT_MAPPER.constructType(this.type));
-        } catch (JsonProcessingException e) {
-            logger.error("Could not parse the given text to the desired target type:" + text + " into " + this.type);
+            // Remove trailing ```
+            text = text.substring(0, text.length() - 3);
 
-            throw new RuntimeException(e);
+            // Trim again to remove any potential whitespace
+            text = text.trim();
         }
+
+        String finalText = text;
+
+        return context.json(json -> json.read(finalText, this.typeReference));
     }
 
     /**
