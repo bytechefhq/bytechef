@@ -9,6 +9,8 @@ import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
+import {encodeParameters, encodePath} from '../../utils/encodingUtils';
+import getParameterItemType from '../../utils/getParameterItemType';
 import saveProperty from '../../utils/saveProperty';
 import Property from './Property';
 import DeletePropertyButton from './components/DeletePropertyButton';
@@ -134,6 +136,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 parameterItemType = 'OBJECT';
             }
 
+            if (!parameterItemType) {
+                parameterItemType = getParameterItemType(parameterKeyValue);
+            }
+
             if (matchingProperty) {
                 const matchingPropertyType = matchingProperty.type || parameterItemType;
 
@@ -182,11 +188,21 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set default values for subProperties when they are created
     useEffect(() => {
-        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !subProperties ||
+            !path ||
+            !currentComponent ||
+            !currentComponent.parameters ||
+            !updateWorkflowNodeParameterMutation ||
+            !workflow.id
+        ) {
             return;
         }
 
-        const existingObject = resolvePath(currentComponent.parameters, path);
+        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedPath = encodePath(path);
+
+        const existingObject = resolvePath(encodedParameters, encodedPath);
 
         if (existingObject && isObject(existingObject)) {
             return;

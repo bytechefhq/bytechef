@@ -21,7 +21,6 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {Option} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
@@ -38,8 +37,7 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
-import formatKeysWithDigits from '../../utils/formatKeysWithDigits';
-import replaceSpacesInKeys from '../../utils/replaceSpacesInObjectKeys';
+import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -184,27 +182,12 @@ const Property = ({
         path = `${path}.${name}`;
     }
 
-    if (path) {
-        path = path.replace(/[^a-zA-Z0-9_.[]]/g, (char) => {
-            const charCode = char.charCodeAt(0);
-
-            return charCode ? `0x${charCode.toString()}` : '0x00';
-        });
-    }
-
-    if (path?.includes(' ')) {
-        path = path.replace(/\s/g, PATH_SPACE_REPLACEMENT);
-    }
-
-    if (path) {
-        path = path
-            .split('.')
-            .map((step) => (step.match(/^\d/) ? `${PATH_DIGIT_PREFIX}${step}` : step))
-            .join('.');
-    }
-
     if (objectName && !path?.includes(objectName)) {
         path = `${objectName}.${path}`;
+    }
+
+    if (path) {
+        path = decodePath(path);
     }
 
     if (displayCondition) {
@@ -334,7 +317,10 @@ const Property = ({
             }
         }
 
-        const currentValue = resolvePath(parameters, path) || '';
+        const encodedParameters = encodeParameters(parameters);
+        const encodedPath = encodePath(path);
+
+        const currentValue = resolvePath(encodedParameters, encodedPath) || '';
 
         if (currentValue === strippedValue) {
             return;
@@ -607,16 +593,15 @@ const Property = ({
                 return;
             }
 
-            let formattedParameters = replaceSpacesInKeys(parameters);
+            const encodedParameters = encodeParameters(parameters);
+            const encodedPath = encodePath(path);
 
-            formattedParameters = formatKeysWithDigits(formattedParameters);
-
-            const paramValue = resolvePath(formattedParameters, path);
+            const paramValue = resolvePath(encodedParameters, encodedPath);
 
             if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
             } else {
-                setPropertyParameterValue(formattedParameters[name]);
+                setPropertyParameterValue(encodedParameters[name]);
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
