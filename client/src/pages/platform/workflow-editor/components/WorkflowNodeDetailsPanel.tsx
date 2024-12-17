@@ -17,7 +17,6 @@ import {
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
-import {useDeleteWorkflowNodeTestOutputMutation} from '@/shared/mutations/platform/workflowNodeTestOutputs.mutations';
 import {
     ActionDefinitionKeys,
     useGetComponentActionDefinitionQuery,
@@ -30,7 +29,6 @@ import {
 } from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     ComponentPropertiesType,
@@ -219,14 +217,6 @@ const WorkflowNodeDetailsPanel = ({
         }
 
         return true;
-    });
-
-    const deleteWorkflowNodeTestOutputMutation = useDeleteWorkflowNodeTestOutputMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [...WorkflowNodeOutputKeys.workflowNodeOutputs, workflow.id],
-            });
-        },
     });
 
     const queryClient = useQueryClient();
@@ -481,11 +471,6 @@ const WorkflowNodeDetailsPanel = ({
     // Close the panel if the current node is deleted from the workflow definition
     useEffect(() => {
         if (currentNode?.trigger) {
-            deleteWorkflowNodeTestOutputMutation.mutate({
-                id: workflow.id!,
-                workflowNodeName: currentNode.name,
-            });
-
             return;
         }
 
