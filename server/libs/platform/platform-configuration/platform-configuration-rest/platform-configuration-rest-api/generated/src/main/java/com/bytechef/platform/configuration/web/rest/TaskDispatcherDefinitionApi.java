@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-30T08:22:07.952410+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-12-17T07:23:43.893312+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "task-dispatcher-definition", description = "The Platform Task Dispatcher Definition Internal API")
 public interface TaskDispatcherDefinitionApi {
@@ -115,7 +115,7 @@ public interface TaskDispatcherDefinitionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\" }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\" } ]";
+                    String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"version\" : 0 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"version\" : 0 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

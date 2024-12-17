@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * Gets or Sets credential_status
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-27T19:49:56.171918+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-12-17T07:29:43.709208+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public enum CredentialStatusModel {
   
   VALID("VALID"),
