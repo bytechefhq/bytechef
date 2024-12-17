@@ -120,9 +120,11 @@ export default function useHandleDrop(): [
                 queryFn: () =>
                     new ComponentDefinitionApi().getComponentDefinition({
                         componentName: newWorkflowNode.data.componentName,
+                        componentVersion: newWorkflowNode.data.version,
                     }),
                 queryKey: ComponentDefinitionKeys.componentDefinition({
                     componentName: newWorkflowNode.data.componentName,
+                    componentVersion: newWorkflowNode.data.version,
                 }),
             });
 
@@ -252,9 +254,11 @@ export default function useHandleDrop(): [
                 queryFn: () =>
                     new ComponentDefinitionApi().getComponentDefinition({
                         componentName: newWorkflowNode.data.componentName,
+                        componentVersion: newWorkflowNode.data.version,
                     }),
                 queryKey: ComponentDefinitionKeys.componentDefinition({
                     componentName: newWorkflowNode.data.componentName,
+                    componentVersion: newWorkflowNode.data.version,
                 }),
             });
 
@@ -296,19 +300,21 @@ export default function useHandleDrop(): [
     }
 
     async function handleDropOnTriggerNode(droppedNode: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic) {
-        const {icon, name, title} = droppedNode;
+        const {icon, name, title, version} = droppedNode;
 
         const draggedComponentDefinition = await queryClient.fetchQuery({
             queryFn: () =>
                 new ComponentDefinitionApi().getComponentDefinition({
                     componentName: name,
+                    componentVersion: version,
                 }),
             queryKey: ComponentDefinitionKeys.componentDefinition({
                 componentName: name,
+                componentVersion: version,
             }),
         });
 
-        const {triggers, version} = draggedComponentDefinition;
+        const {triggers} = draggedComponentDefinition;
 
         const newTriggerNodeData = {
             componentName: name,

@@ -105,6 +105,7 @@ const WorkflowNodeDetailsPanel = ({
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
             componentName: currentNode?.componentName || currentNode?.id || '',
+            componentVersion: currentNode?.version || 1,
         },
         !!currentNode && !currentNode.taskDispatcher
     );

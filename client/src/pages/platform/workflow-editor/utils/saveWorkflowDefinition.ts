@@ -103,8 +103,9 @@ export default async function saveWorkflowDefinition({
 
     if (!operationName && !taskDispatcher) {
         const newNodeComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () => new ComponentDefinitionApi().getComponentDefinition({componentName}),
-            queryKey: ComponentDefinitionKeys.componentDefinition({componentName}),
+            queryFn: () =>
+                new ComponentDefinitionApi().getComponentDefinition({componentName, componentVersion: version!}),
+            queryKey: ComponentDefinitionKeys.componentDefinition({componentName, componentVersion: version!}),
         });
 
         if (!version) {
