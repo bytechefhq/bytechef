@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 /**
  * @author Ivica Cardic
  */
-public interface AIComponentDefinition extends PlatformComponentDefinition {
+public interface AiComponentDefinition extends PlatformComponentDefinition {
 
     /**
      *

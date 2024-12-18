@@ -17,15 +17,15 @@
 package com.bytechef.component.ai.text.analysis;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.platform.component.definition.AIComponentDefinition.AI_TEXT_ANALYSIS;
+import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_TEXT_ANALYSIS;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.analysis.action.SummarizeTextAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.component.definition.AIComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.component.definition.AiComponentDefinition;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component(AI_TEXT_ANALYSIS + "_v1_ComponentHandler")
 public class AiTextAnalysisComponentHandler implements ComponentHandler {
 
-    private final AIComponentDefinition componentDefinition;
+    private final AiComponentDefinition componentDefinition;
 
     public AiTextAnalysisComponentHandler(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
@@ -48,7 +48,7 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
     }
 
     private static class AiTextAnalysisComponentDefinitionImpl
-        extends AbstractComponentDefinitionWrapper implements AIComponentDefinition {
+        extends AbstractComponentDefinitionWrapper implements AiComponentDefinition {
 
         private AiTextAnalysisComponentDefinitionImpl(ApplicationProperties.Ai.Component component) {
             super(
