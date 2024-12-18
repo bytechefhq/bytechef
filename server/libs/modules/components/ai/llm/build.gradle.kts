@@ -6,6 +6,6 @@ dependencies {
 
 subprojects {
     dependencies {
-        implementation(project(":server:libs:modules:components:llm"))
+        implementation(project(":server:libs:modules:components:ai:llm"))
     }
 }
