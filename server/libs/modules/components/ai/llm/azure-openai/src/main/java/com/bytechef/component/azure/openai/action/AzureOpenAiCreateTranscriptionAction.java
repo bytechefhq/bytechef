@@ -38,7 +38,7 @@ import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.Transcript;
+import com.bytechef.component.llm.AudioTranscription;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -54,7 +54,7 @@ import org.springframework.ai.model.Model;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public class AzureOpenAICreateTranscriptionAction {
+public class AzureOpenAiCreateTranscriptionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
         .title("Create Transcriptions")
@@ -105,18 +105,18 @@ public class AzureOpenAICreateTranscriptionAction {
                 .maxValue(1)
                 .required(false))
         .output()
-        .perform(AzureOpenAICreateTranscriptionAction::perform);
+        .perform(AzureOpenAiCreateTranscriptionAction::perform);
 
-    private AzureOpenAICreateTranscriptionAction() {
+    private AzureOpenAiCreateTranscriptionAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
-        return TRANSCRIPT.getResponse(inputParameters, connectionParameters);
+        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Transcript TRANSCRIPT = new Transcript() {
+    private static final AudioTranscription AUDIO_TRANSCRIPTION = new AudioTranscription() {
 
         public AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
             return AzureOpenAiAudioTranscriptionOptions.builder()
@@ -130,7 +130,7 @@ public class AzureOpenAICreateTranscriptionAction {
         }
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
             Parameters inputParameters, Parameters connectionParameters) {
 
             OpenAIClient openAIClient = new OpenAIClientBuilder()

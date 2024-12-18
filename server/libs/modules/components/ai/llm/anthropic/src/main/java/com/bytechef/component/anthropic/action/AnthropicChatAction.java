@@ -75,13 +75,6 @@ public class AnthropicChatAction {
         .output()
         .perform(AnthropicChatAction::perform);
 
-    private AnthropicChatAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -103,4 +96,11 @@ public class AnthropicChatAction {
             return builder.build();
         }
     };
+
+    private AnthropicChatAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

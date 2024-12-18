@@ -83,15 +83,6 @@ public class VertexGeminiChatAction {
         .output()
         .perform(VertexGeminiChatAction::perform);
 
-    private VertexGeminiChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -119,4 +110,13 @@ public class VertexGeminiChatAction {
             return builder.build();
         }
     };
+
+    private VertexGeminiChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

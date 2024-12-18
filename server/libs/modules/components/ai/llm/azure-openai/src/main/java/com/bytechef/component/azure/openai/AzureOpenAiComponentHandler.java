@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.nvidia;
+package com.bytechef.component.azure.openai;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.azure.openai.action.AzureOpenAiChatAction;
+import com.bytechef.component.azure.openai.action.AzureOpenAiCreateImageAction;
+import com.bytechef.component.azure.openai.action.AzureOpenAiCreateTranscriptionAction;
+import com.bytechef.component.azure.openai.connection.AzureOpenAiConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.nvidia.action.NVIDIAChatAction;
-import com.bytechef.component.nvidia.connection.NVIDIAConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -30,18 +32,20 @@ import com.google.auto.service.AutoService;
  * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
-public class NVIDIAComponentHandler implements ComponentHandler {
+public class AzureOpenAiComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("nvidia")
-        .title("NVIDIA LLM")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("azureOpenai")
+        .title("Azure OpenAI")
         .description(
-            "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and " +
-                "engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the " +
-                "epicenter of this industrial transformation.")
-        .icon("path:assets/nvidia.svg")
+            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in " +
+                "ways that benefit humanity as a whole.")
+        .icon("path:assets/openai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .connection(NVIDIAConnection.CONNECTION_DEFINITION)
-        .actions(NVIDIAChatAction.ACTION_DEFINITION);
+        .connection(AzureOpenAiConnection.CONNECTION_DEFINITION)
+        .actions(
+            AzureOpenAiChatAction.ACTION_DEFINITION,
+            AzureOpenAiCreateImageAction.ACTION_DEFINITION,
+            AzureOpenAiCreateTranscriptionAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

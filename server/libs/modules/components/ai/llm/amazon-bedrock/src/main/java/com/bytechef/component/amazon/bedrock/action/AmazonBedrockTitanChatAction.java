@@ -72,15 +72,6 @@ public class AmazonBedrockTitanChatAction {
         .output()
         .perform(AmazonBedrockTitanChatAction::perform);
 
-    private AmazonBedrockTitanChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -103,4 +94,13 @@ public class AmazonBedrockTitanChatAction {
                 .build();
         }
     };
+
+    private AmazonBedrockTitanChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

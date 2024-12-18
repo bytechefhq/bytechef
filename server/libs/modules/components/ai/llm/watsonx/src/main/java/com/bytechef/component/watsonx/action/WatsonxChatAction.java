@@ -98,13 +98,6 @@ public class WatsonxChatAction {
         .output()
         .perform(WatsonxChatAction::perform);
 
-    private WatsonxChatAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -133,4 +126,11 @@ public class WatsonxChatAction {
                 .build();
         }
     };
+
+    private WatsonxChatAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.azure.openai.connection;
+package com.bytechef.component.openai.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 
@@ -29,20 +28,18 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public final class AzureOpenAIConnection {
+public final class OpenAiConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
-                    string(ENDPOINT)
-                        .label("Endpoint")
-                        .required(true),
                     string(TOKEN)
                         .label("Token")
                         .required(true)));
 
-    private AzureOpenAIConnection() {
+    private OpenAiConnection() {
     }
 }

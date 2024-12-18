@@ -78,15 +78,6 @@ public class AmazonBedrockAnthropic3ChatAction {
         .output()
         .perform(AmazonBedrockAnthropic3ChatAction::perform);
 
-    private AmazonBedrockAnthropic3ChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -112,4 +103,13 @@ public class AmazonBedrockAnthropic3ChatAction {
                 .build();
         }
     };
+
+    private AmazonBedrockAnthropic3ChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

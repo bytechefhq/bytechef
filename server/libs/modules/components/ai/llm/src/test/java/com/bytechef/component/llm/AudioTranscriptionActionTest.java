@@ -27,7 +27,6 @@ import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.audio.transcription.AudioTranscription;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.Model;
@@ -35,7 +34,7 @@ import org.springframework.ai.model.Model;
 /**
  * @author Marko Kriskovic
  */
-public class TranscriptActionTest extends AbstractActionTest {
+public class AudioTranscriptionActionTest extends AbstractActionTest {
 
     private static final String ANSWER = "ANSWER";
 
@@ -66,14 +65,14 @@ public class TranscriptActionTest extends AbstractActionTest {
                 }
             });
 
-        Transcript mockedTranscription = spy(new MockTranscript());
+        AudioTranscription mockedTranscription = spy(new MockAudioTranscription());
         Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel = mock(Model.class);
 
-        when(mockedTranscription.createTranscriptionModel(mockedParameters, mockedParameters))
+        when(mockedTranscription.createAudioTranscriptionModel(mockedParameters, mockedParameters))
             .thenReturn(mockedTranscriptModel);
 
         AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
-            new AudioTranscription(ANSWER));
+            new org.springframework.ai.audio.transcription.AudioTranscription(ANSWER));
 
         AudioTranscriptionResponse mockedTranscriptionResponse = spy(transcriptionResponse);
 
@@ -84,10 +83,10 @@ public class TranscriptActionTest extends AbstractActionTest {
         assertEquals(ANSWER, response);
     }
 
-    private static class MockTranscript implements Transcript {
+    private static class MockAudioTranscription implements AudioTranscription {
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
             Parameters inputParameters, Parameters connectionParameters) {
             return null;
         }

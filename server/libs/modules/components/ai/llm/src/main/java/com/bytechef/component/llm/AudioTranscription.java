@@ -21,7 +21,6 @@ import static com.bytechef.component.llm.constant.LLMConstants.FILE;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
-import org.springframework.ai.audio.transcription.AudioTranscription;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.Model;
@@ -30,22 +29,22 @@ import org.springframework.core.io.UrlResource;
 /**
  * @author Marko Kriskovic
  */
-public interface Transcript {
+public interface AudioTranscription {
 
-    Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+    Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
         Parameters inputParameters, Parameters connectionParameters);
 
     default String getResponse(Parameters inputParameters, Parameters connectionParameters)
         throws MalformedURLException {
 
-        Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> transcriptionModel = createTranscriptionModel(
+        Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> transcriptionModel = createAudioTranscriptionModel(
             inputParameters, connectionParameters);
 
         AudioTranscriptionPrompt transcriptionPrompt = getTranscriptionPrompt(inputParameters);
 
         AudioTranscriptionResponse response = transcriptionModel.call(transcriptionPrompt);
 
-        AudioTranscription result = response.getResult();
+        org.springframework.ai.audio.transcription.AudioTranscription result = response.getResult();
 
         return result.getOutput();
     }

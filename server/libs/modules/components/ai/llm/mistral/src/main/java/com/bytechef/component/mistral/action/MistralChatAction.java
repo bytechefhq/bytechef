@@ -80,15 +80,6 @@ public class MistralChatAction {
         .output()
         .perform(MistralChatAction::perform);
 
-    private MistralChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -115,4 +106,13 @@ public class MistralChatAction {
             return builder.build();
         }
     };
+
+    private MistralChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

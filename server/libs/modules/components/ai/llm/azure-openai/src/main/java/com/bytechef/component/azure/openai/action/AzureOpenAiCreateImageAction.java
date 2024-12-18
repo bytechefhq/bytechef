@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.action;
+package com.bytechef.component.azure.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.N;
@@ -33,8 +34,10 @@ import static com.bytechef.component.llm.constant.LLMConstants.SIZE;
 import static com.bytechef.component.llm.constant.LLMConstants.STYLE;
 import static com.bytechef.component.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
-import static com.bytechef.component.openai.constant.OpenAIConstants.QUALITY;
 
+import com.azure.ai.openai.OpenAIClient;
+import com.azure.ai.openai.OpenAIClientBuilder;
+import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -43,18 +46,16 @@ import com.bytechef.component.llm.Image;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
+import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImageOptions;
-import org.springframework.ai.openai.OpenAiImageModel;
-import org.springframework.ai.openai.OpenAiImageOptions;
-import org.springframework.ai.openai.api.OpenAiImageApi;
-import org.springframework.retry.support.RetryTemplate;
 
 /**
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public class OpenAICreateImageAction {
+public class AzureOpenAiCreateImageAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
         .title("Create Image")
@@ -65,11 +66,11 @@ public class OpenAICreateImageAction {
                 .description("The model to use for image generation.")
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiImageApi.ImageModel.values())
+                        Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
                             .collect(
                                 Collectors.toMap(
-                                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue,
-                                    (f, s) -> f))))
+                                    AzureOpenAiImageOptions.ImageModel::getValue,
+                                    AzureOpenAiImageOptions.ImageModel::getValue, (f, s) -> f))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
@@ -93,27 +94,20 @@ public class OpenAICreateImageAction {
                     }))
                 .required(true),
             integer(N)
-                .label("Number of responses")
+                .label("Number of Responses")
                 .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
+                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
                 .defaultValue(1)
                 .minValue(1)
                 .maxValue(10)
                 .advancedOption(true),
             string(RESPONSE_FORMAT)
-                .label("Response format")
+                .label("Response Format")
                 .description("The format in which the generated images are returned.")
                 .options(
                     option("url", "url"),
                     option("b64_json", "b64_json"))
                 .defaultValue("url")
-                .advancedOption(true),
-            string(QUALITY)
-                .label("Quality")
-                .description("The quality of the image that will be generated.")
-                .options(
-                    option("standard", "standard"),
-                    option("hd", "hd"))
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
@@ -137,9 +131,9 @@ public class OpenAICreateImageAction {
                                             .controlType(Property.ControlType.URL),
                                         string("b64Json"),
                                         string("revisedPrompt"))))))
-        .perform(OpenAICreateImageAction::perform);
+        .perform(AzureOpenAiCreateImageAction::perform);
 
-    private OpenAICreateImageAction() {
+    private AzureOpenAiCreateImageAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
@@ -150,15 +144,19 @@ public class OpenAICreateImageAction {
 
         @Override
         public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiImageModel(
-                new OpenAiImageApi(connectionParameters.getString(TOKEN)),
-                (OpenAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
+            OpenAIClient openAIClient = new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT))
+                .buildClient();
+
+            return new AzureOpenAiImageModel(
+                openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
         }
 
         private ImageOptions createImageOptions(Parameters inputParameters) {
             Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
-            return OpenAiImageOptions.builder()
+            return AzureOpenAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
                 .withHeight(size[1])
@@ -166,7 +164,6 @@ public class OpenAICreateImageAction {
                 .withStyle(inputParameters.getString(STYLE))
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
-                .withQuality(inputParameters.getString(QUALITY))
                 .build();
         }
     };

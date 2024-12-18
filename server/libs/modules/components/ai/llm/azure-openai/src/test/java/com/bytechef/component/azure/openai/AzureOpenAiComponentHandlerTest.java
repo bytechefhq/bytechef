@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.nvidia;
+package com.bytechef.component.azure.openai;
 
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,11 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-class NVIDIAComponentHandlerTest {
+class AzureOpenAiComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/nvidia_v1.json", new NVIDIAComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/azure-openai_v1.json", new AzureOpenAiComponentHandler().getDefinition());
     }
 }

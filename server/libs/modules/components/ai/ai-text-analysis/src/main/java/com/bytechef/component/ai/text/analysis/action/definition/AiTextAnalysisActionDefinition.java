@@ -29,7 +29,7 @@ import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAc
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
 import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.anthropic.action.AnthropicChatAction;
-import com.bytechef.component.azure.openai.action.AzureOpenAIChatAction;
+import com.bytechef.component.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -37,8 +37,8 @@ import com.bytechef.component.groq.action.GroqChatAction;
 import com.bytechef.component.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.llm.Chat;
 import com.bytechef.component.mistral.action.MistralChatAction;
-import com.bytechef.component.nvidia.action.NVIDIAChatAction;
-import com.bytechef.component.openai.action.OpenAIChatAction;
+import com.bytechef.component.nvidia.action.NvidiaChatAction;
+import com.bytechef.component.openai.action.OpenAiChatAction;
 import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
@@ -121,7 +121,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
                 modelConnectionParametersMap.put(TOKEN, component.getAzureOpenAi()
                     .getApiKey());
 
-                yield AzureOpenAIChatAction.CHAT;
+                yield AzureOpenAiChatAction.CHAT;
             }
             case 8 -> {
                 modelConnectionParametersMap.put(TOKEN, component.getGroq()
@@ -133,7 +133,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
                 modelConnectionParametersMap.put(TOKEN, component.getNvidia()
                     .getApiKey());
 
-                yield NVIDIAChatAction.CHAT;
+                yield NvidiaChatAction.CHAT;
             }
             case 10 -> {
                 modelConnectionParametersMap.put(TOKEN, component.getHuggingFace()
@@ -151,7 +151,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
                 modelConnectionParametersMap.put(TOKEN, component.getOpenAi()
                     .getApiKey());
 
-                yield OpenAIChatAction.CHAT;
+                yield OpenAiChatAction.CHAT;
             }
             case 13 -> {
                 modelConnectionParametersMap.put(TOKEN, component.getVertexGemini()

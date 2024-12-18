@@ -83,13 +83,6 @@ public class GroqChatAction {
         .output()
         .perform(GroqChatAction::perform);
 
-    private GroqChatAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -115,4 +108,11 @@ public class GroqChatAction {
             return builder.build();
         }
     };
+
+    private GroqChatAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

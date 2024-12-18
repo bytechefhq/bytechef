@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-class OpenAIComponentHandlerTest {
+class OpenAiComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/openai_v1.json", new OpenAIComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/openai_v1.json", new OpenAiComponentHandler().getDefinition());
     }
 }

@@ -224,13 +224,6 @@ public class OllamaChatAction {
         .output()
         .perform(OllamaChatAction::perform);
 
-    private OllamaChatAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     private static final Chat CHAT = new Chat() {
 
         @Override
@@ -284,4 +277,11 @@ public class OllamaChatAction {
             return builder.build();
         }
     };
+
+    private OllamaChatAction() {
+    }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

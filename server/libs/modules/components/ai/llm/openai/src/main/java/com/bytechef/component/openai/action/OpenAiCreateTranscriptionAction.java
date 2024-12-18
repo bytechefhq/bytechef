@@ -34,7 +34,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.llm.Transcript;
+import com.bytechef.component.llm.AudioTranscription;
 import com.bytechef.component.llm.util.LLMUtils;
 import java.net.MalformedURLException;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ import org.springframework.ai.openai.api.OpenAiAudioApi;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public class OpenAICreateTranscriptionAction {
+public class OpenAiCreateTranscriptionAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
         .title("Create Transcriptions")
@@ -100,22 +100,12 @@ public class OpenAICreateTranscriptionAction {
                 .maxValue(1)
                 .required(false))
         .output()
-        .perform(OpenAICreateTranscriptionAction::perform);
+        .perform(OpenAiCreateTranscriptionAction::perform);
 
-    private OpenAICreateTranscriptionAction() {
-    }
-
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-        throws MalformedURLException {
-
-        return TRANSCRIPT.getResponse(inputParameters, connectionParameters);
-    }
-
-    private static final Transcript TRANSCRIPT = new Transcript() {
+    private static final AudioTranscription AUDIO_TRANSCRIPTION = new AudioTranscription() {
 
         @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createTranscriptionModel(
+        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
             Parameters inputParameters, Parameters connectionParameters) {
 
             return new OpenAiAudioTranscriptionModel(
@@ -133,4 +123,14 @@ public class OpenAICreateTranscriptionAction {
                 .build();
         }
     };
+
+    private OpenAiCreateTranscriptionAction() {
+    }
+
+    public static String perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+        throws MalformedURLException {
+
+        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters);
+    }
 }

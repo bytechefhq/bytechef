@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.nvidia.action;
+package com.bytechef.component.azure.openai.action;
 
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.llm.constant.LLMConstants.ASK;
+import static com.bytechef.component.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.LOGIT_BIAS;
@@ -32,6 +33,7 @@ import static com.bytechef.component.llm.constant.LLMConstants.N;
 import static com.bytechef.component.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.STOP;
@@ -43,22 +45,23 @@ import static com.bytechef.component.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 
+import com.azure.ai.openai.OpenAIClientBuilder;
+import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
+import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
+import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
+import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
-import org.springframework.ai.openai.api.OpenAiApi;
 
 /**
- * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public class NVIDIAChatAction {
+public class AzureOpenAiChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
@@ -66,7 +69,8 @@ public class NVIDIAChatAction {
         .properties(
             string(MODEL)
                 .label("Model")
-                .description("ID of the model to use.")
+                .description("Deployment name, written in string.")
+                .exampleValue("gpt-4o")
                 .required(true),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
@@ -74,34 +78,34 @@ public class NVIDIAChatAction {
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
-            TOP_P_PROPERTY,
             FREQUENCY_PENALTY_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             LOGIT_BIAS_PROPERTY,
+            TOP_P_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
         .output()
-        .perform(NVIDIAChatAction::perform);
-
-    private NVIDIAChatAction() {
-    }
-
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
+        .perform(AzureOpenAiChatAction::perform);
 
     public static final Chat CHAT = new Chat() {
 
         @Override
         public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(
-                new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
-                (OpenAiChatOptions) createChatOptions(inputParameters));
+            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT));
+
+            return new AzureOpenAiChatModel(
+                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
         }
 
         private ChatOptions createChatOptions(Parameters inputParameters) {
-            OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
+            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
+            AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
+                ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
+
+            AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()
+                .withDeploymentName(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                 .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
@@ -110,9 +114,18 @@ public class NVIDIAChatAction {
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withTopP(inputParameters.getDouble(TOP_P))
-                .withUser(inputParameters.getString(USER));
+                .withUser(inputParameters.getString(USER))
+                .withResponseFormat(format);
 
             return builder.build();
         }
     };
+
+    private AzureOpenAiChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

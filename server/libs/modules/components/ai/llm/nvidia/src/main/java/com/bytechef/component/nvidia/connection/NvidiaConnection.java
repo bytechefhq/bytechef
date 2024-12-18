@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai.connection;
+package com.bytechef.component.nvidia.connection;
 
 import static com.bytechef.component.definition.Authorization.AuthorizationType.BEARER_TOKEN;
 import static com.bytechef.component.definition.Authorization.TOKEN;
@@ -26,12 +26,11 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 
 /**
  * @author Monika Domiter
- * @author Marko Kriskovic
  */
-public final class OpenAIConnection {
+public final class NvidiaConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
+        .baseUri((connectionParameters, context) -> "https://integrate.api.nvidia.com/")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
@@ -40,6 +39,6 @@ public final class OpenAIConnection {
                         .label("Token")
                         .required(true)));
 
-    private OpenAIConnection() {
+    private NvidiaConnection() {
     }
 }

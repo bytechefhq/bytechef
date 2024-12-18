@@ -97,15 +97,6 @@ public class AmazonBedrockJurassic2ChatAction {
         .output()
         .perform(AmazonBedrockJurassic2ChatAction::perform);
 
-    private AmazonBedrockJurassic2ChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
-    }
-
     public static final Chat CHAT = new Chat() {
 
         @Override
@@ -142,4 +133,13 @@ public class AmazonBedrockJurassic2ChatAction {
                 .build();
         }
     };
+
+    private AmazonBedrockJurassic2ChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, context);
+    }
 }

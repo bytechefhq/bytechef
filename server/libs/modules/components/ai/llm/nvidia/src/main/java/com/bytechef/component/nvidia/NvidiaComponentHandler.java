@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.openai;
+package com.bytechef.component.nvidia;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.openai.action.OpenAIChatAction;
-import com.bytechef.component.openai.action.OpenAICreateImageAction;
-import com.bytechef.component.openai.action.OpenAICreateSpeechAction;
-import com.bytechef.component.openai.action.OpenAICreateTranscriptionAction;
-import com.bytechef.component.openai.connection.OpenAIConnection;
+import com.bytechef.component.nvidia.action.NvidiaChatAction;
+import com.bytechef.component.nvidia.connection.NvidiaConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -33,21 +30,18 @@ import com.google.auto.service.AutoService;
  * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
-public class OpenAIComponentHandler implements ComponentHandler {
+public class NvidiaComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("openai")
-        .title("OpenAI")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("nvidia")
+        .title("NVIDIA LLM")
         .description(
-            "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
-                "that benefit humanity as a whole.")
-        .icon("path:assets/openai.svg")
+            "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and " +
+                "engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the " +
+                "epicenter of this industrial transformation.")
+        .icon("path:assets/nvidia.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .connection(OpenAIConnection.CONNECTION_DEFINITION)
-        .actions(
-            OpenAIChatAction.ACTION_DEFINITION,
-            OpenAICreateImageAction.ACTION_DEFINITION,
-            OpenAICreateSpeechAction.ACTION_DEFINITION,
-            OpenAICreateTranscriptionAction.ACTION_DEFINITION);
+        .connection(NvidiaConnection.CONNECTION_DEFINITION)
+        .actions(NvidiaChatAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

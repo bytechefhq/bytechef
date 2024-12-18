@@ -48,7 +48,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.llm.Chat;
-import com.bytechef.component.openai.constant.OpenAIConstants;
+import com.bytechef.component.openai.constant.OpenAiConstants;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
@@ -59,7 +59,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public class OpenAIChatAction {
+public class OpenAiChatAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
@@ -69,7 +69,7 @@ public class OpenAIChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(OpenAIConstants.MODELS),
+                .options(OpenAiConstants.MODELS),
             MESSAGES_PROPERTY,
             RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
@@ -83,16 +83,7 @@ public class OpenAIChatAction {
             STOP_PROPERTY,
             USER_PROPERTY)
         .output()
-        .perform(OpenAIChatAction::perform);
-
-    private OpenAIChatAction() {
-    }
-
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
-
-        return CHAT.getResponse(inputParameters, connectionParameters, actionContext);
-    }
+        .perform(OpenAiChatAction::perform);
 
     public static final Chat CHAT = new Chat() {
 
@@ -119,4 +110,13 @@ public class OpenAIChatAction {
             return builder.build();
         }
     };
+
+    private OpenAiChatAction() {
+    }
+
+    public static Object perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        return CHAT.getResponse(inputParameters, connectionParameters, actionContext);
+    }
 }

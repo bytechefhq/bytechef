@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.azure.openai;
+package com.bytechef.component.openai;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.azure.openai.action.AzureOpenAIChatAction;
-import com.bytechef.component.azure.openai.action.AzureOpenAICreateImageAction;
-import com.bytechef.component.azure.openai.action.AzureOpenAICreateTranscriptionAction;
-import com.bytechef.component.azure.openai.connection.AzureOpenAIConnection;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.openai.action.OpenAiChatAction;
+import com.bytechef.component.openai.action.OpenAiCreateImageAction;
+import com.bytechef.component.openai.action.OpenAiCreateSpeechAction;
+import com.bytechef.component.openai.action.OpenAiCreateTranscriptionAction;
+import com.bytechef.component.openai.connection.OpenAiConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,20 +33,21 @@ import com.google.auto.service.AutoService;
  * @author Marko Kriskovic
  */
 @AutoService(ComponentHandler.class)
-public class AzureOpenAIComponentHandler implements ComponentHandler {
+public class OpenAiComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("azureOpenai")
-        .title("Azure OpenAI")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("openai")
+        .title("OpenAI")
         .description(
-            "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in " +
-                "ways that benefit humanity as a whole.")
+            "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
+                "that benefit humanity as a whole.")
         .icon("path:assets/openai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-        .connection(AzureOpenAIConnection.CONNECTION_DEFINITION)
+        .connection(OpenAiConnection.CONNECTION_DEFINITION)
         .actions(
-            AzureOpenAIChatAction.ACTION_DEFINITION,
-            AzureOpenAICreateImageAction.ACTION_DEFINITION,
-            AzureOpenAICreateTranscriptionAction.ACTION_DEFINITION);
+            OpenAiChatAction.ACTION_DEFINITION,
+            OpenAiCreateImageAction.ACTION_DEFINITION,
+            OpenAiCreateSpeechAction.ACTION_DEFINITION,
+            OpenAiCreateTranscriptionAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

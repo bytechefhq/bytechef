@@ -49,7 +49,7 @@ import org.springframework.ai.openai.audio.speech.SpeechResponse;
 /**
  * @author Monika Domiter
  */
-public class OpenAICreateSpeechAction {
+public class OpenAiCreateSpeechAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
         .title("Text-To-Speech")
@@ -101,9 +101,9 @@ public class OpenAICreateSpeechAction {
                 .maxValue(4.0)
                 .required(false))
         .output(outputSchema(fileEntry()))
-        .perform(OpenAICreateSpeechAction::perform);
+        .perform(OpenAiCreateSpeechAction::perform);
 
-    private OpenAICreateSpeechAction() {
+    private OpenAiCreateSpeechAction() {
     }
 
     public static FileEntry perform(

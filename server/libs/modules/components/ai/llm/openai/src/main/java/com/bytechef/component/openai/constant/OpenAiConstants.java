@@ -27,7 +27,7 @@ import org.springframework.ai.openai.api.OpenAiApi;
  * @author Monika Domiter
  * @author Marko Kriskovic
  */
-public final class OpenAIConstants {
+public final class OpenAiConstants {
 
     public static final String QUALITY = "quality";
 
@@ -37,6 +37,6 @@ public final class OpenAIConstants {
                 Collectors.toMap(
                     OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
 
-    private OpenAIConstants() {
+    private OpenAiConstants() {
     }
 }

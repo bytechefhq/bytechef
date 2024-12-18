@@ -33,7 +33,7 @@ import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
 import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.mistral.constant.MistralConstants;
-import com.bytechef.component.openai.constant.OpenAIConstants;
+import com.bytechef.component.openai.constant.OpenAiConstants;
 import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.config.ApplicationProperties;
 
@@ -129,7 +129,7 @@ public class SummarizeTextAction {
                     string(MODEL)
                         .label("Model")
                         .description("ID of the model to use.")
-                        .options(OpenAIConstants.MODELS)
+                        .options(OpenAiConstants.MODELS)
                         .displayCondition("modelProvider == 12")
                         .required(true),
                     string(MODEL)
