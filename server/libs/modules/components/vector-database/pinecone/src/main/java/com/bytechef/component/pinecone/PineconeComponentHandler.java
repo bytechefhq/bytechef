@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.pinecone.action.PineconeDataLoaderAction;
 import com.bytechef.component.pinecone.action.PineconeQueryAction;
+import com.bytechef.component.pinecone.connection.PineconeConnection;
 import com.google.auto.service.AutoService;
 
 /**
@@ -37,6 +38,7 @@ public class PineconeComponentHandler implements ComponentHandler {
             "Pinecone is a vector database designed for efficient similarity search and storage of high-dimensional " +
                 "data, commonly used in machine learning and AI applications.")
         .icon("path:assets/pinecone.svg")
+        .connection(PineconeConnection.CONNECTION_DEFINITION)
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .actions(
             PineconeDataLoaderAction.ACTION_DEFINITION,
