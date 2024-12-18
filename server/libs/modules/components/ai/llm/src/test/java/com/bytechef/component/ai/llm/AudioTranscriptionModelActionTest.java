@@ -34,7 +34,7 @@ import org.springframework.ai.model.Model;
 /**
  * @author Marko Kriskovic
  */
-public class AudioTranscriptionActionTest extends AbstractActionTest {
+public class AudioTranscriptionModelActionTest extends AbstractActionTest {
 
     private static final String ANSWER = "ANSWER";
 
@@ -65,7 +65,7 @@ public class AudioTranscriptionActionTest extends AbstractActionTest {
                 }
             });
 
-        AudioTranscription mockedTranscription = spy(new MockAudioTranscription());
+        AudioTranscriptionModel mockedTranscription = spy(new MockAudioTranscriptionModel());
         Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> mockedTranscriptModel = mock(Model.class);
 
         when(mockedTranscription.createAudioTranscriptionModel(mockedParameters, mockedParameters))
@@ -83,7 +83,7 @@ public class AudioTranscriptionActionTest extends AbstractActionTest {
         assertEquals(ANSWER, response);
     }
 
-    private static class MockAudioTranscription implements AudioTranscription {
+    private static class MockAudioTranscriptionModel implements AudioTranscriptionModel {
 
         @Override
         public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(

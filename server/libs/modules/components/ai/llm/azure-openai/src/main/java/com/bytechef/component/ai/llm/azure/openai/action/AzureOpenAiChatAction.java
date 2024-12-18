@@ -47,7 +47,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -85,7 +85,7 @@ public class AzureOpenAiChatAction {
         .output()
         .perform(AzureOpenAiChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
         OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
             .endpoint(connectionParameters.getString(ENDPOINT));
@@ -117,6 +117,6 @@ public class AzureOpenAiChatAction {
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

@@ -35,7 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.openai.constant.OpenAiConstants.QUALITY;
 
-import com.bytechef.component.ai.llm.Image;
+import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -137,7 +137,7 @@ public class OpenAiCreateImageAction {
                                         string("revisedPrompt"))))))
         .perform(OpenAiCreateImageAction::perform);
 
-    private static final Image IMAGE = (inputParameters, connectionParameters) -> {
+    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
         return new OpenAiImageModel(
@@ -159,6 +159,6 @@ public class OpenAiCreateImageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return IMAGE.getResponse(inputParameters, connectionParameters);
+        return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 }

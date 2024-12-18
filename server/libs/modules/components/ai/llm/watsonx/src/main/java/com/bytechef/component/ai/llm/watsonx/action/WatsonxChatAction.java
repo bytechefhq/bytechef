@@ -46,7 +46,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -96,7 +96,7 @@ public class WatsonxChatAction {
         .output()
         .perform(WatsonxChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new WatsonxAiChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new WatsonxAiChatModel(
         new WatsonxAiApi(
             connectionParameters.getString(URL),
             connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
@@ -119,6 +119,6 @@ public class WatsonxChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

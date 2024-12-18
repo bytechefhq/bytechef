@@ -22,23 +22,24 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import org.springframework.ai.image.ImageGeneration;
-import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
 /**
  * @author Marko Kriskovic
  */
-public interface Image {
+public interface ImageModel {
 
-    ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters);
+    org.springframework.ai.image.ImageModel createImageModel(
+        Parameters inputParameters, Parameters connectionParameters);
 
     default Object getResponse(Parameters inputParameters, Parameters connectionParameters) {
-        ImageModel imageModel = createImageModel(inputParameters, connectionParameters);
+        org.springframework.ai.image.ImageModel imageModel = createImageModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.image.ImageMessage> messages = getMessages(inputParameters);
 
         ImageResponse response = imageModel.call(new ImagePrompt(messages));
+
         ImageGeneration result = response.getResult();
 
         return result.getOutput();

@@ -39,7 +39,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -81,7 +81,7 @@ public class VertexGeminiChatAction {
         .output()
         .perform(VertexGeminiChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
         Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
         String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
@@ -106,6 +106,6 @@ public class VertexGeminiChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

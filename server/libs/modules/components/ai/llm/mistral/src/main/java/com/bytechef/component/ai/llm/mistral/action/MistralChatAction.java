@@ -38,7 +38,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -78,7 +78,7 @@ public class MistralChatAction {
         .output()
         .perform(MistralChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
         Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
         String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
@@ -103,6 +103,6 @@ public class MistralChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

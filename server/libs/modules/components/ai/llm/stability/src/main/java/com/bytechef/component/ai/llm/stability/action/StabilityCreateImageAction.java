@@ -40,7 +40,7 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.springframework.ai.stabilityai.api.StabilityAiApi.DEFAULT_IMAGE_MODEL;
 
-import com.bytechef.component.ai.llm.Image;
+import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -156,10 +156,10 @@ public class StabilityCreateImageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return IMAGE.getResponse(inputParameters, connectionParameters);
+        return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Image IMAGE = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
         new StabilityAiApi(connectionParameters.getString(TOKEN)),
         StabilityAiImageOptions.builder()
             .withModel(inputParameters.getRequiredString(MODEL))

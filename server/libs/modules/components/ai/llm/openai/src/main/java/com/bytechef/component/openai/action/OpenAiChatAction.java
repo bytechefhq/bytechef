@@ -43,7 +43,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -83,7 +83,7 @@ public class OpenAiChatAction {
         .output()
         .perform(OpenAiChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new OpenAiChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new OpenAiChatModel(
         new OpenAiApi(connectionParameters.getString(TOKEN)),
         OpenAiChatOptions.builder()
             .withModel(inputParameters.getRequiredString(MODEL))
@@ -104,6 +104,6 @@ public class OpenAiChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, actionContext);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, actionContext);
     }
 }

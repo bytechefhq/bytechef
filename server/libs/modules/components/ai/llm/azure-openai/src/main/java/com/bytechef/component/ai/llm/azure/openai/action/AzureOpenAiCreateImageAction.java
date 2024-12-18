@@ -38,7 +38,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
-import com.bytechef.component.ai.llm.Image;
+import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -135,10 +135,10 @@ public class AzureOpenAiCreateImageAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return IMAGE.getResponse(inputParameters, connectionParameters);
+        return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Image IMAGE = (inputParameters, connectionParameters) -> {
+    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         OpenAIClient openAIClient = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
             .endpoint(connectionParameters.getString(ENDPOINT))

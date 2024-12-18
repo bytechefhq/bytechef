@@ -34,7 +34,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -70,7 +70,7 @@ public class AmazonBedrockTitanChatAction {
         .output()
         .perform(AmazonBedrockTitanChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockTitanChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockTitanChatModel(
         new TitanChatBedrockApi(inputParameters.getRequiredString(MODEL),
             () -> AwsBasicCredentials.create(
                 connectionParameters.getRequiredString(ACCESS_KEY_ID),
@@ -89,6 +89,6 @@ public class AmazonBedrockTitanChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

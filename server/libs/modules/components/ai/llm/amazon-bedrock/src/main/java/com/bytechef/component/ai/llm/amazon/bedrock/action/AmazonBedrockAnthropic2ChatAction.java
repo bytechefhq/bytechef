@@ -36,7 +36,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -76,7 +76,7 @@ public class AmazonBedrockAnthropic2ChatAction {
         .output()
         .perform(AmazonBedrockAnthropic2ChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockAnthropicChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockAnthropicChatModel(
         new AnthropicChatBedrockApi(
             inputParameters.getRequiredString(MODEL),
             () -> AwsBasicCredentials.create(
@@ -97,6 +97,6 @@ public class AmazonBedrockAnthropic2ChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

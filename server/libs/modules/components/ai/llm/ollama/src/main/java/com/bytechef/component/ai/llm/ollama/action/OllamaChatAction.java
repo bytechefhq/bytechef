@@ -68,7 +68,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -222,7 +222,7 @@ public class OllamaChatAction {
         .output()
         .perform(OllamaChatAction::perform);
 
-    private static final Chat CHAT = (inputParameters, connectionParameters) -> {
+    private static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
         String url = connectionParameters.getString(URL);
 
         OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
@@ -272,6 +272,6 @@ public class OllamaChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

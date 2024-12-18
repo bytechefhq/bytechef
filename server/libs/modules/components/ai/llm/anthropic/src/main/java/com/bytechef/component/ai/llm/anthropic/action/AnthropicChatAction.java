@@ -35,7 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -73,7 +73,7 @@ public class AnthropicChatAction {
         .output()
         .perform(AnthropicChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new AnthropicChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new AnthropicChatModel(
         new AnthropicApi(connectionParameters.getString(TOKEN)),
         AnthropicChatOptions.builder()
             .withModel(inputParameters.getRequiredString(MODEL))
@@ -88,6 +88,6 @@ public class AnthropicChatAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

@@ -31,19 +31,19 @@ import java.util.List;
 import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.model.ChatModel;
 
 /**
  * @author Marko Kriskovic
  */
-public interface Chat {
+public interface ChatModel {
 
-    ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters);
+    org.springframework.ai.chat.model.ChatModel createChatModel(
+        Parameters inputParameters, Parameters connectionParameters);
 
     default Object getResponse(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
+        org.springframework.ai.chat.model.ChatModel chatModel = createChatModel(inputParameters, connectionParameters);
 
         List<org.springframework.ai.chat.messages.Message> messages = getMessages(inputParameters, actionContext);
 

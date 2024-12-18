@@ -32,7 +32,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -66,7 +66,7 @@ public class AmazonBedrockLlamaChatAction {
         .output()
         .perform(AmazonBedrockLlamaChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockLlamaChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockLlamaChatModel(
         new LlamaChatBedrockApi(
             inputParameters.getRequiredString(MODEL),
             () -> AwsBasicCredentials.create(
@@ -85,6 +85,6 @@ public class AmazonBedrockLlamaChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

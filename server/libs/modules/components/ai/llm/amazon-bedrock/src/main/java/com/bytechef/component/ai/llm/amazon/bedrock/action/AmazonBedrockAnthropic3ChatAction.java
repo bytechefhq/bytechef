@@ -36,7 +36,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -76,21 +76,22 @@ public class AmazonBedrockAnthropic3ChatAction {
         .output()
         .perform(AmazonBedrockAnthropic3ChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockAnthropic3ChatModel(
-        new Anthropic3ChatBedrockApi(
-            inputParameters.getRequiredString(MODEL),
-            () -> AwsBasicCredentials.create(
-                connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-            connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-        Anthropic3ChatOptions.builder()
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTopK(inputParameters.getInteger(TOP_K))
-            .withAnthropicVersion("bedrock-2023-05-31")
-            .build());
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters) -> new BedrockAnthropic3ChatModel(
+            new Anthropic3ChatBedrockApi(
+                inputParameters.getRequiredString(MODEL),
+                () -> AwsBasicCredentials.create(
+                    connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                    connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+                connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+            Anthropic3ChatOptions.builder()
+                .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .withTopP(inputParameters.getDouble(TOP_P))
+                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .withTopK(inputParameters.getInteger(TOP_K))
+                .withAnthropicVersion("bedrock-2023-05-31")
+                .build());
 
     private AmazonBedrockAnthropic3ChatAction() {
     }
@@ -98,6 +99,6 @@ public class AmazonBedrockAnthropic3ChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }

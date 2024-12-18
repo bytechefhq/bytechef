@@ -35,7 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
-import com.bytechef.component.ai.llm.AudioTranscription;
+import com.bytechef.component.ai.llm.AudioTranscriptionModel;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -112,7 +112,7 @@ public class AzureOpenAiCreateTranscriptionAction {
         return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final AudioTranscription AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
+    private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
         OpenAIClient openAIClient = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
             .endpoint(connectionParameters.getString(ENDPOINT))

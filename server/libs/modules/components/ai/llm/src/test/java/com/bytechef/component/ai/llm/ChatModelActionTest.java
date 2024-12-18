@@ -28,46 +28,42 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.springframework.ai.image.ImageGeneration;
-import org.springframework.ai.image.ImageMessage;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImagePrompt;
-import org.springframework.ai.image.ImageResponse;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.model.Generation;
+import org.springframework.ai.chat.prompt.Prompt;
 
 /**
  * @author Marko Kriskovic
  */
-public class ImageActionTest extends AbstractActionTest {
+public class ChatModelActionTest extends AbstractActionTest {
 
-    private static final org.springframework.ai.image.Image ANSWER =
-        new org.springframework.ai.image.Image("url", "b64JSON");
+    private static final String ANSWER = "ANSWER";
 
     @Test
     public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
-            .thenReturn(List.of(new ImageMessage("PROMPT", 1f)));
+            .thenReturn(List.of(new ChatModel.Message("QUESTION", null, "user")));
 
-        Image mockedImage = spy(new MockImage());
-        ImageModel mockedImageModel = mock(ImageModel.class);
+        ChatModel mockedChat = spy(new MockChatModel());
+        org.springframework.ai.chat.model.ChatModel mockedChatModelModel =
+            mock(org.springframework.ai.chat.model.ChatModel.class);
 
-        when(mockedImage.createImageModel(mockedParameters, mockedParameters)).thenReturn(mockedImageModel);
+        when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModelModel);
 
-        ImageResponse imageResponse = new ImageResponse(List.of(new ImageGeneration(ANSWER)));
+        when(mockedChatModelModel.call(any(Prompt.class))).thenReturn(
+            new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));
 
-        ImageResponse mockedImageResponse = spy(imageResponse);
-
-        when(mockedImageModel.call(any(ImagePrompt.class))).thenReturn(mockedImageResponse);
-
-        org.springframework.ai.image.Image response = (org.springframework.ai.image.Image) mockedImage.getResponse(
-            mockedParameters, mockedParameters);
+        Object response = mockedChat.getResponse(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(ANSWER, response);
     }
 
-    private static class MockImage implements Image {
+    private static class MockChatModel implements ChatModel {
 
         @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
+        public org.springframework.ai.chat.model.ChatModel
+            createChatModel(Parameters inputParameters, Parameters connectionParameters) {
             return null;
         }
     }

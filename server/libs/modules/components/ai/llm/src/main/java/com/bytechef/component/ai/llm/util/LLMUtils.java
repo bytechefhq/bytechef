@@ -18,7 +18,7 @@ package com.bytechef.component.ai.llm.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
@@ -42,7 +42,7 @@ public class LLMUtils {
     private LLMUtils() {
     }
 
-    public static Message createMessage(Chat.Message message, ActionContext actionContext) {
+    public static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
 
         return switch (message.role()) {
             case "system" -> new SystemMessage(message.content());

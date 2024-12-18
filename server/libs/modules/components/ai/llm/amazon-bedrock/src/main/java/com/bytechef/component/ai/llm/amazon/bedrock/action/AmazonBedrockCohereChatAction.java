@@ -45,7 +45,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -118,7 +118,7 @@ public class AmazonBedrockCohereChatAction {
         .output()
         .perform(AmazonBedrockCohereChatAction::perform);
 
-    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockCohereChatModel(
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockCohereChatModel(
         new CohereChatBedrockApi(
             inputParameters.getRequiredString(MODEL),
             () -> AwsBasicCredentials.create(
@@ -146,6 +146,6 @@ public class AmazonBedrockCohereChatAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return CHAT.getResponse(inputParameters, connectionParameters, context);
+        return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }
 }
