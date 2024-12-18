@@ -130,7 +130,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
                 yield GroqChatAction.CHAT;
             }
             case 9 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getNVIDIA()
+                modelConnectionParametersMap.put(TOKEN, component.getNvidia()
                     .getApiKey());
 
                 yield NVIDIAChatAction.CHAT;
