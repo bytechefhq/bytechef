@@ -24,9 +24,6 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 
 beforeEach(() => {
     mockApplicationInfoStore();
-});
-
-beforeEach(() => {
     windowResizeObserver();
 });
 
@@ -72,7 +69,7 @@ it('should show password input field after clicking "Continue" if email is valid
     });
 });
 
-it('should hide password input on render and toggle "show password" when "show password" icon is clicked', async () => {
+it('should set type as password initially and toggle between types when "show password" icon is clicked', async () => {
     await act(async () => renderRegisterPage());
 
     await triggerShowPasswordInputField();
@@ -82,16 +79,18 @@ it('should hide password input on render and toggle "show password" when "show p
     });
 
     const passwordInputField = screen.getByLabelText('Password');
-    const button = screen.getByRole('button', {name: /Show Password/i});
+    await userEvent.type(passwordInputField, 'password');
+
+    const showPasswordButton = screen.getByRole('button', {name: /Show Password/i});
 
     expect(passwordInputField).toHaveAttribute('type', 'password');
 
-    await userEvent.click(button);
+    await userEvent.click(showPasswordButton);
     await waitFor(() => {
         expect(passwordInputField).toHaveAttribute('type', 'text');
     });
 
-    await userEvent.click(button);
+    await userEvent.click(showPasswordButton);
     await waitFor(() => {
         expect(passwordInputField).toHaveAttribute('type', 'password');
     });

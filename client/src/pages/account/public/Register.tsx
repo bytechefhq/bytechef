@@ -27,36 +27,42 @@ const formSchema = z
         email: z.string().min(5, {message: 'Email is required'}).max(254),
         password: z.string(),
     })
-    .superRefine(({password}, checkPassComplexity) => {
+    .superRefine(({password}, checkPasswordComplexity) => {
         const containsUppercase = (character: string) => /[A-Z]/.test(character);
         const containsNumber = (char: string) => /\d/.test(char);
 
-        const errObj = {
-            passwordLength: {message: passwordLengthMessage, pass: password.length >= 8},
-            totalNumber: {message: passwordContainsNumberMessage, pass: [...password].some(containsNumber)},
-            upperCase: {message: passwordContainsUppercaseMessage, pass: [...password].some(containsUppercase)},
+        const passwordValidationCriteria = {
+            passwordLength: {message: passwordLengthMessage, validationPass: password.length >= 8},
+            totalNumbers: {message: passwordContainsNumberMessage, validationPass: [...password].some(containsNumber)},
+            upperCase: {
+                message: passwordContainsUppercaseMessage,
+                validationPass: [...password].some(containsUppercase),
+            },
         };
 
-        if (!errObj.passwordLength.pass || !errObj.upperCase.pass || !errObj.totalNumber.pass) {
-            checkPassComplexity.addIssue({
+        if (
+            !passwordValidationCriteria.passwordLength.validationPass ||
+            !passwordValidationCriteria.upperCase.validationPass ||
+            !passwordValidationCriteria.totalNumbers.validationPass
+        ) {
+            checkPasswordComplexity.addIssue({
                 code: 'custom',
-                message: JSON.stringify(errObj),
+                message: JSON.stringify(passwordValidationCriteria),
                 path: ['password'],
             });
         }
     });
 
 const Register = () => {
+    const [emailIsValid, setEmailIsValid] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore();
 
     const {
         getApplicationInfo,
         signUp: {activationRequired},
     } = useApplicationInfoStore();
-
-    const [emailIsValid, setEmailIsValid] = useState(false);
-
-    const [showPassword, setShowPassword] = useState(false);
 
     const {captureUserSignedUp} = useAnalytics();
 
@@ -127,16 +133,13 @@ const Register = () => {
                     </CardTitle>
 
                     <CardDescription className="self-center text-content-neutral-secondary">
-                        Automate the work you do every day
+                        Automate the work you do every day.
                     </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-6 p-0">
                     <div className="flex flex-col gap-4">
-                        <Button
-                            className="flex h-10 items-center gap-2 rounded-md px-4 py-2 shadow-md"
-                            variant="outline"
-                        >
+                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
                             <img alt="Google logo" src={googleLogo} />
 
                             <span className="text-sm font-medium text-content-neutral-primary">
@@ -144,10 +147,7 @@ const Register = () => {
                             </span>
                         </Button>
 
-                        <Button
-                            className="flex h-10 items-center gap-2 rounded-md px-4 py-2 shadow-md"
-                            variant="outline"
-                        >
+                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
                             <img alt="Github logo" src={githubLogo} />
 
                             <span className="text-sm font-medium text-content-neutral-primary">
@@ -174,12 +174,7 @@ const Register = () => {
                                         <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                         <FormControl>
-                                            <Input
-                                                className="h-10 py-2"
-                                                placeholder="m@example.com"
-                                                type="email"
-                                                {...field}
-                                            />
+                                            <Input className="py-5" type="email" {...field} />
                                         </FormControl>
 
                                         <FormMessage />
@@ -187,7 +182,7 @@ const Register = () => {
                                 )}
                             />
 
-                            {emailIsValid ? (
+                            {emailIsValid && (
                                 <>
                                     <FormField
                                         control={form.control}
@@ -200,75 +195,81 @@ const Register = () => {
                                                     <div className="relative">
                                                         <Input
                                                             aria-label="Password"
-                                                            className="h-10 py-2"
+                                                            className="py-5"
                                                             type={showPassword ? 'text' : 'password'}
                                                             {...field}
                                                         />
 
-                                                        <button
-                                                            aria-label={
-                                                                showPassword ? 'Hide Password' : 'Show Password'
-                                                            }
-                                                            className="absolute right-4 top-2 z-10"
-                                                            onClick={() => setShowPassword((prev) => !prev)}
-                                                            type="button"
-                                                        >
-                                                            {showPassword ? (
-                                                                <EyeOff className="cursor-pointer text-content-neutral-primary" />
-                                                            ) : (
-                                                                <Eye className="cursor-pointer text-content-neutral-primary" />
-                                                            )}
-                                                        </button>
+                                                        {getValues('password') !== '' && (
+                                                            <button
+                                                                aria-label={
+                                                                    showPassword ? 'Hide Password' : 'Show Password'
+                                                                }
+                                                                className="absolute right-4 top-2 z-10"
+                                                                onClick={() => setShowPassword((show) => !show)}
+                                                                type="button"
+                                                            >
+                                                                {showPassword ? (
+                                                                    <EyeOff className="cursor-pointer text-content-neutral-primary" />
+                                                                ) : (
+                                                                    <Eye className="cursor-pointer text-content-neutral-primary" />
+                                                                )}
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </FormControl>
 
                                                 <ul>
-                                                    {errors.password?.message
-                                                        ? Object.entries(JSON.parse(errors.password.message)).map(
-                                                              ([key, value]) => {
-                                                                  const {message, pass} = value as {
-                                                                      message: string;
-                                                                      pass: boolean;
-                                                                  };
-                                                                  return (
-                                                                      <li
-                                                                          className={twMerge(
-                                                                              'mt-2 flex items-center gap-1 text-base',
-                                                                              'text-destructive',
-                                                                              pass && 'text-success'
-                                                                          )}
-                                                                          key={key}
-                                                                      >
-                                                                          {pass ? (
-                                                                              <CheckIcon size={20} />
-                                                                          ) : (
-                                                                              <XIcon size={20} />
-                                                                          )}
+                                                    {errors.password?.message &&
+                                                        getValues('password') !== '' &&
+                                                        Object.entries(JSON.parse(errors.password.message)).map(
+                                                            ([key, value]) => {
+                                                                const {message, validationPass} = value as {
+                                                                    message: string;
+                                                                    validationPass: boolean;
+                                                                };
 
-                                                                          <p>{message}</p>
-                                                                      </li>
-                                                                  );
-                                                              }
-                                                          )
-                                                        : getValues('password') === '' && (
-                                                              <>
-                                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                      <XIcon size={20} />
+                                                                return (
+                                                                    <li
+                                                                        className={twMerge(
+                                                                            'mt-2 flex items-center gap-1 text-base text-destructive',
+                                                                            validationPass && 'text-success'
+                                                                        )}
+                                                                        key={key}
+                                                                    >
+                                                                        {validationPass ? (
+                                                                            <CheckIcon size={20} />
+                                                                        ) : (
+                                                                            <XIcon size={20} />
+                                                                        )}
 
-                                                                      <p>{passwordLengthMessage}</p>
-                                                                  </li>
-                                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                      <XIcon size={20} />
+                                                                        <p>{message}</p>
+                                                                    </li>
+                                                                );
+                                                            }
+                                                        )}
 
-                                                                      <p>{passwordContainsNumberMessage}</p>
-                                                                  </li>
-                                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                      <XIcon size={20} />
+                                                    {getValues('password') === '' && (
+                                                        <>
+                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                                <XIcon size={20} />
 
-                                                                      <p>{passwordContainsUppercaseMessage}</p>
-                                                                  </li>
-                                                              </>
-                                                          )}
+                                                                <p>{passwordLengthMessage}</p>
+                                                            </li>
+
+                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                                <XIcon size={20} />
+
+                                                                <p>{passwordContainsNumberMessage}</p>
+                                                            </li>
+
+                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                                <XIcon size={20} />
+
+                                                                <p>{passwordContainsUppercaseMessage}</p>
+                                                            </li>
+                                                        </>
+                                                    )}
 
                                                     {!errors.password && getValues('password') !== '' && (
                                                         <>
@@ -277,11 +278,13 @@ const Register = () => {
 
                                                                 <p>{passwordLengthMessage}</p>
                                                             </li>
+
                                                             <li className="mt-2 flex items-center gap-1 text-base text-success">
                                                                 <CheckIcon size={20} />
 
                                                                 <p>{passwordContainsNumberMessage}</p>
                                                             </li>
+
                                                             <li className="mt-2 flex items-center gap-1 text-base text-success">
                                                                 <CheckIcon size={20} />
 
@@ -295,7 +298,7 @@ const Register = () => {
                                     />
 
                                     <Button
-                                        className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                                         disabled={isSubmitting}
                                         type="submit"
                                     >
@@ -303,9 +306,11 @@ const Register = () => {
                                         Continue with password
                                     </Button>
                                 </>
-                            ) : (
+                            )}
+
+                            {!emailIsValid && (
                                 <Button
-                                    className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                    className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                                     onClick={handleValidateEmailInput}
                                 >
                                     Continue

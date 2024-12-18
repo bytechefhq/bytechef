@@ -33,13 +33,7 @@ vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
 
 beforeEach(() => {
     mockApplicationInfoStore();
-});
-
-beforeEach(() => {
     mockAuthenticationStore();
-});
-
-beforeEach(() => {
     windowResizeObserver();
 });
 
@@ -53,17 +47,19 @@ it('should render the login page on "/login" path', () => {
     expect(screen.getByText('Welcome back')).toBeInTheDocument();
 });
 
-it('should hide password input on render and toggle "show password" when "show password" icon is clicked', async () => {
+it('should set type as password initially and toggle between types when "show password" icon is clicked', async () => {
     renderLoginPage();
 
     const passwordInputField = screen.getByLabelText('Password');
+    await userEvent.type(passwordInputField, 'password');
+
     expect(passwordInputField).toHaveAttribute('type', 'password');
 
-    const button = screen.getByRole('button', {name: /Show Passwor/i});
-    await userEvent.click(button);
+    const showPasswordButton = screen.getByRole('button', {name: /show password/i});
+    await userEvent.click(showPasswordButton);
     expect(passwordInputField).toHaveAttribute('type', 'text');
 
-    await userEvent.click(button);
+    await userEvent.click(showPasswordButton);
     expect(passwordInputField).toHaveAttribute('type', 'password');
 });
 
@@ -100,11 +96,11 @@ it('should render "PasswordResetInit" page if "Forgot your password" is clicked'
 
     expect(screen.getByText('Welcome back')).toBeInTheDocument();
 
-    const forgotPasswordButton = screen.getByText('Forgot your password');
+    const forgotPasswordButton = screen.getByText('Forgot your password?');
     await userEvent.click(forgotPasswordButton);
 
     await waitFor(() => {
-        expect(screen.getByText('Forgot your password?')).toBeInTheDocument();
+        expect(screen.getByText('Send link to email')).toBeInTheDocument();
     });
 });
 

@@ -65,12 +65,7 @@ export const PasswordResetInit = () => {
                                         <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                         <FormControl>
-                                            <Input
-                                                className="h-10 py-2"
-                                                placeholder="m@example.com"
-                                                type="email"
-                                                {...field}
-                                            />
+                                            <Input className="py-5" type="email" {...field} />
                                         </FormControl>
 
                                         <FormMessage />
@@ -79,7 +74,7 @@ export const PasswordResetInit = () => {
                             />
 
                             <Button
-                                className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                                 data-cy="submit"
                                 type="submit"
                             >

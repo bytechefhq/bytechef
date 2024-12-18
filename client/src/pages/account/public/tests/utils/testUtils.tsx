@@ -11,10 +11,12 @@ export const windowResizeObserver = () => {
 
 export const resetAll = () => {
     cleanup();
+
     vi.clearAllMocks();
+
     if (window.ResizeObserver) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (window as any).ResizeObserver;
+        delete (window as unknown as {ResizeObserver?: ResizeObserver}).ResizeObserver;
     }
+
     vi.resetModules();
 };
