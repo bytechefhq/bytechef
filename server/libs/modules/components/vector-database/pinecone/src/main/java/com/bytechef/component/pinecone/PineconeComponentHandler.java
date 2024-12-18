@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.pinecone.action.PineconeDataLoaderAction;
 import com.bytechef.component.pinecone.action.PineconeDataQueryAction;
+import com.bytechef.component.pinecone.action.PineconeLoadDataAction;
 import com.bytechef.component.pinecone.connection.PineconeConnection;
 import com.google.auto.service.AutoService;
 
@@ -41,8 +41,8 @@ public class PineconeComponentHandler implements ComponentHandler {
         .connection(PineconeConnection.CONNECTION_DEFINITION)
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .actions(
-            PineconeDataLoaderAction.ACTION_DEFINITION,
-            PineconeDataQueryAction.ACTION_DEFINITION);
+            PineconeDataQueryAction.ACTION_DEFINITION,
+            PineconeLoadDataAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

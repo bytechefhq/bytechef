@@ -38,18 +38,18 @@ import org.springframework.ai.vectorstore.PineconeVectorStore.PineconeVectorStor
 /**
  * @author Monika Kušter
  */
-public class PineconeDataLoaderAction {
+public class PineconeLoadDataAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("dataLoader")
-        .title("Data Loader")
-        .description("")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("loadData")
+        .title("Load Data")
+        .description("Loads data into a Pinecone vector store using OpenAI embeddings.")
         .properties(
             DOCUMENT_TYPE_PROPERTY,
             JSON_KEYS_TO_USE_PROPERTY,
             DOCUMENT_PROPERTY)
-        .perform(PineconeDataLoaderAction::perform);
+        .perform(PineconeLoadDataAction::perform);
 
-    private PineconeDataLoaderAction() {
+    private PineconeLoadDataAction() {
     }
 
     protected static Object perform(
