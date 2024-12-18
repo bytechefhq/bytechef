@@ -24,14 +24,13 @@ const formSchema = z.object({
 });
 
 const Login = () => {
-    const {authenticated, login, loginError, reset} = useAuthenticationStore();
-
     const [showPassword, setShowPassword] = useState(false);
+
+    const {authenticated, login, loginError, reset} = useAuthenticationStore();
 
     const analytics = useAnalytics();
 
     const pageLocation = useLocation();
-
     const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -83,10 +82,7 @@ const Login = () => {
 
                 <CardContent className="flex flex-col gap-6 p-0">
                     <div className="flex flex-col gap-4">
-                        <Button
-                            className="flex h-10 items-center gap-2 rounded-md px-4 py-2 shadow-md"
-                            variant="outline"
-                        >
+                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
                             <img alt="Google logo" src={googleLogo} />
 
                             <span className="text-sm font-medium text-content-neutral-primary">
@@ -94,10 +90,7 @@ const Login = () => {
                             </span>
                         </Button>
 
-                        <Button
-                            className="flex h-10 items-center gap-2 rounded-md px-4 py-2 shadow-md"
-                            variant="outline"
-                        >
+                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
                             <img alt="Github logo" src={githubLogo} />
 
                             <span className="text-sm font-medium text-content-neutral-primary">
@@ -125,12 +118,7 @@ const Login = () => {
                                             <FormLabel className="text-content-neutral-primary">Email</FormLabel>
 
                                             <FormControl>
-                                                <Input
-                                                    className="h-10 py-2"
-                                                    placeholder="m@example.com"
-                                                    type="email"
-                                                    {...field}
-                                                />
+                                                <Input className="py-5" type="email" {...field} />
                                             </FormControl>
 
                                             <FormMessage />
@@ -151,23 +139,27 @@ const Login = () => {
                                                 <div className="relative">
                                                     <Input
                                                         aria-label="Password"
-                                                        className="h-10 py-2"
+                                                        className="py-5"
                                                         type={showPassword ? 'text' : 'password'}
                                                         {...field}
                                                     />
 
-                                                    <button
-                                                        aria-label={showPassword ? 'Hide Password' : 'Show Password'}
-                                                        className="absolute right-4 top-2 z-10"
-                                                        onClick={() => setShowPassword((prev) => !prev)}
-                                                        type="button"
-                                                    >
-                                                        {showPassword ? (
-                                                            <EyeOff className="cursor-pointer text-content-neutral-primary" />
-                                                        ) : (
-                                                            <Eye className="cursor-pointer text-content-neutral-primary" />
-                                                        )}
-                                                    </button>
+                                                    {form.getValues('password') !== '' && (
+                                                        <button
+                                                            aria-label={
+                                                                showPassword ? 'Hide Password' : 'Show Password'
+                                                            }
+                                                            className="absolute right-4 top-2 z-10"
+                                                            onClick={() => setShowPassword((show) => !show)}
+                                                            type="button"
+                                                        >
+                                                            {showPassword ? (
+                                                                <EyeOff className="cursor-pointer text-content-neutral-primary" />
+                                                            ) : (
+                                                                <Eye className="cursor-pointer text-content-neutral-primary" />
+                                                            )}
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </FormControl>
 
@@ -177,7 +169,7 @@ const Login = () => {
                                                 className="inline-block text-sm text-content-neutral-secondary hover:text-content-neutral-primary"
                                                 to="/password-reset/init"
                                             >
-                                                Forgot your password
+                                                Forgot your password?
                                             </Link>
                                         </FormItem>
                                     )}
@@ -206,7 +198,7 @@ const Login = () => {
 
                             <Button
                                 aria-label="log in button"
-                                className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                                 disabled={isSubmitting}
                                 type="submit"
                             >

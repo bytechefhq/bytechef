@@ -20,32 +20,41 @@ const formSchema = z
     .object({
         newPassword: z.string(),
     })
-    .superRefine(({newPassword}, checkPassComplexity) => {
+    .superRefine(({newPassword}, checkPasswordComplexity) => {
         const containsUppercase = (character: string) => /[A-Z]/.test(character);
         const containsNumber = (char: string) => /\d/.test(char);
 
-        const errObj = {
-            passwordLength: {message: passwordLengthMessage, pass: newPassword.length >= 8},
-            totalNumber: {message: passwordContainsNumberMessage, pass: [...newPassword].some(containsNumber)},
-            upperCase: {message: passwordContainsUppercaseMessage, pass: [...newPassword].some(containsUppercase)},
+        const passwordValidationCriteria = {
+            passwordLength: {message: passwordLengthMessage, validationPass: newPassword.length >= 8},
+            totalNumbers: {
+                message: passwordContainsNumberMessage,
+                validationPass: [...newPassword].some(containsNumber),
+            },
+            upperCase: {
+                message: passwordContainsUppercaseMessage,
+                validationPass: [...newPassword].some(containsUppercase),
+            },
         };
 
-        if (!errObj.passwordLength.pass || !errObj.upperCase.pass || !errObj.totalNumber.pass) {
-            checkPassComplexity.addIssue({
+        if (
+            !passwordValidationCriteria.passwordLength.validationPass ||
+            !passwordValidationCriteria.upperCase.validationPass ||
+            !passwordValidationCriteria.totalNumbers.validationPass
+        ) {
+            checkPasswordComplexity.addIssue({
                 code: 'custom',
-                message: JSON.stringify(errObj),
+                message: JSON.stringify(passwordValidationCriteria),
                 path: ['newPassword'],
             });
         }
     });
 
 const PasswordResetFinish = () => {
-    const {reset, resetPasswordFailure, resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore();
-
     const [showPassword, setShowPassword] = useState(false);
 
-    const [searchParams] = useSearchParams();
+    const {reset, resetPasswordFailure, resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore();
 
+    const [searchParams] = useSearchParams();
     const key = searchParams.get('key');
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -78,67 +87,73 @@ const PasswordResetFinish = () => {
                                     <div className="relative">
                                         <Input
                                             aria-label="Password"
-                                            className="h-10 py-2"
+                                            className="py-5"
                                             type={showPassword ? 'text' : 'password'}
                                             {...field}
                                         />
 
-                                        <button
-                                            aria-label={showPassword ? 'Hide Password' : 'Show Password'}
-                                            className="absolute right-4 top-2 z-10"
-                                            onClick={() => setShowPassword((prev) => !prev)}
-                                            type="button"
-                                        >
-                                            {showPassword ? (
-                                                <EyeOff className="cursor-pointer text-content-neutral-primary" />
-                                            ) : (
-                                                <Eye className="cursor-pointer text-content-neutral-primary" />
-                                            )}
-                                        </button>
+                                        {getValues('newPassword') !== '' && (
+                                            <button
+                                                aria-label={showPassword ? 'Hide Password' : 'Show Password'}
+                                                className="absolute right-4 top-2 z-10"
+                                                onClick={() => setShowPassword((show) => !show)}
+                                                type="button"
+                                            >
+                                                {showPassword ? (
+                                                    <EyeOff className="cursor-pointer text-content-neutral-primary" />
+                                                ) : (
+                                                    <Eye className="cursor-pointer text-content-neutral-primary" />
+                                                )}
+                                            </button>
+                                        )}
                                     </div>
                                 </FormControl>
 
                                 <ul>
-                                    {errors.newPassword?.message
-                                        ? Object.entries(JSON.parse(errors.newPassword.message)).map(([key, value]) => {
-                                              const {message, pass} = value as {
-                                                  message: string;
-                                                  pass: boolean;
-                                              };
-                                              return (
-                                                  <li
-                                                      className={twMerge(
-                                                          'mt-2 flex items-center gap-1 text-base',
-                                                          'text-destructive',
-                                                          pass && 'text-success'
-                                                      )}
-                                                      key={key}
-                                                  >
-                                                      {pass ? <CheckIcon size={20} /> : <XIcon size={20} />}
+                                    {errors.newPassword?.message &&
+                                        getValues('newPassword') !== '' &&
+                                        Object.entries(JSON.parse(errors.newPassword.message)).map(([key, value]) => {
+                                            const {message, validationPass} = value as {
+                                                message: string;
+                                                validationPass: boolean;
+                                            };
 
-                                                      <span>{message}</span>
-                                                  </li>
-                                              );
-                                          })
-                                        : getValues('newPassword') === '' && (
-                                              <>
-                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                      <XIcon size={20} />
+                                            return (
+                                                <li
+                                                    className={twMerge(
+                                                        'mt-2 flex items-center gap-1 text-base text-destructive',
+                                                        validationPass && 'text-success'
+                                                    )}
+                                                    key={key}
+                                                >
+                                                    {validationPass ? <CheckIcon size={20} /> : <XIcon size={20} />}
 
-                                                      <p>{passwordLengthMessage}</p>
-                                                  </li>
-                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                      <XIcon size={20} />
+                                                    <p>{message}</p>
+                                                </li>
+                                            );
+                                        })}
 
-                                                      <p>{passwordContainsNumberMessage}</p>
-                                                  </li>
-                                                  <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                      <XIcon size={20} />
+                                    {getValues('newPassword') === '' && (
+                                        <>
+                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                <XIcon size={20} />
 
-                                                      <p>{passwordContainsUppercaseMessage}</p>
-                                                  </li>
-                                              </>
-                                          )}
+                                                <p>{passwordLengthMessage}</p>
+                                            </li>
+
+                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                <XIcon size={20} />
+
+                                                <p>{passwordContainsNumberMessage}</p>
+                                            </li>
+
+                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
+                                                <XIcon size={20} />
+
+                                                <p>{passwordContainsUppercaseMessage}</p>
+                                            </li>
+                                        </>
+                                    )}
 
                                     {!errors.newPassword && getValues('newPassword') !== '' && (
                                         <>
@@ -147,11 +162,13 @@ const PasswordResetFinish = () => {
 
                                                 <p>{passwordLengthMessage}</p>
                                             </li>
+
                                             <li className="mt-2 flex items-center gap-1 text-base text-success">
                                                 <CheckIcon size={20} />
 
                                                 <p>{passwordContainsNumberMessage}</p>
                                             </li>
+
                                             <li className="mt-2 flex items-center gap-1 text-base text-success">
                                                 <CheckIcon size={20} />
 
@@ -165,7 +182,7 @@ const PasswordResetFinish = () => {
                     />
 
                     <Button
-                        className="h-10 w-full bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                        className="w-full bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                         data-cy="submit"
                         type="submit"
                     >

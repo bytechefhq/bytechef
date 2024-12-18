@@ -16,12 +16,12 @@ const PasswordResetSuccessful = () => {
                     </CardTitle>
 
                     <CardDescription className="self-center text-center text-content-neutral-secondary">
-                        Your password has been successfully reset. <br /> Click below to log in
+                        Your password has been successfully reset. <br /> Click below to log in.
                     </CardDescription>
                 </CardHeader>
 
                 <Link to="/login">
-                    <Button className="h-10 w-fit space-x-2 bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed">
+                    <Button className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed">
                         Continue to Log in
                     </Button>
                 </Link>

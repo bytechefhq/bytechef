@@ -42,20 +42,14 @@ const RegisterSuccess = () => {
                     </CardDescription>
                 </CardHeader>
 
-                {loading ? (
-                    <Button className="h-10 w-fit space-x-2 self-center bg-surface-brand-primary" disabled>
-                        <LoadingIcon /> Start
+                <Link to="/login">
+                    <Button
+                        className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                        disabled={loading}
+                    >
+                        {loading && <LoadingIcon />} Start
                     </Button>
-                ) : (
-                    <Link to="/login">
-                        <Button
-                            className="h-10 w-fit space-x-2 bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
-                            disabled={loading}
-                        >
-                            Start
-                        </Button>
-                    </Link>
-                )}
+                </Link>
             </Card>
         </PublicLayoutContainer>
     );

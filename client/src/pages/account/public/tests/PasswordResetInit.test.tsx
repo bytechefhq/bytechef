@@ -27,9 +27,6 @@ vi.mock('@/pages/account/public/stores/usePasswordResetStore', () => ({
 
 beforeEach(() => {
     mockPasswordResetStore();
-});
-
-beforeEach(() => {
     windowResizeObserver();
 });
 

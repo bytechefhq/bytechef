@@ -3,12 +3,11 @@ import {Mock, vi} from 'vitest';
 
 export const createMockApplicationInfoStore = (overrides = {}) => {
     const defaultMock = {
+        getApplicationInfo: vi.fn(),
         signUp: {
             activationRequired: false,
             enabled: true,
         },
-        // eslint-disable-next-line sort-keys
-        getApplicationInfo: vi.fn(),
     };
 
     return {

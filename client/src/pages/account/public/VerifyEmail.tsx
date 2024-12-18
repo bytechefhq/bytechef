@@ -6,11 +6,10 @@ import {useEffect, useState} from 'react';
 import {useLocation} from 'react-router-dom';
 
 const VerifyEmail = () => {
-    const {register} = useRegisterStore();
-
     const [disabled, setDisabled] = useState(false);
-
     const [countdown, setCountdown] = useState(60);
+
+    const {register} = useRegisterStore();
 
     const location = useLocation();
 
@@ -19,14 +18,16 @@ const VerifyEmail = () => {
 
         if (disabled) {
             timer = setInterval(() => {
-                setCountdown((prev) => {
-                    if (prev <= 1) {
+                setCountdown((currentCountValue) => {
+                    if (currentCountValue <= 1) {
                         clearInterval(timer);
                         setDisabled(false);
                         setCountdown(60);
+
                         return 60;
                     }
-                    return prev - 1;
+
+                    return currentCountValue - 1;
                 });
             }, 1000);
         }
@@ -51,7 +52,7 @@ const VerifyEmail = () => {
                     </CardTitle>
 
                     <CardDescription className="self-center text-content-neutral-secondary">
-                        We sent an email to {location.state.email}
+                        We sent an email to {location.state.email}.
                     </CardDescription>
                 </CardHeader>
 
@@ -60,13 +61,15 @@ const VerifyEmail = () => {
                         {disabled ? `Mail sent. Wait ${countdown} sec to send again.` : `Didn't get an email?`}
                     </span>
 
-                    <button
-                        className="font-bold text-content-neutral-primary underline hover:text-content-neutral-secondary"
-                        disabled={disabled}
-                        onClick={handleResendEmail}
-                    >
-                        {!disabled && 'Click to resend'}
-                    </button>
+                    {!disabled && (
+                        <button
+                            className="font-bold text-content-neutral-primary underline hover:text-content-neutral-secondary"
+                            disabled={disabled}
+                            onClick={handleResendEmail}
+                        >
+                            Click to resend
+                        </button>
+                    )}
                 </div>
             </Card>
         </PublicLayoutContainer>

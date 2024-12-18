@@ -21,7 +21,7 @@ const AccountErrorPage = () => {
                 </CardHeader>
 
                 <Link to="/">
-                    <Button className="h-10 w-fit space-x-2 bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed">
+                    <Button className="w-fit space-x-2 bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed">
                         Go back
                     </Button>
                 </Link>
