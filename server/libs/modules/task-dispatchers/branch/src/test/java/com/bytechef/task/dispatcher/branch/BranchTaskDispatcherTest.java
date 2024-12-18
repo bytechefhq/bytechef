@@ -66,9 +66,10 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(base64FileStorageService.storeFileContent("", "", CompressionUtils.compress("{}")));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder()
-                .id(1L)
-                .build());
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(1L)
+                    .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -154,9 +155,10 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(taskFileStorage.storeContextValue(1, Context.Classname.TASK_EXECUTION, Map.of()));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder()
-                .id(1L)
-                .build());
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(1L)
+                    .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
@@ -199,8 +201,9 @@ public class BranchTaskDispatcherTest {
 
         verify(taskDispatcher, times(1)).dispatch(argument.capture());
 
-        Assertions.assertEquals("sleep", argument.getValue()
-            .getType());
+        TaskExecution value = argument.getValue();
+
+        Assertions.assertEquals("sleep", value.getType());
     }
 
     @Test
@@ -208,9 +211,10 @@ public class BranchTaskDispatcherTest {
         when(contextService.peek(anyLong(), any()))
             .thenReturn(base64FileStorageService.storeFileContent("", "", "{}"));
         when(taskExecutionService.create(any()))
-            .thenReturn(TaskExecution.builder()
-                .id(1L)
-                .build());
+            .thenReturn(
+                TaskExecution.builder()
+                    .id(1L)
+                    .build());
 
         BranchTaskDispatcher branchTaskDispatcher = new BranchTaskDispatcher(
             eventPublisher, contextService, taskDispatcher, taskExecutionService, taskFileStorage);
