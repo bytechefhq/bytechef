@@ -142,6 +142,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:ai:llm:watsonx"))
     implementation(project(":server:libs:modules:components:ai:vector-store:pinecone"))
+    implementation(project(":server:libs:modules:components:ai:vector-store:weaviate"))
     implementation(project(":server:libs:modules:components:airtable"))
     implementation(project(":server:libs:modules:components:aitable"))
     implementation(project(":server:libs:modules:components:app-event"))

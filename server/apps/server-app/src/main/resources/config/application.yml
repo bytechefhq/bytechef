@@ -98,7 +98,8 @@ spring:
       org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
       org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration,
       org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration,
-      org.springframework.ai.autoconfigure.vectorstore.pinecone.PineconeVectorStoreAutoConfiguration
+      org.springframework.ai.autoconfigure.vectorstore.pinecone.PineconeVectorStoreAutoConfiguration,
+      org.springframework.ai.autoconfigure.vectorstore.weaviate.WeaviateVectorStoreAutoConfiguration
   application:
     name: server-app
   cache:
