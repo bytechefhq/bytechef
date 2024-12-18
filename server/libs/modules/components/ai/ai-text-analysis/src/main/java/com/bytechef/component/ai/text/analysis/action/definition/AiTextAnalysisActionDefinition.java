@@ -16,30 +16,30 @@
 
 package com.bytechef.component.ai.text.analysis.action.definition;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockCohereChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockJurassic2ChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
-import com.bytechef.component.amazon.bedrock.action.AmazonBedrockTitanChatAction;
-import com.bytechef.component.anthropic.action.AnthropicChatAction;
-import com.bytechef.component.azure.openai.action.AzureOpenAiChatAction;
+import com.bytechef.component.ai.llm.Chat;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic3ChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockCohereChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockJurassic2ChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockLlamaChatAction;
+import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockTitanChatAction;
+import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
+import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
+import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
+import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
+import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
+import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.groq.action.GroqChatAction;
-import com.bytechef.component.hugging.face.action.HuggingFaceChatAction;
-import com.bytechef.component.llm.Chat;
-import com.bytechef.component.mistral.action.MistralChatAction;
-import com.bytechef.component.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.openai.action.OpenAiChatAction;
-import com.bytechef.component.vertex.gemini.action.VertexGeminiChatAction;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ParametersFactory;

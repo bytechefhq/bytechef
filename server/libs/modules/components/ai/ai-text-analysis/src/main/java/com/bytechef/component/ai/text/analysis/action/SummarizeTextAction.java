@@ -16,6 +16,9 @@
 
 package com.bytechef.component.ai.text.analysis.action;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.PROMPT;
@@ -24,17 +27,14 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 
+import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
+import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.ai.text.analysis.action.definition.AiTextAnalysisActionDefinition;
 import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.anthropic.constant.AnthropicConstants;
-import com.bytechef.component.mistral.constant.MistralConstants;
 import com.bytechef.component.openai.constant.OpenAiConstants;
-import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.config.ApplicationProperties;
 
 /**

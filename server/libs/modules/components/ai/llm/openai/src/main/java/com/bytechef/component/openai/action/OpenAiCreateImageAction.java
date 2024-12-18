@@ -16,6 +16,15 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SIZE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.STYLE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -24,23 +33,14 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.llm.constant.LLMConstants.CREATE_IMAGE;
-import static com.bytechef.component.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
-import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.llm.constant.LLMConstants.N;
-import static com.bytechef.component.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.llm.constant.LLMConstants.SIZE;
-import static com.bytechef.component.llm.constant.LLMConstants.STYLE;
-import static com.bytechef.component.llm.constant.LLMConstants.USER;
-import static com.bytechef.component.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.openai.constant.OpenAiConstants.QUALITY;
 
+import com.bytechef.component.ai.llm.Image;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.component.llm.Image;
-import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.image.ImageModel;

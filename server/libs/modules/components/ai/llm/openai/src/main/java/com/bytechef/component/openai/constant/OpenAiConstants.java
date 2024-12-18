@@ -16,8 +16,8 @@
 
 package com.bytechef.component.openai.constant;
 
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.Option;
-import com.bytechef.component.llm.util.LLMUtils;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
