@@ -43,8 +43,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -139,19 +137,12 @@ public class OpenAiCreateImageAction {
                                         string("revisedPrompt"))))))
         .perform(OpenAiCreateImageAction::perform);
 
-    private static final Image IMAGE = new Image() {
+    private static final Image IMAGE = (inputParameters, connectionParameters) -> {
+        Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiImageModel(
-                new OpenAiImageApi(connectionParameters.getString(TOKEN)),
-                (OpenAiImageOptions) createImageOptions(inputParameters), new RetryTemplate());
-        }
-
-        private ImageOptions createImageOptions(Parameters inputParameters) {
-            Integer[] size = inputParameters.getArray(SIZE, Integer.class);
-
-            return OpenAiImageOptions.builder()
+        return new OpenAiImageModel(
+            new OpenAiImageApi(connectionParameters.getString(TOKEN)),
+            OpenAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
                 .withHeight(size[1])
@@ -160,8 +151,8 @@ public class OpenAiCreateImageAction {
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
                 .withQuality(inputParameters.getString(QUALITY))
-                .build();
-        }
+                .build(),
+            new RetryTemplate());
     };
 
     private OpenAiCreateImageAction() {

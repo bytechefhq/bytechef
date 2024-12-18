@@ -48,8 +48,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.api.OpenAiApi;
@@ -83,31 +81,20 @@ public class NvidiaChatAction {
         .output()
         .perform(NvidiaChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new OpenAiChatModel(
-                new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
-                (OpenAiChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            OpenAiChatOptions.Builder builder = OpenAiChatOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withN(inputParameters.getInteger(N))
-                .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withUser(inputParameters.getString(USER));
-
-            return builder.build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new OpenAiChatModel(
+        new OpenAiApi("https://integrate.api.nvidia.com/", connectionParameters.getString(TOKEN)),
+        OpenAiChatOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+            .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withN(inputParameters.getInteger(N))
+            .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+            .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withUser(inputParameters.getString(USER))
+            .build());
 
     private NvidiaChatAction() {
     }

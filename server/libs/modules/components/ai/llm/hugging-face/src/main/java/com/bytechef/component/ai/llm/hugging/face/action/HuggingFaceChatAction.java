@@ -29,7 +29,6 @@ import com.bytechef.component.ai.llm.Chat;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.huggingface.HuggingfaceChatModel;
 
 /**
@@ -50,13 +49,8 @@ public class HuggingFaceChatAction {
         .output()
         .perform(HuggingFaceChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new HuggingfaceChatModel(connectionParameters.getString(TOKEN), inputParameters.getString(URL));
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new HuggingfaceChatModel(
+        connectionParameters.getString(TOKEN), inputParameters.getString(URL));
 
     private HuggingFaceChatAction() {
     }

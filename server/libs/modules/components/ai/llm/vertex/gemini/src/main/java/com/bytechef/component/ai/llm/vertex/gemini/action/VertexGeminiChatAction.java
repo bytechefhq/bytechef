@@ -46,8 +46,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.google.cloud.vertexai.VertexAI;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatOptions;
 
@@ -83,21 +81,14 @@ public class VertexGeminiChatAction {
         .output()
         .perform(VertexGeminiChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new VertexAiGeminiChatModel(
-                new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
-                (VertexAiGeminiChatOptions) createChatOptions(inputParameters));
-        }
+        String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
 
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-
-            String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
-
-            VertexAiGeminiChatOptions.Builder builder = VertexAiGeminiChatOptions.builder()
+        return new VertexAiGeminiChatModel(
+            new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
+            VertexAiGeminiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
@@ -105,10 +96,8 @@ public class VertexGeminiChatAction {
                 .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withTopK(inputParameters.getFloat(TOP_K))
                 .withCandidateCount(inputParameters.getInteger(N))
-                .withResponseMimeType(type);
-
-            return builder.build();
-        }
+                .withResponseMimeType(type)
+                .build());
     };
 
     private VertexGeminiChatAction() {

@@ -55,8 +55,6 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.azure.openai.AzureOpenAiChatModel;
 import org.springframework.ai.azure.openai.AzureOpenAiChatOptions;
 import org.springframework.ai.azure.openai.AzureOpenAiResponseFormat;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 
 /**
  * @author Marko Kriskovic
@@ -87,24 +85,19 @@ public class AzureOpenAiChatAction {
         .output()
         .perform(AzureOpenAiChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+        OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
+            .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+            .endpoint(connectionParameters.getString(ENDPOINT));
 
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClientBuilder openAIClientBuilder = new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT));
+        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
-            return new AzureOpenAiChatModel(
-                openAIClientBuilder, (AzureOpenAiChatOptions) createChatOptions(inputParameters));
-        }
+        AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
+            ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
 
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-            AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
-                ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
-
-            AzureOpenAiChatOptions.Builder builder = AzureOpenAiChatOptions.builder()
+        return new AzureOpenAiChatModel(
+            openAIClientBuilder,
+            AzureOpenAiChatOptions.builder()
                 .withDeploymentName(inputParameters.getRequiredString(MODEL))
                 .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                 .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
@@ -115,10 +108,8 @@ public class AzureOpenAiChatAction {
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withTopP(inputParameters.getDouble(TOP_P))
                 .withUser(inputParameters.getString(USER))
-                .withResponseFormat(format);
-
-            return builder.build();
-        }
+                .withResponseFormat(format)
+                .build());
     };
 
     private AzureOpenAiChatAction() {

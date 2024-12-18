@@ -58,8 +58,6 @@ import java.util.stream.Collectors;
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatModel;
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatOptions;
 import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 /**
@@ -120,37 +118,27 @@ public class AmazonBedrockCohereChatAction {
         .output()
         .perform(AmazonBedrockCohereChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockCohereChatModel(
-                new CohereChatBedrockApi(
-                    inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (BedrockCohereChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            return BedrockCohereChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(
-                    inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
-                .withNumGenerations(inputParameters.getInteger(N))
-                .withReturnLikelihoods(inputParameters.get(RETURN_LIKELIHOODS,
-                    CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-                .withTruncate(inputParameters.get(TRUNCATE,
-                    CohereChatBedrockApi.CohereChatRequest.Truncate.class))
-                .build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockCohereChatModel(
+        new CohereChatBedrockApi(
+            inputParameters.getRequiredString(MODEL),
+            () -> AwsBasicCredentials.create(
+                connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+            connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+        BedrockCohereChatOptions.builder()
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTopK(inputParameters.getInteger(TOP_K))
+            .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(
+                inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
+            .withNumGenerations(inputParameters.getInteger(N))
+            .withReturnLikelihoods(inputParameters.get(RETURN_LIKELIHOODS,
+                CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
+            .withTruncate(inputParameters.get(TRUNCATE,
+                CohereChatBedrockApi.CohereChatRequest.Truncate.class))
+            .build());
 
     private AmazonBedrockCohereChatAction() {
     }

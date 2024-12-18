@@ -48,8 +48,6 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.azure.openai.AzureOpenAiImageModel;
 import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
 
 /**
  * @author Monika Domiter
@@ -140,23 +138,17 @@ public class AzureOpenAiCreateImageAction {
         return IMAGE.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Image IMAGE = new Image() {
+    private static final Image IMAGE = (inputParameters, connectionParameters) -> {
+        OpenAIClient openAIClient = new OpenAIClientBuilder()
+            .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+            .endpoint(connectionParameters.getString(ENDPOINT))
+            .buildClient();
 
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            OpenAIClient openAIClient = new OpenAIClientBuilder()
-                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-                .endpoint(connectionParameters.getString(ENDPOINT))
-                .buildClient();
+        Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
-            return new AzureOpenAiImageModel(
-                openAIClient, (AzureOpenAiImageOptions) createImageOptions(inputParameters));
-        }
-
-        private ImageOptions createImageOptions(Parameters inputParameters) {
-            Integer[] size = inputParameters.getArray(SIZE, Integer.class);
-
-            return AzureOpenAiImageOptions.builder()
+        return new AzureOpenAiImageModel(
+            openAIClient,
+            AzureOpenAiImageOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withN(inputParameters.getInteger(N))
                 .withHeight(size[1])
@@ -164,7 +156,6 @@ public class AzureOpenAiCreateImageAction {
                 .withStyle(inputParameters.getString(STYLE))
                 .withUser(inputParameters.getString(USER))
                 .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
-                .build();
-        }
+                .build());
     };
 }

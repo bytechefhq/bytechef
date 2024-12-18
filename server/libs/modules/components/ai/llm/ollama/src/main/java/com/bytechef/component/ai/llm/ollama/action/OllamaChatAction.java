@@ -76,8 +76,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaModel;
@@ -224,58 +222,50 @@ public class OllamaChatAction {
         .output()
         .perform(OllamaChatAction::perform);
 
-    private static final Chat CHAT = new Chat() {
+    private static final Chat CHAT = (inputParameters, connectionParameters) -> {
+        String url = connectionParameters.getString(URL);
 
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            String url = connectionParameters.getString(URL);
+        OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
 
-            OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
-
-            return OllamaChatModel.builder()
-                .withOllamaApi(ollamaApi)
-                .withDefaultOptions((OllamaOptions) createChatOptions(inputParameters))
-                .build();
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            OllamaOptions builder = OllamaOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .withSeed(inputParameters.getInteger(SEED))
-                .withFormat(inputParameters.getString(FORMAT))
-                .withKeepAlive(inputParameters.getString(KEEP_ALIVE))
-                .withF16KV(inputParameters.getBoolean(F16KV))
-                .withLogitsAll(inputParameters.getBoolean(LOGTS_ALL))
-                .withUseMMap(inputParameters.getBoolean(USE_MMAP))
-                .withLowVRAM(inputParameters.getBoolean(LOW_VRAM))
-                .withMainGPU(inputParameters.getInteger(MAIN_GPU))
-                .withMirostat(inputParameters.getInteger(MIROSTAT))
-                .withMirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
-                .withMirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
-                .withNumBatch(inputParameters.getInteger(NUM_BATCH))
-                .withNumCtx(inputParameters.getInteger(NUM_CTX))
-                .withNumGPU(inputParameters.getInteger(NUM_GPU))
-                .withNumKeep(inputParameters.getInteger(NUM_KEEP))
-                .withNumThread(inputParameters.getInteger(NUM_THREAD))
-                .withNumPredict(inputParameters.getInteger(MAX_TOKENS))
-                .withPenalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
-                .withRepeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
-                .withRepeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
-                .withTfsZ(inputParameters.getFloat(TFSZ))
-                .withTruncate(inputParameters.getBoolean(TRUNCATE))
-                .withTypicalP(inputParameters.getFloat(TYPICAL_P))
-                .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
-                .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
-                .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
-
-            return builder.build();
-        }
+        return OllamaChatModel.builder()
+            .withOllamaApi(ollamaApi)
+            .withDefaultOptions(
+                OllamaOptions.builder()
+                    .withModel(inputParameters.getRequiredString(MODEL))
+                    .withTemperature(inputParameters.getDouble(TEMPERATURE))
+                    .withTopP(inputParameters.getDouble(TOP_P))
+                    .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .withTopK(inputParameters.getInteger(TOP_K))
+                    .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .withSeed(inputParameters.getInteger(SEED))
+                    .withFormat(inputParameters.getString(FORMAT))
+                    .withKeepAlive(inputParameters.getString(KEEP_ALIVE))
+                    .withF16KV(inputParameters.getBoolean(F16KV))
+                    .withLogitsAll(inputParameters.getBoolean(LOGTS_ALL))
+                    .withUseMMap(inputParameters.getBoolean(USE_MMAP))
+                    .withLowVRAM(inputParameters.getBoolean(LOW_VRAM))
+                    .withMainGPU(inputParameters.getInteger(MAIN_GPU))
+                    .withMirostat(inputParameters.getInteger(MIROSTAT))
+                    .withMirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
+                    .withMirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
+                    .withNumBatch(inputParameters.getInteger(NUM_BATCH))
+                    .withNumCtx(inputParameters.getInteger(NUM_CTX))
+                    .withNumGPU(inputParameters.getInteger(NUM_GPU))
+                    .withNumKeep(inputParameters.getInteger(NUM_KEEP))
+                    .withNumThread(inputParameters.getInteger(NUM_THREAD))
+                    .withNumPredict(inputParameters.getInteger(MAX_TOKENS))
+                    .withPenalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
+                    .withRepeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
+                    .withRepeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
+                    .withTfsZ(inputParameters.getFloat(TFSZ))
+                    .withTruncate(inputParameters.getBoolean(TRUNCATE))
+                    .withTypicalP(inputParameters.getFloat(TYPICAL_P))
+                    .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
+                    .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
+                    .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
+                    .build())
+            .build();
     };
 
     private OllamaChatAction() {

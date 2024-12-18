@@ -56,8 +56,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatModel;
 import org.springframework.ai.bedrock.jurassic2.BedrockAi21Jurassic2ChatOptions;
 import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 public class AmazonBedrockJurassic2ChatAction {
@@ -97,42 +95,32 @@ public class AmazonBedrockJurassic2ChatAction {
         .output()
         .perform(AmazonBedrockJurassic2ChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockAi21Jurassic2ChatModel(
-                new Ai21Jurassic2ChatBedrockApi(
-                    inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (BedrockAi21Jurassic2ChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            return BedrockAi21Jurassic2ChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withMinTokens(inputParameters.getInteger(MIN_TOKENS))
-                .withNumResults(inputParameters.getInteger(N))
-                .withPrompt(inputParameters.getString(PROMPT))
-                .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getDouble(COUNT_PENALTY))
-                    .build())
-                .withFrequencyPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .build())
-                .withPresencePenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
-                    .scale(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .build())
-                .build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockAi21Jurassic2ChatModel(
+        new Ai21Jurassic2ChatBedrockApi(
+            inputParameters.getRequiredString(MODEL),
+            () -> AwsBasicCredentials.create(
+                connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+            connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+        BedrockAi21Jurassic2ChatOptions.builder()
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTopK(inputParameters.getInteger(TOP_K))
+            .withMinTokens(inputParameters.getInteger(MIN_TOKENS))
+            .withNumResults(inputParameters.getInteger(N))
+            .withPrompt(inputParameters.getString(PROMPT))
+            .withCountPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                .scale(inputParameters.getDouble(COUNT_PENALTY))
+                .build())
+            .withFrequencyPenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                .scale(inputParameters.getDouble(FREQUENCY_PENALTY))
+                .build())
+            .withPresencePenaltyOptions(BedrockAi21Jurassic2ChatOptions.Penalty.builder()
+                .scale(inputParameters.getDouble(PRESENCE_PENALTY))
+                .build())
+            .build());
 
     private AmazonBedrockJurassic2ChatAction() {
     }

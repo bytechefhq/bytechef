@@ -44,8 +44,6 @@ import com.bytechef.component.definition.TypeReference;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 
 /**
  * @author Marko Kriskovic
@@ -75,27 +73,16 @@ public class AnthropicChatAction {
         .output()
         .perform(AnthropicChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new AnthropicChatModel(
-                new AnthropicApi(connectionParameters.getString(TOKEN)),
-                (AnthropicChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            AnthropicChatOptions.Builder builder = AnthropicChatOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K));
-
-            return builder.build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new AnthropicChatModel(
+        new AnthropicApi(connectionParameters.getString(TOKEN)),
+        AnthropicChatOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTopK(inputParameters.getInteger(TOP_K))
+            .build());
 
     private AnthropicChatAction() {
     }

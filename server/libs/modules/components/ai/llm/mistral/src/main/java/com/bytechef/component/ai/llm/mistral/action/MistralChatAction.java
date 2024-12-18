@@ -44,8 +44,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.mistralai.MistralAiChatModel;
 import org.springframework.ai.mistralai.MistralAiChatOptions;
 import org.springframework.ai.mistralai.api.MistralAiApi;
@@ -80,20 +78,14 @@ public class MistralChatAction {
         .output()
         .perform(MistralChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> {
+        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
 
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new MistralAiChatModel(
-                new MistralAiApi(connectionParameters.getString(TOKEN)),
-                (MistralAiChatOptions) createChatOptions(inputParameters));
-        }
+        String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
 
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-            String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
-
-            MistralAiChatOptions.Builder builder = MistralAiChatOptions.builder()
+        return new MistralAiChatModel(
+            new MistralAiApi(connectionParameters.getString(TOKEN)),
+            MistralAiChatOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withTemperature(inputParameters.getDouble(TEMPERATURE))
                 .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
@@ -101,10 +93,8 @@ public class MistralChatAction {
                 .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
                 .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
                 .withRandomSeed(inputParameters.getInteger(SEED))
-                .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type));
-
-            return builder.build();
-        }
+                .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
+                .build());
     };
 
     private MistralChatAction() {

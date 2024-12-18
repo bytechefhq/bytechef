@@ -46,8 +46,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.anthropic.AnthropicChatOptions;
 import org.springframework.ai.bedrock.anthropic.BedrockAnthropicChatModel;
 import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 /**
@@ -78,30 +76,20 @@ public class AmazonBedrockAnthropic2ChatAction {
         .output()
         .perform(AmazonBedrockAnthropic2ChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockAnthropicChatModel(
-                new AnthropicChatBedrockApi(
-                    inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (AnthropicChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            return AnthropicChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokensToSample(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockAnthropicChatModel(
+        new AnthropicChatBedrockApi(
+            inputParameters.getRequiredString(MODEL),
+            () -> AwsBasicCredentials.create(
+                connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+            connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+        AnthropicChatOptions.builder()
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxTokensToSample(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTopK(inputParameters.getInteger(TOP_K))
+            .build());
 
     private AmazonBedrockAnthropic2ChatAction() {
     }

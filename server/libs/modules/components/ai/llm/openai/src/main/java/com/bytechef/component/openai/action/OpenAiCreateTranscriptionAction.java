@@ -39,10 +39,6 @@ import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.springframework.ai.audio.transcription.AudioTranscriptionOptions;
-import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.ai.model.Model;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
@@ -102,27 +98,17 @@ public class OpenAiCreateTranscriptionAction {
         .output()
         .perform(OpenAiCreateTranscriptionAction::perform);
 
-    private static final AudioTranscription AUDIO_TRANSCRIPTION = new AudioTranscription() {
-
-        @Override
-        public Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
-            Parameters inputParameters, Parameters connectionParameters) {
-
-            return new OpenAiAudioTranscriptionModel(
-                new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
-                (OpenAiAudioTranscriptionOptions) createTranscriptOptions(inputParameters));
-        }
-
-        private AudioTranscriptionOptions createTranscriptOptions(Parameters inputParameters) {
-            return OpenAiAudioTranscriptionOptions.builder()
+    private static final AudioTranscription AUDIO_TRANSCRIPTION =
+        (inputParameters, connectionParameters) -> new OpenAiAudioTranscriptionModel(
+            new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
+            OpenAiAudioTranscriptionOptions.builder()
                 .withModel(inputParameters.getRequiredString(MODEL))
                 .withPrompt(inputParameters.getString(PROMPT))
                 .withLanguage(inputParameters.getString(LANGUAGE))
-                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
+                .withResponseFormat(
+                    inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
                 .withTemperature(inputParameters.getFloat(TEMPERATURE))
-                .build();
-        }
-    };
+                .build());
 
     private OpenAiCreateTranscriptionAction() {
     }

@@ -51,8 +51,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.watsonx.WatsonxAiChatModel;
 import org.springframework.ai.watsonx.WatsonxAiChatOptions;
 import org.springframework.ai.watsonx.api.WatsonxAiApi;
@@ -98,34 +96,24 @@ public class WatsonxChatAction {
         .output()
         .perform(WatsonxChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new WatsonxAiChatModel(
-                new WatsonxAiApi(
-                    connectionParameters.getString(URL),
-                    connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
-                    null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
-                    RestClient.builder()),
-                (WatsonxAiChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            return WatsonxAiChatOptions.builder()
-                .withModel(inputParameters.getString(MODEL))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxNewTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withMinNewTokens(inputParameters.getInteger(MIN_TOKENS))
-                .withRandomSeed(inputParameters.getInteger(SEED))
-                .withRepetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
-                .withDecodingMethod(inputParameters.getString(DECODING_METHOD))
-                .build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new WatsonxAiChatModel(
+        new WatsonxAiApi(
+            connectionParameters.getString(URL),
+            connectionParameters.getString(STREAM_ENDPOINT), connectionParameters.getString(TEXT_ENDPOINT),
+            null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
+            RestClient.builder()),
+        WatsonxAiChatOptions.builder()
+            .withModel(inputParameters.getString(MODEL))
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxNewTokens(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .withTopK(inputParameters.getInteger(TOP_K))
+            .withMinNewTokens(inputParameters.getInteger(MIN_TOKENS))
+            .withRandomSeed(inputParameters.getInteger(SEED))
+            .withRepetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
+            .withDecodingMethod(inputParameters.getString(DECODING_METHOD))
+            .build());
 
     private WatsonxChatAction() {
     }

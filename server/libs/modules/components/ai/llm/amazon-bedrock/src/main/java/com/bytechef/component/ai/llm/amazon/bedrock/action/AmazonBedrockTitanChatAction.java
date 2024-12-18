@@ -44,8 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.bedrock.titan.BedrockTitanChatModel;
 import org.springframework.ai.bedrock.titan.BedrockTitanChatOptions;
 import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 
 /**
@@ -72,28 +70,18 @@ public class AmazonBedrockTitanChatAction {
         .output()
         .perform(AmazonBedrockTitanChatAction::perform);
 
-    public static final Chat CHAT = new Chat() {
-
-        @Override
-        public ChatModel createChatModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new BedrockTitanChatModel(
-                new TitanChatBedrockApi(inputParameters.getRequiredString(MODEL),
-                    () -> AwsBasicCredentials.create(
-                        connectionParameters.getRequiredString(ACCESS_KEY_ID),
-                        connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
-                    connectionParameters.getRequiredString(REGION), new ObjectMapper()),
-                (BedrockTitanChatOptions) createChatOptions(inputParameters));
-        }
-
-        private ChatOptions createChatOptions(Parameters inputParameters) {
-            return BedrockTitanChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokenCount(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .build();
-        }
-    };
+    public static final Chat CHAT = (inputParameters, connectionParameters) -> new BedrockTitanChatModel(
+        new TitanChatBedrockApi(inputParameters.getRequiredString(MODEL),
+            () -> AwsBasicCredentials.create(
+                connectionParameters.getRequiredString(ACCESS_KEY_ID),
+                connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
+            connectionParameters.getRequiredString(REGION), new ObjectMapper()),
+        BedrockTitanChatOptions.builder()
+            .withTemperature(inputParameters.getDouble(TEMPERATURE))
+            .withMaxTokenCount(inputParameters.getInteger(MAX_TOKENS))
+            .withTopP(inputParameters.getDouble(TOP_P))
+            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .build());
 
     private AmazonBedrockTitanChatAction() {
     }

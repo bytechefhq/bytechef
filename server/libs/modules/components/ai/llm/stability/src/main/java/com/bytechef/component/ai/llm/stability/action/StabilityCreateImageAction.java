@@ -48,8 +48,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import org.springframework.ai.image.ImageModel;
-import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
 import org.springframework.ai.stabilityai.StyleEnum;
 import org.springframework.ai.stabilityai.api.StabilityAiApi;
@@ -161,28 +159,18 @@ public class StabilityCreateImageAction {
         return IMAGE.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final Image IMAGE = new Image() {
-
-        @Override
-        public ImageModel createImageModel(Parameters inputParameters, Parameters connectionParameters) {
-            return new StabilityAiImageModel(
-                new StabilityAiApi(connectionParameters.getString(TOKEN)),
-                (StabilityAiImageOptions) createImageOptions(inputParameters));
-        }
-
-        private ImageOptions createImageOptions(Parameters inputParameters) {
-            return StabilityAiImageOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withN(inputParameters.getInteger(N))
-                .withHeight(inputParameters.getInteger(HEIGHT))
-                .withWidth(inputParameters.getInteger(WIDTH))
-                .withStylePreset(inputParameters.getString(STYLE))
-                .withSteps(inputParameters.getInteger(STEPS))
-                .withCfgScale(inputParameters.getFloat(CFG_SCALE))
-                .withClipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
-                .withSampler(inputParameters.getString(SAMPLER))
-                .withSeed(inputParameters.getLong(SEED))
-                .build();
-        }
-    };
+    private static final Image IMAGE = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+        new StabilityAiApi(connectionParameters.getString(TOKEN)),
+        StabilityAiImageOptions.builder()
+            .withModel(inputParameters.getRequiredString(MODEL))
+            .withN(inputParameters.getInteger(N))
+            .withHeight(inputParameters.getInteger(HEIGHT))
+            .withWidth(inputParameters.getInteger(WIDTH))
+            .withStylePreset(inputParameters.getString(STYLE))
+            .withSteps(inputParameters.getInteger(STEPS))
+            .withCfgScale(inputParameters.getFloat(CFG_SCALE))
+            .withClipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+            .withSampler(inputParameters.getString(SAMPLER))
+            .withSeed(inputParameters.getLong(SEED))
+            .build());
 }
