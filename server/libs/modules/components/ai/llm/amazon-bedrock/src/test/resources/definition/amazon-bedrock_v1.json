@@ -54,28 +54,8 @@
         "value" : "anthropic.claude-v2:1"
       }, {
         "description" : null,
-        "label" : "anthropic.claude-3-haiku-20240307-v1:0",
-        "value" : "anthropic.claude-3-haiku-20240307-v1:0"
-      }, {
-        "description" : null,
-        "label" : "anthropic.claude-3-sonnet-20240229-v1:0",
-        "value" : "anthropic.claude-3-sonnet-20240229-v1:0"
-      }, {
-        "description" : null,
-        "label" : "anthropic.claude-3-5-sonnet-20241022-v2:0",
-        "value" : "anthropic.claude-3-5-sonnet-20241022-v2:0"
-      }, {
-        "description" : null,
         "label" : "anthropic.claude-v2",
         "value" : "anthropic.claude-v2"
-      }, {
-        "description" : null,
-        "label" : "anthropic.claude-3-5-sonnet-20240620-v1:0",
-        "value" : "anthropic.claude-3-5-sonnet-20240620-v1:0"
-      }, {
-        "description" : null,
-        "label" : "anthropic.claude-3-opus-20240229-v1:0",
-        "value" : "anthropic.claude-3-opus-20240229-v1:0"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1444,15 +1424,7 @@
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "ai21.j2-ultra-v1",
-        "value" : "ai21.j2-ultra-v1"
-      }, {
-        "description" : null,
-        "label" : "ai21.j2-mid-v1",
-        "value" : "ai21.j2-mid-v1"
-      } ],
+      "options" : [ ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -2726,6 +2698,9 @@
     "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -2862,8 +2837,5 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  }
 }
