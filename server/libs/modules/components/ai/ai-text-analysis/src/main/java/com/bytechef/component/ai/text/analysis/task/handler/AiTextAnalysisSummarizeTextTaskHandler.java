@@ -17,7 +17,7 @@
 package com.bytechef.component.ai.text.analysis.task.handler;
 
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.SUMMARIZE_TEXT;
-import static com.bytechef.platform.component.definition.AIComponentDefinition.AI_TEXT_ANALYSIS;
+import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_TEXT_ANALYSIS;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.task.handler.AbstractTaskHandler;
