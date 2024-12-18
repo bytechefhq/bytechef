@@ -499,17 +499,17 @@ public class ApplicationProperties {
                 }
             }
 
-            private NVIDIA NVIDIA = new NVIDIA();
+            private Nvidia nvidia = new Nvidia();
 
-            public NVIDIA getNVIDIA() {
-                return NVIDIA;
+            public Nvidia getNvidia() {
+                return nvidia;
             }
 
-            public void setNVIDIA(NVIDIA NVIDIA) {
-                this.NVIDIA = NVIDIA;
+            public void setNvidia(Nvidia nvidia) {
+                this.nvidia = nvidia;
             }
 
-            public static class NVIDIA {
+            public static class Nvidia {
 
                 private String apiKey;
 
