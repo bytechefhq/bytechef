@@ -4,14 +4,21 @@ import com.bytechef.component.ai.text.analysis.action.definition.AiTextAnalysisA
 import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
 import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.mistral.constant.MistralConstants;
 import com.bytechef.component.openai.constant.OpenAIConstants;
 import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ParametersFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CATEGORIES;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CATEGORY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.EXAMPLES;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.SAMPLE;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
@@ -25,11 +32,15 @@ import static com.bytechef.component.llm.constant.LLMConstants.MAX_TOKENS_PROPER
 import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 
-public class ClassifyTextAction {
+public class ClassifyTextAction implements AITextAnalysisAction{
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public ClassifyTextAction(ApplicationProperties.Ai.Component component) {
-        this.actionDefinition = new AiTextAnalysisActionDefinition(
+        this.actionDefinition = getActionDefinition(component);
+    }
+
+    private AiTextAnalysisActionDefinition getActionDefinition(ApplicationProperties.Ai.Component component) {
+        return new AiTextAnalysisActionDefinition(
             action(AiTextAnalysisConstants.CLASSIFY_TEXT)
                 .title("Classify Text")
                 .description("AI reads, analyzes and classifies your text into one of defined categories.")
@@ -145,6 +156,20 @@ public class ClassifyTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component);
+            component, this);
+    }
+
+    public Parameters createParameters(Parameters inputParameters) {
+        Map<String, Object> modelInputParametersMap = new HashMap<>();
+
+        String prompt = "You will receive a list of categories and a text. You will answer which of the given categories fits the given text the most.";
+
+        modelInputParametersMap.put("messages",
+            List.of(
+                Map.of("content", prompt, "role", "system"),
+                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
+        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+
+        return ParametersFactory.createParameters(modelInputParametersMap);
     }
 }

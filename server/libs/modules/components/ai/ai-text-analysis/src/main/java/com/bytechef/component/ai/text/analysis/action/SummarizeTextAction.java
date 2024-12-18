@@ -34,13 +34,24 @@ import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
 import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.ai.text.analysis.action.definition.AiTextAnalysisActionDefinition;
 import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
+import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.mistral.constant.MistralConstants;
+import com.bytechef.component.openai.constant.OpenAIConstants;
+import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.openai.constant.OpenAiConstants;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ParametersFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marko Kriskovic
  */
-public class SummarizeTextAction {
+public class SummarizeTextAction implements AITextAnalysisAction {
 
     public final AiTextAnalysisActionDefinition actionDefinition;
 
@@ -161,6 +172,27 @@ public class SummarizeTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component);
+            component, this);
+    }
+
+    public Parameters createParameters(Parameters inputParameters) {
+        Map<String, Object> modelInputParametersMap = new HashMap<>();
+
+        String prompt = switch (inputParameters.getRequiredInteger(FORMAT)) {
+            case 0 -> "You will receive a text. Make a structured summary of that text with sections.";
+            case 1 -> "You will receive a text. Make a brief title summarizing the content in 4-7 words.";
+            case 2 -> "You will receive a text. Summarize it in a single, concise sentence.";
+            case 3 -> "You will receive a text. Create a bullet list recap.";
+            case 4 -> "You will receive a text." + inputParameters.getString("prompt");
+            default -> throw new IllegalArgumentException("Invalid format");
+        };
+
+        modelInputParametersMap.put("messages",
+            List.of(
+                Map.of("content", prompt, "role", "system"),
+                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
+        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+
+        return ParametersFactory.createParameters(modelInputParametersMap);
     }
 }
