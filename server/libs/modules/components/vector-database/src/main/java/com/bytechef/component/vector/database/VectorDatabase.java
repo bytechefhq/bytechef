@@ -20,6 +20,7 @@ import static com.bytechef.component.vector.database.constant.VectorDatabaseCons
 import static com.bytechef.component.vector.database.constant.VectorDatabaseConstants.DOCUMENT_TYPE;
 import static com.bytechef.component.vector.database.constant.VectorDatabaseConstants.JSON;
 import static com.bytechef.component.vector.database.constant.VectorDatabaseConstants.JSON_KEYS_TO_USE;
+import static com.bytechef.component.vector.database.constant.VectorDatabaseConstants.QUERY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
@@ -98,5 +99,11 @@ public interface VectorDatabase {
                 vectorStore.add(documents);
             }
         }
+    }
+
+    default List<Document> query(Parameters inputParameters, Parameters connectionParameters) {
+        VectorStore vectorStore = createVectorStore(connectionParameters);
+
+        return vectorStore.similaritySearch(inputParameters.getRequiredString(QUERY));
     }
 }

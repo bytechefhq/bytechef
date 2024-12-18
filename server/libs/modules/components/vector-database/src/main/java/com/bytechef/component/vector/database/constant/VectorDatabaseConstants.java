@@ -37,6 +37,7 @@ public class VectorDatabaseConstants {
     public static final String DOCUMENT_TYPE = "documentType";
     public static final String JSON = "json";
     public static final String JSON_KEYS_TO_USE = "jsonKeysToUse";
+    public static final String QUERY = "query";
 
     public static final ModifiableFileEntryProperty DOCUMENT_PROPERTY = fileEntry(DOCUMENT)
         .required(true);
