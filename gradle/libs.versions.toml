@@ -14,7 +14,7 @@ spring-ai = "1.0.0-M4"
 spring-boot = "3.3.6"
 spring-cloud-aws = "3.2.1"
 spring-cloud-dependencies = "2023.0.4"
-spring-shell = "3.3.3"
+spring-shell = "3.3.4"
 
 [libraries]
 com-github-miachm-sods-sods = "com.github.miachm.sods:SODS:1.6.7"
