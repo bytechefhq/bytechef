@@ -34,6 +34,7 @@ public class VectorStoreConstants {
     public static final String DOCUMENT_TYPE = "documentType";
     public static final String JSON = "json";
     public static final String JSON_KEYS_TO_USE = "jsonKeysToUse";
+    public static final String MD = "md";
     public static final String PDF = "pdf";
     public static final String TIKA = "tika";
     public static final String TXT = "txt";
@@ -47,8 +48,9 @@ public class VectorStoreConstants {
         .description("The type of the document.")
         .options(
             option("JSON document", JSON),
-            option("text document", TXT),
+            option("Markdown document", MD),
             option("PDF document", PDF),
+            option("text document", TXT),
             option("Tika (DOCX, PPTX, HTML...)", TIKA))
         .required(true);
 
