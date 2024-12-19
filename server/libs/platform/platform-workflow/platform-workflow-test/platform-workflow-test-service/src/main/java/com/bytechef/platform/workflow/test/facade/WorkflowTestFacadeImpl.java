@@ -24,6 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.domain.TriggerDefinitionBasic;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
@@ -44,6 +45,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import org.springframework.stereotype.Service;
@@ -137,6 +139,19 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                 triggerExecutionDTO = new TriggerExecutionDTO(
                     triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(), inputs,
                     sampleOutput);
+
+                WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+                TriggerDefinitionBasic triggerDefinition = componentDefinition.getTriggers()
+                    .stream()
+                    .filter(curTriggerDefinition -> Objects.equals(
+                        curTriggerDefinition.getName(), triggerNodeType.componentOperationName()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Trigger definition not found"));
+
+                if (!triggerDefinition.isBatch() && sampleOutput instanceof List<?> list) {
+                    sampleOutput = list.getFirst();
+                }
 
                 inputs = MapUtils.concat((Map<String, Object>) inputs, Map.of(workflowTrigger.getName(), sampleOutput));
             }
