@@ -20,7 +20,10 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PRO
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_NO_OPTIONS_PROPERTY;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_OPTIONS_PROPERTY;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER_PROPERTY;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.PROMPT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -28,22 +31,11 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
-import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
-import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.ai.text.analysis.action.definition.AiTextAnalysisActionDefinition;
 import com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants;
-import com.bytechef.component.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.mistral.constant.MistralConstants;
-import com.bytechef.component.openai.constant.OpenAIConstants;
-import com.bytechef.component.vertex.gemini.constant.VertexGeminiConstants;
-import com.bytechef.component.openai.constant.OpenAiConstants;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,94 +53,10 @@ public class SummarizeTextAction implements AITextAnalysisAction {
                 .title("Summarize Text")
                 .description("AI reads, analyzes and summarizes your text into a shorter format.")
                 .properties(
-                    integer(MODEL_PROVIDER)
-                        .label("Model provider")
-                        .options(
-                            option("Amazon Bedrock: Anthropic 2", 0),
-                            option("Amazon Bedrock: Anthropic 3", 1),
-                            option("Amazon Bedrock: Cohere", 2),
-                            option("Amazon Bedrock: Jurassic 2", 3),
-                            option("Amazon Bedrock: Llama", 4),
-                            option("Amazon Bedrock: Titan", 5),
-                            option("Anthropic", 6),
-                            option("Azure Open AI", 7),
-                            option("Groq", 8),
-                            option("NVIDIA", 9),
-                            option("Hugging Face", 10),
-                            option("Mistral", 11),
-                            option("Open AI", 12),
-                            option("Vertex Gemini", 13))
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.ANTHROPIC2_MODELS)
-                        .displayCondition("modelProvider == 0")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.ANTHROPIC3_MODELS)
-                        .displayCondition("modelProvider == 1")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.COHERE_MODELS)
-                        .displayCondition("modelProvider == 2")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.JURASSIC2_MODELS)
-                        .displayCondition("modelProvider == 3")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.LLAMA_MODELS)
-                        .displayCondition("modelProvider == 4")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AmazonBedrockConstants.TITAN_MODELS)
-                        .displayCondition("modelProvider == 5")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(AnthropicConstants.MODELS)
-                        .displayCondition("modelProvider == 6")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .displayCondition("modelProvider >= 7 && modelProvider <= 9")
-                        .required(true),
-                    string(MODEL)
-                        .label("URL")
-                        .description("Url of the inference endpoint.")
-                        .displayCondition("modelProvider == 10")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(MistralConstants.MODELS)
-                        .displayCondition("modelProvider == 11")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(OpenAiConstants.MODELS)
-                        .displayCondition("modelProvider == 12")
-                        .required(true),
-                    string(MODEL)
-                        .label("Model")
-                        .description("ID of the model to use.")
-                        .options(VertexGeminiConstants.MODELS)
-                        .displayCondition("modelProvider == 13")
-                        .required(true),
+                    MODEL_PROVIDER_PROPERTY,
+                    MODEL_OPTIONS_PROPERTY,
+                    MODEL_NO_OPTIONS_PROPERTY,
+                    MODEL_URL_PROPERTY,
                     string(TEXT)
                         .label("Text")
                         .description("The text that is to be summarized.")
