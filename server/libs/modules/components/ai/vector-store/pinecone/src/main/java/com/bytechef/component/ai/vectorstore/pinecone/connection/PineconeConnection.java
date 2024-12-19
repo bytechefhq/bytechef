@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.pinecone.connection;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.ENVIRONMENT;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.INDEX_NAME;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PROJECT_ID;
@@ -37,10 +37,7 @@ public class PineconeConnection {
         .authorizations(
             authorization(CUSTOM)
                 .properties(
-                    string(EMBEDDING_API_KEY)
-                        .label("Open AI API Key")
-                        .description("The API key for the OpenAI API which is used to generate embeddings.")
-                        .required(true),
+                    EMBEDDING_API_KEY_PROPERTY,
                     string(API_KEY)
                         .label("Pinecone API Key")
                         .description("The API key for the Pinecone API.")

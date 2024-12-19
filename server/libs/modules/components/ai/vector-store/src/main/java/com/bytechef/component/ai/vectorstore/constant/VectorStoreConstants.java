@@ -30,10 +30,14 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
  */
 public class VectorStoreConstants {
 
+    public static final String DATA_QUERY = "dataQuery";
     public static final String DOCUMENT = "document";
     public static final String DOCUMENT_TYPE = "documentType";
+    public static final String EMBEDDING_API_KEY = "embeddingApiKey";
     public static final String JSON = "json";
     public static final String JSON_KEYS_TO_USE = "jsonKeysToUse";
+    public static final String LOAD_DATA = "loadData";
+    public static final String MD = "md";
     public static final String PDF = "pdf";
     public static final String TIKA = "tika";
     public static final String TXT = "txt";
@@ -47,9 +51,15 @@ public class VectorStoreConstants {
         .description("The type of the document.")
         .options(
             option("JSON document", JSON),
-            option("text document", TXT),
+            option("Markdown document", MD),
             option("PDF document", PDF),
+            option("text document", TXT),
             option("Tika (DOCX, PPTX, HTML...)", TIKA))
+        .required(true);
+
+    public static final ModifiableStringProperty EMBEDDING_API_KEY_PROPERTY = string(EMBEDDING_API_KEY)
+        .label("Open AI API Key")
+        .description("The API key for the OpenAI API which is used to generate embeddings.")
         .required(true);
 
     public static final ModifiableArrayProperty JSON_KEYS_TO_USE_PROPERTY = array(JSON_KEYS_TO_USE)
@@ -57,7 +67,7 @@ public class VectorStoreConstants {
         .description(
             "Json keys on which extraction of content is based. If no keys are specified, it uses the entire " +
                 "JSON object as content.")
-        .displayCondition("%s == '%s".formatted(DOCUMENT, JSON))
+        .displayCondition("%s == '%s'".formatted(DOCUMENT, JSON))
         .items(string())
         .required(false);
 

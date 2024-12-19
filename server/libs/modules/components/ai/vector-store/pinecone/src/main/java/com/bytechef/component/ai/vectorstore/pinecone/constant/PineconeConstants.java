@@ -25,7 +25,6 @@ public class PineconeConstants {
     }
 
     public static final String API_KEY = "apiKey";
-    public static final String EMBEDDING_API_KEY = "embeddingApiKey";
     public static final String ENVIRONMENT = "environment";
     public static final String INDEX_NAME = "indexName";
     public static final String PROJECT_ID = "projectId";
