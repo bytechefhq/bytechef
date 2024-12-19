@@ -59,7 +59,7 @@ public class VectorStoreConstants {
         .description(
             "Json keys on which extraction of content is based. If no keys are specified, it uses the entire " +
                 "JSON object as content.")
-        .displayCondition("%s == '%s".formatted(DOCUMENT, JSON))
+        .displayCondition("%s == '%s'".formatted(DOCUMENT, JSON))
         .items(string())
         .required(false);
 
