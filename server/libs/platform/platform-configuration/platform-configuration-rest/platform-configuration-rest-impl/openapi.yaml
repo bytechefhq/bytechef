@@ -1108,6 +1108,9 @@ components:
         outputDefined:
           description: "Does action define output schema."
           type: "boolean"
+        outputFunctionDefined:
+          description: "Does action define output function."
+          type: "boolean"
         properties:
           description: "The list of action properties."
           type: "array"
@@ -1922,6 +1925,9 @@ components:
           type: "string"
         outputDefined:
           description: "Does trigger define output schema."
+          type: "boolean"
+        outputFunctionDefined:
+          description: "Does trigger define output function."
           type: "boolean"
         properties:
           description: "The list of action properties."

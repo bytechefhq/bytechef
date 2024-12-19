@@ -33,6 +33,7 @@ import org.springframework.lang.Nullable;
 public class ActionDefinition extends ActionDefinitionBasic {
 
     private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean workflowNodeDescriptionDefined;
@@ -48,6 +49,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         this.outputDefined = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
@@ -83,6 +87,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
     }
 
     public boolean isWorkflowNodeDescriptionDefined() {
