@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_TYPE;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON_KEYS_TO_USE;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.MD;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.PDF;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TIKA;
@@ -35,6 +36,8 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.TextReader;
+import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
+import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
@@ -69,6 +72,21 @@ public interface VectorStore {
                 }
 
                 List<Document> documents = jsonReader.get();
+
+                vectorStore.add(documents);
+            }
+            case MD -> {
+                MarkdownDocumentReaderConfig markdownDocumentReaderConfig = MarkdownDocumentReaderConfig.builder()
+                    .withHorizontalRuleCreateDocument(true)
+                    .withIncludeCodeBlock(false)
+                    .withIncludeBlockquote(false)
+                    .withAdditionalMetadata("filename", fileEntry.getName())
+                    .build();
+
+                MarkdownDocumentReader markdownDocumentReader =
+                    new MarkdownDocumentReader(fileSystemResource, markdownDocumentReaderConfig);
+
+                List<Document> documents = markdownDocumentReader.get();
 
                 vectorStore.add(documents);
             }
