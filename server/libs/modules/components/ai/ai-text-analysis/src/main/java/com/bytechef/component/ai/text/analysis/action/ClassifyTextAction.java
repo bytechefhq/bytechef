@@ -14,6 +14,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CATEGORIES;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CATEGORY;
@@ -142,17 +143,10 @@ public class ClassifyTextAction implements AITextAnalysisAction{
                         .description("A list of categories that the model can choose from.")
                         .items(string())
                         .required(true),
-                    array(EXAMPLES)
+                    object(EXAMPLES)
                         .label("Examples")
                         .description("You can classify a few samples, to guide your model on how to classify the real data.")
-                        .items(
-                            object().properties(
-                                string(SAMPLE)
-                                    .label("Sample")
-                                    .description("Sample data that you want to classify manually."),
-                                string(CATEGORY)
-                                    .label("Category")
-                                    .description("Which of the categories above does the sample belong to?"))),
+                        .additionalProperties(string()),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
@@ -162,12 +156,26 @@ public class ClassifyTextAction implements AITextAnalysisAction{
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        String prompt = "You will receive a list of categories and a text. You will answer which of the given categories fits the given text the most.";
+        String systemPrompt = "You will receive a list of categories, text and examples. You will choose which of the given categories fits the given text the most. Your response will only be the chosen category.";
+
+        String userBuilder = "List of categories: " + inputParameters.getList(CATEGORIES).toString() + "\n" +
+            "Text: " + inputParameters.getString(TEXT);
+
+        Map<String, ?> exampleMap = inputParameters.getMap(EXAMPLES, String.class, Map.of());
+
+        if (!exampleMap.isEmpty()){
+            userBuilder = userBuilder + "\n" +
+                "Examples: " +
+                exampleMap.entrySet()
+                    .stream()
+                    .map(Map.Entry::toString)
+                    .collect(Collectors.joining(";"));
+        }
 
         modelInputParametersMap.put("messages",
             List.of(
-                Map.of("content", prompt, "role", "system"),
-                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
+                Map.of("content", systemPrompt, "role", "system"),
+                Map.of("content", userBuilder, "role", "user")));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
