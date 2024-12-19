@@ -22,7 +22,7 @@
     "metadata" : null,
     "name" : "set",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -472,9 +472,9 @@
       "controlType" : "TIME"
     } ],
     "title" : "Set Value",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,

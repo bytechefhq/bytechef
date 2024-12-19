@@ -34,6 +34,7 @@ import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition;
 
 /**
  * @author Ivica Cardic
@@ -110,8 +111,14 @@ public class VarSetAction {
                 .description("Value of any type to set.")
                 .displayCondition("type == 10")
                 .required(true))
-        .output()
+        .output(VarSetAction::output)
         .perform(VarSetAction::perform);
+
+    protected static BaseOutputDefinition.OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        return new BaseOutputDefinition.OutputResponse(inputParameters.getRequired(VALUE));
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
