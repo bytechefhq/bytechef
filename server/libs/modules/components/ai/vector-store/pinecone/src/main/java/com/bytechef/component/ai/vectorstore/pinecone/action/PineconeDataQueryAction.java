@@ -16,9 +16,10 @@
 
 package com.bytechef.component.ai.vectorstore.pinecone.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DATA_QUERY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.ENVIRONMENT;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.INDEX_NAME;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PROJECT_ID;
@@ -38,9 +39,9 @@ import org.springframework.ai.vectorstore.PineconeVectorStore;
  */
 public class PineconeDataQueryAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("dataQuery")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action(DATA_QUERY)
         .title("Data Query")
-        .description("Loads data into a Pinecone vector store using OpenAI embeddings.")
+        .description("Query data from a Pinecone vector store using OpenAI embeddings.")
         .properties(
             string(QUERY)
                 .label("Query")
