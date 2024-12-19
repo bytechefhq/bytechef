@@ -42,6 +42,7 @@ import {WorkflowKeys} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
@@ -64,6 +65,8 @@ const Integration = () => {
     const {integrationId, integrationWorkflowId} = useParams();
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+
+    const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
     const rightSidebarNavigation: {
         name?: string;
@@ -102,7 +105,7 @@ const Integration = () => {
             name: 'Workflow Code Editor',
             onClick: () => setShowWorkflowCodeEditorSheet(true),
         },
-    ];
+    ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true));
 
     const {
         data: componentDefinitions,
