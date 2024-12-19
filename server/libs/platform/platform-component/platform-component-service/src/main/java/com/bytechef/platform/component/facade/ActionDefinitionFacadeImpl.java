@@ -76,11 +76,11 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
-            (curComponentConnection, curActionContext) -> actionDefinitionService.executeDynamicProperties(
+            (componentConnection1, actionContext1) -> actionDefinitionService.executeDynamicProperties(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                curComponentConnection, curActionContext),
+                componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true));
+                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
     }
 
     @Override
@@ -101,7 +101,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 searchText, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true));
+                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
     }
 
     @Override
@@ -181,7 +181,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getType(),
                 actionContextAware.getInstanceId(), actionContextAware.getInstanceWorkflowId(),
-                actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection,
+                actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection1,
                 actionContextAware.isDevEnvironment()));
     }
 
