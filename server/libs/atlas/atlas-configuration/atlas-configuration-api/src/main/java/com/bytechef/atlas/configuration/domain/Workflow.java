@@ -419,6 +419,17 @@ public final class Workflow implements Persistable<String>, Serializable {
                                 .toList();
 
                             returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
+                        } else if (firstItem instanceof Map<?, ?> map &&
+                            map.containsKey(WorkflowConstants.TASKS)) {
+
+                            for (Object curItem : curList) {
+                                Map<String, ?> curMap = (Map<String, ?>) curItem;
+
+                                List<WorkflowTask> curWorkflowTasks = MapUtils.getList(
+                                    curMap, WorkflowConstants.TASKS, WorkflowTask.class, List.of());
+
+                                returnedWorkflowTasks.addAll(getTasks(curWorkflowTasks, lastWorkflowNodeName));
+                            }
                         }
                     }
                 } else if (entry.getValue() instanceof Map<?, ?> curMap) {

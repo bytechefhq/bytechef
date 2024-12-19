@@ -131,9 +131,9 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             contextService.push(
-                Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                 taskFileStorage.storeContextValue(
-                    Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }
