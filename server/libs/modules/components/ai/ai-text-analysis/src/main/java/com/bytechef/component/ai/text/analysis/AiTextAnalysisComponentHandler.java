@@ -60,8 +60,7 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
                         new SummarizeTextAction(component).actionDefinition,
-                        new ClassifyTextAction(component).actionDefinition
-                    ));
+                        new ClassifyTextAction(component).actionDefinition));
         }
     }
 }

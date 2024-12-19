@@ -16,11 +16,8 @@
 
 package com.bytechef.component.ai.text.analysis.action.definition;
 
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.component.llm.constant.LLMConstants.MODEL;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockAnthropic2ChatAction;
@@ -36,6 +33,7 @@ import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
+import com.bytechef.component.ai.text.analysis.action.AITextAnalysisAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -45,7 +43,6 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.ParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -59,8 +56,8 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
 
     @SuppressFBWarnings("EI")
     public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition,
-                                          ApplicationProperties.Ai.Component component,
-                                          AITextAnalysisAction aiTextAnalysisAction) {
+        ApplicationProperties.Ai.Component component,
+        AITextAnalysisAction aiTextAnalysisAction) {
         super(actionDefinition);
 
         this.component = component;
