@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-12-17T07:23:43.893312+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-12-19T06:42:45.365162+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ActionDefinitionModel {
 
   private String componentName;
@@ -40,6 +40,8 @@ public class ActionDefinitionModel {
   private String name;
 
   private Boolean outputDefined;
+
+  private Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
@@ -180,6 +182,26 @@ public class ActionDefinitionModel {
     this.outputDefined = outputDefined;
   }
 
+  public ActionDefinitionModel outputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+    return this;
+  }
+
+  /**
+   * Does action define output function.
+   * @return outputFunctionDefined
+   */
+  
+  @Schema(name = "outputFunctionDefined", description = "Does action define output function.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("outputFunctionDefined")
+  public Boolean getOutputFunctionDefined() {
+    return outputFunctionDefined;
+  }
+
+  public void setOutputFunctionDefined(Boolean outputFunctionDefined) {
+    this.outputFunctionDefined = outputFunctionDefined;
+  }
+
   public ActionDefinitionModel properties(List<@Valid PropertyModel> properties) {
     this.properties = properties;
     return this;
@@ -263,6 +285,7 @@ public class ActionDefinitionModel {
         Objects.equals(this.help, actionDefinition.help) &&
         Objects.equals(this.name, actionDefinition.name) &&
         Objects.equals(this.outputDefined, actionDefinition.outputDefined) &&
+        Objects.equals(this.outputFunctionDefined, actionDefinition.outputFunctionDefined) &&
         Objects.equals(this.properties, actionDefinition.properties) &&
         Objects.equals(this.title, actionDefinition.title) &&
         Objects.equals(this.workflowNodeDescriptionDefined, actionDefinition.workflowNodeDescriptionDefined);
@@ -270,7 +293,7 @@ public class ActionDefinitionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, properties, title, workflowNodeDescriptionDefined);
+    return Objects.hash(componentName, componentVersion, description, help, name, outputDefined, outputFunctionDefined, properties, title, workflowNodeDescriptionDefined);
   }
 
   @Override
@@ -283,6 +306,7 @@ public class ActionDefinitionModel {
     sb.append("    help: ").append(toIndentedString(help)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    outputDefined: ").append(toIndentedString(outputDefined)).append("\n");
+    sb.append("    outputFunctionDefined: ").append(toIndentedString(outputFunctionDefined)).append("\n");
     sb.append("    properties: ").append(toIndentedString(properties)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    workflowNodeDescriptionDefined: ").append(toIndentedString(workflowNodeDescriptionDefined)).append("\n");
