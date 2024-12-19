@@ -20,8 +20,10 @@ package com.bytechef.atlas.execution.repository.memory;
 
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
-import java.util.HashMap;
-import java.util.Map;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Arik Cohen
@@ -30,35 +32,31 @@ import java.util.Map;
  */
 public class InMemoryCounterRepository implements CounterRepository {
 
-    private final Map<Long, Long> counters = new HashMap<>();
+    private static final Cache<Long, Long> COUNTERS =
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
 
     @Override
     public void deleteById(Long id) {
-        counters.remove(id);
+        COUNTERS.invalidate(id);
     }
 
     @Override
-    public Iterable<Counter> findAll() {
-        return counters.entrySet()
-            .stream()
-            .map(entry -> new Counter(entry.getKey(), entry.getValue()))
-            .toList();
-    }
-
-    @Override
-    public Long findValueByIdForUpdate(Long id) {
-        return counters.get(id);
+    public Optional<Long> findValueByIdForUpdate(Long id) {
+        return Optional.ofNullable(COUNTERS.getIfPresent(id));
     }
 
     @Override
     public Counter save(Counter counter) {
-        counters.put(counter.getId(), counter.getValue());
+        COUNTERS.put(counter.getId(), counter.getValue());
 
         return counter;
     }
 
     @Override
     public void update(Long id, long value) {
-        counters.put(id, value);
+        COUNTERS.put(id, value);
     }
 }

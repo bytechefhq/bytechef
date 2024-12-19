@@ -96,7 +96,10 @@ public class JobServiceImpl implements JobService {
     @Override
     @Transactional(readOnly = true)
     public Job getTaskExecutionJob(long taskExecutionId) {
-        return jobRepository.findByTaskExecutionId(taskExecutionId);
+        return jobRepository
+            .findByTaskExecutionId(taskExecutionId)
+            .orElseThrow(
+                () -> new IllegalArgumentException("Unable to locate job with taskExecutionId: " + taskExecutionId));
     }
 
     @Override

@@ -19,17 +19,16 @@ package com.bytechef.atlas.execution.repository.memory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.JobRepository;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.HashMap;
+import java.security.SecureRandom;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -38,11 +37,16 @@ import org.springframework.data.domain.Pageable;
  */
 public class InMemoryJobRepository implements JobRepository {
 
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final InMemoryTaskExecutionRepository inMemoryTaskExecutionRepository;
-    private final Map<Long, Job> jobs = new HashMap<>();
     private final ObjectMapper objectMapper;
+
+    private static final Cache<Long, Job> JOBS =
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
 
     @SuppressFBWarnings("EI2")
     public InMemoryJobRepository(
@@ -88,7 +92,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public Optional<Job> findById(Long id) {
-        return Optional.ofNullable(jobs.get(id));
+        return Optional.ofNullable(JOBS.get(id, s -> null));
     }
 
     @Override
@@ -102,24 +106,22 @@ public class InMemoryJobRepository implements JobRepository {
     }
 
     @Override
-    public Job findByTaskExecutionId(Long taskExecutionId) {
+    public Optional<Job> findByTaskExecutionId(Long taskExecutionId) {
         TaskExecution taskExecution = OptionalUtils.get(inMemoryTaskExecutionRepository.findById(taskExecutionId));
 
-        return CollectionUtils.getFirst(
-            jobs.values(),
-            job -> Objects.equals(job.getId(), taskExecution.getJobId()));
+        return Optional.ofNullable(JOBS.getIfPresent(taskExecution.getJobId()));
     }
 
     @Override
     public Job save(Job job) {
         if (job.isNew()) {
-            job.setId(RANDOM.nextLong());
+            job.setId(Math.abs(Math.max(RANDOM.nextLong(), Long.MIN_VALUE + 1)));
         }
 
         try {
             // Emulate identical behaviour when storing in db by serialization and deserialization
 
-            jobs.put(job.getId(), objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
+            JOBS.put(job.getId(), objectMapper.readValue(objectMapper.writeValueAsString(job), Job.class));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

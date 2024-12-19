@@ -48,7 +48,7 @@ public interface JobRepository {
 
     Optional<Job> findById(Long id);
 
-    Job findByTaskExecutionId(Long taskExecutionId);
+    Optional<Job> findByTaskExecutionId(Long taskExecutionId);
 
     Optional<Job> findLastJob();
 

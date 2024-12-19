@@ -56,7 +56,7 @@ public interface JdbcJobRepository
 
     @Override
     @Query("SELECT * FROM job j WHERE j.id = (SELECT job_id FROM task_execution te WHERE te.id=:taskExecutionId)")
-    Job findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
+    Optional<Job> findByTaskExecutionId(@Param("taskExecutionId") Long taskExecutionId);
 
     Job save(Job job);
 }

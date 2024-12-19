@@ -21,12 +21,13 @@ package com.bytechef.atlas.execution.repository.memory;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.repository.ContextRepository;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import java.security.SecureRandom;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Random;
-import org.apache.commons.lang3.Validate;
+import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Arik Cohen
@@ -34,48 +35,45 @@ import org.apache.commons.lang3.Validate;
  */
 public class InMemoryContextRepository implements ContextRepository {
 
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
-    private final Map<String, Deque<FileEntry>> contexts = new HashMap<>();
+    private static final Cache<String, Deque<FileEntry>> CONTEXTS =
+        Caffeine.newBuilder()
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
 
     @Override
-    public Iterable<Context> findAll() {
-        return contexts.values()
-            .stream()
-            .flatMap(deque -> deque.stream()
-                .map(Context::new))
-            .toList();
+    public Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
+        Deque<FileEntry> linkedList = CONTEXTS.getIfPresent(getKey(stackId, null, classnameId));
+
+        return Optional.ofNullable(linkedList == null ? null : new Context(linkedList.peek()));
     }
 
     @Override
-    public Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId) {
-        Deque<FileEntry> linkedList = contexts.get(getKey(stackId, null, classnameId));
-
-        Validate.notNull(linkedList, "unknown stack: %s", stackId);
-
-        return new Context(linkedList.peek());
-    }
-
-    @Override
-    public Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+    public Optional<Context> findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
         long stackId, int subStackId, int classnameId) {
-        Deque<FileEntry> linkedList = contexts.get(getKey(stackId, subStackId, classnameId));
 
-        Validate.notNull(linkedList, "unknown stack: " + stackId);
+        Deque<FileEntry> linkedList = CONTEXTS.getIfPresent(getKey(stackId, subStackId, classnameId));
 
-        return new Context(linkedList.peek());
+        return Optional.ofNullable(linkedList == null ? null : new Context(linkedList.peek()));
     }
 
     @Override
     public Context save(Context context) {
-        Deque<FileEntry> stack = contexts.computeIfAbsent(
-            getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId()), k -> new LinkedList<>());
+        String key = getKey(context.getStackId(), context.getSubStackId(), context.getClassnameId());
 
-        if (context.isNew()) {
-            context.setId(RANDOM.nextLong());
+        synchronized (CONTEXTS) {
+            Deque<FileEntry> stack = CONTEXTS.get(key, k -> new LinkedList<>());
+
+            if (context.isNew()) {
+                context.setId(Math.abs(Math.max(RANDOM.nextLong(), Long.MIN_VALUE + 1)));
+            }
+
+            stack.push(context.getValue());
+
+            CONTEXTS.put(key, stack);
         }
-
-        stack.push(context.getValue());
 
         return context;
     }
