@@ -7,6 +7,7 @@ services:
       - "8025:8025"
   postgres:
     image: postgres:14-alpine
+    platform: linux/amd64
     ports:
       - "5432:5432"
     volumes:
@@ -24,6 +25,7 @@ services:
 #      - '15672:15672'
   redis:
     image: redis:7-alpine
+    platform: linux/amd64
     restart: always
     ports:
       - "6379:6379"
