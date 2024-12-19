@@ -78,6 +78,12 @@ export interface TriggerDefinition {
      */
     outputDefined: boolean;
     /**
+     * Does trigger define output function.
+     * @type {boolean}
+     * @memberof TriggerDefinition
+     */
+    outputFunctionDefined?: boolean;
+    /**
      * The list of action properties.
      * @type {Array<Property>}
      * @memberof TriggerDefinition
@@ -131,6 +137,7 @@ export function TriggerDefinitionFromJSONTyped(json: any, ignoreDiscriminator: b
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'type': TriggerTypeFromJSON(json['type']),
@@ -155,6 +162,7 @@ export function TriggerDefinitionToJSONTyped(value?: TriggerDefinition | null, i
         'help': HelpToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
         'title': value['title'],
         'type': TriggerTypeToJSON(value['type']),
