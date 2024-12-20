@@ -7,6 +7,7 @@ import {Input} from '@/components/ui/input';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Eye, EyeOff} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -27,6 +28,8 @@ const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
     const {authenticated, login, loginError, reset} = useAuthenticationStore();
+
+    const ff_1874 = useFeatureFlagsStore()('ff-1874');
 
     const analytics = useAnalytics();
 
@@ -81,31 +84,41 @@ const Login = () => {
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-6 p-0">
-                    <div className="flex flex-col gap-4">
-                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
-                            <img alt="Google logo" src={googleLogo} />
+                    {ff_1874 && (
+                        <>
+                            <div className="flex flex-col gap-4">
+                                <Button
+                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
+                                    variant="outline"
+                                >
+                                    <img alt="Google logo" src={googleLogo} />
 
-                            <span className="text-sm font-medium text-content-neutral-primary">
-                                Continue with Google
-                            </span>
-                        </Button>
+                                    <span className="text-sm font-medium text-content-neutral-primary">
+                                        Continue with Google
+                                    </span>
+                                </Button>
 
-                        <Button className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md" variant="outline">
-                            <img alt="Github logo" src={githubLogo} />
+                                <Button
+                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
+                                    variant="outline"
+                                >
+                                    <img alt="Github logo" src={githubLogo} />
 
-                            <span className="text-sm font-medium text-content-neutral-primary">
-                                Continue with Github
-                            </span>
-                        </Button>
-                    </div>
+                                    <span className="text-sm font-medium text-content-neutral-primary">
+                                        Continue with Github
+                                    </span>
+                                </Button>
+                            </div>
 
-                    <div className="flex items-center">
-                        <hr className="w-1/2 border-content-neutral-tertiary" />
+                            <div className="flex items-center">
+                                <hr className="w-1/2 border-content-neutral-tertiary" />
 
-                        <p className="px-2 text-sm text-content-neutral-tertiary">or</p>
+                                <p className="px-2 text-sm text-content-neutral-tertiary">or</p>
 
-                        <hr className="w-1/2 border-content-neutral-tertiary" />
-                    </div>
+                                <hr className="w-1/2 border-content-neutral-tertiary" />
+                            </div>
+                        </>
+                    )}
 
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(handleSubmit)} role="form">
