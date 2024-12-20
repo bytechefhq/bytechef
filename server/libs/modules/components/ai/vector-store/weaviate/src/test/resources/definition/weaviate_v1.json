@@ -48,8 +48,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Data Query",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -102,7 +102,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Json keys on which extraction of content is based. If no keys are specified, it uses the entire JSON object as content.",
-      "displayCondition" : "document == 'json'",
+      "displayCondition" : "documentType == 'json'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -238,10 +238,13 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Load Data",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -340,13 +343,13 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "pkce" : null,
       "apply" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
@@ -358,8 +361,5 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  }
 }
