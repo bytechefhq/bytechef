@@ -127,9 +127,10 @@ const Property = ({
     const {isFetching: isFetchingDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
             id: workflow.id!,
-            workflowNodeName: currentNode?.name,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            workflowNodeName: currentNode?.workflowNodeName!,
         },
-        !!currentNode?.name
+        !!currentNode?.workflowNodeName
     );
 
     const previousOperationName = usePrevious(currentNode?.operationName);

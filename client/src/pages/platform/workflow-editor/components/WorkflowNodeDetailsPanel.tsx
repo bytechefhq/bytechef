@@ -102,7 +102,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
-            componentName: currentNode?.componentName || currentNode?.id || '',
+            componentName: currentNode?.componentName || '',
             componentVersion: currentNode?.version || 1,
         },
         !!currentNode && !currentNode.taskDispatcher
@@ -149,7 +149,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {data: currentTaskDispatcherDefinition} = useGetTaskDispatcherDefinitionQuery(
         {
-            taskDispatcherName: currentNode?.componentName || currentNode?.id || '',
+            taskDispatcherName: currentNode?.componentName || '',
             taskDispatcherVersion: currentNode?.version || 1,
         },
         !!currentNode && !!currentNode.taskDispatcher
@@ -278,7 +278,7 @@ const WorkflowNodeDetailsPanel = ({
 
         const {componentName, description, label, workflowNodeName} = currentComponent;
 
-        let nodeData = {
+        let nodeData: NodeDataType = {
             componentName,
             description,
             label,
@@ -289,6 +289,7 @@ const WorkflowNodeDetailsPanel = ({
             }),
             trigger: currentNode?.trigger,
             type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+            workflowNodeName,
         };
 
         if (currentNode?.conditionData) {
@@ -326,7 +327,7 @@ const WorkflowNodeDetailsPanel = ({
                         return;
                     }
 
-                    const updatedRootConditionNode = updateConditionSubtask({
+                    nodeData = updateConditionSubtask({
                         conditionCase,
                         conditionId: currentNode.conditionData.conditionId,
                         nodeIndex: taskIndex,
@@ -336,8 +337,6 @@ const WorkflowNodeDetailsPanel = ({
                         updatedParentConditionTask,
                         workflow,
                     });
-
-                    nodeData = updatedRootConditionNode.data ?? (updatedRootConditionNode as NodeDataType);
                 }
             }
         }

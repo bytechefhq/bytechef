@@ -1,7 +1,7 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ActionDefinition} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedOperationType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -14,7 +14,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
     conditionId: string;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     nodes: Array<Node>;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;

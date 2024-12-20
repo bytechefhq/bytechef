@@ -1,14 +1,14 @@
 /* eslint-disable sort-keys */
-import {ComponentType, NodeType} from '@/shared/types';
+import {ComponentType, NodeDataType} from '@/shared/types';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface WorkflowNodeDetailsPanelStateI {
+interface WorkflowNodeDetailsPanelStoreI {
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
 
-    currentNode: NodeType | undefined;
-    setCurrentNode: (currentNode: NodeType | undefined) => void;
+    currentNode: NodeDataType | undefined;
+    setCurrentNode: (currentNode: NodeDataType | undefined) => void;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     focusedInput: any;
@@ -21,7 +21,7 @@ interface WorkflowNodeDetailsPanelStateI {
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
 
-const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
+const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>()(
     devtools(
         (set) => ({
             currentComponent: undefined,
