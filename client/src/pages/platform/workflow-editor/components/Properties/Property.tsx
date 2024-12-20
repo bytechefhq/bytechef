@@ -116,6 +116,15 @@ const Property = ({
     const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
         useWorkflowEditorStore();
 
+    const {isFetching: isFetchingDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
+        {
+            id: workflow.id!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            workflowNodeName: currentNode?.workflowNodeName!,
+        },
+        !!currentNode?.workflowNodeName
+    );
+
     const previousOperationName = usePrevious(currentNode?.operationName);
 
     const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
