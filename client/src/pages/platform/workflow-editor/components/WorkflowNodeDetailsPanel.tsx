@@ -219,6 +219,20 @@ const WorkflowNodeDetailsPanel = ({
         return true;
     });
 
+    const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
+    const currentOperationFetched = currentActionFetched || currentTriggerFetched;
+
+    const operationDataMissing =
+        currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched);
+
+    const tabDataExists =
+        (!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
+        currentNode?.taskDispatcher ||
+        (currentNode?.trigger &&
+            currentTriggerFetched &&
+            nodeTabs.length > 1 &&
+            currentNode.componentName !== 'manual');
+
     const queryClient = useQueryClient();
 
     const handleOperationSelectChange = async (newOperationName: string) => {
@@ -426,6 +440,10 @@ const WorkflowNodeDetailsPanel = ({
         if (activeTab === 'output' && !hasOutputData) {
             setActiveTab('description');
         }
+
+        if (activeTab === 'properties' && !operationDataMissing && !currentOperationProperties?.length) {
+            setActiveTab('description');
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         activeTab,
@@ -511,20 +529,6 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.name]);
-
-    const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
-    const currentOperationFetched = currentActionFetched || currentTriggerFetched;
-
-    const operationDataMissing =
-        currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched);
-
-    const tabDataExists =
-        (!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
-        currentNode?.taskDispatcher ||
-        (currentNode?.trigger &&
-            currentTriggerFetched &&
-            nodeTabs.length > 1 &&
-            currentNode.componentName !== 'manual');
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
         return <></>;
@@ -661,20 +665,17 @@ const WorkflowNodeDetailsPanel = ({
                                     )}
 
                                 {activeTab === 'properties' &&
-                                    currentTaskData &&
-                                    !operationDataMissing &&
-                                    (currentOperationProperties?.length ? (
-                                        <Properties
-                                            customClassName="p-4"
-                                            key={`${currentNode?.name}_${currentOperationName}_properties`}
-                                            operationName={currentOperationName}
-                                            properties={currentOperationProperties}
-                                        />
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center text-xl">
-                                            Loading...
-                                        </div>
-                                    ))}
+                                !operationDataMissing &&
+                                currentOperationProperties?.length ? (
+                                    <Properties
+                                        customClassName="p-4"
+                                        key={`${currentNode?.name}_${currentOperationName}_properties`}
+                                        operationName={currentOperationName}
+                                        properties={currentOperationProperties}
+                                    />
+                                ) : (
+                                    <div className="flex h-full items-center justify-center text-xl">Loading...</div>
+                                )}
 
                                 {activeTab === 'output' && currentNode && currentComponentDefinition && (
                                     <OutputTab
