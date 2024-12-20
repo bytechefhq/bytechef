@@ -145,12 +145,9 @@ export default function useHandleDrop(): [
                 undefined
             );
 
-            parameters = {
-                ...newWorkflowNode.data,
-                parameters: getParametersWithDefaultValues({
-                    properties: draggedComponentActionDefinition.properties || [],
-                }),
-            };
+            parameters = getParametersWithDefaultValues({
+                properties: draggedComponentActionDefinition.properties || [],
+            });
         }
 
         let taskNodeIndex: number | undefined = undefined;
@@ -279,12 +276,9 @@ export default function useHandleDrop(): [
                 undefined
             );
 
-            parameters = {
-                ...newWorkflowNode.data,
-                parameters: getParametersWithDefaultValues({
-                    properties: draggedComponentActionDefinition.properties || [],
-                }),
-            };
+            parameters = getParametersWithDefaultValues({
+                properties: draggedComponentActionDefinition.properties || [],
+            });
         }
 
         saveWorkflowDefinition({
