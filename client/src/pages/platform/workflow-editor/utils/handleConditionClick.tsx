@@ -1,7 +1,7 @@
 import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedDefinitionType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
 import InlineSVG from 'react-inlinesvg';
@@ -14,7 +14,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     edge?: boolean;
     getNodes: () => Array<Node>;
     queryClient: QueryClient;
@@ -110,6 +110,7 @@ export default async function handleConditionClick({
                 caseFalse: [],
                 caseTrue: [],
             },
+            workflowNodeName,
         },
         nodeIndex: taskIndex,
         onSuccess: () => {

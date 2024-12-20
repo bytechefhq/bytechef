@@ -12,7 +12,7 @@ import {
     WorkflowNodeOutputKeys,
     useGetWorkflowNodeOutputQuery,
 } from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {NodeType, PropertyAllType} from '@/shared/types';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -24,7 +24,7 @@ import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
     connectionMissing: boolean;
-    currentNode: NodeType;
+    currentNode: NodeDataType;
     outputDefined: boolean;
     outputFunctionDefined: boolean;
     workflowId: string;

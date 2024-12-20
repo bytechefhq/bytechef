@@ -24,7 +24,6 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
-import {Node} from 'reactflow';
 
 export type DataPillType = {
     componentName?: string;
@@ -104,7 +103,13 @@ export type ClickedOperationType = {
 
 export type NodeDataType = {
     componentName: string;
+    conditionData?: {
+        conditionCase: string;
+        conditionId: string;
+        index: number;
+    };
     connections?: Array<WorkflowConnection>;
+    connectionId?: number;
     description?: string;
     icon?: JSX.Element | ReactNode | string;
     label?: string;
@@ -121,44 +126,8 @@ export type NodeDataType = {
     trigger?: boolean;
     type?: string;
     version?: number;
-    workflowNodeName?: string;
-};
-
-export type NodeType = {
-    componentName?: string;
-    conditionData?: {
-        conditionCase: string;
-        conditionId: string;
-        index: number;
-    };
-    connections?: Array<WorkflowConnectionType>;
-    connectionId?: number;
-    data: NodeDataType;
-    displayConditions?: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: boolean;
-    };
-    metadata?: {
-        ui?: {
-            condition?: string;
-            dynamicPropertyTypes?: {[key: string]: string};
-        };
-    };
-    icon?: ReactNode;
-    id: string;
-    label?: string;
-    name: string;
-    operationName?: string;
-    parameters?: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-    };
-    taskDispatcher?: boolean;
-    trigger?: boolean;
-    type: string;
-    version: number;
     workflowNodeName: string;
-} & Node;
+};
 
 export type SubPropertyType = PropertyAllType & {custom: boolean};
 

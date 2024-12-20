@@ -4,7 +4,7 @@ import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutp
 import {
     ComponentType,
     ConditionTaskDispatcherType,
-    NodeType,
+    NodeDataType,
     WorkflowDefinitionType,
     WorkflowTaskType,
 } from '@/shared/types';
@@ -16,13 +16,13 @@ import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
     currentComponent?: ComponentType;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     data: NodeProps['data'];
     getNode: (id: string) => Node | undefined;
     id: string;
     queryClient: QueryClient;
     setCurrentComponent: (component: ComponentType | undefined) => void;
-    setCurrentNode: (node: NodeType | undefined) => void;
+    setCurrentNode: (node: NodeDataType | undefined) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
