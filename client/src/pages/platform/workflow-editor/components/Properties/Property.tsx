@@ -2,6 +2,7 @@ import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
@@ -22,6 +23,7 @@ import deleteProperty from '@/pages/platform/workflow-editor/utils/deletePropert
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {Option} from '@/shared/middleware/platform/configuration';
+import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
@@ -121,6 +123,14 @@ const Property = ({
     const {componentDefinitions, workflow} = useWorkflowDataStore();
     const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
         useWorkflowEditorStore();
+
+    const {isFetching: isFetchingDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
+        {
+            id: workflow.id!,
+            workflowNodeName: currentNode?.name,
+        },
+        !!currentNode?.name
+    );
 
     const previousOperationName = usePrevious(currentNode?.operationName);
     const previousMentionInputValue = usePrevious(mentionInputValue);
@@ -904,6 +914,16 @@ const Property = ({
 
     if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
         return <></>;
+    }
+
+    if (displayCondition && currentComponent?.displayConditions?.[displayCondition] && isFetchingDisplayConditions) {
+        return (
+            <div className="flex flex-col gap-y-2">
+                <Skeleton className="h-6 w-1/4" />
+
+                <Skeleton className="h-10 w-full" />
+            </div>
+        );
     }
 
     return (
