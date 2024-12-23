@@ -20,7 +20,13 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_TYPE_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON_KEYS_TO_USE_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.KEYWORD_METADATA_ENRICHER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.LOAD_DATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SUMMARY_METADATA_ENRICHER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOKEN_TEXT_SPLITTER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_KEYWORD_ENRICHER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_SUMMARY_ENRICHER_PROPERTy;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_TOKEN_TEXT_SPLITTER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.API_KEY;
 import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.HOST;
 import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.SCHEME;
@@ -50,7 +56,13 @@ public class WeaviateLoadDataAction {
         .properties(
             DOCUMENT_TYPE_PROPERTY,
             JSON_KEYS_TO_USE_PROPERTY,
-            DOCUMENT_PROPERTY)
+            DOCUMENT_PROPERTY,
+            USE_TOKEN_TEXT_SPLITTER_PROPERTY,
+            TOKEN_TEXT_SPLITTER_PROPERTY,
+            USE_KEYWORD_ENRICHER_PROPERTY,
+            KEYWORD_METADATA_ENRICHER_PROPERTY,
+            USE_SUMMARY_ENRICHER_PROPERTy,
+            SUMMARY_METADATA_ENRICHER_PROPERTY)
         .perform(WeaviateLoadDataAction::perform);
 
     private WeaviateLoadDataAction() {
@@ -80,7 +92,7 @@ public class WeaviateLoadDataAction {
 
             return new WeaviateVectorStore(weaviateVectorStoreConfig, openAiEmbeddingModel, weaviateClient);
         } catch (AuthException authException) {
-            throw new RuntimeException("Authetication failed", authException);
+            throw new RuntimeException("Authentication failed", authException);
         }
     };
 }
