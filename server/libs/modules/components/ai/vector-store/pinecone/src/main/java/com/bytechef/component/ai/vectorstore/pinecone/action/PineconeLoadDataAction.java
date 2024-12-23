@@ -20,7 +20,13 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_TYPE_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON_KEYS_TO_USE_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.KEYWORD_METADATA_ENRICHER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.LOAD_DATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SUMMARY_METADATA_ENRICHER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOKEN_TEXT_SPLITTER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_KEYWORD_ENRICHER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_SUMMARY_ENRICHER_PROPERTy;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_TOKEN_TEXT_SPLITTER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.API_KEY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.ENVIRONMENT;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.INDEX_NAME;
@@ -47,7 +53,13 @@ public class PineconeLoadDataAction {
         .properties(
             DOCUMENT_TYPE_PROPERTY,
             JSON_KEYS_TO_USE_PROPERTY,
-            DOCUMENT_PROPERTY)
+            DOCUMENT_PROPERTY,
+            USE_TOKEN_TEXT_SPLITTER_PROPERTY,
+            TOKEN_TEXT_SPLITTER_PROPERTY,
+            USE_KEYWORD_ENRICHER_PROPERTY,
+            KEYWORD_METADATA_ENRICHER_PROPERTY,
+            USE_SUMMARY_ENRICHER_PROPERTy,
+            SUMMARY_METADATA_ENRICHER_PROPERTY)
         .perform(PineconeLoadDataAction::perform);
 
     private PineconeLoadDataAction() {
