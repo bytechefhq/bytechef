@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.server.config;
+package com.bytechef.observability.config;
 
 import brave.handler.MutableSpan;
 import org.springframework.context.annotation.Bean;
