@@ -30,7 +30,13 @@ import {
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {ComponentPropertiesType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ComponentPropertiesType,
+    DataPillType,
+    NodeDataType,
+    PropertyAllType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
