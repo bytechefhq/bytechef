@@ -1,6 +1,5 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ActionDefinition} from '@/shared/middleware/platform/configuration';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
@@ -10,6 +9,7 @@ import {Node} from 'reactflow';
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
@@ -61,14 +61,13 @@ export default function handleConditionChildOperationClick({
             }),
         },
         nodeIndex: taskAfterCurrentIndex,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                    id: workflow.id!,
-                    lastWorkflowNodeName: currentNode?.name,
-                }),
-            });
-        },
+        onSuccess: () =>
+            handleComponentAddedSuccess({
+                currentNode,
+                nodeData: newWorkflowNodeData,
+                queryClient,
+                workflow,
+            }),
         placeholderId,
         queryClient,
         updateWorkflowMutation,

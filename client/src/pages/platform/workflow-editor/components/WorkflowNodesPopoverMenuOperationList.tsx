@@ -1,7 +1,6 @@
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {ActionDefinitionApi, ComponentDefinition} from '@/shared/middleware/platform/configuration';
 import {ActionDefinitionKeys} from '@/shared/queries/platform/actionDefinitions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
@@ -15,6 +14,7 @@ import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
+import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleConditionChildOperationClick from '../utils/handleConditionChildOperationClick';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
@@ -36,7 +36,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
     const {setLatestComponentDefinition, workflow} = useWorkflowDataStore();
-    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -76,7 +76,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 label: componentLabel,
                 metadata: undefined,
                 name: 'trigger_1',
-                operationName: operationName,
+                operationName,
                 parameters: undefined,
                 trigger: true,
                 type: `${componentName}/v${version}/${operationName}`,
@@ -86,30 +86,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             saveWorkflowDefinition({
                 nodeData: newTriggerNodeData,
-                onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                            id: workflow.id!,
-                            lastWorkflowNodeName: currentNode?.name,
-                        }),
-                    });
-
-                    if (currentNode?.trigger) {
-                        setCurrentNode({
-                            ...currentNode,
-                            ...newTriggerNodeData,
-                        });
-                    }
-
-                    setCurrentComponent({
-                        componentName: newTriggerNodeData.componentName,
-                        description: newTriggerNodeData.description,
-                        label: newTriggerNodeData.label,
-                        operationName: newTriggerNodeData.operationName,
-                        type: newTriggerNodeData.type,
-                        workflowNodeName: newTriggerNodeData.workflowNodeName ?? 'trigger_1',
-                    });
-                },
+                onSuccess: () =>
+                    handleComponentAddedSuccess({
+                        currentNode,
+                        nodeData: newTriggerNodeData,
+                        queryClient,
+                        workflow,
+                    }),
                 queryClient,
                 updateWorkflowMutation,
                 workflow,
@@ -144,23 +127,27 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             const workflowNodeName = getFormattedName(clickedOperation.componentName!, nodes);
 
+            const newWorkflowNodeData = {
+                componentName: clickedOperation.componentName,
+                icon: clickedOperation.icon && (
+                    <InlineSVG
+                        className="size-9"
+                        loader={<ComponentIcon className="size-9" />}
+                        src={clickedOperation.icon}
+                    />
+                ),
+                label: clickedOperation.componentLabel,
+                metadata: undefined,
+                name: workflowNodeName,
+                operationName: clickedOperation.operationName,
+                parameters: undefined,
+                type: clickedOperation.type,
+                version,
+                workflowNodeName,
+            };
+
             const newWorkflowNode = {
-                data: {
-                    componentName: clickedOperation.componentName,
-                    icon: clickedOperation.icon && (
-                        <InlineSVG
-                            className="size-9"
-                            loader={<ComponentIcon className="size-9" />}
-                            src={clickedOperation.icon}
-                        />
-                    ),
-                    label: clickedOperation.componentLabel,
-                    metadata: {},
-                    name: workflowNodeName,
-                    type: clickedOperation.type,
-                    version,
-                    workflowNodeName,
-                },
+                data: newWorkflowNodeData,
                 id: getRandomId(),
                 position: {
                     x: 0,
@@ -179,20 +166,19 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
             saveWorkflowDefinition({
                 nodeData: {
-                    ...newWorkflowNode.data,
+                    ...newWorkflowNodeData,
                     parameters: getParametersWithDefaultValues({
                         properties: clickedComponentActionDefinition?.properties as Array<PropertyAllType>,
                     }),
                 },
                 nodeIndex: (previousWorkflowTaskIndex ?? 0) + 1,
-                onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                            id: workflow.id!,
-                            lastWorkflowNodeName: currentNode?.name,
-                        }),
-                    });
-                },
+                onSuccess: () =>
+                    handleComponentAddedSuccess({
+                        currentNode,
+                        nodeData: newWorkflowNodeData,
+                        queryClient,
+                        workflow,
+                    }),
                 queryClient,
                 updateWorkflowMutation,
                 workflow,
@@ -264,14 +250,13 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     }),
                 },
                 nodeIndex: taskNodeIndex,
-                onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                            id: workflow.id!,
-                            lastWorkflowNodeName: currentNode?.name,
-                        }),
-                    });
-                },
+                onSuccess: () =>
+                    handleComponentAddedSuccess({
+                        currentNode,
+                        nodeData: newWorkflowNodeData,
+                        queryClient,
+                        workflow,
+                    }),
                 queryClient,
                 updateWorkflowMutation,
                 workflow,

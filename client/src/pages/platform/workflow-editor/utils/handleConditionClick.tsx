@@ -1,6 +1,5 @@
 import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
 import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
@@ -10,6 +9,7 @@ import {Node} from 'reactflow';
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
@@ -53,7 +53,7 @@ export default async function handleConditionClick({
 
     const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 
-    const newConditionNodeData = {
+    const newConditionNodeData: NodeDataType = {
         ...clickedTaskDispatcherDefinition,
         componentName: clickedItem.name,
         icon: (
@@ -69,6 +69,7 @@ export default async function handleConditionClick({
         name: workflowNodeName,
         taskDispatcher: true,
         type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
+        workflowNodeName,
     };
 
     const {tasks} = workflow;
@@ -113,14 +114,13 @@ export default async function handleConditionClick({
             workflowNodeName,
         },
         nodeIndex: taskIndex,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                    id: workflow.id!,
-                    lastWorkflowNodeName: currentNode?.name,
-                }),
-            });
-        },
+        onSuccess: () =>
+            handleComponentAddedSuccess({
+                currentNode,
+                nodeData: newConditionNodeData,
+                queryClient,
+                workflow,
+            }),
         placeholderId: sourceNodeId,
         queryClient,
         updateWorkflowMutation,
