@@ -36,7 +36,6 @@ import {
     NodeDataType,
     PropertyAllType,
     UpdateWorkflowMutationType,
-    WorkflowDefinitionType,
 } from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
@@ -47,7 +46,6 @@ import {twMerge} from 'tailwind-merge';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
-import getAllTaskNames from '../utils/getAllTaskNames';
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
@@ -93,7 +91,6 @@ const WorkflowNodeDetailsPanel = ({
     const [availableDataPills, setAvailableDataPills] = useState<Array<DataPillType>>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
-    const [workflowDefinition, setWorkflowDefinition] = useState<WorkflowDefinitionType>({});
 
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -111,7 +108,7 @@ const WorkflowNodeDetailsPanel = ({
     const {data: workflowTestConfigurationConnections} = useGetWorkflowTestConfigurationConnectionsQuery(
         {
             workflowId: workflow.id as string,
-            workflowNodeName: currentNode?.name as string,
+            workflowNodeName: currentNode?.workflowNodeName as string,
         },
         !!workflow.id && !!currentNode
     );
@@ -163,7 +160,7 @@ const WorkflowNodeDetailsPanel = ({
 
     const {nodeNames} = workflow;
 
-    const currentNodeIndex = currentNode && nodeNames?.indexOf(currentNode?.name);
+    const currentNodeIndex = currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName);
 
     const previousNodeNames = nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : [];
 
@@ -191,8 +188,8 @@ const WorkflowNodeDetailsPanel = ({
     );
 
     const hasOutputData = currentNodeDefinition?.outputDefined;
-    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.name);
-    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.name);
+    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName);
+    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.workflowNodeName);
 
     const componentConnections: WorkflowConnection[] =
         currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
@@ -282,7 +279,7 @@ const WorkflowNodeDetailsPanel = ({
             componentName,
             description,
             label,
-            name: workflowNodeName || currentNode?.name || '',
+            name: workflowNodeName || currentNode?.workflowNodeName || '',
             operationName: newOperationName,
             parameters: getParametersWithDefaultValues({
                 properties: operationData.properties as Array<PropertyAllType>,
@@ -452,13 +449,6 @@ const WorkflowNodeDetailsPanel = ({
         currentComponentDefinition?.name,
     ]);
 
-    // Close the panel if the current node is deleted
-    useEffect(() => {
-        if (!currentNode?.name || !nodeNames.includes(currentNode?.name)) {
-            useWorkflowNodeDetailsPanelStore.getState().reset();
-        }
-    }, [currentNode?.name, nodeNames]);
-
     // If the current component requires a connection, set the active tab to 'connection'
     useEffect(() => {
         if (currentComponentDefinition?.connectionRequired && !workflowTestConfigurationConnections?.length) {
@@ -478,31 +468,6 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowTestConfigurationConnections]);
 
-    // Parse the workflow definition to an object
-    useEffect(() => {
-        if (workflow.definition) {
-            setWorkflowDefinition(JSON.parse(workflow.definition));
-        }
-    }, [workflow.definition]);
-
-    // Close the panel if the current node is deleted from the workflow definition
-    useEffect(() => {
-        if (currentNode?.trigger) {
-            return;
-        }
-
-        if (!workflowDefinition.tasks) {
-            return;
-        }
-
-        const taskNames = getAllTaskNames(workflowDefinition.tasks);
-
-        if (currentNode && taskNames && !taskNames?.includes(currentNode?.name)) {
-            useWorkflowNodeDetailsPanelStore.getState().reset();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNode, workflowDefinition.tasks?.length]);
-
     // Store new operationName into currentNode
     useEffect(() => {
         if (currentNode?.operationName && currentOperationName) {
@@ -519,7 +484,7 @@ const WorkflowNodeDetailsPanel = ({
     useEffect(() => {
         if (componentActions?.length) {
             const currentComponentAction = componentActions.find(
-                (action) => action.workflowNodeName === currentNode?.name
+                (action) => action.workflowNodeName === currentNode?.workflowNodeName
             );
 
             if (currentComponentAction) {
@@ -527,16 +492,16 @@ const WorkflowNodeDetailsPanel = ({
             }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [componentActions, currentNode?.name]);
+    }, [componentActions, currentNode?.workflowNodeName]);
 
-    if (!workflowNodeDetailsPanelOpen || !currentNode?.name || !currentTaskData) {
+    if (!workflowNodeDetailsPanelOpen || !currentNode?.workflowNodeName || !currentTaskData) {
         return <></>;
     }
 
     return (
         <div
             className="absolute inset-y-4 right-4 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-xl border border-border/50 bg-white shadow-lg"
-            key={currentNode?.name}
+            key={currentNode?.workflowNodeName}
         >
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-white">
                 <header className="flex items-center p-4 text-lg font-medium">
@@ -550,7 +515,7 @@ const WorkflowNodeDetailsPanel = ({
 
                     {currentNode?.label}
 
-                    <span className="mx-2 text-sm text-gray-500">({currentNode?.name})</span>
+                    <span className="mx-2 text-sm text-gray-500">({currentNode?.workflowNodeName})</span>
 
                     {currentTaskData.description && (
                         <Tooltip delayDuration={500}>
@@ -642,7 +607,7 @@ const WorkflowNodeDetailsPanel = ({
                             <div className="absolute left-0 top-0 size-full">
                                 {activeTab === 'description' && (
                                     <DescriptionTab
-                                        key={`${currentNode?.name}_description`}
+                                        key={`${currentNode?.workflowNodeName}_description`}
                                         updateWorkflowMutation={updateWorkflowMutation}
                                     />
                                 )}
@@ -655,10 +620,10 @@ const WorkflowNodeDetailsPanel = ({
                                     currentComponentDefinition && (
                                         <ConnectionTab
                                             componentDefinition={currentComponentDefinition}
-                                            key={`${currentNode?.name}_connection`}
+                                            key={`${currentNode?.workflowNodeName}_connection`}
                                             workflowConnections={componentConnections}
                                             workflowId={workflow.id!}
-                                            workflowNodeName={currentNode?.name}
+                                            workflowNodeName={currentNode?.workflowNodeName}
                                             workflowTestConfigurationConnections={workflowTestConfigurationConnections}
                                         />
                                     )}
@@ -668,7 +633,7 @@ const WorkflowNodeDetailsPanel = ({
                                 currentOperationProperties?.length ? (
                                     <Properties
                                         customClassName="p-4"
-                                        key={`${currentNode?.name}_${currentOperationName}_properties`}
+                                        key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
                                         operationName={currentOperationName}
                                         properties={currentOperationProperties}
                                     />
@@ -683,7 +648,7 @@ const WorkflowNodeDetailsPanel = ({
                                             !workflowTestConfigurationConnections?.length
                                         }
                                         currentNode={currentNode}
-                                        key={`${currentNode?.name}_output`}
+                                        key={`${currentNode?.workflowNodeName}_output`}
                                         outputDefined={currentActionDefinition?.outputDefined ?? false}
                                         outputFunctionDefined={currentActionDefinition?.outputFunctionDefined ?? false}
                                         workflowId={workflow.id!}

@@ -12,6 +12,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {Node, NodeProps} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
@@ -127,6 +128,8 @@ export default function handleDeleteTask({
 
                 if (currentNode?.name === data.name) {
                     setCurrentNode(undefined);
+
+                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(false);
                 }
 
                 if (currentComponent?.workflowNodeName === data.name) {
