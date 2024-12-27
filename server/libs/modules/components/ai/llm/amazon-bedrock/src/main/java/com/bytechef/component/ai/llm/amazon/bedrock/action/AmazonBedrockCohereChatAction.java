@@ -131,13 +131,14 @@ public class AmazonBedrockCohereChatAction {
             .withTopP(inputParameters.getDouble(TOP_P))
             .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
             .withTopK(inputParameters.getInteger(TOP_K))
-            .withLogitBias(new CohereChatBedrockApi.CohereChatRequest.LogitBias(
-                inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
+            .withLogitBias(
+                new CohereChatBedrockApi.CohereChatRequest.LogitBias(
+                    inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
             .withNumGenerations(inputParameters.getInteger(N))
-            .withReturnLikelihoods(inputParameters.get(RETURN_LIKELIHOODS,
-                CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-            .withTruncate(inputParameters.get(TRUNCATE,
-                CohereChatBedrockApi.CohereChatRequest.Truncate.class))
+            .withReturnLikelihoods(
+                inputParameters.get(RETURN_LIKELIHOODS, CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
+            .withTruncate(
+                inputParameters.get(TRUNCATE, CohereChatBedrockApi.CohereChatRequest.Truncate.class))
             .build());
 
     private AmazonBedrockCohereChatAction() {
