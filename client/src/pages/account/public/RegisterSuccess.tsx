@@ -23,7 +23,7 @@ const RegisterSuccess = () => {
 
     useEffect(() => {
         if (activationFailure) {
-            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
+            navigate('/account-error');
         }
     }, [activationFailure, navigate]);
 

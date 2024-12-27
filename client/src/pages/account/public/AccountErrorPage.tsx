@@ -6,6 +6,7 @@ import {Link, useLocation} from 'react-router-dom';
 
 const AccountErrorPage = () => {
     const location = useLocation();
+    const errorMessage = location.state?.error || 'Something went wrong. Try again.';
 
     return (
         <PublicLayoutContainer>
@@ -16,7 +17,7 @@ const AccountErrorPage = () => {
                     <CardTitle className="self-center text-xl font-bold text-content-neutral-primary">Error</CardTitle>
 
                     <CardDescription className="self-center text-center text-content-neutral-secondary">
-                        {location.state.error ? `${location.state.error}` : 'Something went wrong. Try again.'}
+                        {errorMessage}
                     </CardDescription>
                 </CardHeader>
 
