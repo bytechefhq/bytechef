@@ -637,8 +637,8 @@ const WorkflowNodeDetailsPanel = ({
                                             properties={currentOperationProperties}
                                         />
                                     ) : (
-                                        <div className="flex h-full items-center justify-center text-xl">
-                                            Loading...
+                                        <div className="flex size-full items-center justify-center">
+                                            <LoadingIcon /> Loading...
                                         </div>
                                     ))}
 
