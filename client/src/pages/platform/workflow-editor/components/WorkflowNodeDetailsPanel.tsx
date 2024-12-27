@@ -629,17 +629,18 @@ const WorkflowNodeDetailsPanel = ({
                                     )}
 
                                 {activeTab === 'properties' &&
-                                !operationDataMissing &&
-                                currentOperationProperties?.length ? (
-                                    <Properties
-                                        customClassName="p-4"
-                                        key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
-                                        operationName={currentOperationName}
-                                        properties={currentOperationProperties}
-                                    />
-                                ) : (
-                                    <div className="flex h-full items-center justify-center text-xl">Loading...</div>
-                                )}
+                                    (!operationDataMissing && currentOperationProperties?.length ? (
+                                        <Properties
+                                            customClassName="p-4"
+                                            key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
+                                            operationName={currentOperationName}
+                                            properties={currentOperationProperties}
+                                        />
+                                    ) : (
+                                        <div className="flex h-full items-center justify-center text-xl">
+                                            Loading...
+                                        </div>
+                                    ))}
 
                                 {activeTab === 'output' && currentNode && currentComponentDefinition && (
                                     <OutputTab
