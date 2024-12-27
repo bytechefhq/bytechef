@@ -651,7 +651,6 @@ const WorkflowNodeDetailsPanel = ({
                                         currentNode={currentNode}
                                         key={`${currentNode?.workflowNodeName}_output`}
                                         outputDefined={currentActionDefinition?.outputDefined ?? false}
-                                        outputFunctionDefined={currentActionDefinition?.outputFunctionDefined ?? false}
                                         workflowId={workflow.id!}
                                     />
                                 )}

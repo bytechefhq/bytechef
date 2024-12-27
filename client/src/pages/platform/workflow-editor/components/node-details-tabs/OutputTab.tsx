@@ -26,17 +26,10 @@ interface OutputTabProps {
     connectionMissing: boolean;
     currentNode: NodeDataType;
     outputDefined: boolean;
-    outputFunctionDefined: boolean;
     workflowId: string;
 }
 
-const OutputTab = ({
-    connectionMissing,
-    currentNode,
-    outputDefined = false,
-    outputFunctionDefined = false,
-    workflowId,
-}: OutputTabProps) => {
+const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workflowId}: OutputTabProps) => {
     const [showUploadDialog, setShowUploadDialog] = useState(false);
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
@@ -135,7 +128,7 @@ const OutputTab = ({
                                     </DropdownMenuItem>
                                 )}
 
-                                {!currentNode.trigger && !outputFunctionDefined && (
+                                {!currentNode.trigger && (
                                     <DropdownMenuItem
                                         className="cursor-pointer"
                                         disabled={connectionMissing}
