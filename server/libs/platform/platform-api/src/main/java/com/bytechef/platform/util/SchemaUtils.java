@@ -174,9 +174,9 @@ public class SchemaUtils {
                 BaseControlType baseControlType = p.getControlType();
 
                 if (Objects.equals(baseControlType.name(), "EMAIL")) {
-                    yield "sample_email@" + p.getName();
+                    yield "sample_email@" + (p.getName() == null ? "gmail.com" : p.getName());
                 } else {
-                    yield "sample " + p.getName();
+                    yield "sample " + (p.getName() == null ? "string" : p.getName());
                 }
             }
             case BaseTimeProperty ignored -> LocalTime.now();
