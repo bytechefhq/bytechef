@@ -10,7 +10,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -144,10 +144,7 @@ const Register = () => {
                     {ff_1874 && (
                         <>
                             <div className="flex flex-col gap-4">
-                                <Button
-                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
-                                    variant="outline"
-                                >
+                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
                                     <img alt="Google logo" src={googleLogo} />
 
                                     <span className="text-sm font-medium text-content-neutral-primary">
@@ -155,10 +152,7 @@ const Register = () => {
                                     </span>
                                 </Button>
 
-                                <Button
-                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
-                                    variant="outline"
-                                >
+                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
                                     <img alt="Github logo" src={githubLogo} />
 
                                     <span className="text-sm font-medium text-content-neutral-primary">
@@ -232,7 +226,7 @@ const Register = () => {
                                                     </div>
                                                 </FormControl>
 
-                                                <ul>
+                                                <ul className="space-y-1">
                                                     {errors.password?.message &&
                                                         getValues('password') !== '' &&
                                                         Object.entries(JSON.parse(errors.password.message)).map(
@@ -245,15 +239,15 @@ const Register = () => {
                                                                 return (
                                                                     <li
                                                                         className={twMerge(
-                                                                            'mt-2 flex items-center gap-1 text-base text-destructive',
+                                                                            'flex items-center gap-1 text-sm text-destructive',
                                                                             validationPass && 'text-success'
                                                                         )}
                                                                         key={key}
                                                                     >
                                                                         {validationPass ? (
-                                                                            <CheckIcon size={20} />
+                                                                            <CheckIcon size={15} />
                                                                         ) : (
-                                                                            <XIcon size={20} />
+                                                                            <XIcon size={15} />
                                                                         )}
 
                                                                         <p>{message}</p>
@@ -264,20 +258,20 @@ const Register = () => {
 
                                                     {getValues('password') === '' && (
                                                         <>
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                <XIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                                <XIcon size={15} />
 
                                                                 <p>{passwordLengthMessage}</p>
                                                             </li>
 
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                <XIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                                <XIcon size={15} />
 
                                                                 <p>{passwordContainsNumberMessage}</p>
                                                             </li>
 
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                                <XIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                                <XIcon size={15} />
 
                                                                 <p>{passwordContainsUppercaseMessage}</p>
                                                             </li>
@@ -286,20 +280,20 @@ const Register = () => {
 
                                                     {!errors.password && getValues('password') !== '' && (
                                                         <>
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                                <CheckIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                                <CheckIcon size={15} />
 
                                                                 <p>{passwordLengthMessage}</p>
                                                             </li>
 
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                                <CheckIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                                <CheckIcon size={15} />
 
                                                                 <p>{passwordContainsNumberMessage}</p>
                                                             </li>
 
-                                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                                <CheckIcon size={20} />
+                                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                                <CheckIcon size={15} />
 
                                                                 <p>{passwordContainsUppercaseMessage}</p>
                                                             </li>

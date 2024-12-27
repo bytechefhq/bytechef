@@ -10,9 +10,9 @@ import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Eye, EyeOff} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {Link, Navigate, useLocation, useNavigate} from 'react-router-dom';
+import {Link, Navigate, useLocation} from 'react-router-dom';
 import {z} from 'zod';
 
 import githubLogo from '../images/github-logo.svg';
@@ -27,14 +27,13 @@ const formSchema = z.object({
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const {authenticated, login, loginError, reset} = useAuthenticationStore();
+    const {authenticated, login} = useAuthenticationStore();
 
     const ff_1874 = useFeatureFlagsStore()('ff-1874');
 
     const analytics = useAnalytics();
 
     const pageLocation = useLocation();
-    const navigate = useNavigate();
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -60,16 +59,6 @@ const Login = () => {
 
     const {from} = pageLocation.state || {from: {pathname: '/', search: pageLocation.search}};
 
-    useEffect(() => {
-        if (loginError) {
-            navigate('/account-error', {
-                state: {error: 'Failed to sign in, please check your credentials and try again.'},
-            });
-
-            reset();
-        }
-    }, [loginError, navigate, reset]);
-
     if (authenticated) {
         return <Navigate replace to={from} />;
     }
@@ -87,10 +76,7 @@ const Login = () => {
                     {ff_1874 && (
                         <>
                             <div className="flex flex-col gap-4">
-                                <Button
-                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
-                                    variant="outline"
-                                >
+                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
                                     <img alt="Google logo" src={googleLogo} />
 
                                     <span className="text-sm font-medium text-content-neutral-primary">
@@ -98,10 +84,7 @@ const Login = () => {
                                     </span>
                                 </Button>
 
-                                <Button
-                                    className="flex items-center gap-2 rounded-md px-4 py-5 shadow-md"
-                                    variant="outline"
-                                >
+                                <Button className="flex items-center gap-2 rounded-md px-4 py-5" variant="outline">
                                     <img alt="Github logo" src={githubLogo} />
 
                                     <span className="text-sm font-medium text-content-neutral-primary">

@@ -61,7 +61,7 @@ it('should render "AccountError" page when "resetPasswordFailure" is true', asyn
     });
 });
 
-it('should render "PasswordResetEmailSent" page when "resetPasswordSuccess" is true', async () => {
+it('should render "PasswordResetEmailSent" page when there is valid email address and "resetPasswordSuccess" is true', async () => {
     mockPasswordResetStore({
         resetPasswordSuccess: true,
     });
@@ -75,6 +75,8 @@ it('should render "PasswordResetEmailSent" page when "resetPasswordSuccess" is t
             </Routes>
         </MemoryRouter>
     );
+
+    await userEvent.type(screen.getByLabelText('Email'), 'email@example.com');
 
     await waitFor(() => {
         expect(screen.getByText('Please check your email')).toBeInTheDocument();
