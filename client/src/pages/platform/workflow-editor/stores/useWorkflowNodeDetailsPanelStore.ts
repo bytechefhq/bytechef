@@ -1,5 +1,6 @@
 /* eslint-disable sort-keys */
 import {ComponentType, NodeDataType} from '@/shared/types';
+import {Editor} from '@tiptap/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -11,9 +12,9 @@ interface WorkflowNodeDetailsPanelStoreI {
     setCurrentNode: (currentNode: NodeDataType | undefined) => void;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    focusedInput: any;
+    focusedInput: Editor | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setFocusedInput: (focusedInput: any) => void;
+    setFocusedInput: (focusedInput: Editor | null) => void;
 
     reset: () => void;
 

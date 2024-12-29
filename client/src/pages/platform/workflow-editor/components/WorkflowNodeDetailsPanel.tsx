@@ -30,13 +30,7 @@ import {
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {
-    ComponentPropertiesType,
-    DataPillType,
-    NodeDataType,
-    PropertyAllType,
-    UpdateWorkflowMutationType,
-} from '@/shared/types';
+import {ComponentPropertiesType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
@@ -88,7 +82,6 @@ const WorkflowNodeDetailsPanel = ({
     workflowNodeOutputs: WorkflowNodeOutput[];
 }) => {
     const [activeTab, setActiveTab] = useState('description');
-    const [availableDataPills, setAvailableDataPills] = useState<Array<DataPillType>>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
 
@@ -399,17 +392,9 @@ const WorkflowNodeDetailsPanel = ({
 
         const dataPills = getDataPillsFromProperties(previousComponentProperties!, workflow, filteredNodeNames);
 
-        setAvailableDataPills(dataPills.flat(Infinity));
+        setDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [previousComponentProperties.length]);
-
-    // Set dataPills depending on availableDataPills
-    useEffect(() => {
-        if (availableDataPills?.length) {
-            setDataPills(availableDataPills.flat(Infinity));
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [availableDataPills?.length]);
 
     // Tab switching logic
     useEffect(() => {

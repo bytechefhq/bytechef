@@ -1,0 +1,26 @@
+.property-bubble-menu {
+    @apply bg-background;
+    @apply border;
+    @apply rounded-xl;
+    @apply shadow-lg;
+    @apply inline-flex;
+    @apply p-1;
+    @apply text-sm;
+
+    button {
+        @apply rounded-md;
+        @apply p-1;
+
+        &:hover {
+            @apply bg-muted;
+        }
+
+        &.is-active {
+            @apply bg-foreground/15;
+
+            &:hover {
+                @apply bg-muted;
+            }
+        }
+    }
+}

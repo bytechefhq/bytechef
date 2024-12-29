@@ -2,6 +2,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {PropertyAllType} from '@/shared/types';
+import {Editor} from '@tiptap/react';
 import resolvePath from 'object-resolve-path';
 import {MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -27,7 +28,7 @@ const DataPill = ({
 }) => {
     const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore();
 
-    const mentionInput = focusedInput?.getEditor().getModule('mention');
+    const mentionInput: Editor | null = focusedInput;
 
     const subProperties = property?.properties || property?.items;
 
@@ -50,29 +51,31 @@ const DataPill = ({
             : `${propertyName || workflowNodeName}`;
 
         const value = propertyName
-            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.').replaceAll('.[index]', '[index]')}`
+            ? `${workflowNodeName}.${(path || dataPillName).replaceAll('/', '.').replaceAll('.[index]', '[0]')}`
             : workflowNodeName;
 
         const parameters = currentComponent?.parameters || {};
 
         if (Object.keys(parameters).length) {
-            const paramValue = resolvePath(parameters, mentionInput.options.path);
+            const attributes = mentionInput.view.props.attributes as {[name: string]: string};
 
-            if (mentionInput.options.singleMention && paramValue) {
+            const paramValue = resolvePath(parameters, attributes.path);
+
+            if (attributes.type !== 'STRING' && paramValue) {
                 return;
             }
         }
 
-        mentionInput.insertItem(
-            {
-                componentIcon,
-                id: propertyName || workflowNodeName,
-                nodeName: workflowNodeName,
-                value,
-            },
-            true,
-            {blotName: 'property-mention'}
-        );
+        mentionInput
+            .chain()
+            .focus()
+            .insertContent({
+                attrs: {
+                    id: value,
+                },
+                type: 'mention',
+            })
+            .run();
     };
 
     const getSubPropertyPath = (subPropertyName = '[index]') =>
