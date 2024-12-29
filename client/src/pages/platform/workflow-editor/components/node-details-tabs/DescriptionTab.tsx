@@ -61,7 +61,7 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
 
     return (
         <div className="flex h-full flex-col gap-4 overflow-auto p-4">
-            <fieldset className="space-y-2">
+            <fieldset className="space-y-1">
                 <Label>Title</Label>
 
                 <Input
@@ -72,11 +72,10 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                 />
             </fieldset>
 
-            <fieldset className="space-y-2">
+            <fieldset className="space-y-1">
                 <Label>Notes</Label>
 
                 <Textarea
-                    className="mt-1"
                     defaultValue={currentComponent?.description || ''}
                     key={`${currentComponent?.componentName}_nodeNotes`}
                     name="nodeNotes"

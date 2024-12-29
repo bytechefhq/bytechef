@@ -107,7 +107,7 @@ const ConnectionTabConnectionSelect = ({
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col">
+            <div className="space-y-1">
                 {componentDefinition && (
                     <Label className="mb-2 font-normal">
                         {componentDefinition.title}
