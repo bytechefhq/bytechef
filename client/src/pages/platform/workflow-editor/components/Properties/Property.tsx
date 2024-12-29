@@ -25,12 +25,12 @@ import {Option} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
-import ReactQuill from 'react-quill';
 import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
@@ -54,7 +54,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
-const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'TEXT', 'TEXT_AREA', 'URL'];
+const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'RICH_TEXT', 'TEXT', 'TEXT_AREA', 'URL'];
 
 interface PropertyProps {
     arrayIndex?: number;
@@ -106,24 +106,17 @@ const Property = ({
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
 
-    const editorRef = useRef<ReactQuill>(null);
+    const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {
-        currentComponent,
-        currentNode,
-        focusedInput,
-        setCurrentComponent,
-        setFocusedInput,
-        workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent, setFocusedInput, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentDefinitions, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
     const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
         useWorkflowEditorStore();
 
     const previousOperationName = usePrevious(currentNode?.operationName);
-    const previousMentionInputValue = usePrevious(mentionInputValue);
 
     const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
@@ -204,16 +197,6 @@ const Property = ({
         });
     }
 
-    const getComponentIcon = (mentionValue: string) => {
-        let componentName = mentionValue.split('_')[0].replace('${', '');
-
-        if (componentName === 'trigger') {
-            componentName = workflow.workflowTriggerComponentNames?.[0] || '';
-        }
-
-        return componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
-    };
-
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
             return;
@@ -250,91 +233,18 @@ const Property = ({
             return;
         }
 
-        let strippedValue: string | number = sanitizeHtml(mentionInputValue, {
-            allowedTags: ['br', 'p'],
-        });
+        let value: string | number = mentionInputValue;
 
-        strippedValue = strippedValue.replace(/<\/p><p>/g, '\n');
-
-        if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('\n')) {
-            const equal =
-                sanitizeHtml(propertyParameterValue, {allowedTags: []}).trim() ===
-                sanitizeHtml(mentionInputValue, {allowedTags: []}).trim();
-
-            if (equal) {
-                return;
-            }
+        if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.startsWith('${')) {
+            value = parseInt(value);
         }
 
-        const dataValueAttributes = mentionInputValue.match(/data-value="([^"]+)"/g);
-
-        if (dataValueAttributes?.length) {
-            const dataPillValues = dataValueAttributes
-                .map((match) => match.match(/data-value="([^"]+)"/)?.[1])
-                .map((value) => `\${${value}}`);
-
-            const basicValues = mentionInputValue
-                .split(/<div[^>]*>[\s\S]*?<\/div>/g)
-                .map((value) => value.replace(/<[^>]*>?/gm, ''));
-
-            if (strippedValue.startsWith('${') && focusedInput) {
-                const editor = focusedInput.getEditor();
-
-                editor.deleteText(0, editor.getLength());
-
-                editor.setText(' ');
-
-                const mentionInput = editor.getModule('mention');
-
-                mentionInput.insertItem(
-                    {
-                        componentIcon: currentNode?.icon,
-                        id: currentNode?.name,
-                        value: strippedValue.replace('${', '').replace('}', ''),
-                    },
-                    true,
-                    {blotName: 'property-mention'}
-                );
-
-                return;
-            }
-
-            if (dataPillValues?.length) {
-                strippedValue = basicValues.reduce(
-                    (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
-                    ''
-                );
-            } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
-                strippedValue = parseInt(strippedValue);
-            } else {
-                const dataPillValue = dataPillValues?.[0];
-
-                if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-                    strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
-                } else {
-                    strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
-                }
-            }
+        if (typeof value === 'string' && controlType !== 'RICH_TEXT') {
+            value = sanitizeHtml(value, {allowedTags: []});
         }
 
-        const encodedParameters = encodeParameters(parameters);
-        const encodedPath = encodePath(path);
-
-        const currentValue = resolvePath(encodedParameters, encodedPath) || '';
-
-        if (currentValue === strippedValue) {
-            return;
-        }
-
-        strippedValue =
-            typeof strippedValue === 'string'
-                ? sanitizeHtml(strippedValue, {
-                      allowedTags: [],
-                  })
-                : strippedValue;
-
-        if (typeof strippedValue === 'string') {
-            strippedValue = decode(strippedValue);
+        if (typeof value === 'string') {
+            value = decode(value);
         }
 
         saveProperty({
@@ -344,7 +254,7 @@ const Property = ({
             setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
-            value: strippedValue || null,
+            value: value || null,
             workflowId: workflow.id,
         });
     }, 200);
@@ -455,7 +365,8 @@ const Property = ({
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
 
-                editorRef.current?.focus();
+                editorRef.current?.commands.setContent('');
+                editorRef.current?.commands.focus();
 
                 if (workflowNodeDetailsPanelOpen) {
                     setDataPillPanelOpen(true);
@@ -622,50 +533,7 @@ const Property = ({
         }
 
         if (mentionInput && propertyParameterValue) {
-            const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
-
-            if (typeof propertyParameterValue === 'number') {
-                setMentionInputValue(propertyParameterValue.toString());
-            }
-
-            if (!mentionInputElement || typeof propertyParameterValue !== 'string') {
-                return;
-            }
-
-            const mentionValues: Array<string> = propertyParameterValue
-                .split(/(\$\{.*?\})/g)
-                .filter((value: string) => value !== '');
-
-            if (propertyParameterValue.includes('\n')) {
-                const valueLines = propertyParameterValue.split('\n');
-
-                const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                setMentionInputValue(paragraphedLines.join(''));
-
-                return;
-            }
-
-            if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
-                const mentionInputNodes = mentionValues.map((value) => {
-                    if (value.startsWith('${')) {
-                        const node = document.createElement('div');
-
-                        node.className = 'property-mention';
-
-                        node.dataset.value = value.replace(/\$\{|\}/g, '');
-                        node.dataset.componentIcon = getComponentIcon(value);
-
-                        return node.outerHTML;
-                    } else {
-                        return value;
-                    }
-                });
-
-                setMentionInputValue(mentionInputNodes.join(''));
-            } else {
-                setMentionInputValue(propertyParameterValue);
-            }
+            setMentionInputValue(propertyParameterValue);
         }
 
         if (!mentionInput && inputValue === '' && propertyParameterValue) {
@@ -705,6 +573,7 @@ const Property = ({
         ) {
             setNumericValue(propertyParameterValue);
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue, mentionInput]);
 
@@ -795,52 +664,6 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
 
-    // handle pasting mentions
-    useEffect(() => {
-        if (typeof mentionInputValue !== 'string' || !mentionInputValue.includes('${')) {
-            return;
-        }
-
-        const mentionValues: Array<string> = mentionInputValue
-            .split(/(\$\{.*?\})/g)
-            .filter((value: string) => value !== '');
-
-        const mentionInputNodes = mentionValues.map((value) => {
-            if (value.startsWith('${')) {
-                const node = document.createElement('div');
-
-                node.className = 'property-mention';
-
-                node.dataset.value = value.replace(/\$\{|\}/g, '');
-                node.dataset.componentIcon = getComponentIcon(value);
-
-                return node.outerHTML;
-            } else {
-                return value;
-            }
-        });
-
-        const pastingChange =
-            previousMentionInputValue &&
-            mentionValues.length > 1 &&
-            previousMentionInputValue.length !== mentionInputValue.length;
-
-        if (pastingChange) {
-            setTimeout(() => {
-                const selection = editorRef.current?.getEditor().getSelection();
-
-                if (selection) {
-                    editorRef.current?.getEditor().setSelection(selection.index + 1, 0);
-                }
-            }, 50);
-
-            setMentionInputValue(mentionInputNodes.join(''));
-
-            saveMentionInputValue();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mentionInputValue]);
-
     // handle NULL type property saving
     useEffect(() => {
         if (
@@ -927,17 +750,12 @@ const Property = ({
                     label={label || name}
                     leadingIcon={typeIcon}
                     onChange={handleMentionsInputChange}
-                    onKeyPress={(event: KeyboardEvent) => {
-                        if (type !== 'STRING' && event.key !== '{') {
-                            event.preventDefault();
-                        }
-                    }}
                     path={path}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
                     showInputTypeSwitchButton={showInputTypeSwitchButton}
-                    singleMention={type !== 'STRING'}
+                    type={type}
                     value={mentionInputValue}
                 />
             )}

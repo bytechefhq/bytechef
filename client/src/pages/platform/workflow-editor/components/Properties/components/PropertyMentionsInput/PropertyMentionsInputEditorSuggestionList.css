@@ -1,0 +1,30 @@
+.property-mentions-suggestion-menu {
+    @apply bg-background;
+    @apply border;
+    @apply rounded-md;
+    @apply shadow-md;
+    @apply flex;
+    @apply flex-col;
+    @apply overflow-auto;
+    @apply p-2;
+    @apply: relative;
+    @apply text-sm;
+
+    button {
+        @apply items-center;
+        @apply flex;
+        @apply p-1;
+        @apply rounded-md;
+        @apply text-left;
+        @apply w-full;
+
+        &:hover,
+        &:hover.is-selected {
+            @apply bg-muted;
+        }
+
+        &.is-selected {
+            @apply bg-muted;
+        }
+    }
+}

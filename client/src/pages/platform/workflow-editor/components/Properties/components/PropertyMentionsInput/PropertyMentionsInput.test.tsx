@@ -14,8 +14,8 @@ describe('PropertyMentionsInput', () => {
                 label="PropertyMentionsInput Label"
                 leadingIcon="📄"
                 onChange={mockFunction}
-                onKeyPress={mockFunction}
                 placeholder=""
+                type="STRING"
                 value=""
             />
         );
