@@ -49,7 +49,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
-import updateConditionSubtask from '../utils/updateRootConditionNode';
+import updateRootConditionNode from '../utils/updateRootConditionNode';
 import CurrentOperationSelect from './CurrentOperationSelect';
 import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
@@ -323,7 +323,7 @@ const WorkflowNodeDetailsPanel = ({
                         return;
                     }
 
-                    nodeData = updateConditionSubtask({
+                    nodeData = updateRootConditionNode({
                         conditionCase,
                         conditionId: currentNode.conditionData.conditionId,
                         nodeIndex: taskIndex,
