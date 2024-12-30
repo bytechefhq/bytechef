@@ -114,11 +114,11 @@ public class OpenAiCreateSpeechAction {
             inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.SpeechRequest.AudioResponseFormat.class);
 
         OpenAiAudioSpeechOptions speechOptions = OpenAiAudioSpeechOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withInput(input)
-            .withVoice(inputParameters.get(VOICE, OpenAiAudioApi.SpeechRequest.Voice.class))
-            .withResponseFormat(audioResponseFormat)
-            .withSpeed(inputParameters.getFloat(SPEED))
+            .model(inputParameters.getRequiredString(MODEL))
+            .input(input)
+            .voice(inputParameters.get(VOICE, OpenAiAudioApi.SpeechRequest.Voice.class))
+            .responseFormat(audioResponseFormat)
+            .speed(inputParameters.getFloat(SPEED))
             .build();
 
         SpeechModel speechModel = new OpenAiAudioSpeechModel(

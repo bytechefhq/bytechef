@@ -35,8 +35,7 @@ import io.weaviate.client.WeaviateClient;
 import io.weaviate.client.v1.auth.exception.AuthException;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.vectorstore.WeaviateVectorStore;
-import org.springframework.ai.vectorstore.WeaviateVectorStore.WeaviateVectorStoreConfig;
+import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
 
 /**
  * @author Monika Kušter
@@ -67,19 +66,18 @@ public class WeaviateDataQueryAction {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
 
-        Config config =
-            new Config(connectionParameters.getRequiredString(SCHEME), connectionParameters.getRequiredString(HOST));
+        Config config = new Config(
+            connectionParameters.getRequiredString(SCHEME), connectionParameters.getRequiredString(HOST));
+
+        WeaviateClient weaviateClient;
 
         try {
-            WeaviateClient weaviateClient =
-                WeaviateAuthClient.apiKey(config, connectionParameters.getRequiredString(API_KEY));
-
-            WeaviateVectorStoreConfig weaviateVectorStoreConfig = WeaviateVectorStoreConfig.builder()
-                .build();
-
-            return new WeaviateVectorStore(weaviateVectorStoreConfig, openAiEmbeddingModel, weaviateClient);
+            weaviateClient = WeaviateAuthClient.apiKey(config, connectionParameters.getRequiredString(API_KEY));
         } catch (AuthException authException) {
-            throw new RuntimeException("Authetication failed", authException);
+            throw new RuntimeException("Authentication failed", authException);
         }
+
+        return WeaviateVectorStore.builder(weaviateClient, openAiEmbeddingModel)
+            .build();
     };
 }

@@ -85,12 +85,12 @@ public class AmazonBedrockAnthropic3ChatAction {
                     connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
                 connectionParameters.getRequiredString(REGION), new ObjectMapper()),
             Anthropic3ChatOptions.builder()
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getInteger(TOP_K))
-                .withAnthropicVersion("bedrock-2023-05-31")
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .topK(inputParameters.getInteger(TOP_K))
+                .anthropicVersion("bedrock-2023-05-31")
                 .build());
 
     private AmazonBedrockAnthropic3ChatAction() {

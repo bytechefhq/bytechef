@@ -39,8 +39,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Parameters;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.vectorstore.PineconeVectorStore;
-import org.springframework.ai.vectorstore.PineconeVectorStore.PineconeVectorStoreConfig;
+import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
 
 /**
  * @author Monika Kušter
@@ -77,13 +76,11 @@ public class PineconeLoadDataAction {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
 
-        PineconeVectorStoreConfig pineconeVectorStoreConfig = PineconeVectorStoreConfig.builder()
-            .withApiKey(connectionParameters.getRequiredString(API_KEY))
-            .withEnvironment(connectionParameters.getRequiredString(ENVIRONMENT))
-            .withProjectId(connectionParameters.getRequiredString(PROJECT_ID))
-            .withIndexName(connectionParameters.getRequiredString(INDEX_NAME))
+        return PineconeVectorStore
+            .builder(
+                openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
+                connectionParameters.getRequiredString(PROJECT_ID), connectionParameters.getRequiredString(ENVIRONMENT),
+                connectionParameters.getRequiredString(INDEX_NAME))
             .build();
-
-        return new PineconeVectorStore(pineconeVectorStoreConfig, openAiEmbeddingModel);
     };
 }

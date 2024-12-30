@@ -76,12 +76,12 @@ public class AnthropicChatAction {
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new AnthropicChatModel(
         new AnthropicApi(connectionParameters.getString(TOKEN)),
         AnthropicChatOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTopK(inputParameters.getInteger(TOP_K))
+            .model(inputParameters.getRequiredString(MODEL))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K))
             .build());
 
     private AnthropicChatAction() {

@@ -74,9 +74,9 @@ public class AmazonBedrockLlamaChatAction {
                 connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
             connectionParameters.getRequiredString(REGION), new ObjectMapper()),
         BedrockLlamaChatOptions.builder()
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxGenLen(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxGenLen(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
             .build());
 
     private AmazonBedrockLlamaChatAction() {

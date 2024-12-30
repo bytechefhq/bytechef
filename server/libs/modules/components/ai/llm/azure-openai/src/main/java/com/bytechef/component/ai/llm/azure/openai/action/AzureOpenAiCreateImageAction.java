@@ -149,13 +149,13 @@ public class AzureOpenAiCreateImageAction {
         return new AzureOpenAiImageModel(
             openAIClient,
             AzureOpenAiImageOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withN(inputParameters.getInteger(N))
-                .withHeight(size[1])
-                .withWidth(size[0])
-                .withStyle(inputParameters.getString(STYLE))
-                .withUser(inputParameters.getString(USER))
-                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .model(inputParameters.getRequiredString(MODEL))
+                .N(inputParameters.getInteger(N))
+                .height(size[1])
+                .width(size[0])
+                .style(inputParameters.getString(STYLE))
+                .user(inputParameters.getString(USER))
+                .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
                 .build());
     };
 }

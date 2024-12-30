@@ -86,14 +86,14 @@ public class MistralChatAction {
         return new MistralAiChatModel(
             new MistralAiApi(connectionParameters.getString(TOKEN)),
             MistralAiChatOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withSafePrompt(inputParameters.getBoolean(SAFE_PROMPT))
-                .withRandomSeed(inputParameters.getInteger(SEED))
-                .withResponseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .safePrompt(inputParameters.getBoolean(SAFE_PROMPT))
+                .randomSeed(inputParameters.getInteger(SEED))
+                .responseFormat(new MistralAiApi.ChatCompletionRequest.ResponseFormat(type))
                 .build());
     };
 

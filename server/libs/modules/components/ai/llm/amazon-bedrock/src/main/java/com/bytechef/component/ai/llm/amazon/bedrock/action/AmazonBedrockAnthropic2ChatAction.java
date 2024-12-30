@@ -84,11 +84,11 @@ public class AmazonBedrockAnthropic2ChatAction {
                 connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
             connectionParameters.getRequiredString(REGION), new ObjectMapper()),
         AnthropicChatOptions.builder()
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxTokensToSample(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTopK(inputParameters.getInteger(TOP_K))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxTokensToSample(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K))
             .build());
 
     private AmazonBedrockAnthropic2ChatAction() {

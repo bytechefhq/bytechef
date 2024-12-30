@@ -134,7 +134,7 @@ public interface VectorStore {
         OpenAiChatModel openAiChatModel = new OpenAiChatModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)),
             OpenAiChatOptions.builder()
-                .withModel("gpt-4")
+                .model("gpt-4")
                 .build());
 
         if (inputParameters.getRequiredBoolean(USE_KEYWORD_ENRICHER)) {

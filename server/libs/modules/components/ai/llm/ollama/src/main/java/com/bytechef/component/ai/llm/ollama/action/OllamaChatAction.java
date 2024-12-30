@@ -25,6 +25,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
@@ -101,13 +102,7 @@ public class OllamaChatAction {
                                 Collectors.toMap(
                                     OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
             MESSAGES_PROPERTY,
-            integer(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("In which format do you want the response to be in?")
-                .options(option("Object", 1, "JSON response with key-value pairs."),
-                    option("List", 2, "JSON response that is a list."))
-                .defaultValue(1)
-                .required(false),
+            RESPONSE_FORMAT_PROPERTY,
             RESPONSE_SCHEMA_PROPERTY,
             string(KEEP_ALIVE)
                 .label("Keep alive for")
@@ -228,42 +223,42 @@ public class OllamaChatAction {
         OllamaApi ollamaApi = url.isEmpty() ? new OllamaApi() : new OllamaApi(url);
 
         return OllamaChatModel.builder()
-            .withOllamaApi(ollamaApi)
-            .withDefaultOptions(
+            .ollamaApi(ollamaApi)
+            .defaultOptions(
                 OllamaOptions.builder()
-                    .withModel(inputParameters.getRequiredString(MODEL))
-                    .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                    .withTopP(inputParameters.getDouble(TOP_P))
-                    .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .withTopK(inputParameters.getInteger(TOP_K))
-                    .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .withSeed(inputParameters.getInteger(SEED))
-                    .withFormat(inputParameters.getString(FORMAT))
-                    .withKeepAlive(inputParameters.getString(KEEP_ALIVE))
-                    .withF16KV(inputParameters.getBoolean(F16KV))
-                    .withLogitsAll(inputParameters.getBoolean(LOGTS_ALL))
-                    .withUseMMap(inputParameters.getBoolean(USE_MMAP))
-                    .withLowVRAM(inputParameters.getBoolean(LOW_VRAM))
-                    .withMainGPU(inputParameters.getInteger(MAIN_GPU))
-                    .withMirostat(inputParameters.getInteger(MIROSTAT))
-                    .withMirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
-                    .withMirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
-                    .withNumBatch(inputParameters.getInteger(NUM_BATCH))
-                    .withNumCtx(inputParameters.getInteger(NUM_CTX))
-                    .withNumGPU(inputParameters.getInteger(NUM_GPU))
-                    .withNumKeep(inputParameters.getInteger(NUM_KEEP))
-                    .withNumThread(inputParameters.getInteger(NUM_THREAD))
-                    .withNumPredict(inputParameters.getInteger(MAX_TOKENS))
-                    .withPenalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
-                    .withRepeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
-                    .withRepeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
-                    .withTfsZ(inputParameters.getFloat(TFSZ))
-                    .withTruncate(inputParameters.getBoolean(TRUNCATE))
-                    .withTypicalP(inputParameters.getFloat(TYPICAL_P))
-                    .withUseMLock(inputParameters.getBoolean(USE_MLOCK))
-                    .withUseNUMA(inputParameters.getBoolean(USE_NUMA))
-                    .withVocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .topK(inputParameters.getInteger(TOP_K))
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .seed(inputParameters.getInteger(SEED))
+                    .format(inputParameters.getString(FORMAT))
+                    .keepAlive(inputParameters.getString(KEEP_ALIVE))
+                    .f16KV(inputParameters.getBoolean(F16KV))
+                    .logitsAll(inputParameters.getBoolean(LOGTS_ALL))
+                    .useMMap(inputParameters.getBoolean(USE_MMAP))
+                    .lowVRAM(inputParameters.getBoolean(LOW_VRAM))
+                    .mainGPU(inputParameters.getInteger(MAIN_GPU))
+                    .mirostat(inputParameters.getInteger(MIROSTAT))
+                    .mirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
+                    .mirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
+                    .numBatch(inputParameters.getInteger(NUM_BATCH))
+                    .numCtx(inputParameters.getInteger(NUM_CTX))
+                    .numGPU(inputParameters.getInteger(NUM_GPU))
+                    .numKeep(inputParameters.getInteger(NUM_KEEP))
+                    .numThread(inputParameters.getInteger(NUM_THREAD))
+                    .numPredict(inputParameters.getInteger(MAX_TOKENS))
+                    .penalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
+                    .repeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
+                    .repeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
+                    .tfsZ(inputParameters.getFloat(TFSZ))
+                    .truncate(inputParameters.getBoolean(TRUNCATE))
+                    .typicalP(inputParameters.getFloat(TYPICAL_P))
+                    .useMLock(inputParameters.getBoolean(USE_MLOCK))
+                    .useNUMA(inputParameters.getBoolean(USE_NUMA))
+                    .vocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
                     .build())
             .build();
     };

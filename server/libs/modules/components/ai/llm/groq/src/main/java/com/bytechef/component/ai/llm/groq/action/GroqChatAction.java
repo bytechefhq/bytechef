@@ -84,16 +84,16 @@ public class GroqChatAction {
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new OpenAiChatModel(
         new OpenAiApi("https://api.groq.com/openai", connectionParameters.getString(TOKEN)),
         OpenAiChatOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withFrequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-            .withLogitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .withN(inputParameters.getInteger(N))
-            .withPresencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-            .withStop(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withUser(inputParameters.getString(USER))
+            .model(inputParameters.getRequiredString(MODEL))
+            .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+            .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .N(inputParameters.getInteger(N))
+            .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+            .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .topP(inputParameters.getDouble(TOP_P))
+            .user(inputParameters.getString(USER))
             .build());
 
     private GroqChatAction() {

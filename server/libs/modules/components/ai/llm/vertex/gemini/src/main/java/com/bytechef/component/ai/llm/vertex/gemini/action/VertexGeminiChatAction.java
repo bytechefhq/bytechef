@@ -89,14 +89,14 @@ public class VertexGeminiChatAction {
         return new VertexAiGeminiChatModel(
             new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),
             VertexAiGeminiChatOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withTemperature(inputParameters.getDouble(TEMPERATURE))
-                .withMaxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
-                .withTopP(inputParameters.getDouble(TOP_P))
-                .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .withTopK(inputParameters.getFloat(TOP_K))
-                .withCandidateCount(inputParameters.getInteger(N))
-                .withResponseMimeType(type)
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .topK(inputParameters.getInteger(TOP_K))
+                .candidateCount(inputParameters.getInteger(N))
+                .responseMimeType(type)
                 .build());
     };
 

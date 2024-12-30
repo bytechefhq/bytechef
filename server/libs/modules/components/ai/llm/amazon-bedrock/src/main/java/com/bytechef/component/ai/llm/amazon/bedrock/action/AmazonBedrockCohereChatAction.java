@@ -126,18 +126,18 @@ public class AmazonBedrockCohereChatAction {
                 connectionParameters.getRequiredString(SECRET_ACCESS_KEY)),
             connectionParameters.getRequiredString(REGION), new ObjectMapper()),
         BedrockCohereChatOptions.builder()
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxTokens(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTopK(inputParameters.getInteger(TOP_K))
-            .withLogitBias(
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K))
+            .logitBias(
                 new CohereChatBedrockApi.CohereChatRequest.LogitBias(
                     inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
-            .withNumGenerations(inputParameters.getInteger(N))
-            .withReturnLikelihoods(
+            .numGenerations(inputParameters.getInteger(N))
+            .returnLikelihoods(
                 inputParameters.get(RETURN_LIKELIHOODS, CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-            .withTruncate(
+            .truncate(
                 inputParameters.get(TRUNCATE, CohereChatBedrockApi.CohereChatRequest.Truncate.class))
             .build());
 

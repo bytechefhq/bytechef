@@ -103,16 +103,16 @@ public class WatsonxChatAction {
             null, connectionParameters.getString(PROJECT_ID), connectionParameters.getString(TOKEN),
             RestClient.builder()),
         WatsonxAiChatOptions.builder()
-            .withModel(inputParameters.getString(MODEL))
-            .withTemperature(inputParameters.getDouble(TEMPERATURE))
-            .withMaxNewTokens(inputParameters.getInteger(MAX_TOKENS))
-            .withTopP(inputParameters.getDouble(TOP_P))
-            .withStopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .withTopK(inputParameters.getInteger(TOP_K))
-            .withMinNewTokens(inputParameters.getInteger(MIN_TOKENS))
-            .withRandomSeed(inputParameters.getInteger(SEED))
-            .withRepetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
-            .withDecodingMethod(inputParameters.getString(DECODING_METHOD))
+            .model(inputParameters.getString(MODEL))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .maxNewTokens(inputParameters.getInteger(MAX_TOKENS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K))
+            .minNewTokens(inputParameters.getInteger(MIN_TOKENS))
+            .randomSeed(inputParameters.getInteger(SEED))
+            .repetitionPenalty(inputParameters.getDouble(REPETITION_PENALTY))
+            .decodingMethod(inputParameters.getString(DECODING_METHOD))
             .build());
 
     private WatsonxChatAction() {

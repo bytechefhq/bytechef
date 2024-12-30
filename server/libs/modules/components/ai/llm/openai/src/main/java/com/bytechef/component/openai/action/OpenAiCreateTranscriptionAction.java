@@ -102,12 +102,12 @@ public class OpenAiCreateTranscriptionAction {
         (inputParameters, connectionParameters) -> new OpenAiAudioTranscriptionModel(
             new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
             OpenAiAudioTranscriptionOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withPrompt(inputParameters.getString(PROMPT))
-                .withLanguage(inputParameters.getString(LANGUAGE))
-                .withResponseFormat(
+                .model(inputParameters.getRequiredString(MODEL))
+                .prompt(inputParameters.getString(PROMPT))
+                .language(inputParameters.getString(LANGUAGE))
+                .responseFormat(
                     inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .temperature(inputParameters.getFloat(TEMPERATURE))
                 .build());
 
     private OpenAiCreateTranscriptionAction() {

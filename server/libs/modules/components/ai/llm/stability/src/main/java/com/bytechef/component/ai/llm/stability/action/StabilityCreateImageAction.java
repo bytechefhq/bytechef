@@ -162,15 +162,15 @@ public class StabilityCreateImageAction {
     private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
         new StabilityAiApi(connectionParameters.getString(TOKEN)),
         StabilityAiImageOptions.builder()
-            .withModel(inputParameters.getRequiredString(MODEL))
-            .withN(inputParameters.getInteger(N))
-            .withHeight(inputParameters.getInteger(HEIGHT))
-            .withWidth(inputParameters.getInteger(WIDTH))
-            .withStylePreset(inputParameters.getString(STYLE))
-            .withSteps(inputParameters.getInteger(STEPS))
-            .withCfgScale(inputParameters.getFloat(CFG_SCALE))
-            .withClipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
-            .withSampler(inputParameters.getString(SAMPLER))
-            .withSeed(inputParameters.getLong(SEED))
+            .model(inputParameters.getRequiredString(MODEL))
+            .N(inputParameters.getInteger(N))
+            .height(inputParameters.getInteger(HEIGHT))
+            .width(inputParameters.getInteger(WIDTH))
+            .stylePreset(inputParameters.getString(STYLE))
+            .steps(inputParameters.getInteger(STEPS))
+            .cfgScale(inputParameters.getFloat(CFG_SCALE))
+            .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+            .sampler(inputParameters.getString(SAMPLER))
+            .seed(inputParameters.getLong(SEED))
             .build());
 }

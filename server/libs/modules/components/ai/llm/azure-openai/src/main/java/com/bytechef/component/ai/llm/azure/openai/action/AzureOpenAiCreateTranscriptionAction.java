@@ -121,12 +121,13 @@ public class AzureOpenAiCreateTranscriptionAction {
         return new AzureOpenAiAudioTranscriptionModel(
             openAIClient,
             AzureOpenAiAudioTranscriptionOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withPrompt(inputParameters.getString(PROMPT))
-                .withLanguage(inputParameters.getString(LANGUAGE))
-                .withResponseFormat(inputParameters.get(RESPONSE_FORMAT,
-                    AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.class))
-                .withTemperature(inputParameters.getFloat(TEMPERATURE))
+                .model(inputParameters.getRequiredString(MODEL))
+                .prompt(inputParameters.getString(PROMPT))
+                .language(inputParameters.getString(LANGUAGE))
+                .responseFormat(
+                    inputParameters.get(
+                        RESPONSE_FORMAT, AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.class))
+                .temperature(inputParameters.getFloat(TEMPERATURE))
                 .build());
     };
 }
