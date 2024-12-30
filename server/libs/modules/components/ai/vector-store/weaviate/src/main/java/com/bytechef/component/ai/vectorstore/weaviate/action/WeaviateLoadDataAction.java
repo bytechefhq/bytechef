@@ -18,7 +18,6 @@ package com.bytechef.component.ai.vectorstore.weaviate.action;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_TYPE_PROPERTY;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON_KEYS_TO_USE_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.KEYWORD_METADATA_ENRICHER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.LOAD_DATA;
@@ -27,22 +26,12 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_KEYWORD_ENRICHER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_SUMMARY_ENRICHER_PROPERTy;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_TOKEN_TEXT_SPLITTER_PROPERTY;
-import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.HOST;
-import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.SCHEME;
 import static com.bytechef.component.definition.ComponentDsl.action;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import io.weaviate.client.Config;
-import io.weaviate.client.WeaviateAuthClient;
-import io.weaviate.client.WeaviateClient;
-import io.weaviate.client.v1.auth.exception.AuthException;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
 
 /**
  * @author Monika Kušter
@@ -70,26 +59,8 @@ public class WeaviateLoadDataAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        VECTOR_STORE.loadData(inputParameters, connectionParameters, actionContext);
+        WeaviateConstants.VECTOR_STORE.loadData(inputParameters, connectionParameters, actionContext);
 
         return null;
     }
-
-    public static final VectorStore VECTOR_STORE = connectionParameters -> {
-        OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
-            new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
-
-        Config config =
-            new Config(connectionParameters.getRequiredString(SCHEME), connectionParameters.getRequiredString(HOST));
-
-        try {
-            WeaviateClient weaviateClient = WeaviateAuthClient.apiKey(
-                config, connectionParameters.getRequiredString(API_KEY));
-
-            return WeaviateVectorStore.builder(weaviateClient, openAiEmbeddingModel)
-                .build();
-        } catch (AuthException authException) {
-            throw new RuntimeException("Authentication failed", authException);
-        }
-    };
 }

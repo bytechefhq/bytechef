@@ -17,22 +17,14 @@
 package com.bytechef.component.ai.vectorstore.pinecone.action;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DATA_QUERY;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.ENVIRONMENT;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.INDEX_NAME;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PROJECT_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.api.OpenAiApi;
-import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
 
 /**
  * @author Monika Kušter
@@ -56,18 +48,6 @@ public class PineconeDataQueryAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return VECTOR_STORE.query(inputParameters, connectionParameters);
+        return PineconeConstants.VECTOR_STORE.query(inputParameters, connectionParameters);
     }
-
-    public static final VectorStore VECTOR_STORE = connectionParameters -> {
-        OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
-            new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
-
-        return PineconeVectorStore
-            .builder(
-                openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
-                connectionParameters.getRequiredString(PROJECT_ID), connectionParameters.getRequiredString(ENVIRONMENT),
-                connectionParameters.getRequiredString(INDEX_NAME))
-            .build();
-    };
 }

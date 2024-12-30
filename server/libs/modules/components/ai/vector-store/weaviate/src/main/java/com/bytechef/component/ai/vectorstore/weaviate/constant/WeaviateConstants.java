@@ -16,6 +16,17 @@
 
 package com.bytechef.component.ai.vectorstore.weaviate.constant;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
+
+import com.bytechef.component.ai.vectorstore.VectorStore;
+import io.weaviate.client.Config;
+import io.weaviate.client.WeaviateAuthClient;
+import io.weaviate.client.WeaviateClient;
+import io.weaviate.client.v1.auth.exception.AuthException;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
+
 /**
  * @author Monika Kušter
  */
@@ -27,4 +38,22 @@ public class WeaviateConstants {
     public static final String API_KEY = "apiKey";
     public static final String HOST = "host";
     public static final String SCHEME = "scheme";
+    public static final VectorStore VECTOR_STORE = connectionParameters -> {
+        OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
+            new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
+
+        Config config = new Config(
+            connectionParameters.getRequiredString(SCHEME), connectionParameters.getRequiredString(HOST));
+
+        WeaviateClient weaviateClient;
+
+        try {
+            weaviateClient = WeaviateAuthClient.apiKey(config, connectionParameters.getRequiredString(API_KEY));
+        } catch (AuthException authException) {
+            throw new RuntimeException("Authentication failed", authException);
+        }
+
+        return WeaviateVectorStore.builder(weaviateClient, openAiEmbeddingModel)
+            .build();
+    };
 }

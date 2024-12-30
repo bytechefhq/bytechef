@@ -16,6 +16,13 @@
 
 package com.bytechef.component.ai.vectorstore.pinecone.constant;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
+
+import com.bytechef.component.ai.vectorstore.VectorStore;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
+
 /**
  * @author Monika Kušter
  */
@@ -28,4 +35,15 @@ public class PineconeConstants {
     public static final String ENVIRONMENT = "environment";
     public static final String INDEX_NAME = "indexName";
     public static final String PROJECT_ID = "projectId";
+    public static final VectorStore VECTOR_STORE = connectionParameters -> {
+        OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
+            new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
+
+        return PineconeVectorStore
+            .builder(
+                openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
+                connectionParameters.getRequiredString(PROJECT_ID), connectionParameters.getRequiredString(ENVIRONMENT),
+                connectionParameters.getRequiredString(INDEX_NAME))
+            .build();
+    };
 }
