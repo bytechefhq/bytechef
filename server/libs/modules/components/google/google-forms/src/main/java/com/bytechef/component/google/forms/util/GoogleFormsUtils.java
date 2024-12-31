@@ -27,6 +27,8 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +89,42 @@ public class GoogleFormsUtils {
                             option(
                                 respondentEmail == null ? responseId : respondentEmail + " (" + responseId + ")",
                                 responseId));
+                    }
+                }
+            }
+
+        } while (nextToken != null);
+
+        return formResponses;
+    }
+
+    public static List<Map<?, ?>>
+        getFormResponses(Parameters inputParameters, Context context, String startDateString) {
+
+        String encode = URLEncoder.encode("timestamp > " + startDateString, StandardCharsets.UTF_8);
+
+        List<Map<?, ?>> formResponses = new ArrayList<>();
+        String nextToken = null;
+        do {
+            Http.Executor executor = context
+                .http(http -> http.get(
+                    "https://forms.googleapis.com/v1/forms/" + inputParameters.getRequiredString(FORM) + "/responses"))
+                .queryParameter("filter", encode)
+                .configuration(Http.responseType(Http.ResponseType.JSON));
+
+            if (nextToken != null) {
+                executor.queryParameter("nextPageToken", nextToken);
+            }
+
+            Map<String, Object> response = executor.execute()
+                .getBody(new TypeReference<>() {});
+
+            nextToken = (String) response.getOrDefault("nextPageToken", null);
+
+            if (response.get("responses") instanceof List<?> list) {
+                for (Object o : list) {
+                    if (o instanceof Map<?, ?> map) {
+                        formResponses.add(map);
                     }
                 }
             }
