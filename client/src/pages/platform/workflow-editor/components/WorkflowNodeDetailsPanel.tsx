@@ -30,13 +30,7 @@ import {
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {
-    ComponentPropertiesType,
-    DataPillType,
-    NodeDataType,
-    PropertyAllType,
-    UpdateWorkflowMutationType,
-} from '@/shared/types';
+import {ComponentPropertiesType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
@@ -362,6 +356,11 @@ const WorkflowNodeDetailsPanel = ({
         useWorkflowNodeDetailsPanelStore.getState().reset();
     };
 
+    const nodeDefinition = currentComponentDefinition || currentTaskDispatcherDefinition || currentTriggerDefinition;
+
+    const currentTaskDataOperations =
+        (currentTaskData as ComponentDefinition)?.actions ?? (currentTaskData as ComponentDefinition)?.triggers;
+
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
         if (currentNodeDefinition?.properties) {
@@ -534,7 +533,7 @@ const WorkflowNodeDetailsPanel = ({
                 </header>
 
                 <main className="flex h-full flex-col">
-                    {operationDataMissing && (
+                    {!!currentTaskDataOperations?.length && operationDataMissing && (
                         <div className="flex flex-col border-b border-muted p-4">
                             <span className="text-sm leading-6">Actions</span>
 
@@ -542,25 +541,23 @@ const WorkflowNodeDetailsPanel = ({
                         </div>
                     )}
 
-                    {(!!(currentTaskData as ComponentDefinition).actions?.length ||
-                        !!(currentTaskData as ComponentDefinition).triggers?.length) &&
-                        !operationDataMissing && (
-                            <CurrentOperationSelect
-                                description={
-                                    currentNode?.trigger
-                                        ? currentTriggerDefinition?.description
-                                        : currentActionDefinition?.description
-                                }
-                                handleValueChange={handleOperationSelectChange}
-                                operations={
-                                    (currentNode?.trigger
-                                        ? currentComponentDefinition?.triggers
-                                        : currentComponentDefinition?.actions)!
-                                }
-                                triggerSelect={currentNode?.trigger}
-                                value={currentOperationName}
-                            />
-                        )}
+                    {currentTaskDataOperations && !operationDataMissing && (
+                        <CurrentOperationSelect
+                            description={
+                                currentNode?.trigger
+                                    ? currentTriggerDefinition?.description
+                                    : currentActionDefinition?.description
+                            }
+                            handleValueChange={handleOperationSelectChange}
+                            operations={
+                                (currentNode?.trigger
+                                    ? currentComponentDefinition?.triggers
+                                    : currentComponentDefinition?.actions)!
+                            }
+                            triggerSelect={currentNode?.trigger}
+                            value={currentOperationName}
+                        />
+                    )}
 
                     {tabDataExists && (
                         <div className="flex justify-center">
@@ -596,12 +593,28 @@ const WorkflowNodeDetailsPanel = ({
                     <div className="relative h-full overflow-y-scroll">
                         {currentTaskData && (
                             <div className="absolute left-0 top-0 size-full">
-                                {activeTab === 'description' && (
-                                    <DescriptionTab
-                                        key={`${currentNode?.workflowNodeName}_description`}
-                                        updateWorkflowMutation={updateWorkflowMutation}
-                                    />
-                                )}
+                                {activeTab === 'description' &&
+                                    (nodeDefinition ? (
+                                        <DescriptionTab
+                                            key={`${currentNode?.workflowNodeName}_description`}
+                                            nodeDefinition={nodeDefinition}
+                                            updateWorkflowMutation={updateWorkflowMutation}
+                                        />
+                                    ) : (
+                                        <div className="flex flex-col gap-y-4 p-4">
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-6 w-1/4" />
+
+                                                <Skeleton className="h-8 w-full" />
+                                            </div>
+
+                                            <div className="flex flex-col gap-y-2">
+                                                <Skeleton className="h-6 w-1/4" />
+
+                                                <Skeleton className="h-24 w-full" />
+                                            </div>
+                                        </div>
+                                    ))}
 
                                 {activeTab === 'dataStreamComponents' && <DataStreamComponentsTab />}
 

@@ -4,7 +4,12 @@ import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {WorkflowTask} from '@/shared/middleware/automation/configuration';
-import {ComponentType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ComponentDefinition,
+    TaskDispatcherDefinition,
+    TriggerDefinition,
+} from '@/shared/middleware/platform/configuration';
+import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
@@ -12,26 +17,27 @@ import {useDebouncedCallback} from 'use-debounce';
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import updateRootConditionNode from '../../utils/updateRootConditionNode';
 
-const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: UpdateWorkflowMutationType}) => {
+const DescriptionTab = ({
+    nodeDefinition,
+    updateWorkflowMutation,
+}: {
+    nodeDefinition: ComponentDefinition | TaskDispatcherDefinition | TriggerDefinition;
+    updateWorkflowMutation: UpdateWorkflowMutationType;
+}) => {
     const {nodes, workflow} = useWorkflowDataStore();
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const queryClient = useQueryClient();
 
-    const componentData: ComponentType = {
-        ...currentComponent!,
-        workflowNodeName: currentNode!.workflowNodeName,
-    };
-
     const updateNodeData = (value: string, field: 'label' | 'description'): NodeDataType | undefined => {
-        if (!currentComponent || !currentNode) {
+        if (!currentNode) {
             return;
         }
 
         let nodeData = {
-            ...currentComponent!,
+            ...currentNode!,
             [field]: value,
-            name: currentComponent.workflowNodeName,
+            name: currentNode.workflowNodeName,
         };
 
         if (currentNode.conditionData) {
@@ -79,8 +85,6 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                         updatedParentConditionTask,
                         workflow,
                     });
-
-                    console.log('nodeData', nodeData);
                 }
             }
         }
@@ -89,28 +93,30 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
     };
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
-        if (!currentComponent || !currentNode) {
+        if (!currentNode) {
             return;
         }
 
         let nodeData: NodeDataType = {
-            ...currentComponent!,
+            ...currentNode,
             label: event.target.value,
-            name: currentComponent.workflowNodeName,
+            name: currentNode.workflowNodeName,
+            version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
         };
 
         if (currentNode.conditionData) {
             nodeData = updateNodeData(event.target.value, 'label') ?? nodeData;
         }
 
-        console.log('currentNode before save: ', currentNode);
         saveWorkflowDefinition({
             decorative: true,
             nodeData,
             onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
+                    componentName: currentNode.componentName,
                     label: event.target.value,
+                    workflowNodeName: currentNode.workflowNodeName,
                 });
 
                 setCurrentNode({
@@ -125,14 +131,15 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
     }, 200);
 
     const handleNotesChange = useDebouncedCallback((event: ChangeEvent<HTMLTextAreaElement>) => {
-        if (!currentComponent || !currentNode) {
+        if (!currentNode) {
             return;
         }
 
         let nodeData: NodeDataType = {
-            ...componentData,
+            ...currentNode,
             description: event.target.value,
-            name: currentComponent.workflowNodeName,
+            name: currentNode.workflowNodeName,
+            version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
         };
 
         if (currentNode.conditionData) {
@@ -145,7 +152,9 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
             onSuccess: () => {
                 setCurrentComponent({
                     ...currentComponent,
+                    componentName: currentNode.componentName,
                     description: event.target.value,
+                    workflowNodeName: currentNode.workflowNodeName,
                 });
 
                 setCurrentNode({
@@ -165,8 +174,8 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                 <Label>Title</Label>
 
                 <Input
-                    defaultValue={currentComponent?.label}
-                    key={`${currentComponent?.componentName}_nodeTitle`}
+                    defaultValue={currentNode?.label}
+                    key={`${currentNode?.componentName}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
                 />
@@ -176,8 +185,8 @@ const DescriptionTab = ({updateWorkflowMutation}: {updateWorkflowMutation: Updat
                 <Label>Notes</Label>
 
                 <Textarea
-                    defaultValue={currentComponent?.description || ''}
-                    key={`${currentComponent?.componentName}_nodeNotes`}
+                    defaultValue={currentNode?.description || ''}
+                    key={`${currentNode?.componentName}_nodeNotes`}
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
