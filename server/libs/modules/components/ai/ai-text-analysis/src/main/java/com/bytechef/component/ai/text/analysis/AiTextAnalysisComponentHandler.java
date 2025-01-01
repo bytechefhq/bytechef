@@ -21,6 +21,7 @@ import static com.bytechef.platform.component.definition.AiComponentDefinition.A
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.analysis.action.ClassifyTextAction;
+import com.bytechef.component.ai.text.analysis.action.SentimentAnalysisAction;
 import com.bytechef.component.ai.text.analysis.action.SummarizeTextAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -58,8 +59,9 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
                     .description("AI Helper component for text analysis.")
                     .icon("path:assets/ai-text-analysis.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                    .actions(
-                        new ClassifyTextAction(component).actionDefinition,
+                    .actions(                        
+new ClassifyTextAction(component).actionDefinition,
+                        new SentimentAnalysisAction(component).actionDefinition,
                         new SummarizeTextAction(component).actionDefinition));
         }
     }
