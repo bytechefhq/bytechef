@@ -40,6 +40,7 @@ public class AiTextAnalysisConstants {
     public static final String MODEL_PROVIDER = "modelProvider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String CLASSIFY_TEXT = "classifyText";
+    public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
 
     public static final ModifiableIntegerProperty MODEL_PROVIDER_PROPERTY = integer(MODEL_PROVIDER)
         .label("Model provider")
