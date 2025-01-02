@@ -47,7 +47,11 @@ const DataPillPanelBodyPropertiesItem = ({
 
     const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === workflowNodeName);
 
-    const handleOutputTabRedirectClick = useNodeClickHandler(redirectTargetNode?.data, redirectTargetNode?.data.name);
+    const handleOutputTabRedirectClick = useNodeClickHandler(
+        redirectTargetNode?.data,
+        redirectTargetNode?.data.name,
+        'output'
+    );
 
     return (
         <>

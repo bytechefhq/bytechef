@@ -102,6 +102,7 @@ export type ClickedOperationType = {
 };
 
 export type NodeDataType = {
+    activeTab?: 'connection' | 'dataStreamComponents' | 'description' | 'output' | 'properties';
     componentName: string;
     conditionData?: {
         conditionCase: string;
