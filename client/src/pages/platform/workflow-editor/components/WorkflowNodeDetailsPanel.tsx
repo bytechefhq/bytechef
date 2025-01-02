@@ -403,6 +403,12 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
+        if (currentNode?.activeTab) {
+            setActiveTab(currentNode.activeTab);
+
+            return;
+        }
+
         if (activeTab === 'connection' && componentConnections.length === 0) {
             setActiveTab('description');
         }

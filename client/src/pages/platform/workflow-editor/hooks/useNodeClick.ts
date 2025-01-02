@@ -4,7 +4,11 @@ import {NodeProps, useReactFlow} from 'reactflow';
 
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
-export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id']) {
+export default function useNodeClick(
+    data: NodeProps['data'],
+    id: NodeProps['id'],
+    activeTab?: 'connection' | 'dataStreamComponents' | 'description' | 'output' | 'properties'
+) {
     const {setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
 
@@ -21,20 +25,22 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
 
         setWorkflowNodeDetailsPanelOpen(true);
 
-        setCurrentNode(data);
+        setCurrentNode({...data, activeTab});
 
         if (data.type) {
             setCurrentComponent({
-                componentName: data.componentName,
-                description: data.description,
-                displayConditions: data.displayConditions,
-                label: data.label,
-                metadata: data.metadata,
-                operationName: data.operationName,
-                parameters: data.parameters,
-                type: data.type,
+                ...data,
                 workflowNodeName: data.name,
             });
         }
-    }, [getNode, id, data, setRightSidebarOpen, setWorkflowNodeDetailsPanelOpen, setCurrentNode, setCurrentComponent]);
+    }, [
+        getNode,
+        id,
+        setRightSidebarOpen,
+        setWorkflowNodeDetailsPanelOpen,
+        setCurrentNode,
+        data,
+        activeTab,
+        setCurrentComponent,
+    ]);
 }
