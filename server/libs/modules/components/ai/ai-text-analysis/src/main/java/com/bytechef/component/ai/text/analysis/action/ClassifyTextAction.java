@@ -19,16 +19,16 @@ package com.bytechef.component.ai.text.analysis.action;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.CATEGORIES;
+import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.EXAMPLES;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_URL_PROPERTY;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.PROMPT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.text.analysis.action.definition.AiTextAnalysisActionDefinition;
@@ -39,19 +39,20 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-/**
- * @author Marko Kriskovic
- */
-public class SummarizeTextAction implements AITextAnalysisAction {
-
+public class ClassifyTextAction implements AITextAnalysisAction {
     public final AiTextAnalysisActionDefinition actionDefinition;
 
-    public SummarizeTextAction(ApplicationProperties.Ai.Component component) {
-        this.actionDefinition = new AiTextAnalysisActionDefinition(
-            action(AiTextAnalysisConstants.SUMMARIZE_TEXT)
-                .title("Summarize Text")
-                .description("AI reads, analyzes and summarizes your text into a shorter format.")
+    public ClassifyTextAction(ApplicationProperties.Ai.Component component) {
+        this.actionDefinition = getActionDefinition(component);
+    }
+
+    private AiTextAnalysisActionDefinition getActionDefinition(ApplicationProperties.Ai.Component component) {
+        return new AiTextAnalysisActionDefinition(
+            action(AiTextAnalysisConstants.CLASSIFY_TEXT)
+                .title("Classify Text")
+                .description("AI reads, analyzes and classifies your text into one of defined categories.")
                 .properties(
                     MODEL_PROVIDER_PROPERTY,
                     MODEL_OPTIONS_PROPERTY,
@@ -59,24 +60,18 @@ public class SummarizeTextAction implements AITextAnalysisAction {
                     MODEL_URL_PROPERTY,
                     string(TEXT)
                         .label("Text")
-                        .description("The text that is to be summarized.")
-                        .minLength(100)
+                        .description("The text that is to be classified.")
                         .required(true),
-                    integer(FORMAT)
-                        .label("Format")
-                        .description("In what format do you wish the text summarized?")
-                        .options(
-                            option("A structured summary with sections", 0),
-                            option("A brief title summarizing the content in 4-7 words", 1),
-                            option("A single, concise sentence", 2),
-                            option("A bulleted list recap", 3),
-                            option("Custom Prompt", 4))
+                    array(CATEGORIES)
+                        .label("Categories")
+                        .description("A list of categories that the model can choose from.")
+                        .items(string())
                         .required(true),
-                    string(PROMPT)
-                        .label("Custom Prompt")
-                        .description("Write your prompt for summarizing text.")
-                        .displayCondition("format == 4")
-                        .required(true),
+                    object(EXAMPLES)
+                        .label("Examples")
+                        .description(
+                            "You can classify a few samples, to guide your model on how to classify the real data.")
+                        .additionalProperties(string()),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
@@ -86,19 +81,28 @@ public class SummarizeTextAction implements AITextAnalysisAction {
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        String prompt = switch (inputParameters.getRequiredInteger(FORMAT)) {
-            case 0 -> "You will receive a text. Make a structured summary of that text with sections.";
-            case 1 -> "You will receive a text. Make a brief title summarizing the content in 4-7 words.";
-            case 2 -> "You will receive a text. Summarize it in a single, concise sentence.";
-            case 3 -> "You will receive a text. Create a bullet list recap.";
-            case 4 -> "You will receive a text." + inputParameters.getString("prompt");
-            default -> throw new IllegalArgumentException("Invalid format");
-        };
+        String systemPrompt =
+            "You will receive a list of categories, text and examples. You will choose which of the given categories fits the given text the most. Your response will only be the chosen category.";
+
+        String userBuilder = "List of categories: " + inputParameters.getList(CATEGORIES)
+            .toString() + "\n" +
+            "Text: " + inputParameters.getString(TEXT);
+
+        Map<String, ?> exampleMap = inputParameters.getMap(EXAMPLES, String.class, Map.of());
+
+        if (!exampleMap.isEmpty()) {
+            userBuilder = userBuilder + "\n" +
+                "Examples: " +
+                exampleMap.entrySet()
+                    .stream()
+                    .map(Map.Entry::toString)
+                    .collect(Collectors.joining(";"));
+        }
 
         modelInputParametersMap.put("messages",
             List.of(
-                Map.of("content", prompt, "role", "system"),
-                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
+                Map.of("content", systemPrompt, "role", "system"),
+                Map.of("content", userBuilder, "role", "user")));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
