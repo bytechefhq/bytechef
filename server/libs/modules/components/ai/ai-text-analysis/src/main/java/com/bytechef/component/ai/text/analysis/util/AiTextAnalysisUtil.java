@@ -53,4 +53,7 @@ public class AiTextAnalysisUtil {
             default -> throw new IllegalStateException("Unexpected value: " + modelProvider);
         };
     }
+
+    public record Criteria(String criterion, double lowestScore, double highestScore, boolean isDecimal) {
+    }
 }

@@ -35,12 +35,19 @@ public class AiTextAnalysisConstants {
     public static final String FORMAT = "format";
     public static final String PROMPT = "prompt";
     public static final String CATEGORIES = "categories";
+    public static final String CRITERIA = "criteria";
     public static final String EXAMPLES = "examples";
+
+    public static final String CRITERION = "criterion";
+    public static final String LOWEST_SCORE = "lowestScore";
+    public static final String HIGHEST_SCORE = "highestScore";
+    public static final String IS_DECIMAL = "isDecimal";
 
     public static final String MODEL_PROVIDER = "modelProvider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String CLASSIFY_TEXT = "classifyText";
     public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
+    public static final String SCORE = "score";
 
     public static final ModifiableIntegerProperty MODEL_PROVIDER_PROPERTY = integer(MODEL_PROVIDER)
         .label("Model provider")
