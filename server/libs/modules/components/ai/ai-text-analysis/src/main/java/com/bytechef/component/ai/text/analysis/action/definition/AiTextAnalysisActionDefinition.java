@@ -16,10 +16,7 @@
 
 package com.bytechef.component.ai.text.analysis.action.definition;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.FORMAT;
 import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.MODEL_PROVIDER;
-import static com.bytechef.component.ai.text.analysis.constant.AiTextAnalysisConstants.TEXT;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.ChatModel;
@@ -36,6 +33,7 @@ import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
+import com.bytechef.component.ai.text.analysis.action.AITextAnalysisAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -45,7 +43,6 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.ParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -55,13 +52,16 @@ import java.util.Optional;
 public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrapper {
 
     private final ApplicationProperties.Ai.Component component;
+    private final AITextAnalysisAction aiTextAnalysisAction;
 
     @SuppressFBWarnings("EI")
     public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition,
-        ApplicationProperties.Ai.Component component) {
+        ApplicationProperties.Ai.Component component,
+        AITextAnalysisAction aiTextAnalysisAction) {
         super(actionDefinition);
 
         this.component = component;
+        this.aiTextAnalysisAction = aiTextAnalysisAction;
     }
 
     @Override
@@ -164,24 +164,7 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
 
         Parameters modelConnectionParameters = ParametersFactory.createParameters(modelConnectionParametersMap);
 
-        Map<String, Object> modelInputParametersMap = new HashMap<>();
-
-        String prompt = switch (inputParameters.getRequiredInteger(FORMAT)) {
-            case 0 -> "You will receive a text. Make a structured summary of that text with sections.";
-            case 1 -> "You will receive a text. Make a brief title summarizing the content in 4-7 words.";
-            case 2 -> "You will receive a text. Summarize it in a single, concise sentence.";
-            case 3 -> "You will receive a text. Create a bullet list recap.";
-            case 4 -> "You will receive a text." + inputParameters.getString("prompt");
-            default -> throw new IllegalArgumentException("Invalid format");
-        };
-
-        modelInputParametersMap.put("messages",
-            List.of(
-                Map.of("content", prompt, "role", "system"),
-                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
-        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
-
-        Parameters modelInputParameters = ParametersFactory.createParameters(modelInputParametersMap);
+        Parameters modelInputParameters = aiTextAnalysisAction.createParameters(inputParameters);
 
         Object response = chatModel.getResponse(modelInputParameters, modelConnectionParameters, context);
 
