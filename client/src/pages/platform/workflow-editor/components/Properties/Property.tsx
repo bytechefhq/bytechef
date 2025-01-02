@@ -740,7 +740,13 @@ const Property = ({
         return <></>;
     }
 
-    if (displayCondition && currentComponent?.displayConditions?.[displayCondition] && isFetchingDisplayConditions) {
+    if (
+        displayCondition &&
+        currentComponent?.displayConditions?.[displayCondition] &&
+        isFetchingDisplayConditions &&
+        type !== 'ARRAY' &&
+        type !== 'OBJECT'
+    ) {
         return (
             <div className="flex flex-col gap-y-2">
                 <Skeleton className="h-6 w-1/4" />
