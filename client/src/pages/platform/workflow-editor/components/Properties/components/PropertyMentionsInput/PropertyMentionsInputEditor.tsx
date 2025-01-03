@@ -185,6 +185,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         );
 
         const getContent = useCallback((value?: string) => {
+            if (typeof value !== 'string') {
+                return;
+            }
+
             if (!value) {
                 return '';
             }
