@@ -101,8 +101,10 @@ export type ClickedOperationType = {
     version: number;
 };
 
+export type TabNameType = 'description' | 'dataStreamComponents' | 'connection' | 'properties' | 'output';
+
 export type NodeDataType = {
-    activeTab?: 'connection' | 'dataStreamComponents' | 'description' | 'output' | 'properties';
+    activeTab?: TabNameType;
     componentName: string;
     conditionData?: {
         conditionCase: string;
