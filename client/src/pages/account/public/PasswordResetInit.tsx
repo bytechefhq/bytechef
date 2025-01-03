@@ -28,10 +28,10 @@ export const PasswordResetInit = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (resetPasswordSuccess) {
+        if (form.getValues().email && resetPasswordSuccess) {
             navigate('/password-reset/email', {state: {email: form.getValues().email}});
         } else if (resetPasswordFailure) {
-            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
+            navigate('/account-error');
         }
 
         reset();

@@ -44,7 +44,7 @@ const PasswordResetEmailSent = () => {
 
     useEffect(() => {
         if (resetPasswordFailure) {
-            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
+            navigate('/account-error');
         }
 
         reset();

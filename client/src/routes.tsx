@@ -43,7 +43,6 @@ import {createBrowserRouter, redirect} from 'react-router-dom';
 
 import AccountErrorPage from './pages/account/public/AccountErrorPage';
 import PasswordResetEmailSent from './pages/account/public/PasswordResetEmailSent';
-import PasswordResetSuccessful from './pages/account/public/PasswordResetSuccessful';
 import RegisterSuccess from './pages/account/public/RegisterSuccess';
 
 const getAccountRoutes = (path: string) => ({
@@ -164,10 +163,6 @@ export const getRouter = (queryClient: QueryClient) =>
                         {
                             element: <PasswordResetEmailSent />,
                             path: 'email',
-                        },
-                        {
-                            element: <PasswordResetSuccessful />,
-                            path: 'success',
                         },
                     ],
                     path: 'password-reset',

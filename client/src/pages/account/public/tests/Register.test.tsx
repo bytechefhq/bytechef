@@ -1,6 +1,7 @@
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {act, render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import {afterEach, beforeEach, expect, it, vi} from 'vitest';
+import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
 import Register from '../Register';
 import {mockApplicationInfoStore} from '../tests/mocks/mockApplicationInfoStore';
@@ -21,6 +22,12 @@ const renderRegisterPage = () => {
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: vi.fn(),
 }));
+
+vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
+    useFeatureFlagsStore: vi.fn(),
+}));
+
+(useFeatureFlagsStore as unknown as Mock).mockReturnValue(vi.fn());
 
 beforeEach(() => {
     mockApplicationInfoStore();
@@ -94,4 +101,15 @@ it('should set type as password initially and toggle between types when "show pa
     await waitFor(() => {
         expect(passwordInputField).toHaveAttribute('type', 'password');
     });
+});
+
+it('should show socials login buttons with correct feature flag', async () => {
+    (useFeatureFlagsStore as unknown as Mock).mockReturnValue((featureFlag: string) => {
+        return featureFlag === 'ff-1874';
+    });
+
+    renderRegisterPage();
+
+    expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
 });

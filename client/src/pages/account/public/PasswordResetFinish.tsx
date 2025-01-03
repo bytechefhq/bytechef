@@ -1,16 +1,18 @@
 import {Button} from '@/components/ui/button';
-import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
+import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordResetStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {useForm} from 'react-hook-form';
-import {useNavigate, useSearchParams} from 'react-router-dom';
+import {useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {z} from 'zod';
+
+import PasswordResetSuccessful from './PasswordResetSuccessful';
 
 const passwordLengthMessage = 'At least 8 characters';
 const passwordContainsNumberMessage = 'At least 1 number';
@@ -52,7 +54,7 @@ const formSchema = z
 const PasswordResetFinish = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const {reset, resetPasswordFailure, resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore();
+    const {resetPasswordFinish, resetPasswordSuccess} = usePasswordResetStore();
 
     const [searchParams] = useSearchParams();
     const key = searchParams.get('key');
@@ -109,7 +111,7 @@ const PasswordResetFinish = () => {
                                     </div>
                                 </FormControl>
 
-                                <ul>
+                                <ul className="space-y-1">
                                     {errors.newPassword?.message &&
                                         getValues('newPassword') !== '' &&
                                         Object.entries(JSON.parse(errors.newPassword.message)).map(([key, value]) => {
@@ -121,12 +123,12 @@ const PasswordResetFinish = () => {
                                             return (
                                                 <li
                                                     className={twMerge(
-                                                        'mt-2 flex items-center gap-1 text-base text-destructive',
+                                                        'flex items-center gap-1 text-sm text-destructive',
                                                         validationPass && 'text-success'
                                                     )}
                                                     key={key}
                                                 >
-                                                    {validationPass ? <CheckIcon size={20} /> : <XIcon size={20} />}
+                                                    {validationPass ? <CheckIcon size={15} /> : <XIcon size={15} />}
 
                                                     <p>{message}</p>
                                                 </li>
@@ -135,20 +137,20 @@ const PasswordResetFinish = () => {
 
                                     {getValues('newPassword') === '' && (
                                         <>
-                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                <XIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                <XIcon size={15} />
 
                                                 <p>{passwordLengthMessage}</p>
                                             </li>
 
-                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                <XIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                <XIcon size={15} />
 
                                                 <p>{passwordContainsNumberMessage}</p>
                                             </li>
 
-                                            <li className="mt-2 flex items-center gap-1 text-base text-content-neutral-secondary">
-                                                <XIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-content-neutral-secondary">
+                                                <XIcon size={15} />
 
                                                 <p>{passwordContainsUppercaseMessage}</p>
                                             </li>
@@ -157,20 +159,20 @@ const PasswordResetFinish = () => {
 
                                     {!errors.newPassword && getValues('newPassword') !== '' && (
                                         <>
-                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                <CheckIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                <CheckIcon size={15} />
 
                                                 <p>{passwordLengthMessage}</p>
                                             </li>
 
-                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                <CheckIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                <CheckIcon size={15} />
 
                                                 <p>{passwordContainsNumberMessage}</p>
                                             </li>
 
-                                            <li className="mt-2 flex items-center gap-1 text-base text-success">
-                                                <CheckIcon size={20} />
+                                            <li className="flex items-center gap-1 text-sm text-success">
+                                                <CheckIcon size={15} />
 
                                                 <p>{passwordContainsUppercaseMessage}</p>
                                             </li>
@@ -197,31 +199,17 @@ const PasswordResetFinish = () => {
         resetPasswordFinish(key, newPassword);
     }
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (resetPasswordSuccess) {
-            navigate('/password-reset/success');
-        }
-
-        if (resetPasswordFailure) {
-            navigate('/account-error', {state: {error: 'Something went wrong. Try again.'}});
-        }
-
-        reset();
-    }, [navigate, reset, resetPasswordSuccess, resetPasswordFailure]);
+    if (resetPasswordSuccess) {
+        return <PasswordResetSuccessful />;
+    }
 
     return (
         <PublicLayoutContainer>
             <Card className="mx-auto max-w-sm rounded-xl p-6 text-start shadow-none">
-                <CardHeader className="p-0 pb-10 text-center">
+                <CardHeader className="p-0 pb-8 text-center">
                     <CardTitle className="text-xl font-bold text-content-neutral-primary">
                         Create a new password
                     </CardTitle>
-
-                    <CardDescription className="text-content-neutral-secondary">
-                        Your password needs to be different from previously used passwords.
-                    </CardDescription>
                 </CardHeader>
 
                 <CardContent className="flex flex-col gap-6 p-0">

@@ -1,9 +1,9 @@
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {render, screen, userEvent, waitFor} from '@/shared/util/test-utils';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
-import {afterEach, beforeEach, expect, it, vi} from 'vitest';
+import {Mock, afterEach, beforeEach, expect, it, vi} from 'vitest';
 
-import AccountErrorPage from '../AccountErrorPage';
 import Login from '../Login';
 import PasswordResetInit from '../PasswordResetInit';
 import Register from '../Register';
@@ -30,6 +30,12 @@ vi.mock('@/shared/stores/useAuthenticationStore', () => ({
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: vi.fn(),
 }));
+
+vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
+    useFeatureFlagsStore: vi.fn(),
+}));
+
+(useFeatureFlagsStore as unknown as Mock).mockReturnValue(vi.fn());
 
 beforeEach(() => {
     mockApplicationInfoStore();
@@ -125,27 +131,6 @@ it('should render "Register" page if "Create account" is clicked', async () => {
     });
 });
 
-it('should render "AccountErrorPage" if loginError is true', async () => {
-    mockAuthenticationStore({
-        loginError: true,
-        reset: vi.fn(),
-    });
-
-    render(
-        <MemoryRouter initialEntries={['/login']}>
-            <Routes>
-                <Route element={<Login />} path="/login" />
-
-                <Route element={<AccountErrorPage />} path="/account-error" />
-            </Routes>
-        </MemoryRouter>
-    );
-
-    await waitFor(() => {
-        expect(screen.getByText('Failed to sign in, please check your credentials and try again.')).toBeInTheDocument();
-    });
-});
-
 it('should submit form with correct login details when "Log in" is clicked', async () => {
     renderLoginPage();
 
@@ -219,4 +204,15 @@ it('should disable submit button and show loading icon while log in credentials 
 
     expect(logInButton).toBeDisabled();
     expect(screen.getByLabelText('loading icon')).toBeInTheDocument();
+});
+
+it('should show socials login buttons with correct feature flag', async () => {
+    (useFeatureFlagsStore as unknown as Mock).mockReturnValue((featureFlag: string) => {
+        return featureFlag === 'ff-1874';
+    });
+
+    renderLoginPage();
+
+    expect(screen.queryByText('Continue with Google')).toBeInTheDocument();
+    expect(screen.queryByText('Continue with Github')).toBeInTheDocument();
 });
