@@ -30,7 +30,13 @@ import {
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {ComponentPropertiesType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {
+    ComponentPropertiesType,
+    NodeDataType,
+    PropertyAllType,
+    TabNameType,
+    UpdateWorkflowMutationType,
+} from '@/shared/types';
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
@@ -81,7 +87,7 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
 }) => {
-    const [activeTab, setActiveTab] = useState('description');
+    const [activeTab, setActiveTab] = useState<TabNameType>('description');
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
 
@@ -401,14 +407,29 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [previousComponentProperties.length]);
 
-    // Tab switching logic
+    // Set activeTab depending on currentNode.activeTab
     useEffect(() => {
         if (currentNode?.activeTab) {
             setActiveTab(currentNode.activeTab);
-
-            return;
         }
+    }, [currentNode?.activeTab]);
 
+    // Add activeTab to currentNode when activeTab changes
+    useEffect(
+        () => {
+            if (currentNode?.componentName) {
+                setCurrentNode({
+                    ...currentNode,
+                    activeTab,
+                });
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [activeTab]
+    );
+
+    // Tab switching logic
+    useEffect(() => {
         if (activeTab === 'connection' && componentConnections.length === 0) {
             setActiveTab('description');
         }
