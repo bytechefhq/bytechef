@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.component.ai.text.action;
+
+import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
-public interface AiComponentDefinition extends PlatformComponentDefinition {
+public interface AiTextAction {
 
-    /**
-     *
-     */
-    String AI_TEXT = "aiTextAnalysis";
+    Parameters createParameters(Parameters inputParameters);
 }
