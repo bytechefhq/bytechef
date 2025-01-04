@@ -219,7 +219,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:modules:components:accelo")
 include("server:libs:modules:components:active-campaign")
 include("server:libs:modules:components:affinity")
-include("server:libs:modules:components:ai:ai-text-analysis")
+include("server:libs:modules:components:ai:ai-text")
 include("server:libs:modules:components:ai:llm:amazon-bedrock")
 include("server:libs:modules:components:ai:llm:anthropic")
 include("server:libs:modules:components:ai:llm:azure-openai")
