@@ -18,6 +18,10 @@ package com.bytechef.component.ai.text.analysis.action;
 
 import com.bytechef.component.definition.Parameters;
 
-public interface AITextAnalysisAction {
+/**
+ * @author Marko Kriskovic
+ */
+public interface AiTextAnalysisAction {
+
     Parameters createParameters(Parameters inputParameters);
 }
