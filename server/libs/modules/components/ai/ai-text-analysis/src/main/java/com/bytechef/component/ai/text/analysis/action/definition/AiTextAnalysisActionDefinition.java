@@ -33,7 +33,7 @@ import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.vertex.gemini.action.VertexGeminiChatAction;
-import com.bytechef.component.ai.text.analysis.action.AITextAnalysisAction;
+import com.bytechef.component.ai.text.analysis.action.AiTextAnalysisAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -52,12 +52,13 @@ import java.util.Optional;
 public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrapper {
 
     private final ApplicationProperties.Ai.Component component;
-    private final AITextAnalysisAction aiTextAnalysisAction;
+    private final AiTextAnalysisAction aiTextAnalysisAction;
 
     @SuppressFBWarnings("EI")
-    public AiTextAnalysisActionDefinition(ActionDefinition actionDefinition,
-        ApplicationProperties.Ai.Component component,
-        AITextAnalysisAction aiTextAnalysisAction) {
+    public AiTextAnalysisActionDefinition(
+        ActionDefinition actionDefinition, ApplicationProperties.Ai.Component component,
+        AiTextAnalysisAction aiTextAnalysisAction) {
+
         super(actionDefinition);
 
         this.component = component;
@@ -74,40 +75,36 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
 
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
+        final ApplicationProperties.Ai.Component.AmazonBedrock amazonBedrock = component.getAmazonBedrock();
+
         ChatModel chatModel = switch (inputParameters.getRequiredInteger(MODEL_PROVIDER)) {
             case 0 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockAnthropic2ChatAction.CHAT_MODEL;
             }
             case 1 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockAnthropic3ChatAction.CHAT_MODEL;
             }
             case 2 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockCohereChatAction.CHAT_MODEL;
             }
             case 3 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockJurassic2ChatAction.CHAT_MODEL;
             }
             case 4 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockLlamaChatAction.CHAT_MODEL;
             }
             case 5 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAmazonBedrock()
-                    .getApiKey());
+                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
 
                 yield AmazonBedrockTitanChatAction.CHAT_MODEL;
             }
@@ -118,44 +115,51 @@ public class AiTextAnalysisActionDefinition extends AbstractActionDefinitionWrap
                 yield AnthropicChatAction.CHAT_MODEL;
             }
             case 7 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAzureOpenAi()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.AzureOpenAi azureOpenAi = component.getAzureOpenAi();
+
+                modelConnectionParametersMap.put(TOKEN, azureOpenAi.getApiKey());
 
                 yield AzureOpenAiChatAction.CHAT_MODEL;
             }
             case 8 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getGroq()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.Groq groq = component.getGroq();
+
+                modelConnectionParametersMap.put(TOKEN, groq.getApiKey());
 
                 yield GroqChatAction.CHAT_MODEL;
             }
             case 9 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getNvidia()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.Nvidia nvidia = component.getNvidia();
+
+                modelConnectionParametersMap.put(TOKEN, nvidia.getApiKey());
 
                 yield NvidiaChatAction.CHAT_MODEL;
             }
             case 10 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getHuggingFace()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.HuggingFace huggingFace = component.getHuggingFace();
+
+                modelConnectionParametersMap.put(TOKEN, huggingFace.getApiKey());
 
                 yield HuggingFaceChatAction.CHAT_MODEL;
             }
             case 11 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getMistral()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.Mistral mistral = component.getMistral();
+
+                modelConnectionParametersMap.put(TOKEN, mistral.getApiKey());
 
                 yield MistralChatAction.CHAT_MODEL;
             }
             case 12 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getOpenAi()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.OpenAi openAi = component.getOpenAi();
+
+                modelConnectionParametersMap.put(TOKEN, openAi.getApiKey());
 
                 yield OpenAiChatAction.CHAT_MODEL;
             }
             case 13 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getVertexGemini()
-                    .getApiKey());
+                ApplicationProperties.Ai.Component.VertexGemini vertexGemini = component.getVertexGemini();
+
+                modelConnectionParametersMap.put(TOKEN, vertexGemini.getApiKey());
 
                 yield VertexGeminiChatAction.CHAT_MODEL;
             }

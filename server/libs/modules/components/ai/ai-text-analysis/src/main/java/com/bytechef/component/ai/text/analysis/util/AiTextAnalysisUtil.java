@@ -29,6 +29,9 @@ import com.bytechef.component.openai.constant.OpenAiConstants;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author Marko Kriskovic
+ */
 public class AiTextAnalysisUtil {
 
     private AiTextAnalysisUtil() {
@@ -37,6 +40,7 @@ public class AiTextAnalysisUtil {
     public static List<? extends Option<String>> createModelProperties(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
+
         Integer modelProvider = inputParameters.getInteger(MODEL_PROVIDER);
 
         return switch (modelProvider) {

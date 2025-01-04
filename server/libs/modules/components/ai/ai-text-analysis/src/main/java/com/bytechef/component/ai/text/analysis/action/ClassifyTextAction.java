@@ -41,7 +41,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ClassifyTextAction implements AITextAnalysisAction {
+/**
+ * @author Marko Kriskovic
+ */
+public class ClassifyTextAction implements AiTextAnalysisAction {
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public ClassifyTextAction(ApplicationProperties.Ai.Component component) {
@@ -84,25 +87,22 @@ public class ClassifyTextAction implements AITextAnalysisAction {
         String systemPrompt =
             "You will receive a list of categories, text and examples. You will choose which of the given categories fits the given text the most. Your response will only be the chosen category.";
 
-        String userBuilder = "List of categories: " + inputParameters.getList(CATEGORIES)
-            .toString() + "\n" +
-            "Text: " + inputParameters.getString(TEXT);
+        String userBuilder = "List of categories: " + inputParameters.getList(CATEGORIES) + "\nText: " +
+            inputParameters.getString(TEXT);
 
         Map<String, ?> exampleMap = inputParameters.getMap(EXAMPLES, String.class, Map.of());
 
         if (!exampleMap.isEmpty()) {
-            userBuilder = userBuilder + "\n" +
-                "Examples: " +
+            userBuilder = userBuilder + "\nExamples: " +
                 exampleMap.entrySet()
                     .stream()
                     .map(Map.Entry::toString)
                     .collect(Collectors.joining(";"));
         }
 
-        modelInputParametersMap.put("messages",
-            List.of(
-                Map.of("content", systemPrompt, "role", "system"),
-                Map.of("content", userBuilder, "role", "user")));
+        modelInputParametersMap.put(
+            "messages",
+            List.of(Map.of("content", systemPrompt, "role", "system"), Map.of("content", userBuilder, "role", "user")));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);

@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * @author Marko Kriskovic
  */
-public class SummarizeTextAction implements AITextAnalysisAction {
+public class SummarizeTextAction implements AiTextAnalysisAction {
 
     public final AiTextAnalysisActionDefinition actionDefinition;
 
