@@ -46,7 +46,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ScoreAction implements AITextAnalysisAction {
+public class ScoreAction implements AiTextAnalysisAction {
+
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public ScoreAction(ApplicationProperties.Ai.Component component) {
@@ -104,36 +105,38 @@ public class ScoreAction implements AITextAnalysisAction {
             "You are an objective text scoring judge. You will receive a text and list of criteria that you will score the text on. Within the list of criteria you will also receive `Lowest Score` which indicates the lowest possible score you can give, `Highest Score` which indicates the highest possible score you can give and `Decimal` which tells you that you will be using decimal numbers if true or only integers if false. Your response will be a JSON array of objects for each criteria containing your score and a short explanation.";
 
         StringBuilder userBuilder = new StringBuilder();
+
         userBuilder.append("Text: ")
             .append(inputParameters.getString(TEXT))
             .append("\n");
 
-        List<AiTextAnalysisUtil.Criteria> criteria =
-            inputParameters.getList(CRITERIA, AiTextAnalysisUtil.Criteria.class, List.of());
+        List<AiTextAnalysisUtil.Criteria> criteria = inputParameters.getList(
+            CRITERIA, AiTextAnalysisUtil.Criteria.class, List.of());
 
         userBuilder.append("Criteria: {")
             .append("\n");
 
-        criteria.forEach(critrion -> userBuilder.append("{")
+        criteria.forEach(criterion -> userBuilder.append("{")
             .append("\n")
             .append("Criterion: ")
-            .append(critrion.criterion())
+            .append(criterion.criterion())
             .append("\n")
             .append("Lowest Score: ")
-            .append(critrion.lowestScore())
+            .append(criterion.lowestScore())
             .append("\n")
             .append("Highest Score: ")
-            .append(critrion.highestScore())
+            .append(criterion.highestScore())
             .append("\n")
             .append("Decimal: ")
-            .append(critrion.isDecimal())
+            .append(criterion.isDecimal())
             .append("\n")
             .append("},")
             .append("\n"));
 
         userBuilder.append("}\n");
 
-        modelInputParametersMap.put("messages",
+        modelInputParametersMap.put(
+            "messages",
             List.of(
                 Map.of("content", systemPrompt, "role", "system"),
                 Map.of("content", userBuilder.toString(), "role", "user")));

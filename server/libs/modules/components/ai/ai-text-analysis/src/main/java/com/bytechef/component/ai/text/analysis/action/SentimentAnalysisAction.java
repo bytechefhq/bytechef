@@ -36,7 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SentimentAnalysisAction implements AITextAnalysisAction {
+public class SentimentAnalysisAction implements AiTextAnalysisAction {
+
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public SentimentAnalysisAction(ApplicationProperties.Ai.Component component) {
