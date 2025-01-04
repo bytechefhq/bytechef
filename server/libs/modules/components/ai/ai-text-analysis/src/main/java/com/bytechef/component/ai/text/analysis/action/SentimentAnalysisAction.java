@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SentimentAnalysisAction implements AITextAnalysisAction {
+public class SentimentAnalysisAction implements AiTextAnalysisAction {
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public SentimentAnalysisAction(ApplicationProperties.Ai.Component component) {
@@ -71,10 +71,9 @@ public class SentimentAnalysisAction implements AITextAnalysisAction {
 
         String userBuilder = "Text: " + inputParameters.getString(TEXT);
 
-        modelInputParametersMap.put("messages",
-            List.of(
-                Map.of("content", systemPrompt, "role", "system"),
-                Map.of("content", userBuilder, "role", "user")));
+        modelInputParametersMap.put(
+            "messages",
+            List.of(Map.of("content", systemPrompt, "role", "system"), Map.of("content", userBuilder, "role", "user")));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
