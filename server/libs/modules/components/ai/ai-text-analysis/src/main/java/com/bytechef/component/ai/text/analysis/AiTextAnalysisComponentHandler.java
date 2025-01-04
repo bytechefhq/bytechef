@@ -59,8 +59,8 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
                     .description("AI Helper component for text analysis.")
                     .icon("path:assets/ai-text-analysis.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-                    .actions(                        
-new ClassifyTextAction(component).actionDefinition,
+                    .actions(
+                        new ClassifyTextAction(component).actionDefinition,
                         new SentimentAnalysisAction(component).actionDefinition,
                         new SummarizeTextAction(component).actionDefinition));
         }
