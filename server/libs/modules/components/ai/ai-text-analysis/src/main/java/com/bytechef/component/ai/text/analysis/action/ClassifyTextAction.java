@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
  * @author Marko Kriskovic
  */
 public class ClassifyTextAction implements AiTextAnalysisAction {
+
     public final AiTextAnalysisActionDefinition actionDefinition;
 
     public ClassifyTextAction(ApplicationProperties.Ai.Component component) {

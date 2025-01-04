@@ -63,7 +63,7 @@ public class AiTextAnalysisComponentHandler implements ComponentHandler {
                     .actions(
                         new ClassifyTextAction(component).actionDefinition,
                         new SentimentAnalysisAction(component).actionDefinition,
-new ScoreAction(component).actionDefinition),
+                        new ScoreAction(component).actionDefinition,
                         new SummarizeTextAction(component).actionDefinition));
         }
     }
