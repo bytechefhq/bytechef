@@ -18,6 +18,7 @@ package com.bytechef.platform.component.definition;
 
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
+import com.bytechef.platform.constant.PlatformConstants;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import java.io.File;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 import org.springframework.lang.NonNull;
 
 /**
@@ -55,6 +57,10 @@ public final class TempFilesFileStorage implements FilesFileStorage {
 
     @Override
     public String readFileToString(@NonNull FileEntry fileEntry) {
+        if (Objects.equals(fileEntry.getUrl(), PlatformConstants.FILE_ENTRY_SAMPLE_URL)) {
+            return "This is a sample file content";
+        }
+
         return filesFileStorage.readFileToString(fileEntry);
     }
 

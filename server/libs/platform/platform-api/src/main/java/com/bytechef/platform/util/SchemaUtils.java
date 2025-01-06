@@ -33,6 +33,7 @@ import com.bytechef.definition.BaseProperty.BaseNumberProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import com.bytechef.definition.BaseProperty.BaseStringProperty;
 import com.bytechef.definition.BaseProperty.BaseTimeProperty;
+import com.bytechef.platform.constant.PlatformConstants;
 import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.LocalDate;
@@ -155,7 +156,7 @@ public class SchemaUtils {
             case BaseFileEntryProperty<?> ignored ->
                 Map.of(
                     "extension", "txt", "mimeType", "text/plain", "name", "sampleName", "url",
-                    "file:///tmp/sampleFileName.txt");
+                    PlatformConstants.FILE_ENTRY_SAMPLE_URL);
             case BaseIntegerProperty ignored -> 57;
             case BaseNullProperty ignored -> null;
             case BaseNumberProperty ignored -> 23.34;
