@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.action.ClassifyTextAction;
 import com.bytechef.component.ai.text.action.ScoreAction;
 import com.bytechef.component.ai.text.action.SentimentAction;
+import com.bytechef.component.ai.text.action.SimilaritySearchAction;
 import com.bytechef.component.ai.text.action.SummarizeTextAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -64,7 +65,8 @@ public class AiTextComponentHandler implements ComponentHandler {
                         new ClassifyTextAction(component).actionDefinition,
                         new SentimentAction(component).actionDefinition,
                         new ScoreAction(component).actionDefinition,
-                        new SummarizeTextAction(component).actionDefinition));
+                        new SummarizeTextAction(component).actionDefinition,
+                        new SimilaritySearchAction(component).actionDefinition));
         }
     }
 }

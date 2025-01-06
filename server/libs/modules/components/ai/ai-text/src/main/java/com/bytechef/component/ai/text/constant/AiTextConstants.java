@@ -32,6 +32,7 @@ import com.bytechef.component.definition.OptionsDataSource;
 public class AiTextConstants {
 
     public static final String TEXT = "text";
+    public static final String QUERY = "query";
     public static final String FORMAT = "format";
     public static final String PROMPT = "prompt";
     public static final String CATEGORIES = "categories";
@@ -42,9 +43,12 @@ public class AiTextConstants {
     public static final String LOWEST_SCORE = "lowestScore";
     public static final String HIGHEST_SCORE = "highestScore";
     public static final String IS_DECIMAL = "isDecimal";
+    public static final String NUM_RESULTS = "numResults";
+    public static final String CHUNK_SIZE = "chunkSize";
 
     public static final String MODEL_PROVIDER = "modelProvider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
+    public static final String SIMILARITY_SEARCH = "similaritySearch";
     public static final String CLASSIFY_TEXT = "classifyText";
     public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
     public static final String SCORE = "score";
