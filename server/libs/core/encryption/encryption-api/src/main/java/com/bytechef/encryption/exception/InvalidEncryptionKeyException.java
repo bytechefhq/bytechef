@@ -16,12 +16,26 @@
 
 package com.bytechef.encryption.exception;
 
+import com.bytechef.encryption.Encryption;
+import com.bytechef.exception.AbstractErrorType;
+import com.bytechef.exception.AbstractException;
+
 /**
  * @author Ivica Cardic
  */
-public class InvalidEncryptionKeyException extends RuntimeException {
+public class InvalidEncryptionKeyException extends AbstractException {
 
-    public InvalidEncryptionKeyException(Exception exception) {
-        super(exception);
+    public InvalidEncryptionKeyException(String message, Exception exception) {
+        super(message, exception, InvalidEncryptionKeyErrorType.INVALID_ENCRYPTION_KEY);
+    }
+
+    private static class InvalidEncryptionKeyErrorType extends AbstractErrorType {
+
+        private static final InvalidEncryptionKeyErrorType INVALID_ENCRYPTION_KEY =
+            new InvalidEncryptionKeyErrorType(100);
+
+        private InvalidEncryptionKeyErrorType(int errorKey) {
+            super(Encryption.class, errorKey);
+        }
     }
 }

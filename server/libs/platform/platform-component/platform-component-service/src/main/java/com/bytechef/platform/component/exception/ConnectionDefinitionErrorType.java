@@ -17,30 +17,27 @@
 package com.bytechef.platform.component.exception;
 
 import com.bytechef.component.definition.ConnectionDefinition;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ConnectionDefinitionErrorType implements ErrorType {
+public class ConnectionDefinitionErrorType extends AbstractErrorType {
 
-    GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION(100), GET_DEFAULT_REFRESH_URL(101), EXECUTE_AUTHORIZATION_APPLY(102),
-    EXECUTE_AUTHORIZATION_CALLBACK(103), GET_OAUTH2_AUTHORIZATION_PARAMETERS(104), EXECUTE_AUTHORIZATION_REFRESH(105),
-    EXECUTE_ACQUIRE(106);
+    public static final ConnectionDefinitionErrorType GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION =
+        new ConnectionDefinitionErrorType(100);
+    public static final ConnectionDefinitionErrorType GET_DEFAULT_REFRESH_URL = new ConnectionDefinitionErrorType(101);
+    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_APPLY =
+        new ConnectionDefinitionErrorType(102);
+    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_CALLBACK =
+        new ConnectionDefinitionErrorType(103);
+    public static final ConnectionDefinitionErrorType GET_OAUTH2_AUTHORIZATION_PARAMETERS =
+        new ConnectionDefinitionErrorType(104);
+    public static final ConnectionDefinitionErrorType EXECUTE_AUTHORIZATION_REFRESH = new ConnectionDefinitionErrorType(
+        105);
+    public static final ConnectionDefinitionErrorType EXECUTE_ACQUIRE = new ConnectionDefinitionErrorType(106);
 
-    private final int errorKey;
-
-    ConnectionDefinitionErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return ConnectionDefinition.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private ConnectionDefinitionErrorType(int errorKey) {
+        super(ConnectionDefinition.class, errorKey);
     }
 }

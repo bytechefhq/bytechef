@@ -26,7 +26,7 @@ public class TaskExecutionErrorType extends AbstractErrorType {
 
     public static final TaskExecutionErrorType TASK_EXECUTION_FAILED = new TaskExecutionErrorType(100);
 
-    TaskExecutionErrorType(int errorKey) {
+    private TaskExecutionErrorType(int errorKey) {
         super(TaskExecution.class, errorKey);
     }
 }

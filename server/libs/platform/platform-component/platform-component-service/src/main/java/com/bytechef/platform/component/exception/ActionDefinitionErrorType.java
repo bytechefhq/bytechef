@@ -17,29 +17,22 @@
 package com.bytechef.platform.component.exception;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ActionDefinitionErrorType implements ErrorType {
+public class ActionDefinitionErrorType extends AbstractErrorType {
 
-    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102), EXECUTE_OUTPUT(103),
-    EXECUTE_PERFORM(104), EXECUTE_PROCESS_ERROR_RESPONSE(105);
+    public static final ActionDefinitionErrorType EXECUTE_DYNAMIC_PROPERTIES = new ActionDefinitionErrorType(100);
+    public static final ActionDefinitionErrorType EXECUTE_WORKFLOW_NODE_DESCRIPTION =
+        new ActionDefinitionErrorType(101);
+    public static final ActionDefinitionErrorType EXECUTE_OPTIONS = new ActionDefinitionErrorType(102);
+    public static final ActionDefinitionErrorType EXECUTE_OUTPUT = new ActionDefinitionErrorType(103);
+    public static final ActionDefinitionErrorType EXECUTE_PERFORM = new ActionDefinitionErrorType(104);
+    public static final ActionDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE = new ActionDefinitionErrorType(105);
 
-    private final int errorKey;
-
-    ActionDefinitionErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return ActionDefinition.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private ActionDefinitionErrorType(int errorKey) {
+        super(ActionDefinition.class, errorKey);
     }
 }

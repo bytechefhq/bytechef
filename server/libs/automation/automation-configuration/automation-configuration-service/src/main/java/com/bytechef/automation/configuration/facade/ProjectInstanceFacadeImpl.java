@@ -48,7 +48,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -129,13 +129,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         Project project = projectService.getProject(projectId);
 
         if (!project.isPublished()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Project id=%s is not published".formatted(projectId),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
 
         if (project.getLastProjectVersion() == projectInstance.getProjectVersion()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectInstance.getProjectVersion()),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
@@ -476,7 +476,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     .toList());
 
             if (requiredWorkflowConnections.size() != projectInstanceWorkflow.getConnectionsCount()) {
-                throw new PlatformException(
+                throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     ProjectInstanceErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
             }

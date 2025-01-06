@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.exception.AbstractException;
 
 /**
  * @author Ivica Cardic
  */
-public class UserAlreadyExistsException extends PlatformException {
+public class UserAlreadyExistsException extends AbstractException {
 
     public UserAlreadyExistsException() {
         super("A new user cannot already have an ID", UserErrorType.USER_ALREADY_EXISTS);

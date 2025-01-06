@@ -17,28 +17,16 @@
 package com.bytechef.automation.configuration.exception;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ProjectErrorType implements ErrorType {
+public class ProjectErrorType extends AbstractErrorType {
 
-    REMOVE_LAST_WORKFLOW(100);
+    public static final ProjectErrorType REMOVE_LAST_WORKFLOW = new ProjectErrorType(100);
 
-    private final int errorKey;
-
-    ProjectErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return Project.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private ProjectErrorType(int errorKey) {
+        super(Project.class, errorKey);
     }
 }

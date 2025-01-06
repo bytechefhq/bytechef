@@ -17,28 +17,17 @@
 package com.bytechef.automation.configuration.exception;
 
 import com.bytechef.automation.configuration.domain.ProjectInstance;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ProjectInstanceErrorType implements ErrorType {
+public class ProjectInstanceErrorType extends AbstractErrorType {
 
-    CREATE_PROJECT_INSTANCE(100), REQUIRED_WORKFLOW_CONNECTIONS(101);
+    public static final ProjectInstanceErrorType CREATE_PROJECT_INSTANCE = new ProjectInstanceErrorType(100);
+    public static final ProjectInstanceErrorType REQUIRED_WORKFLOW_CONNECTIONS = new ProjectInstanceErrorType(101);
 
-    private final int errorKey;
-
-    ProjectInstanceErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return ProjectInstance.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private ProjectInstanceErrorType(int errorKey) {
+        super(ProjectInstance.class, errorKey);
     }
 }

@@ -17,28 +17,18 @@
 package com.bytechef.embedded.configuration.exception;
 
 import com.bytechef.embedded.configuration.domain.Integration;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum IntegrationErrorType implements ErrorType {
+public class IntegrationErrorType extends AbstractErrorType {
 
-    DELETE_INTEGRATION(100), REMOVE_WORKFLOW(101), UPDATE_OLD_WORKFLOW(102);
+    public static final IntegrationErrorType DELETE_INTEGRATION = new IntegrationErrorType(100);
+    public static final IntegrationErrorType REMOVE_WORKFLOW = new IntegrationErrorType(101);
+    public static final IntegrationErrorType UPDATE_OLD_WORKFLOW = new IntegrationErrorType(102);
 
-    private final int errorKey;
-
-    IntegrationErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return Integration.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private IntegrationErrorType(int errorKey) {
+        super(Integration.class, errorKey);
     }
 }

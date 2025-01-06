@@ -57,7 +57,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.domain.BaseProperty;
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
@@ -156,13 +156,13 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         Integration integration = integrationService.getIntegration(integrationId);
 
         if (!integration.isPublished()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Integration id=%s is not published".formatted(integrationId),
                 IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
         }
 
         if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Integration version v=%s cannot be in DRAFT".formatted(
                     integrationInstanceConfiguration.getIntegrationVersion()),
                 IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
@@ -178,7 +178,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             .anyMatch(curIntegrationInstanceConfigurations -> curIntegrationInstanceConfigurations
                 .getVersion() == integrationVersion)) {
 
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Instance Configuration is already set for environment=%s and integrationVersion=%s".formatted(
                     integrationInstanceConfiguration.getEnvironment(), integrationVersion),
                 IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
@@ -634,7 +634,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             int connectionsCount = integrationInstanceConfigurationWorkflow.getConnectionsCount();
 
             if (!requiredWorkflowConnections.isEmpty() && requiredWorkflowConnections.size() != connectionsCount) {
-                throw new PlatformException(
+                throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
             }

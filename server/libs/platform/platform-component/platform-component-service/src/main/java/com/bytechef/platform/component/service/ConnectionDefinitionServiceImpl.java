@@ -51,8 +51,8 @@ import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
-import com.bytechef.platform.component.exception.ComponentConfigurationException;
 import com.bytechef.platform.component.exception.ConnectionDefinitionErrorType;
+import com.bytechef.platform.exception.ConfigurationException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.github.mizosoft.methanol.FormBodyPublisher;
 import com.github.mizosoft.methanol.Methanol;
@@ -97,7 +97,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return OptionalUtils.get(authorization.getAcquire())
                 .apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
-            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_ACQUIRE);
         }
     }
 
@@ -115,7 +115,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return applyFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
         } catch (Exception e) {
-            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_APPLY);
         }
     }
 
@@ -138,7 +138,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             try {
                 pkce = pkceFunction.apply(null, null, "SHA256", context);
             } catch (Exception e) {
-                throw new ComponentConfigurationException(
+                throw new ConfigurationException(
                     e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
             }
 
@@ -166,7 +166,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 ParametersFactory.createParameters(connectionParameters),
                 MapUtils.getString(connectionParameters, CODE), redirectUri, verifier, context);
         } catch (Exception e) {
-            throw new ComponentConfigurationException(
+            throw new ConfigurationException(
                 e, ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_CALLBACK);
         }
     }
@@ -220,7 +220,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             return refreshFunction.apply(ParametersFactory.createParameters(connectionParameters), context);
 
         } catch (Exception exception) {
-            throw new ComponentConfigurationException(
+            throw new ConfigurationException(
                 "Unable to perform oauth token refresh", exception,
                 ConnectionDefinitionErrorType.EXECUTE_AUTHORIZATION_REFRESH);
         }
@@ -331,7 +331,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                 oAuth2AuthorizationExtraQueryParametersFunction.apply(connectionParameters, context),
                 scopesFunction.apply(connectionParameters, context));
         } catch (Exception e) {
-            throw new ComponentConfigurationException(
+            throw new ConfigurationException(
                 e, ConnectionDefinitionErrorType.GET_OAUTH2_AUTHORIZATION_PARAMETERS);
         }
     }
@@ -432,12 +432,12 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         "Invalid claim", ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
 
@@ -479,13 +479,13 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                     HttpResponse.BodyHandlers.ofString());
 
                 if (httpResponse.statusCode() < 200 || httpResponse.statusCode() > 299) {
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         "OAuth provider rejected token refresh request",
                         ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
                 }
 
                 if (httpResponse.body() == null) {
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         "Unable to locate access_token, body content misses",
                         ConnectionDefinitionErrorType.GET_DEFAULT_AUTHORIZATION_CALLBACK_FUNCTION);
                 }
@@ -540,7 +540,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         try {
             return tokenUrlFunction.apply(connectionParameters, context);
         } catch (Exception e) {
-            throw new ComponentConfigurationException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
+            throw new ConfigurationException(e, ConnectionDefinitionErrorType.GET_DEFAULT_REFRESH_URL);
         }
     }
 

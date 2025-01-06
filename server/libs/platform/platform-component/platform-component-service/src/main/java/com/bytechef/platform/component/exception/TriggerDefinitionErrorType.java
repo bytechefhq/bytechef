@@ -17,31 +17,29 @@
 package com.bytechef.platform.component.exception;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum TriggerDefinitionErrorType implements ErrorType {
+public class TriggerDefinitionErrorType extends AbstractErrorType {
 
-    EXECUTE_DYNAMIC_PROPERTIES(100), EXECUTE_WORKFLOW_NODE_DESCRIPTION(101), EXECUTE_OPTIONS(102),
-    EXECUTE_LISTENER_DISABLE(103), EXECUTE_LISTENER_ENABLE(104), EXECUTE_DYNAMIC_WEBHOOK_TRIGGER(105),
-    EXECUTE_POLLING_TRIGGER(106), EXECUTE_STATIC_WEBHOOK_ERROR_TYPE(107), EXECUTE_DYNAMIC_WEBHOOK_DISABLE(108),
-    EXECUTE_DYNAMIC_WEBHOOK_ENABLE(109);
+    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_PROPERTIES = new TriggerDefinitionErrorType(100);
+    public static final TriggerDefinitionErrorType EXECUTE_WORKFLOW_NODE_DESCRIPTION = new TriggerDefinitionErrorType(
+        101);
+    public static final TriggerDefinitionErrorType EXECUTE_OPTIONS = new TriggerDefinitionErrorType(102);
+    public static final TriggerDefinitionErrorType EXECUTE_LISTENER_DISABLE = new TriggerDefinitionErrorType(103);
+    public static final TriggerDefinitionErrorType EXECUTE_LISTENER_ENABLE = new TriggerDefinitionErrorType(104);
+    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_TRIGGER = new TriggerDefinitionErrorType(
+        105);
+    public static final TriggerDefinitionErrorType EXECUTE_POLLING_TRIGGER = new TriggerDefinitionErrorType(106);
+    public static final TriggerDefinitionErrorType EXECUTE_STATIC_WEBHOOK_ERROR_TYPE = new TriggerDefinitionErrorType(
+        107);
+    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_DISABLE = new TriggerDefinitionErrorType(
+        108);
+    public static final TriggerDefinitionErrorType EXECUTE_DYNAMIC_WEBHOOK_ENABLE = new TriggerDefinitionErrorType(109);
 
-    private final int errorKey;
-
-    TriggerDefinitionErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return ActionDefinition.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private TriggerDefinitionErrorType(int errorKey) {
+        super(ActionDefinition.class, errorKey);
     }
 }

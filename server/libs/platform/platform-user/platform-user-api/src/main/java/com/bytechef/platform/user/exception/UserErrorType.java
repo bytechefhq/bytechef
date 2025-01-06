@@ -16,30 +16,23 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 import com.bytechef.platform.user.domain.User;
 
 /**
  * @author Ivica Cardic
  */
-public enum UserErrorType implements ErrorType {
+public class UserErrorType extends AbstractErrorType {
 
-    USER_NOT_FOUND(100), EMAIL_ALREADY_USED(101), LOGIN_ALREADY_USED(102), AUTHORITY_ALREADY_USED(103),
-    INVALID_PASSWORD(104), USER_ALREADY_EXISTS(105), INVALID_EMAIL(106);
+    public static final UserErrorType USER_NOT_FOUND = new UserErrorType(100);
+    public static final UserErrorType EMAIL_ALREADY_USED = new UserErrorType(101);
+    public static final UserErrorType LOGIN_ALREADY_USED = new UserErrorType(102);
+    public static final UserErrorType AUTHORITY_ALREADY_USED = new UserErrorType(103);
+    public static final UserErrorType INVALID_PASSWORD = new UserErrorType(104);
+    public static final UserErrorType USER_ALREADY_EXISTS = new UserErrorType(105);
+    public static final UserErrorType INVALID_EMAIL = new UserErrorType(106);
 
-    private final int errorKey;
-
-    UserErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return User.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private UserErrorType(int errorKey) {
+        super(User.class, errorKey);
     }
 }

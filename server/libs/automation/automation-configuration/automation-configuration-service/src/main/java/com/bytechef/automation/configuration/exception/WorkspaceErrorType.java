@@ -17,28 +17,17 @@
 package com.bytechef.automation.configuration.exception;
 
 import com.bytechef.automation.configuration.domain.Workspace;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum WorkspaceErrorType implements ErrorType {
+public class WorkspaceErrorType extends AbstractErrorType {
 
-    DELETE_DEFAULT_WORKSPACE(100), UPDATE_DEFAULT_WORKSPACE(101);
+    public static final WorkspaceErrorType DELETE_DEFAULT_WORKSPACE = new WorkspaceErrorType(100);
+    public static final WorkspaceErrorType UPDATE_DEFAULT_WORKSPACE = new WorkspaceErrorType(101);
 
-    private final int errorKey;
-
-    WorkspaceErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return Workspace.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private WorkspaceErrorType(int errorKey) {
+        super(Workspace.class, errorKey);
     }
 }

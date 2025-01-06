@@ -54,11 +54,11 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolverChain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
-import com.bytechef.exception.PlatformException;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.exception.ExecutionException;
 import com.bytechef.platform.tenant.TenantContext;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -235,7 +235,7 @@ public class JobSyncExecutor {
         if (taskExecution != null && taskExecution.getStatus() == TaskExecution.Status.FAILED) {
             ExecutionError error = taskExecution.getError();
 
-            throw new PlatformException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+            throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
         }
     }
 

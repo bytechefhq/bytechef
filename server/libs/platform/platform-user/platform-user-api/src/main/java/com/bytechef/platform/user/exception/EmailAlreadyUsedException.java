@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.exception.AbstractException;
 
 /**
  * @author Ivica Cardic
  */
-public class EmailAlreadyUsedException extends PlatformException {
+public class EmailAlreadyUsedException extends AbstractException {
 
     public EmailAlreadyUsedException() {
         super("Email is already in use!", UserErrorType.EMAIL_ALREADY_USED);
