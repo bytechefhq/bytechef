@@ -38,6 +38,7 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -83,6 +84,7 @@ public final class SendgridSendEmailAction {
                 .label("Message Body")
                 .description("This is the message you want to send")
                 .minLength(1)
+                .controlType(Property.ControlType.RICH_TEXT)
                 .required(true),
             string(TYPE)
                 .label("Message Type")

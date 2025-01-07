@@ -37,6 +37,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.intercom.util.IntercomUtils;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class IntercomSendMessageAction {
                 .label("Content")
                 .description("Content of the message")
                 .maxLength(360)
+                .controlType(Property.ControlType.RICH_TEXT)
                 .required(true),
             string(TEMPLATE)
                 .options(option("Plain", "plain"), option("Personal", "personal"))

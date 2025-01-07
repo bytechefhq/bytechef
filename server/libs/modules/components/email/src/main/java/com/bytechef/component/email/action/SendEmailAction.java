@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import jakarta.activation.DataHandler;
 import jakarta.mail.Authenticator;
 import jakarta.mail.Message;
@@ -95,7 +96,8 @@ public class SendEmailAction {
                 .required(true),
             string(CONTENT)
                 .label("Content")
-                .description("Your email content. Will be sent as a HTML email."),
+                .description("Your email content. Will be sent as a HTML email.")
+                .controlType(Property.ControlType.RICH_TEXT),
             array(ATTACHMENTS)
                 .label("Attachments")
                 .description("A list of attachments to send with the email.")

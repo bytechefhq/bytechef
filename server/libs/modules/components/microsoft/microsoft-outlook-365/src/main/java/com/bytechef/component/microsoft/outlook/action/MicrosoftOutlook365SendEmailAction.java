@@ -23,7 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BCC_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.BODY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CC_RECIPIENTS;
-import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_HTML;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_PROPERTY_TEXT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.RECIPIENT_PROPERTY;
@@ -80,8 +81,9 @@ public class MicrosoftOutlook365SendEmailAction {
                 .label("Body")
                 .description("The body of the message. It can be in HTML or text format.")
                 .properties(
-                    CONTENT_PROPERTY,
-                    CONTENT_TYPE_PROPERTY)
+                    CONTENT_TYPE_PROPERTY,
+                    CONTENT_PROPERTY_HTML,
+                    CONTENT_PROPERTY_TEXT)
                 .required(true))
         .perform(MicrosoftOutlook365SendEmailAction::perform);
 
