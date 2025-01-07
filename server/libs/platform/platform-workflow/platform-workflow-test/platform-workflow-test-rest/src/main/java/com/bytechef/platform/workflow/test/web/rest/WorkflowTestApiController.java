@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.test.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.workflow.test.facade.WorkflowTestFacade;
+import com.bytechef.platform.workflow.test.web.rest.model.TestWorkflowRequestModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +44,10 @@ public class WorkflowTestApiController implements WorkflowTestApi {
     }
 
     @Override
-    public ResponseEntity<WorkflowTestExecutionModel> testWorkflow(String id) {
+    public ResponseEntity<WorkflowTestExecutionModel> testWorkflow(
+        String id, TestWorkflowRequestModel testWorkflowRequestModel) {
+
         return ResponseEntity.ok(
-            conversionService.convert(workflowTestFacade.testWorkflow(id), WorkflowTestExecutionModel.class));
+            conversionService.convert(workflowTestFacade.testWorkflow(id, testWorkflowRequestModel.getInputs()), WorkflowTestExecutionModel.class));
     }
 }
