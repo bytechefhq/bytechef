@@ -34,6 +34,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -49,7 +50,8 @@ class HubspotUtilsTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of("__item", Map.of("properties", Map.of("pipeline", "123"))));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final ArgumentCaptor<String> queryNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -109,7 +111,7 @@ class HubspotUtilsTest {
 
         List<Option<String>> expectedOptions = new ArrayList<>();
 
-        expectedOptions.add(option("email", "123"));
+        expectedOptions.add(option("label", "123"));
 
         assertEquals(
             expectedOptions,
@@ -122,13 +124,27 @@ class HubspotUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("label", "123"));
+        List<Option<String>> expectedOptions = List.of(option("label", "123"));
 
         assertEquals(
             expectedOptions,
             HubspotUtils.getPipelineDealOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+    }
+
+    @Test
+    void testGetTicketIdOptions() {
+        Map<String, Object> propertiesMap = Map.of("subject", "ticket");
+
+        mockHttpResponse();
+
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "properties", propertiesMap))));
+
+        List<Option<String>> expectedOptions = List.of(option("ticket", "123"));
+
+        assertEquals(
+            expectedOptions,
+            HubspotUtils.getTicketIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
     }
 
     private void mockHttpResponse() {
