@@ -13,9 +13,6 @@ interface WorkflowEditorI {
     showPropertyCodeEditorSheet: boolean;
     setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
 
-    showPropertyJsonSchemaBuilder: boolean;
-    setShowPropertyJsonSchemaBuilder: (showPropertyJsonSchemaBuilder: boolean) => void;
-
     showWorkflowCodeEditorSheet: boolean;
     setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
 
@@ -45,12 +42,6 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet) =>
                 set(() => ({
                     showPropertyCodeEditorSheet,
-                })),
-
-            showPropertyJsonSchemaBuilder: false,
-            setShowPropertyJsonSchemaBuilder: (showPropertyJsonSchemaBuilder) =>
-                set(() => ({
-                    showPropertyJsonSchemaBuilder,
                 })),
 
             showWorkflowCodeEditorSheet: false,

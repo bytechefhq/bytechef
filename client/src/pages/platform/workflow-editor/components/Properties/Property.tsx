@@ -115,8 +115,7 @@ const Property = ({
         useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
-    const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
-        useWorkflowEditorStore();
+    const {showPropertyCodeEditorSheet, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
 
     const {isFetching: isFetchingDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
@@ -647,7 +646,7 @@ const Property = ({
             !currentNode?.name ||
             !name ||
             !path ||
-            !(showPropertyCodeEditorSheet || showPropertyJsonSchemaBuilder || showWorkflowCodeEditorSheet)
+            !(showPropertyCodeEditorSheet || showWorkflowCodeEditorSheet)
         ) {
             return;
         }
