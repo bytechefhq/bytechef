@@ -127,7 +127,7 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
@@ -150,20 +150,13 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
 | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
 | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body Content Type | STRING | SELECT  |  Content-Type to use when sending body parameters.  |
-| Body Content - JSON | {} | OBJECT_BUILDER  |  Body Parameters to send.  |
-| Body Content - XML | {} | OBJECT_BUILDER  |  XML content to send.  |
-| Body Content - Form Data | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Form URL-Encoded | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Raw | STRING | TEXT  |  The raw text to send.  |
-| Body Content - Binary | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Content Type | STRING | TEXT  |  Mime-Type to use when sending raw body content.  |
+| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
 | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
 | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
 | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
@@ -181,26 +174,13 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
 | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
 | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body Content - JSON | {} | OBJECT_BUILDER  |  Body Parameters to send.  |
-| Body Content - XML | {} | OBJECT_BUILDER  |  XML content to send.  |
-| Body Content - Form Data | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Form URL-Encoded | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Raw | STRING | TEXT  |  The raw text to send.  |
-| Body Content - Binary | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Body Content Type | STRING | SELECT  |  Content-Type to use when sending body parameters.  |
-| Body Content - JSON | {} | OBJECT_BUILDER  |  Body Parameters to send.  |
-| Body Content - XML | {} | OBJECT_BUILDER  |  XML content to send.  |
-| Body Content - Form Data | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Form URL-Encoded | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Raw | STRING | TEXT  |  The raw text to send.  |
-| Body Content - Binary | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Content Type | STRING | TEXT  |  Mime-Type to use when sending raw body content.  |
+| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
 | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
 | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
 | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
@@ -218,26 +198,13 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
 | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
 | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body Content - JSON | {} | OBJECT_BUILDER  |  Body Parameters to send.  |
-| Body Content - XML | {} | OBJECT_BUILDER  |  XML content to send.  |
-| Body Content - Form Data | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Form URL-Encoded | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Raw | STRING | TEXT  |  The raw text to send.  |
-| Body Content - Binary | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Body Content Type | STRING | SELECT  |  Content-Type to use when sending body parameters.  |
-| Body Content - JSON | {} | OBJECT_BUILDER  |  Body Parameters to send.  |
-| Body Content - XML | {} | OBJECT_BUILDER  |  XML content to send.  |
-| Body Content - Form Data | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Form URL-Encoded | {} | OBJECT_BUILDER  |  Body parameters to send.  |
-| Body Content - Raw | STRING | TEXT  |  The raw text to send.  |
-| Body Content - Binary | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Content Type | STRING | TEXT  |  Mime-Type to use when sending raw body content.  |
+| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
 | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
 | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
 | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
@@ -255,7 +222,7 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
@@ -278,7 +245,7 @@ The request method to use.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to  |
+| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
 | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
 | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
 | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |

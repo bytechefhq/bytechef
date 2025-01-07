@@ -60,14 +60,14 @@ Type: ARRAY
 
 
 
-### Write to File
-Writes the data to a csv file.
+### Write to CSV File
+Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Rows | [{}] | ARRAY_BUILDER  |  The array of objects to write to the file.  |
+| Line Structure Definition | [{}] | ARRAY_BUILDER  |  Define a sequence of fields that will form a line. The values for these fields will consistently repeat in the same order defined here across all lines.  |
 | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.csv" will be used.  |
 
 
