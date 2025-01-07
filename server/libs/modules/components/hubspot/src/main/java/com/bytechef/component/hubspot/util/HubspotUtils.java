@@ -116,6 +116,30 @@ public class HubspotUtils {
         return getOptions(body, LABEL);
     }
 
+    public static List<Option<String>> getTicketIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body =
+            context.http(http -> http.get("/crm/v3/objects/tickets"))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+        List<Option<String>> options = new ArrayList<>();
+
+        if (body.get(RESULTS) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map && map.get("properties") instanceof Map<?, ?> propertiesMap) {
+
+                    options.add(option((String) propertiesMap.get("subject"), (String) map.get(ID)));
+                }
+            }
+        }
+
+        return options;
+    }
+
     public static String subscribeWebhook(
         String eventType, String appId, String hapikey, String webhookUrl, TriggerContext triggerContext) {
 
