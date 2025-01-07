@@ -14,29 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.ee.automation.apiplatform.handler.executor;
-
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+package com.bytechef.platform.component.definition;
 
 /**
  * @author Ivica Cardic
  */
-@Disabled
-public class ApiPlatformHandlerExecutorTest {
-
-    @Test
-    public void testExecuteAsync() {
-        // TODO
-    }
-
-    @Test
-    public void testExecute() {
-        // TODO
-    }
-
-    @Test
-    public void testValidateAndExecute() {
-        // TODO
-    }
+public interface ApiPlatformComponentDefinition extends PlatformComponentDefinition {
 }

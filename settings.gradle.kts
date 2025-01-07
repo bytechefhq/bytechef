@@ -379,9 +379,7 @@ include("server:ee:libs:automation:automation-configuration:automation-configura
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-service")
-include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-api")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest")
-include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-impl")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-security-web:automation-api-platform-handler-security-web-impl")
 
 include("server:ee:libs:config:tenant-multi-data-config")

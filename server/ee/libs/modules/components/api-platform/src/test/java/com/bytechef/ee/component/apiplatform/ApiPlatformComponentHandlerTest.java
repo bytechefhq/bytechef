@@ -23,7 +23,7 @@ public class ApiPlatformComponentHandlerTest {
 
     @Test
     public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/api-platform_v1.json",
-            new ApiPlatformComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/api-platform_v1.json", new ApiPlatformComponentHandler(null).getDefinition());
     }
 }
