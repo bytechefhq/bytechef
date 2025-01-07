@@ -76,7 +76,7 @@ class MicrosoftOneDriveNewFileTriggerTest {
             PollOutput pollOutput =
                 MicrosoftOneDriveNewFileTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
 
-            assertEquals(List.of(fileMap), pollOutput.getRecords());
+            assertEquals(List.of(fileMap), pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
         }
     }

@@ -410,9 +410,6 @@ public interface TriggerDefinition {
      */
     @SuppressFBWarnings("EI")
     record PollOutput(List<?> records, Map<String, ?> closureParameters, boolean pollImmediately) {
-        public List<?> getRecords() {
-            return records;
-        }
     }
 
     /**
