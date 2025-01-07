@@ -75,7 +75,9 @@ public class TriggerWorker {
     }
 
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
-        logger.debug("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
+        }
 
         TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
         CountDownLatch latch = new CountDownLatch(1);

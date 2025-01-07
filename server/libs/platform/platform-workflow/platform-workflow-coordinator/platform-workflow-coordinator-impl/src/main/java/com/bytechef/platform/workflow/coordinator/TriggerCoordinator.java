@@ -97,8 +97,8 @@ public class TriggerCoordinator {
      * @param applicationEvent
      */
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onApplicationEvent: applicationEvent={}", applicationEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onApplicationEvent: applicationEvent={}", applicationEvent);
         }
 
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
@@ -107,8 +107,8 @@ public class TriggerCoordinator {
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onErrorEvent: errorEvent={}", errorEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onErrorEvent: errorEvent={}", errorEvent);
         }
 
         for (ErrorEventListener errorEventListener : errorEventListeners) {
@@ -123,8 +123,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (logger.isTraceEnabled()) {
+            logger.trace(
                 "onTriggerExecutionCompleteEvent: triggerExecutionCompleteEvent={}", triggerExecutionCompleteEvent);
         }
 
@@ -133,8 +133,8 @@ public class TriggerCoordinator {
 
     // TODO @Transactional
     public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
         }
 
         TriggerExecution triggerExecution = TriggerExecution.builder()
@@ -161,8 +161,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onTriggerPollEvent: triggerPollEvent={}", triggerPollEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTriggerPollEvent: triggerPollEvent={}", triggerPollEvent);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
@@ -188,8 +188,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
         }
 
         TriggerWebhookEvent.WebhookParameters webhookParameters = triggerWebhookEvent.getWebhookParameters();

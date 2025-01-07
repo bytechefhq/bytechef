@@ -96,7 +96,9 @@ public class TaskWorker {
      * @param taskExecutionEvent The task event which contains task to execute.
      */
     public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
-        logger.debug("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
+        }
 
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
@@ -110,8 +112,7 @@ public class TaskWorker {
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                eventPublisher.publishEvent(
-                    new TaskExecutionCompleteEvent(completedTaskExecution));
+                eventPublisher.publishEvent(new TaskExecutionCompleteEvent(completedTaskExecution));
             } catch (InterruptedException e) {
                 if (logger.isTraceEnabled()) {
                     logger.trace(e.getMessage(), e);
