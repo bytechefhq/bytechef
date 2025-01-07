@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -146,7 +147,11 @@ public class GoogleSheetsUtils {
                 .boxed()
                 .collect(
                     Collectors.toMap(i -> String.valueOf(firstRow.get(i)),
-                        i -> String.valueOf(row.get(i)), (a, b) -> b, LinkedHashMap::new));
+                        i -> {
+                            Object value = row.get(i);
+
+                            return value == null ? "" : String.valueOf(value);
+                        }, (a, b) -> b, LinkedHashMap::new));
         } else {
             valuesMap = IntStream.range(0, row.size())
                 .boxed()
@@ -175,14 +180,19 @@ public class GoogleSheetsUtils {
     public static List<Object> getRowValues(Parameters inputParameters) {
         List<Object> row = new ArrayList<>();
 
-        Map<String, Object> rowMap = inputParameters.getRequiredMap(ROW, Object.class);
+        if (inputParameters.get(ROW) instanceof Map<?, ?> rowMap) {
+            Object values = rowMap.get(VALUES);
 
-        Object values = rowMap.get(VALUES);
-
-        if (values instanceof Map<?, ?> map) {
-            row = new ArrayList<>(map.values());
-        } else if (values instanceof List<?> list) {
-            row.addAll(list);
+            if (values instanceof Map<?, ?> map) {
+                row = map.values()
+                    .stream()
+                    .map(value -> Objects.requireNonNullElse(value, ""))
+                    .toList();
+            } else if (values instanceof List<?> list) {
+                row = list.stream()
+                    .map(item -> Objects.requireNonNullElse(item, ""))
+                    .toList();
+            }
         }
 
         return row;
