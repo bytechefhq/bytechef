@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.configuration.facade;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
@@ -50,16 +51,22 @@ public class WorkflowNodeParameterFacadeTest {
                 List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
                 List.of(Map.of("operation", "REGEX"))));
 
-        Map<String, Boolean> displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation != 'EMPTY'", Map.of(), Map.of(), parametersMap);
+        Map<String, Boolean> displayConditionMap = new HashMap<>();
+
+        WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
+            parametersMap);
 
         Assertions.assertEquals(2, displayConditionMap.size());
         Assertions.assertEquals(
             Map.of("conditions[0][0].operation != 'EMPTY'", true, "conditions[1][0].operation != 'EMPTY'", true),
             displayConditionMap);
 
-        displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation == 'EMPTY'", Map.of(), Map.of(), parametersMap);
+        displayConditionMap = new HashMap<>();
+
+        WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
+            parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
@@ -70,8 +77,11 @@ public class WorkflowNodeParameterFacadeTest {
                 List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
                 List.of(Map.of("operation", "NOT_CONTAINS"))));
 
-        displayConditionMap = WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", Map.of(), Map.of(), parametersMap);
+        displayConditionMap = new HashMap<>();
+
+        WorkflowNodeParameterFacadeImpl.evaluateArray(
+            "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(), Map.of(),
+            "conditions[0]", parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(
