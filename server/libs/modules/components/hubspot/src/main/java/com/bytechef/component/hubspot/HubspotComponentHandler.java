@@ -102,6 +102,9 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), "contactId")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options((ActionOptionsFunction<String>) HubspotUtils::getContactsOptions);
+        } else if (Objects.equals(modifiableProperty.getName(), "ticketId")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options((ActionOptionsFunction<String>) HubspotUtils::getTicketIdOptions);
         } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
             Optional<List<? extends ValueProperty<?>>> propertiesOptional =
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
