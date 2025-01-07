@@ -20,7 +20,7 @@ import static com.bytechef.component.ai.text.constant.AiTextConstants.CLASSIFY_T
 import static com.bytechef.platform.component.definition.AiComponentDefinition.AI_TEXT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.task.handler.AbstractTaskHandler;
+import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
 /**

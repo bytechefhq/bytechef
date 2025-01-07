@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
     implementation(project(":server:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     testImplementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     testImplementation(project(":server:libs:atlas:atlas-worker:atlas-worker-api"))

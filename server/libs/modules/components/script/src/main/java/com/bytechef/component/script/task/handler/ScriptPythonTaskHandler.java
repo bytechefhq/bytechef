@@ -19,7 +19,7 @@ package com.bytechef.component.script.task.handler;
 import static com.bytechef.platform.component.definition.ScriptComponentDefinition.SCRIPT;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.task.handler.AbstractTaskHandler;
+import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
