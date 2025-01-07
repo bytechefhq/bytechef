@@ -75,6 +75,10 @@ const ConnectionTabConnectionSelect = ({
     });
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
+        if (!connectionId) {
+            return;
+        }
+
         saveWorkflowTestConfigurationConnectionMutation.mutate({
             saveWorkflowTestConfigurationConnectionRequest: {
                 connectionId,
