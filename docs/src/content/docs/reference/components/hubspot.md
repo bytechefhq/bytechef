@@ -109,6 +109,39 @@ Type: OBJECT
 
 
 
+### New Ticket
+Triggers when new ticket is created.
+
+#### Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| App Id | STRING | TEXT  |  The id of a Hubspot app used to register this trigger to.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+| STRING | TEXT  |
+
+
+
+
+
+
+
 <hr />
 
 
@@ -235,6 +268,34 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | {STRING\(id), {STRING\(dealname), NUMBER\(amount), DATE\(closedate), STRING\(pipeline), STRING\(dealstage), STRING\(hubspot_owner_id)}\(properties)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Ticket
+Gets ticket details.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Ticket ID | STRING | SELECT  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), {STRING\(content), STRING\(hs_object_id), STRING\(hs_pipeline), STRING\(hs_pipeline_stage), STRING\(hs_ticket_priority), STRING\(subject)}\(properties)} | OBJECT_BUILDER  |
 
 
 
