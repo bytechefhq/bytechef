@@ -79,14 +79,21 @@ public class HubspotUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
-        Map<String, Object> body =
-            context
-                .http(http -> http.get("/crm/v3/pipelines/deals/" + inputParameters.getString("pipeline") + "/stages"))
-                .configuration(Http.responseType(Http.ResponseType.JSON))
-                .execute()
-                .getBody(new TypeReference<>() {});
+        Map<String, ?> itemMap = inputParameters.getMap("__item");
 
-        return getOptions(body, LABEL);
+        if (itemMap.get("properties") instanceof Map<?, ?> propertiesMap) {
+            String pipeline = (String) propertiesMap.get("pipeline");
+            Map<String, Object> body =
+                context
+                    .http(http -> http.get("/crm/v3/pipelines/deals/" + pipeline + "/stages"))
+                    .configuration(Http.responseType(Http.ResponseType.JSON))
+                    .execute()
+                    .getBody(new TypeReference<>() {});
+
+            return getOptions(body, LABEL);
+        }
+
+        return List.of();
     }
 
     public static List<Option<String>> getOwnerOptions(
@@ -187,7 +194,7 @@ public class HubspotUtils {
         if (body.get(RESULTS) instanceof List<?> list) {
             for (Object item : list) {
                 if (item instanceof Map<?, ?> map) {
-                    options.add(option(label, (String) map.get(ID)));
+                    options.add(option((String) map.get(label), (String) map.get(ID)));
                 }
             }
         }

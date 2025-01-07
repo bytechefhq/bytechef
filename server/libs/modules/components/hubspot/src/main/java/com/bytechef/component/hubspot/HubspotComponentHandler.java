@@ -122,7 +122,7 @@ public class HubspotComponentHandler extends AbstractHubspotComponentHandler {
                         } else if (Objects.equals(baseProperty1.getName(), "dealstage")) {
                             ((ModifiableStringProperty) baseProperty1)
                                 .options((ActionOptionsFunction<String>) HubspotUtils::getDealStageOptions)
-                                .optionsLookupDependsOn("pipeline");
+                                .optionsLookupDependsOn("__item.properties.pipeline");
                         } else if (Objects.equals(baseProperty1.getName(), "hubspot_owner_id")) {
                             ((ModifiableStringProperty) baseProperty1)
                                 .options((ActionOptionsFunction<String>) HubspotUtils::getOwnerOptions);
