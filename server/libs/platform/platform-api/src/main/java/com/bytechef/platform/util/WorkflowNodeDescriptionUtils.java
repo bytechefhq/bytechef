@@ -28,7 +28,9 @@ public class WorkflowNodeDescriptionUtils {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("<table class=\"w-full mt-4\">");
+        sb.append("<table class=\"w-full");
+        sb.append(inputParameters.isEmpty() ? "" : " mt-4");
+        sb.append(" \">");
 
         renderProperties(null, inputParameters, sb);
 
