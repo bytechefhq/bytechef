@@ -24,7 +24,7 @@ const SchemaMenu = ({onChange, schema}: SchemaMenuProps) => {
     const displayFields = useMemo(() => allOptions.filter((item) => fields.includes(item.value)), [allOptions, fields]);
 
     return (
-        <div className="min-w-72">
+        <div className="min-w-72 text-sm">
             <SchemaMenuList fields={displayFields} onChange={onChange} schema={schema} />
 
             <Select
