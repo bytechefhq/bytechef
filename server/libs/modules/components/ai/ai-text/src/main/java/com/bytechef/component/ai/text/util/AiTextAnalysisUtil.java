@@ -37,7 +37,7 @@ public class AiTextAnalysisUtil {
     private AiTextAnalysisUtil() {
     }
 
-    public static List<? extends Option<String>> createModelProperties(
+    public static List<? extends Option<String>> getModelOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 

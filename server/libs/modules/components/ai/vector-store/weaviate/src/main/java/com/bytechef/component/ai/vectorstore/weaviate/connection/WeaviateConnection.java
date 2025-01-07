@@ -45,8 +45,8 @@ public class WeaviateConnection {
                     string(SCHEME)
                         .label("Scheme")
                         .options(
-                            option("http", "http"),
-                            option("https", "https"))
+                            option("HTTP", "http"),
+                            option("HTTPS", "https"))
                         .required(true),
                     string(API_KEY)
                         .label("Weaviate API Key")

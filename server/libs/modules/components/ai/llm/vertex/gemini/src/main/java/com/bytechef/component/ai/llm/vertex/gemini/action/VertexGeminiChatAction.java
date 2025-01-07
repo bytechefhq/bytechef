@@ -22,9 +22,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PRO
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
@@ -64,8 +64,7 @@ public class VertexGeminiChatAction {
                 .required(true)
                 .options(VertexGeminiConstants.MODELS),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             integer(N)
                 .label("Candidate Count")
@@ -82,9 +81,8 @@ public class VertexGeminiChatAction {
         .perform(VertexGeminiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-
-        String type = responseInteger == null || responseInteger < 1 ? "text/plain" : "application/json";
+        String type = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1) == 1
+            ? "text/plain" : "application/json";
 
         return new VertexAiGeminiChatModel(
             new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),

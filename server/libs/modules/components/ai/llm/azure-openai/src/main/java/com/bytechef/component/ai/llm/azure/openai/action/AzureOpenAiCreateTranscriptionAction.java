@@ -29,8 +29,8 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions.WhisperModel;
 
 import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionModel;
 import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions;
+import org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat;
 
 /**
  * @author Monika Domiter
@@ -67,11 +68,8 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .required(true)
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.WhisperModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue,
-                                    AzureOpenAiAudioTranscriptionOptions.WhisperModel::getValue, (f, s) -> f)))),
+                        Arrays.stream(WhisperModel.values())
+                            .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -79,17 +77,13 @@ public class AzureOpenAiCreateTranscriptionAction {
                     "An optional text to guide the model's style or continue a previous audio segment. The prompt " +
                         "should match the audio language.")
                 .required(false),
-            object(RESPONSE_FORMAT)
+            string(RESPONSE_FORMAT)
                 .label("Response Format")
                 .description("The format of the transcript output")
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.values())
-                            .collect(
-                                Collectors.toMap(
-                                    clazz -> String.valueOf(clazz.getValue()),
-                                    AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat::getValue,
-                                    (f, s) -> f))))
+                        Arrays.stream(TranscriptResponseFormat.values())
+                            .collect(Collectors.toMap(clazz -> String.valueOf(clazz.getValue()), Enum::name))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -124,9 +118,7 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .model(inputParameters.getRequiredString(MODEL))
                 .prompt(inputParameters.getString(PROMPT))
                 .language(inputParameters.getString(LANGUAGE))
-                .responseFormat(
-                    inputParameters.get(
-                        RESPONSE_FORMAT, AzureOpenAiAudioTranscriptionOptions.TranscriptResponseFormat.class))
+                .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
                 .temperature(inputParameters.getFloat(TEMPERATURE))
                 .build());
     };

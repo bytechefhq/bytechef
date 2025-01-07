@@ -92,8 +92,8 @@ public class StabilityCreateImageAction {
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
                 .options(
-                    option("url", "url"),
-                    option("b64_json", "b64_json"))
+                    option("URL", "url"),
+                    option("B64_JSON", "b64_json"))
                 .defaultValue("url")
                 .advancedOption(true),
             string(STYLE)
@@ -103,9 +103,7 @@ public class StabilityCreateImageAction {
                 .options(
                     LLMUtils.getEnumOptions(
                         Arrays.stream(StyleEnum.values())
-                            .collect(
-                                Collectors.toMap(
-                                    StyleEnum::toString, StyleEnum::toString, (f, s) -> f)))),
+                            .collect(Collectors.toMap(StyleEnum::toString, StyleEnum::name)))),
             integer(STEPS)
                 .label("Steps")
                 .description("Number of diffusion steps to run. Valid range: 10 to 50.")
@@ -162,15 +160,16 @@ public class StabilityCreateImageAction {
     private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
         new StabilityAiApi(connectionParameters.getString(TOKEN)),
         StabilityAiImageOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
-            .N(inputParameters.getInteger(N))
-            .height(inputParameters.getInteger(HEIGHT))
-            .width(inputParameters.getInteger(WIDTH))
-            .stylePreset(inputParameters.getString(STYLE))
-            .steps(inputParameters.getInteger(STEPS))
             .cfgScale(inputParameters.getFloat(CFG_SCALE))
             .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+            .height(inputParameters.getInteger(HEIGHT))
+            .model(inputParameters.getRequiredString(MODEL))
+            .N(inputParameters.getInteger(N))
+            .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
             .sampler(inputParameters.getString(SAMPLER))
             .seed(inputParameters.getLong(SEED))
+            .steps(inputParameters.getInteger(STEPS))
+            .stylePreset(StyleEnum.valueOf(inputParameters.getString(STYLE)))
+            .width(inputParameters.getInteger(WIDTH))
             .build());
 }

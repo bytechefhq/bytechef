@@ -24,9 +24,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
@@ -66,7 +64,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
@@ -98,12 +95,9 @@ public class OllamaChatAction {
                 .options(
                     LLMUtils.getEnumOptions(
                         Arrays.stream(OllamaModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OllamaModel::getName, OllamaModel::getName, (f, s) -> f)))),
+                            .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName)))),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             string(KEEP_ALIVE)
                 .label("Keep alive for")
                 .description("Controls how long the model will stay loaded into memory following the request")

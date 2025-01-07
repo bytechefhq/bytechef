@@ -17,6 +17,7 @@
 package com.bytechef.component.ai.llm;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.util.LLMUtils.createMessage;
@@ -26,6 +27,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -77,19 +79,31 @@ public interface ChatModel {
     private Object returnChatEntity(
         Parameters parameters, ChatClient.CallResponseSpec call, ActionContext actionContext) {
 
-        int responseFormat = parameters.getInteger(RESPONSE_FORMAT, 0);
+        int responseFormat = parameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1);
 
-        if (responseFormat == 0) {
-            return Objects.requireNonNull(call.chatResponse())
-                .getResult()
-                .getOutput()
-                .getContent();
+        if (responseFormat == 1) {
+            try {
+                return Objects.requireNonNull(call.chatResponse())
+                    .getResult()
+                    .getOutput()
+                    .getContent();
+            } catch (org.springframework.ai.retry.NonTransientAiException e) {
+                String message = e.getMessage();
+
+                String providerMessage = actionContext.json(
+                    json -> json.read(
+                        message.substring(message.indexOf("{"), message.lastIndexOf("}") + 1), "error.message",
+                        new TypeReference<>() {}));
+
+                throw new ProviderException(providerMessage);
+            }
         } else {
             return call.entity(
                 new JsonSchemaStructuredOutputConverter(parameters.getRequiredString(RESPONSE_SCHEMA), actionContext));
         }
     }
 
-    record Message(String content, FileEntry image, String role) {
+    @SuppressFBWarnings("EI")
+    record Message(String content, List<FileEntry> attachments, String role) {
     }
 }

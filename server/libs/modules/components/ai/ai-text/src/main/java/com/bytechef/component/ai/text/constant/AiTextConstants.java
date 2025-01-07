@@ -75,7 +75,7 @@ public class AiTextConstants {
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) AiTextAnalysisUtil::createModelProperties)
+        .options((OptionsDataSource.ActionOptionsFunction<String>) AiTextAnalysisUtil::getModelOptions)
         .optionsLookupDependsOn(MODEL_PROVIDER)
         .displayCondition("modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)")
         .required(true);

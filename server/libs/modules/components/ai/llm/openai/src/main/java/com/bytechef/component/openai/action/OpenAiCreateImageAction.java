@@ -66,8 +66,7 @@ public class OpenAiCreateImageAction {
                         Arrays.stream(OpenAiImageApi.ImageModel.values())
                             .collect(
                                 Collectors.toMap(
-                                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue,
-                                    (f, s) -> f))))
+                                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
@@ -102,9 +101,9 @@ public class OpenAiCreateImageAction {
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
                 .options(
-                    option("url", "url"),
-                    option("b64_json", "b64_json"))
-                .defaultValue("url")
+                    option("URL", "url"),
+                    option("B64_JSON", "b64_json"))
+                .defaultValue("URL")
                 .advancedOption(true),
             string(QUALITY)
                 .label("Quality")

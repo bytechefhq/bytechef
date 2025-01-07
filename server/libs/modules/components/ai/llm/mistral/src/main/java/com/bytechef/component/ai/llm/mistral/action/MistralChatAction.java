@@ -21,9 +21,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
@@ -63,8 +63,7 @@ public class MistralChatAction {
                 .required(true)
                 .options(MistralConstants.MODELS),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
@@ -79,9 +78,8 @@ public class MistralChatAction {
         .perform(MistralChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-
-        String type = responseInteger != null ? responseInteger < 1 ? "text" : "json_object" : null;
+        String type = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1) == 1
+            ? "text" : "json_object";
 
         return new MistralAiChatModel(
             new MistralAiApi(connectionParameters.getString(TOKEN)),

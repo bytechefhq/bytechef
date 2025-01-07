@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
 
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.ControlType;
@@ -57,6 +58,7 @@ public class LLMConstants {
     public static final String N = "n";
     public static final String PRESENCE_PENALTY = "presencePenalty";
     public static final String PROMPT = "prompt";
+    public static final String RESPONSE = "response";
     public static final String RESPONSE_FORMAT = "responseFormat";
     public static final String RESPONSE_SCHEMA = "responseSchema";
     public static final String ROLE = "role";
@@ -81,15 +83,6 @@ public class LLMConstants {
         .minValue(-2)
         .maxValue(2)
         .advancedOption(true);
-
-    public static final ModifiableIntegerProperty RESPONSE_FORMAT_PROPERTY = integer(RESPONSE_FORMAT)
-        .label("Response Format")
-        .description("In which format do you want the response to be in?")
-        .options(
-            option("Text", 0, "Text response."),
-            option("JSON", 1, "JSON response with key-value pairs."))
-        .defaultValue(0)
-        .required(false);
 
     public static final ModifiableArrayProperty IMAGE_MESSAGE_PROPERTY = array(IMAGE_MESSAGES)
         .label("Messages")
@@ -189,24 +182,27 @@ public class LLMConstants {
             object()
                 .label("Message")
                 .properties(
-                    string(CONTENT)
-                        .label("Content")
-                        .description("The contents of the message.")
-                        .required(true),
-                    fileEntry("image")
-                        .label("Image")
-                        .displayCondition("%s == '%s'".formatted("messages[index].role", "user"))
-                        .required(false),
                     string(ROLE)
                         .label("Role")
-                        .description("The role of the messages author")
+                        .description("The role of the messages author.")
                         .options(
                             option("System", "system"),
                             option("User", "user"),
                             option("Assistant", "assistant"),
                             option("Tool", "tool"))
-                        .defaultValue("user")
-                        .required(true)))
+                        .required(true),
+                    string(CONTENT)
+                        .label("Content")
+                        .description("The contents of the message.")
+                        .controlType(ControlType.TEXT_AREA)
+                        .required(true),
+                    array("attachments")
+                        .label("Attachments")
+                        .description(
+                            "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.")
+                        .displayCondition("%s == '%s'".formatted("messages[index].role", "user"))
+                        .items(fileEntry())
+                        .required(false)))
         .required(true);
 
     public static final ModifiableIntegerProperty N_PROPERTY = integer(N)
@@ -231,11 +227,24 @@ public class LLMConstants {
         .maxValue(2)
         .advancedOption(true);
 
-    public static final ModifiableStringProperty RESPONSE_SCHEMA_PROPERTY = string(RESPONSE_SCHEMA)
-        .label("Response Schema")
-        .description("Define the JSON schema for the response.")
-        .controlType(ControlType.JSON_SCHEMA_BUILDER)
-        .displayCondition("responseFormat != 0")
+    public static final ModifiableObjectProperty RESPONSE_PROPERTY = object(RESPONSE)
+        .label("Response")
+        .description("The response from the API.")
+        .properties(
+            integer(RESPONSE_FORMAT)
+                .label("Response Format")
+                .description("In which format do you want the response to be in?")
+                .options(
+                    option("Text", 1, "Text response"),
+                    option("JSON", 2, "JSON response with key-value pairs"))
+                .defaultValue(1)
+                .required(false),
+            string(RESPONSE_SCHEMA)
+                .label("Response Schema")
+                .description("Define the JSON schema for the response.")
+                .controlType(JSON_SCHEMA_BUILDER)
+                .displayCondition("response.responseFormat == 2")
+                .required(false))
         .required(false);
 
     public static final ModifiableIntegerProperty SEED_PROPERTY = integer(SEED)

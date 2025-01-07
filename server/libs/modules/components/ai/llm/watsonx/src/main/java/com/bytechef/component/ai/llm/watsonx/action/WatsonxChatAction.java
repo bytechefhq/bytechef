@@ -21,8 +21,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
@@ -71,8 +70,7 @@ public class WatsonxChatAction {
                 .exampleValue("google/flan-ul2")
                 .required(false),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             string(DECODING_METHOD)
                 .label("Decoding Method")
                 .description("Decoding is the process that a model uses to choose the tokens in the generated output.")

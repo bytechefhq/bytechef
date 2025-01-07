@@ -30,8 +30,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPE
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
@@ -44,6 +43,9 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi.CohereChatRequest.LogitBias;
+import static org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods;
+import static org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi.CohereChatRequest.Truncate;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
@@ -75,8 +77,7 @@ public class AmazonBedrockCohereChatAction {
                 .required(true)
                 .options(AmazonBedrockConstants.COHERE_MODELS),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -92,29 +93,22 @@ public class AmazonBedrockCohereChatAction {
                     number(BIAS_VALUE)
                         .label("Logic Bias"))
                 .advancedOption(true),
-            object(RETURN_LIKELIHOODS)
+            string(RETURN_LIKELIHOODS)
                 .label("Return Likelihoods")
                 .description("The token likelihoods are returned with the response.")
                 .advancedOption(true)
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(
-                            CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.values())
-                            .collect(
-                                Collectors.toMap(
-                                    CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods::name, clazz -> clazz,
-                                    (f, s) -> f)))),
-            object(TRUNCATE)
+                        Arrays.stream(ReturnLikelihoods.values())
+                            .collect(Collectors.toMap(Enum::name, Enum::name)))),
+            string(TRUNCATE)
                 .label("Truncate")
                 .description("Specifies how the API handles inputs longer than the maximum token length")
                 .advancedOption(true)
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(CohereChatBedrockApi.CohereChatRequest.Truncate.values())
-                            .collect(
-                                Collectors.toMap(
-                                    CohereChatBedrockApi.CohereChatRequest.Truncate::name, clazz -> clazz,
-                                    (f, s) -> f)))))
+                        Arrays.stream(Truncate.values())
+                            .collect(Collectors.toMap(Enum::name, Enum::name)))))
         .output()
         .perform(AmazonBedrockCohereChatAction::perform);
 
@@ -132,13 +126,11 @@ public class AmazonBedrockCohereChatAction {
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
             .topK(inputParameters.getInteger(TOP_K))
             .logitBias(
-                new CohereChatBedrockApi.CohereChatRequest.LogitBias(
+                new LogitBias(
                     inputParameters.getString(BIAS_TOKEN), inputParameters.getFloat(BIAS_VALUE)))
             .numGenerations(inputParameters.getInteger(N))
-            .returnLikelihoods(
-                inputParameters.get(RETURN_LIKELIHOODS, CohereChatBedrockApi.CohereChatRequest.ReturnLikelihoods.class))
-            .truncate(
-                inputParameters.get(TRUNCATE, CohereChatBedrockApi.CohereChatRequest.Truncate.class))
+            .returnLikelihoods(ReturnLikelihoods.valueOf(inputParameters.getString(RETURN_LIKELIHOODS)))
+            .truncate(Truncate.valueOf(inputParameters.getString(TRUNCATE)))
             .build());
 
     private AmazonBedrockCohereChatAction() {

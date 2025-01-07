@@ -28,7 +28,6 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
@@ -42,6 +41,8 @@ import java.util.stream.Collectors;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.openai.api.OpenAiAudioApi.TranscriptResponseFormat;
+import org.springframework.ai.openai.api.OpenAiAudioApi.WhisperModel;
 
 /**
  * @author Monika Domiter
@@ -64,11 +65,8 @@ public class OpenAiCreateTranscriptionAction {
                 .required(true)
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiAudioApi.WhisperModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OpenAiAudioApi.WhisperModel::getValue, OpenAiAudioApi.WhisperModel::getValue,
-                                    (f, s) -> f)))),
+                        Arrays.stream(WhisperModel.values())
+                            .collect(Collectors.toMap(WhisperModel::getValue, WhisperModel::getValue)))),
             LANGUAGE_PROPERTY,
             string(PROMPT)
                 .label("Prompt")
@@ -76,15 +74,13 @@ public class OpenAiCreateTranscriptionAction {
                     "An optional text to guide the model's style or continue a previous audio segment. The prompt " +
                         "should match the audio language.")
                 .required(false),
-            object(RESPONSE_FORMAT)
+            string(RESPONSE_FORMAT)
                 .label("Response format")
                 .description("The format of the transcript output")
                 .options(
                     LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiAudioApi.TranscriptResponseFormat.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OpenAiAudioApi.TranscriptResponseFormat::getValue, clas -> clas, (f, s) -> f))))
+                        Arrays.stream(TranscriptResponseFormat.values())
+                            .collect(Collectors.toMap(OpenAiAudioApi.TranscriptResponseFormat::getValue, Enum::name))))
                 .required(true),
             number(TEMPERATURE)
                 .label("Temperature")
@@ -105,8 +101,7 @@ public class OpenAiCreateTranscriptionAction {
                 .model(inputParameters.getRequiredString(MODEL))
                 .prompt(inputParameters.getString(PROMPT))
                 .language(inputParameters.getString(LANGUAGE))
-                .responseFormat(
-                    inputParameters.get(RESPONSE_FORMAT, OpenAiAudioApi.TranscriptResponseFormat.class))
+                .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
                 .temperature(inputParameters.getFloat(TEMPERATURE))
                 .build());
 

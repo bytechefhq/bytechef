@@ -38,6 +38,7 @@ public class WeaviateConstants {
     public static final String API_KEY = "apiKey";
     public static final String HOST = "host";
     public static final String SCHEME = "scheme";
+
     public static final VectorStore VECTOR_STORE = connectionParameters -> {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));

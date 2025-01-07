@@ -30,11 +30,9 @@ public final class MistralConstants {
 
     public static final String SAFE_PROMPT = "safePrompt";
 
-    public static final List<Option<String>> MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(MistralAiApi.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue, (f, s) -> f)));
+    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(MistralAiApi.ChatModel.values())
+            .collect(Collectors.toMap(MistralAiApi.ChatModel::getValue, MistralAiApi.ChatModel::getValue)));
 
     private MistralConstants() {
     }

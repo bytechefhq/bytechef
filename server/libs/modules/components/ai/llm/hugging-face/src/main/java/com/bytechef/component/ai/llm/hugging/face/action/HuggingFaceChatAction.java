@@ -18,8 +18,7 @@ package com.bytechef.component.ai.llm.hugging.face.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.hugging.face.constant.HuggingFaceConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -44,8 +43,7 @@ public class HuggingFaceChatAction {
                 .label("URL")
                 .description("Url of the inference endpoint"),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY)
+            RESPONSE_PROPERTY)
         .output()
         .perform(HuggingFaceChatAction::perform);
 

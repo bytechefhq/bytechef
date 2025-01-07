@@ -31,11 +31,9 @@ public final class OpenAiConstants {
 
     public static final String QUALITY = "quality";
 
-    public static final List<Option<String>> MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(OpenAiApi.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue, (f, s) -> f)));
+    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(OpenAiApi.ChatModel.values())
+            .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
 
     private OpenAiConstants() {
     }

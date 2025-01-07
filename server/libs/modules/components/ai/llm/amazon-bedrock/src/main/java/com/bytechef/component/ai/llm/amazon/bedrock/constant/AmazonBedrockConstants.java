@@ -21,11 +21,11 @@ import com.bytechef.component.definition.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi;
-import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi;
-import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi;
-import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi;
-import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi;
+import org.springframework.ai.bedrock.anthropic.api.AnthropicChatBedrockApi.AnthropicChatModel;
+import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi.CohereChatModel;
+import org.springframework.ai.bedrock.jurassic2.api.Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel;
+import org.springframework.ai.bedrock.llama.api.LlamaChatBedrockApi.LlamaChatModel;
+import org.springframework.ai.bedrock.titan.api.TitanChatBedrockApi.TitanChatModel;
 
 /**
  * @author Monika Domiter
@@ -43,45 +43,24 @@ public final class AmazonBedrockConstants {
     public static final String SECRET_ACCESS_KEY = "secretKey";
     public static final String TRUNCATE = "truncate";
 
-    public static final List<Option<String>> ANTHROPIC2_MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(AnthropicChatBedrockApi.AnthropicChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    AnthropicChatBedrockApi.AnthropicChatModel::getName,
-                    AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
-
+    public static final List<Option<String>> ANTHROPIC2_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(AnthropicChatModel.values())
+            .collect(Collectors.toMap(AnthropicChatModel::getName, AnthropicChatModel::getName)));
     public static final List<Option<String>> ANTHROPIC3_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(AnthropicChatBedrockApi.AnthropicChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    AnthropicChatBedrockApi.AnthropicChatModel::getName,
-                    AnthropicChatBedrockApi.AnthropicChatModel::getName, (f, s) -> f)));
-    public static final List<Option<String>> COHERE_MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(CohereChatBedrockApi.CohereChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    CohereChatBedrockApi.CohereChatModel::getName,
-                    CohereChatBedrockApi.CohereChatModel::getName, (f, s) -> f)));
-    public static final List<Option<String>> JURASSIC2_MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName,
-                    Ai21Jurassic2ChatBedrockApi.Ai21Jurassic2ChatModel::getName, (f, s) -> f)));
-    public static final List<Option<String>> LLAMA_MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(LlamaChatBedrockApi.LlamaChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    LlamaChatBedrockApi.LlamaChatModel::getName,
-                    LlamaChatBedrockApi.LlamaChatModel::getName,
-                    (f, s) -> f)));
-    public static final List<Option<String>> TITAN_MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(TitanChatBedrockApi.TitanChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    TitanChatBedrockApi.TitanChatModel::getName,
-                    TitanChatBedrockApi.TitanChatModel::getName,
-                    (f, s) -> f)));
+        Arrays.stream(AnthropicChatModel.values())
+            .collect(Collectors.toMap(AnthropicChatModel::getName, AnthropicChatModel::getName)));
+    public static final List<Option<String>> COHERE_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(CohereChatModel.values())
+            .collect(Collectors.toMap(CohereChatModel::getName, CohereChatModel::getName)));
+    public static final List<Option<String>> JURASSIC2_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(Ai21Jurassic2ChatModel.values())
+            .collect(Collectors.toMap(Ai21Jurassic2ChatModel::getName, Ai21Jurassic2ChatModel::getName)));
+    public static final List<Option<String>> LLAMA_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(LlamaChatModel.values())
+            .collect(Collectors.toMap(LlamaChatModel::getName, LlamaChatModel::getName)));
+    public static final List<Option<String>> TITAN_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(TitanChatModel.values())
+            .collect(Collectors.toMap(TitanChatModel::getName, TitanChatModel::getName)));
 
     private AmazonBedrockConstants() {
     }

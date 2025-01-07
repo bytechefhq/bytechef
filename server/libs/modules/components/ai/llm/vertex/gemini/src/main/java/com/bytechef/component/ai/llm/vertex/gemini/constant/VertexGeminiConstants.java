@@ -36,9 +36,7 @@ public final class VertexGeminiConstants {
         Arrays.stream(VertexAiGeminiChatModel.ChatModel.values())
             .collect(
                 Collectors.toMap(
-                    VertexAiGeminiChatModel.ChatModel::getValue,
-                    VertexAiGeminiChatModel.ChatModel::getValue,
-                    (f, s) -> f)));
+                    VertexAiGeminiChatModel.ChatModel::getValue, VertexAiGeminiChatModel.ChatModel::getValue)));
 
     private VertexGeminiConstants() {
     }

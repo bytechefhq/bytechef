@@ -30,9 +30,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
@@ -44,6 +44,8 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.JSON;
+import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.TEXT;
 
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
@@ -71,8 +73,7 @@ public class AzureOpenAiChatAction {
                 .exampleValue("gpt-4o")
                 .required(true),
             MESSAGES_PROPERTY,
-            RESPONSE_FORMAT_PROPERTY,
-            RESPONSE_SCHEMA_PROPERTY,
+            RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,
             N_PROPERTY,
             TEMPERATURE_PROPERTY,
@@ -90,10 +91,8 @@ public class AzureOpenAiChatAction {
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
             .endpoint(connectionParameters.getString(ENDPOINT));
 
-        Integer responseInteger = inputParameters.getInteger(RESPONSE_FORMAT);
-
-        AzureOpenAiResponseFormat format = responseInteger == null || responseInteger < 1
-            ? AzureOpenAiResponseFormat.TEXT : AzureOpenAiResponseFormat.JSON;
+        AzureOpenAiResponseFormat format =
+            inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1) == 1 ? TEXT : JSON;
 
         return new AzureOpenAiChatModel(
             openAIClientBuilder,

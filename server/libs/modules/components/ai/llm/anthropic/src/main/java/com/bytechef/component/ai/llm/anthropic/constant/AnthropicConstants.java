@@ -21,15 +21,13 @@ import com.bytechef.component.definition.Option;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.ai.anthropic.api.AnthropicApi;
+import org.springframework.ai.anthropic.api.AnthropicApi.ChatModel;
 
 /**
  * @author Ivica Cardic
  */
 public class AnthropicConstants {
-    public static final List<Option<String>> MODELS = LLMUtils
-        .getEnumOptions(Arrays.stream(AnthropicApi.ChatModel.values())
-            .collect(
-                Collectors.toMap(
-                    AnthropicApi.ChatModel::getValue, AnthropicApi.ChatModel::getValue, (f, s) -> f)));
+
+    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(Arrays.stream(ChatModel.values())
+        .collect(Collectors.toMap(ChatModel::getValue, ChatModel::getValue)));
 }

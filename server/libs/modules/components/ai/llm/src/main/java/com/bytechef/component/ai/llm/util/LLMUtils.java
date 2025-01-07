@@ -39,25 +39,40 @@ import org.springframework.util.MimeTypeUtils;
  * @author Marko Kriskovic
  */
 public class LLMUtils {
+
     private LLMUtils() {
     }
 
     public static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
-
         return switch (message.role()) {
             case "system" -> new SystemMessage(message.content());
             case "user" -> {
-                FileEntry fileEntry = message.image();
+                List<FileEntry> attachments = message.attachments();
+                StringBuilder content = new StringBuilder(message.content());
 
-                if (fileEntry == null) {
+                if (attachments == null || attachments.isEmpty()) {
                     yield new UserMessage(message.content());
                 } else {
-                    String mimeType = fileEntry.getMimeType();
-                    byte[] encodedImageBytes = actionContext.file(file -> file.readAllBytes(fileEntry));
+                    List<Media> media = new ArrayList<>();
 
-                    yield new UserMessage(
-                        message.content(), new Media(
-                            MimeTypeUtils.parseMimeType(mimeType), new ByteArrayResource(encodedImageBytes)));
+                    for (FileEntry attachment : attachments) {
+                        String mimeType = attachment.getMimeType();
+
+                        if (mimeType.startsWith("text/")) {
+                            content.append("\n");
+                            content.append((String) actionContext.file(file -> file.readToString(attachment)));
+                        } else if (mimeType.startsWith("image/")) {
+                            byte[] attachmentBytes = actionContext.file(file -> file.readAllBytes(attachment));
+
+                            media.add(
+                                new Media(
+                                    MimeTypeUtils.parseMimeType(mimeType), new ByteArrayResource(attachmentBytes)));
+                        } else {
+                            throw new IllegalArgumentException("Unsupported attachment type: " + mimeType);
+                        }
+                    }
+
+                    yield new UserMessage(content.toString(), media);
                 }
             }
             case "assistant" -> new AssistantMessage(message.content());
@@ -70,6 +85,7 @@ public class LLMUtils {
     public static <R> List<Option<R>> getEnumOptions(Map<String, R> map) {
         return map.entrySet()
             .stream()
+            .sorted(Map.Entry.comparingByKey())
             .map(entry -> (Option<R>) option(entry.getKey(), entry.getValue()))
             .toList();
     }
