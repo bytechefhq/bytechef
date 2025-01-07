@@ -25,7 +25,7 @@ paths:
 #        - "connection"
 #      operationId: "getConnections"
 #      parameters:
-#        - name: "x-environment"
+#        - name: "X-Environment"
 #          description: "The environment."
 #          in: "header"
 #          required: false
@@ -48,7 +48,7 @@ paths:
         - "frontend-integration"
       operationId: "getFrontendIntegrations"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -75,7 +75,7 @@ paths:
         - "frontend-integration"
       operationId: "getFrontendIntegration"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -107,7 +107,7 @@ paths:
         - "integration"
       operationId: "getIntegrations"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -140,7 +140,7 @@ paths:
 #        - "integration-instance"
 #      operationId: "getIntegrationInstances"
 #      parameters:
-#        - name: "x-environment"
+#        - name: "X-Environment"
 #          description: "The environment."
 #          in: "header"
 #          required: false

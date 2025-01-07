@@ -96,7 +96,7 @@ paths:
         - "app-event-trigger"
       operationId: "executeWorkflows"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -113,7 +113,7 @@ paths:
         - "action"
       operationId: "executeAction"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -235,7 +235,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false

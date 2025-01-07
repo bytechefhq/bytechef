@@ -1,4 +1,4 @@
-name: x-environment
+name: X-Environment
 in: header
 required: false
 schema:
