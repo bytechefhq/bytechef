@@ -102,7 +102,7 @@ const WorkflowNode = ({data, id}: NodeProps) => {
                 <HoverCardTrigger>
                     <Button
                         className={twMerge(
-                            'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none',
+                            'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none [&_svg]:size-9',
                             isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-blue-100 shadow-none'
                         )}
                         onClick={handleNodeClick}

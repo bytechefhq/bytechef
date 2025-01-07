@@ -24,21 +24,21 @@ export function RightSidebar({
                                 item.separator ? (
                                     <div className="my-2 w-8/12 border-b" key={`right-sidebar-separator-${index}`} />
                                 ) : (
-                                    <a
-                                        className="flex items-center rounded-lg p-3 hover:text-blue-600"
+                                    <button
+                                        className="flex items-center rounded-lg p-3 hover:text-blue-600 [&_svg]:size-5"
                                         key={item.name}
                                         onClick={item.onClick}
                                     >
                                         <Tooltip>
                                             <TooltipTrigger>
-                                                {item.icon && <item.icon aria-hidden="true" className="size-6" />}
+                                                {item.icon && <item.icon aria-hidden="true" />}
                                             </TooltipTrigger>
 
                                             <TooltipContent side="left">{item.name}</TooltipContent>
                                         </Tooltip>
 
                                         <span className="sr-only">{item.name}</span>
-                                    </a>
+                                    </button>
                                 )
                             )}
                         </nav>

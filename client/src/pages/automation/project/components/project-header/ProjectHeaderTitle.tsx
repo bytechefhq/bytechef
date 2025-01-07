@@ -15,12 +15,12 @@ const ProjectHeaderTitle = ({project}: {project: Project}) => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            className="hover:bg-background/70"
+                            className="hover:bg-background/70 [&_svg]:size-5"
                             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                             size="icon"
                             variant="ghost"
                         >
-                            <PanelLeftIcon className="size-5" />
+                            <PanelLeftIcon />
                         </Button>
                     </TooltipTrigger>
 

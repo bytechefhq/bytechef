@@ -34,12 +34,16 @@ const IntegrationsSidebarHeader = () => {
                     <div>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button className="size-8 hover:bg-background/50" size="icon" variant="ghost">
-                                    <FilterIcon className="size-5" />
+                                <Button
+                                    className="size-8 hover:bg-background/50 [&_svg]:size-5"
+                                    size="icon"
+                                    variant="ghost"
+                                >
+                                    <FilterIcon />
                                 </Button>
                             </TooltipTrigger>
 
-                            <TooltipContent side="right">Filter projects</TooltipContent>
+                            <TooltipContent side="right">Filter integrations</TooltipContent>
                         </Tooltip>
                     </div>
                 </PopoverTrigger>
@@ -53,12 +57,12 @@ const IntegrationsSidebarHeader = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            className="hover:bg-background/70"
+                            className="hover:bg-background/70 [&_svg]:size-5"
                             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                             size="icon"
                             variant="ghost"
                         >
-                            <PanelLeftIcon className="size-5" />
+                            <PanelLeftIcon />
                         </Button>
                     </TooltipTrigger>
 

@@ -16,7 +16,7 @@ const IntegrationHeaderOutputButton = ({
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-background/70"
+                    className="hover:bg-background/70 [&_svg]:size-5"
                     onClick={() => {
                         setShowBottomPanelOpen(!showBottomPanel);
 
@@ -27,7 +27,7 @@ const IntegrationHeaderOutputButton = ({
                     size="icon"
                     variant="ghost"
                 >
-                    <SquareChevronRightIcon className="h-5" />
+                    <SquareChevronRightIcon />
                 </Button>
             </TooltipTrigger>
 

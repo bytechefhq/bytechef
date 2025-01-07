@@ -201,10 +201,10 @@ const ProjectHeader = ({
                             createWorkflowMutation={createProjectWorkflowMutation}
                             parentId={projectId}
                             triggerNode={
-                                <Button className="hover:bg-background/70" size="icon" variant="ghost">
+                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <PlusIcon className="mx-2 size-5" />
+                                            <PlusIcon />
                                         </TooltipTrigger>
 
                                         <TooltipContent>New workflow</TooltipContent>
