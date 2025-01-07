@@ -1,37 +1,24 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {CopilotRuntimeProvider} from '@/pages/platform/copilot/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
-import {Thread, useAssistantRuntime} from '@assistant-ui/react';
-import {LocalRuntime} from '@assistant-ui/react/dist/runtimes/local/useLocalRuntime';
+import {Thread} from '@assistant-ui/react';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect} from 'react';
 
-export type MessageType = {text: string; sender: 'ai' | 'user'};
-
 const CopilotPanel = () => {
-    const {setCopilotPanelOpen} = useCopilotStore();
-
-    const runtime = useAssistantRuntime();
+    const {generateConversationId, resetMessages, setCopilotPanelOpen} = useCopilotStore();
 
     const handleCleanMessages = () => {
-        (runtime as LocalRuntime).reset();
+        resetMessages();
 
         generateConversationId();
-    };
-
-    const generateConversationId = () => {
-        sessionStorage.setItem(
-            'bytechef.copilot-conversation-id',
-            Array(32)
-                .fill(0)
-                .map(() => Math.random().toString(36).charAt(2))
-                .join('')
-        );
     };
 
     useEffect(() => {
         generateConversationId();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     return (
@@ -58,8 +45,10 @@ const CopilotPanel = () => {
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 top-16">
-                <Thread />
+            <div className="absolute inset-x-0 bottom-0 top-16 text-sm">
+                <CopilotRuntimeProvider>
+                    <Thread />
+                </CopilotRuntimeProvider>
             </div>
         </div>
     );

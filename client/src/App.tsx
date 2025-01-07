@@ -1,7 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import CopilotPanel from '@/pages/platform/copilot/CopilotPanel';
-import {CopilotRuntimeProvider} from '@/pages/platform/copilot/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
@@ -243,9 +242,7 @@ function App() {
 
                     {ai.copilot.enabled && copilotPanelOpen && (
                         <aside className="border-l border-l-border/70">
-                            <CopilotRuntimeProvider>
-                                <CopilotPanel />
-                            </CopilotRuntimeProvider>
+                            <CopilotPanel />
                         </aside>
                     )}
                 </div>
