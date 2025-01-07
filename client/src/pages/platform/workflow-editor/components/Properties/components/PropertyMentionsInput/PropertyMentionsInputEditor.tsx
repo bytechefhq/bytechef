@@ -2,8 +2,11 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/propertyMentionsInputEditorSuggestionOptions';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
+import Document from '@tiptap/extension-document';
 import {Mention} from '@tiptap/extension-mention';
+import Paragraph from '@tiptap/extension-paragraph';
 import Placeholder from '@tiptap/extension-placeholder';
+import Text from '@tiptap/extension-text';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {EditorView} from 'prosemirror-view';
@@ -80,7 +83,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         const extensions: any[] = useMemo((): any[] => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const extensions: any[] = [
-                StarterKit,
+                ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 Mention.configure({
                     HTMLAttributes: {
                         class: 'property-mention',
