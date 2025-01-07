@@ -6,6 +6,7 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
+import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
@@ -117,6 +118,8 @@ const WorkflowEditorLayout = ({
                     workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
             )}
+
+            {workflow.id && <WorkflowTestChatPanel />}
 
             {(filteredWorkflowNodeOutputs || (!filteredWorkflowNodeOutputs && currentNode?.trigger)) &&
                 previousComponentDefinitions && (

@@ -2,6 +2,7 @@ import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
@@ -35,6 +36,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
     const {copilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen} = useRightSidebarStore();
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {workflowTestChatPanelOpen} = useWorkflowTestChatStore();
 
     const {getEdge, getNode, setViewport} = useReactFlow();
 
@@ -182,7 +184,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
         canvasWidth -= 384;
     }
 
-    if (workflowNodeDetailsPanelOpen) {
+    if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
         canvasWidth -= 460;
     }
 

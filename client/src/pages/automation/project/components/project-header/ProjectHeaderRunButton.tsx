@@ -1,8 +1,14 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {PlayIcon} from 'lucide-react';
+import {MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 
-const ProjectHeaderRunButton = ({onRunClick, runDisabled}: {onRunClick: () => void; runDisabled: boolean}) => {
+interface ProjectHeaderRunButtonProps {
+    chatTrigger: boolean;
+    onRunClick: () => void;
+    runDisabled: boolean;
+}
+
+const ProjectHeaderRunButton = ({chatTrigger, onRunClick, runDisabled}: ProjectHeaderRunButtonProps) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
@@ -13,7 +19,7 @@ const ProjectHeaderRunButton = ({onRunClick, runDisabled}: {onRunClick: () => vo
                     size="icon"
                     variant="ghost"
                 >
-                    <PlayIcon className="text-success" />
+                    {chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon className="text-success" />}
                 </Button>
             </TooltipTrigger>
 

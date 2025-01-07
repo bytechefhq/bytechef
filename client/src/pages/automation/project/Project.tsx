@@ -22,6 +22,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
@@ -65,6 +66,7 @@ const Project = () => {
     const {leftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {currentWorkspaceId} = useWorkspaceStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
@@ -92,6 +94,7 @@ const Project = () => {
             name: 'Components & Flow Controls',
             onClick: () => {
                 setWorkflowNodeDetailsPanelOpen(false);
+                setWorkflowTestChatPanelOpen(false);
 
                 setRightSidebarOpen(!rightSidebarOpen);
             },
@@ -231,6 +234,7 @@ const Project = () => {
 
     useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
+        setWorkflowTestChatPanelOpen(false);
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -278,6 +282,10 @@ const Project = () => {
                     projectId && (
                         <ProjectHeader
                             bottomResizablePanelRef={bottomResizablePanelRef}
+                            chatTrigger={
+                                workflow.triggers &&
+                                workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                            }
                             projectId={parseInt(projectId)}
                             projectWorkflowId={parseInt(projectWorkflowId!)}
                             runDisabled={runDisabled}

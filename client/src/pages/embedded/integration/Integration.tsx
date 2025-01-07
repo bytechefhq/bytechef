@@ -18,6 +18,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
@@ -60,6 +61,7 @@ const Integration = () => {
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {integrationId, integrationWorkflowId} = useParams();
@@ -86,6 +88,7 @@ const Integration = () => {
             name: 'Components & Flow Controls',
             onClick: () => {
                 setWorkflowNodeDetailsPanelOpen(false);
+                setWorkflowTestChatPanelOpen(false);
 
                 setRightSidebarOpen(!rightSidebarOpen);
             },
@@ -227,6 +230,7 @@ const Integration = () => {
 
     useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
+        setWorkflowTestChatPanelOpen(false);
 
         useWorkflowDataStore.getState().reset();
         useWorkflowNodeDetailsPanelStore.getState().reset();

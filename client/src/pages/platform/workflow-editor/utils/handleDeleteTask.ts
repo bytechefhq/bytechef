@@ -1,3 +1,4 @@
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
@@ -130,6 +131,7 @@ export default function handleDeleteTask({
                     setCurrentNode(undefined);
 
                     useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(false);
+                    useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
                 }
 
                 if (currentComponent?.workflowNodeName === data.name) {

@@ -6,14 +6,19 @@ import {useToast} from '@/hooks/use-toast';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import ProjectInstanceWorkflowListItemDropdownMenu from '@/pages/automation/project-instances/components/project-instance-workflow-list/ProjectInstanceWorkflowListItemDropdownMenu';
 import useProjectInstanceWorkflowSheetStore from '@/pages/automation/project-instances/stores/useProjectInstanceWorkflowSheetStore';
-import {ProjectInstanceApi, ProjectInstanceWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
+import {
+    Environment,
+    ProjectInstanceApi,
+    ProjectInstanceWorkflow,
+    Workflow,
+} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
 import {ProjectInstanceKeys} from '@/shared/queries/automation/projectInstances.queries';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
-import {ClipboardIcon, PlayIcon} from 'lucide-react';
+import {ClipboardIcon, MessageCircleMoreIcon, PlayIcon} from 'lucide-react';
 import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
@@ -21,6 +26,7 @@ import {twMerge} from 'tailwind-merge';
 const projectInstanceApi = new ProjectInstanceApi();
 
 const ProjectInstanceWorkflowListItem = ({
+    environment,
     filteredComponentNames,
     projectInstanceEnabled,
     projectInstanceId,
@@ -29,6 +35,7 @@ const ProjectInstanceWorkflowListItem = ({
     workflowComponentDefinitions,
     workflowTaskDispatcherDefinitions,
 }: {
+    environment?: Environment;
     filteredComponentNames?: string[];
     projectInstanceEnabled: boolean;
     projectInstanceId: number;
@@ -59,23 +66,10 @@ const ProjectInstanceWorkflowListItem = ({
         },
     });
 
-    const handleProjectInstanceEnable = () => {
-        enableProjectInstanceWorkflowMutation.mutate(
-            {
-                enable: !projectInstanceWorkflow.enabled,
-                id: projectInstanceId,
-                workflowId: workflow.id!,
-            },
-            {
-                onSuccess: () => {
-                    projectInstanceWorkflow = {
-                        ...projectInstanceWorkflow,
-                        enabled: !projectInstanceWorkflow?.enabled,
-                    };
-                },
-            }
-        );
-    };
+    const hostedChatTrigger =
+        workflow.triggers &&
+        workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1 &&
+        (workflow.triggers?.[0]?.parameters?.mode ?? 1) === 1;
 
     const handleWorkflowClick = () => {
         setWorkflowId(workflow.id!);
@@ -180,7 +174,7 @@ const ProjectInstanceWorkflowListItem = ({
                             >
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <PlayIcon className="h-5 text-success" />
+                                        <PlayIcon className="text-success" />
                                     </TooltipTrigger>
 
                                     <TooltipContent>Run workflow manually</TooltipContent>
@@ -188,7 +182,7 @@ const ProjectInstanceWorkflowListItem = ({
                             </Button>
                         )}
 
-                        {projectInstanceWorkflow.staticWebhookUrl && (
+                        {!hostedChatTrigger && projectInstanceWorkflow.staticWebhookUrl && (
                             <Button
                                 disabled={!projectInstanceWorkflow.enabled}
                                 onClick={() => copyToClipboard(projectInstanceWorkflow.staticWebhookUrl!)}
@@ -197,7 +191,34 @@ const ProjectInstanceWorkflowListItem = ({
                             >
                                 <Tooltip>
                                     <TooltipTrigger asChild>
-                                        <ClipboardIcon className="h-5" />
+                                        <ClipboardIcon />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>
+                                </Tooltip>
+                            </Button>
+                        )}
+
+                        {hostedChatTrigger && projectInstanceWorkflow.staticWebhookUrl && (
+                            <Button
+                                disabled={!projectInstanceWorkflow.enabled}
+                                onClick={() =>
+                                    window.open(
+                                        `/chat/${environment === Environment.Production ? '' : 'test/'}` +
+                                            projectInstanceWorkflow.staticWebhookUrl?.substring(
+                                                projectInstanceWorkflow.staticWebhookUrl?.lastIndexOf('/webhooks/') +
+                                                    10,
+                                                projectInstanceWorkflow.staticWebhookUrl?.length
+                                            ),
+                                        '_blank'
+                                    )
+                                }
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        {hostedChatTrigger ? <MessageCircleMoreIcon /> : <ClipboardIcon />}
                                     </TooltipTrigger>
 
                                     <TooltipContent>Copy static workflow webhook trigger url</TooltipContent>

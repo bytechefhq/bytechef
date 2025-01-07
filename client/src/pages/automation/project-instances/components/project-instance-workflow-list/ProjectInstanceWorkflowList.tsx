@@ -1,18 +1,20 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import ProjectInstanceWorkflowListItem from '@/pages/automation/project-instances/components/project-instance-workflow-list/ProjectInstanceWorkflowListItem';
-import {ProjectInstanceWorkflow} from '@/shared/middleware/automation/configuration';
+import {Environment, ProjectInstanceWorkflow} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 
 const ProjectInstanceWorkflowList = ({
+    environment,
     projectId,
     projectInstanceEnabled,
     projectInstanceId,
     projectInstanceWorkflows,
     projectVersion,
 }: {
+    environment?: Environment;
     projectId: number;
     projectInstanceId: number;
     projectInstanceEnabled: boolean;
@@ -106,6 +108,7 @@ const ProjectInstanceWorkflowList = ({
 
                             return (
                                 <ProjectInstanceWorkflowListItem
+                                    environment={environment}
                                     filteredComponentNames={filteredComponentNames}
                                     key={workflow.id}
                                     projectInstanceEnabled={projectInstanceEnabled}

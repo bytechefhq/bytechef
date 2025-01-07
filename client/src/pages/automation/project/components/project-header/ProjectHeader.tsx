@@ -11,9 +11,11 @@ import ProjectHeaderTitle from '@/pages/automation/project/components/project-he
 import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowDropDownMenu';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
@@ -31,7 +33,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {RefObject, useState} from 'react';
+import {RefObject, useCallback, useEffect, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 
@@ -39,12 +41,14 @@ const workflowTestApi = new WorkflowTestApi();
 
 const ProjectHeader = ({
     bottomResizablePanelRef,
+    chatTrigger,
     projectId,
     projectWorkflowId,
     runDisabled,
     updateWorkflowMutation,
 }: {
     bottomResizablePanelRef: RefObject<ImperativePanelHandle>;
+    chatTrigger?: boolean;
     projectId: number;
     projectWorkflowId: number;
     runDisabled: boolean;
@@ -63,7 +67,10 @@ const ProjectHeader = ({
         workflowIsRunning,
     } = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
-    const {setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {setDataPillPanelOpen} = useDataPillPanelStore();
+    const {setCurrentNode, setWorkflowNodeDetailsPanelOpen, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
+    const {resetMessages, setWorkflowTestChatPanelOpen, workflowTestChatPanelOpen} = useWorkflowTestChatStore();
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowTested} = useAnalytics();
 
@@ -149,7 +156,6 @@ const ProjectHeader = ({
 
     const handleRunClick = () => {
         setShowBottomPanelOpen(true);
-        setWorkflowIsRunning(true);
         setWorkflowTestExecution(undefined);
 
         if (bottomResizablePanelRef.current) {
@@ -159,24 +165,51 @@ const ProjectHeader = ({
         if (workflow.id) {
             captureProjectWorkflowTested();
 
-            workflowTestApi
-                .testWorkflow({
-                    id: workflow.id,
-                })
-                .then((workflowTestExecution) => {
-                    setWorkflowTestExecution(workflowTestExecution);
-                    setWorkflowIsRunning(false);
+            if (chatTrigger) {
+                resetMessages();
+                setDataPillPanelOpen(false);
+                setWorkflowNodeDetailsPanelOpen(false);
+                setWorkflowTestChatPanelOpen(true);
+            } else {
+                setWorkflowIsRunning(true);
 
-                    if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
-                        bottomResizablePanelRef.current.resize(35);
-                    }
-                })
-                .catch(() => {
-                    setWorkflowIsRunning(false);
-                    setWorkflowTestExecution(undefined);
-                });
+                workflowTestApi
+                    .testWorkflow({
+                        id: workflow.id,
+                    })
+                    .then((workflowTestExecution) => {
+                        setWorkflowTestExecution(workflowTestExecution);
+                        setWorkflowIsRunning(false);
+
+                        if (bottomResizablePanelRef.current && bottomResizablePanelRef.current.getSize() === 0) {
+                            bottomResizablePanelRef.current.resize(35);
+                        }
+                    })
+                    .catch(() => {
+                        setWorkflowIsRunning(false);
+                        setWorkflowTestExecution(undefined);
+                    });
+            }
         }
     };
+
+    const handleStopClick = useCallback(() => {
+        setWorkflowIsRunning(false);
+
+        if (chatTrigger) {
+            setWorkflowTestChatPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        }
+    }, [bottomResizablePanelRef, chatTrigger, setWorkflowIsRunning, setWorkflowTestChatPanelOpen]);
+
+    useEffect(() => {
+        if (workflowNodeDetailsPanelOpen || !workflowTestChatPanelOpen) {
+            handleStopClick();
+        }
+    }, [handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
     return (
         <header className="flex items-center border-b border-b-border/50 py-2.5 pl-3 pr-2.5">
@@ -217,9 +250,13 @@ const ProjectHeader = ({
                     )}
 
                     {workflowIsRunning ? (
-                        <ProjectHeaderStopButton />
+                        <ProjectHeaderStopButton onStopClick={handleStopClick} />
                     ) : (
-                        <ProjectHeaderRunButton onRunClick={handleRunClick} runDisabled={runDisabled} />
+                        <ProjectHeaderRunButton
+                            chatTrigger={chatTrigger ?? false}
+                            onRunClick={handleRunClick}
+                            runDisabled={runDisabled}
+                        />
                     )}
 
                     <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />

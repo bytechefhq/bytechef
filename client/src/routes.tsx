@@ -14,6 +14,7 @@ import {Connections as AutomationConnections} from '@/pages/automation/connectio
 import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
+import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
 import {WorkflowExecutions as AutomationWorkflowExecutions} from '@/pages/automation/workflow-executions/WorkflowExecutions';
 import AppEvents from '@/pages/embedded/app-events/AppEvents';
 import ConnectedUsers from '@/pages/embedded/connected-users/ConnectedUsers';
@@ -135,6 +136,14 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <OAuthPopup />,
             path: '/callback',
+        },
+        {
+            element: <WorkflowChat />,
+            path: 'chat/:workflowExecutionId',
+        },
+        {
+            element: <WorkflowChat />,
+            path: 'chat/:environment/:workflowExecutionId',
         },
         {
             children: [
