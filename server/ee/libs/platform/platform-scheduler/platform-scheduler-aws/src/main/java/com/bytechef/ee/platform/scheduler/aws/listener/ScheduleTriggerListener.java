@@ -33,7 +33,7 @@ public class ScheduleTriggerListener {
     @SqsListener(AwsTriggerSchedulerConstants.SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
     public void onSchedule(String message) {
         Date fireTime = new Date();
-        String[] split = message.split(AwsTriggerSchedulerConstants.SPLITTER_PATTERN);
+        String[] split = message.split(AwsTriggerSchedulerConstants.SPLITTER);
 
         eventPublisher.publishEvent(
             new TriggerListenerEvent(
