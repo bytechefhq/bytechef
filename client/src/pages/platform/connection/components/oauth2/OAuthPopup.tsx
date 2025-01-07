@@ -1,4 +1,4 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 
 import {OAUTH_RESPONSE, OAUTH_STATE_KEY} from './constants';
 import {queryToObject} from './tools';
@@ -13,9 +13,10 @@ interface OAuthPopupProps {
 }
 
 const OAuthPopup = (props: OAuthPopupProps) => {
-    const {Component = <div className="flex h-screen items-center justify-center text-xl">Loading...</div>} = props;
+    const [message, setMessage] = useState('Loading...');
 
-    // On mount
+    const {Component = <div className="flex h-screen items-center justify-center text-xl">{message}</div>} = props;
+
     useEffect(() => {
         const payload = {
             ...queryToObject(window.location.search.split('?')[1]),
@@ -29,6 +30,8 @@ const OAuthPopup = (props: OAuthPopupProps) => {
         }
 
         if (error) {
+            setMessage(decodeURI(error) || 'OAuth error: An error has occurred.');
+
             window.opener.postMessage({
                 error: decodeURI(error) || 'OAuth error: An error has occurred.',
                 type: OAUTH_RESPONSE,
@@ -39,6 +42,8 @@ const OAuthPopup = (props: OAuthPopupProps) => {
                 type: OAUTH_RESPONSE,
             });
         } else {
+            setMessage('OAuth error: State mismatch.');
+
             window.opener.postMessage({
                 error: 'OAuth error: State mismatch.',
                 type: OAUTH_RESPONSE,
