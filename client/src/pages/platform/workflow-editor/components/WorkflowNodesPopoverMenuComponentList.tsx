@@ -112,7 +112,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                                     size="icon"
                                     variant="ghost"
                                 >
-                                    <SparklesIcon />
+                                    <SparklesIcon className="h-5" />
                                 </Button>
                             )}
                         </TooltipTrigger>

@@ -3,13 +3,12 @@ import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
-import PropertyCodeEditorSheetConnectionsSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
-import {RightSidebar} from '@/shared/layout/RightSidebar';
+import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanel';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import Editor from '@monaco-editor/react';
-import {Link2Icon, PlayIcon, RefreshCwIcon, SparklesIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, RefreshCwIcon, SparklesIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
@@ -37,7 +36,6 @@ const PropertyCodeEditorSheet = ({
     const [newValue, setNewValue] = useState<string | undefined>(value);
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
-    const [showConnections, setShowConnections] = useState(false);
 
     const {ai} = useApplicationInfoStore();
     const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
@@ -76,7 +74,7 @@ const PropertyCodeEditorSheet = ({
             <Sheet modal={!copilotPanelOpen} onOpenChange={onClose} open={true}>
                 <SheetContent
                     className={twMerge(
-                        'flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg',
+                        'flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-xl',
                         copilotPanelOpen && 'mr-[450px]'
                     )}
                     onFocusOutside={(event) => event.preventDefault()}
@@ -129,7 +127,7 @@ const PropertyCodeEditorSheet = ({
                                                     size="icon"
                                                     variant="ghost"
                                                 >
-                                                    <SparklesIcon />
+                                                    <SparklesIcon className="h-5" />
                                                 </Button>
                                             )}
                                         </TooltipTrigger>
@@ -201,29 +199,13 @@ const PropertyCodeEditorSheet = ({
                         </ResizablePanelGroup>
 
                         <div className="flex border-l border-l-border/50">
-                            <RightSidebar
-                                className="bg-transparent"
-                                navigation={[
-                                    {
-                                        icon: Link2Icon,
-                                        name: 'Connections',
-                                        onClick: () => setShowConnections(!showConnections),
-                                    },
-                                ]}
-                            />
-                        </div>
-                    </div>
-
-                    {showConnections && (
-                        <div className="w-80 border-l border-l-border/50">
-                            <PropertyCodeEditorSheetConnectionsSheet
-                                onCLose={() => setShowConnections(false)}
+                            <PropertyCodeEditorSheetRightPanel
                                 workflow={workflow}
                                 workflowConnections={currentWorkflowTask?.connections || []}
                                 workflowNodeName={workflowNodeName}
                             />
                         </div>
-                    )}
+                    </div>
                 </SheetContent>
             </Sheet>
         </>
