@@ -46,7 +46,7 @@ public class HubspotConnection {
             .authorizationUrl((connectionParameters, context) -> "https://app.hubspot.com/oauth/authorize")
             .scopes((connection, context) -> List.of("crm.objects.contacts.read", "crm.objects.contacts.write",
                 "crm.objects.deals.read", "crm.objects.deals.write", "crm.schemas.deals.read",
-                "crm.objects.owners.read"))
+                "crm.objects.owners.read", "tickets"))
             .tokenUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token")
             .refreshUrl((connectionParameters, context) -> "https://api.hubapi.com/oauth/v1/token"));
 

@@ -24,6 +24,7 @@ import com.bytechef.component.hubspot.action.HubspotCreateContactAction;
 import com.bytechef.component.hubspot.action.HubspotCreateDealAction;
 import com.bytechef.component.hubspot.action.HubspotDeleteContactAction;
 import com.bytechef.component.hubspot.action.HubspotGetContactAction;
+import com.bytechef.component.hubspot.action.HubspotGetTicketAction;
 import com.bytechef.component.hubspot.action.HubspotUpdateContactAction;
 import com.bytechef.component.hubspot.connection.HubspotConnection;
 
@@ -40,7 +41,8 @@ public abstract class AbstractHubspotComponentHandler implements OpenApiComponen
                 "HubSpot is a CRM platform with all the software, integrations, and resources you need to connect marketing, sales, content management, and customer service."))
                     .actions(modifyActions(HubspotCreateContactAction.ACTION_DEFINITION,
                         HubspotDeleteContactAction.ACTION_DEFINITION, HubspotGetContactAction.ACTION_DEFINITION,
-                        HubspotUpdateContactAction.ACTION_DEFINITION, HubspotCreateDealAction.ACTION_DEFINITION))
+                        HubspotUpdateContactAction.ACTION_DEFINITION, HubspotCreateDealAction.ACTION_DEFINITION,
+                        HubspotGetTicketAction.ACTION_DEFINITION))
                     .connection(modifyConnection(HubspotConnection.CONNECTION_DEFINITION))
                     .triggers(getTriggers());
 
