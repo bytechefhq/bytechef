@@ -831,7 +831,10 @@ public class MapUtils {
     private static Object convert(Object value, List<Class<?>> elementTypes) {
         for (Class<?> elementType : elementTypes) {
             try {
-                value = convert(value, elementType);
+                value = OBJECT_MAPPER
+                    .copy()
+                    .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                    .convertValue(value, elementType);
             } catch (Exception e) {
                 if (logger.isTraceEnabled()) {
                     logger.trace(e.getMessage(), e);
