@@ -7,6 +7,6 @@ tasks:
     items: "${range(1,10)}"
     iteratee:
     - name: "sumVar1"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "${1 + loop_1.item}"

@@ -53,7 +53,7 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
             .build();
 
     @Override
-    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId) {
+    public List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId) {
         Comparator<Object> comparable = Comparators.comparable();
 
         return TASK_EXECUTIONS_BY_JOB_ID.get(jobId, s -> new ArrayList<>())
@@ -63,24 +63,24 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     }
 
     @Override
-    public List<TaskExecution> findAllByParentId(Long parentId) {
+    public List<TaskExecution> findAllByParentId(long parentId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deleteById(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId) {
+    public List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId) {
         return TASK_EXECUTIONS_BY_JOB_ID.get(jobId, s -> new ArrayList<>())
             .stream()
             .toList();
     }
 
     @Override
-    public List<TaskExecution> findAllByJobIdOrderByIdDesc(Long jobId) {
+    public List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId) {
         return TASK_EXECUTIONS_BY_JOB_ID.get(jobId, s -> new ArrayList<>())
             .stream()
             .sorted((taskExecution1, taskExecution2) -> {
@@ -102,6 +102,17 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
     @Override
     public Optional<TaskExecution> findByIdForUpdate(long id) {
         return findById(id);
+    }
+
+    @Override
+    public Optional<TaskExecution> findLastByJobId(long jobId) {
+        List<TaskExecution> taskExecutions = TASK_EXECUTIONS_BY_JOB_ID.get(jobId, s -> new ArrayList<>());
+
+        if (taskExecutions.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(taskExecutions.getLast());
+        }
     }
 
     @Override

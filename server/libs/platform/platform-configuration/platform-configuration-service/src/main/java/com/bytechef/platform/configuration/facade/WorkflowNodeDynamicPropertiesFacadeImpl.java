@@ -88,7 +88,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
                 return actionDefinitionFacade.executeDynamicProperties(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName(), propertyName,
+                    workflowNodeType.componentOperationName(), propertyName, workflowId,
                     workflowTask.evaluateParameters(
                         MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs)),
                     lookupDependsOnPaths, connectionId);

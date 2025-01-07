@@ -75,11 +75,11 @@ class ContextFactoryImpl implements ContextFactory {
     @Override
     public TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment) {
+        Long instanceId, String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment) {
 
         return new TriggerContextImpl(
-            componentName, componentVersion, triggerName, type, workflowReferenceCode, connection,
-            getDataStorage(workflowReferenceCode, devEnvironment), getFilesFileStorage(devEnvironment),
+            componentName, componentVersion, triggerName, type, instanceId, workflowReferenceCode, connection,
+            devEnvironment, getDataStorage(workflowReferenceCode, devEnvironment), getFilesFileStorage(devEnvironment),
             getHttpClientExecutor(devEnvironment));
     }
 

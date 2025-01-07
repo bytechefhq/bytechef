@@ -15,6 +15,6 @@ tasks:
         items: "${range(1,loop_1.item)}"
         iteratee:
         - name: "var1"
-          type: "var"
+          type: "var/v1/set"
           parameters:
             value: "${loop_1.item + '_' + loop_2.item}"

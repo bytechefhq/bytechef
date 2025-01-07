@@ -49,6 +49,18 @@ public interface BaseOutputDefinition {
         public OutputResponse(Object sampleOutput) {
             this(null, sampleOutput);
         }
+
+        public static OutputResponse of(BaseValueProperty<?> outputSchema) {
+            return new OutputResponse(outputSchema);
+        }
+
+        public static OutputResponse of(Object sampleOutput) {
+            return new OutputResponse(sampleOutput);
+        }
+
+        public static OutputResponse of(BaseValueProperty<?> outputSchema, Object sampleOutput) {
+            return new OutputResponse(outputSchema, sampleOutput);
+        }
     }
 
     /**

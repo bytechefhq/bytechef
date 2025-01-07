@@ -38,5 +38,5 @@ public interface ContextFactory {
 
     TriggerContext createTriggerContext(
         @NonNull String componentName, int componentVersion, @NonNull String triggerName, ModeType type,
-        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment);
+        Long instanceId, String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment);
 }

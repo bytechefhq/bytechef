@@ -21,6 +21,7 @@ import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +61,11 @@ public class TaskExecutionServiceImpl implements TaskExecutionService {
         for (TaskExecution taskExecution : taskExecutions) {
             taskExecutionRepository.deleteById(Validate.notNull(taskExecution.getId(), "id"));
         }
+    }
+
+    @Override
+    public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
+        return taskExecutionRepository.findLastByJobId(jobId);
     }
 
     @Override

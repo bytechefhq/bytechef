@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.jayway.jsonpath.Configuration;
@@ -301,6 +302,14 @@ public class JsonUtils {
             path, new TypeTypeRef<>(
                 typeFactory.constructMapType(
                     Map.class, typeFactory.constructType(String.class), typeFactory.constructType(valueType))));
+    }
+
+    public static JsonNode readTree(String json) {
+        try {
+            return OBJECT_MAPPER.readTree(json);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {

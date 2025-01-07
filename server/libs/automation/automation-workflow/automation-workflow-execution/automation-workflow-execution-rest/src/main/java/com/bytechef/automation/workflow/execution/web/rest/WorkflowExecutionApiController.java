@@ -53,8 +53,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     @Override
     public ResponseEntity<WorkflowExecutionModel> getWorkflowExecution(Long id) {
         return ResponseEntity.ok(
-            conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id),
-                WorkflowExecutionModel.class));
+            conversionService.convert(workflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
     }
 
     @Override

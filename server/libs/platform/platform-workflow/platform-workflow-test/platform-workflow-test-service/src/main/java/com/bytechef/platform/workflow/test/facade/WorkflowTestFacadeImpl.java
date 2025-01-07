@@ -23,18 +23,15 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinitionBasic;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
+import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
+import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
@@ -60,33 +57,27 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
     private final JobTestExecutor jobTestExecutor;
-    private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
-    private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestFacadeImpl(
         ComponentDefinitionService componentDefinitionService, JobTestExecutor jobTestExecutor,
-        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.componentDefinitionService = componentDefinitionService;
         this.jobTestExecutor = jobTestExecutor;
-        this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
-        this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+        this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @SuppressWarnings("unchecked")
-    public WorkflowTestExecution testWorkflow(String workflowId) {
+    public WorkflowTestExecution testWorkflow(String workflowId, Map<String, Object> inputs) {
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
             workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId);
-
-        Map<String, ?> inputs = OptionalUtils.mapOrElse(
-            workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
 
         Map<String, Map<String, Long>> connectionIdsMap = new HashMap<>();
 
@@ -111,20 +102,12 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
-            Object sampleOutput = OptionalUtils.mapOrElseGet(
-                workflowNodeTestOutputService.fetchWorkflowTestNodeOutput(workflowId, workflowTrigger.getName()),
-                WorkflowNodeTestOutput::getOutput,
-                () -> {
-                    TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                        workflowNodeType.componentOperationName());
+            WorkflowNodeOutputDTO workflowNodeOutputDTO = workflowNodeOutputFacade.getWorkflowNodeOutput(
+                workflowId, workflowTrigger.getName());
 
-                    OutputResponse outputResponse = triggerDefinition.getOutputResponse();
+            Object sampleOutput = workflowNodeOutputDTO.sampleOutput();
 
-                    return outputResponse == null ? null : outputResponse.sampleOutput();
-                });
-
-            if (sampleOutput != null) {
+            if (inputs == null && sampleOutput != null) {
                 TriggerExecution triggerExecution = TriggerExecution.builder()
                     .id(-RANDOM.nextLong())
                     .startDate(Instant.now())
@@ -136,9 +119,12 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                 ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
                     workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
+                Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
+                    workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
+
                 triggerExecutionDTO = new TriggerExecutionDTO(
-                    triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(), inputs,
-                    sampleOutput);
+                    triggerExecution, componentDefinition.getTitle(), componentDefinition.getIcon(),
+                    workflowTestConfigurationInputs, sampleOutput);
 
                 WorkflowNodeType triggerNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
 
@@ -153,7 +139,9 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
                     sampleOutput = list.getFirst();
                 }
 
-                inputs = MapUtils.concat((Map<String, Object>) inputs, Map.of(workflowTrigger.getName(), sampleOutput));
+                inputs = MapUtils.concat(
+                    (Map<String, Object>) workflowTestConfigurationInputs,
+                    Map.of(workflowTrigger.getName(), sampleOutput));
             }
         }
 

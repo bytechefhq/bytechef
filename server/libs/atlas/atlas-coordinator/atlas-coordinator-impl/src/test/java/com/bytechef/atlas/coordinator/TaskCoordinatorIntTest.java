@@ -42,6 +42,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
@@ -85,6 +86,8 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import(PostgreSQLContainerConfiguration.class)
 public class TaskCoordinatorIntTest {
 
+    private static final TaskFileStorage TASK_FILE_STORAGE = new TaskFileStorageImpl(new Base64FileStorageService());
+
     @Autowired
     private ContextService contextService;
 
@@ -117,8 +120,7 @@ public class TaskCoordinatorIntTest {
         taskHandlerMap.put("randomHelper/v1/randomInt", taskExecution -> null);
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, List.of(), taskExecutionService,
-            taskHandlerMap::get, new TaskFileStorageImpl(new Base64FileStorageService()),
+            contextService, jobService, List.of(), taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE,
             workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));

@@ -9,6 +9,6 @@ tasks:
   parameters:
     workflowId: "demo/random_int"
 - name: "output"
-  type: "var"
+  type: "var/v1/set"
   parameters:
     value: "${subflowOutput.randomNumber}"

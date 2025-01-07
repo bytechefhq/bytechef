@@ -12,6 +12,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +51,11 @@ public class RemoteTaskExecutionServiceClient implements TaskExecutionService {
 
     @Override
     public void deleteJobTaskExecutions(long jobId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Optional<TaskExecution> fetchLastJobTaskExecution(long jobId) {
         throw new UnsupportedOperationException();
     }
 

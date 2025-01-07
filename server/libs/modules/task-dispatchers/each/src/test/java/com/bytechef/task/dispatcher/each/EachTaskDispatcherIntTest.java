@@ -65,7 +65,7 @@ public class EachTaskDispatcherIntTest {
                     (taskDispatcher) -> new EachTaskDispatcher(
                         messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
                         taskFileStorage)),
-            () -> Map.of("var", testVarTaskHandler));
+            () -> Map.of("var/v1/set", testVarTaskHandler));
 
         Assertions.assertEquals(
             IntStream.rangeClosed(1, 25)

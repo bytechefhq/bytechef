@@ -19,6 +19,7 @@ package com.bytechef.commons.util;
 import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MAPPER;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.jayway.jsonpath.JsonPath;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -598,6 +599,14 @@ public class MapUtils {
         return value;
     }
 
+    public static <K, T> T getRequired(Map<K, ?> map, K key, TypeReference<T> returnTypeRef) {
+        T value = get(map, key, returnTypeRef);
+
+        Validate.notNull(value, "Unknown value for : " + key);
+
+        return value;
+    }
+
     public static <K> Object[] getRequiredArray(Map<K, ?> map, K key) {
         Object[] value = getArray(map, key);
 
@@ -780,6 +789,12 @@ public class MapUtils {
         Set<Map.Entry<K, V>> entry = map.entrySet();
 
         return entry.stream();
+    }
+
+    public static Map<String, List<String>> toMap(Map<String, String[]> map) {
+        return map.entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> Arrays.asList(entry.getValue())));
     }
 
     public static <K, V, T> Map<K, V> toMap(

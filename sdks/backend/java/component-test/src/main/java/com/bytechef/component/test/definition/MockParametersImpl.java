@@ -93,6 +93,11 @@ public final class MockParametersImpl implements Parameters {
     }
 
     @Override
+    public Object[] getArray(String key, List<?> defaultValue) {
+        return MapUtils.getArray(map, key, defaultValue.toArray(new Object[0]));
+    }
+
+    @Override
     public <T> T[] getArray(String key, Class<T> elementType) {
         return MapUtils.getArray(map, key, elementType);
     }
@@ -100,6 +105,12 @@ public final class MockParametersImpl implements Parameters {
     @Override
     public <T> T[] getArray(String key, Class<T> elementType, T[] defaultValue) {
         return MapUtils.getArray(map, key, elementType, defaultValue);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] getArray(String key, Class<T> elementType, List<T> defaultValue) {
+        return (T[]) MapUtils.getArray(map, key, defaultValue.toArray(new Object[0]));
     }
 
     @Override
@@ -145,6 +156,11 @@ public final class MockParametersImpl implements Parameters {
     @Override
     public FileEntry getFileEntry(String key) {
         return MapUtils.get(map, key, FileEntry.class);
+    }
+
+    @Override
+    public List<FileEntry> getFileEntries(String key) {
+        return getList(key, FileEntry.class);
     }
 
     @Override

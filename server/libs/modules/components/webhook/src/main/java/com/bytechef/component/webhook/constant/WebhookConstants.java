@@ -26,4 +26,5 @@ public class WebhookConstants {
     public static final String HEADERS = "headers";
     public static final String METHOD = "method";
     public static final String PARAMETERS = "parameters";
+    public static final String STATUS_CODE = "statusCode";
 }

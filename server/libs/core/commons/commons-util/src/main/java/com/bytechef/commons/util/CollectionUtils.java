@@ -16,8 +16,10 @@
 
 package com.bytechef.commons.util;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -252,6 +254,16 @@ public final class CollectionUtils {
 
     public static <T> Stream<T> stream(Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    public static List<String> toList(Enumeration<String> enumeration) {
+        List<String> list = new ArrayList<>();
+
+        while (enumeration.hasMoreElements()) {
+            list.add(enumeration.nextElement());
+        }
+
+        return list;
     }
 
     public static <T> List<T> toList(Iterable<T> iterable) {

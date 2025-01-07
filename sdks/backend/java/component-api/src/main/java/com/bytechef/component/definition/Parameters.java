@@ -37,9 +37,13 @@ public interface Parameters extends Map<String, Object> {
 
     Object[] getArray(String key, Object[] defaultValue);
 
+    Object[] getArray(String key, List<?> defaultValue);
+
     <T> T[] getArray(String key, Class<T> elementType);
 
     <T> T[] getArray(String key, Class<T> elementType, T[] defaultValue);
+
+    <T> T[] getArray(String key, Class<T> elementType, List<T> defaultValue);
 
     Boolean getBoolean(String key);
 
@@ -58,6 +62,8 @@ public interface Parameters extends Map<String, Object> {
     Duration getDuration(String key, Duration defaultDuration);
 
     FileEntry getFileEntry(String key);
+
+    List<FileEntry> getFileEntries(String key);
 
     List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue);
 

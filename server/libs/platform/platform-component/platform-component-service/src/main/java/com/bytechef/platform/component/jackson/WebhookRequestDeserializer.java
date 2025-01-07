@@ -33,6 +33,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.boot.jackson.JsonComponent;
 
 /**
@@ -107,7 +108,7 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
     })
     private static Object checkFileEntry(Object item) {
         if (item instanceof Map map) {
-            return new FileEntry(
+            return new FileEntryImpl(
                 MapUtils.getRequiredString(map, "name"), MapUtils.getRequiredString(map, "extension"),
                 MapUtils.getRequiredString(map, MIME_TYPE), MapUtils.getRequiredString(map, "url"));
         } else {
@@ -130,5 +131,54 @@ public class WebhookRequestDeserializer extends JsonDeserializer<WebhookRequest>
         JsonNode fieldJsonNode = jsonNode.get("method");
 
         return fieldJsonNode.asText();
+    }
+
+    private static class FileEntryImpl implements com.bytechef.component.definition.FileEntry {
+
+        private String extension;
+        private String mimeType;
+        private String name;
+        private String url;
+
+        private FileEntryImpl() {
+        }
+
+        public FileEntryImpl(String name, String extension, String mimeType, String url) {
+            this.extension = Objects.requireNonNull(extension);
+            this.mimeType = Objects.requireNonNull(mimeType);
+            this.name = Objects.requireNonNull(name);
+            this.url = Objects.requireNonNull(url);
+        }
+
+        @Override
+
+        public String getExtension() {
+            return extension;
+        }
+
+        @Override
+        public String getMimeType() {
+            return mimeType;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public String getUrl() {
+            return url;
+        }
+
+        @Override
+        public String toString() {
+            return "FileEntryImpl{" +
+                "name='" + name + '\'' +
+                ", extension='" + extension + '\'' +
+                ", mimeType='" + mimeType + '\'' +
+                ", url='" + url + '\'' +
+                '}';
+        }
     }
 }

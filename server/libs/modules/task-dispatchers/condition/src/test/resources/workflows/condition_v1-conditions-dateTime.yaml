@@ -18,12 +18,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "afterResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "afterResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_1"
@@ -36,11 +36,11 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "beforeResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "beforeResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"

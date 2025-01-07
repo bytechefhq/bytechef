@@ -51,7 +51,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters,
+                propertiesRequest.propertyName, propertiesRequest.workflowId, propertiesRequest.inputParameters,
                 propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }
@@ -136,8 +136,8 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId,
-        List<String> lookupDependsOnPaths) {
+        @NotNull String propertyName, @NonNull String workflowId, Map<String, Object> inputParameters,
+        Long connectionId, List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

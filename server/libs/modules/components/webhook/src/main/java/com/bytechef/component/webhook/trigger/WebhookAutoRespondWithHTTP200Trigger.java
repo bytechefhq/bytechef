@@ -41,6 +41,6 @@ public class WebhookAutoRespondWithHTTP200Trigger {
         .type(TriggerType.STATIC_WEBHOOK)
         .output(
             sampleOutput(
-                Map.of(METHOD, "POST", HEADERS, Map.of("Header1", "value"), PARAMETERS, Map.of("parameter1", "value"))))
+                Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of())))
         .webhookRequest(WebhookUtils::getWebhookResult);
 }

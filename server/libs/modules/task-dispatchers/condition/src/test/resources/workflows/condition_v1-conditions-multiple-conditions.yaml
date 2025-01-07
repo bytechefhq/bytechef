@@ -22,12 +22,12 @@ tasks:
         value2: "aaa"
     caseTrue:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_2"
@@ -48,12 +48,12 @@ tasks:
         value2: "aaa"
     caseTrue:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_3"
@@ -74,11 +74,11 @@ tasks:
         value2: "ccc"
     caseTrue:
     - name: "notEqualsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "notEqualsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"

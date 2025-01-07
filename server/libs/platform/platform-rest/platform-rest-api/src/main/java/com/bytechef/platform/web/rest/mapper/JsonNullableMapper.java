@@ -49,10 +49,6 @@ public class JsonNullableMapper {
         return JsonNullable.of(OffsetDateTime.from(value));
     }
 
-//    public JsonNullable<Object> map(Object value) {
-//        return value == null ? JsonNullable.undefined() : JsonNullable.of(value);
-//    }
-
     public BigDecimal mapBigDecimal(JsonNullable<BigDecimal> value) {
         return value.orElse(null);
     }

@@ -255,8 +255,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentExecutionException(
-                e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 
