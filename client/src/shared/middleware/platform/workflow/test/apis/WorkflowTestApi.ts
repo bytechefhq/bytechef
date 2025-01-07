@@ -15,15 +15,19 @@
 
 import * as runtime from '../runtime';
 import type {
+  TestWorkflowRequest,
   WorkflowTestExecution,
 } from '../models/index';
 import {
+    TestWorkflowRequestFromJSON,
+    TestWorkflowRequestToJSON,
     WorkflowTestExecutionFromJSON,
     WorkflowTestExecutionToJSON,
 } from '../models/index';
 
-export interface TestWorkflowRequest {
+export interface TestWorkflowOperationRequest {
     id: string;
+    testWorkflowRequest?: TestWorkflowRequest;
 }
 
 /**
@@ -35,7 +39,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflowRaw(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestExecution>> {
+    async testWorkflowRaw(requestParameters: TestWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestExecution>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -47,11 +51,14 @@ export class WorkflowTestApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+        headerParameters['Content-Type'] = 'application/json';
+
         const response = await this.request({
             path: `/workflows/{id}/tests`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
+            body: TestWorkflowRequestToJSON(requestParameters['testWorkflowRequest']),
         }, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestExecutionFromJSON(jsonValue));
@@ -61,7 +68,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
      * Execute a workflow synchronously for testing purposes.
      * Execute a workflow synchronously for testing purpose
      */
-    async testWorkflow(requestParameters: TestWorkflowRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestExecution> {
+    async testWorkflow(requestParameters: TestWorkflowOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestExecution> {
         const response = await this.testWorkflowRaw(requestParameters, initOverrides);
         return await response.value();
     }
