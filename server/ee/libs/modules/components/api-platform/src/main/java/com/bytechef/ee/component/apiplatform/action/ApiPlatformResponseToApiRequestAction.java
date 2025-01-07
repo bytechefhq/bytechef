@@ -30,7 +30,6 @@ import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
-import com.bytechef.ee.component.apiplatform.util.JsonSchemaUtils;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.WebhookResponse;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -122,17 +121,20 @@ public class ApiPlatformResponseToApiRequestAction {
         Map<String, ?> responseMap = MapUtils.getMap(parameters, RESPONSE, Map.of());
 
         return switch (inputParameters.getInteger(RESPONSE_TYPE)) {
-            case 1 -> getProperty(SUCCESS, responseMap);
-            case 2 -> getProperty(INVALID_INPUT, responseMap);
-            case 3 -> getProperty(INTERNAL_ERROR, responseMap);
-            case 4 -> getProperty(FORBIDDEN, responseMap);
+            case 1 -> getJsonSchemaProperty(SUCCESS, responseMap, actionContext);
+            case 2 -> getJsonSchemaProperty(INVALID_INPUT, responseMap, actionContext);
+            case 3 -> getJsonSchemaProperty(INTERNAL_ERROR, responseMap, actionContext);
+            case 4 -> getJsonSchemaProperty(FORBIDDEN, responseMap, actionContext);
             default ->
                 throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
         };
     }
 
-    private static List<ModifiableValueProperty<?, ?>> getProperty(String name, Map<String, ?> responseMap) {
-        ModifiableValueProperty<?, ?> property = JsonSchemaUtils.getProperty(name, responseMap);
+    private static List<ModifiableValueProperty<?, ?>> getJsonSchemaProperty(
+        String name, Map<String, ?> responseMap, ActionContext actionContext) {
+
+        ModifiableValueProperty<?, ?> property = (ModifiableValueProperty<?, ?>) actionContext.outputSchema(
+            outputSchema -> outputSchema.getOutputSchema(name, (String) responseMap.get(name)));
 
         if (property == null) {
             return List.of();

@@ -17,7 +17,7 @@
 package com.bytechef.component.definition;
 
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
-import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.component.definition.Property.ValueProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1153,7 +1153,11 @@ public interface Context {
 
     interface OutputSchema {
 
-        BaseValueProperty<?> getOutputSchema(Object value);
+        ValueProperty<?> getOutputSchema(String jsonSchema);
+
+        ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema);
+
+        ValueProperty<?> getOutputSchema(Object value);
     }
 
     /**

@@ -21,10 +21,11 @@ import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.util.JsonSchemaUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -626,9 +627,18 @@ class ContextImpl implements Context {
     private record OutputSchemaImpl() implements OutputSchema {
 
         @Override
-        public BaseProperty.BaseValueProperty<?> getOutputSchema(Object value) {
-            return (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                value, PropertyFactory.PROPERTY_FACTORY);
+        public ValueProperty<?> getOutputSchema(String jsonSchema) {
+            return JsonSchemaUtils.getProperty(jsonSchema);
+        }
+
+        @Override
+        public ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema) {
+            return JsonSchemaUtils.getProperty(propertyName, jsonSchema);
+        }
+
+        @Override
+        public ValueProperty<?> getOutputSchema(Object value) {
+            return (ValueProperty<?>) SchemaUtils.getOutputSchema(value, PropertyFactory.PROPERTY_FACTORY);
         }
     }
 

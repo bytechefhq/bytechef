@@ -35,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -65,7 +66,7 @@ public class AmazonBedrockTitanChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY,
             STOP_PROPERTY)
-        .output()
+        .output(LLMUtils::output)
         .perform(AmazonBedrockTitanChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockTitanChatModel(

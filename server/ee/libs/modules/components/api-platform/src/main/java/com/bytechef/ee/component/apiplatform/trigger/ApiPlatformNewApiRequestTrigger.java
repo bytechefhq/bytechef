@@ -34,7 +34,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.ee.component.apiplatform.constant.ApiPlatformConstants;
-import com.bytechef.ee.component.apiplatform.util.JsonSchemaUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,19 +120,22 @@ public class ApiPlatformNewApiRequestTrigger {
 
         properties.add(string(METHOD));
 
-        ModifiableValueProperty<?, ?> headers = JsonSchemaUtils.getProperty(HEADERS, request);
+        ModifiableValueProperty<?, ?> headers = (ModifiableValueProperty<?, ?>) context.outputSchema(
+            outputSchema -> outputSchema.getOutputSchema(HEADERS, (String) request.get(HEADERS)));
 
         if (headers != null) {
             properties.add(headers);
         }
 
-        ModifiableValueProperty<?, ?> parameters = JsonSchemaUtils.getProperty(PARAMETERS, request);
+        ModifiableValueProperty<?, ?> parameters = (ModifiableValueProperty<?, ?>) context.outputSchema(
+            outputSchema -> outputSchema.getOutputSchema(PARAMETERS, (String) request.get(PARAMETERS)));
 
         if (parameters != null) {
             properties.add(parameters);
         }
 
-        ModifiableValueProperty<?, ?> body = JsonSchemaUtils.getProperty(BODY, request);
+        ModifiableValueProperty<?, ?> body = (ModifiableValueProperty<?, ?>) context.outputSchema(
+            outputSchema -> outputSchema.getOutputSchema(BODY, (String) request.get(BODY)));
 
         if (body != null) {
             properties.add(body);

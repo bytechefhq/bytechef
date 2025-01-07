@@ -36,6 +36,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -68,7 +69,7 @@ public class AnthropicChatAction {
             TOP_P_PROPERTY,
             TOP_K_PROPERTY,
             STOP_PROPERTY)
-        .output()
+        .output(LLMUtils::output)
         .perform(AnthropicChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new AnthropicChatModel(

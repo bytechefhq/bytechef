@@ -21,6 +21,7 @@ import static com.bytechef.commons.util.constant.ObjectMapperConstants.OBJECT_MA
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.PathNotFoundException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.time.Duration;
@@ -299,13 +300,13 @@ public class MapUtils {
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         return convert(value, elementType);
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType, T defaultValue) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         if (value == null) {
             return defaultValue;
@@ -315,13 +316,13 @@ public class MapUtils {
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         return convert(value, typeReference);
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference, T defaultValue) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         if (value == null) {
             return defaultValue;
@@ -656,7 +657,7 @@ public class MapUtils {
     }
 
     public static <T> T getRequiredFromPath(Map<String, ?> map, String path, Class<T> elementType) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         Validate.notNull(value, "Unknown value for : " + path);
 
@@ -664,7 +665,7 @@ public class MapUtils {
     }
 
     public static <T> T getRequiredFromPath(Map<String, ?> map, String path, TypeReference<T> typeReference) {
-        Object value = JsonPath.read(map, path);
+        Object value = readFromPath(JsonPath.read(map, path));
 
         return convert(value, typeReference);
     }
@@ -882,5 +883,18 @@ public class MapUtils {
         }
 
         return outputArray;
+    }
+
+    private static Object readFromPath(Object map) {
+        Object value = null;
+
+        try {
+            value = map;
+        } catch (PathNotFoundException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage());
+            }
+        }
+        return value;
     }
 }

@@ -17,11 +17,15 @@
 package com.bytechef.component.ai.llm.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,5 +92,20 @@ public class LLMUtils {
             .sorted(Map.Entry.comparingByKey())
             .map(entry -> (Option<R>) option(entry.getKey(), entry.getValue()))
             .toList();
+    }
+
+    public static BaseOutputDefinition.OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
+
+        BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
+
+        if (inputParameters.getFromPath("response.responseFormat", Integer.class, 1) == 2) {
+            String responseSchema = inputParameters.getRequiredFromPath("response.responseSchema", String.class);
+
+            outputSchemaProperty = actionContext.outputSchema(
+                outputSchema -> outputSchema.getOutputSchema(responseSchema));
+        }
+
+        return new BaseOutputDefinition.OutputResponse(outputSchemaProperty);
     }
 }

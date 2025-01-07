@@ -40,6 +40,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -74,7 +75,7 @@ public class MistralChatAction {
                 .description("Should the prompt be safe for work?")
                 .defaultValue(true)
                 .advancedOption(true))
-        .output()
+        .output(LLMUtils::output)
         .perform(MistralChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {

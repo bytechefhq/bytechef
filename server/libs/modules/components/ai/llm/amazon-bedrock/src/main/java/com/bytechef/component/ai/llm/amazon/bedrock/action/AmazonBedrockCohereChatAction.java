@@ -109,7 +109,7 @@ public class AmazonBedrockCohereChatAction {
                     LLMUtils.getEnumOptions(
                         Arrays.stream(Truncate.values())
                             .collect(Collectors.toMap(Enum::name, Enum::name)))))
-        .output()
+        .output(LLMUtils::output)
         .perform(AmazonBedrockCohereChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> new BedrockCohereChatModel(

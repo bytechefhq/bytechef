@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.component.apiplatform.util;
+package com.bytechef.platform.component.util;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -32,12 +32,16 @@ import java.util.Map;
  */
 public class JsonSchemaUtils {
 
-    public static ModifiableValueProperty<?, ?> getProperty(String propertyName, Map<String, ?> jsonSchemaMap) {
-        if (!jsonSchemaMap.containsKey(propertyName)) {
+    public static ModifiableValueProperty<?, ?> getProperty(String jsonSchema) {
+        return getProperty(null, jsonSchema);
+    }
+
+    public static ModifiableValueProperty<?, ?> getProperty(String propertyName, String jsonSchema) {
+        if (jsonSchema == null) {
             return null;
         }
 
-        JsonNode schemaJsonNode = JsonUtils.readTree((String) jsonSchemaMap.get(propertyName));
+        JsonNode schemaJsonNode = JsonUtils.readTree(jsonSchema);
 
         return getProperty(propertyName, schemaJsonNode);
     }

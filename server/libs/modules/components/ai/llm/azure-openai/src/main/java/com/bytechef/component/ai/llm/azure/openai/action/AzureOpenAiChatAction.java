@@ -50,6 +50,7 @@ import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.TEXT
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -83,7 +84,7 @@ public class AzureOpenAiChatAction {
             TOP_P_PROPERTY,
             STOP_PROPERTY,
             USER_PROPERTY)
-        .output()
+        .output(LLMUtils::output)
         .perform(AzureOpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {

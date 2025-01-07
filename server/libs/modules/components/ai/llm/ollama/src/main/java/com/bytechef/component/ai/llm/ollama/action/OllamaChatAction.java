@@ -208,7 +208,7 @@ public class OllamaChatAction {
             bool(TRUNCATE)
                 .label("Truncate")
                 .advancedOption(true))
-        .output()
+        .output(LLMUtils::output)
         .perform(OllamaChatAction::perform);
 
     private static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {

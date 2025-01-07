@@ -47,6 +47,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -90,7 +91,7 @@ public class AmazonBedrockJurassic2ChatAction {
                 .label("Count Penalty")
                 .description("Penalty object for count.")
                 .advancedOption(true))
-        .output()
+        .output(LLMUtils::output)
         .perform(AmazonBedrockJurassic2ChatAction::perform);
 
     public static final ChatModel CHAT_MODEL =
