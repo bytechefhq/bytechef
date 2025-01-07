@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Stability AI",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "API Key",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -489,11 +538,11 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "url",
+        "label" : "URL",
         "value" : "url"
       }, {
         "description" : null,
-        "label" : "b64_json",
+        "label" : "B64_JSON",
         "value" : "b64_json"
       } ],
       "optionsDataSource" : null
@@ -517,72 +566,72 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "comic-book",
-        "value" : "comic-book"
-      }, {
-        "description" : null,
         "label" : "3d-model",
-        "value" : "3d-model"
-      }, {
-        "description" : null,
-        "label" : "pixel-art",
-        "value" : "pixel-art"
-      }, {
-        "description" : null,
-        "label" : "photographic",
-        "value" : "photographic"
+        "value" : "THREE_D_MODEL"
       }, {
         "description" : null,
         "label" : "analog-film",
-        "value" : "analog-film"
-      }, {
-        "description" : null,
-        "label" : "tile-texture",
-        "value" : "tile-texture"
-      }, {
-        "description" : null,
-        "label" : "isometric",
-        "value" : "isometric"
-      }, {
-        "description" : null,
-        "label" : "fantasy-art",
-        "value" : "fantasy-art"
-      }, {
-        "description" : null,
-        "label" : "origami",
-        "value" : "origami"
-      }, {
-        "description" : null,
-        "label" : "neon-punk",
-        "value" : "neon-punk"
-      }, {
-        "description" : null,
-        "label" : "line-art",
-        "value" : "line-art"
-      }, {
-        "description" : null,
-        "label" : "modeling-compound",
-        "value" : "modeling-compound"
-      }, {
-        "description" : null,
-        "label" : "digital-art",
-        "value" : "digital-art"
-      }, {
-        "description" : null,
-        "label" : "low-poly",
-        "value" : "low-poly"
-      }, {
-        "description" : null,
-        "label" : "cinematic",
-        "value" : "cinematic"
+        "value" : "ANALOG_FILM"
       }, {
         "description" : null,
         "label" : "anime",
-        "value" : "anime"
+        "value" : "ANIME"
+      }, {
+        "description" : null,
+        "label" : "cinematic",
+        "value" : "CINEMATIC"
+      }, {
+        "description" : null,
+        "label" : "comic-book",
+        "value" : "COMIC_BOOK"
+      }, {
+        "description" : null,
+        "label" : "digital-art",
+        "value" : "DIGITAL_ART"
       }, {
         "description" : null,
         "label" : "enhance",
-        "value" : "enhance"
+        "value" : "ENHANCE"
+      }, {
+        "description" : null,
+        "label" : "fantasy-art",
+        "value" : "FANTASY_ART"
+      }, {
+        "description" : null,
+        "label" : "isometric",
+        "value" : "ISOMETRIC"
+      }, {
+        "description" : null,
+        "label" : "line-art",
+        "value" : "LINE_ART"
+      }, {
+        "description" : null,
+        "label" : "low-poly",
+        "value" : "LOW_POLY"
+      }, {
+        "description" : null,
+        "label" : "modeling-compound",
+        "value" : "MODELING_COMPOUND"
+      }, {
+        "description" : null,
+        "label" : "neon-punk",
+        "value" : "NEON_PUNK"
+      }, {
+        "description" : null,
+        "label" : "origami",
+        "value" : "ORIGAMI"
+      }, {
+        "description" : null,
+        "label" : "photographic",
+        "value" : "PHOTOGRAPHIC"
+      }, {
+        "description" : null,
+        "label" : "pixel-art",
+        "value" : "PIXEL_ART"
+      }, {
+        "description" : null,
+        "label" : "tile-texture",
+        "value" : "TILE_TEXTURE"
       } ],
       "optionsDataSource" : null
     }, {
@@ -690,59 +739,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Image",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "API Key",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : { }
-  },
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

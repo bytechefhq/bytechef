@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "OpenAI",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -21,10 +70,10 @@
     "metadata" : null,
     "name" : "ask",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -46,44 +95,48 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "gpt-4-0125-preview",
-        "value" : "gpt-4-0125-preview"
+        "label" : "gpt-3.5-turbo",
+        "value" : "gpt-3.5-turbo"
       }, {
         "description" : null,
-        "label" : "o1-preview-2024-09-12",
-        "value" : "o1-preview-2024-09-12"
+        "label" : "gpt-3.5-turbo-0125",
+        "value" : "gpt-3.5-turbo-0125"
       }, {
         "description" : null,
-        "label" : "gpt-4-turbo-preview",
-        "value" : "gpt-4-turbo-preview"
-      }, {
-        "description" : null,
-        "label" : "gpt-4-turbo",
-        "value" : "gpt-4-turbo"
-      }, {
-        "description" : null,
-        "label" : "gpt-4o-mini",
-        "value" : "gpt-4o-mini"
+        "label" : "gpt-3.5-turbo-1106",
+        "value" : "gpt-3.5-turbo-1106"
       }, {
         "description" : null,
         "label" : "gpt-4",
         "value" : "gpt-4"
       }, {
         "description" : null,
-        "label" : "o1-preview",
-        "value" : "o1-preview"
+        "label" : "gpt-4-0125-preview",
+        "value" : "gpt-4-0125-preview"
       }, {
         "description" : null,
-        "label" : "gpt-3.5-turbo",
-        "value" : "gpt-3.5-turbo"
+        "label" : "gpt-4-turbo",
+        "value" : "gpt-4-turbo"
       }, {
         "description" : null,
         "label" : "gpt-4-turbo-2024-04-09",
         "value" : "gpt-4-turbo-2024-04-09"
       }, {
         "description" : null,
-        "label" : "gpt-3.5-turbo-0125",
-        "value" : "gpt-3.5-turbo-0125"
+        "label" : "gpt-4-turbo-preview",
+        "value" : "gpt-4-turbo-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o",
+        "value" : "gpt-4o"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o-audio-preview",
+        "value" : "gpt-4o-audio-preview"
+      }, {
+        "description" : null,
+        "label" : "gpt-4o-mini",
+        "value" : "gpt-4o-mini"
       }, {
         "description" : null,
         "label" : "o1-mini",
@@ -94,12 +147,12 @@
         "value" : "o1-mini-2024-09-12"
       }, {
         "description" : null,
-        "label" : "gpt-3.5-turbo-1106",
-        "value" : "gpt-3.5-turbo-1106"
+        "label" : "o1-preview",
+        "value" : "o1-preview"
       }, {
         "description" : null,
-        "label" : "gpt-4o",
-        "value" : "gpt-4o"
+        "label" : "o1-preview-2024-09-12",
+        "value" : "o1-preview-2024-09-12"
       } ],
       "optionsDataSource" : null
     }, {
@@ -135,123 +188,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : "The contents of the message.",
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : true,
-          "name" : "content",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : "Content",
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : "messages[index].role == 'user'",
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : false,
-          "name" : "image",
-          "type" : "FILE_ENTRY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : "Image",
-          "placeholder" : null,
-          "properties" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "extension",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "mimeType",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "name",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "url",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          } ],
-          "controlType" : "FILE_ENTRY"
-        }, {
-          "advancedOption" : null,
-          "description" : "The role of the messages author",
+          "description" : "The role of the messages author.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -259,7 +196,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : "user",
+          "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -285,6 +222,143 @@
             "value" : "tool"
           } ],
           "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The contents of the message.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "content",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Content",
+          "placeholder" : null,
+          "controlType" : "TEXT_AREA",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
+          "displayCondition" : "messages[index].role == 'user'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : false,
+          "name" : "attachments",
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Attachments",
+          "placeholder" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "FILE_ENTRY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "properties" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "extension",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "mimeType",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "name",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "url",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            } ],
+            "controlType" : "FILE_ENTRY"
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
@@ -297,50 +371,70 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "In which format do you want the response to be in?",
+      "description" : "The response from the API.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : false,
-      "name" : "responseFormat",
-      "type" : "INTEGER",
-      "defaultValue" : 0,
-      "exampleValue" : null,
-      "label" : "Response Format",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : "Text response.",
-        "label" : "Text",
-        "value" : 0
-      }, {
-        "description" : "JSON response with key-value pairs.",
-        "label" : "JSON",
-        "value" : 1
-      } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "Define the JSON schema for the response.",
-      "displayCondition" : "responseFormat != 0",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "responseSchema",
-      "type" : "STRING",
+      "name" : "response",
+      "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Response Schema",
+      "label" : "Response",
       "placeholder" : null,
-      "controlType" : "JSON_SCHEMA_BUILDER",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
       "options" : null,
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "In which format do you want the response to be in?",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseFormat",
+        "type" : "INTEGER",
+        "defaultValue" : 1,
+        "exampleValue" : null,
+        "label" : "Response Format",
+        "placeholder" : null,
+        "maxValue" : null,
+        "minValue" : null,
+        "options" : [ {
+          "description" : "Text response",
+          "label" : "Text",
+          "value" : 1
+        }, {
+          "description" : "JSON response with key-value pairs",
+          "label" : "JSON",
+          "value" : 2
+        } ],
+        "controlType" : "SELECT",
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Define the JSON schema for the response.",
+        "displayCondition" : "response.responseFormat == 2",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseSchema",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Response Schema",
+        "placeholder" : null,
+        "controlType" : "JSON_SCHEMA_BUILDER",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
@@ -729,6 +823,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -869,8 +964,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -892,12 +986,12 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "dall-e-3",
-        "value" : "dall-e-3"
-      }, {
-        "description" : null,
         "label" : "dall-e-2",
         "value" : "dall-e-2"
+      }, {
+        "description" : null,
+        "label" : "dall-e-3",
+        "value" : "dall-e-3"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1052,7 +1146,7 @@
       "required" : null,
       "name" : "responseFormat",
       "type" : "STRING",
-      "defaultValue" : "url",
+      "defaultValue" : "URL",
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
@@ -1062,11 +1156,11 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "url",
+        "label" : "URL",
         "value" : "url"
       }, {
         "description" : null,
-        "label" : "b64_json",
+        "label" : "B64_JSON",
         "value" : "b64_json"
       } ],
       "optionsDataSource" : null
@@ -1260,6 +1354,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1356,8 +1451,7 @@
           "optionsDataSource" : null
         } ],
         "controlType" : "FILE_ENTRY"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1379,12 +1473,12 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "tts-1-hd",
-        "value" : "tts-1-hd"
-      }, {
-        "description" : null,
         "label" : "tts-1",
         "value" : "tts-1"
+      }, {
+        "description" : null,
+        "label" : "tts-1-hd",
+        "value" : "tts-1-hd"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1416,40 +1510,40 @@
       "metadata" : { },
       "required" : true,
       "name" : "voice",
-      "type" : "OBJECT",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Voice",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "alloy",
-        "value" : "alloy"
-      }, {
-        "description" : null,
-        "label" : "onyx",
-        "value" : "onyx"
-      }, {
-        "description" : null,
-        "label" : "fable",
-        "value" : "fable"
+        "value" : "ALLOY"
       }, {
         "description" : null,
         "label" : "echo",
-        "value" : "echo"
+        "value" : "ECHO"
       }, {
         "description" : null,
-        "label" : "shimmer",
-        "value" : "shimmer"
+        "label" : "fable",
+        "value" : "FABLE"
       }, {
         "description" : null,
         "label" : "nova",
-        "value" : "nova"
+        "value" : "NOVA"
+      }, {
+        "description" : null,
+        "label" : "onyx",
+        "value" : "ONYX"
+      }, {
+        "description" : null,
+        "label" : "shimmer",
+        "value" : "SHIMMER"
       } ],
-      "properties" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -1460,32 +1554,32 @@
       "metadata" : { },
       "required" : false,
       "name" : "responseFormat",
-      "type" : "OBJECT",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "mp3",
-        "value" : "mp3"
-      }, {
-        "description" : null,
         "label" : "aac",
-        "value" : "aac"
+        "value" : "AAC"
       }, {
         "description" : null,
         "label" : "flac",
-        "value" : "flac"
+        "value" : "FLAC"
+      }, {
+        "description" : null,
+        "label" : "mp3",
+        "value" : "MP3"
       }, {
         "description" : null,
         "label" : "opus",
-        "value" : "opus"
+        "value" : "OPUS"
       } ],
-      "properties" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -1524,8 +1618,8 @@
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
+      "sampleOutput" : null,
+      "outputSchema" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1924,36 +2018,36 @@
       "metadata" : { },
       "required" : true,
       "name" : "responseFormat",
-      "type" : "OBJECT",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Response format",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "srt",
-        "value" : "srt"
-      }, {
-        "description" : null,
-        "label" : "vtt",
-        "value" : "vtt"
-      }, {
-        "description" : null,
         "label" : "json",
-        "value" : "json"
+        "value" : "JSON"
+      }, {
+        "description" : null,
+        "label" : "srt",
+        "value" : "SRT"
       }, {
         "description" : null,
         "label" : "text",
-        "value" : "text"
+        "value" : "TEXT"
       }, {
         "description" : null,
         "label" : "verbose_json",
-        "value" : "verbose_json"
+        "value" : "VERBOSE_JSON"
+      }, {
+        "description" : null,
+        "label" : "vtt",
+        "value" : "VTT"
       } ],
-      "properties" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -1985,54 +2079,5 @@
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

@@ -26,7 +26,7 @@ class HuggingFaceComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/hugging-face_v1.json",
-            new HuggingFaceComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/hugging-face_v1.json", new HuggingFaceComponentHandler().getDefinition());
     }
 }

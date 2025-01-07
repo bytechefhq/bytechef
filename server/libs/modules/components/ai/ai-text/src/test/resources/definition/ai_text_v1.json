@@ -289,13 +289,13 @@
     } ],
     "title" : "Classify Text",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -506,13 +506,13 @@
     } ],
     "title" : "Sentiment Analysis",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -852,13 +852,13 @@
     } ],
     "title" : "Score",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1128,13 +1128,13 @@
     } ],
     "title" : "Summarize Text",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1403,13 +1403,13 @@
     } ],
     "title" : "Similarity Search",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "categories" : [ {

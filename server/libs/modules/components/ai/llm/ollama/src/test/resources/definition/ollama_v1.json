@@ -13,6 +13,55 @@
   "resources" : null,
   "version" : 1,
   "title" : "Ollama",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "URL to your Ollama server",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : "url",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Url",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -21,7 +70,7 @@
     "metadata" : null,
     "name" : "ask",
     "outputDefinition" : {
-      "output" : null,
+      "output" : { },
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
@@ -46,96 +95,96 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "llama3.2:1b",
-        "value" : "llama3.2:1b"
-      }, {
-        "description" : null,
-        "label" : "llama2-uncensored",
-        "value" : "llama2-uncensored"
-      }, {
-        "description" : null,
-        "label" : "starling-lm",
-        "value" : "starling-lm"
-      }, {
-        "description" : null,
-        "label" : "moondream",
-        "value" : "moondream"
-      }, {
-        "description" : null,
-        "label" : "llava",
-        "value" : "llava"
-      }, {
-        "description" : null,
-        "label" : "mistral-nemo",
-        "value" : "mistral-nemo"
+        "label" : "codellama",
+        "value" : "codellama"
       }, {
         "description" : null,
         "label" : "dolphin-phi",
         "value" : "dolphin-phi"
       }, {
         "description" : null,
-        "label" : "mxbai-embed-large",
-        "value" : "mxbai-embed-large"
-      }, {
-        "description" : null,
-        "label" : "orca-mini",
-        "value" : "orca-mini"
-      }, {
-        "description" : null,
-        "label" : "codellama",
-        "value" : "codellama"
-      }, {
-        "description" : null,
-        "label" : "phi",
-        "value" : "phi"
-      }, {
-        "description" : null,
-        "label" : "llama3.2",
-        "value" : "llama3.2"
-      }, {
-        "description" : null,
-        "label" : "llama3.1",
-        "value" : "llama3.1"
-      }, {
-        "description" : null,
-        "label" : "nomic-embed-text",
-        "value" : "nomic-embed-text"
-      }, {
-        "description" : null,
-        "label" : "llama3",
-        "value" : "llama3"
-      }, {
-        "description" : null,
-        "label" : "phi3",
-        "value" : "phi3"
+        "label" : "gemma",
+        "value" : "gemma"
       }, {
         "description" : null,
         "label" : "llama2",
         "value" : "llama2"
       }, {
         "description" : null,
-        "label" : "gemma",
-        "value" : "gemma"
+        "label" : "llama2-uncensored",
+        "value" : "llama2-uncensored"
+      }, {
+        "description" : null,
+        "label" : "llama3",
+        "value" : "llama3"
+      }, {
+        "description" : null,
+        "label" : "llama3.1",
+        "value" : "llama3.1"
+      }, {
+        "description" : null,
+        "label" : "llama3.2",
+        "value" : "llama3.2"
+      }, {
+        "description" : null,
+        "label" : "llama3.2-vision",
+        "value" : "llama3.2-vision"
       }, {
         "description" : null,
         "label" : "llama3.2-vision:90b",
         "value" : "llama3.2-vision:90b"
       }, {
         "description" : null,
-        "label" : "qwen2.5",
-        "value" : "qwen2.5"
+        "label" : "llama3.2:1b",
+        "value" : "llama3.2:1b"
       }, {
         "description" : null,
-        "label" : "neural-chat",
-        "value" : "neural-chat"
+        "label" : "llava",
+        "value" : "llava"
       }, {
         "description" : null,
         "label" : "mistral",
         "value" : "mistral"
       }, {
         "description" : null,
-        "label" : "llama3.2-vision",
-        "value" : "llama3.2-vision"
+        "label" : "mistral-nemo",
+        "value" : "mistral-nemo"
+      }, {
+        "description" : null,
+        "label" : "moondream",
+        "value" : "moondream"
+      }, {
+        "description" : null,
+        "label" : "mxbai-embed-large",
+        "value" : "mxbai-embed-large"
+      }, {
+        "description" : null,
+        "label" : "neural-chat",
+        "value" : "neural-chat"
+      }, {
+        "description" : null,
+        "label" : "nomic-embed-text",
+        "value" : "nomic-embed-text"
+      }, {
+        "description" : null,
+        "label" : "orca-mini",
+        "value" : "orca-mini"
+      }, {
+        "description" : null,
+        "label" : "phi",
+        "value" : "phi"
+      }, {
+        "description" : null,
+        "label" : "phi3",
+        "value" : "phi3"
+      }, {
+        "description" : null,
+        "label" : "qwen2.5",
+        "value" : "qwen2.5"
+      }, {
+        "description" : null,
+        "label" : "starling-lm",
+        "value" : "starling-lm"
       } ],
       "optionsDataSource" : null
     }, {
@@ -171,123 +220,7 @@
         "options" : null,
         "properties" : [ {
           "advancedOption" : null,
-          "description" : "The contents of the message.",
-          "displayCondition" : null,
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : true,
-          "name" : "content",
-          "type" : "STRING",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : "Content",
-          "placeholder" : null,
-          "controlType" : "TEXT",
-          "languageId" : null,
-          "maxLength" : null,
-          "minLength" : null,
-          "options" : null,
-          "optionsDataSource" : null
-        }, {
-          "advancedOption" : null,
-          "description" : null,
-          "displayCondition" : "messages[index].role == 'user'",
-          "expressionEnabled" : null,
-          "hidden" : null,
-          "metadata" : { },
-          "required" : false,
-          "name" : "image",
-          "type" : "FILE_ENTRY",
-          "defaultValue" : null,
-          "exampleValue" : null,
-          "label" : "Image",
-          "placeholder" : null,
-          "properties" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "extension",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "mimeType",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "name",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          }, {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : true,
-            "name" : "url",
-            "type" : "STRING",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "controlType" : "TEXT",
-            "languageId" : null,
-            "maxLength" : null,
-            "minLength" : null,
-            "options" : null,
-            "optionsDataSource" : null
-          } ],
-          "controlType" : "FILE_ENTRY"
-        }, {
-          "advancedOption" : null,
-          "description" : "The role of the messages author",
+          "description" : "The role of the messages author.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -295,7 +228,7 @@
           "required" : true,
           "name" : "role",
           "type" : "STRING",
-          "defaultValue" : "user",
+          "defaultValue" : null,
           "exampleValue" : null,
           "label" : "Role",
           "placeholder" : null,
@@ -321,63 +254,220 @@
             "value" : "tool"
           } ],
           "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The contents of the message.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "content",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Content",
+          "placeholder" : null,
+          "controlType" : "TEXT_AREA",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
+          "displayCondition" : "messages[index].role == 'user'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : false,
+          "name" : "attachments",
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Attachments",
+          "placeholder" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "FILE_ENTRY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "properties" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "extension",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "mimeType",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "name",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "url",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            } ],
+            "controlType" : "FILE_ENTRY"
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
-      "description" : "In which format do you want the response to be in?",
+      "description" : "The response from the API.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : false,
-      "name" : "responseFormat",
-      "type" : "INTEGER",
-      "defaultValue" : 1,
-      "exampleValue" : null,
-      "label" : "Response format",
-      "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : "JSON response with key-value pairs.",
-        "label" : "Object",
-        "value" : 1
-      }, {
-        "description" : "JSON response that is a list.",
-        "label" : "List",
-        "value" : 2
-      } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
-    }, {
-      "advancedOption" : null,
-      "description" : "Define the JSON schema for the response.",
-      "displayCondition" : "responseFormat != 0",
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : false,
-      "name" : "responseSchema",
-      "type" : "STRING",
+      "name" : "response",
+      "type" : "OBJECT",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Response Schema",
+      "label" : "Response",
       "placeholder" : null,
-      "controlType" : "JSON_SCHEMA_BUILDER",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "In which format do you want the response to be in?",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseFormat",
+        "type" : "INTEGER",
+        "defaultValue" : 1,
+        "exampleValue" : null,
+        "label" : "Response Format",
+        "placeholder" : null,
+        "maxValue" : null,
+        "minValue" : null,
+        "options" : [ {
+          "description" : "Text response",
+          "label" : "Text",
+          "value" : 1
+        }, {
+          "description" : "JSON response with key-value pairs",
+          "label" : "JSON",
+          "value" : 2
+        } ],
+        "optionsDataSource" : null,
+        "controlType" : "SELECT"
+      }, {
+        "advancedOption" : null,
+        "description" : "Define the JSON schema for the response.",
+        "displayCondition" : "response.responseFormat == 2",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseSchema",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Response Schema",
+        "placeholder" : null,
+        "controlType" : "JSON_SCHEMA_BUILDER",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Controls how long the model will stay loaded into memory following the request",
@@ -415,8 +505,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -437,8 +527,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -459,8 +549,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Specify the number of token choices the generative uses to generate the next token.",
@@ -478,8 +568,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -500,8 +590,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -522,8 +612,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -563,8 +653,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "Keeping the same seed would output the same response.",
@@ -582,8 +672,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Whether to use NUMA.",
@@ -625,8 +715,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Prompt processing maximum batch size.",
@@ -644,8 +734,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The number of layers to send to the GPU(s). On macOS it defaults to 1 to enable metal support, 0 to disable. 1 here indicates that NumGPU should be set dynamically",
@@ -663,8 +753,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "When using multiple GPUs this option controls which GPU is used for small tensors for which the overhead of splitting the computation across all GPUs is not worthwhile. The GPU in question will use slightly more VRAM to store a scratch buffer for temporary results.",
@@ -682,8 +772,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : null,
@@ -845,8 +935,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : null,
@@ -864,8 +954,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Tail-free sampling is used to reduce the impact of less probable tokens from the output. A higher value (e.g., 2.0) will reduce the impact more, while a value of 1.0 disables this setting.",
@@ -886,8 +976,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : null,
@@ -908,8 +998,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)",
@@ -927,8 +1017,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Sets how strongly to penalize repetitions. A higher value (e.g., 1.5) will penalize repetitions more strongly, while a lower value (e.g., 0.9) will be more lenient.",
@@ -949,8 +1039,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Enable Mirostat sampling for controlling perplexity. (default: 0, 0 = disabled, 1 = Mirostat, 2 = Mirostat 2.0)",
@@ -968,8 +1058,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls the balance between coherence and diversity of the output. A lower value will result in more focused and coherent text.",
@@ -990,8 +1080,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Influences how quickly the algorithm responds to feedback from the generated text. A lower learning rate will result in slower adjustments, while a higher learning rate will make the algorithm more responsive.",
@@ -1012,8 +1102,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : null,
@@ -1064,60 +1154,11 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "URL to your Ollama server",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : null,
-        "name" : "url",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Url",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "scopes" : null,
-      "apply" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "refreshUrl" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "dataStream" : null,
+  "unifiedApi" : null
 }

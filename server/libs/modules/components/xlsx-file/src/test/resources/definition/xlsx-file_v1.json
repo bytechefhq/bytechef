@@ -255,9 +255,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -700,9 +700,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to File",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,

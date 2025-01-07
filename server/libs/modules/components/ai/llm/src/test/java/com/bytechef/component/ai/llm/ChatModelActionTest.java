@@ -44,10 +44,12 @@ public class ChatModelActionTest extends AbstractActionTest {
     public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
             .thenReturn(List.of(new ChatModel.Message("QUESTION", null, "user")));
+        when(mockedParameters.getFromPath(any(), eq(Integer.class), eq(1)))
+            .thenReturn(1);
 
         ChatModel mockedChat = spy(new MockChatModel());
-        org.springframework.ai.chat.model.ChatModel mockedChatModelModel =
-            mock(org.springframework.ai.chat.model.ChatModel.class);
+        org.springframework.ai.chat.model.ChatModel mockedChatModelModel = mock(
+            org.springframework.ai.chat.model.ChatModel.class);
 
         when(mockedChat.createChatModel(mockedParameters, mockedParameters)).thenReturn(mockedChatModelModel);
 
@@ -62,8 +64,9 @@ public class ChatModelActionTest extends AbstractActionTest {
     private static class MockChatModel implements ChatModel {
 
         @Override
-        public org.springframework.ai.chat.model.ChatModel
-            createChatModel(Parameters inputParameters, Parameters connectionParameters) {
+        public org.springframework.ai.chat.model.ChatModel createChatModel(
+            Parameters inputParameters, Parameters connectionParameters) {
+
             return null;
         }
     }

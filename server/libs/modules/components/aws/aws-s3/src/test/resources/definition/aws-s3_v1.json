@@ -525,7 +525,7 @@
           "options" : null,
           "optionsDataSource" : null
         },
-        "sampleOutput" : null
+        "sampleOutput" : "https://s3.amazonaws.com/bucket-name/key"
       },
       "outputSchema" : {
         "advancedOption" : null,
@@ -548,7 +548,7 @@
         "options" : null,
         "optionsDataSource" : null
       },
-      "sampleOutput" : null
+      "sampleOutput" : "https://s3.amazonaws.com/bucket-name/key"
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1145,7 +1145,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

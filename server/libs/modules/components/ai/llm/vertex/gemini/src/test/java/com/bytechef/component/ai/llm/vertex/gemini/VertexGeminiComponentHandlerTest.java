@@ -27,7 +27,7 @@ class VertexGeminiComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/vertex-gemini_v1.json",
-            new VertexGeminiComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals(
+            "definition/vertex-gemini_v1.json", new VertexGeminiComponentHandler().getDefinition());
     }
 }
