@@ -30,7 +30,7 @@ export function RightSidebar({
                                         onClick={item.onClick}
                                     >
                                         <Tooltip>
-                                            <TooltipTrigger>
+                                            <TooltipTrigger asChild>
                                                 {item.icon && <item.icon aria-hidden="true" />}
                                             </TooltipTrigger>
 
