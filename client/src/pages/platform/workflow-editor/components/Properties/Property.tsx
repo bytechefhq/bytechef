@@ -1087,8 +1087,11 @@ const Property = ({
 
             {type === 'DYNAMIC_PROPERTIES' && currentComponent && (
                 <PropertyDynamicProperties
-                    currentNodeConnectionId={currentNode?.connectionId}
                     currentOperationName={operationName}
+                    enabled={
+                        !!(currentNode?.connectionId && currentNode?.connections) ||
+                        currentNode?.connections?.length === 0
+                    }
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}
