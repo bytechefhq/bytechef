@@ -97,8 +97,7 @@ public class VarSetAction {
             object(VALUE)
                 .label("Value")
                 .description("Value of any type to set.")
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                .additionalProperties()
                 .displayCondition("type == 8")
                 .required(true),
             string(VALUE)
@@ -117,7 +116,11 @@ public class VarSetAction {
     protected static BaseOutputDefinition.OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return new BaseOutputDefinition.OutputResponse(inputParameters.getRequired(VALUE));
+        if (!inputParameters.containsKey(VALUE)) {
+            return null;
+        }
+
+        return new BaseOutputDefinition.OutputResponse(perform(inputParameters, connectionParameters, context));
     }
 
     protected static Object perform(
