@@ -138,7 +138,6 @@
     "@testing-library/react": "^16.1.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/node": "^20.14.10",
-    "@types/react-datepicker": "^6.2.0",
     "@types/react-dom": "^19.0.1",
     "@types/sanitize-html": "^2.13.0",
     "@typescript-eslint/eslint-plugin": "^8.17.0",
