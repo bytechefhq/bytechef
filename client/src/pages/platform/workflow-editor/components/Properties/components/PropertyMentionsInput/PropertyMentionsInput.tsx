@@ -149,9 +149,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                     <div
                         className={twMerge(
-                            'property-mentions-editor flex h-full w-full rounded-md bg-white',
+                            'property-mentions-editor flex h-full min-h-[34px] w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pl-10',
-                            controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA' ? 'min-h-32' : 'min-h-[34px]',
                             className
                         )}
                     >
