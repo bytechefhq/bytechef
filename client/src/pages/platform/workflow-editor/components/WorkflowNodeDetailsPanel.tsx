@@ -55,7 +55,7 @@ import ConnectionTab from './node-details-tabs/ConnectionTab';
 import DescriptionTab from './node-details-tabs/DescriptionTab';
 import OutputTab from './node-details-tabs/OutputTab';
 
-const TABS = [
+const TABS: Array<{label: string; name: TabNameType}> = [
     {
         label: 'Description',
         name: 'description',

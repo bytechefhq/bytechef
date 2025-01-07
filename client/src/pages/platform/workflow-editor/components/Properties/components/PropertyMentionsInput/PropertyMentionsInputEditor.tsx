@@ -253,7 +253,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         useEffect(() => {
             if (value && editor && !initialized) {
-                editor.commands.setContent(getContent(value));
+                editor.commands.setContent(getContent(value)!);
+
                 setInitialized(true);
             }
         }, [editor, getContent, initialized, setInitialized, value]);
