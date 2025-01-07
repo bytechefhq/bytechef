@@ -28,9 +28,7 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                                 <div className="flex flex-col">
                                     <SheetTitle>JSON Schema Builder</SheetTitle>
 
-                                    <SheetHeader>
-                                        Define desired response format for the output returned by the model
-                                    </SheetHeader>
+                                    <SheetHeader>Define desired response format for the output</SheetHeader>
                                 </div>
 
                                 <div className="flex items-center gap-2">
