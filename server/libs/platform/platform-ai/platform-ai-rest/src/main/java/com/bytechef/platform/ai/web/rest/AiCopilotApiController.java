@@ -18,8 +18,6 @@ package com.bytechef.platform.ai.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.ai.service.ChatService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,24 +46,9 @@ public class AiCopilotApiController {
     public Flux<Map<String, ?>> chat(
         @RequestBody Request request, @RequestHeader("X-Copilot-Conversation-Id") String conversationId) {
 
-        Content lastContent = request.message.content.getLast();
-
-        return chatService.chat(lastContent.text, conversationId);
+        return chatService.chat(request.message, conversationId);
     }
 
-    public record Request(Message message) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record Message(
-        List<String> attachments, List<Content> content, String createdAt, String id, Metadata metadata, String role) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record Content(String type, String text) {
-    }
-
-    @SuppressFBWarnings("EI")
-    public record Metadata(Map<String, ?> custom) {
+    public record Request(String message) {
     }
 }
