@@ -163,16 +163,8 @@ const WorkflowNodeDetailsPanel = ({
 
     const previousNodeNames = nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : [];
 
-    const actionDefinitions = workflowNodeOutputs
-        .filter((workflowNodeOutput) => workflowNodeOutput?.actionDefinition)
-        .map((workflowNodeOutput) => workflowNodeOutput.actionDefinition!);
-
     const previousComponentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions?.map(
         (componentDefinition, index) => {
-            if (!actionDefinitions?.length) {
-                return;
-            }
-
             const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs[index]?.outputSchema;
 
             const properties = outputSchemaDefinition?.properties?.length
@@ -401,7 +393,7 @@ const WorkflowNodeDetailsPanel = ({
             );
         }
 
-        const dataPills = getDataPillsFromProperties(previousComponentProperties!, workflow, filteredNodeNames);
+        const dataPills = getDataPillsFromProperties(previousComponentProperties!, filteredNodeNames);
 
         setDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps

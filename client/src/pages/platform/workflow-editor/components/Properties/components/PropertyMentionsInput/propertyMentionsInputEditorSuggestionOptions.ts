@@ -35,7 +35,7 @@ export function getSuggestionOptions(dataPills: DataPillType[]): MentionOptions[
         items: ({query}: {query: string}): DataPillType[] => {
             return dataPills
                 .map((dataPill) => dataPill)
-                .filter((item) => item.value.toLowerCase().startsWith(query.toLowerCase()));
+                .filter((item) => (!query ? item : item.value.toLowerCase().startsWith(query.toLowerCase())));
         },
         render: () => {
             let component: ReactRenderer<PropertyMentionsInputListRefType> | undefined;
