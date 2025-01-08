@@ -57,7 +57,7 @@ Send an email to any address.
 | BCC Email | [STRING] | ARRAY_BUILDER  |  Who to BCC on the email.  |
 | Reply To | [STRING] | ARRAY_BUILDER  |  When someone replies to this email, where should it go to?  |
 | Subject | STRING | TEXT  |  Your email subject.  |
-| Content | STRING | TEXT  |  Your email content. Will be sent as a HTML email.  |
+| Content | STRING | RICH_TEXT  |  Your email content. Will be sent as a HTML email.  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
 

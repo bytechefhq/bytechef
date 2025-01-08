@@ -54,7 +54,7 @@ Sends an email.
 | To | [STRING] | ARRAY_BUILDER  |  Email addresses which you want to send to.  |
 | CC | [STRING] | ARRAY_BUILDER  |  Email address which receives a copy.  |
 | Subject | STRING | TEXT  |  Subject of your email  |
-| Message Body | STRING | TEXT  |  This is the message you want to send  |
+| Message Body | STRING | RICH_TEXT  |  This is the message you want to send  |
 | Message Type | STRING | SELECT  |  Message type for your content  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments you want to include with the email.  |
 

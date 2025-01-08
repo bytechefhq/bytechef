@@ -285,7 +285,7 @@ Send the message.
 | Bcc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Bcc recipients for the message.  |
 | Cc Recipients | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The Cc recipients for the message.  |
 | Reply To | [{{STRING\(address), STRING\(name)}\(emailAddress)}\($recipient)] | ARRAY_BUILDER  |  The email addresses to use when replying.  |
-| Body | {STRING\(content), STRING\(contentType)} | OBJECT_BUILDER  |  The body of the message. It can be in HTML or text format.  |
+| Body | {INTEGER\(contentType), STRING\(content), STRING\(content)} | OBJECT_BUILDER  |  The body of the message. It can be in HTML or text format.  |
 
 
 

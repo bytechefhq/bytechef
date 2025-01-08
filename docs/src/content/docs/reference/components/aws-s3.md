@@ -91,6 +91,11 @@ Get the url of an AWS S3 object.
 ### Output
 
 
+___Sample Output:___
+
+```https://s3.amazonaws.com/bucket-name/key```
+
+
 
 Type: STRING
 
