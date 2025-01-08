@@ -136,9 +136,7 @@ public interface ActionDefinition {
          * @param context
          * @return
          */
-        OutputResponse apply(
-            Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-
+        OutputResponse apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
             throws Exception;
     }
 
