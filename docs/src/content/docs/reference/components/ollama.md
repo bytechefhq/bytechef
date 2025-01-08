@@ -51,9 +51,8 @@ Ask anything you want.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
-| Messages | [{STRING\(content), FILE_ENTRY\(image), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
-| Response Schema | STRING | JSON_SCHEMA_BUILDER  |  Define the JSON schema for the response.  |
+| Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Keep alive for | STRING | TEXT  |  Controls how long the model will stay loaded into memory following the request  |
 | Num predict | INTEGER | INTEGER  |  Maximum number of tokens to predict when generating text. (-1 = infinite generation, -2 = fill context)  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |

@@ -266,7 +266,7 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
 | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
 | Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
-| Body | STRING | TEXT  |  Body text of the email  |
+| Body | STRING | RICH_TEXT  |  Body text of the email  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
 

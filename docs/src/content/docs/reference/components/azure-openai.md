@@ -52,9 +52,8 @@ Ask anything you want.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | TEXT  |  Deployment name, written in string.  |
-| Messages | [{STRING\(content), FILE_ENTRY\(image), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response Format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
-| Response Schema | STRING | JSON_SCHEMA_BUILDER  |  Define the JSON schema for the response.  |
+| Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Max Tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Number of Chat Completion Choices | INTEGER | INTEGER  |  How many chat completion choices to generate for each input message.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
@@ -114,7 +113,7 @@ Transcribes audio into the input language.
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Language | STRING | SELECT  |  The language of the input audio.  |
 | Prompt | STRING | TEXT  |  An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language.  |
-| Response Format | {} | SELECT  |  The format of the transcript output  |
+| Response Format | STRING | SELECT  |  The format of the transcript output  |
 | Temperature | NUMBER | NUMBER  |  The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.   |
 
 
