@@ -27,15 +27,17 @@ export const PasswordResetInit = () => {
 
     const navigate = useNavigate();
 
+    const email = form.getValues().email;
+
     useEffect(() => {
-        if (form.getValues().email && resetPasswordSuccess) {
-            navigate('/password-reset/email', {state: {email: form.getValues().email}});
+        if (email && resetPasswordSuccess) {
+            navigate('/password-reset/email', {state: {email: email}});
         } else if (resetPasswordFailure) {
             navigate('/account-error');
         }
 
         reset();
-    }, [form, navigate, reset, resetPasswordFailure, resetPasswordSuccess]);
+    }, [email, navigate, reset, resetPasswordFailure, resetPasswordSuccess]);
 
     function handleSubmit({email}: z.infer<typeof formSchema>) {
         resetPasswordInit(email);
