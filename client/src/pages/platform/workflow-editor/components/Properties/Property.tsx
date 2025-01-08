@@ -388,7 +388,7 @@ const Property = ({
             return;
         }
 
-        const parentParameterValue = resolvePath(currentComponent.parameters, path);
+        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -710,7 +710,7 @@ const Property = ({
             currentComponent &&
             path &&
             updateWorkflowNodeParameterMutation &&
-            resolvePath(currentComponent.parameters, path) !== defaultValue
+            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
