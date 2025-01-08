@@ -20,12 +20,11 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getForm;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
 
 /**
@@ -51,10 +50,6 @@ public class GoogleFormsGetFormAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + inputParameters.getRequiredString(FORM)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return getForm(inputParameters.getRequiredString(FORM), actionContext);
     }
 }
