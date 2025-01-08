@@ -77,7 +77,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             return;
         }
 
-        const clickedItemParameterValue = resolvePath(currentComponent.parameters, path);
+        const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
         if (clickedItemParameterValue !== undefined) {
             onDeleteClick(path);
