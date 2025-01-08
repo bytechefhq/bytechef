@@ -17,7 +17,12 @@
 package com.bytechef.component.google.forms.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.ANSWERS;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FILE_UPLOAD_ANSWERS;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.NEXT_PAGE_TOKEN;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSES;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.TEXT_ANSWERS;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -30,6 +35,7 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +46,14 @@ import java.util.Map;
 public class GoogleFormsUtils {
 
     private GoogleFormsUtils() {
+    }
+
+    public static Map<String, Object> getForm(String formId, Context context) {
+        return context
+            .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
     }
 
     public static List<Option<String>> getFormOptions(
@@ -64,22 +78,22 @@ public class GoogleFormsUtils {
 
         List<Option<String>> formResponses = new ArrayList<>();
         String nextToken = null;
+        String formId = inputParameters.getRequiredString(FORM);
         do {
             Http.Executor executor = context
-                .http(http -> http.get(
-                    "https://forms.googleapis.com/v1/forms/" + inputParameters.getRequiredString(FORM) + "/responses"))
+                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
                 .configuration(Http.responseType(Http.ResponseType.JSON));
 
             if (nextToken != null) {
-                executor.queryParameter("nextPageToken", nextToken);
+                executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
             }
 
             Map<String, Object> response = executor.execute()
                 .getBody(new TypeReference<>() {});
 
-            nextToken = (String) response.getOrDefault("nextPageToken", null);
+            nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
 
-            if (response.get("responses") instanceof List<?> list) {
+            if (response.get(RESPONSES) instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
                         String responseId = (String) map.get("responseId");
@@ -98,30 +112,27 @@ public class GoogleFormsUtils {
         return formResponses;
     }
 
-    public static List<Map<?, ?>>
-        getFormResponses(Parameters inputParameters, Context context, String startDateString) {
-
+    public static List<Map<?, ?>> getFormResponses(String formId, Context context, String startDateString) {
         String encode = URLEncoder.encode("timestamp > " + startDateString, StandardCharsets.UTF_8);
-
         List<Map<?, ?>> formResponses = new ArrayList<>();
         String nextToken = null;
+
         do {
             Http.Executor executor = context
-                .http(http -> http.get(
-                    "https://forms.googleapis.com/v1/forms/" + inputParameters.getRequiredString(FORM) + "/responses"))
+                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
                 .queryParameter("filter", encode)
                 .configuration(Http.responseType(Http.ResponseType.JSON));
 
             if (nextToken != null) {
-                executor.queryParameter("nextPageToken", nextToken);
+                executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
             }
 
             Map<String, Object> response = executor.execute()
                 .getBody(new TypeReference<>() {});
 
-            nextToken = (String) response.getOrDefault("nextPageToken", null);
+            nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
 
-            if (response.get("responses") instanceof List<?> list) {
+            if (response.get(RESPONSES) instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
                         formResponses.add(map);
@@ -132,5 +143,97 @@ public class GoogleFormsUtils {
         } while (nextToken != null);
 
         return formResponses;
+    }
+
+    public static Map<String, Object> getCustomResponse(Context context, String formId, Map<?, ?> response) {
+        List<FormItem> formItems = getFormItems(getForm(formId, context));
+
+        Map<String, Object> responses = new LinkedHashMap<>();
+
+        responses.put("formId", formId);
+        responses.put("responseId", response.get("responseId"));
+
+        if (response.get(ANSWERS) instanceof Map<?, ?> answers) {
+            int index = 1;
+            for (FormItem formItem : formItems) {
+                String id = formItem.itemId();
+
+                if (answers.get(id) instanceof Map<?, ?> answer) {
+                    processAnswers(responses, formItem, answer, index++);
+                }
+            }
+        }
+
+        return responses;
+    }
+
+    private static List<FormItem> getFormItems(Map<String, Object> body) {
+        List<FormItem> formItems = new ArrayList<>();
+
+        if (body.get("items") instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    if (map.get("questionItem") instanceof Map<?, ?> questionItem &&
+                        questionItem.get("question") instanceof Map<?, ?> question) {
+
+                        formItems.add(new FormItem((String) question.get("questionId"), (String) map.get("title")));
+                    }
+                }
+            }
+        }
+
+        return formItems;
+    }
+
+    private static void processAnswers(Map<String, Object> responses, FormItem formItem, Map<?, ?> answer, int index) {
+        if (answer.containsKey(FILE_UPLOAD_ANSWERS)) {
+            processFileUploadAnswers(responses, formItem, answer, index);
+        } else if (answer.containsKey(TEXT_ANSWERS)) {
+            processTextAnswers(responses, formItem, answer, index);
+        }
+    }
+
+    private static void processFileUploadAnswers(
+        Map<String, Object> responses, FormItem formItem, Map<?, ?> answer, int index) {
+
+        if (answer.get(FILE_UPLOAD_ANSWERS) instanceof Map<?, ?> textAnswers &&
+            textAnswers.get(ANSWERS) instanceof List<?> list) {
+            for (Object fileUploadAnswer : list) {
+                if (fileUploadAnswer instanceof Map<?, ?> map) {
+                    responses.put(
+                        "question" + index,
+                        new FormFileUploadAnswer(
+                            formItem.itemId(), formItem.title(), (String) map.get("fileId"),
+                            (String) map.get("fileName")));
+                }
+            }
+        }
+    }
+
+    private static void processTextAnswers(
+        Map<String, Object> responses, FormItem formItem, Map<?, ?> answer, int index) {
+
+        if (answer.get(TEXT_ANSWERS) instanceof Map<?, ?> textAnswers &&
+            textAnswers.get(ANSWERS) instanceof List<?> list) {
+            List<String> answers = new ArrayList<>();
+            for (Object textAnswer : list) {
+                if (textAnswer instanceof Map<?, ?> map) {
+                    answers.add((String) map.get("value"));
+                }
+            }
+            responses.put(
+                "question" + index,
+                new FormTextAnswer(formItem.itemId(), formItem.title(), answers));
+        }
+
+    }
+
+    record FormItem(String itemId, String title) {
+    }
+
+    record FormTextAnswer(String questionId, String title, List<String> answers) {
+    }
+
+    record FormFileUploadAnswer(String questionId, String title, String fileId, String fileName) {
     }
 }

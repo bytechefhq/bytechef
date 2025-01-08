@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponse;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -28,6 +29,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import java.util.Map;
 
 /**
  * @author Vihar Shah
@@ -55,16 +57,18 @@ public class GoogleFormsGetResponseAction {
     private GoogleFormsGetResponseAction() {
     }
 
-    protected static Object perform(
+    protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         String formId = inputParameters.getRequiredString(FORM);
         String responseId = inputParameters.getRequiredString(RESPONSE);
 
-        return actionContext
+        Map<String, Object> response = actionContext
             .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses/" + responseId))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        return getCustomResponse(actionContext, formId, response);
     }
 }
