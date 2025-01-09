@@ -49,6 +49,39 @@ public class GoogleFormsUtils {
     private GoogleFormsUtils() {
     }
 
+    public static Map<String, Object> createCustomResponse(Context context, String formId, Map<?, ?> response) {
+        List<FormItem> formItems = getFormItems(getForm(formId, context));
+
+        Map<String, Object> responses = new LinkedHashMap<>();
+
+        responses.put(FORM_ID, formId);
+        responses.put(RESPONSE_ID, response.get(RESPONSE_ID));
+
+        if (response.get(ANSWERS) instanceof Map<?, ?> answers) {
+            int index = 1;
+            for (FormItem formItem : formItems) {
+                String id = formItem.itemId();
+
+                if (answers.get(id) instanceof Map<?, ?> answer) {
+                    processAnswers(responses, formItem, answer, index++);
+                }
+            }
+        }
+
+        return responses;
+    }
+
+    public static List<Map<String, Object>> getCustomResponses(Context context, String formId, String timestamp) {
+        List<Map<?, ?>> formResponses = getFormResponses(formId, context, timestamp);
+
+        List<Map<String, Object>> customResponses = new ArrayList<>();
+
+        for (Map<?, ?> formResponse : formResponses) {
+            customResponses.add(createCustomResponse(context, formId, formResponse));
+        }
+        return customResponses;
+    }
+
     public static Map<String, Object> getForm(String formId, Context context) {
         return context
             .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId))
@@ -113,59 +146,52 @@ public class GoogleFormsUtils {
         return formResponses;
     }
 
-    public static List<Map<?, ?>> getFormResponses(String formId, Context context, String startDateString) {
-        String encode = URLEncoder.encode("timestamp > " + startDateString, StandardCharsets.UTF_8);
+    private static List<Map<?, ?>> getFormResponses(String formId, Context context, String timestamp) {
         List<Map<?, ?>> formResponses = new ArrayList<>();
         String nextToken = null;
 
         do {
-            Http.Executor executor = context
-                .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
-                .queryParameter("filter", encode)
-                .configuration(Http.responseType(Http.ResponseType.JSON));
-
-            if (nextToken != null) {
-                executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
-            }
+            Http.Executor executor = createHttpExecutor(formId, context, timestamp, nextToken);
 
             Map<String, Object> response = executor.execute()
                 .getBody(new TypeReference<>() {});
 
             nextToken = (String) response.getOrDefault(NEXT_PAGE_TOKEN, null);
 
-            if (response.get(RESPONSES) instanceof List<?> list) {
-                for (Object o : list) {
-                    if (o instanceof Map<?, ?> map) {
-                        formResponses.add(map);
-                    }
-                }
-            }
+            extractResponses(response, formResponses);
 
         } while (nextToken != null);
 
         return formResponses;
     }
 
-    public static Map<String, Object> getCustomResponse(Context context, String formId, Map<?, ?> response) {
-        List<FormItem> formItems = getFormItems(getForm(formId, context));
+    private static Http.Executor createHttpExecutor(
+        String formId, Context context, String timestamp, String nextToken) {
 
-        Map<String, Object> responses = new LinkedHashMap<>();
+        Http.Executor executor = context
+            .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
+            .configuration(Http.responseType(Http.ResponseType.JSON));
 
-        responses.put(FORM_ID, formId);
-        responses.put(RESPONSE_ID, response.get(RESPONSE_ID));
+        if (timestamp != null) {
+            String encode = URLEncoder.encode("timestamp > " + timestamp, StandardCharsets.UTF_8);
+            executor.queryParameter("filter", encode);
+        }
 
-        if (response.get(ANSWERS) instanceof Map<?, ?> answers) {
-            int index = 1;
-            for (FormItem formItem : formItems) {
-                String id = formItem.itemId();
+        if (nextToken != null) {
+            executor.queryParameter(NEXT_PAGE_TOKEN, nextToken);
+        }
 
-                if (answers.get(id) instanceof Map<?, ?> answer) {
-                    processAnswers(responses, formItem, answer, index++);
+        return executor;
+    }
+
+    private static void extractResponses(Map<String, Object> response, List<Map<?, ?>> formResponses) {
+        if (response.get(RESPONSES) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map) {
+                    formResponses.add(map);
                 }
             }
         }
-
-        return responses;
     }
 
     private static List<FormItem> getFormItems(Map<String, Object> body) {
@@ -173,12 +199,11 @@ public class GoogleFormsUtils {
 
         if (body.get("items") instanceof List<?> list) {
             for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    if (map.get("questionItem") instanceof Map<?, ?> questionItem &&
-                        questionItem.get("question") instanceof Map<?, ?> question) {
+                if (item instanceof Map<?, ?> map &&
+                    map.get("questionItem") instanceof Map<?, ?> questionItem &&
+                    questionItem.get("question") instanceof Map<?, ?> question) {
 
-                        formItems.add(new FormItem((String) question.get("questionId"), (String) map.get("title")));
-                    }
+                    formItems.add(new FormItem((String) question.get("questionId"), (String) map.get("title")));
                 }
             }
         }
@@ -202,7 +227,7 @@ public class GoogleFormsUtils {
             for (Object fileUploadAnswer : list) {
                 if (fileUploadAnswer instanceof Map<?, ?> map) {
                     responses.put(
-                        "question" + index,
+                        "question_" + index,
                         new FormFileUploadAnswer(
                             formItem.itemId(), formItem.title(), (String) map.get("fileId"),
                             (String) map.get("fileName")));
@@ -223,7 +248,7 @@ public class GoogleFormsUtils {
                 }
             }
             responses.put(
-                "question" + index,
+                "question_" + index,
                 new FormTextAnswer(formItem.itemId(), formItem.title(), answers));
         }
 

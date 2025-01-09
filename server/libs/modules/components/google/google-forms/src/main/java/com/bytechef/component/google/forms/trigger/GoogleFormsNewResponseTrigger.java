@@ -20,8 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDe
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
-import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponse;
-import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getFormResponses;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponses;
 
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
@@ -32,7 +31,6 @@ import com.bytechef.component.google.forms.util.GoogleFormsUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -69,14 +67,8 @@ public class GoogleFormsNewResponseTrigger {
             .withZone(gmtZoneId));
         LocalDateTime endDate = LocalDateTime.now(gmtZoneId);
 
-        String formId = inputParameters.getRequiredString(FORM_ID);
-        List<Map<?, ?>> formResponses = getFormResponses(formId, triggerContext, startDateString);
-
-        List<Object> customResponses = new ArrayList<>();
-
-        for (Map<?, ?> formResponse : formResponses) {
-            customResponses.add(getCustomResponse(triggerContext, formId, formResponse));
-        }
+        List<Map<String, Object>> customResponses =
+            getCustomResponses(triggerContext, inputParameters.getRequiredString(FORM_ID), startDateString);
 
         return new PollOutput(customResponses, Map.of(LAST_TIME_CHECKED, endDate), false);
     }
