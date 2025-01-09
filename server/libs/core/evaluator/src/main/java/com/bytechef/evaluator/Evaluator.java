@@ -105,9 +105,9 @@ public class Evaluator {
                 continue;
             }
 
-            throw new IllegalArgumentException(
-                "unknown expression type: " + subExpression.getClass()
-                    .getName());
+            Class<? extends Expression> subExpressionClass = subExpression.getClass();
+
+            throw new IllegalArgumentException("unknown expression type: " + subExpressionClass.getName());
         }
 
         return stringBuilder.toString();
