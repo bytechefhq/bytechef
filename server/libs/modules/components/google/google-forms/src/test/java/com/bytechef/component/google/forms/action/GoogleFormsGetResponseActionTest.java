@@ -16,8 +16,8 @@
 
 package com.bytechef.component.google.forms.action;
 
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 class GoogleFormsGetResponseActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FORM, "formId", RESPONSE, "responseId"));
+        Map.of(FORM_ID, "formId", RESPONSE_ID, "responseId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);

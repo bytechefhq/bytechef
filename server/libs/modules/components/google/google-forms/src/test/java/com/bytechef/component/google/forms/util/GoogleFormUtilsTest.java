@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.util;
+package com.bytechef.component.google.forms.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,7 +28,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.google.forms.util.GoogleFormsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
@@ -59,7 +58,7 @@ class GoogleFormUtilsTest {
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetFormOptions() throws IOException {
+    void testGetFormIdOptions() throws IOException {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic.when(() -> GoogleServices.getDrive(mockedParameters))
                 .thenReturn(mockedDrive);
@@ -81,7 +80,8 @@ class GoogleFormUtilsTest {
                 .thenReturn(files);
 
             assertEquals(List.of(option("name", "id")),
-                GoogleFormsUtils.getFormOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext));
+                GoogleFormsUtils.getFormIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                    mockedActionContext));
 
             assertEquals("mimeType = 'application/vnd.google-apps.form' and trashed = false",
                 qArgumentCaptor.getValue());
@@ -89,7 +89,7 @@ class GoogleFormUtilsTest {
     }
 
     @Test
-    void testGetResponseOptions() {
+    void testGetResponseIdOptions() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -99,7 +99,7 @@ class GoogleFormUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("responses", List.of(Map.of("responseId", "123", "respondentEmail", "test@mail.com"))));
 
-        List<Option<String>> result = GoogleFormsUtils.getResponseOptions(
+        List<Option<String>> result = GoogleFormsUtils.getResponseIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(List.of(option("test@mail.com (123)", "123")), result);

@@ -19,8 +19,8 @@ package com.bytechef.component.google.forms.action;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponse;
 
 import com.bytechef.component.definition.ActionContext;
@@ -40,16 +40,16 @@ public class GoogleFormsGetResponseAction {
         .title("Get Response")
         .description("Get the response of a form.")
         .properties(
-            string(FORM)
-                .label("Form")
-                .description("Form to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
+            string(FORM_ID)
+                .label("Form ID")
+                .description("ID of the form whose response to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
                 .required(true),
-            string(RESPONSE)
-                .label("Response")
-                .description("Response to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
-                .optionsLookupDependsOn(FORM)
+            string(RESPONSE_ID)
+                .label("Response ID")
+                .description("ID of the response to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseIdOptions)
+                .optionsLookupDependsOn(FORM_ID)
                 .required(true))
         .output()
         .perform(GoogleFormsGetResponseAction::perform);
@@ -60,8 +60,8 @@ public class GoogleFormsGetResponseAction {
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String formId = inputParameters.getRequiredString(FORM);
-        String responseId = inputParameters.getRequiredString(RESPONSE);
+        String formId = inputParameters.getRequiredString(FORM_ID);
+        String responseId = inputParameters.getRequiredString(RESPONSE_ID);
 
         Map<String, Object> response = actionContext
             .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses/" + responseId))

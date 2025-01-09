@@ -19,9 +19,10 @@ package com.bytechef.component.google.forms.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.ANSWERS;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FILE_UPLOAD_ANSWERS;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.NEXT_PAGE_TOKEN;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSES;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.TEXT_ANSWERS;
 
 import com.bytechef.component.definition.Context;
@@ -56,7 +57,7 @@ public class GoogleFormsUtils {
             .getBody(new TypeReference<>() {});
     }
 
-    public static List<Option<String>> getFormOptions(
+    public static List<Option<String>> getFormIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) throws IOException {
 
@@ -72,13 +73,13 @@ public class GoogleFormsUtils {
             .toList();
     }
 
-    public static List<Option<String>> getResponseOptions(
+    public static List<Option<String>> getResponseIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
         List<Option<String>> formResponses = new ArrayList<>();
         String nextToken = null;
-        String formId = inputParameters.getRequiredString(FORM);
+        String formId = inputParameters.getRequiredString(FORM_ID);
         do {
             Http.Executor executor = context
                 .http(http -> http.get("https://forms.googleapis.com/v1/forms/%s/responses".formatted(formId)))
@@ -96,7 +97,7 @@ public class GoogleFormsUtils {
             if (response.get(RESPONSES) instanceof List<?> list) {
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> map) {
-                        String responseId = (String) map.get("responseId");
+                        String responseId = (String) map.get(RESPONSE_ID);
                         String respondentEmail = (String) map.get("respondentEmail");
 
                         formResponses.add(
@@ -150,8 +151,8 @@ public class GoogleFormsUtils {
 
         Map<String, Object> responses = new LinkedHashMap<>();
 
-        responses.put("formId", formId);
-        responses.put("responseId", response.get("responseId"));
+        responses.put(FORM_ID, formId);
+        responses.put(RESPONSE_ID, response.get(RESPONSE_ID));
 
         if (response.get(ANSWERS) instanceof Map<?, ?> answers) {
             int index = 1;

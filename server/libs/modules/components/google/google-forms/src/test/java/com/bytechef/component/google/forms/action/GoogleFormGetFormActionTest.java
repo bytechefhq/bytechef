@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.forms.action;
 
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -35,7 +35,7 @@ import org.junit.jupiter.api.Test;
  */
 class GoogleFormGetFormActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM, "formId"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM_ID, "formId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Object mockedObject = mock(Object.class);
