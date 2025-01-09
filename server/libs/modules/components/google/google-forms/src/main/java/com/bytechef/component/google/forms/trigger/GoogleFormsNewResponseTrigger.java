@@ -19,7 +19,7 @@ package com.bytechef.component.google.forms.trigger;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponse;
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getFormResponses;
 
@@ -48,10 +48,10 @@ public class GoogleFormsNewResponseTrigger {
         .description("Triggers when response is submitted to Google Form.")
         .type(TriggerType.POLLING)
         .properties(
-            string(FORM)
+            string(FORM_ID)
                 .label("Form")
                 .description("Form to watch for new responses.")
-                .options((TriggerOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
+                .options((TriggerOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
                 .required(true))
         .output()
         .poll(GoogleFormsNewResponseTrigger::poll);
@@ -69,7 +69,7 @@ public class GoogleFormsNewResponseTrigger {
             .withZone(gmtZoneId));
         LocalDateTime endDate = LocalDateTime.now(gmtZoneId);
 
-        String formId = inputParameters.getRequiredString(FORM);
+        String formId = inputParameters.getRequiredString(FORM_ID);
         List<Map<?, ?>> formResponses = getFormResponses(formId, triggerContext, startDateString);
 
         List<Object> customResponses = new ArrayList<>();
