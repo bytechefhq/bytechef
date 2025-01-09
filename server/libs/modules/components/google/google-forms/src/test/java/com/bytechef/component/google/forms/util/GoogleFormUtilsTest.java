@@ -17,13 +17,14 @@
 package com.bytechef.component.google.forms.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -47,13 +48,13 @@ import org.mockito.MockedStatic;
 class GoogleFormUtilsTest {
 
     private final List<File> files = new ArrayList<>();
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Context mockedContext = mock(Context.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileList mockedFileList = mock(FileList.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM_ID, "123"));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
@@ -81,7 +82,7 @@ class GoogleFormUtilsTest {
 
             assertEquals(List.of(option("name", "id")),
                 GoogleFormsUtils.getFormIdOptions(mockedParameters, mockedParameters, Map.of(), "",
-                    mockedActionContext));
+                    mockedContext));
 
             assertEquals("mimeType = 'application/vnd.google-apps.form' and trashed = false",
                 qArgumentCaptor.getValue());
@@ -90,7 +91,7 @@ class GoogleFormUtilsTest {
 
     @Test
     void testGetResponseIdOptions() {
-        when(mockedActionContext.http(any()))
+        when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -100,7 +101,7 @@ class GoogleFormUtilsTest {
             .thenReturn(Map.of("responses", List.of(Map.of("responseId", "123", "respondentEmail", "test@mail.com"))));
 
         List<Option<String>> result = GoogleFormsUtils.getResponseIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("test@mail.com (123)", "123")), result);
     }
