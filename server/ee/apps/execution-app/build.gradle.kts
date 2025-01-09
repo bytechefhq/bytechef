@@ -7,7 +7,6 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.loki.logback.appender)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
@@ -30,6 +29,7 @@ dependencies {
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:config:liquibase-config"))
+    implementation(project(":server:libs:config:observability-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:file-storage:file-storage-base64-service"))
