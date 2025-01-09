@@ -17,8 +17,6 @@
 package com.bytechef.component.google.forms.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
@@ -53,7 +51,7 @@ public class GoogleFormsNewResponseTrigger {
                 .description("Form to watch for new responses.")
                 .options((TriggerOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
                 .required(true))
-        .output(outputSchema(object()))
+        .output()
         .poll(GoogleFormsNewResponseTrigger::poll);
 
     private GoogleFormsNewResponseTrigger() {

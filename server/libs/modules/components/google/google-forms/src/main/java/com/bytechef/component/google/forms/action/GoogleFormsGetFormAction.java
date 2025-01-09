@@ -18,9 +18,6 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
 
@@ -45,23 +42,7 @@ public class GoogleFormsGetFormAction {
                 .description("Form to retrieve.")
                 .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("formId"),
-                        object("info")
-                            .properties(
-                                string("title"),
-                                string("documentTitle")),
-                        string("revisionId"),
-                        string("respondeUri"),
-                        array("items")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("itemdId"),
-                                        string("title"))))))
+        .output()
         .perform(GoogleFormsGetFormAction::perform);
 
     private GoogleFormsGetFormAction() {

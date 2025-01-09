@@ -18,9 +18,6 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
@@ -52,17 +49,7 @@ public class GoogleFormsGetResponseAction {
                 .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
                 .optionsLookupDependsOn(FORM)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("formId"),
-                        string("responseId"),
-                        string("createTime"),
-                        string("lastSubmittedTime"),
-                        string("respondentEmail"),
-                        object("answers"),
-                        number("totalScore"))))
+        .output()
         .perform(GoogleFormsGetResponseAction::perform);
 
     private GoogleFormsGetResponseAction() {
