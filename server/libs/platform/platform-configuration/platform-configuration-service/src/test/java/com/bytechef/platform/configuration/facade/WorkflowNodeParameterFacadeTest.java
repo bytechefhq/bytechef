@@ -55,7 +55,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
             "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
-            parametersMap);
+            parametersMap, false);
 
         Assertions.assertEquals(2, displayConditionMap.size());
         Assertions.assertEquals(
@@ -66,7 +66,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
             "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
-            parametersMap);
+            parametersMap, false);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
@@ -81,7 +81,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
             "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(), Map.of(),
-            "conditions[0]", parametersMap);
+            "conditions[0]", parametersMap, false);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(

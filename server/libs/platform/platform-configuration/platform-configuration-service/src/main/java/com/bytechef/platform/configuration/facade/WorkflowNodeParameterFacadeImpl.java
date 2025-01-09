@@ -92,18 +92,17 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        ParameterMapPropertiesResult result =
-            getParameterMapProperties(workflowNodeName, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(workflowNodeName, definitionMap);
 
         String[] pathItems = path.split("\\.");
 
         setDynamicPropertyTypeItem(path, null, getMetadataMap(workflowNodeName, definitionMap));
-        setParameter(pathItems, null, true, result.parameterMap);
+        setParameter(pathItems, null, true, workflowNodeStructure.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return result.parameterMap;
+        return workflowNodeStructure.parameterMap;
     }
 
     @Override
@@ -114,7 +113,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        ParameterMapPropertiesResult parameterMapProperties = getParameterMapProperties(
+        WorkflowNodeStructure parameterMapProperties = getWorkflowNodeStructure(
             workflowNodeName, definitionMap);
 
         Set<String> keySet = parameterMapProperties.parameterMap.keySet();
@@ -123,9 +122,9 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         for (String parameterName : new HashSet<>(keySet)) {
             displayConditionMap.putAll(
-                checkParameters(
-                    workflowNodeName, parameterName, parameterMapProperties.properties, workflow,
-                    parameterMapProperties.parameterMap, inputMap, parameterMapProperties.parameterType, Map.of()));
+                checkDisplayConditionsAndParameters(
+                    parameterName, workflowNodeName, workflow, parameterMapProperties.operationType,
+                    parameterMapProperties.parameterMap, inputMap, Map.of(), parameterMapProperties.properties, false));
         }
 
         return displayConditionMap;
@@ -140,7 +139,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         Map<String, ?> definitionMap = JsonUtils.readMap(workflow.getDefinition());
 
-        ParameterMapPropertiesResult result = getParameterMapProperties(workflowNodeName, definitionMap);
+        WorkflowNodeStructure workflowNodeStructure = getWorkflowNodeStructure(workflowNodeName, definitionMap);
 
         Map<String, Object> metadataMap = getMetadataMap(workflowNodeName, definitionMap);
 
@@ -148,18 +147,20 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String[] parameterPathParts = parameterPath.split("\\.");
 
-        setParameter(parameterPathParts, value, false, result.parameterMap);
+        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
         // For now only check the first, root level of properties on which other properties could depend on
 
-        checkDependOn(parameterPathParts[0], result.properties(), result.parameterMap, dynamicPropertyTypesMap);
+        checkDependOn(parameterPathParts[0], workflowNodeStructure.properties(), workflowNodeStructure.parameterMap,
+            dynamicPropertyTypesMap);
 
         Map<String, ?> inputMap = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflow.getId());
 
-        Map<String, Boolean> displayConditionMap = checkParameters(
-            workflowNodeName, parameterPathParts[0], result.properties, workflow, result.parameterMap, inputMap,
-            result.parameterType, dynamicPropertyTypesMap);
+        Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
+            parameterPathParts[0], workflowNodeName, workflow, workflowNodeStructure.operationType,
+            workflowNodeStructure.parameterMap,
+            inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties, true);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
@@ -168,12 +169,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         // Set value again af it will be deleted during parameters check as some connectors like http-client have
         // defined multiple properties with the same name and only one is used based on the display condition
 
-        setParameter(parameterPathParts, value, false, result.parameterMap);
+        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
 
-        return new UpdateParameterResultDTO(displayConditionMap, metadataMap, result.parameterMap);
+        return new UpdateParameterResultDTO(displayConditionMap, metadataMap, workflowNodeStructure.parameterMap);
     }
 
     protected static boolean hasExpressionVariable(String expression, String variableName) {
@@ -204,7 +205,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     protected static void evaluateArray(
         String displayCondition, Map<String, Boolean> displayConditionMap, Map<String, Object> inputMap,
-        Map<String, Object> outputs, String propertyName, Map<String, ?> parameterMap) {
+        Map<String, Object> outputs, String propertyName, Map<String, ?> parameterMap, boolean removeParameters) {
 
         List<List<Integer>> indexesList = findIndexes(parameterMap, displayCondition);
 
@@ -219,7 +220,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (result) {
                 displayConditionMap.put(updatedDisplayCondition, true);
-            } else {
+            } else if (removeParameters) {
                 removeParameter(propertyName, indexes, parameterMap);
             }
         }
@@ -258,63 +259,83 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
     }
 
-    private Map<String, Boolean> checkParameters(
-        String workflowNodeName, String parameterName, List<? extends BaseProperty> properties, Workflow workflow,
-        Map<String, ?> parameterMap, Map<String, ?> inputMap, ParameterMapPropertiesResult.ParameterType parameterType,
-        Map<String, ?> dynamicPropertyTypesMap) {
+    private Map<String, Boolean> checkDisplayConditionsAndParameters(
+        String rootParameterName, String workflowNodeName, Workflow workflow,
+        WorkflowNodeStructure.OperationType operationType,
+        Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, ?> dynamicPropertyTypesMap,
+        List<? extends BaseProperty> properties, boolean removeParameters) {
 
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
-        checkParameters(
-            workflowNodeName, parameterName, properties, workflow, parameterMap, inputMap, parameterType,
-            dynamicPropertyTypesMap, displayConditionMap);
+        checkDisplayConditionsAndParameters(
+            rootParameterName, workflowNodeName, workflow, operationType, parameterMap, inputMap,
+            displayConditionMap, dynamicPropertyTypesMap, properties, removeParameters);
 
         return displayConditionMap;
     }
 
     @SuppressWarnings("unchecked")
-    private void checkParameters(
-        String workflowNodeName, String parameterName, List<? extends BaseProperty> properties, Workflow workflow,
-        Map<String, ?> parameterMap, Map<String, ?> inputMap, ParameterMapPropertiesResult.ParameterType parameterType,
-        Map<String, ?> dynamicPropertyTypesMap, Map<String, Boolean> displayConditionMap) {
+    private void checkDisplayConditionsAndParameters(
+        String rootParameterName, String workflowNodeName, Workflow workflow,
+        WorkflowNodeStructure.OperationType operationType,
+        Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, Boolean> displayConditionMap,
+        Map<String, ?> dynamicPropertyTypesMap, List<? extends BaseProperty> properties, boolean removeParameters) {
 
         for (BaseProperty property : properties) {
             if (property instanceof ArrayProperty arrayProperty) {
-                checkParameters(
-                    workflowNodeName, parameterName, arrayProperty, workflow, parameterMap,
-                    (Map<String, Object>) inputMap,
-                    parameterType, dynamicPropertyTypesMap, displayConditionMap);
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
+                    removeParameters);
 
-                checkParameters(
-                    workflowNodeName, parameterName, arrayProperty.getItems(), workflow, parameterMap, inputMap,
-                    parameterType, dynamicPropertyTypesMap, displayConditionMap);
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(), removeParameters);
             }
             if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty) {
-                checkParameters(
-                    workflowNodeName, parameterName, arrayProperty.getItems(), workflow, parameterMap, inputMap,
-                    parameterType, dynamicPropertyTypesMap, displayConditionMap);
-            } else if (property instanceof ObjectProperty objectProperty) {
-                checkParameters(
-                    workflowNodeName, parameterName, objectProperty.getProperties(), workflow, parameterMap, inputMap,
-                    parameterType, dynamicPropertyTypesMap, displayConditionMap);
-            } else if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
-                checkParameters(
-                    workflowNodeName, parameterName, objectProperty.getProperties(), workflow, parameterMap,
-                    inputMap, parameterType, dynamicPropertyTypesMap, displayConditionMap);
-            }
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
+                    removeParameters);
 
-            checkParameters(
-                workflowNodeName, parameterName, property, workflow, parameterMap, (Map<String, Object>) inputMap,
-                parameterType, dynamicPropertyTypesMap, displayConditionMap);
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(), removeParameters);
+            } else if (property instanceof ObjectProperty objectProperty) {
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
+                    removeParameters);
+
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
+                    removeParameters);
+            } else if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
+                    removeParameters);
+
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
+                    removeParameters);
+            } else {
+                checkDisplayConditionsAndParameters(
+                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, property,
+                    removeParameters);
+            }
         }
     }
 
     @SuppressWarnings("unchecked")
-    private void checkParameters(
-        String workflowNodeName, String parameterName, BaseProperty property, Workflow workflow,
-        Map<String, ?> parameterMap, Map<String, Object> inputMap,
-        ParameterMapPropertiesResult.ParameterType parameterType, Map<String, ?> dynamicPropertyTypesMap,
-        Map<String, Boolean> displayConditionMap) {
+    private void checkDisplayConditionsAndParameters(
+        String rootParameterName, String workflowNodeName, Workflow workflow,
+        WorkflowNodeStructure.OperationType operationType,
+        Map<String, ?> parameterMap, Map<String, Object> inputMap, Map<String, Boolean> displayConditionMap,
+        Map<String, ?> dynamicPropertyTypesMap, BaseProperty property, boolean removeParameters) {
 
         if (property.getDisplayCondition() == null) {
             return;
@@ -322,14 +343,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         String displayCondition = property.getDisplayCondition();
 
-        if (hasExpressionVariable(displayCondition, parameterName)) {
+        if (hasExpressionVariable(displayCondition, rootParameterName)) {
             checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
         }
 
         boolean result;
 
-        if (parameterType == ParameterMapPropertiesResult.ParameterType.TASK ||
-            parameterType == ParameterMapPropertiesResult.ParameterType.TASK_DISPATCHER) {
+        if (operationType == WorkflowNodeStructure.OperationType.TASK ||
+            operationType == WorkflowNodeStructure.OperationType.TASK_DISPATCHER) {
 
             WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
@@ -339,14 +360,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             if (displayCondition.contains("[index]")) {
                 evaluateArray(
                     displayCondition, displayConditionMap, inputMap, (Map<String, Object>) outputs, property.getName(),
-                    parameterMap);
+                    parameterMap, removeParameters);
             } else {
                 result = evaluate(
                     displayCondition, inputMap, (Map<String, Object>) outputs, parameterMap);
 
                 if (result) {
                     displayConditionMap.put(displayCondition, true);
-                } else {
+                } else if (removeParameters) {
                     removeParameter(property.getName(), null, parameterMap);
                 }
             }
@@ -355,7 +376,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (result) {
                 displayConditionMap.put(displayCondition, true);
-            } else {
+            } else if (removeParameters) {
                 removeParameter(property.getName(), null, parameterMap);
             }
         }
@@ -382,6 +403,14 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     indexes.removeFirst();
 
                     removeParameter(parameterName, indexes, subParameterMap);
+                } else if (subList.get(index) instanceof List<?> subList2) {
+                    indexes.removeFirst();
+
+                    if (subList2.get(index) instanceof Map<?, ?> subParameterMap) {
+                        indexes.removeFirst();
+
+                        removeParameter(parameterName, indexes, subParameterMap);
+                    }
                 }
             } else if (parameterMap.get(key) instanceof Map<?, ?> subParameterMap) {
                 removeParameter(parameterName, indexes, subParameterMap);
@@ -506,63 +535,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressWarnings("unchecked")
-    private ParameterMapPropertiesResult getParameterMapProperties(
-        String workflowNodeName, Map<String, ?> definitionMap) {
-
-        Map<String, ?> parameterMap;
-        List<? extends BaseProperty> properties;
-
-        Map<String, ?> triggerMap = getTrigger(
-            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
-
-        ParameterMapPropertiesResult.ParameterType parameterType;
-
-        if (triggerMap == null) {
-            Map<String, ?> taskMap = getTask(
-                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
-
-            if (taskMap == null) {
-                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
-            }
-
-            parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                (String) taskMap.get(WorkflowConstants.TYPE));
-
-            if (workflowNodeType.componentOperationName() == null) {
-                parameterType = ParameterMapPropertiesResult.ParameterType.TASK_DISPATCHER;
-
-                TaskDispatcherDefinition taskDispatcherDefinition =
-                    taskDispatcherDefinitionService.getTaskDispatcherDefinition(
-                        workflowNodeType.componentName(), workflowNodeType.componentVersion());
-
-                properties = taskDispatcherDefinition.getProperties();
-            } else {
-                parameterType = ParameterMapPropertiesResult.ParameterType.TASK;
-
-                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
-                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                    workflowNodeType.componentOperationName());
-
-                properties = actionDefinition.getProperties();
-            }
-        } else {
-            parameterType = ParameterMapPropertiesResult.ParameterType.TRIGGER;
-            parameterMap = (Map<String, ?>) triggerMap.get(WorkflowConstants.PARAMETERS);
-            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
-                (String) triggerMap.get(WorkflowConstants.TYPE));
-
-            TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
-                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
-                workflowNodeType.componentOperationName());
-
-            properties = triggerDefinition.getProperties();
-        }
-
-        return new ParameterMapPropertiesResult(parameterMap, properties, parameterType);
-    }
-
-    @SuppressWarnings("unchecked")
     private static Map<String, ?> getTask(String workflowNodeName, List<Map<String, ?>> tasksMaps) {
         for (Map<String, ?> taskMap : tasksMaps) {
             if (Objects.equals(taskMap.get(WorkflowConstants.NAME), workflowNodeName)) {
@@ -651,6 +623,61 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private WorkflowNodeStructure getWorkflowNodeStructure(String workflowNodeName, Map<String, ?> definitionMap) {
+        Map<String, ?> parameterMap;
+        List<? extends BaseProperty> properties;
+
+        Map<String, ?> triggerMap = getTrigger(
+            workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowExtConstants.TRIGGERS));
+
+        WorkflowNodeStructure.OperationType operationType;
+
+        if (triggerMap == null) {
+            Map<String, ?> taskMap = getTask(
+                workflowNodeName, (List<Map<String, ?>>) definitionMap.get(WorkflowConstants.TASKS));
+
+            if (taskMap == null) {
+                throw new IllegalArgumentException("Workflow node %s does not exist".formatted(workflowNodeName));
+            }
+
+            parameterMap = (Map<String, ?>) taskMap.get(WorkflowConstants.PARAMETERS);
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                (String) taskMap.get(WorkflowConstants.TYPE));
+
+            if (workflowNodeType.componentOperationName() == null) {
+                operationType = WorkflowNodeStructure.OperationType.TASK_DISPATCHER;
+
+                TaskDispatcherDefinition taskDispatcherDefinition =
+                    taskDispatcherDefinitionService.getTaskDispatcherDefinition(
+                        workflowNodeType.componentName(), workflowNodeType.componentVersion());
+
+                properties = taskDispatcherDefinition.getProperties();
+            } else {
+                operationType = WorkflowNodeStructure.OperationType.TASK;
+
+                ActionDefinition actionDefinition = actionDefinitionService.getActionDefinition(
+                    workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                    workflowNodeType.componentOperationName());
+
+                properties = actionDefinition.getProperties();
+            }
+        } else {
+            operationType = WorkflowNodeStructure.OperationType.TRIGGER;
+            parameterMap = (Map<String, ?>) triggerMap.get(WorkflowConstants.PARAMETERS);
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(
+                (String) triggerMap.get(WorkflowConstants.TYPE));
+
+            TriggerDefinition triggerDefinition = triggerDefinitionService.getTriggerDefinition(
+                workflowNodeType.componentName(), workflowNodeType.componentVersion(),
+                workflowNodeType.componentOperationName());
+
+            properties = triggerDefinition.getProperties();
+        }
+
+        return new WorkflowNodeStructure(operationType, parameterMap, properties);
     }
 
     private void setDynamicPropertyTypeItem(
@@ -782,10 +809,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     @SuppressFBWarnings("EI")
-    private record ParameterMapPropertiesResult(
-        Map<String, ?> parameterMap, List<? extends BaseProperty> properties, ParameterType parameterType) {
+    private record WorkflowNodeStructure(
+        OperationType operationType, Map<String, ?> parameterMap, List<? extends BaseProperty> properties) {
 
-        enum ParameterType {
+        enum OperationType {
             TASK,
             TASK_DISPATCHER,
             TRIGGER
