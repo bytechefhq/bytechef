@@ -6,7 +6,8 @@ import {NodeProps, useReactFlow} from 'reactflow';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'], activeTab?: TabNameType) {
-    const {setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setActiveTab, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
 
     const {getNode} = useReactFlow();
@@ -20,9 +21,9 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
 
         setRightSidebarOpen(false);
 
+        setActiveTab(activeTab ?? 'description');
+        setCurrentNode({...data});
         setWorkflowNodeDetailsPanelOpen(true);
-
-        setCurrentNode({...data, activeTab});
 
         if (data.type) {
             setCurrentComponent({
@@ -38,6 +39,7 @@ export default function useNodeClick(data: NodeProps['data'], id: NodeProps['id'
         setCurrentNode,
         data,
         activeTab,
+        setActiveTab,
         setCurrentComponent,
     ]);
 }

@@ -104,7 +104,6 @@ export type ClickedOperationType = {
 export type TabNameType = 'description' | 'dataStreamComponents' | 'connection' | 'properties' | 'output';
 
 export type NodeDataType = {
-    activeTab?: TabNameType;
     componentName: string;
     conditionData?: {
         conditionCase: string;

@@ -5,6 +5,9 @@ import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
 interface WorkflowNodeDetailsPanelStoreI {
+    activeTab: string;
+    setActiveTab: (activeTab: string) => void;
+
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
 
@@ -25,6 +28,9 @@ interface WorkflowNodeDetailsPanelStoreI {
 const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>()(
     devtools(
         (set) => ({
+            activeTab: 'description',
+            setActiveTab: (activeTab) => set((state) => ({...state, activeTab})),
+
             currentComponent: undefined,
             setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
 

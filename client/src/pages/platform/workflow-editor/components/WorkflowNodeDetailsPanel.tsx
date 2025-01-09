@@ -87,12 +87,18 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
 }) => {
-    const [activeTab, setActiveTab] = useState<TabNameType>('description');
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {
+        activeTab,
+        currentComponent,
+        currentNode,
+        setActiveTab,
+        setCurrentComponent,
+        setCurrentNode,
+        workflowNodeDetailsPanelOpen,
+    } = useWorkflowNodeDetailsPanelStore();
 
     const {componentActions, nodes, setDataPills, workflow} = useWorkflowDataStore();
 
@@ -398,27 +404,6 @@ const WorkflowNodeDetailsPanel = ({
         setDataPills(dataPills.flat(Infinity));
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [previousComponentProperties.length]);
-
-    // Set activeTab depending on currentNode.activeTab
-    useEffect(() => {
-        if (currentNode?.activeTab) {
-            setActiveTab(currentNode.activeTab);
-        }
-    }, [currentNode?.activeTab]);
-
-    // Add activeTab to currentNode when activeTab changes
-    useEffect(
-        () => {
-            if (currentNode?.componentName) {
-                setCurrentNode({
-                    ...currentNode,
-                    activeTab,
-                });
-            }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [activeTab]
-    );
 
     // Tab switching logic
     useEffect(() => {
