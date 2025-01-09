@@ -20,37 +20,38 @@ import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDef
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
-import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getForm;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponses;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import java.util.List;
 import java.util.Map;
 
 /**
  * @author Monika Kušter
  */
-public class GoogleFormsGetFormAction {
+public class GoogleFormsGetAllResponsesAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getForm")
-        .title("Get Form")
-        .description("Get the information about a form.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getAllResponses")
+        .title("Get All Responses")
+        .description("Get all responses of a form.")
         .properties(
             string(FORM_ID)
                 .label("Form ID")
-                .description("ID of the form to retrieve.")
+                .description("ID of the form whose responses to retrieve.")
                 .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
                 .required(true))
         .output()
-        .perform(GoogleFormsGetFormAction::perform);
+        .perform(GoogleFormsGetAllResponsesAction::perform);
 
-    private GoogleFormsGetFormAction() {
+    private GoogleFormsGetAllResponsesAction() {
     }
 
-    public static Map<String, Object> perform(
+    protected static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return getForm(inputParameters.getRequiredString(FORM_ID), actionContext);
+        return getCustomResponses(actionContext, inputParameters.getRequiredString(FORM_ID), null);
     }
 }

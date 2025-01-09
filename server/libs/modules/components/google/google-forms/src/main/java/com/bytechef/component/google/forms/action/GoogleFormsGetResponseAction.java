@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
-import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponse;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.createCustomResponse;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -69,6 +69,6 @@ public class GoogleFormsGetResponseAction {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getCustomResponse(actionContext, formId, response);
+        return createCustomResponse(actionContext, formId, response);
     }
 }
