@@ -300,13 +300,13 @@ public class MapUtils {
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         return convert(value, elementType);
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, Class<T> elementType, T defaultValue) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         if (value == null) {
             return defaultValue;
@@ -316,13 +316,13 @@ public class MapUtils {
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         return convert(value, typeReference);
     }
 
     public static <K, T> T getFromPath(Map<K, ?> map, String path, TypeReference<T> typeReference, T defaultValue) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         if (value == null) {
             return defaultValue;
@@ -657,7 +657,7 @@ public class MapUtils {
     }
 
     public static <T> T getRequiredFromPath(Map<String, ?> map, String path, Class<T> elementType) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         Validate.notNull(value, "Unknown value for : " + path);
 
@@ -665,7 +665,7 @@ public class MapUtils {
     }
 
     public static <T> T getRequiredFromPath(Map<String, ?> map, String path, TypeReference<T> typeReference) {
-        Object value = readFromPath(JsonPath.read(map, path));
+        Object value = readFromPath(map, path);
 
         return convert(value, typeReference);
     }
@@ -885,11 +885,11 @@ public class MapUtils {
         return outputArray;
     }
 
-    private static Object readFromPath(Object map) {
+    private static Object readFromPath(Object map, String path) {
         Object value = null;
 
         try {
-            value = map;
+            value = JsonPath.read(map, path);
         } catch (PathNotFoundException e) {
             if (logger.isTraceEnabled()) {
                 logger.trace(e.getMessage());
