@@ -11,7 +11,7 @@
     <springProperty name="applicationName" source="spring.application.name" />
     <springProperty name="log.level" source="logging.level.root" defaultValue="INFO" />
     <springProperty name="loki.appender.level" source="bytechef.loki.appender.level" defaultValue="OFF" />
-    <springProperty name="loki.appender.http.url" source="bytechef.loki.appender.http.url" />
+    <springProperty name="loki.appender.http.url" source="bytechef.loki.appender.http.url" defaultValue="http://localhost:3100/loki/api/v1/push" />
 
     <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
     <include resource="org/springframework/boot/logging/logback/console-appender.xml" />
