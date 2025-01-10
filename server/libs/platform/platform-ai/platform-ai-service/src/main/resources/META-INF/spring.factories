@@ -1,2 +1,2 @@
 org.springframework.boot.env.EnvironmentPostProcessor=\
-com.bytechef.platform.ai.config.AiCopilotPostProcessor
+com.bytechef.platform.ai.config.AiCopilotEnvironmentPostProcessor
