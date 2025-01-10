@@ -131,6 +131,7 @@ export default defineConfig({
                 {
                     label: 'Reference',
                     items: [
+                        {label: 'Overview', link: '/reference/overview'},
                         {
                             label: 'Components',
                             autogenerate: {directory: '/reference/components'},
