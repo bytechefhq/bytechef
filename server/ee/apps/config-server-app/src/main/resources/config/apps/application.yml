@@ -180,3 +180,8 @@ bytechef:
     repository:
       jdbc:
         enabled: true
+  loki:
+    appender:
+      level: "OFF"
+      http:
+        url: http://localhost:3100/loki/api/v1/push
