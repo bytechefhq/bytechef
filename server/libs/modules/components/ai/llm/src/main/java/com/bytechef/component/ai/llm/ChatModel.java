@@ -99,7 +99,8 @@ public interface ChatModel {
             }
         } else {
             return call.entity(
-                new JsonSchemaStructuredOutputConverter(parameters.getRequiredString(RESPONSE_SCHEMA), actionContext));
+                new JsonSchemaStructuredOutputConverter(
+                    parameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), actionContext));
         }
     }
 
