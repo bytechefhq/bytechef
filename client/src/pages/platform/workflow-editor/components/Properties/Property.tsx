@@ -31,14 +31,13 @@ import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, ReactNode, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
-import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
@@ -107,6 +106,7 @@ const Property = ({
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
+    const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(false);
 
     const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -115,9 +115,8 @@ const Property = ({
         useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
-    const {showPropertyCodeEditorSheet, showWorkflowCodeEditorSheet} = useWorkflowEditorStore();
 
-    const {isFetching: isFetchingDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
+    const {isFetchedAfterMount: isDisplayConditionFetched} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
             id: workflow.id!,
             // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
@@ -154,21 +153,28 @@ const Property = ({
 
     let {displayCondition} = property;
 
-    const formattedOptions = options
-        ?.map((option) => {
-            if (option.value === '') {
-                return null;
-            }
+    const formattedOptions = useMemo(() => {
+        return options
+            ?.map((option) => {
+                if (option.value === '') {
+                    return null;
+                }
+                return option;
+            })
+            .filter((option) => option !== null);
+    }, [options]);
 
-            return option;
-        })
-        .filter((option) => option !== null);
+    const isValidControlType = useMemo(() => {
+        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+    }, [controlType]);
 
-    const isValidControlType = controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+    const isNumericalInput = useMemo(() => {
+        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
+    }, [mentionInput, controlType]);
 
-    const isNumericalInput = !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
-
-    const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    const typeIcon = useMemo(() => {
+        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    }, [type]);
 
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
@@ -525,6 +531,32 @@ const Property = ({
                 setPropertyParameterValue(encodedParameters[name]);
             }
         }
+
+        // save hidden property to definition on render
+        if (
+            hidden &&
+            currentComponent &&
+            path &&
+            updateWorkflowNodeParameterMutation &&
+            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
+        ) {
+            const saveDefaultValue = () => {
+                saveProperty({
+                    currentComponent,
+                    path,
+                    setCurrentComponent,
+                    type,
+                    updateWorkflowNodeParameterMutation,
+                    value: defaultValue,
+                    workflowId: workflow.id!,
+                });
+            };
+
+            const timeoutId = setTimeout(saveDefaultValue, 200);
+
+            return () => clearTimeout(timeoutId);
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -639,23 +671,21 @@ const Property = ({
         }
     }, [controlType, expressionEnabled]);
 
-    // update propertyParameterValue when workflow definition changes
+    const memoizedWorkflowTask = useMemo(() => {
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+            (node) => node.name === currentNode?.name
+        );
+    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
+    // set propertyParameterValue on workflow definition change
     useEffect(() => {
-        if (
-            !workflow.definition ||
-            !currentNode?.name ||
-            !name ||
-            !path ||
-            !(showPropertyCodeEditorSheet || showWorkflowCodeEditorSheet)
-        ) {
+        // debouncedSetPropertyParameterValue();
+
+        if (!workflow.definition || !currentNode?.name || !name || !path) {
             return;
         }
 
-        const currentWorkflowNode = [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
-        );
-
-        setPropertyParameterValue(resolvePath(currentWorkflowNode?.parameters, path));
+        setPropertyParameterValue(resolvePath(memoizedWorkflowTask?.parameters, path));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
@@ -703,33 +733,15 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
 
-    // save hidden property to definition on render
     useEffect(() => {
-        if (
-            hidden &&
-            currentComponent &&
-            path &&
-            updateWorkflowNodeParameterMutation &&
-            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
-        ) {
-            const saveDefaultValue = () => {
-                saveProperty({
-                    currentComponent,
-                    path,
-                    setCurrentComponent,
-                    type,
-                    updateWorkflowNodeParameterMutation,
-                    value: defaultValue,
-                    workflowId: workflow.id!,
-                });
-            };
+        if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
+            setIsFetchingCurrentDisplayCondition(true);
 
-            const timeoutId = setTimeout(saveDefaultValue, 200);
-
-            return () => clearTimeout(timeoutId);
+            if (isDisplayConditionFetched) {
+                setIsFetchingCurrentDisplayCondition(false);
+            }
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionFetched]);
 
     if (hidden) {
         return <></>;
@@ -742,15 +754,15 @@ const Property = ({
     if (
         displayCondition &&
         currentComponent?.displayConditions?.[displayCondition] &&
-        isFetchingDisplayConditions &&
+        isFetchingCurrentDisplayCondition &&
         type !== 'ARRAY' &&
         type !== 'OBJECT'
     ) {
         return (
-            <div className="flex flex-col gap-y-2">
-                <Skeleton className="h-6 w-1/4" />
+            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
+                <Skeleton className="h-5 w-1/4" />
 
-                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-9 w-full" />
             </div>
         );
     }
