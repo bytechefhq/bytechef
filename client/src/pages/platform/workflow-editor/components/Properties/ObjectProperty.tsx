@@ -4,7 +4,7 @@ import {ControlType, PropertyType} from '@/shared/middleware/platform/configurat
 import {PropertyAllType, SubPropertyType} from '@/shared/types';
 import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowNodeParameterMutation} from '../../providers/workflowNodeParameterMutationProvider';
@@ -41,29 +41,31 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     const isContainerObject = name === '__item';
 
-    let availablePropertyTypes = additionalProperties?.length
-        ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
-              if (property.type) {
-                  types.push({
-                      label: property.type,
-                      value: property.type,
-                  });
-              }
+    const availablePropertyTypes = useMemo(() => {
+        if (properties?.length) {
+            const hasCustomProperty = (properties as Array<PropertyAllType>).find((property) => property.custom);
 
-              return types;
-          }, [])
-        : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-              label: type,
-              value: type,
-          }));
-
-    if (properties?.length) {
-        const hasCustomProperty = (properties as Array<PropertyAllType>).find((property) => property.custom);
-
-        if (!hasCustomProperty) {
-            availablePropertyTypes = [];
+            if (!hasCustomProperty) {
+                return [];
+            }
         }
-    }
+
+        return additionalProperties?.length
+            ? additionalProperties?.reduce((types: Array<{label: string; value: string}>, property) => {
+                  if (property.type) {
+                      types.push({
+                          label: property.type,
+                          value: property.type,
+                      });
+                  }
+
+                  return types;
+              }, [])
+            : Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
+                  label: type,
+                  value: type,
+              }));
+    }, [additionalProperties, properties]);
 
     if (!path) {
         path = name;
@@ -73,7 +75,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         path = path.replace('.__item', '');
     }
 
-    const handleAddItemClick = () => {
+    const handleAddItemClick = useCallback(() => {
         const newItem: SubPropertyType = {
             additionalProperties,
             controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlType,
@@ -86,22 +88,27 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
         };
 
-        setSubProperties([...(subProperties || []), newItem]);
+        setSubProperties((previousSubProperties) => [...(previousSubProperties || []), newItem]);
 
         setNewPropertyName('');
-    };
+    }, [additionalProperties, newPropertyName, newPropertyType]);
 
-    const handleDeleteClick = (subProperty: SubPropertyType) => {
-        if (!path) {
-            return;
-        }
+    const handleDeleteClick = useCallback(
+        (subProperty: SubPropertyType) => {
+            if (!path) {
+                return;
+            }
 
-        setSubProperties((subProperties) => subProperties?.filter((property) => property.name !== subProperty.name));
+            setSubProperties((previousSubProperties) =>
+                previousSubProperties?.filter((property) => property.name !== subProperty.name)
+            );
 
-        if (onDeleteClick) {
-            onDeleteClick(`${path}.${subProperty.name}`);
-        }
-    };
+            if (onDeleteClick) {
+                onDeleteClick(`${path}.${subProperty.name}`);
+            }
+        },
+        [onDeleteClick, path]
+    );
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
