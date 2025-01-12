@@ -4,10 +4,10 @@ info:
   title: "The Automation Configuration Internal API"
   version: "1"
 servers:
-- url: "/api/automation/internal"
+  - url: "/api/automation/internal"
 tags:
-- name: "workspace"
-  description: "The Automation Workspace Internal API"
+  - name: "workspace"
+    description: "The Automation Workspace Internal API"
 paths:
   /users/{id}/workspaces:
     get:

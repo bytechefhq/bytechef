@@ -16,13 +16,17 @@
 
 package com.bytechef.embedded.unified.web.rest.mapper.config;
 
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
+import com.bytechef.platform.web.rest.mapper.JsonNullableMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring")
+@MapperConfig(componentModel = "spring", uses = {
+    JsonNullableMapper.class, DateTimeMapper.class
+})
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.embedded.unified.web.rest.adapter",
     conversionServiceAdapterClassName = "UnifiedConversionServiceAdapter")

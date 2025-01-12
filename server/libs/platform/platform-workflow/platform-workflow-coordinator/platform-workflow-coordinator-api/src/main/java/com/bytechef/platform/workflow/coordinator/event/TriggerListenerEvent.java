@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.coordinator.event;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 /**
  * @author Ivica Cardic
@@ -42,7 +42,7 @@ public class TriggerListenerEvent extends AbstractEvent {
         return listenerParameters;
     }
 
-    public LocalDateTime getExecutionDate() {
+    public Instant getExecutionDate() {
         return listenerParameters.executionDate;
     }
 
@@ -64,6 +64,6 @@ public class TriggerListenerEvent extends AbstractEvent {
     }
 
     public record ListenerParameters(
-        WorkflowExecutionId workflowExecutionId, LocalDateTime executionDate, Object output) {
+        WorkflowExecutionId workflowExecutionId, Instant executionDate, Object output) {
     }
 }

@@ -50,7 +50,7 @@ const WorkflowNodesTabs = ({
                         </TabsTrigger>
                     )}
 
-                    {ff_1057 && !hideTaskDispatchers && (
+                    {!hideTaskDispatchers && (
                         <TabsTrigger className="w-full" value="taskDispatchers">
                             Flows
                         </TabsTrigger>
@@ -128,31 +128,36 @@ const WorkflowNodesTabs = ({
                             <TabsContent className="mt-0 w-full" value="taskDispatchers">
                                 <ul className="space-y-2" role="list">
                                     {taskDispatcherDefinitions.length ? (
-                                        taskDispatcherDefinitions.map(
-                                            (
-                                                taskDispatcherDefinition: TaskDispatcherDefinition & {
-                                                    taskDispatcher?: boolean;
-                                                }
-                                            ) => (
-                                                <WorkflowNodesTabsItem
-                                                    draggable={itemsDraggable}
-                                                    handleClick={() =>
-                                                        onItemClick &&
-                                                        onItemClick({
-                                                            ...taskDispatcherDefinition,
-                                                            taskDispatcher: true,
-                                                        } as ClickedDefinitionType)
-                                                    }
-                                                    key={taskDispatcherDefinition.name}
-                                                    node={
-                                                        taskDispatcherDefinition as (
-                                                            | ComponentDefinitionBasic
-                                                            | TaskDispatcherDefinition
-                                                        ) & {taskDispatcher: boolean; trigger: boolean}
-                                                    }
-                                                />
+                                        taskDispatcherDefinitions
+                                            .filter(
+                                                (taskDispatcherDefinition) =>
+                                                    ff_1057 || taskDispatcherDefinition.name === 'condition'
                                             )
-                                        )
+                                            .map(
+                                                (
+                                                    taskDispatcherDefinition: TaskDispatcherDefinition & {
+                                                        taskDispatcher?: boolean;
+                                                    }
+                                                ) => (
+                                                    <WorkflowNodesTabsItem
+                                                        draggable={itemsDraggable}
+                                                        handleClick={() =>
+                                                            onItemClick &&
+                                                            onItemClick({
+                                                                ...taskDispatcherDefinition,
+                                                                taskDispatcher: true,
+                                                            } as ClickedDefinitionType)
+                                                        }
+                                                        key={taskDispatcherDefinition.name}
+                                                        node={
+                                                            taskDispatcherDefinition as (
+                                                                | ComponentDefinitionBasic
+                                                                | TaskDispatcherDefinition
+                                                            ) & {taskDispatcher: boolean; trigger: boolean}
+                                                        }
+                                                    />
+                                                )
+                                            )
                                     ) : (
                                         <span className="block px-3 py-2 text-xs text-gray-500">
                                             No flow controls found.

@@ -22,8 +22,10 @@ import static com.bytechef.component.google.forms.connection.GoogleFormsConnecti
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.google.forms.action.GoogleFormsGetAllResponsesAction;
 import com.bytechef.component.google.forms.action.GoogleFormsGetFormAction;
 import com.bytechef.component.google.forms.action.GoogleFormsGetResponseAction;
+import com.bytechef.component.google.forms.trigger.GoogleFormsNewResponseTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -43,8 +45,10 @@ public class GoogleFormsComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(CONNECTION_DEFINITION)
         .actions(
+            GoogleFormsGetAllResponsesAction.ACTION_DEFINITION,
             GoogleFormsGetFormAction.ACTION_DEFINITION,
-            GoogleFormsGetResponseAction.ACTION_DEFINITION);
+            GoogleFormsGetResponseAction.ACTION_DEFINITION)
+        .triggers(GoogleFormsNewResponseTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {

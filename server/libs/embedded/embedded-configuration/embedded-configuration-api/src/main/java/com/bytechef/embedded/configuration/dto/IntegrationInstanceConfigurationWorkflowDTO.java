@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -29,15 +29,15 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record IntegrationInstanceConfigurationWorkflowDTO(
-    List<IntegrationInstanceConfigurationWorkflowConnection> connections, String createdBy, LocalDateTime createdDate,
-    Map<String, ?> inputs, boolean enabled, Long id, LocalDateTime lastExecutionDate, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, Long integrationInstanceConfigurationId, int version, Workflow workflow,
+    List<IntegrationInstanceConfigurationWorkflowConnection> connections, String createdBy, Instant createdDate,
+    Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
+    Instant lastModifiedDate, Long integrationInstanceConfigurationId, int version, Workflow workflow,
     String workflowId, String workflowReferenceCode)
     implements Comparable<IntegrationInstanceConfigurationWorkflowDTO> {
 
     public IntegrationInstanceConfigurationWorkflowDTO(
-        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow,
-        LocalDateTime lastExecutionDate, Workflow workflow, String workflowReferenceCode) {
+        IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow, Instant lastExecutionDate,
+        Workflow workflow, String workflowReferenceCode) {
 
         this(
             integrationInstanceConfigurationWorkflow.getConnections(),

@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Counter;
+import java.util.Optional;
 
 /**
  * A repository that can be used to update a counter value.
@@ -35,9 +36,7 @@ public interface CounterRepository {
      */
     void deleteById(Long id);
 
-    Iterable<Counter> findAll();
-
-    Long findValueByIdForUpdate(Long id);
+    Optional<Long> findValueByIdForUpdate(Long id);
 
     Counter save(Counter counter);
 

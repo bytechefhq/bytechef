@@ -20,7 +20,7 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.exception.WorkspaceErrorType;
 import com.bytechef.automation.configuration.repository.WorkspaceRepository;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.exception.ConfigurationException;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -50,7 +50,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public void delete(long id) {
         if (id == Workspace.DEFAULT_WORKSPACE_ID) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Default workspace cannot be deleted", WorkspaceErrorType.DELETE_DEFAULT_WORKSPACE);
         }
 
@@ -73,7 +73,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         Validate.isTrue(workspace.getId() != null, "'workspace.id' must not be null");
 
         if (workspace.getId() == Workspace.DEFAULT_WORKSPACE_ID) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Default workspace cannot be updated", WorkspaceErrorType.UPDATE_DEFAULT_WORKSPACE);
         }
 

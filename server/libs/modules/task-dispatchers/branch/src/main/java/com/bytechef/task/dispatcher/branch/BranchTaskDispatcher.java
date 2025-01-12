@@ -38,7 +38,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +75,7 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        taskExecution.setStartDate(LocalDateTime.now());
+        taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -87,8 +87,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 selectedCase, TASKS, WorkflowTask.class, Collections.emptyList());
 
             if (subWorkflowTasks.isEmpty()) {
-                taskExecution.setStartDate(LocalDateTime.now());
-                taskExecution.setEndDate(LocalDateTime.now());
+                taskExecution.setStartDate(Instant.now());
+                taskExecution.setEndDate(Instant.now());
                 taskExecution.setExecutionTime(0);
 
                 eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
@@ -118,8 +118,8 @@ public class BranchTaskDispatcher implements TaskDispatcher<TaskExecution>, Task
                 taskDispatcher.dispatch(subTaskExecution);
             }
         } else {
-            taskExecution.setStartDate(LocalDateTime.now());
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
             // TODO check, it seems wrong
 

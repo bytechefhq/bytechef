@@ -18,7 +18,7 @@ package com.bytechef.atlas.worker.event;
 
 import com.bytechef.atlas.worker.message.route.TaskWorkerMessageRoute;
 import com.bytechef.message.event.MessageEvent;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,15 +28,15 @@ import java.util.Map;
  */
 public abstract class AbstractEvent implements MessageEvent<TaskWorkerMessageRoute> {
 
-    protected LocalDateTime createDate;
+    protected Instant createDate;
     protected Map<String, Object> metadata = new HashMap<>();
 
     public AbstractEvent() {
-        this.createDate = LocalDateTime.now();
+        this.createDate = Instant.now();
     }
 
     @Override
-    public LocalDateTime getCreateDate() {
+    public Instant getCreateDate() {
         return createDate;
     }
 

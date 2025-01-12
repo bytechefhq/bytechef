@@ -5,18 +5,14 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuration';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {PropertyAllType, WorkflowDefinitionType} from '@/shared/types';
+import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
+import {Editor} from '@tiptap/react';
 import {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
-import ReactQuill from 'react-quill';
 import sanitizeHtml from 'sanitize-html';
 import {z} from 'zod';
 
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import getDataPillsFromProperties from '../utils/getDataPillsFromProperties';
 import PropertyMentionsInput from './Properties/components/PropertyMentionsInput/PropertyMentionsInput';
 
 const SPACE = 4;
@@ -42,26 +38,7 @@ const WorkflowOutputsSheetDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
     const [mentionInputValue, setMentionInputValue] = useState('');
 
-    const editorRef = useRef<ReactQuill>(null);
-
-    const {componentActions, workflow: currentWorkflow} = useWorkflowDataStore();
-
-    const {data: workflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
-        {
-            id: workflow.id!,
-        },
-        !!componentActions?.length
-    );
-
-    const workflowComponentNames = [
-        ...(workflow?.workflowTriggerComponentNames ?? []),
-        ...(workflow?.workflowTaskComponentNames ?? []),
-    ];
-
-    const {data: componentDefinitions} = useGetComponentDefinitionsQuery(
-        {include: workflowComponentNames},
-        workflowComponentNames !== undefined
-    );
+    const editorRef = useRef<Editor>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -117,76 +94,10 @@ const WorkflowOutputsSheetDialog = ({
         );
     }
 
-    const componentProperties = componentDefinitions
-        ?.filter((componentDefinition) => componentDefinition.name !== 'manual')
-        ?.map((componentDefinition, index) => {
-            if (componentDefinition.name === 'manual') {
-                return;
-            }
-
-            const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs?.[index]?.outputSchema;
-
-            const properties = outputSchemaDefinition?.properties?.length
-                ? outputSchemaDefinition.properties
-                : outputSchemaDefinition?.items;
-
-            return {
-                componentDefinition,
-                properties,
-            };
-        });
-
-    const dataPills = componentProperties
-        ? getDataPillsFromProperties(componentProperties, workflow, currentWorkflow.nodeNames)
-        : [];
-
     const handleMentionInputValueChange = (value: string) => {
         setMentionInputValue(value);
 
-        const originalValue = value;
-
-        let sanitizedValue = sanitizeHtml(value, {allowedTags: []});
-
-        const dataValueAttributes = originalValue.match(/data-value="([^"]+)"/g);
-
-        if (dataValueAttributes?.length) {
-            const dataPillValues = dataValueAttributes
-                .map((match) => match.match(/data-value="([^"]+)"/)?.[1])
-                .map((value) => `\${${value}}`);
-
-            const basicValues = originalValue
-                .split(/<div[^>]*>[\s\S]*?<\/div>/g)
-                .map((value) => value.replace(/<[^>]*>?/gm, ''));
-
-            if (sanitizedValue.startsWith('${') && editorRef.current) {
-                const editor = editorRef.current.getEditor();
-
-                editor.deleteText(0, editor.getLength());
-
-                editor.setText(' ');
-
-                const mentionInput = editor.getModule('mention');
-
-                mentionInput.insertItem(
-                    {
-                        componentIcon: '📄',
-                        id: 'currentNode?.name',
-                        value: sanitizedValue.replace('${', '').replace('}', ''),
-                    },
-                    true,
-                    {blotName: 'property-mention'}
-                );
-
-                return;
-            }
-
-            if (dataPillValues?.length) {
-                sanitizedValue = basicValues.reduce(
-                    (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
-                    ''
-                );
-            }
-        }
+        const sanitizedValue = sanitizeHtml(value, {allowedTags: []});
 
         form.setValue('value', sanitizedValue);
     };
@@ -249,7 +160,6 @@ const WorkflowOutputsSheetDialog = ({
                                             className="rounded-md border"
                                             {...field}
                                             onChange={(value) => handleMentionInputValueChange(value)}
-                                            overriddenDataPills={dataPills.flat(Infinity)}
                                             ref={editorRef}
                                             value={mentionInputValue}
                                         />

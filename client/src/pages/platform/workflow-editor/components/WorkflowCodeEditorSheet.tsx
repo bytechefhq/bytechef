@@ -107,11 +107,12 @@ const WorkflowCodeEditorSheet = ({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
+                                                className="[&_svg]:size-5"
                                                 disabled={testConfigurationDisabled}
                                                 onClick={() => setShowWorkflowTestConfigurationDialog(true)}
                                                 variant="ghost"
                                             >
-                                                <Settings2Icon className="mr-1 h-5" /> Test Configuration
+                                                <Settings2Icon /> Test Configuration
                                             </Button>
                                         </TooltipTrigger>
 
@@ -121,13 +122,14 @@ const WorkflowCodeEditorSheet = ({
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
+                                                className="[&_svg]:size-5"
                                                 disabled={!dirty}
                                                 onClick={() => handleWorkflowCodeEditorSheetSave(workflow, definition)}
                                                 size="icon"
                                                 type="submit"
                                                 variant="ghost"
                                             >
-                                                <SaveIcon className="h-5" />
+                                                <SaveIcon />
                                             </Button>
                                         </TooltipTrigger>
 
@@ -139,12 +141,13 @@ const WorkflowCodeEditorSheet = ({
                                             <TooltipTrigger asChild>
                                                 <span tabIndex={0}>
                                                     <Button
+                                                        className="[&_svg]:size-5"
                                                         disabled={runDisabled || dirty}
                                                         onClick={handleRunClick}
                                                         size="icon"
                                                         variant="ghost"
                                                     >
-                                                        <PlayIcon className="h-5 text-success" />
+                                                        <PlayIcon className="text-success" />
                                                     </Button>
                                                 </span>
                                             </TooltipTrigger>

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:58.475444+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class IntegrationInstanceBasicModel {
 
   private Long connectionId;
@@ -35,7 +35,7 @@ public class IntegrationInstanceBasicModel {
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private Boolean enabled;
 
@@ -44,12 +44,12 @@ public class IntegrationInstanceBasicModel {
   private Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
+  private OffsetDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private Long integrationInstanceConfigurationId;
 
@@ -124,7 +124,7 @@ public class IntegrationInstanceBasicModel {
     this.createdBy = createdBy;
   }
 
-  public IntegrationInstanceBasicModel createdDate(LocalDateTime createdDate) {
+  public IntegrationInstanceBasicModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -136,11 +136,11 @@ public class IntegrationInstanceBasicModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -204,7 +204,7 @@ public class IntegrationInstanceBasicModel {
     this.id = id;
   }
 
-  public IntegrationInstanceBasicModel lastExecutionDate(LocalDateTime lastExecutionDate) {
+  public IntegrationInstanceBasicModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -216,11 +216,11 @@ public class IntegrationInstanceBasicModel {
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
+  public OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
+  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
@@ -244,7 +244,7 @@ public class IntegrationInstanceBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public IntegrationInstanceBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public IntegrationInstanceBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -256,11 +256,11 @@ public class IntegrationInstanceBasicModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

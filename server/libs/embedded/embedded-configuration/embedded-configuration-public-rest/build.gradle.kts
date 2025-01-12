@@ -6,7 +6,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     apiPackage.set("com.bytechef.embedded.configuration.public_.web.rest")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useEnumCaseInsensitive" to "true",
             "useSpringBoot3" to "true",
@@ -35,7 +34,6 @@ dependencies {
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation(libs.org.mapstruct)
     implementation(libs.org.mapstruct.extensions.spring.mapstruct.spring.annotations)
     implementation("org.apache.commons:commons-lang3")
@@ -46,6 +44,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-api"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

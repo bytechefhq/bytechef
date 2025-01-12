@@ -16,31 +16,23 @@
 
 package com.bytechef.platform.user.web.rest.exception;
 
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import org.springframework.http.HttpStatus;
 
-public enum AccountErrorType implements ErrorType {
+public class AccountErrorType extends AbstractErrorType {
 
-    USER_NOT_FOUND(100, HttpStatus.INTERNAL_SERVER_ERROR), ORGANIZATION_ALREADY_EXISTS(101, HttpStatus.BAD_REQUEST),
-    SIGN_UP_DISABLED(102, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType USER_NOT_FOUND = new AccountErrorType(100, HttpStatus.INTERNAL_SERVER_ERROR);
+    public static final AccountErrorType ORGANIZATION_ALREADY_EXISTS = new AccountErrorType(
+        101, HttpStatus.BAD_REQUEST);
+    public static final AccountErrorType SIGN_UP_DISABLED = new AccountErrorType(102, HttpStatus.BAD_REQUEST);
 
-    private final int errorKey;
     private final HttpStatus status;
 
-    AccountErrorType(int errorKey, HttpStatus status) {
-        this.errorKey = errorKey;
+    private AccountErrorType(int errorKey, HttpStatus status) {
+        super(AdminUserDTO.class, errorKey);
+
         this.status = status;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return AdminUserDTO.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
     }
 
     public HttpStatus getStatus() {

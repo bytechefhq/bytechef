@@ -1,0 +1,682 @@
+{
+  "categories" : [ {
+    "key" : "artificial-intelligence",
+    "label" : "artificial-intelligence"
+  } ],
+  "customAction" : null,
+  "customActionHelp" : null,
+  "description" : "Vertex AI is a fully-managed, unified AI development platform for building and using generative AI.",
+  "icon" : "path:assets/google-vertex.svg",
+  "tags" : null,
+  "metadata" : null,
+  "name" : "vertexGemini",
+  "resources" : null,
+  "version" : 1,
+  "title" : "Vertex AI Gemini",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Google Cloud Platform project ID",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "projectId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Project Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Region",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "location",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Location",
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "Taiwan, asia-east1",
+          "value" : "asia-east1"
+        }, {
+          "description" : null,
+          "label" : "China, asia-east2",
+          "value" : "asia-east2"
+        }, {
+          "description" : null,
+          "label" : "Japan, asia-northeast1",
+          "value" : "asia-northeast1"
+        }, {
+          "description" : null,
+          "label" : "South Korea, asia-northeast3",
+          "value" : "asia-northeast3"
+        }, {
+          "description" : null,
+          "label" : "India, asia-south1",
+          "value" : "asia-south1"
+        }, {
+          "description" : null,
+          "label" : "Singapore, asia-southeast1",
+          "value" : "asia-southeast1"
+        }, {
+          "description" : null,
+          "label" : "Australia, australia-southeast1",
+          "value" : "australia-southeast1"
+        }, {
+          "description" : null,
+          "label" : "Poland, europe-central2",
+          "value" : "europe-central2"
+        }, {
+          "description" : null,
+          "label" : "Finland, europe-north1",
+          "value" : "europe-north1"
+        }, {
+          "description" : null,
+          "label" : "Spain, europe-southwest1",
+          "value" : "europe-southwest1"
+        }, {
+          "description" : null,
+          "label" : "Belgium, europe-west1",
+          "value" : "europe-west1"
+        }, {
+          "description" : null,
+          "label" : "UK, europe-west2",
+          "value" : "europe-west2"
+        }, {
+          "description" : null,
+          "label" : "Germany, europe-west3",
+          "value" : "europe-west3"
+        }, {
+          "description" : null,
+          "label" : "Netherlands, europe-west4",
+          "value" : "europe-west4"
+        }, {
+          "description" : null,
+          "label" : "Switzerland, europe-west6",
+          "value" : "europe-west6"
+        }, {
+          "description" : null,
+          "label" : "Italy, europe-west8",
+          "value" : "europe-west8"
+        }, {
+          "description" : null,
+          "label" : "France, europe-west9",
+          "value" : "europe-west9"
+        }, {
+          "description" : null,
+          "label" : "Qatar, me-central1",
+          "value" : "me-central1"
+        }, {
+          "description" : null,
+          "label" : "Kingdom of Saudi, me-central2",
+          "value" : "me-central2"
+        }, {
+          "description" : null,
+          "label" : "Israel, me-west1",
+          "value" : "me-west1"
+        }, {
+          "description" : null,
+          "label" : "Montreal, northamerica-northeast1",
+          "value" : "northamerica-northeast1"
+        }, {
+          "description" : null,
+          "label" : "Brazil, southamerica-east1",
+          "value" : "southamerica-east1"
+        }, {
+          "description" : null,
+          "label" : "Iowa, us-central1",
+          "value" : "us-central1"
+        }, {
+          "description" : null,
+          "label" : "South Carolina, us-east1",
+          "value" : "us-east1"
+        }, {
+          "description" : null,
+          "label" : "Northern Virginia, us-east4",
+          "value" : "us-east4"
+        }, {
+          "description" : null,
+          "label" : "Columbus, us-east5",
+          "value" : "us-east5"
+        }, {
+          "description" : null,
+          "label" : "Dallas, us-south1",
+          "value" : "us-south1"
+        }, {
+          "description" : null,
+          "label" : "Oregon, us-west1",
+          "value" : "us-west1"
+        }, {
+          "description" : null,
+          "label" : "Nevada, us-west4",
+          "value" : "us-west4"
+        } ],
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
+  "actions" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Ask anything you want.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "ask",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "sampleOutput" : null,
+      "outputSchema" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "ID of the model to use.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "gemini-1.5-flash-001",
+        "value" : "gemini-1.5-flash-001"
+      }, {
+        "description" : null,
+        "label" : "gemini-1.5-pro-001",
+        "value" : "gemini-1.5-pro-001"
+      }, {
+        "description" : null,
+        "label" : "gemini-pro",
+        "value" : "gemini-pro"
+      }, {
+        "description" : null,
+        "label" : "gemini-pro-vision",
+        "value" : "gemini-pro-vision"
+      } ],
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "A list of messages comprising the conversation so far.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "messages",
+      "type" : "ARRAY",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Messages",
+      "placeholder" : "Add message",
+      "items" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Message",
+        "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "description" : "The role of the messages author.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "role",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Role",
+          "placeholder" : null,
+          "controlType" : "SELECT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : [ {
+            "description" : null,
+            "label" : "System",
+            "value" : "system"
+          }, {
+            "description" : null,
+            "label" : "User",
+            "value" : "user"
+          }, {
+            "description" : null,
+            "label" : "Assistant",
+            "value" : "assistant"
+          }, {
+            "description" : null,
+            "label" : "Tool",
+            "value" : "tool"
+          } ],
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "The contents of the message.",
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : true,
+          "name" : "content",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Content",
+          "placeholder" : null,
+          "controlType" : "TEXT_AREA",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
+          "displayCondition" : "messages[index].role == 'user'",
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : false,
+          "name" : "attachments",
+          "type" : "ARRAY",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : "Attachments",
+          "placeholder" : null,
+          "items" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : null,
+            "type" : "FILE_ENTRY",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "properties" : [ {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "extension",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "mimeType",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "name",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            }, {
+              "advancedOption" : null,
+              "description" : null,
+              "displayCondition" : null,
+              "expressionEnabled" : null,
+              "hidden" : null,
+              "metadata" : { },
+              "required" : true,
+              "name" : "url",
+              "type" : "STRING",
+              "defaultValue" : null,
+              "exampleValue" : null,
+              "label" : null,
+              "placeholder" : null,
+              "controlType" : "TEXT",
+              "languageId" : null,
+              "maxLength" : null,
+              "minLength" : null,
+              "options" : null,
+              "optionsDataSource" : null
+            } ],
+            "controlType" : "FILE_ENTRY"
+          } ],
+          "maxItems" : null,
+          "minItems" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
+        } ],
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      } ],
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The response from the API.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "response",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Response",
+      "placeholder" : null,
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "In which format do you want the response to be in?",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseFormat",
+        "type" : "INTEGER",
+        "defaultValue" : 1,
+        "exampleValue" : null,
+        "label" : "Response Format",
+        "placeholder" : null,
+        "maxValue" : null,
+        "minValue" : null,
+        "options" : [ {
+          "description" : "Text response",
+          "label" : "Text",
+          "value" : 1
+        }, {
+          "description" : "JSON response with key-value pairs",
+          "label" : "JSON",
+          "value" : 2
+        } ],
+        "controlType" : "SELECT",
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Define the JSON schema for the response.",
+        "displayCondition" : "response.responseFormat == 2",
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : false,
+        "name" : "responseSchema",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Response Schema",
+        "placeholder" : null,
+        "controlType" : "JSON_SCHEMA_BUILDER",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "maxTokens",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Max Tokens",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "n",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Candidate Count",
+      "placeholder" : null,
+      "maxValue" : 8,
+      "minValue" : 0,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "temperature",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Temperature",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : 0.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "topP",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Top P",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : null,
+      "minNumberPrecision" : null,
+      "minValue" : null,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Specify the number of token choices the generative uses to generate the next token.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "topK",
+      "type" : "INTEGER",
+      "defaultValue" : 1,
+      "exampleValue" : null,
+      "label" : "Top K",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Up to 4 sequences where the API will stop generating further tokens.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "stop",
+      "type" : "ARRAY",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Stop",
+      "placeholder" : null,
+      "items" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "maxItems" : null,
+      "minItems" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Ask Gemini",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "perform" : { }
+  } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
+}

@@ -19,8 +19,8 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +33,7 @@ import org.springframework.lang.Nullable;
 public class ActionDefinition extends ActionDefinitionBasic {
 
     private boolean outputDefined;
+    private boolean outputFunctionDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
     private boolean workflowNodeDescriptionDefined;
@@ -48,6 +49,9 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
         this.outputDefined = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            actionDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             actionDefinition.getOutputDefinition(), ActionDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
@@ -83,6 +87,10 @@ public class ActionDefinition extends ActionDefinitionBasic {
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
     }
 
     public boolean isWorkflowNodeDescriptionDefined() {

@@ -83,7 +83,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                 () -> {
                     WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                    Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+                    Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
                         workflowId, workflowTask.getName());
                     WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 

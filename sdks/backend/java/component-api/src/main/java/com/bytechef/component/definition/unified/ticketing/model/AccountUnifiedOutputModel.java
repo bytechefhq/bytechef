@@ -18,7 +18,7 @@ package com.bytechef.component.definition.unified.ticketing.model;
 
 import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 /**
@@ -45,12 +45,12 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     }
 
     @Override
-    public LocalDateTime getCreatedDate() {
+    public OffsetDateTime getCreatedDate() {
         return null;
     }
 
     @Override
-    public LocalDateTime getLastModifiedDate() {
+    public OffsetDateTime getLastModifiedDate() {
         return null;
     }
 }

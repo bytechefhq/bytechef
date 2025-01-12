@@ -51,7 +51,7 @@ const SubPropertyPopover = ({
                     size="sm"
                     variant="ghost"
                 >
-                    <PlusIcon className="mr-2 size-4" />
+                    <PlusIcon className="size-4" />
 
                     {buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
                 </Button>

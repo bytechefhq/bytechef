@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,14 +35,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "DateTimeProperty", description = "A date-time property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:59.239958+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:59.057170+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class DateTimePropertyModel extends ValuePropertyModel {
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime defaultValue;
+  private OffsetDateTime defaultValue;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime exampleValue;
+  private OffsetDateTime exampleValue;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
@@ -60,7 +60,7 @@ public class DateTimePropertyModel extends ValuePropertyModel {
     super(controlType, type);
   }
 
-  public DateTimePropertyModel defaultValue(LocalDateTime defaultValue) {
+  public DateTimePropertyModel defaultValue(OffsetDateTime defaultValue) {
     this.defaultValue = defaultValue;
     return this;
   }
@@ -72,15 +72,15 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public LocalDateTime getDefaultValue() {
+  public OffsetDateTime getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(LocalDateTime defaultValue) {
+  public void setDefaultValue(OffsetDateTime defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public DateTimePropertyModel exampleValue(LocalDateTime exampleValue) {
+  public DateTimePropertyModel exampleValue(OffsetDateTime exampleValue) {
     this.exampleValue = exampleValue;
     return this;
   }
@@ -92,11 +92,11 @@ public class DateTimePropertyModel extends ValuePropertyModel {
   @Valid 
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public LocalDateTime getExampleValue() {
+  public OffsetDateTime getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(LocalDateTime exampleValue) {
+  public void setExampleValue(OffsetDateTime exampleValue) {
     this.exampleValue = exampleValue;
   }
 

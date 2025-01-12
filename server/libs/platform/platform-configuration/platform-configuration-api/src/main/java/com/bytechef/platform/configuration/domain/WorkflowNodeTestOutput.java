@@ -20,8 +20,8 @@ import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.ValueProperty;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import java.time.LocalDateTime;
+import com.bytechef.platform.domain.OutputResponse;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -55,7 +55,7 @@ public class WorkflowNodeTestOutput {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Id
     private Long id;
@@ -66,7 +66,7 @@ public class WorkflowNodeTestOutput {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("output_schema")
     private MapWrapper outputSchema;
@@ -118,7 +118,7 @@ public class WorkflowNodeTestOutput {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -130,7 +130,7 @@ public class WorkflowNodeTestOutput {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

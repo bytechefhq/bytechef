@@ -46,7 +46,8 @@ public class GoogleConnection {
                             .label("Client Secret")
                             .required(true))
                     .authorizationUrl((connection, context) -> " https://accounts.google.com/o/oauth2/v2/auth")
-                    .oAuth2AuthorizationExtraQueryParameters(Map.of("access_type", "offline"))
+                    .oAuth2AuthorizationExtraQueryParameters(
+                        Map.of("access_type", "offline", "prompt", "select_account"))
                     .refreshUrl((connectionParameters, context) -> GoogleOAuthConstants.TOKEN_SERVER_URL)
                     .refreshOn("^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$")
                     .scopes(scopes)

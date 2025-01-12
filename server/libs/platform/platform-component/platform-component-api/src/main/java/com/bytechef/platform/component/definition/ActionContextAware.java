@@ -34,7 +34,7 @@ public interface ActionContextAware extends ActionContext {
 
     Long getJobId();
 
-    boolean isDevEnvironment();
-
     String getWorkflowId();
+
+    boolean isDevEnvironment();
 }

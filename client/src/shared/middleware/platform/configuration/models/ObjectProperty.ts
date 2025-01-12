@@ -70,16 +70,16 @@ export interface ObjectProperty extends ValueProperty {
     additionalProperties?: Array<Property>;
     /**
      * The property default value.
-     * @type {object}
+     * @type {{ [key: string]: any; }}
      * @memberof ObjectProperty
      */
-    defaultValue?: object;
+    defaultValue?: { [key: string]: any; };
     /**
      * The property sample value.
-     * @type {object}
+     * @type {{ [key: string]: any; }}
      * @memberof ObjectProperty
      */
-    exampleValue?: object;
+    exampleValue?: { [key: string]: any; };
     /**
      * If the object can contain multiple additional properties.
      * @type {boolean}

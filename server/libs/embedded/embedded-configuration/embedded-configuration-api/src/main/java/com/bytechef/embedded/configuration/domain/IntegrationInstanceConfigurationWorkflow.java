@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +48,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private MapWrapper inputs = new MapWrapper();
@@ -65,7 +65,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("integration_instance_configuration_id")
     private AggregateReference<IntegrationInstanceConfiguration, Long> integrationInstanceConfigurationId;
@@ -127,7 +127,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -143,7 +143,7 @@ public class IntegrationInstanceConfigurationWorkflow implements Comparable<Inte
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

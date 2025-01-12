@@ -77,7 +77,7 @@ public class Evaluator {
         METHOD_EXECUTOR_MAP.put("uuid", new Uuid());
     }
 
-    public static Map<String, Object> evaluate(Map<String, Object> map, Map<String, ?> context) {
+    public static Map<String, Object> evaluate(Map<String, ?> map, Map<String, ?> context) {
         return evaluateInternal(map, context);
     }
 
@@ -105,9 +105,9 @@ public class Evaluator {
                 continue;
             }
 
-            throw new IllegalArgumentException(
-                "unknown expression type: " + subExpression.getClass()
-                    .getName());
+            Class<? extends Expression> subExpressionClass = subExpression.getClass();
+
+            throw new IllegalArgumentException("unknown expression type: " + subExpressionClass.getName());
         }
 
         return stringBuilder.toString();

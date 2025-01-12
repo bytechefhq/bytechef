@@ -25,6 +25,9 @@ import org.springframework.data.relational.core.mapping.event.AbstractRelational
 import org.springframework.data.relational.core.mapping.event.AfterSaveEvent;
 import org.springframework.stereotype.Component;
 
+/**
+ * @author Ivica Cardic
+ */
 @Component
 public class WorkflowAfterSaveEventListener extends AbstractRelationalEventListener<Workflow> {
 

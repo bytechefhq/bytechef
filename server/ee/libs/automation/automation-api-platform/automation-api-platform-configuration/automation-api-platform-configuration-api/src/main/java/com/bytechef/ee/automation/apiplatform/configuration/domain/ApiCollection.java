@@ -10,7 +10,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.domain;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.tag.domain.Tag;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -43,7 +43,7 @@ public class ApiCollection {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String description;
@@ -60,7 +60,7 @@ public class ApiCollection {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -101,7 +101,7 @@ public class ApiCollection {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -113,7 +113,7 @@ public class ApiCollection {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

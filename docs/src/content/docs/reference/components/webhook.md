@@ -37,7 +37,7 @@ null
 
 ___Sample Output:___
 
-```{method=POST, headers={Header1=value}, parameters={parameter1=value}}```
+```{method=POST, parameters={}, headers={}}```
 
 
 null
@@ -61,7 +61,7 @@ Upon receiving a webhook request, it goes through a validation process. Once val
 
 ___Sample Output:___
 
-```{method=POST, headers={Header1=value}, parameters={parameter1=value}}```
+```{method=POST, parameters={}, headers={}}```
 
 
 null
@@ -86,7 +86,7 @@ You have the flexibility to set up your preferred response. After a webhook requ
 
 ___Sample Output:___
 
-```{method=POST, headers={Header1=value}, parameters={parameter1=value}}```
+```{method=POST, parameters={}, headers={}}```
 
 
 null
@@ -95,6 +95,27 @@ null
 
 
 <hr />
+
+
+
+## Actions
+
+
+### Response to Webhook Request
+Converts the response to the webhook request.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Response Type | INTEGER | SELECT  |  The type of the response.  |
+| Headers | {} | OBJECT_BUILDER  |  The headers of the response.  |
+| Body | {} | OBJECT_BUILDER  |  The body of the response.  |
+| Body | STRING | TEXT  |  The body of the response.  |
+| Redirect URL | STRING | TEXT  |  The redirect URL.  |
+| Body | FILE_ENTRY | FILE_ENTRY  |  The body of the response.  |
+| Status Code | INTEGER | INTEGER  |  The status code of the response.  |
+
 
 
 

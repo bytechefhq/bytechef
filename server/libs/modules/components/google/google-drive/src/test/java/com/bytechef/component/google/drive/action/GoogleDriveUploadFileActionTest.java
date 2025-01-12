@@ -50,7 +50,7 @@ class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
             .thenReturn("name");
         when(mockedFileEntry.getMimeType())
             .thenReturn("mimeType");
-        when(mockedContext.file(any()))
+        when(mockedActionContext.file(any()))
             .thenReturn(mockedFile);
 
         when(mockedFiles.create(fileArgumentCaptor.capture(), abstractInputStreamContentArgumentCaptor.capture()))
@@ -58,7 +58,7 @@ class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
         when(mockedCreate.execute())
             .thenReturn(mockedGoogleFile);
 
-        File result = GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        File result = GoogleDriveUploadFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedGoogleFile, result);
 

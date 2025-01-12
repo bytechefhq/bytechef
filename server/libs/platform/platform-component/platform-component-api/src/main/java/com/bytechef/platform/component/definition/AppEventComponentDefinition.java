@@ -19,7 +19,7 @@ package com.bytechef.platform.component.definition;
 /**
  * @author Ivica Cardic
  */
-public interface AppEventComponentDefinition {
+public interface AppEventComponentDefinition extends PlatformComponentDefinition {
 
     String APP_EVENT = "appEvent";
     String NEW_EVENT = "newEvent";

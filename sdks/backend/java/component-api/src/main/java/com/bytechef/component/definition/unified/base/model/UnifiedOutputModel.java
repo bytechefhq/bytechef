@@ -16,7 +16,7 @@
 
 package com.bytechef.component.definition.unified.base.model;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Map;
 
 /**
@@ -32,7 +32,7 @@ public interface UnifiedOutputModel extends UnifiedInputModel {
 
     Map<String, ?> getRemoteData();
 
-    LocalDateTime getCreatedDate();
+    OffsetDateTime getCreatedDate();
 
-    LocalDateTime getLastModifiedDate();
+    OffsetDateTime getLastModifiedDate();
 }

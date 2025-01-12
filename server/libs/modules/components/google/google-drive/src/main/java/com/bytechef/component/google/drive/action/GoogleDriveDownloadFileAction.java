@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 
 import com.bytechef.component.definition.ActionContext;
@@ -63,26 +62,57 @@ public class GoogleDriveDownloadFileAction {
 
         String fileId = inputParameters.getRequiredString(FILE_ID);
 
-        Drive.Files files = drive.files();
+        Drive.Files.Get get = drive.files()
+            .get(fileId);
 
-        Drive.Files.Get get = files.get(fileId);
+        File googleFile = get.execute();
 
-        try (InputStream inputStream = get.executeMediaAsInputStream()) {
-            String fileName = getFileName(files, fileId);
+        String mimeType = googleFile.getMimeType();
+        String fileName = googleFile.getName();
+        String exportMimeType = getExportMimeType(mimeType);
 
-            return actionContext.file(file -> file.storeContent(fileName, inputStream));
+        if (exportMimeType != null) {
+            try (InputStream inputStream = drive.files()
+                .export(fileId, exportMimeType)
+                .executeMediaAsInputStream()) {
+
+                String extension = actionContext.mimeType(mimeType1 -> mimeType1.lookupExt(exportMimeType));
+
+                String finalFileName = fileName + "." + extension;
+
+                return actionContext.file(file -> file.storeContent(finalFileName, inputStream));
+            }
+        } else {
+            String fileExtension = googleFile.getFileExtension();
+
+            if (fileExtension == null || fileExtension.isEmpty()) {
+                fileExtension =
+                    actionContext.mimeType(
+                        mimeType1 -> mimeType1.lookupExt(mimeType.equals("plain/text") ? "text/plain" : mimeType));
+                if (fileExtension != null && !fileName.contains(fileExtension)) {
+                    fileName += "." + fileExtension;
+                }
+            }
+
+            try (InputStream inputStream = get.executeMediaAsInputStream()) {
+                String finalFilename = fileName;
+
+                return actionContext.file(file -> file.storeContent(finalFilename, inputStream));
+            }
         }
     }
 
-    private static String getFileName(Drive.Files files, String fileId) throws IOException {
-        return files.list()
-            .setQ("mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "'")
-            .execute()
-            .getFiles()
-            .stream()
-            .filter(file -> fileId.equals(file.getId()))
-            .map(File::getName)
-            .findFirst()
-            .orElse("fileName");
+    private static String getExportMimeType(String mimeType) {
+        String exportMimeType = null;
+
+        if (mimeType.contains("application/vnd.google-apps.document")) {
+            exportMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        } else if (mimeType.contains("application/vnd.google-apps.spreadsheet")) {
+            exportMimeType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        } else if (mimeType.contains("application/vnd.google-apps.presentation")) {
+            exportMimeType = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+        }
+
+        return exportMimeType;
     }
 }

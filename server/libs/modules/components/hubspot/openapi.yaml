@@ -258,6 +258,47 @@ paths:
                             type: "string"
                           hubspot_owner_id:
                             type: "string"
+  /crm/v3/objects/tickets/{ticketId}:
+    get:
+      summary: "Get Ticket"
+      description: "Gets ticket details."
+      operationId: "getTicket"
+      parameters:
+        - name: "ticketId"
+          in: "path"
+          required: true
+          schema:
+            title: "Ticket ID"
+            description: "The ID of the ticket to get."
+            type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      properties:
+                        type: "object"
+                        properties:
+                          content:
+                            type: "string"
+                          hs_object_id:
+                            type: "string"
+                          hs_pipeline:
+                            type: "string"
+                          hs_pipeline_stage:
+                            type: "string"
+                          hs_ticket_priority:
+                            type: "string"
+                          subject:
+                            type: "string"
 components:
   securitySchemes:
     oauth2:
@@ -274,3 +315,4 @@ components:
             crm.objects.deals.write: " "
             crm.schemas.deals.read: " "
             crm.objects.owners.read: " "
+            tickets: " "

@@ -20,7 +20,6 @@ import com.bytechef.atlas.configuration.constant.WorkflowConstants;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.workflow.contributor.WorkflowReservedWordContributor;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,9 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ServiceConfigurationError;
@@ -90,7 +89,7 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
     protected Workflow doReadWorkflow(WorkflowResource workflowResource) throws IOException {
         return new Workflow(
             workflowResource.getId(), readDefinition(workflowResource), workflowResource.getWorkflowFormat(),
-            LocalDateTimeUtils.toLocalDateTime(new Date(workflowResource.lastModified())),
+            Instant.ofEpochMilli(workflowResource.lastModified()),
             workflowResource.getMetadata());
     }
 

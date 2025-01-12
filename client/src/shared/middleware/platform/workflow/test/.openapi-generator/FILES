@@ -5,6 +5,7 @@ models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
 models/TaskExecution.ts
+models/TestWorkflowRequest.ts
 models/TriggerExecution.ts
 models/Webhook.ts
 models/WebhookRetry.ts

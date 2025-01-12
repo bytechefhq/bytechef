@@ -24,5 +24,5 @@ import reactor.core.publisher.Flux;
  */
 public interface ChatService {
 
-    Flux<Map<String, ?>> chat(String message);
+    Flux<Map<String, ?>> chat(String message, String conversationId);
 }

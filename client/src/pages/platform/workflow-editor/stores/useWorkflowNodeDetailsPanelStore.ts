@@ -1,19 +1,23 @@
 /* eslint-disable sort-keys */
-import {ComponentType, NodeType} from '@/shared/types';
+import {ComponentType, NodeDataType} from '@/shared/types';
+import {Editor} from '@tiptap/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-interface WorkflowNodeDetailsPanelStateI {
+interface WorkflowNodeDetailsPanelStoreI {
+    activeTab: string;
+    setActiveTab: (activeTab: string) => void;
+
     currentComponent: ComponentType | undefined;
     setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
 
-    currentNode: NodeType | undefined;
-    setCurrentNode: (currentNode: NodeType | undefined) => void;
+    currentNode: NodeDataType | undefined;
+    setCurrentNode: (currentNode: NodeDataType | undefined) => void;
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    focusedInput: any;
+    focusedInput: Editor | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setFocusedInput: (focusedInput: any) => void;
+    setFocusedInput: (focusedInput: Editor | null) => void;
 
     reset: () => void;
 
@@ -21,9 +25,12 @@ interface WorkflowNodeDetailsPanelStateI {
     setWorkflowNodeDetailsPanelOpen: (workflowNodeDetailsPanelOpen: boolean) => void;
 }
 
-const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStateI>()(
+const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>()(
     devtools(
         (set) => ({
+            activeTab: 'description',
+            setActiveTab: (activeTab) => set((state) => ({...state, activeTab})),
+
             currentComponent: undefined,
             setCurrentComponent: (currentComponent) => set((state) => ({...state, currentComponent})),
 

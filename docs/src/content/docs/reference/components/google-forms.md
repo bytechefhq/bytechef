@@ -39,9 +39,40 @@ Version: 1
 
 
 
+## Triggers
+
+
+### New Response
+Triggers when response is submitted to Google Form.
+
+#### Type: POLLING
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Form | STRING | SELECT  |  Form to watch for new responses.  |
+
+
+
+
+
+<hr />
+
 
 
 ## Actions
+
+
+### Get All Responses
+Get all responses of a form.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Form ID | STRING | SELECT  |  ID of the form whose responses to retrieve.  |
+
+
 
 
 ### Get Form
@@ -51,27 +82,7 @@ Get the information about a form.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form | STRING | SELECT  |  Form to retrieve.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| {STRING\(title), STRING\(documentTitle)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(itemdId), STRING\(title)}] | ARRAY_BUILDER  |
-
-
+| Form ID | STRING | SELECT  |  ID of the form to retrieve.  |
 
 
 
@@ -83,30 +94,8 @@ Get the response of a form.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form | STRING | SELECT  |  Form to retrieve.  |
-| Response | STRING | SELECT  |  Response to retrieve.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {} | OBJECT_BUILDER  |
-| NUMBER | NUMBER  |
-
-
+| Form ID | STRING | SELECT  |  ID of the form whose response to retrieve.  |
+| Response ID | STRING | SELECT  |  ID of the response to retrieve.  |
 
 
 

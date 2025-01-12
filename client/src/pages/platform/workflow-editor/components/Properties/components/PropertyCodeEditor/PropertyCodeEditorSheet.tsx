@@ -2,13 +2,16 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import PropertyCodeEditorSheetConnectionsSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetConnectionsSheet';
-import {RightSidebar} from '@/shared/layout/RightSidebar';
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
+import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanel';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import Editor from '@monaco-editor/react';
-import {Link2Icon, PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, RefreshCwIcon, SparklesIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
+import {twMerge} from 'tailwind-merge';
 
 const workflowNodeScriptApi: WorkflowNodeScriptApi = new WorkflowNodeScriptApi();
 
@@ -33,7 +36,11 @@ const PropertyCodeEditorSheet = ({
     const [newValue, setNewValue] = useState<string | undefined>(value);
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
-    const [showConnections, setShowConnections] = useState(false);
+
+    const {ai} = useApplicationInfoStore();
+    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
+
+    const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
 
@@ -64,9 +71,12 @@ const PropertyCodeEditorSheet = ({
 
     return (
         <>
-            <Sheet onOpenChange={onClose} open={true}>
+            <Sheet modal={!copilotPanelOpen} onOpenChange={onClose} open={true}>
                 <SheetContent
-                    className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
+                    className={twMerge(
+                        'flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-xl',
+                        copilotPanelOpen && 'mr-[450px]'
+                    )}
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
@@ -106,12 +116,30 @@ const PropertyCodeEditorSheet = ({
                                             <SquareIcon className="h-5" />
                                         </Button>
                                     )}
+
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            {ai.copilot.enabled && ff_1570 && (
+                                                <Button
+                                                    onClick={() =>
+                                                        !copilotPanelOpen && setCopilotPanelOpen(!copilotPanelOpen)
+                                                    }
+                                                    size="icon"
+                                                    variant="ghost"
+                                                >
+                                                    <SparklesIcon className="h-5" />
+                                                </Button>
+                                            )}
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Open Copilot panel</TooltipContent>
+                                    </Tooltip>
                                 </div>
                             </div>
                         </div>
                     </SheetHeader>
 
-                    <div className="flex h-full border">
+                    <div className="flex h-full border-y border-y-border/50">
                         <ResizablePanelGroup className="flex-1" direction="vertical">
                             <ResizablePanel defaultSize={75}>
                                 <Editor
@@ -171,29 +199,13 @@ const PropertyCodeEditorSheet = ({
                         </ResizablePanelGroup>
 
                         <div className="flex border-l border-l-border/50">
-                            <RightSidebar
-                                className="bg-transparent"
-                                navigation={[
-                                    {
-                                        icon: Link2Icon,
-                                        name: 'Connections',
-                                        onClick: () => setShowConnections(!showConnections),
-                                    },
-                                ]}
-                            />
-                        </div>
-                    </div>
-
-                    {showConnections && (
-                        <div className="w-80 border-l border-l-border/50">
-                            <PropertyCodeEditorSheetConnectionsSheet
-                                onCLose={() => setShowConnections(false)}
+                            <PropertyCodeEditorSheetRightPanel
                                 workflow={workflow}
                                 workflowConnections={currentWorkflowTask?.connections || []}
                                 workflowNodeName={workflowNodeName}
                             />
                         </div>
-                    )}
+                    </div>
                 </SheetContent>
             </Sheet>
         </>

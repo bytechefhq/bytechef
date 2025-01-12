@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.task.handler;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 
 /**
  * @author Ivica Cardic

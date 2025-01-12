@@ -18,6 +18,7 @@ package com.bytechef.platform.ai.service;
 
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -28,7 +29,7 @@ import reactor.core.publisher.Flux;
  * @author Ivica Cardic
  */
 @Service
-@ConditionalOnProperty(prefix = "bytechef.ai", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class ChatServiceImpl implements ChatService {
 
     private final ChatClient chatClient;
@@ -41,9 +42,11 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    public Flux<Map<String, ?>> chat(String message) {
+    public Flux<Map<String, ?>> chat(String message, String conversationId) {
         return chatClient.prompt()
             .user(message)
+            .advisors(advisor -> advisor
+                .param(AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY, conversationId))
             .stream()
             .content()
             .map(content -> Map.of("text", content));

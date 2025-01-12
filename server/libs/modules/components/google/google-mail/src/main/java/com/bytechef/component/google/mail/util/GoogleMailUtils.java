@@ -75,6 +75,7 @@ import jakarta.mail.internet.MimeBodyPart;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.mail.internet.MimeMultipart;
 import jakarta.mail.util.ByteArrayDataSource;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -261,7 +262,7 @@ public class GoogleMailUtils {
     }
 
     public static Message getMessage(Parameters inputParameters, Gmail service) throws IOException {
-        String format = inputParameters.getString(FORMAT);
+        String format = inputParameters.getString(FORMAT, SIMPLE);
 
         return service.users()
             .messages()
@@ -406,7 +407,8 @@ public class GoogleMailUtils {
                     messagePartBody.getAttachmentId());
 
                 fileEntries.add(actionContext.file(
-                    file -> file.storeContent(messagePart.getFilename(), attachment.getData())));
+                    file -> file.storeContent(
+                        messagePart.getFilename(), new ByteArrayInputStream(attachment.decodeData()))));
             }
         }
         return fileEntries;

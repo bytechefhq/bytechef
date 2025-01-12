@@ -5,9 +5,8 @@ import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyJsonSchemaBuilder/PropertyJsonSchemaBuilderSheet';
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import React, {ReactNode, forwardRef} from 'react';
+import React, {ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface PropertyJsonSchemaBuilderProps {
@@ -41,7 +40,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
         },
         ref
     ) => {
-        const {setShowPropertyJsonSchemaBuilder, showPropertyJsonSchemaBuilder} = useWorkflowEditorStore();
+        const [showPropertyJsonSchemaBuilder, setShowPropertyJsonSchemaBuilder] = useState(false);
 
         return (
             <>

@@ -20,7 +20,6 @@ package com.bytechef.atlas.execution.domain;
 
 import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.error.Errorable;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.evaluator.Evaluator;
@@ -31,7 +30,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -99,10 +98,10 @@ public final class TaskExecution
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("end_date")
-    private LocalDateTime endDate;
+    private Instant endDate;
 
     @Column("error")
     private ExecutionError error;
@@ -122,7 +121,7 @@ public final class TaskExecution
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Transient
     private Map<String, Object> metadata = new HashMap<>();
@@ -152,7 +151,7 @@ public final class TaskExecution
     private int retryDelayFactor;
 
     @Column("start_date")
-    private LocalDateTime startDate;
+    private Instant startDate;
 
     @Column
     private int status;
@@ -220,7 +219,7 @@ public final class TaskExecution
      *
      * @return Date
      */
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -229,7 +228,7 @@ public final class TaskExecution
      *
      * @return Date
      */
-    public LocalDateTime getEndDate() {
+    public Instant getEndDate() {
         return endDate;
     }
 
@@ -276,7 +275,7 @@ public final class TaskExecution
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
@@ -375,7 +374,7 @@ public final class TaskExecution
      *
      * @return Date
      */
-    public LocalDateTime getStartDate() {
+    public Instant getStartDate() {
         return startDate;
     }
 
@@ -426,11 +425,11 @@ public final class TaskExecution
         return this;
     }
 
-    public void setEndDate(LocalDateTime endDate) {
+    public void setEndDate(Instant endDate) {
         this.endDate = endDate;
 
         if (endDate != null && startDate != null) {
-            this.executionTime = LocalDateTimeUtils.getTime(endDate) - LocalDateTimeUtils.getTime(startDate);
+            this.executionTime = endDate.toEpochMilli() - startDate.toEpochMilli();
         }
     }
 
@@ -494,7 +493,7 @@ public final class TaskExecution
         this.retryDelayFactor = retryDelayFactor;
     }
 
-    public void setStartDate(LocalDateTime startDate) {
+    public void setStartDate(Instant startDate) {
         this.startDate = startDate;
     }
 
@@ -539,7 +538,7 @@ public final class TaskExecution
 
     @SuppressFBWarnings("EI")
     public static final class Builder {
-        private LocalDateTime endDate;
+        private Instant endDate;
         private ExecutionError error;
         private Long id;
         private Long jobId;
@@ -552,7 +551,7 @@ public final class TaskExecution
         private int retryAttempts;
         private String retryDelay = "1s";
         private int retryDelayFactor = 2;
-        private LocalDateTime startDate;
+        private Instant startDate;
         private Status status = Status.CREATED;
         private int taskNumber = DEFAULT_TASK_NUMBER;
         private WorkflowTask workflowTask;
@@ -560,7 +559,7 @@ public final class TaskExecution
         private Builder() {
         }
 
-        public Builder endDate(LocalDateTime endDate) {
+        public Builder endDate(Instant endDate) {
             this.endDate = endDate;
             return this;
         }
@@ -625,7 +624,7 @@ public final class TaskExecution
             return this;
         }
 
-        public Builder startDate(LocalDateTime startDate) {
+        public Builder startDate(Instant startDate) {
             this.startDate = startDate;
             return this;
         }

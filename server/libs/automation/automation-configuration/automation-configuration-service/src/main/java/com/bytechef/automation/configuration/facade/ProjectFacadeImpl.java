@@ -282,6 +282,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+            .sorted(
+                (projectWorkflow1, projectWorkflow2) -> {
+                    String label1 = projectWorkflow1.getLabel();
+                    String label2 = projectWorkflow2.getLabel();
+
+                    return label1.compareToIgnoreCase(label2);
+                })
             .toList();
     }
 

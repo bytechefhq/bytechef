@@ -58,6 +58,11 @@ public class DataStreamContextImpl implements DataStreamContext {
     }
 
     @Override
+    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeFunction) {
+        return actionContext.mimeType(mimeTypeFunction);
+    }
+
+    @Override
     public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
         return actionContext.outputSchema(outputSchemaFunction);
     }

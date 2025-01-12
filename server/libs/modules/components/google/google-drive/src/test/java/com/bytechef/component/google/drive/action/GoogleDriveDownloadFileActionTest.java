@@ -27,10 +27,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,37 +40,62 @@ import org.mockito.ArgumentCaptor;
 class GoogleDriveDownloadFileActionTest extends AbstractGoogleDriveActionTest {
 
     private final InputStream mockedInputStream = mock(InputStream.class);
-    private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
-    private final FileList mockedFileList = mock(FileList.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "fileId"));
-    private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final Drive.Files.Export mockedExport = mock(Drive.Files.Export.class);
+    private final ArgumentCaptor<String> exportMimeTypeArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() throws IOException {
+    void testPerformWithGoogleDoc() throws IOException {
         when(mockedFiles.get(fileIdArgumentCaptor.capture()))
             .thenReturn(mockedGet);
-        when(mockedGet.executeMediaAsInputStream())
+        when(mockedGet.execute())
+            .thenReturn(new File().setName("testDoc")
+                .setMimeType("application/vnd.google-apps.document"));
+
+        when(mockedFiles.export(fileIdArgumentCaptor.capture(), exportMimeTypeArgumentCaptor.capture()))
+            .thenReturn(mockedExport);
+        when(mockedExport.executeMediaAsInputStream())
             .thenReturn(mockedInputStream);
 
-        when(mockedFiles.list())
-            .thenReturn(mockedList);
-        when(mockedList.setQ(qArgumentCaptor.capture()))
-            .thenReturn(mockedList);
-        when(mockedList.execute())
-            .thenReturn(mockedFileList);
-        when(mockedFileList.getFiles())
-            .thenReturn(List.of(new File().setId("fileId")
-                .setName("fileName")));
-
-        when(mockedContext.file(any()))
+        when(mockedActionContext.mimeType(any()))
+            .thenReturn("type");
+        when(mockedActionContext.file(any()))
             .thenReturn(mockedFileEntry);
 
-        FileEntry result = GoogleDriveDownloadFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        FileEntry result =
+            GoogleDriveDownloadFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedFileEntry, result);
 
         assertEquals("fileId", fileIdArgumentCaptor.getValue());
-        assertEquals("mimeType != 'application/vnd.google-apps.folder'", qArgumentCaptor.getValue());
+        assertEquals(
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            exportMimeTypeArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformWithNonGoogleDoc() throws IOException {
+        when(mockedFiles.get(fileIdArgumentCaptor.capture()))
+            .thenReturn(mockedGet);
+        when(mockedGet.execute())
+            .thenReturn(new File().setName("testDoc")
+                .setMimeType("application/pdf")
+                .setFileExtension("pdf"));
+
+        when(mockedGet.executeMediaAsInputStream())
+            .thenReturn(mockedInputStream);
+
+        when(mockedActionContext.mimeType(any()))
+            .thenReturn("type");
+        when(mockedActionContext.file(any()))
+            .thenReturn(mockedFileEntry);
+
+        FileEntry result =
+            GoogleDriveDownloadFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+
+        assertEquals(mockedFileEntry, result);
+
+        assertEquals("fileId", fileIdArgumentCaptor.getValue());
     }
 }

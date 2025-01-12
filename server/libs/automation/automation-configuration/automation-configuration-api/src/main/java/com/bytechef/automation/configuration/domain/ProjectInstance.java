@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ProjectInstance {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String description;
@@ -71,7 +71,7 @@ public class ProjectInstance {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
@@ -112,7 +112,7 @@ public class ProjectInstance {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -140,7 +140,7 @@ public class ProjectInstance {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

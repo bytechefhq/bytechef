@@ -6,7 +6,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     apiPackage.set("com.bytechef.automation.configuration.public_.web.rest")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
@@ -38,7 +37,6 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)

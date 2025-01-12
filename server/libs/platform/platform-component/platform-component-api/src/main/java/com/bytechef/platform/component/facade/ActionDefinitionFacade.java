@@ -21,7 +21,7 @@ import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -33,7 +33,8 @@ public interface ActionDefinitionFacade extends OperationDefinitionFacade {
 
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId);
+        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        Long connectionId);
 
     List<Option> executeOptions(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,

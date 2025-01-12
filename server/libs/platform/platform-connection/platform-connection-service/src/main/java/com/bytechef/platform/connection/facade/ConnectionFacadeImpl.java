@@ -32,9 +32,9 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.domain.BaseProperty;
+import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.registry.domain.BaseProperty;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -132,7 +132,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
         Connection connection = connectionService.getConnection(id);
 
         if (isConnectionUsed(id, connection.getType())) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Connection id=%s is used".formatted(id), ConnectionErrorType.CONNECTION_IS_USED);
         }
 

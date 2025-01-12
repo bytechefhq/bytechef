@@ -57,8 +57,8 @@ Send an email
 | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
 | Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
 | Content Type | INTEGER | SELECT  |  |
-| HTML | STRING | TEXT  |  The HTML version of the message.  |
-| Text | STRING | TEXT  |  The plain text version of the message.  |
+| HTML | STRING | RICH_TEXT  |  The HTML version of the message.  |
+| Text | STRING | TEXT_AREA  |  The plain text version of the message.  |
 | Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 | [{STRING\(name), STRING\(value)}] | ARRAY_BUILDER  |

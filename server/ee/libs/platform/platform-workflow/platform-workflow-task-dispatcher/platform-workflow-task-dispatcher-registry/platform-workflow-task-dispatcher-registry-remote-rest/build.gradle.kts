@@ -4,5 +4,5 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 }

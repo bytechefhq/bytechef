@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.domain;
 
-import com.bytechef.platform.registry.domain.BaseResources;
+import com.bytechef.platform.domain.BaseResources;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**

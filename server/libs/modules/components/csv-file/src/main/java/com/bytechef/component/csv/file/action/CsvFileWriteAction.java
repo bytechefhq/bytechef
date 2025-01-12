@@ -50,12 +50,14 @@ import java.util.Map;
 public class CsvFileWriteAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
-        .title("Write to File")
-        .description("Writes the data to a csv file.")
+        .title("Write to CSV File")
+        .description(
+            "Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.")
         .properties(
             array(ROWS)
-                .label("Rows")
-                .description("The array of objects to write to the file.")
+                .label("Line Structure Definition")
+                .description(
+                    "Define a sequence of fields that will form a line. The values for these fields will consistently repeat in the same order defined here across all lines.")
                 .required(true)
                 .items(
                     object()

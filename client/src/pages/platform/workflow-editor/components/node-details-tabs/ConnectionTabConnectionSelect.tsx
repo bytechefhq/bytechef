@@ -17,6 +17,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 const ConnectionTabConnectionSelect = ({
     workflowConnection,
@@ -74,6 +75,10 @@ const ConnectionTabConnectionSelect = ({
     });
 
     const handleValueChange = (connectionId: number, workflowConnectionKey: string) => {
+        if (!connectionId) {
+            return;
+        }
+
         saveWorkflowTestConfigurationConnectionMutation.mutate({
             saveWorkflowTestConfigurationConnectionRequest: {
                 connectionId,
@@ -106,7 +111,7 @@ const ConnectionTabConnectionSelect = ({
 
     return (
         <div className="flex flex-col gap-6">
-            <div className="flex flex-col">
+            <div className="space-y-1">
                 {componentDefinition && (
                     <Label className="mb-2 font-normal">
                         {componentDefinition.title}
@@ -125,9 +130,11 @@ const ConnectionTabConnectionSelect = ({
                     value={connectionId ? connectionId.toString() : undefined}
                 >
                     <div className="flex space-x-2">
-                        <SelectTrigger>
-                            <SelectValue placeholder={`${connections?.length ? 'Choose' : 'Create'} a Connection...`} />
-                        </SelectTrigger>
+                        {connections && connections.length > 0 && (
+                            <SelectTrigger>
+                                <SelectValue placeholder="Choose Connection..." />
+                            </SelectTrigger>
+                        )}
 
                         {componentDefinition && (
                             <ConnectionDialog
@@ -135,8 +142,12 @@ const ConnectionTabConnectionSelect = ({
                                 connectionTagsQueryKey={ConnectionKeys!.connectionTags}
                                 connectionsQueryKey={ConnectionKeys!.connections}
                                 triggerNode={
-                                    <Button className="mt-auto p-2" title="Create a new connection" variant="outline">
-                                        <PlusIcon className="size-5" />
+                                    <Button
+                                        className={twMerge('mt-auto p-2', !connections?.length && 'w-full')}
+                                        title="Create a new connection"
+                                        variant="outline"
+                                    >
+                                        <PlusIcon className="size-5" /> {!connections?.length && 'Create Connection'}
                                     </Button>
                                 }
                                 useCreateConnectionMutation={useCreateConnectionMutation}

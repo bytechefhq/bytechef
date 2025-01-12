@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,13 +30,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.797159+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:57.435090+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ProjectInstanceModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private String description;
 
@@ -47,12 +47,12 @@ public class ProjectInstanceModel {
   private Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastExecutionDate;
+  private OffsetDateTime lastExecutionDate;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private String name;
 
@@ -101,7 +101,7 @@ public class ProjectInstanceModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectInstanceModel createdDate(LocalDateTime createdDate) {
+  public ProjectInstanceModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -113,11 +113,11 @@ public class ProjectInstanceModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -201,7 +201,7 @@ public class ProjectInstanceModel {
     this.id = id;
   }
 
-  public ProjectInstanceModel lastExecutionDate(LocalDateTime lastExecutionDate) {
+  public ProjectInstanceModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -213,11 +213,11 @@ public class ProjectInstanceModel {
   @Valid 
   @Schema(name = "lastExecutionDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last execution date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
-  public LocalDateTime getLastExecutionDate() {
+  public OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
   }
 
-  public void setLastExecutionDate(LocalDateTime lastExecutionDate) {
+  public void setLastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
   }
 
@@ -241,7 +241,7 @@ public class ProjectInstanceModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectInstanceModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ProjectInstanceModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -253,11 +253,11 @@ public class ProjectInstanceModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

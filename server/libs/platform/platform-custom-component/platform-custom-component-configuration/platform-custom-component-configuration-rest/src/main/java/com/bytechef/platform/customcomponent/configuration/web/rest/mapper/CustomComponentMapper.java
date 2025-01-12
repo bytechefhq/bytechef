@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.customcomponent.configuration.web.rest.mapper;
 
+import com.bytechef.platform.custom.component.configuration.web.rest.model.CustomComponentModel;
 import com.bytechef.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.platform.customcomponent.configuration.web.rest.mapper.config.CustomComponentMapperSpringConfig;
-import com.bytechef.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

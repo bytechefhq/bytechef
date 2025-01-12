@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:59.239958+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:59.057170+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class TaskDispatcherDefinitionBasicModel {
 
   private String description;
@@ -35,6 +35,8 @@ public class TaskDispatcherDefinitionBasicModel {
 
   private String title;
 
+  private Integer version;
+
   public TaskDispatcherDefinitionBasicModel() {
     super();
   }
@@ -42,8 +44,9 @@ public class TaskDispatcherDefinitionBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskDispatcherDefinitionBasicModel(String name) {
+  public TaskDispatcherDefinitionBasicModel(String name, Integer version) {
     this.name = name;
+    this.version = version;
   }
 
   public TaskDispatcherDefinitionBasicModel description(String description) {
@@ -146,6 +149,26 @@ public class TaskDispatcherDefinitionBasicModel {
     this.title = title;
   }
 
+  public TaskDispatcherDefinitionBasicModel version(Integer version) {
+    this.version = version;
+    return this;
+  }
+
+  /**
+   * The version of a task dispatcher.
+   * @return version
+   */
+  @NotNull 
+  @Schema(name = "version", description = "The version of a task dispatcher.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("version")
+  public Integer getVersion() {
+    return version;
+  }
+
+  public void setVersion(Integer version) {
+    this.version = version;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -159,12 +182,13 @@ public class TaskDispatcherDefinitionBasicModel {
         Objects.equals(this.icon, taskDispatcherDefinitionBasic.icon) &&
         Objects.equals(this.name, taskDispatcherDefinitionBasic.name) &&
         Objects.equals(this.resources, taskDispatcherDefinitionBasic.resources) &&
-        Objects.equals(this.title, taskDispatcherDefinitionBasic.title);
+        Objects.equals(this.title, taskDispatcherDefinitionBasic.title) &&
+        Objects.equals(this.version, taskDispatcherDefinitionBasic.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, icon, name, resources, title);
+    return Objects.hash(description, icon, name, resources, title, version);
   }
 
   @Override
@@ -176,6 +200,7 @@ public class TaskDispatcherDefinitionBasicModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    resources: ").append(toIndentedString(resources)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
+    sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");
     return sb.toString();
   }

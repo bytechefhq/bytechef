@@ -1,27 +1,52 @@
+import {ThreadMessageLike} from '@assistant-ui/react';
+
+/* eslint-disable sort-keys */
+
 import {create} from 'zustand';
-import {devtools, persist} from 'zustand/middleware';
+import {devtools} from 'zustand/middleware';
 
 interface CopilotStateI {
-    showCopilot: boolean;
-    setShowCopilot: (showCopilot: boolean) => void;
+    conversationId: string | undefined;
+    generateConversationId: () => void;
+    copilotPanelOpen: boolean;
+    messages: ThreadMessageLike[];
+    setMessage: (message: ThreadMessageLike) => void;
+    resetMessages: () => void;
+    setCopilotPanelOpen: (showCopilot: boolean) => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
-    devtools(
-        persist(
-            (set) => ({
-                setShowCopilot: (showCopilot) =>
-                    set((state) => {
-                        return {
-                            ...state,
-                            showCopilot,
-                        };
-                    }),
-                showCopilot: false,
+    devtools((set) => ({
+        conversationId: undefined,
+        generateConversationId: () => {
+            set((state) => {
+                return {
+                    ...state,
+                    conversationId: Array(32)
+                        .fill(0)
+                        .map(() => Math.random().toString(36).charAt(2))
+                        .join(''),
+                };
+            });
+        },
+
+        copilotPanelOpen: false,
+        setCopilotPanelOpen: (copilotPanelOpen) =>
+            set((state) => {
+                return {
+                    ...state,
+                    copilotPanelOpen,
+                };
             }),
-            {
-                name: 'bytechef.copilot',
-            }
-        )
-    )
+
+        messages: [],
+        setMessage: (message) =>
+            set((state) => {
+                return {
+                    ...state,
+                    messages: [...state.messages, message],
+                };
+            }),
+        resetMessages: () => set({messages: []}),
+    }))
 );

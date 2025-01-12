@@ -45,7 +45,7 @@ public class EncryptionImpl implements Encryption {
 
             return new String(cipher.doFinal(EncodingUtils.base64Decode(encryptedString)), StandardCharsets.UTF_8);
         } catch (BadPaddingException bpe) {
-            throw new InvalidEncryptionKeyException(bpe);
+            throw new InvalidEncryptionKeyException("Invalid encryption key", bpe);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

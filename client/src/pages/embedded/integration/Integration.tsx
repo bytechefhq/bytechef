@@ -18,6 +18,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
@@ -42,6 +43,7 @@ import {WorkflowKeys} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
@@ -59,11 +61,14 @@ const Integration = () => {
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {integrationId, integrationWorkflowId} = useParams();
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+
+    const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
     const rightSidebarNavigation: {
         name?: string;
@@ -83,6 +88,7 @@ const Integration = () => {
             name: 'Components & Flow Controls',
             onClick: () => {
                 setWorkflowNodeDetailsPanelOpen(false);
+                setWorkflowTestChatPanelOpen(false);
 
                 setRightSidebarOpen(!rightSidebarOpen);
             },
@@ -102,7 +108,7 @@ const Integration = () => {
             name: 'Workflow Code Editor',
             onClick: () => setShowWorkflowCodeEditorSheet(true),
         },
-    ];
+    ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true));
 
     const {
         data: componentDefinitions,
@@ -176,14 +182,7 @@ const Integration = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: IntegrationKeys.integration(parseInt(integrationId!)),
-            });
-
-            queryClient.invalidateQueries({
-                queryKey: IntegrationWorkflowKeys.integrationWorkflow(
-                    parseInt(integrationId!),
-                    parseInt(integrationWorkflowId!)
-                ),
+                queryKey: IntegrationWorkflowKeys.integrationWorkflows(parseInt(integrationId!)),
             });
 
             setShowEditWorkflowDialog(false);
@@ -231,6 +230,7 @@ const Integration = () => {
 
     useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
+        setWorkflowTestChatPanelOpen(false);
 
         useWorkflowDataStore.getState().reset();
         useWorkflowNodeDetailsPanelStore.getState().reset();

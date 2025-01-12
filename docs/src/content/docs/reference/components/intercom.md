@@ -123,7 +123,7 @@ Send a new message
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Message Type | STRING | SELECT  |  In app message or email message  |
 | Title | STRING | TEXT  |  Title of the Email/Message  |
-| Content | STRING | TEXT  |  Content of the message  |
+| Content | STRING | RICH_TEXT  |  Content of the message  |
 | Template | STRING | SELECT  |  The style of the outgoing message  |
 | To | STRING | SELECT  |  Receiver of the message  |
 

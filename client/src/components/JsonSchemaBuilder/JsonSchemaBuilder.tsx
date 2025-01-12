@@ -16,16 +16,21 @@ interface JsonSchemaBuilderProps {
 }
 
 const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderProps) => {
-    const [curSchema, setCurSchema] = useState<SchemaRecordType>(!isEmpty(schema) ? {...schema} : {...DEFAULT_SCHEMA});
+    const [curSchema, setCurSchema] = useState<SchemaRecordType>();
 
     const {i18n, ready} = useTranslation('null', {useSuspense: false});
+
+    useEffect(() => {
+        setCurSchema(!isEmpty(schema) ? {...schema} : {...DEFAULT_SCHEMA});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         i18n.changeLanguage(locale);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [locale]);
 
-    if (!ready) {
+    if (!ready || !curSchema) {
         return null;
     }
 

@@ -1,6 +1,7 @@
 dependencies {
     api("org.springframework.data:spring-data-commons")
     api(project(":server:libs:platform:platform-api"))
+    api(project(":server:libs:core:exception:exception-api"))
 
     implementation("jakarta.validation:jakarta.validation-api")
     implementation("com.fasterxml.jackson.core:jackson-annotations")

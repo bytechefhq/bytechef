@@ -104,6 +104,11 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
+    public ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ComponentDefinition> getDataStreamComponentDefinitions(@NonNull ComponentType componentType) {
         // TODO
 

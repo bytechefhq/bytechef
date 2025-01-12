@@ -7,6 +7,7 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation(libs.loki.logback.appender)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
@@ -19,7 +20,6 @@ dependencies {
     implementation(project(":server:libs:config:jackson-config"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:messages-config"))
-    implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
@@ -32,8 +32,9 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-impl"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-service"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-service"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))

@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.exception.AbstractException;
 
 /**
  * @author Ivica Cardic
  */
-public class AuthorityAlreadyUsedException extends PlatformException {
+public class AuthorityAlreadyUsedException extends AbstractException {
 
     public AuthorityAlreadyUsedException() {
         super("Authority name already used!", UserErrorType.AUTHORITY_ALREADY_USED);

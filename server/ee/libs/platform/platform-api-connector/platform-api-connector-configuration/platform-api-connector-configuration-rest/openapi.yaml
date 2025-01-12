@@ -4,7 +4,7 @@ info:
   title: "The Platform API Connector Internal API"
   version: "1"
 servers:
-- url: "/api/platform/internal"
+  - url: "/api/platform/internal"
 tags:
   - name: "api-connector"
     description: "The Platform API Connector Internal API"

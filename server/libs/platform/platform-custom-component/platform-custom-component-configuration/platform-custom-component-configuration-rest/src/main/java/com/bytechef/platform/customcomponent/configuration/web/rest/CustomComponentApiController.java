@@ -18,9 +18,10 @@ package com.bytechef.platform.customcomponent.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.custom.component.configuration.web.rest.CustomComponentApi;
+import com.bytechef.platform.custom.component.configuration.web.rest.model.CustomComponentModel;
 import com.bytechef.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.platform.customcomponent.configuration.service.CustomComponentService;
-import com.bytechef.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;

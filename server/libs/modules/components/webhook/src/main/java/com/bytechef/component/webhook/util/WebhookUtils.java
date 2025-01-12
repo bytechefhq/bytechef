@@ -29,7 +29,6 @@ import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
-import com.bytechef.component.definition.TriggerDefinition.WebhookValidateFunction;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import java.util.List;
 import java.util.Map;
@@ -51,37 +50,34 @@ public class WebhookUtils {
         if (body == null) {
             return Map.of(
                 METHOD, method,
-                HEADERS, headerMap
-                    .entrySet()
+                HEADERS, headerMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)),
-                PARAMETERS, parameterMap
-                    .entrySet()
+                PARAMETERS, parameterMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)));
         } else {
             return Map.of(
                 BODY, body.getContent(),
                 METHOD, method,
-                HEADERS, headerMap
-                    .entrySet()
+                HEADERS, headerMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)),
-                PARAMETERS, parameterMap
-                    .entrySet()
+                PARAMETERS, parameterMap.entrySet()
                     .stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, WebhookUtils::checkList)));
         }
     }
 
-    public static WebhookValidateFunction getWebhookValidateFunction() {
-        return (inputParameters, headers, parameters, body, method, triggerContext) -> {
-            if (Objects.equals(getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN))) {
-                return WebhookValidateResponse.ok(); // OK
-            } else {
-                return WebhookValidateResponse.badRequest(); // Bad Request
-            }
-        };
+    public static WebhookValidateResponse getWebhookValidate(
+        Parameters inputParameters, HttpHeaders headers, HttpParameters parameters, WebhookBody body,
+        WebhookMethod method, TriggerContext context) {
+
+        if (Objects.equals(getCsrfToken(headers), inputParameters.getRequiredString(CSRF_TOKEN))) {
+            return WebhookValidateResponse.ok(); // OK
+        } else {
+            return WebhookValidateResponse.badRequest(); // Bad Request
+        }
     }
 
     private static Object checkList(Map.Entry<String, ?> entry) {

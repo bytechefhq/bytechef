@@ -56,13 +56,19 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
+import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.exception.ExecutionException;
 import com.bytechef.platform.tenant.TenantContext;
+import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.stream.Stream;
+import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
@@ -77,28 +83,8 @@ public class JobSyncExecutor {
 
     private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
 
-    private static final AsyncTaskExecutor EXECUTOR = new AsyncTaskExecutor() {
-
-        private static final Executor executor = Executors.newCachedThreadPool();
-
-        @Override
-        public void execute(@NonNull Runnable task) {
-            String tenantId = TenantContext.getCurrentTenantId();
-
-            executor.execute(
-                () -> {
-                    String currentTenantId = TenantContext.getCurrentTenantId();
-
-                    try {
-                        TenantContext.setCurrentTenantId(tenantId);
-
-                        task.run();
-                    } finally {
-                        TenantContext.setCurrentTenantId(currentTenantId);
-                    }
-                });
-        }
-    };
+    private static final AsyncTaskExecutor ASYNC_TASK_EXECUTOR = new JobSyncAsyncTaskExecutor();
+    private static final List<String> WEBHOOK_COMPONENTS = List.of("apiPlatform", "chat", "webhook");
 
     private final ContextService contextService;
     private final ApplicationEventPublisher eventPublisher;
@@ -114,9 +100,8 @@ public class JobSyncExecutor {
         TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
 
         this(
-            contextService, jobService, new SyncMessageBroker(), List.of(), List.of(),
-            taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage,
-            workflowService);
+            contextService, jobService, new SyncMessageBroker(), List.of(), List.of(), taskDispatcherPreSendProcessors,
+            List.of(), taskExecutionService, taskHandlerRegistry, taskFileStorage, workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -157,7 +142,8 @@ public class JobSyncExecutor {
                 new TaskDispatcherAdapterTaskHandlerResolver(taskDispatcherAdapterFactories, taskHandlerResolverChain),
                 new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
-        TaskWorker worker = new TaskWorker(eventPublisher, EXECUTOR, taskHandlerResolverChain, taskFileStorage);
+        TaskWorker worker = new TaskWorker(
+            eventPublisher, ASYNC_TASK_EXECUTOR, taskHandlerResolverChain, taskFileStorage);
 
         syncMessageBroker.receive(
             TaskWorkerMessageRoute.TASK_EXECUTION_EVENTS, e -> worker.onTaskExecutionEvent((TaskExecutionEvent) e));
@@ -199,7 +185,11 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParameters jobParameters) {
-        return jobService.getJob(jobFacade.createJob(jobParameters));
+        Job job = jobService.getJob(jobFacade.createJob(jobParameters));
+
+        checkForError(job);
+
+        return checkForWebhookResponse(job);
     }
 
     public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
@@ -207,7 +197,11 @@ public class JobSyncExecutor {
             eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
             taskFileStorage, workflowService);
 
-        return jobService.getJob(jobFacade.createJob(jobParameters));
+        Job job = jobService.getJob(jobFacade.createJob(jobParameters));
+
+        checkForError(job);
+
+        return checkForWebhookResponse(job);
     }
 
     private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
@@ -231,6 +225,39 @@ public class JobSyncExecutor {
     public interface JobFactoryFunction {
 
         Job apply(JobParameters jobParameters);
+    }
+
+    private void checkForError(Job job) {
+        TaskExecution taskExecution = taskExecutionService
+            .fetchLastJobTaskExecution(Validate.notNull(job.getId(), "id"))
+            .orElse(null);
+
+        if (taskExecution != null && taskExecution.getStatus() == TaskExecution.Status.FAILED) {
+            ExecutionError error = taskExecution.getError();
+
+            throw new ExecutionException(error.getMessage(), TaskExecutionErrorType.TASK_EXECUTION_FAILED);
+        }
+    }
+
+    private Job checkForWebhookResponse(Job job) {
+        long jobId = Validate.notNull(job.getId(), "id");
+
+        return taskExecutionService.fetchLastJobTaskExecution(jobId)
+            .map(lastTaskExecution -> {
+                WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(lastTaskExecution.getType());
+
+                if (WEBHOOK_COMPONENTS.contains(workflowNodeType.componentName())) {
+                    job.setOutputs(
+                        taskFileStorage.storeJobOutputs(
+                            jobId,
+                            Map.of(
+                                WebhookConstants.WEBHOOK_RESPONSE,
+                                taskFileStorage.readTaskExecutionOutput(lastTaskExecution.getOutput()))));
+                }
+
+                return job;
+            })
+            .orElse(job);
     }
 
     private record JobServiceWrapper(JobFactoryFunction jobFactoryFunction)
@@ -294,6 +321,29 @@ public class JobSyncExecutor {
         @Override
         public Job update(Job job) {
             throw new UnsupportedOperationException();
+        }
+    }
+
+    private static class JobSyncAsyncTaskExecutor implements AsyncTaskExecutor {
+
+        private static final Executor executor = Executors.newCachedThreadPool();
+
+        @Override
+        public void execute(@NonNull Runnable task) {
+            String tenantId = TenantContext.getCurrentTenantId();
+
+            executor.execute(
+                () -> {
+                    String currentTenantId = TenantContext.getCurrentTenantId();
+
+                    try {
+                        TenantContext.setCurrentTenantId(tenantId);
+
+                        task.run();
+                    } finally {
+                        TenantContext.setCurrentTenantId(currentTenantId);
+                    }
+                });
         }
     }
 }

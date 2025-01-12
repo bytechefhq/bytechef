@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.configuration.domain;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -54,7 +54,7 @@ public final class ProjectWorkflow {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -62,7 +62,7 @@ public final class ProjectWorkflow {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Version
     private int version;
@@ -125,7 +125,7 @@ public final class ProjectWorkflow {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -133,7 +133,7 @@ public final class ProjectWorkflow {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

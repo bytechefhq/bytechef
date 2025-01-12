@@ -81,17 +81,30 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             </div>
 
             <div className={twMerge([label && type !== 'hidden' && 'mt-1', leadingIcon && 'relative'])} title={title}>
-                <div className={twMerge(leadingIcon && 'relative rounded-md', type === 'hidden' && 'border-0')}>
+                <div
+                    className={twMerge(
+                        'focus:ring-2 focus:ring-blue-500 focus-visible:outline-none',
+                        leadingIcon && 'relative rounded-md',
+                        type === 'hidden' && 'border-0',
+                        error && 'ring-rose-300'
+                    )}
+                >
                     {type !== 'hidden' && leadingIcon && (
-                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3">
+                        <div
+                            className={twMerge(
+                                'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3',
+                                error && 'border-r-0 border-rose-300 text-rose-900 placeholder-rose-300'
+                            )}
+                        >
                             {leadingIcon}
                         </div>
                     )}
 
                     <Input
                         className={twMerge(
+                            'outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
                             error &&
-                                'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500',
+                                'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                             disabled && 'bg-gray-100 text-gray-500',
                             leadingIcon && 'pl-property-input-position leading-relaxed',
                             className

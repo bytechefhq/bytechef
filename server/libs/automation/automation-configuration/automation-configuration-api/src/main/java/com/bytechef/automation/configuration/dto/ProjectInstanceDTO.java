@@ -22,7 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -30,14 +30,14 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ProjectInstanceDTO(
-    String createdBy, LocalDateTime createdDate, String description, boolean enabled, Environment environment, Long id,
-    String name, LocalDateTime lastExecutionDate, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    String createdBy, Instant createdDate, String description, boolean enabled, Environment environment, Long id,
+    String name, Instant lastExecutionDate, String lastModifiedBy, Instant lastModifiedDate,
     Project project, long projectId, int projectVersion, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows,
     List<Tag> tags, int version) {
 
     public ProjectInstanceDTO(
         ProjectInstance projectInstance, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project,
-        LocalDateTime lastExecutionDate, List<Tag> tags) {
+        Instant lastExecutionDate, List<Tag> tags) {
 
         this(
             projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
@@ -70,15 +70,15 @@ public record ProjectInstanceDTO(
 
     public static final class Builder {
         private String createdBy;
-        private LocalDateTime createdDate;
+        private Instant createdDate;
         private String description;
         private boolean enabled;
         private Environment environment;
         private Long id;
         private String name;
-        private LocalDateTime lastExecutionDate;
+        private Instant lastExecutionDate;
         private String lastModifiedBy;
-        private LocalDateTime lastModifiedDate;
+        private Instant lastModifiedDate;
         private Project project;
         private long projectId;
         private Integer projectVersion;
@@ -95,7 +95,7 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder createdDate(LocalDateTime createdDate) {
+        public Builder createdDate(Instant createdDate) {
             this.createdDate = createdDate;
 
             return this;
@@ -131,7 +131,7 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder lastExecutionDate(LocalDateTime lastExecutionDate) {
+        public Builder lastExecutionDate(Instant lastExecutionDate) {
             this.lastExecutionDate = lastExecutionDate;
 
             return this;
@@ -143,7 +143,7 @@ public record ProjectInstanceDTO(
             return this;
         }
 
-        public Builder lastModifiedDate(LocalDateTime lastModifiedDate) {
+        public Builder lastModifiedDate(Instant lastModifiedDate) {
             this.lastModifiedDate = lastModifiedDate;
 
             return this;

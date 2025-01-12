@@ -1,10 +1,11 @@
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {
     ComponentType,
     ConditionTaskDispatcherType,
-    NodeType,
+    NodeDataType,
     WorkflowDefinitionType,
     WorkflowTaskType,
 } from '@/shared/types';
@@ -12,17 +13,18 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {Node, NodeProps} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
     currentComponent?: ComponentType;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     data: NodeProps['data'];
     getNode: (id: string) => Node | undefined;
     id: string;
     queryClient: QueryClient;
     setCurrentComponent: (component: ComponentType | undefined) => void;
-    setCurrentNode: (node: NodeType | undefined) => void;
+    setCurrentNode: (node: NodeDataType | undefined) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
@@ -127,6 +129,9 @@ export default function handleDeleteTask({
 
                 if (currentNode?.name === data.name) {
                     setCurrentNode(undefined);
+
+                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(false);
+                    useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
                 }
 
                 if (currentComponent?.workflowNodeName === data.name) {

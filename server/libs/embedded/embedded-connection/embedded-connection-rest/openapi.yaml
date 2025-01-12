@@ -4,12 +4,12 @@ info:
   title: "The Embedded Connection Internal API"
   version: "1"
 servers:
-- url: "/api/embedded/internal"
+  - url: "/api/embedded/internal"
 tags:
-- name: "connection-tag"
-  description: "The Embedded Connection Tag Internal API"
-- name: "connection"
-  description: "The Embedded Connection Internal API"
+  - name: "connection-tag"
+    description: "The Embedded Connection Tag Internal API"
+  - name: "connection"
+    description: "The Embedded Connection Internal API"
 paths:
   /connections:
     get:

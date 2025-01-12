@@ -49,20 +49,19 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean devEnvironment,
-        DataStorage dataStorage, ApplicationEventPublisher eventPublisher, FilesFileStorage filesFileStorage,
-        HttpClientExecutor httpClientExecutor) {
+        boolean devEnvironment, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, filesFileStorage, connection, httpClientExecutor);
 
         this.actionName = actionName;
         this.data = new DataImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId, dataStorage);
+        this.devEnvironment = devEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.instanceId = instanceId;
         this.instanceWorkflowId = instanceWorkflowId;
         this.jobId = jobId;
-        this.devEnvironment = devEnvironment;
         this.type = type;
         this.workflowId = workflowId;
     }
@@ -107,13 +106,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public boolean isDevEnvironment() {
-        return devEnvironment;
+    public String getWorkflowId() {
+        return workflowId;
     }
 
     @Override
-    public String getWorkflowId() {
-        return workflowId;
+    public boolean isDevEnvironment() {
+        return devEnvironment;
     }
 
     private record DataImpl(

@@ -6,6 +6,7 @@ import 'reactflow/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
+import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
@@ -54,8 +55,10 @@ const WorkflowEditorLayout = ({
 
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
 
+    let filteredWorkflowNodeOutputs;
+
     if (!currentNode?.trigger && workflowNodeOutputs) {
-        const filteredWorkflowNodeOutputs = workflowNodeOutputs.filter(
+        filteredWorkflowNodeOutputs = workflowNodeOutputs.filter(
             (workflowNodeOutput) => workflowNodeOutput.actionDefinition || workflowNodeOutput.triggerDefinition
         );
 
@@ -112,15 +115,17 @@ const WorkflowEditorLayout = ({
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation}
-                    workflowNodeOutputs={workflowNodeOutputs ?? []}
+                    workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                 />
             )}
 
-            {(workflowNodeOutputs || (!workflowNodeOutputs && currentNode?.trigger)) &&
+            {workflow.id && <WorkflowTestChatPanel />}
+
+            {(filteredWorkflowNodeOutputs || (!filteredWorkflowNodeOutputs && currentNode?.trigger)) &&
                 previousComponentDefinitions && (
                     <DataPillPanel
                         previousComponentDefinitions={previousComponentDefinitions}
-                        workflowNodeOutputs={workflowNodeOutputs ?? []}
+                        workflowNodeOutputs={filteredWorkflowNodeOutputs ?? []}
                     />
                 )}
         </ReactFlowProvider>

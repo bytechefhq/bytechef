@@ -36,9 +36,9 @@ public class HelpMapper {
 
     @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     interface TaskDispatcherHelpMapper
-        extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help, HelpModel> {
+        extends Converter<com.bytechef.platform.workflow.task.dispatcher.domain.Help, HelpModel> {
 
         @Override
-        HelpModel convert(com.bytechef.platform.workflow.task.dispatcher.registry.domain.Help help);
+        HelpModel convert(com.bytechef.platform.workflow.task.dispatcher.domain.Help help);
     }
 }

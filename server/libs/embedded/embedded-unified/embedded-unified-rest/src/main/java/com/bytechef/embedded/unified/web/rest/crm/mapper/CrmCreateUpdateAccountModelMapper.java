@@ -18,13 +18,12 @@ package com.bytechef.embedded.unified.web.rest.crm.mapper;
 
 import com.bytechef.component.definition.unified.crm.model.AccountUnifiedInputModel;
 import com.bytechef.embedded.unified.web.rest.crm.model.CreateUpdateAccountModel;
-import com.bytechef.embedded.unified.web.rest.mapper.JsonNullableMapper;
 import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
 @Mapper(config = UnifiedConfigurationMapperSpringConfig.class, uses = {
-    JsonNullableMapper.class, CrmLifecycleStageModelMapper.class
+    CrmLifecycleStageModelMapper.class
 })
 public interface CrmCreateUpdateAccountModelMapper
     extends Converter<CreateUpdateAccountModel, AccountUnifiedInputModel> {

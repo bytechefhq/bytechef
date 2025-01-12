@@ -10,7 +10,7 @@ import com.bytechef.embedded.unified.web.rest.crm.model.PhonesInnerModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.351813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.978177+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class LeadModel {
 
   @Valid
@@ -67,10 +67,10 @@ public class LeadModel {
   private JsonNullable<String> title = JsonNullable.<String>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> createdDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> createdDate = JsonNullable.<OffsetDateTime>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   public LeadModel() {
     super();
@@ -79,7 +79,7 @@ public class LeadModel {
   /**
    * Constructor with only required parameters
    */
-  public LeadModel(List<@Valid AddressesInnerModel> addresses, String company, String convertedAccountId, String convertedContactId, String id, String leadSource, String ownerId, String title, LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
+  public LeadModel(List<@Valid AddressesInnerModel> addresses, String company, String convertedAccountId, String convertedContactId, String id, String leadSource, String ownerId, String title, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate) {
     this.addresses = addresses;
     this.company = JsonNullable.of(company);
     this.convertedAccountId = JsonNullable.of(convertedAccountId);
@@ -396,7 +396,7 @@ public class LeadModel {
     this.title = title;
   }
 
-  public LeadModel createdDate(LocalDateTime createdDate) {
+  public LeadModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = JsonNullable.of(createdDate);
     return this;
   }
@@ -408,15 +408,15 @@ public class LeadModel {
   @NotNull @Valid 
   @Schema(name = "createdDate", example = "2023-02-10T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
-  public JsonNullable<LocalDateTime> getCreatedDate() {
+  public JsonNullable<OffsetDateTime> getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(JsonNullable<LocalDateTime> createdDate) {
+  public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
 
-  public LeadModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public LeadModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -428,11 +428,11 @@ public class LeadModel {
   @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

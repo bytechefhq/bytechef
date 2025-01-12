@@ -72,7 +72,6 @@ public class WorkflowNodeParameterApiController implements WorkflowNodeParameter
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public ResponseEntity<UpdateWorkflowNodeParameter200ResponseModel> updateWorkflowNodeParameter(
         String id, UpdateWorkflowNodeParameterRequestModel updateWorkflowNodeParameterRequestModel) {
 

@@ -4,7 +4,7 @@ info:
   title: "The Platform Custom Component Internal API"
   version: "1"
 servers:
-- url: "/api/platform/internal"
+  - url: "/api/platform/internal"
 tags:
   - name: "custom-component"
     description: "The Platform Custom Component Internal API"

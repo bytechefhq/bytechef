@@ -91,7 +91,7 @@ class MicrosoftOutlook365NewEmailTriggerTest {
             PollOutput pollOutput =
                 MicrosoftOutlook365NewEmailTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
 
-            assertEquals(List.of(firstMail, secondMail), pollOutput.getRecords());
+            assertEquals(List.of(firstMail, secondMail), pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
 
             Object[] query = queryArgumentCaptor.getValue();

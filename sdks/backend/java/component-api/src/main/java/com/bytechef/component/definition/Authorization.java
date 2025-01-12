@@ -20,7 +20,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -150,17 +149,17 @@ public interface Authorization {
         /**
          *
          */
-        BEARER_TOKEN, CUSTOM,
+        BEARER_TOKEN,
+
+        /**
+         * Custom authorization type
+         */
+        CUSTOM,
 
         /**
          *
          */
         DIGEST_AUTH,
-
-        /**
-         *
-         */
-        NONE,
 
         /**
          *
@@ -195,29 +194,6 @@ public interface Authorization {
             return name().toLowerCase();
         }
 
-        /**
-         * Returns true if value converts to valid authorisation type enumeration. NONE is not valid type as it should
-         * signal absence of authorisation mechanism.
-         *
-         * @param value authorisation name
-         * @return false if value converts to NONE or value does not mach any of enumeration names, otherwise returns
-         *         true
-         */
-        public static boolean isApplicable(String value) {
-            if (value == null) {
-                return false;
-            }
-
-            for (AuthorizationType authorizationType : values()) {
-                String name = authorizationType.getName();
-
-                if ((authorizationType != NONE) && Objects.equals(value.toLowerCase(), name.toLowerCase())) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
     }
 
     /**

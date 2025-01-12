@@ -681,7 +681,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

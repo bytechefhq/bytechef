@@ -3,14 +3,14 @@ import {SquareIcon} from 'lucide-react';
 
 const IntegrationHeaderStopButton = () => (
     <Button
-        className="hover:bg-background/70"
+        className="hover:bg-background/70 [&_svg]:size-5"
         onClick={() => {
             // TODO
         }}
         size="icon"
         variant="ghost"
     >
-        <SquareIcon className="h-5 text-destructive" />
+        <SquareIcon className="text-destructive" />
     </Button>
 );
 

@@ -48,7 +48,7 @@ class GoogleDriveGetFileActionTest extends AbstractGoogleDriveActionTest {
         when(mockedGet.execute())
             .thenReturn(testFile);
 
-        File retrievedFile = GoogleDriveGetFileAction.perform(mockedParameters, mockedParameters, mockedContext);
+        File retrievedFile = GoogleDriveGetFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         verify(mockedDrive.files()).get("testId");
 

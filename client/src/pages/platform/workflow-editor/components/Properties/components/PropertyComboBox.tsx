@@ -27,6 +27,7 @@ type ComboBoxItemType = {
 
 interface PropertyComboBoxProps {
     arrayIndex?: number;
+    defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
     handleInputTypeSwitchButtonClick?: () => void;
@@ -50,6 +51,7 @@ interface PropertyComboBoxProps {
 
 const PropertyComboBox = ({
     arrayIndex,
+    defaultValue,
     deletePropertyButton,
     description,
     handleInputTypeSwitchButtonClick,
@@ -114,6 +116,10 @@ const PropertyComboBox = ({
         }));
     }
 
+    if (defaultValue && !value) {
+        value = defaultValue;
+    }
+
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
     const missingConnection = !options.length && currentNode?.connections?.length && !currentNode.connectionId;
@@ -166,8 +172,7 @@ const PropertyComboBox = ({
                     <Button
                         aria-expanded={open}
                         className={twMerge(
-                            'relative w-full justify-between',
-                            leadingIcon && 'relative',
+                            'relative w-full justify-between whitespace-normal',
                             showInputTypeSwitchButton && 'mt-0'
                         )}
                         disabled={isRefetching || noOptionsAvailable || !!missingConnection}

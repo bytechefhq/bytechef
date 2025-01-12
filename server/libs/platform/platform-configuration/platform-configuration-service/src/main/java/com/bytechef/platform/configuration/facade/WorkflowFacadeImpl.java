@@ -59,7 +59,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
     private WorkflowDTO toWorkflowDTO(Workflow workflow) {
         List<WorkflowTaskDTO> workflowTaskDTOs = new ArrayList<>();
 
-        List<WorkflowTask> allTasks = workflow.getAllTasks();
+        List<WorkflowTask> allTasks = workflow.getTasks(true);
 
         for (WorkflowTask workflowTask : allTasks) {
             workflowTaskDTOs.add(

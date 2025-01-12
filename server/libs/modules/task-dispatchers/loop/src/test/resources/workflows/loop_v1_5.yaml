@@ -20,10 +20,10 @@ tasks:
           type: "loop-break/v1"
         caseFalse:
         - name: "sumVar1"
-          type: "var"
+          type: "var/v1/set"
           parameters:
             value: "${1 + loop_1.item}"
         - name: "sumVar2"
-          type: "var"
+          type: "var/v1/set"
           parameters:
             value: "${sumVar1 + 2}"

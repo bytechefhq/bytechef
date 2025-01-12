@@ -209,6 +209,6 @@ public class LoopTaskDispatcherIntTest {
     }
 
     private TaskDispatcherJobTestExecutor.TaskHandlerMapSupplier getTaskHandlerMap() {
-        return () -> Map.of("var", testVarTaskHandler);
+        return () -> Map.of("var/v1/set", testVarTaskHandler);
     }
 }

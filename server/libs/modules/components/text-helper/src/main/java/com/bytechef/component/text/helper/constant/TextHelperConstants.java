@@ -33,6 +33,8 @@ public class TextHelperConstants {
     public static final String ENCODING_SCHEMA_BASE64 = "base64";
     public static final String ENCODING_SCHEMA_BASE64URL = "base64Url";
     public static final String EXPRESSION = "expression";
+    public static final String HTML = "html";
+    public static final String MARKDOWN = "markdown";
     public static final String QUERY_SELECTOR = "querySelector";
     public static final String REPLACE_ONLY_FIRST = "replaceOnlyFirst";
     public static final String REPLACE_VALUE = "replaceValue";

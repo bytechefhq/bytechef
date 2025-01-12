@@ -34,6 +34,7 @@ import static com.bytechef.component.var.constant.VarConstants.VALUE;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.definition.BaseOutputDefinition;
 
 /**
  * @author Ivica Cardic
@@ -96,8 +97,7 @@ public class VarSetAction {
             object(VALUE)
                 .label("Value")
                 .description("Value of any type to set.")
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
+                .additionalProperties()
                 .displayCondition("type == 8")
                 .required(true),
             string(VALUE)
@@ -110,8 +110,18 @@ public class VarSetAction {
                 .description("Value of any type to set.")
                 .displayCondition("type == 10")
                 .required(true))
-        .output()
+        .output(VarSetAction::output)
         .perform(VarSetAction::perform);
+
+    protected static BaseOutputDefinition.OutputResponse output(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+
+        if (!inputParameters.containsKey(VALUE)) {
+            return null;
+        }
+
+        return new BaseOutputDefinition.OutputResponse(perform(inputParameters, connectionParameters, context));
+    }
 
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {

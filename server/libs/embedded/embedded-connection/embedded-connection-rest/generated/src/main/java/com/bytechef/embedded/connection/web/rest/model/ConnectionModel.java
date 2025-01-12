@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:56.941314+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.575529+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ConnectionModel {
 
   private Boolean active;
@@ -52,7 +52,7 @@ public class ConnectionModel {
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private CredentialStatusModel credentialStatus;
 
@@ -63,7 +63,7 @@ public class ConnectionModel {
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private String name;
 
@@ -82,8 +82,9 @@ public class ConnectionModel {
   /**
    * Constructor with only required parameters
    */
-  public ConnectionModel(String componentName, String name, Map<String, Object> parameters) {
+  public ConnectionModel(String componentName, Integer connectionVersion, String name, Map<String, Object> parameters) {
     this.componentName = componentName;
+    this.connectionVersion = connectionVersion;
     this.name = name;
     this.parameters = parameters;
   }
@@ -213,8 +214,8 @@ public class ConnectionModel {
    * The version of a component that uses this connection.
    * @return connectionVersion
    */
-  
-  @Schema(name = "connectionVersion", description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull 
+  @Schema(name = "connectionVersion", description = "The version of a component that uses this connection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connectionVersion")
   public Integer getConnectionVersion() {
     return connectionVersion;
@@ -244,7 +245,7 @@ public class ConnectionModel {
     this.createdBy = createdBy;
   }
 
-  public ConnectionModel createdDate(LocalDateTime createdDate) {
+  public ConnectionModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -256,11 +257,11 @@ public class ConnectionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -344,7 +345,7 @@ public class ConnectionModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ConnectionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ConnectionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -356,11 +357,11 @@ public class ConnectionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

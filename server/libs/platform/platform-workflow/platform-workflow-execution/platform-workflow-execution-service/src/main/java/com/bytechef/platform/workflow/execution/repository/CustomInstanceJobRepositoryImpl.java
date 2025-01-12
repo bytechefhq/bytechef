@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.execution.repository;
 
 import com.bytechef.commons.util.CollectionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +42,7 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
 
     @Override
     public Page<Long> findAllJobIds(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
+        Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
         @NonNull List<String> workflowIds, Pageable pageable) {
 
         Page<Long> page;
@@ -64,7 +64,7 @@ public class CustomInstanceJobRepositoryImpl implements CustomInstanceJobReposit
     }
 
     private Query buildQuery(
-        Integer status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, int type,
+        Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
         List<String> workflowIds, Pageable pageable, boolean countQuery) {
 
         String query;

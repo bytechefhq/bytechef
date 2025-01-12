@@ -21,7 +21,7 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -29,12 +29,11 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TriggerExecutionDTO(
-    boolean batch, String createdBy, LocalDateTime createdDate,
-    LocalDateTime endDate, ExecutionError error, long executionTime, String icon, Long id, Map<String, ?> input,
-    String lastModifiedBy, LocalDateTime lastModifiedDate, int maxRetries, Object output, int priority,
-    int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate,
-    Object state, TriggerExecution.Status status, WorkflowExecutionId workflowExecutionId, String title, String type,
-    WorkflowTrigger workflowTrigger) {
+    boolean batch, String createdBy, Instant createdDate, Instant endDate, ExecutionError error, long executionTime,
+    String icon, Long id, Map<String, ?> input, String lastModifiedBy, Instant lastModifiedDate, int maxRetries,
+    Object output, int priority, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
+    Instant startDate, Object state, TriggerExecution.Status status, WorkflowExecutionId workflowExecutionId,
+    String title, String type, WorkflowTrigger workflowTrigger) {
 
     public TriggerExecutionDTO(
         TriggerExecution triggerExecution, String title, String icon, Map<String, ?> input, Object output) {

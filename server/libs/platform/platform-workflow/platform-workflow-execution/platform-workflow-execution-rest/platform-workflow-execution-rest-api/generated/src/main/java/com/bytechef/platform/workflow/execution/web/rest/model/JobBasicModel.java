@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,16 +24,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobBasic", description = "Represents an execution of a workflow.")
 @JsonTypeName("JobBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:01.205788+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.804935+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class JobBasicModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endDate;
+  private OffsetDateTime endDate;
 
   private String id;
 
@@ -42,12 +42,12 @@ public class JobBasicModel {
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private Integer priority;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startDate;
+  private OffsetDateTime startDate;
 
   /**
    * The job's status.
@@ -101,7 +101,7 @@ public class JobBasicModel {
   /**
    * Constructor with only required parameters
    */
-  public JobBasicModel(Integer priority, LocalDateTime startDate, StatusEnum status) {
+  public JobBasicModel(Integer priority, OffsetDateTime startDate, StatusEnum status) {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
@@ -127,7 +127,7 @@ public class JobBasicModel {
     this.createdBy = createdBy;
   }
 
-  public JobBasicModel createdDate(LocalDateTime createdDate) {
+  public JobBasicModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -139,15 +139,15 @@ public class JobBasicModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public JobBasicModel endDate(LocalDateTime endDate) {
+  public JobBasicModel endDate(OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -159,11 +159,11 @@ public class JobBasicModel {
   @Valid 
   @Schema(name = "endDate", description = "The time execution entered end status COMPLETED, STOPPED, FAILED", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public LocalDateTime getEndDate() {
+  public OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(LocalDateTime endDate) {
+  public void setEndDate(OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
@@ -227,7 +227,7 @@ public class JobBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public JobBasicModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public JobBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -239,11 +239,11 @@ public class JobBasicModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -267,7 +267,7 @@ public class JobBasicModel {
     this.priority = priority;
   }
 
-  public JobBasicModel startDate(LocalDateTime startDate) {
+  public JobBasicModel startDate(OffsetDateTime startDate) {
     this.startDate = startDate;
     return this;
   }
@@ -279,11 +279,11 @@ public class JobBasicModel {
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time of when the job began.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("startDate")
-  public LocalDateTime getStartDate() {
+  public OffsetDateTime getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(LocalDateTime startDate) {
+  public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
 

@@ -151,6 +151,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -201,6 +202,5 @@
     "deduplicate" : null,
     "poll" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

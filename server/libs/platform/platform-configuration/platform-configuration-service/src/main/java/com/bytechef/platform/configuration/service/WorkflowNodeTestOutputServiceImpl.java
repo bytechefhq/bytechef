@@ -24,8 +24,9 @@ import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.repository.WorkflowNodeTestOutputRepository;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
@@ -49,8 +50,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public void deleteWorkflowNodeTestOutput(String workflowId, String workflowNodeName) {
-        workflowNodeTestOutputRepository
-            .findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
+        workflowNodeTestOutputRepository.findByWorkflowIdAndWorkflowNodeName(workflowId, workflowNodeName)
             .ifPresent(workflowNodeTestOutputRepository::delete);
     }
 
@@ -62,14 +62,16 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
 
     @Override
     public void removeUnusedNodeTestOutputs(Workflow workflow) {
-        List<String> workflowTaskNames = workflow
-            .getAllTasks()
+        List<String> workflowTaskNames = workflow.getTasks(true)
             .stream()
             .map(WorkflowTask::getName)
             .toList();
 
-        List<String> workflowTriggerNames = WorkflowTrigger
-            .of(workflow)
+        List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow)
+            .stream()
+            .toList();
+
+        List<String> workflowTriggerNames = WorkflowTrigger.of(workflow)
             .stream()
             .map(WorkflowTrigger::getName)
             .toList();
@@ -82,6 +84,26 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
                 !workflowTriggerNames.contains(workflowNodeTestOutput.getWorkflowNodeName())) {
 
                 workflowNodeTestOutputRepository.delete(workflowNodeTestOutput);
+            }
+
+            if (workflowTriggerNames.contains(workflowNodeTestOutput.getWorkflowNodeName())) {
+                workflowTriggers.stream()
+                    .filter(workflowTrigger -> {
+                        String name = workflowTrigger.getName();
+
+                        return name.equals(workflowNodeTestOutput.getWorkflowNodeName());
+                    })
+                    .findFirst()
+                    .ifPresent(workflowTrigger -> {
+                        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+                        if (!Objects.equals(
+                            workflowNodeType.componentOperationName(),
+                            workflowNodeTestOutput.getComponentOperationName())) {
+
+                            workflowNodeTestOutputRepository.delete(workflowNodeTestOutput);
+                        }
+                    });
             }
         }
     }

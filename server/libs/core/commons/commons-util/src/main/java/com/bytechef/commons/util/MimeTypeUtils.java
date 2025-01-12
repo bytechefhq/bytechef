@@ -54,6 +54,8 @@ public class MimeTypeUtils {
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     public static final String MIME_APPLICATION_VND_SPREADSHEET = "application/vnd.oasis.opendocument.spreadsheet";
     public static final String MIME_APPLICATION_VND_MSPOWERPOINT = "application/vnd.ms-powerpoint";
+    public static final String MIME_APPLICATION_VND_PRESENTATION =
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation";
     public static final String MIME_APPLICATION_VND_RNREALMEDIA = "application/vnd.rn-realmedia";
     public static final String MIME_APPLICATION_X_BCPIO = "application/x-bcpio";
     public static final String MIME_APPLICATION_X_CDLINK = "application/x-cdlink";
@@ -255,6 +257,7 @@ public class MimeTypeUtils {
                 put1("bcpio", MIME_APPLICATION_X_BCPIO);
                 put1("rm", MIME_APPLICATION_VND_RNREALMEDIA);
                 put1("ppt", MIME_APPLICATION_VND_MSPOWERPOINT);
+                put1("pptx", MIME_APPLICATION_VND_PRESENTATION);
                 put1("mif", MIME_APPLICATION_VND_MIF);
                 put1("grxml", MIME_APPLICATION_SRGS_XML);
                 put1("gram", MIME_APPLICATION_SRGS);
@@ -446,7 +449,9 @@ public class MimeTypeUtils {
                 put1(MIME_APPLICATION_MSWORD_2007, "docx");
                 put1(MIME_APPLICATION_VND_TEXT, "odt");
                 put1(MIME_APPLICATION_VND_MSEXCEL, "xls");
+                put1(MIME_APPLICATION_VND_MSEXCEL_2007, "xlsx");
                 put1(MIME_APPLICATION_VND_SPREADSHEET, "ods");
+                put1(MIME_APPLICATION_VND_PRESENTATION, "pptx");
                 put1(MIME_APPLICATION_POSTSCRIPT, "ps");
                 put1(MIME_APPLICATION_PDF, "pdf");
                 put1(MIME_APPLICATION_OCTET_STREAM, "exe");

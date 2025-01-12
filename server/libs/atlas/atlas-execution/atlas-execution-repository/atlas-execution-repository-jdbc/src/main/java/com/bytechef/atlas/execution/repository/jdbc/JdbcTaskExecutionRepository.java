@@ -35,20 +35,24 @@ public interface JdbcTaskExecutionRepository
     TaskExecutionRepository {
 
     @Override
-    void deleteById(Long aLong);
+    void deleteById(long id);
 
     @Override
-    List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
+    List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
     @Override
-    List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId);
+    List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId);
 
     @Override
-    List<TaskExecution> findAllByParentId(Long parentId);
+    List<TaskExecution> findAllByParentId(long parentId);
 
     @Override
     @Query("SELECT * FROM task_execution WHERE id = :id FOR UPDATE")
     Optional<TaskExecution> findByIdForUpdate(@Param("id") long id);
+
+    @Override
+    @Query("SELECT * FROM task_execution WHERE task_execution.job_id = :jobId ORDER BY task_execution.created_date DESC LIMIT 1")
+    Optional<TaskExecution> findLastByJobId(@Param("jobId") long jobId);
 
     TaskExecution save(TaskExecution taskExecution);
 }

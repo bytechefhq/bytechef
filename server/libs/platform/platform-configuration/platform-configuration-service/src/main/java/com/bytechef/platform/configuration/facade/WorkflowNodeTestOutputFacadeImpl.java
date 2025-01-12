@@ -34,8 +34,8 @@ import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
@@ -125,7 +125,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflow.getId());
-        Map<String, ?> outputs = workflowNodeOutputFacade.getWorkflowNodeSampleOutputs(
+        Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflow.getId(), workflowTask.getName());
 
         Map<String, ?> inputParameters = workflowTask.evaluateParameters(

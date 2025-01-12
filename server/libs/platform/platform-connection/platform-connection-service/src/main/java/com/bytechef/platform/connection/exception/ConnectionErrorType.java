@@ -16,29 +16,17 @@
 
 package com.bytechef.platform.connection.exception;
 
+import com.bytechef.exception.AbstractErrorType;
 import com.bytechef.platform.connection.domain.Connection;
-import com.bytechef.platform.exception.ErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum ConnectionErrorType implements ErrorType {
+public class ConnectionErrorType extends AbstractErrorType {
 
-    CONNECTION_IS_USED(100);
+    public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
 
-    private final int errorKey;
-
-    ConnectionErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return Connection.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private ConnectionErrorType(int errorKey) {
+        super(Connection.class, errorKey);
     }
 }

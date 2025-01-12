@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.webhook.action.WebhookResponseToWebhookRequestAction;
 import com.bytechef.component.webhook.trigger.WebhookAutoRespondWithHTTP200Trigger;
 import com.bytechef.component.webhook.trigger.WebhookAwaitWorkflowAndRespondTrigger;
 import com.bytechef.component.webhook.trigger.WebhookValidateAndRespondTrigger;
@@ -40,6 +41,7 @@ public class WebhookComponentHandler implements ComponentHandler {
                 "receive callouts whenever a service provides the option of distributing signals to a user-defined URL.")
         .icon("path:assets/webhook.svg")
         .categories(ComponentCategory.HELPERS)
+        .actions(WebhookResponseToWebhookRequestAction.ACTION_DEFINITION)
         .triggers(
             WebhookAutoRespondWithHTTP200Trigger.TRIGGER_DEFINITION,
             WebhookValidateAndRespondTrigger.TRIGGER_DEFINITION,

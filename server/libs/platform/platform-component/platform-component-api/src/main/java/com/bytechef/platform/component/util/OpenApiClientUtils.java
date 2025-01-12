@@ -33,8 +33,8 @@ import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
+import com.bytechef.platform.exception.ExecutionException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -49,27 +49,6 @@ import org.springframework.lang.Nullable;
  * @author Ivica Cardic
  */
 public class OpenApiClientUtils {
-
-    public enum ActionDefinitionErrorType implements ErrorType {
-
-        EXECUTE_PROCESS_ERROR_RESPONSE(105);
-
-        private final int errorKey;
-
-        ActionDefinitionErrorType(int errorKey) {
-            this.errorKey = errorKey;
-        }
-
-        @Override
-        public Class<?> getErrorClass() {
-            return ActionDefinition.class;
-        }
-
-        @Override
-        public int getErrorKey() {
-            return errorKey;
-        }
-    }
 
     private static final String TYPE = "type";
 
@@ -105,7 +84,7 @@ public class OpenApiClientUtils {
                 try {
                     throw processErrorResponseFunction.apply(response.getStatusCode(), body, context);
                 } catch (Exception e) {
-                    throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+                    throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
                 }
             }
         }
@@ -206,5 +185,15 @@ public class OpenApiClientUtils {
         }
 
         return valuesMap;
+    }
+
+    private static class ActionDefinitionErrorType extends AbstractErrorType {
+
+        private static final ActionDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE = new ActionDefinitionErrorType(
+            105);
+
+        ActionDefinitionErrorType(int errorKey) {
+            super(ActionDefinition.class, errorKey);
+        }
     }
 }

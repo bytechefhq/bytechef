@@ -23,14 +23,15 @@ import static com.bytechef.component.definition.Authorization.REFRESH_TOKEN;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.exception.ProviderException;
+import com.bytechef.exception.ErrorType;
 import com.bytechef.platform.component.domain.ComponentConnection;
-import com.bytechef.platform.component.exception.ComponentConfigurationException;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.util.AuthorizationUtils;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.platform.exception.ConfigurationException;
+import com.bytechef.platform.exception.ExecutionException;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -75,7 +76,7 @@ public class TokenRefreshHelper {
             return performFunction.apply(componentConnection, context);
         } catch (Exception exception) {
             if (componentConnection == null ||
-                Authorization.AuthorizationType.isApplicable(componentConnection.authorizationName())) {
+                !AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
 
                 throw exception;
             }
@@ -93,11 +94,11 @@ public class TokenRefreshHelper {
             }
 
             if (exception instanceof ProviderException) {
-                throw new ComponentConfigurationException(exception, errorType);
+                throw new ConfigurationException(exception, errorType);
             }
 
-            if (exception instanceof ComponentConfigurationException ||
-                exception instanceof ComponentExecutionException) {
+            if (exception instanceof ConfigurationException ||
+                exception instanceof ExecutionException) {
 
                 throw exception;
             }

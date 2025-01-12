@@ -63,7 +63,7 @@ public class GoogleMailGetMailAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
         Gmail gmail = GoogleServices.getMail(connectionParameters);
 
-        String format = inputParameters.getRequiredString(FORMAT);
+        String format = inputParameters.getString(FORMAT, SIMPLE);
 
         Message message = GoogleMailUtils.getMessage(inputParameters, gmail);
 

@@ -39,7 +39,13 @@
         --chart-4: 43 74% 66%;
         --chart-5: 27 87% 67%;
         --skeleton: 220 9% 93%;
-        --radius: 0.5rem
+        --surface-brand-primary: 213 87% 48%;
+        --surface-brand-primary-hover: 213 87% 34%;
+        --surface-brand-primary-pressed: 213 86% 20%;
+        --content-neutral-primary: 222 47% 11%;
+        --content-neutral-secondary: 215 16% 47%;
+        --content-neutral-tertiary: 215 20% 65%;
+        --radius: 0.5rem;
     }
 
     .dark {
@@ -70,7 +76,7 @@
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%
+        --chart-5: 340 75% 55%;
     }
 }
 

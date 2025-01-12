@@ -11,7 +11,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -51,7 +51,7 @@ public class RemoteActionDefinitionFacadeController {
         return ResponseEntity.ok(
             actionDefinitionFacade.executeDynamicProperties(
                 propertiesRequest.componentName, propertiesRequest.componentVersion, propertiesRequest.actionName,
-                propertiesRequest.propertyName, propertiesRequest.inputParameters,
+                propertiesRequest.propertyName, propertiesRequest.workflowId, propertiesRequest.inputParameters,
                 propertiesRequest.lookupDependsOnPaths,
                 propertiesRequest.connectionId));
     }
@@ -136,8 +136,8 @@ public class RemoteActionDefinitionFacadeController {
     @SuppressFBWarnings("EI")
     public record PropertiesRequest(
         @NotNull String componentName, int componentVersion, @NotNull String actionName,
-        @NotNull String propertyName, Map<String, Object> inputParameters, Long connectionId,
-        List<String> lookupDependsOnPaths) {
+        @NotNull String propertyName, @NonNull String workflowId, Map<String, Object> inputParameters,
+        Long connectionId, List<String> lookupDependsOnPaths) {
     }
 
     @SuppressFBWarnings("EI")

@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.domain;
 
 import com.bytechef.platform.constant.ModeType;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -43,7 +43,7 @@ public class SigningKey {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("key_id")
     private String keyId;
@@ -54,10 +54,10 @@ public class SigningKey {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("last_used_date")
-    private LocalDateTime lastUsedDate;
+    private Instant lastUsedDate;
 
     @Column
     private String name;
@@ -100,7 +100,7 @@ public class SigningKey {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -112,11 +112,11 @@ public class SigningKey {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public LocalDateTime getLastUsedDate() {
+    public Instant getLastUsedDate() {
         return lastUsedDate;
     }
 
@@ -144,15 +144,11 @@ public class SigningKey {
         this.createdBy = createdBy;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public void setKeyId(String keyId) {
         this.keyId = keyId;
     }
 
-    public void setLastUsedDate(LocalDateTime lastUsedDate) {
+    public void setLastUsedDate(Instant lastUsedDate) {
         this.lastUsedDate = lastUsedDate;
     }
 

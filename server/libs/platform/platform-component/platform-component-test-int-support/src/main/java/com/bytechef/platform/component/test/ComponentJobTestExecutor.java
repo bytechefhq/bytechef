@@ -44,6 +44,7 @@ public class ComponentJobTestExecutor {
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
     private final Map<String, TaskHandler<?>> taskHandlerMap;
+    private final TaskFileStorageImpl taskFileStorage;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -55,6 +56,7 @@ public class ComponentJobTestExecutor {
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
         this.taskHandlerMap = taskHandlerMap;
+        this.taskFileStorage = new TaskFileStorageImpl(new Base64FileStorageService());
         this.workflowService = workflowService;
     }
 
@@ -64,9 +66,9 @@ public class ComponentJobTestExecutor {
 
     public Job execute(String workflowId, Map<String, Object> inputs, Map<String, TaskHandler<?>> taskHandlerMap) {
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
-            contextService, jobService, getTaskDispatcherPreSendProcessors(), taskExecutionService,
-            MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get,
-            new TaskFileStorageImpl(new Base64FileStorageService()), workflowService);
+            contextService, jobService, getTaskDispatcherPreSendProcessors(),
+            taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage,
+            workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }

@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.worker.event;
 
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.workflow.worker.message.route.TriggerWorkerMessageRoute;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,15 +28,15 @@ import java.util.Map;
  */
 public abstract class AbstractEvent implements MessageEvent<TriggerWorkerMessageRoute> {
 
-    protected LocalDateTime createDate;
+    protected Instant createDate;
     protected Map<String, Object> metadata = new HashMap<>();
 
     public AbstractEvent() {
-        this.createDate = LocalDateTime.now();
+        this.createDate = Instant.now();
     }
 
     @Override
-    public LocalDateTime getCreateDate() {
+    public Instant getCreateDate() {
         return createDate;
     }
 

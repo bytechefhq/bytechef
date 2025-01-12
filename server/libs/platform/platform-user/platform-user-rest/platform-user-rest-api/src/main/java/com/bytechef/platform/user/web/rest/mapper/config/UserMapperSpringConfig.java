@@ -17,13 +17,16 @@
 package com.bytechef.platform.user.web.rest.mapper.config;
 
 import com.bytechef.platform.user.web.rest.adapter.UserConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
 /**
  * @author Ivica Cardic
  */
-@MapperConfig(componentModel = "spring", uses = UserConversionServiceAdapter.class)
+@MapperConfig(componentModel = "spring", uses = {
+    DateTimeMapper.class, UserConversionServiceAdapter.class
+})
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.user.web.rest.adapter",
     conversionServiceAdapterClassName = "UserConversionServiceAdapter")

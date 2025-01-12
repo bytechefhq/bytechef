@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author Ivica Cardic
@@ -29,6 +30,8 @@ public interface TaskExecutionService {
     void delete(long id);
 
     void deleteJobTaskExecutions(long jobId);
+
+    Optional<TaskExecution> fetchLastJobTaskExecution(long jobId);
 
     TaskExecution getTaskExecution(long id);
 

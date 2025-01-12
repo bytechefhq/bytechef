@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,16 +27,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:01.205788+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.804935+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class TaskExecutionModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endDate;
+  private OffsetDateTime endDate;
 
   private ExecutionErrorModel error;
 
@@ -54,7 +54,7 @@ public class TaskExecutionModel {
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private Integer maxRetries;
 
@@ -73,7 +73,7 @@ public class TaskExecutionModel {
   private Integer retryDelayFactor;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startDate;
+  private OffsetDateTime startDate;
 
   /**
    * The current status of a task.
@@ -135,7 +135,7 @@ public class TaskExecutionModel {
   /**
    * Constructor with only required parameters
    */
-  public TaskExecutionModel(String jobId, Integer priority, LocalDateTime startDate, StatusEnum status) {
+  public TaskExecutionModel(String jobId, Integer priority, OffsetDateTime startDate, StatusEnum status) {
     this.jobId = jobId;
     this.priority = priority;
     this.startDate = startDate;
@@ -162,7 +162,7 @@ public class TaskExecutionModel {
     this.createdBy = createdBy;
   }
 
-  public TaskExecutionModel createdDate(LocalDateTime createdDate) {
+  public TaskExecutionModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -174,15 +174,15 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public TaskExecutionModel endDate(LocalDateTime endDate) {
+  public TaskExecutionModel endDate(OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -194,11 +194,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public LocalDateTime getEndDate() {
+  public OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(LocalDateTime endDate) {
+  public void setEndDate(OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
@@ -350,7 +350,7 @@ public class TaskExecutionModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TaskExecutionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public TaskExecutionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -362,11 +362,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -530,7 +530,7 @@ public class TaskExecutionModel {
     this.retryDelayFactor = retryDelayFactor;
   }
 
-  public TaskExecutionModel startDate(LocalDateTime startDate) {
+  public TaskExecutionModel startDate(OffsetDateTime startDate) {
     this.startDate = startDate;
     return this;
   }
@@ -542,11 +542,11 @@ public class TaskExecutionModel {
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("startDate")
-  public LocalDateTime getStartDate() {
+  public OffsetDateTime getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(LocalDateTime startDate) {
+  public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
 

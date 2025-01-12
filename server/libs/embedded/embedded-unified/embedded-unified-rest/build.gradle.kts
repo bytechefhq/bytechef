@@ -6,7 +6,6 @@ val generateAccountingOpenAPISpring by tasks.registering(org.openapitools.genera
     apiPackage.set("com.bytechef.embedded.unified.web.rest.accounting")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
@@ -28,7 +27,6 @@ val generateCRMOpenAPISpring by tasks.registering(org.openapitools.generator.gra
     apiPackage.set("com.bytechef.embedded.unified.web.rest.crm")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
@@ -53,11 +51,6 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //    inputSpec.set("$projectDir/openapi.yaml")
 //    modelNameSuffix.set("Model")
 //    outputDir.set("$rootDir/client/src/middleware/embedded/unified")
-//    typeMappings.set(
-//        mapOf(
-//            "DateTime" to "Date"
-//        )
-//    )
 //}
 
 tasks.register("generateOpenAPI") {
@@ -72,7 +65,6 @@ dependencies {
 
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
@@ -84,6 +76,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:embedded:embedded-unified:embedded-unified-api"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-web:platform-security-web-api"))
 
     testImplementation("org.springframework:spring-webflux")

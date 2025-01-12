@@ -36,6 +36,7 @@ const ProjectInstanceList = ({
                         {!!projectInstance.projectInstanceWorkflows?.length && (
                             <CollapsibleContent>
                                 <ProjectInstanceWorkflowList
+                                    environment={projectInstance.environment}
                                     projectId={project.id}
                                     projectInstanceEnabled={
                                         projectInstanceMap.has(projectInstance.id!)

@@ -82,7 +82,8 @@ public class ShopifyUtils {
 
         Map<String, List<Map<String, Object>>> body = context.http(
             http -> http.get(
-                "/products/" + inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID)) + "/variants.json"))
+                "/products/" + inputParameters.getRequiredFromPath(dependencyPaths.get(PRODUCT_ID), String.class) +
+                    "/variants.json"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

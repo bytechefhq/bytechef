@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -23,23 +23,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiClient", description = "Contains generated key required for calling API.")
 @JsonTypeName("ApiClient")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:00.868656+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.480310+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ApiClientModel {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private Long id;
 
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastUsedDate;
+  private OffsetDateTime lastUsedDate;
 
   private String name;
 
@@ -77,7 +77,7 @@ public class ApiClientModel {
     this.createdBy = createdBy;
   }
 
-  public ApiClientModel createdDate(LocalDateTime createdDate) {
+  public ApiClientModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -89,11 +89,11 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -137,7 +137,7 @@ public class ApiClientModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ApiClientModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public ApiClientModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -149,15 +149,15 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ApiClientModel lastUsedDate(LocalDateTime lastUsedDate) {
+  public ApiClientModel lastUsedDate(OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
     return this;
   }
@@ -169,11 +169,11 @@ public class ApiClientModel {
   @Valid 
   @Schema(name = "lastUsedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last used date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastUsedDate")
-  public LocalDateTime getLastUsedDate() {
+  public OffsetDateTime getLastUsedDate() {
     return lastUsedDate;
   }
 
-  public void setLastUsedDate(LocalDateTime lastUsedDate) {
+  public void setLastUsedDate(OffsetDateTime lastUsedDate) {
     this.lastUsedDate = lastUsedDate;
   }
 

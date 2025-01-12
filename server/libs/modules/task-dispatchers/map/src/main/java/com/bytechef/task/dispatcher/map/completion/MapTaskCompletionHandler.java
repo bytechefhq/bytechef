@@ -26,7 +26,7 @@ import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
@@ -80,7 +80,7 @@ public class MapTaskCompletionHandler implements TaskCompletionHandler {
                 .getParentTaskExecutions(taskExecution.getParentId());
             TaskExecution mapTaskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-            mapTaskExecution.setEndDate(LocalDateTime.now());
+            mapTaskExecution.setEndDate(Instant.now());
 
             mapTaskExecution.setOutput(
                 taskFileStorage.storeTaskExecutionOutput(

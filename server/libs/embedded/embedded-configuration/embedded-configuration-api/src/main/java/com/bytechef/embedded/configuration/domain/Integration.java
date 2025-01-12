@@ -22,7 +22,7 @@ import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -63,7 +63,7 @@ public final class Integration {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column
     private String description;
@@ -83,7 +83,7 @@ public final class Integration {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private String name;
@@ -144,7 +144,7 @@ public final class Integration {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -164,12 +164,12 @@ public final class Integration {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 
     @Nullable
-    public LocalDateTime getLastPublishedDate() {
+    public Instant getLastPublishedDate() {
         return integrationVersions.stream()
             .sorted((o1, o2) -> Integer.compare(o2.getVersion(), o1.getVersion()))
             .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
@@ -213,7 +213,7 @@ public final class Integration {
         IntegrationVersion integrationVersion = getMaxIntegrationVersion();
 
         integrationVersion.setDescription(description);
-        integrationVersion.setPublishedDate(LocalDateTime.now());
+        integrationVersion.setPublishedDate(Instant.now());
         integrationVersion.setStatus(Status.PUBLISHED);
 
         int newVersion = integrationVersion.getVersion() + 1;

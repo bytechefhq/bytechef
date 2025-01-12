@@ -16,7 +16,7 @@
 
 package com.bytechef.embedded.configuration.domain;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
@@ -36,7 +36,7 @@ public class IntegrationVersion {
     private String description;
 
     @Column("published_date")
-    private LocalDateTime publishedDate;
+    private Instant publishedDate;
 
     @Column
     private int status = Status.DRAFT.ordinal();
@@ -51,7 +51,7 @@ public class IntegrationVersion {
         this.version = version;
     }
 
-    public IntegrationVersion(int version, int status, LocalDateTime publishedDate, String description) {
+    public IntegrationVersion(int version, int status, Instant publishedDate, String description) {
         this.description = description;
         this.publishedDate = publishedDate;
         this.status = status;
@@ -81,7 +81,7 @@ public class IntegrationVersion {
         return description;
     }
 
-    public LocalDateTime getPublishedDate() {
+    public Instant getPublishedDate() {
         return publishedDate;
     }
 
@@ -97,7 +97,7 @@ public class IntegrationVersion {
         this.description = description;
     }
 
-    public void setPublishedDate(LocalDateTime publishedDate) {
+    public void setPublishedDate(Instant publishedDate) {
         this.publishedDate = publishedDate;
     }
 

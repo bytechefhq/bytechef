@@ -23,7 +23,7 @@ import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import java.util.List;
 import java.util.Map;
 import org.springframework.lang.NonNull;
@@ -52,9 +52,9 @@ public interface ActionDefinitionService {
      * @param connection           connection used to connect to outer source
      * @param context              additional technical data required by some actions
      * @return list of dynamically resolved properties
-     * @throws {@link com.bytechef.platform.component.exception.ComponentConfigurationException} - if procession breaks
-     *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
-     *                system is unavailable or call to it results in errors
+     * @throws {@link ConfigurationException} - if procession breaks within ByteChef system or
+     *                {@link com.bytechef.component.exception.ProviderException} - if external system is unavailable or
+     *                call to it results in errors
      */
     List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
@@ -79,9 +79,9 @@ public interface ActionDefinitionService {
      * @param extensions
      * @param context          additional technical data required by some actions
      * @return result of execution or throws exceptions
-     * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
-     *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
-     *                system is unavailable or call to it results in errors
+     * @throws {@link ExecutionException} - if procession breaks within ByteChef system or
+     *                {@link com.bytechef.component.exception.ProviderException} - if external system is unavailable or
+     *                call to it results in errors
      */
     Object executeMultipleConnectionsPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,
@@ -113,9 +113,9 @@ public interface ActionDefinitionService {
      * @param connection       connection used to connect to outer sources
      * @param context          additional technical data required by some actions
      * @return result of execution or throws exceptions
-     * @throws {@link com.bytechef.platform.component.exception.ComponentExecutionException} - if procession breaks
-     *                within ByteChef system or {@link com.bytechef.component.exception.ProviderException} - if external
-     *                system is unavailable or call to it results in errors
+     * @throws {@link ExecutionException} - if procession breaks within ByteChef system or
+     *                {@link com.bytechef.component.exception.ProviderException} - if external system is unavailable or
+     *                call to it results in errors
      */
     Object executeSingleConnectionPerform(
         @NonNull String componentName, int componentVersion, @NonNull String actionName,

@@ -98,6 +98,50 @@ Type: BOOLEAN
 
 
 
+### HTML to Markdown
+Converts HTML to markdown.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| HTML Content | STRING | TEXT_AREA  |  HTML content to be converted to markdown.  |
+
+
+### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+### Markdown to HTML
+Converts markdown to HTML.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Markdown content | STRING | TEXT_AREA  |  Markdown content to convert to HTML.  |
+
+
+### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
 ### Replace
 Replace all instances of any word, character, or phrase in text with another.
 

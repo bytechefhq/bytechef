@@ -78,6 +78,10 @@ public class JobExecutor {
     private void executeNextTask(Job job, Workflow workflow) {
         Validate.notNull(job.getId(), "'job.id' must not be null");
 
+        if (logger.isTraceEnabled()) {
+            logger.trace("executeNextTask: job={}, workflow={}", job, workflow);
+        }
+
         Map<String, ?> context = taskFileStorage.readContextValue(
             contextService.peek(Validate.notNull(job.getId(), "id"), Context.Classname.JOB));
         TaskExecution nextTaskExecution = nextTaskExecution(job, workflow);

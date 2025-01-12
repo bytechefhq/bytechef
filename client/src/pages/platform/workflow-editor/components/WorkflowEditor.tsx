@@ -1,7 +1,10 @@
+import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {ClickedDefinitionType} from '@/shared/types';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
@@ -30,8 +33,10 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             workflow: state.workflow,
         }))
     );
-    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {copilotPanelOpen} = useCopilotStore();
     const {rightSidebarOpen} = useRightSidebarStore();
+    const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {workflowTestChatPanelOpen} = useWorkflowTestChatStore();
 
     const {getEdge, getNode, setViewport} = useReactFlow();
 
@@ -78,9 +83,20 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             droppedNodeName = droppedNodeData;
         }
 
-        const droppedNode = [...componentDefinitions, ...taskDispatcherDefinitions].find(
-            (node) => node.name === droppedNodeName
-        );
+        let droppedNode = componentDefinitions.find((node) => node.name === droppedNodeName) as
+            | ClickedDefinitionType
+            | undefined;
+
+        if (!droppedNode) {
+            const taskDispatcherNode = taskDispatcherDefinitions.find((node) => node.name === droppedNodeName);
+
+            if (taskDispatcherNode) {
+                droppedNode = {
+                    ...taskDispatcherNode,
+                    taskDispatcher: true,
+                } as ClickedDefinitionType;
+            }
+        }
 
         if (!droppedNode) {
             return;
@@ -157,13 +173,18 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
     let canvasWidth = window.innerWidth - 120;
 
+    if (copilotPanelOpen) {
+        canvasWidth -= 450;
+    }
     if (leftSidebarOpen) {
         canvasWidth -= 384;
     }
+
     if (rightSidebarOpen) {
         canvasWidth -= 384;
     }
-    if (workflowNodeDetailsPanelOpen) {
+
+    if (workflowNodeDetailsPanelOpen || workflowTestChatPanelOpen) {
         canvasWidth -= 460;
     }
 

@@ -28,7 +28,7 @@ import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstan
 import static com.bytechef.task.dispatcher.map.constant.MapTaskDispatcherConstants.MAP;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.TaskDispatcherDefinitionFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.OutputFunction;
 import com.bytechef.platform.workflow.task.dispatcher.definition.Property.ObjectProperty;

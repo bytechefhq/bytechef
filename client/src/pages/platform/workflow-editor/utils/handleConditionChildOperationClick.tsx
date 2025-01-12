@@ -1,7 +1,6 @@
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ActionDefinition} from '@/shared/middleware/platform/configuration';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedOperationType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
@@ -10,11 +9,12 @@ import {Node} from 'reactflow';
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
     conditionId: string;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     nodes: Array<Node>;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
@@ -35,7 +35,7 @@ export default function handleConditionChildOperationClick({
     updateWorkflowMutation,
     workflow,
 }: HandleConditionChildOperationClickProps) {
-    const {componentLabel, componentName, icon, type} = operation;
+    const {componentLabel, componentName, icon, type, version} = operation;
 
     const workflowNodeName = getFormattedName(componentName!, nodes);
 
@@ -46,6 +46,7 @@ export default function handleConditionChildOperationClick({
         label: componentLabel,
         name: workflowNodeName,
         type: type,
+        version,
         workflowNodeName,
     };
 
@@ -60,14 +61,13 @@ export default function handleConditionChildOperationClick({
             }),
         },
         nodeIndex: taskAfterCurrentIndex,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                    id: workflow.id!,
-                    lastWorkflowNodeName: currentNode?.name,
-                }),
-            });
-        },
+        onSuccess: () =>
+            handleComponentAddedSuccess({
+                currentNode,
+                nodeData: newWorkflowNodeData,
+                queryClient,
+                workflow,
+            }),
         placeholderId,
         queryClient,
         updateWorkflowMutation,

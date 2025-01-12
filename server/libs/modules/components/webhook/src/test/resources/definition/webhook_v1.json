@@ -14,7 +14,279 @@
   "version" : 1,
   "title" : "Webhook",
   "connection" : null,
-  "actions" : null,
+  "actions" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Converts the response to the webhook request.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "responseToWebhookRequest",
+    "outputDefinition" : {
+      "output" : { },
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The type of the response.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "responseType",
+      "type" : "INTEGER",
+      "defaultValue" : 1,
+      "exampleValue" : null,
+      "label" : "Response Type",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "JSON",
+        "value" : 1
+      }, {
+        "description" : null,
+        "label" : "Raw",
+        "value" : 2
+      }, {
+        "description" : null,
+        "label" : "Binary",
+        "value" : 3
+      }, {
+        "description" : null,
+        "label" : "Redirect",
+        "value" : 4
+      }, {
+        "description" : null,
+        "label" : "No Data",
+        "value" : 5
+      } ],
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The headers of the response.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "headers",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Headers",
+      "placeholder" : "Add header",
+      "additionalProperties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The body of the response.",
+      "displayCondition" : "responseType == 1",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "body",
+      "type" : "OBJECT",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Body",
+      "placeholder" : "Add property",
+      "additionalProperties" : null,
+      "multipleValues" : null,
+      "options" : null,
+      "properties" : null,
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The body of the response.",
+      "displayCondition" : "responseType == 2",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "body",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Body",
+      "placeholder" : "Add property",
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The redirect URL.",
+      "displayCondition" : "responseType == 4",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "body",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Redirect URL",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "The body of the response.",
+      "displayCondition" : "responseType == 3",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "body",
+      "type" : "FILE_ENTRY",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Body",
+      "placeholder" : "Add property",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "extension",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "mimeType",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "name",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "url",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "controlType" : "FILE_ENTRY"
+    }, {
+      "advancedOption" : null,
+      "description" : "The status code of the response.",
+      "displayCondition" : "responseType != 4",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "statusCode",
+      "type" : "INTEGER",
+      "defaultValue" : 200,
+      "exampleValue" : null,
+      "label" : "Status Code",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Response to Webhook Request",
+    "perform" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  } ],
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -27,23 +299,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "headers" : {
-            "Header1" : "value"
-          },
-          "parameters" : {
-            "parameter1" : "value"
-          }
+          "parameters" : { },
+          "headers" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "headers" : {
-          "Header1" : "value"
-        },
-        "parameters" : {
-          "parameter1" : "value"
-        }
+        "parameters" : { },
+        "headers" : { }
       }
     },
     "properties" : null,
@@ -51,18 +315,18 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "deduplicate" : null,
-    "poll" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -75,23 +339,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "headers" : {
-            "Header1" : "value"
-          },
-          "parameters" : {
-            "parameter1" : "value"
-          }
+          "parameters" : { },
+          "headers" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "headers" : {
-          "Header1" : "value"
-        },
-        "parameters" : {
-          "parameter1" : "value"
-        }
+        "parameters" : { },
+        "headers" : { }
       }
     },
     "properties" : [ {
@@ -119,18 +375,18 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -143,23 +399,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "headers" : {
-            "Header1" : "value"
-          },
-          "parameters" : {
-            "parameter1" : "value"
-          }
+          "parameters" : { },
+          "headers" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "headers" : {
-          "Header1" : "value"
-        },
-        "parameters" : {
-          "parameter1" : "value"
-        }
+        "parameters" : { },
+        "headers" : { }
       }
     },
     "properties" : [ {
@@ -199,25 +447,25 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Await Workflow and Respond",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "deduplicate" : null,
-    "poll" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "dynamicWebhookRefresh" : null,
+    "webhookValidateOnEnable" : null
   } ],
   "dataStream" : null,
   "unifiedApi" : null

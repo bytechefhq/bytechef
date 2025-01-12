@@ -17,6 +17,7 @@
 package com.bytechef.automation.connection.web.rest.mapper.config;
 
 import com.bytechef.automation.connection.web.rest.adapter.ProjectConnectionConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,7 +25,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    ProjectConnectionConversionServiceAdapter.class,
+    DateTimeMapper.class, ProjectConnectionConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
 

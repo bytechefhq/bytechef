@@ -34,7 +34,7 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,9 +62,9 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public DefaultTaskCompletionHandler(
-        ContextService contextService, ApplicationEventPublisher eventPublisher,
-        JobExecutor jobExecutor, JobService jobService, TaskExecutionService taskExecutionService,
-        TaskFileStorage taskFileStorage, WorkflowService workflowService) {
+        ContextService contextService, ApplicationEventPublisher eventPublisher, JobExecutor jobExecutor,
+        JobService jobService, TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
+        WorkflowService workflowService) {
 
         this.contextService = contextService;
         this.eventPublisher = eventPublisher;
@@ -85,8 +85,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         Validate.notNull(taskExecution, "'taskExecution' must not be null");
         Validate.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("handle: taskExecution={}", taskExecution);
+        if (logger.isTraceEnabled()) {
+            logger.trace("handle: taskExecution={}", taskExecution);
         }
 
         Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
@@ -131,8 +131,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Validate.notNull(job, "'job' must not be null");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("complete: job={}", job);
+        if (logger.isTraceEnabled()) {
+            logger.trace("complete: job={}", job);
         }
 
         Map<String, ?> context = taskFileStorage.readContextValue(
@@ -143,7 +143,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
             workflow.getOutputs(), Workflow.Output::name, Workflow.Output::value);
 
         job.setCurrentTask(-1);
-        job.setEndDate(LocalDateTime.now());
+        job.setEndDate(Instant.now());
         job.setStatus(Job.Status.COMPLETED);
         job.setOutputs(
             taskFileStorage.storeJobOutputs(
@@ -151,8 +151,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
         job = jobService.update(job);
 
-        eventPublisher
-            .publishEvent(new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+        eventPublisher.publishEvent(
+            new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());

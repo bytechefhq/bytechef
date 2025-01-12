@@ -89,7 +89,7 @@ class GoogleMailNewEmailPollingTriggerTest {
 
             assertEquals("is:unread after:" + zonedDateTime.toEpochSecond(), qArgumentCaptor.getValue());
 
-            assertEquals(messages, pollOutput.getRecords());
+            assertEquals(messages, pollOutput.records());
             assertFalse(pollOutput.pollImmediately());
         }
     }

@@ -2,6 +2,7 @@ import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
@@ -21,25 +22,23 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
 import {Option} from '@/shared/middleware/platform/configuration';
+import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
+import {ChangeEvent, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
-import ReactQuill from 'react-quill';
 import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
 import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
-import useWorkflowEditorStore from '../../stores/useWorkflowEditorStore';
-import formatKeysWithDigits from '../../utils/formatKeysWithDigits';
-import replaceSpacesInKeys from '../../utils/replaceSpacesInObjectKeys';
+import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
 import ArrayProperty from './ArrayProperty';
 import ObjectProperty from './ObjectProperty';
 
@@ -56,7 +55,7 @@ const INPUT_PROPERTY_CONTROL_TYPES = [
     'URL',
 ];
 
-const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'TEXT', 'TEXT_AREA', 'URL'];
+const MENTION_INPUT_PROPERTY_CONTROL_TYPES = ['EMAIL', 'PHONE', 'RICH_TEXT', 'TEXT', 'TEXT_AREA', 'URL'];
 
 interface PropertyProps {
     arrayIndex?: number;
@@ -65,8 +64,8 @@ interface PropertyProps {
     control?: Control<any, any>;
     controlPath?: string;
     customClassName?: string;
-    formState?: FormState<FieldValues>;
     deletePropertyButton?: ReactNode;
+    formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -101,36 +100,40 @@ const Property = ({
     );
     const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
-    const [selectValue, setSelectValue] = useState(property.defaultValue || '' || 'null');
+    const [selectValue, setSelectValue] = useState(
+        property.defaultValue !== undefined ? property.defaultValue : 'null'
+    );
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
+    const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(false);
 
-    const editorRef = useRef<ReactQuill>(null);
+    const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const {
-        currentComponent,
-        currentNode,
-        focusedInput,
-        setCurrentComponent,
-        setFocusedInput,
-        workflowNodeDetailsPanelOpen,
-    } = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent, setFocusedInput, workflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
-    const {componentDefinitions, workflow} = useWorkflowDataStore();
-    const {showPropertyCodeEditorSheet, showPropertyJsonSchemaBuilder, showWorkflowCodeEditorSheet} =
-        useWorkflowEditorStore();
+    const {workflow} = useWorkflowDataStore();
+
+    const {isFetchedAfterMount: isDisplayConditionFetched} = useGetWorkflowNodeParameterDisplayConditionsQuery(
+        {
+            id: workflow.id!,
+            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
+            workflowNodeName: currentNode?.workflowNodeName!,
+        },
+        !!currentNode?.workflowNodeName
+    );
 
     const previousOperationName = usePrevious(currentNode?.operationName);
-    const previousMentionInputValue = usePrevious(mentionInputValue);
 
-    const defaultValue = property.defaultValue || '';
+    const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
     const {
         controlType,
         custom,
         description,
+        expressionEnabled,
         hidden,
         label,
         languageId,
@@ -148,21 +151,30 @@ const Property = ({
         type,
     } = property;
 
-    const formattedOptions = options
-        ?.map((option) => {
-            if (option.value === '') {
-                return null;
-            }
+    let {displayCondition} = property;
 
-            return option;
-        })
-        .filter((option) => option !== null);
+    const formattedOptions = useMemo(() => {
+        return options
+            ?.map((option) => {
+                if (option.value === '') {
+                    return null;
+                }
+                return option;
+            })
+            .filter((option) => option !== null);
+    }, [options]);
 
-    const isValidControlType = controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+    const isValidControlType = useMemo(() => {
+        return controlType && INPUT_PROPERTY_CONTROL_TYPES.includes(controlType);
+    }, [controlType]);
 
-    const isNumericalInput = !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
+    const isNumericalInput = useMemo(() => {
+        return !mentionInput && (controlType === 'INTEGER' || controlType === 'NUMBER');
+    }, [mentionInput, controlType]);
 
-    const typeIcon = TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    const typeIcon = useMemo(() => {
+        return TYPE_ICONS[type as keyof typeof TYPE_ICONS];
+    }, [type]);
 
     const {deleteWorkflowNodeParameterMutation, updateWorkflowNodeParameterMutation} =
         useWorkflowNodeParameterMutation();
@@ -179,34 +191,27 @@ const Property = ({
         path = `${path}.${name}`;
     }
 
-    if (path) {
-        path = path.replace(/[^a-zA-Z0-9_.[]]/g, (char) => {
-            const charCode = char.charCodeAt(0);
-
-            return charCode ? `0x${charCode.toString()}` : '0x00';
-        });
-    }
-
-    if (path?.includes(' ')) {
-        path = path.replace(/\s/g, PATH_SPACE_REPLACEMENT);
+    if (objectName && !path?.includes(objectName)) {
+        path = `${objectName}.${path}`;
     }
 
     if (path) {
-        path = path
-            .split('.')
-            .map((step) => (step.match(/^\d/) ? `${PATH_DIGIT_PREFIX}${step}` : step))
-            .join('.');
+        path = decodePath(path);
     }
 
-    const getComponentIcon = (mentionValue: string) => {
-        let componentName = mentionValue.split('_')[0].replace('${', '');
+    if (displayCondition) {
+        const displayConditionIndexes: number[] = [];
+        const bracketedNumberRegex = /\[(\d+)\]/g;
+        let match;
 
-        if (componentName === 'trigger') {
-            componentName = workflow.workflowTriggerComponentNames?.[0] || '';
+        while ((match = bracketedNumberRegex.exec(path!)) !== null) {
+            displayConditionIndexes.push(parseInt(match[1], 10));
         }
 
-        return componentDefinitions.find((component) => component.name === componentName)?.icon || '📄';
-    };
+        displayConditionIndexes.forEach((index) => {
+            displayCondition = displayCondition!.replace(`[index]`, `[${index}]`);
+        });
+    }
 
     const saveInputValue = useDebouncedCallback(() => {
         if (!currentComponent || !workflow || !name || !path || !updateWorkflowNodeParameterMutation) {
@@ -244,88 +249,18 @@ const Property = ({
             return;
         }
 
-        let strippedValue: string | number = sanitizeHtml(mentionInputValue, {
-            allowedTags: ['br', 'p'],
-        });
+        let value: string | number = mentionInputValue;
 
-        strippedValue = strippedValue.replace(/<\/p><p>/g, '\n');
-
-        if (propertyParameterValue?.includes('\n')) {
-            const equal =
-                sanitizeHtml(propertyParameterValue, {allowedTags: []}).trim() ===
-                sanitizeHtml(mentionInputValue, {allowedTags: []}).trim();
-
-            if (equal) {
-                return;
-            }
+        if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.startsWith('${')) {
+            value = parseInt(value);
         }
 
-        const dataValueAttributes = mentionInputValue.match(/data-value="([^"]+)"/g);
-
-        if (dataValueAttributes?.length) {
-            const dataPillValues = dataValueAttributes
-                .map((match) => match.match(/data-value="([^"]+)"/)?.[1])
-                .map((value) => `\${${value}}`);
-
-            const basicValues = mentionInputValue
-                .split(/<div[^>]*>[\s\S]*?<\/div>/g)
-                .map((value) => value.replace(/<[^>]*>?/gm, ''));
-
-            if (strippedValue.startsWith('${') && focusedInput) {
-                const editor = focusedInput.getEditor();
-
-                editor.deleteText(0, editor.getLength());
-
-                editor.setText(' ');
-
-                const mentionInput = editor.getModule('mention');
-
-                mentionInput.insertItem(
-                    {
-                        componentIcon: currentNode?.icon,
-                        id: currentNode?.name,
-                        value: strippedValue.replace('${', '').replace('}', ''),
-                    },
-                    true,
-                    {blotName: 'property-mention'}
-                );
-
-                return;
-            }
-
-            if (dataPillValues?.length) {
-                strippedValue = basicValues.reduce(
-                    (acc, value, index) => `${acc}${value}${dataPillValues[index] || ''}`,
-                    ''
-                );
-            } else if ((type === 'INTEGER' || type === 'NUMBER') && !mentionInputValue.includes('data-value')) {
-                strippedValue = parseInt(strippedValue);
-            } else {
-                const dataPillValue = dataPillValues?.[0];
-
-                if (dataPillValue && !dataPillValue.startsWith('${') && !dataPillValue.endsWith('}')) {
-                    strippedValue = `\${${dataPillValue.replace(/\//g, '.')}}`;
-                } else {
-                    strippedValue = mentionInputValue.replace(/<[^>]*>?/gm, '');
-                }
-            }
+        if (typeof value === 'string' && controlType !== 'RICH_TEXT') {
+            value = sanitizeHtml(value, {allowedTags: []});
         }
 
-        const currentValue = resolvePath(parameters, path) || '';
-
-        if (currentValue === strippedValue) {
-            return;
-        }
-
-        strippedValue =
-            typeof strippedValue === 'string'
-                ? sanitizeHtml(strippedValue, {
-                      allowedTags: [],
-                  })
-                : strippedValue;
-
-        if (typeof strippedValue === 'string') {
-            strippedValue = decode(strippedValue);
+        if (typeof value === 'string') {
+            value = decode(value);
         }
 
         saveProperty({
@@ -335,7 +270,7 @@ const Property = ({
             setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
-            value: strippedValue || null,
+            value: value || null,
             workflowId: workflow.id,
         });
     }, 200);
@@ -388,9 +323,11 @@ const Property = ({
     }, 200);
 
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
+        const {value} = event.target;
+
         if (isNumericalInput) {
-            const valueTooLow = minValue && parseFloat(numericValue) < minValue;
-            const valueTooHigh = maxValue && parseFloat(numericValue) > maxValue;
+            const valueTooLow = minValue && parseFloat(value) < minValue;
+            const valueTooHigh = maxValue && parseFloat(value) > maxValue;
 
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
@@ -399,17 +336,6 @@ const Property = ({
             } else {
                 setHasError(false);
             }
-        } else {
-            const valueTooShort = minLength && inputValue.length < minLength;
-            const valueTooLong = maxLength && inputValue.length > maxLength;
-
-            setHasError(!!valueTooShort || !!valueTooLong);
-
-            setErrorMessage('Incorrect value');
-        }
-
-        if (isNumericalInput) {
-            const {value} = event.target;
 
             const onlyNumericValue = type === 'NUMBER' ? value.replace(/[^0-9.-]/g, '') : value.replace(/\D/g, '');
 
@@ -419,6 +345,13 @@ const Property = ({
 
             setNumericValue(onlyNumericValue);
         } else {
+            const valueTooShort = minLength && inputValue.length < minLength;
+            const valueTooLong = maxLength && inputValue.length > maxLength;
+
+            setHasError(!!valueTooShort || !!valueTooLong);
+
+            setErrorMessage('Incorrect value');
+
             setInputValue(event.target.value);
         }
 
@@ -448,7 +381,8 @@ const Property = ({
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
 
-                editorRef.current?.focus();
+                editorRef.current?.commands.setContent('');
+                editorRef.current?.commands.focus();
 
                 if (workflowNodeDetailsPanelOpen) {
                     setDataPillPanelOpen(true);
@@ -460,7 +394,7 @@ const Property = ({
             return;
         }
 
-        const parentParameterValue = resolvePath(currentComponent.parameters, path);
+        const parentParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -503,7 +437,13 @@ const Property = ({
 
         setPropertyParameterValue(value);
 
-        let actualValue: string | boolean | null = type === 'BOOLEAN' ? value === 'true' : value;
+        let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
+
+        if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+            actualValue = parseInt(value);
+        } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+            actualValue = parseFloat(value);
+        }
 
         if (value === 'null') {
             actualValue = null;
@@ -527,10 +467,6 @@ const Property = ({
             return;
         }
 
-        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
-            setMentionInput(true);
-        }
-
         if (propertyParameterValue) {
             setMentionInput(false);
 
@@ -542,6 +478,10 @@ const Property = ({
             ) {
                 setMentionInput(true);
             }
+        }
+
+        if (!formState && controlType !== 'SELECT' && controlType === 'FILE_ENTRY') {
+            setMentionInput(true);
         }
 
         if (controlType === 'SELECT' || controlType === 'JSON_SCHEMA_BUILDER' || controlType === 'OBJECT_BUILDER') {
@@ -586,18 +526,43 @@ const Property = ({
                 return;
             }
 
-            let formattedParameters = replaceSpacesInKeys(parameters);
+            const encodedParameters = encodeParameters(parameters);
+            const encodedPath = encodePath(path);
 
-            formattedParameters = formatKeysWithDigits(formattedParameters);
-
-            const paramValue = resolvePath(formattedParameters, path);
+            const paramValue = resolvePath(encodedParameters, encodedPath);
 
             if (paramValue !== undefined || paramValue !== null) {
                 setPropertyParameterValue(paramValue);
             } else {
-                setPropertyParameterValue(formattedParameters[name]);
+                setPropertyParameterValue(encodedParameters[name]);
             }
         }
+
+        // save hidden property to definition on render
+        if (
+            hidden &&
+            currentComponent &&
+            path &&
+            updateWorkflowNodeParameterMutation &&
+            resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
+        ) {
+            const saveDefaultValue = () => {
+                saveProperty({
+                    currentComponent,
+                    path,
+                    setCurrentComponent,
+                    type,
+                    updateWorkflowNodeParameterMutation,
+                    value: defaultValue,
+                    workflowId: workflow.id!,
+                });
+            };
+
+            const timeoutId = setTimeout(saveDefaultValue, 200);
+
+            return () => clearTimeout(timeoutId);
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -616,50 +581,7 @@ const Property = ({
         }
 
         if (mentionInput && propertyParameterValue) {
-            const mentionInputElement = editorRef.current?.getEditor().getModule('mention');
-
-            if (typeof propertyParameterValue === 'number') {
-                setMentionInputValue(propertyParameterValue.toString());
-            }
-
-            if (!mentionInputElement || typeof propertyParameterValue !== 'string') {
-                return;
-            }
-
-            const mentionValues: Array<string> = propertyParameterValue
-                .split(/(\$\{.*?\})/g)
-                .filter((value: string) => value !== '');
-
-            if (propertyParameterValue.includes('\n')) {
-                const valueLines = propertyParameterValue.split('\n');
-
-                const paragraphedLines = valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                setMentionInputValue(paragraphedLines.join(''));
-
-                return;
-            }
-
-            if (typeof propertyParameterValue === 'string' && propertyParameterValue.includes('${')) {
-                const mentionInputNodes = mentionValues.map((value) => {
-                    if (value.startsWith('${')) {
-                        const node = document.createElement('div');
-
-                        node.className = 'property-mention';
-
-                        node.dataset.value = value.replace(/\$\{|\}/g, '');
-                        node.dataset.componentIcon = getComponentIcon(value);
-
-                        return node.outerHTML;
-                    } else {
-                        return value;
-                    }
-                });
-
-                setMentionInputValue(mentionInputNodes.join(''));
-            } else {
-                setMentionInputValue(propertyParameterValue);
-            }
+            setMentionInputValue(propertyParameterValue);
         }
 
         if (!mentionInput && inputValue === '' && propertyParameterValue) {
@@ -699,6 +621,7 @@ const Property = ({
         ) {
             setNumericValue(propertyParameterValue);
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue, mentionInput]);
 
@@ -739,45 +662,43 @@ const Property = ({
             setShowInputTypeSwitchButton(false);
         }
 
-        if (controlType === 'JSON_SCHEMA_BUILDER') {
-            setShowInputTypeSwitchButton(true);
-        }
+        if (expressionEnabled) {
+            if (controlType === 'JSON_SCHEMA_BUILDER') {
+                setShowInputTypeSwitchButton(true);
+            }
 
-        if (controlType === 'SELECT') {
-            setShowInputTypeSwitchButton(true);
+            if (controlType === 'SELECT') {
+                setShowInputTypeSwitchButton(true);
+            }
         }
 
         if (controlType === 'NULL') {
             setShowInputTypeSwitchButton(false);
         }
-    }, [controlType]);
+    }, [controlType, expressionEnabled]);
 
-    // update propertyParameterValue when workflow definition changes
+    const memoizedWorkflowTask = useMemo(() => {
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+            (node) => node.name === currentNode?.name
+        );
+    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
+    // set propertyParameterValue on workflow definition change
     useEffect(() => {
-        if (
-            !workflow.definition ||
-            !currentNode?.name ||
-            !name ||
-            !path ||
-            !(showPropertyCodeEditorSheet || showPropertyJsonSchemaBuilder || showWorkflowCodeEditorSheet)
-        ) {
+        // debouncedSetPropertyParameterValue();
+
+        if (!workflow.definition || !currentNode?.name || !name || !path) {
             return;
         }
 
-        const workflowDefinition = JSON.parse(workflow.definition);
-
-        const currentWorkflowNode = [...workflowDefinition.triggers, ...workflowDefinition.tasks].find(
-            (node) => node.name === currentNode?.name
-        );
-
-        setPropertyParameterValue(resolvePath(currentWorkflowNode.parameters, path));
+        setPropertyParameterValue(resolvePath(memoizedWorkflowTask?.parameters, path));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
 
     // reset all values when currentNode.operationName changes
     useEffect(() => {
-        const parameterDefaultValue = property.defaultValue ?? '';
+        const parameterDefaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
 
         if (previousOperationName) {
             setPropertyParameterValue(parameterDefaultValue);
@@ -789,52 +710,7 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
 
-    // handle pasting mentions
-    useEffect(() => {
-        if (typeof mentionInputValue !== 'string' || !mentionInputValue.includes('${')) {
-            return;
-        }
-
-        const mentionValues: Array<string> = mentionInputValue
-            .split(/(\$\{.*?\})/g)
-            .filter((value: string) => value !== '');
-
-        const mentionInputNodes = mentionValues.map((value) => {
-            if (value.startsWith('${')) {
-                const node = document.createElement('div');
-
-                node.className = 'property-mention';
-
-                node.dataset.value = value.replace(/\$\{|\}/g, '');
-                node.dataset.componentIcon = getComponentIcon(value);
-
-                return node.outerHTML;
-            } else {
-                return value;
-            }
-        });
-
-        const pastingChange =
-            previousMentionInputValue &&
-            mentionValues.length > 1 &&
-            previousMentionInputValue.length !== mentionInputValue.length;
-
-        if (pastingChange) {
-            setTimeout(() => {
-                const selection = editorRef.current?.getEditor().getSelection();
-
-                if (selection) {
-                    editorRef.current?.getEditor().setSelection(selection.index + 1, 0);
-                }
-            }, 50);
-
-            setMentionInputValue(mentionInputNodes.join(''));
-
-            saveMentionInputValue();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [mentionInputValue]);
-
+    // handle NULL type property saving
     useEffect(() => {
         if (
             type === 'NULL' &&
@@ -843,37 +719,15 @@ const Property = ({
             path &&
             updateWorkflowNodeParameterMutation
         ) {
-            saveProperty({
-                currentComponent,
-                includeInMetadata: custom,
-                path,
-                setCurrentComponent,
-                type,
-                updateWorkflowNodeParameterMutation,
-                value: null,
-                workflowId: workflow.id!,
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [propertyParameterValue]);
-
-    // save hidden property to definition on render
-    useEffect(() => {
-        if (
-            hidden &&
-            currentComponent &&
-            path &&
-            updateWorkflowNodeParameterMutation &&
-            resolvePath(currentComponent.parameters, path) !== defaultValue
-        ) {
             const saveDefaultValue = () => {
                 saveProperty({
                     currentComponent,
+                    includeInMetadata: custom,
                     path,
                     setCurrentComponent,
                     type,
                     updateWorkflowNodeParameterMutation,
-                    value: defaultValue,
+                    value: null,
                     workflowId: workflow.id!,
                 });
             };
@@ -883,10 +737,40 @@ const Property = ({
             return () => clearTimeout(timeoutId);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [propertyParameterValue]);
+
+    useEffect(() => {
+        if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
+            setIsFetchingCurrentDisplayCondition(true);
+
+            if (isDisplayConditionFetched) {
+                setIsFetchingCurrentDisplayCondition(false);
+            }
+        }
+    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionFetched]);
 
     if (hidden) {
         return <></>;
+    }
+
+    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+        return <></>;
+    }
+
+    if (
+        displayCondition &&
+        currentComponent?.displayConditions?.[displayCondition] &&
+        isFetchingCurrentDisplayCondition &&
+        type !== 'ARRAY' &&
+        type !== 'OBJECT'
+    ) {
+        return (
+            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
+                <Skeleton className="h-5 w-1/4" />
+
+                <Skeleton className="h-9 w-full" />
+            </div>
+        );
     }
 
     return (
@@ -910,16 +794,12 @@ const Property = ({
                     label={label || name}
                     leadingIcon={typeIcon}
                     onChange={handleMentionsInputChange}
-                    onKeyPress={(event: KeyboardEvent) => {
-                        if (type !== 'STRING' && event.key !== '{') {
-                            event.preventDefault();
-                        }
-                    }}
+                    path={path}
                     placeholder={placeholder}
                     ref={editorRef}
                     required={required}
                     showInputTypeSwitchButton={showInputTypeSwitchButton}
-                    singleMention={type !== 'STRING'}
+                    type={type}
                     value={mentionInputValue}
                 />
             )}
@@ -988,7 +868,7 @@ const Property = ({
                         />
                     )}
 
-                    {controlType === 'OBJECT_BUILDER' && (
+                    {(controlType === 'OBJECT_BUILDER' || type === 'FILE_ENTRY') && (
                         <ObjectProperty
                             arrayIndex={arrayIndex}
                             arrayName={arrayName}
@@ -998,8 +878,6 @@ const Property = ({
                             property={property}
                         />
                     )}
-
-                    {type === 'FILE_ENTRY' && <ObjectProperty operationName={operationName} property={property} />}
 
                     {control && (isValidControlType || isNumericalInput) && path && (
                         <>
@@ -1044,6 +922,7 @@ const Property = ({
                                         setSelectValue(value);
                                     }}
                                     options={options as Array<SelectOptionType>}
+                                    required={required}
                                     value={selectValue}
                                 />
                             )}
@@ -1139,6 +1018,7 @@ const Property = ({
                             name={name}
                             onValueChange={(value) => handleSelectChange(value, name!)}
                             options={options as Array<SelectOptionType>}
+                            required={required}
                             value={selectValue}
                         />
                     )}
@@ -1160,6 +1040,7 @@ const Property = ({
                     {!control && controlType === 'SELECT' && type !== 'BOOLEAN' && (
                         <PropertyComboBox
                             arrayIndex={arrayIndex}
+                            defaultValue={defaultValue}
                             deletePropertyButton={deletePropertyButton}
                             description={description}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
@@ -1197,6 +1078,7 @@ const Property = ({
                                 {label: 'True', value: 'true'},
                                 {label: 'False', value: 'false'},
                             ]}
+                            required={required}
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             value={selectValue}
                         />
@@ -1223,8 +1105,11 @@ const Property = ({
 
             {type === 'DYNAMIC_PROPERTIES' && currentComponent && (
                 <PropertyDynamicProperties
-                    currentNodeConnectionId={currentNode?.connectionId}
                     currentOperationName={operationName}
+                    enabled={
+                        !!(currentNode?.connectionId && currentNode?.connections) ||
+                        currentNode?.connections?.length === 0
+                    }
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}

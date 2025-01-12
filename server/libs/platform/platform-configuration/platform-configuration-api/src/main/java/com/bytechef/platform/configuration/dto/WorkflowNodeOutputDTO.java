@@ -19,24 +19,24 @@ package com.bytechef.platform.configuration.dto;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 
 /**
  * @author Ivica Cardic
  */
 public record WorkflowNodeOutputDTO(
-    ActionDefinition actionDefinition, Property outputSchema, Object sampleOutput,
-    TaskDispatcherDefinition taskDispatcherDefinition, TriggerDefinition triggerDefinition, String workflowNodeName) {
+    String workflowNodeName, Property outputSchema, Object sampleOutput, TriggerDefinition triggerDefinition,
+    ActionDefinition actionDefinition,
+    TaskDispatcherDefinition taskDispatcherDefinition) {
 
     public WorkflowNodeOutputDTO(
-        ActionDefinition actionDefinition, OutputResponse outputResponse,
-        TaskDispatcherDefinition taskDispatcherDefinition, TriggerDefinition triggerDefinition,
-        String workflowNodeName) {
+        String workflowNodeName, OutputResponse outputResponse, TriggerDefinition triggerDefinition,
+        ActionDefinition actionDefinition, TaskDispatcherDefinition taskDispatcherDefinition) {
 
         this(
-            actionDefinition, outputResponse == null ? null : (Property) outputResponse.outputSchema(),
-            outputResponse == null ? null : outputResponse.sampleOutput(), taskDispatcherDefinition,
-            triggerDefinition, workflowNodeName);
+            workflowNodeName, outputResponse == null ? null : (Property) outputResponse.outputSchema(),
+            outputResponse == null ? null : outputResponse.sampleOutput(), triggerDefinition, actionDefinition,
+            taskDispatcherDefinition);
     }
 }

@@ -25,14 +25,18 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.platform.component.definition.WebhookResponse;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -67,8 +71,7 @@ public class JobTestExecutor {
         Job job = jobSyncExecutor.execute(jobParameters);
 
         return new JobDTO(
-            job,
-            job.getOutputs() == null ? null : taskFileStorage.readContextValue(job.getOutputs()),
+            job, getOutputs(job),
             CollectionUtils.map(
                 taskExecutionService.getJobTaskExecutions(Validate.notNull(job.getId(), "id")),
                 taskExecution -> {
@@ -105,6 +108,26 @@ public class JobTestExecutor {
             workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
         return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, ?> getOutputs(Job job) {
+        Map<String, ?> outputs = null;
+
+        if (job.getOutputs() != null) {
+            outputs = taskFileStorage.readJobOutputs(job.getOutputs());
+
+            if (outputs.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+                WebhookResponse webhookResponse = MapUtils.getRequired(
+                    outputs, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+
+                outputs = (Map<String, ?>) webhookResponse.getBody();
+            } else {
+                outputs = taskFileStorage.readContextValue(job.getOutputs());
+            }
+        }
+
+        return outputs;
     }
 
     record DefinitionResult(String title, String icon) {

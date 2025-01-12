@@ -47,12 +47,7 @@ public class WebhookValidateAndRespondTrigger {
                     "To trigger the workflow successfully, the security token must match the X-Csrf-Token HTTP " +
                         "header value passed by the client.")
                 .required(true))
-        .output(
-            sampleOutput(
-                Map.of(
-                    METHOD, "POST",
-                    HEADERS, Map.of("Header1", "value"),
-                    PARAMETERS, Map.of("parameter1", "value"))))
+        .output(sampleOutput(Map.of(METHOD, "POST", HEADERS, Map.of(), PARAMETERS, Map.of())))
         .webhookRequest(WebhookUtils::getWebhookResult)
-        .webhookValidate(WebhookUtils.getWebhookValidateFunction());
+        .webhookValidate(WebhookUtils::getWebhookValidate);
 }

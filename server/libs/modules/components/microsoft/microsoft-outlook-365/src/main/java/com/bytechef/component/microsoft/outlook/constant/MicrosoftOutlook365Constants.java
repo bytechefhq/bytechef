@@ -19,13 +19,16 @@ package com.bytechef.component.microsoft.outlook.constant;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365OptionUtils;
 
 /**
@@ -70,18 +73,27 @@ public class MicrosoftOutlook365Constants {
         .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
         .required(true);
 
-    public static final ModifiableStringProperty CONTENT_PROPERTY = string(CONTENT)
-        .label("Content")
+    public static final ModifiableStringProperty CONTENT_PROPERTY_HTML = string(CONTENT)
+        .label("HTML Content")
         .description("The content of the item.")
+        .controlType(Property.ControlType.RICH_TEXT)
+        .displayCondition("body.contentType == 2")
         .required(false);
 
-    public static final ModifiableStringProperty CONTENT_TYPE_PROPERTY = string(CONTENT_TYPE)
+    public static final ModifiableStringProperty CONTENT_PROPERTY_TEXT = string(CONTENT)
+        .label("Text Content")
+        .description("The content of the item.")
+        .controlType(Property.ControlType.TEXT_AREA)
+        .displayCondition("body.contentType == 1")
+        .required(false);
+
+    public static final ModifiableIntegerProperty CONTENT_TYPE_PROPERTY = integer(CONTENT_TYPE)
         .label("Content Type")
         .description("The type of the content.")
         .options(
-            option("Text", "text"),
-            option("Html", "html"))
-        .defaultValue("text")
+            option("Text", 1),
+            option("HTML", 2))
+        .defaultValue(1)
         .required(false);
 
     public static final ModifiableObjectProperty CUSTOM_EVENT_OUTPUT_PROPERTY = object()

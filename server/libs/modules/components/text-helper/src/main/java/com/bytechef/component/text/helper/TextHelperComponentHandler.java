@@ -25,6 +25,8 @@ import com.bytechef.component.text.helper.action.TextHelperBase64DecodeAction;
 import com.bytechef.component.text.helper.action.TextHelperConcatenateAction;
 import com.bytechef.component.text.helper.action.TextHelperExtractContentFromHtmlAction;
 import com.bytechef.component.text.helper.action.TextHelperFindAction;
+import com.bytechef.component.text.helper.action.TextHelperHTMLToMarkdownAction;
+import com.bytechef.component.text.helper.action.TextHelperMarkdownToHTMLAction;
 import com.bytechef.component.text.helper.action.TextHelperReplaceAction;
 import com.bytechef.component.text.helper.action.TextHelperSplitAction;
 import com.google.auto.service.AutoService;
@@ -45,6 +47,8 @@ public class TextHelperComponentHandler implements ComponentHandler {
             TextHelperConcatenateAction.ACTION_DEFINITION,
             TextHelperExtractContentFromHtmlAction.ACTION_DEFINITION,
             TextHelperFindAction.ACTION_DEFINITION,
+            TextHelperHTMLToMarkdownAction.ACTION_DEFINITION,
+            TextHelperMarkdownToHTMLAction.ACTION_DEFINITION,
             TextHelperReplaceAction.ACTION_DEFINITION,
             TextHelperSplitAction.ACTION_DEFINITION);
 

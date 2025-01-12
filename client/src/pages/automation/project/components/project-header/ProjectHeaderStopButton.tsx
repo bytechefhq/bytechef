@@ -1,16 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {SquareIcon} from 'lucide-react';
 
-const ProjectHeaderStopButton = () => (
-    <Button
-        className="hover:bg-background/70"
-        onClick={() => {
-            // TODO
-        }}
-        size="icon"
-        variant="ghost"
-    >
-        <SquareIcon className="h-5 text-destructive" />
+const ProjectHeaderStopButton = ({onStopClick}: {onStopClick: () => void}) => (
+    <Button className="hover:bg-background/70 [&_svg]:size-5" onClick={onStopClick} size="icon" variant="ghost">
+        <SquareIcon className="text-destructive" />
     </Button>
 );
 

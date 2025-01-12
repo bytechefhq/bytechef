@@ -29,5 +29,5 @@ public interface WorkflowNodeOutputFacade {
 
     List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(String workflowId, String lastWorkflowNodeName);
 
-    Map<String, ?> getWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName);
+    Map<String, ?> getPreviousWorkflowNodeSampleOutputs(String workflowId, String lastWorkflowNodeName);
 }

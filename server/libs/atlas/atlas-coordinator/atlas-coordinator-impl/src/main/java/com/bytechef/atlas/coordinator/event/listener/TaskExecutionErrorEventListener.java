@@ -29,7 +29,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +75,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
             // set task status to FAILED and persist
 
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setStatus(TaskExecution.Status.FAILED);
 
             taskExecution = taskExecutionService.update(taskExecution);
@@ -95,7 +95,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                 while (taskExecution.getParentId() != null) { // mark parent tasks as FAILED as well
                     taskExecution = taskExecutionService.getTaskExecution(taskExecution.getParentId());
 
-                    taskExecution.setEndDate(LocalDateTime.now());
+                    taskExecution.setEndDate(Instant.now());
                     taskExecution.setStatus(TaskExecution.Status.FAILED);
 
                     taskExecution = taskExecutionService.update(taskExecution);
@@ -106,7 +106,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
                 Validate.notNull(job, "No job found for task %s", taskExecution.getId());
 
                 job.setStatus(Job.Status.FAILED);
-                job.setEndDate(LocalDateTime.now());
+                job.setEndDate(Instant.now());
 
                 jobService.update(job);
 

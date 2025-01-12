@@ -23,7 +23,6 @@ import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.commons.util.XmlUtils;
-import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -38,6 +37,7 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.OperationDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
+import com.bytechef.platform.component.util.AuthorizationUtils;
 import com.bytechef.platform.component.util.RefreshCredentialsUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -196,7 +196,7 @@ class HttpClientExecutor {
         }
 
         if (!configuration.isDisableAuthorization() && (componentConnection != null) &&
-            Authorization.AuthorizationType.isApplicable(componentConnection.authorizationName())) {
+            AuthorizationUtils.isApplicable(componentConnection.authorizationName())) {
 
             applyAuthorization(headers, queryParameters, componentName, componentConnection, context);
 

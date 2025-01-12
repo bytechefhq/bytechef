@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.exception.AbstractException;
 
 /**
  * @author Ivica Cardic
  */
-public class InvalidPasswordException extends PlatformException {
+public class InvalidPasswordException extends AbstractException {
 
     public InvalidPasswordException() {
         super("Incorrect password", UserErrorType.INVALID_PASSWORD);

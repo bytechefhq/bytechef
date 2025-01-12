@@ -44,7 +44,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
         },
         ref
     ) => {
-        const {setShowPropertyJsonSchemaBuilder, showPropertyJsonSchemaBuilder} = useWorkflowEditorStore();
+        const {setShowPropertyCodeEditorSheet, showPropertyCodeEditorSheet} = useWorkflowEditorStore();
 
         return (
             <>
@@ -79,7 +79,7 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
 
                             <Button
                                 className="ml-10 flex-1 rounded-l-none"
-                                onClick={() => setShowPropertyJsonSchemaBuilder(true)}
+                                onClick={() => setShowPropertyCodeEditorSheet(true)}
                                 ref={ref}
                                 variant="outline"
                             >
@@ -101,11 +101,11 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                     )}
                 </fieldset>
 
-                {showPropertyJsonSchemaBuilder && (
+                {showPropertyCodeEditorSheet && (
                     <PropertyCodeEditorSheet
                         language={language}
                         onChange={onChange}
-                        onClose={() => setShowPropertyJsonSchemaBuilder(false)}
+                        onClose={() => setShowPropertyCodeEditorSheet(false)}
                         value={value || defaultValue}
                         workflow={workflow}
                         workflowNodeName={workflowNodeName}

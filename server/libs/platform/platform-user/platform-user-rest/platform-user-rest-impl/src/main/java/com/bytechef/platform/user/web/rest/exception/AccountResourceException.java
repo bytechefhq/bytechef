@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.user.web.rest.exception;
 
-import com.bytechef.platform.exception.AbstractException;
+import com.bytechef.exception.AbstractException;
 import org.springframework.http.HttpStatus;
 
 public class AccountResourceException extends AbstractException {

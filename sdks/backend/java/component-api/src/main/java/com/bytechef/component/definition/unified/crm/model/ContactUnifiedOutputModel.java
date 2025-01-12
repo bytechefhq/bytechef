@@ -21,7 +21,7 @@ import com.bytechef.component.definition.unified.crm.model.common.Address;
 import com.bytechef.component.definition.unified.crm.model.common.Email;
 import com.bytechef.component.definition.unified.crm.model.common.Phone;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -37,8 +37,8 @@ public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implemen
     private String id;
     private String remoteId;
     private Map<String, ?> remoteData;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
+    private OffsetDateTime createdDate;
+    private OffsetDateTime lastModifiedDate;
 
     private ContactUnifiedOutputModel() {
     }
@@ -46,7 +46,7 @@ public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implemen
     public ContactUnifiedOutputModel(
         String firstName, String lastName, String userId, List<Address> addresses, List<Email> emails,
         List<Phone> phoneNumbers, Map<String, ?> customFields, String id, String remoteId, Map<String, ?> remoteData,
-        LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
+        OffsetDateTime createdDate, OffsetDateTime lastModifiedDate) {
 
         super(firstName, lastName, userId, addresses, emails, phoneNumbers, customFields);
         this.id = id;
@@ -72,12 +72,12 @@ public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implemen
     }
 
     @Override
-    public LocalDateTime getCreatedDate() {
+    public OffsetDateTime getCreatedDate() {
         return createdDate;
     }
 
     @Override
-    public LocalDateTime getLastModifiedDate() {
+    public OffsetDateTime getLastModifiedDate() {
         return lastModifiedDate;
     }
 

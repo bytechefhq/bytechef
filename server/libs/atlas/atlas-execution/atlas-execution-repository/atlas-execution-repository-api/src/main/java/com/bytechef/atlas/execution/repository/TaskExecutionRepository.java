@@ -28,7 +28,7 @@ import java.util.Optional;
  */
 public interface TaskExecutionRepository {
 
-    void deleteById(Long id);
+    void deleteById(long id);
 
     /**
      * Returns the execution steps of the given job
@@ -36,7 +36,7 @@ public interface TaskExecutionRepository {
      * @param jobId
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobIdOrderByCreatedDate(Long jobId);
+    List<TaskExecution> findAllByJobIdOrderByCreatedDate(long jobId);
 
     /**
      * Returns the execution steps of the given job ordered by id in descending order
@@ -44,7 +44,7 @@ public interface TaskExecutionRepository {
      * @param jobId
      * @return List<TaskExecution>
      */
-    List<TaskExecution> findAllByJobIdOrderByIdDesc(Long jobId);
+    List<TaskExecution> findAllByJobIdOrderByIdDesc(long jobId);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which belong to the job of the given id.
@@ -52,7 +52,7 @@ public interface TaskExecutionRepository {
      * @param jobId
      * @return
      */
-    List<TaskExecution> findAllByJobIdOrderByTaskNumber(Long jobId);
+    List<TaskExecution> findAllByJobIdOrderByTaskNumber(long jobId);
 
     /**
      * Returns a collection of {@link TaskExecution} instances which are the children of the given parent id.
@@ -60,7 +60,7 @@ public interface TaskExecutionRepository {
      * @param parentId
      * @return
      */
-    List<TaskExecution> findAllByParentId(Long parentId);
+    List<TaskExecution> findAllByParentId(long parentId);
 
     /**
      * Find a single {@link TaskExecution} instance by its id.
@@ -71,6 +71,8 @@ public interface TaskExecutionRepository {
     Optional<TaskExecution> findById(long id);
 
     Optional<TaskExecution> findByIdForUpdate(long id);
+
+    Optional<TaskExecution> findLastByJobId(long jobId);
 
     /**
      * Creates a new persistent represenation of the given {@link TaskExecution}.

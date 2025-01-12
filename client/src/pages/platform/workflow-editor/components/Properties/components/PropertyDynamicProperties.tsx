@@ -9,7 +9,7 @@ import Property from '../Property';
 
 interface PropertyDynamicPropertiesProps {
     currentOperationName?: string;
-    currentNodeConnectionId?: number;
+    enabled: boolean;
     lookupDependsOnValues?: Array<string>;
     name?: string;
     path?: string;
@@ -18,8 +18,8 @@ interface PropertyDynamicPropertiesProps {
 }
 
 const PropertyDynamicProperties = ({
-    currentNodeConnectionId,
     currentOperationName,
+    enabled,
     lookupDependsOnValues,
     name,
     parameterValue,
@@ -43,7 +43,7 @@ const PropertyDynamicProperties = ({
             (lookupDependsOnValues
                 ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
                 : false) &&
-            !!currentNodeConnectionId
+            enabled
     );
 
     useEffect(() => {

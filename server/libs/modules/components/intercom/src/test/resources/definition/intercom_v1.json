@@ -63,8 +63,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : { },
       "clientId" : null,
       "pkce" : null,
@@ -74,7 +72,9 @@
       "tokenUrl" : { },
       "authorizationUrl" : { },
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -488,9 +488,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -812,9 +812,9 @@
       }
     } ],
     "title" : "Get Contact",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -933,7 +933,7 @@
       "exampleValue" : null,
       "label" : "Content",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "RICH_TEXT",
       "languageId" : null,
       "maxLength" : 360,
       "minLength" : null,
@@ -992,9 +992,9 @@
       }
     } ],
     "title" : "Send Message",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
   "triggers" : null,

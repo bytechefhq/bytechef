@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.domain;
 
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -57,7 +57,7 @@ public class IntegrationInstanceWorkflow {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -65,7 +65,7 @@ public class IntegrationInstanceWorkflow {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Version
     private int version;
@@ -102,7 +102,7 @@ public class IntegrationInstanceWorkflow {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -110,7 +110,7 @@ public class IntegrationInstanceWorkflow {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

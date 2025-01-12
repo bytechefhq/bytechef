@@ -17,7 +17,7 @@
 package com.bytechef.embedded.configuration.repository;
 
 import com.bytechef.embedded.configuration.domain.Integration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -129,7 +129,7 @@ public class CustomIntegrationRepositoryImpl implements CustomIntegrationReposit
         return integrations;
     }
 
-    private record IntegrationVersion(int version, int status, LocalDateTime publishedDate, String description) {
+    private record IntegrationVersion(int version, int status, Instant publishedDate, String description) {
     }
 
     private record IntegrationWorkflow(String workflow_id, int integration_version) {

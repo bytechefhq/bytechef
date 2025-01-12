@@ -22,6 +22,7 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
@@ -43,6 +44,7 @@ import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
@@ -64,12 +66,15 @@ const Project = () => {
     const {leftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
+    const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {currentWorkspaceId} = useWorkspaceStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
 
     const {projectId, projectWorkflowId} = useParams();
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
+
+    const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
     const rightSidebarNavigation: {
         name?: string;
@@ -89,6 +94,7 @@ const Project = () => {
             name: 'Components & Flow Controls',
             onClick: () => {
                 setWorkflowNodeDetailsPanelOpen(false);
+                setWorkflowTestChatPanelOpen(false);
 
                 setRightSidebarOpen(!rightSidebarOpen);
             },
@@ -108,7 +114,7 @@ const Project = () => {
             name: 'Workflow Code Editor',
             onClick: () => setShowWorkflowCodeEditorSheet(true),
         },
-    ];
+    ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true));
 
     const {
         data: componentDefinitions,
@@ -184,10 +190,6 @@ const Project = () => {
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
-            });
-
-            queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflows(parseInt(projectId!)),
             });
 
@@ -232,6 +234,7 @@ const Project = () => {
 
     useEffect(() => {
         setWorkflowNodeDetailsPanelOpen(false);
+        setWorkflowTestChatPanelOpen(false);
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -279,6 +282,10 @@ const Project = () => {
                     projectId && (
                         <ProjectHeader
                             bottomResizablePanelRef={bottomResizablePanelRef}
+                            chatTrigger={
+                                workflow.triggers &&
+                                workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
+                            }
                             projectId={parseInt(projectId)}
                             projectWorkflowId={parseInt(projectWorkflowId!)}
                             runDisabled={runDisabled}

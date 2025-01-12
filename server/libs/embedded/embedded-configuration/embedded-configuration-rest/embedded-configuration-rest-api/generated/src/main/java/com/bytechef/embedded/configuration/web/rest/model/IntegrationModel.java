@@ -8,7 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +29,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:58.475444+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class IntegrationModel {
 
   private Boolean allowMultipleInstances = false;
@@ -39,7 +39,7 @@ public class IntegrationModel {
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private String description;
 
@@ -50,10 +50,10 @@ public class IntegrationModel {
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastPublishedDate;
+  private OffsetDateTime lastPublishedDate;
 
   private IntegrationStatusModel lastStatus;
 
@@ -143,7 +143,7 @@ public class IntegrationModel {
     this.createdBy = createdBy;
   }
 
-  public IntegrationModel createdDate(LocalDateTime createdDate) {
+  public IntegrationModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -155,11 +155,11 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -243,7 +243,7 @@ public class IntegrationModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public IntegrationModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public IntegrationModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -255,15 +255,15 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public IntegrationModel lastPublishedDate(LocalDateTime lastPublishedDate) {
+  public IntegrationModel lastPublishedDate(OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
     return this;
   }
@@ -275,11 +275,11 @@ public class IntegrationModel {
   @Valid 
   @Schema(name = "lastPublishedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last published date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastPublishedDate")
-  public LocalDateTime getLastPublishedDate() {
+  public OffsetDateTime getLastPublishedDate() {
     return lastPublishedDate;
   }
 
-  public void setLastPublishedDate(LocalDateTime lastPublishedDate) {
+  public void setLastPublishedDate(OffsetDateTime lastPublishedDate) {
     this.lastPublishedDate = lastPublishedDate;
   }
 

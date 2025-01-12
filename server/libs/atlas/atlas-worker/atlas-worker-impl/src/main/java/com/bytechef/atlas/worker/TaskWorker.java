@@ -34,7 +34,7 @@ import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.event.MessageEvent;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -96,7 +96,9 @@ public class TaskWorker {
      * @param taskExecutionEvent The task event which contains task to execute.
      */
     public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
-        logger.debug("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
+        }
 
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
         CountDownLatch latch = new CountDownLatch(1);
@@ -110,8 +112,7 @@ public class TaskWorker {
 
                 TaskExecution completedTaskExecution = doExecuteTask(taskExecution);
 
-                eventPublisher.publishEvent(
-                    new TaskExecutionCompleteEvent(completedTaskExecution));
+                eventPublisher.publishEvent(new TaskExecutionCompleteEvent(completedTaskExecution));
             } catch (InterruptedException e) {
                 if (logger.isTraceEnabled()) {
                     logger.trace(e.getMessage(), e);
@@ -195,7 +196,7 @@ public class TaskWorker {
                         Validate.notNull(taskExecution.getId(), "id"), output));
             }
 
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
             taskExecution.setStatus(Status.COMPLETED);
@@ -225,7 +226,7 @@ public class TaskWorker {
 
             Object output = taskHandler.handle(taskExecution.clone());
 
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(System.currentTimeMillis() - startTime);
             taskExecution.setProgress(100);
             taskExecution.setStatus(Status.COMPLETED);

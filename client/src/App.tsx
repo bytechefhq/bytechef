@@ -1,7 +1,6 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import CopilotPanel from '@/pages/platform/copilot/CopilotPanel';
-import {CopilotRuntimeProvider} from '@/pages/platform/copilot/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
@@ -26,7 +25,7 @@ import {
     ZapIcon,
 } from 'lucide-react';
 import {useEffect, useState} from 'react';
-import {Outlet, useLocation, useNavigate} from 'react-router-dom';
+import {Outlet, useLocation, useNavigate, useSearchParams} from 'react-router-dom';
 
 const user = {
     email: 'emily.selman@example.com',
@@ -106,12 +105,13 @@ function App() {
         account,
         authenticated,
         getAccount,
+        loginError,
         reset: resetAuthentication,
         sessionHasBeenFetched,
         showLogin,
     } = useAuthenticationStore();
 
-    const {showCopilot} = useCopilotStore();
+    const {copilotPanelOpen} = useCopilotStore();
 
     const analytics = useAnalytics();
 
@@ -120,6 +120,9 @@ function App() {
     const location = useLocation();
 
     const navigate = useNavigate();
+
+    const [searchParams] = useSearchParams();
+    const key = searchParams.get('key');
 
     const queryClient = useQueryClient();
 
@@ -177,17 +180,24 @@ function App() {
     }, [getApplicationInfo]);
 
     useEffect(() => {
-        if (showLogin) {
+        if (showLogin && !key) {
             navigate('/login');
         }
-    }, [showLogin, navigate]);
+    }, [showLogin, navigate, key]);
 
     useEffect(() => {
-        if (sessionHasBeenFetched && !authenticated) {
+        if (sessionHasBeenFetched && !authenticated && !key && !loginError) {
             navigate('/login');
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [authenticated, sessionHasBeenFetched]);
+    }, [authenticated, sessionHasBeenFetched, key, navigate, loginError]);
+
+    useEffect(() => {
+        if (loginError) {
+            navigate('/account-error', {
+                state: {error: 'Failed to sign in, please check your credentials and try again.'},
+            });
+        }
+    }, [loginError, navigate]);
 
     useEffect(() => {
         if (!authenticated) {
@@ -230,11 +240,9 @@ function App() {
                 <div className="flex size-full">
                     <Outlet />
 
-                    {ai.enabled && showCopilot && (
+                    {ai.copilot.enabled && copilotPanelOpen && (
                         <aside className="border-l border-l-border/70">
-                            <CopilotRuntimeProvider>
-                                <CopilotPanel />
-                            </CopilotRuntimeProvider>
+                            <CopilotPanel />
                         </aside>
                     )}
                 </div>

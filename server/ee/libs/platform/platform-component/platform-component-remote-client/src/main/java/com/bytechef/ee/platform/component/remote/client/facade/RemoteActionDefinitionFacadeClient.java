@@ -16,7 +16,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,8 @@ public class RemoteActionDefinitionFacadeClient extends AbstractWorkerClient
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId) {
+        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        Long connectionId) {
 
         return defaultRestClient.post(
             uriBuilder -> toUri(uriBuilder, componentName, ACTION_DEFINITION_FACADE + "/execute-dynamic-properties"),

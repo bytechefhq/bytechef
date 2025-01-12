@@ -19,12 +19,12 @@ package com.bytechef.ee.automation.apiplatform.configuration.dto;
 import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record ApiCollectionEndpointDTO(
     long apiCollectionId,
-    String createdBy, LocalDateTime createdDate, boolean enabled, HttpMethod httpMethod, Long id, String lastModifiedBy,
-    LocalDateTime lastModifiedDate, String name, String path, long projectInstanceWorkflowId, int version,
+    String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id, String lastModifiedBy,
+    Instant lastModifiedDate, String name, String path, long projectInstanceWorkflowId, int version,
     String workflowReferenceCode) {
 
     public ApiCollectionEndpointDTO(

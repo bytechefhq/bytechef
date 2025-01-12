@@ -18,12 +18,10 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.createCustomResponse;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -31,6 +29,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import java.util.Map;
 
 /**
  * @author Vihar Shah
@@ -41,43 +40,35 @@ public class GoogleFormsGetResponseAction {
         .title("Get Response")
         .description("Get the response of a form.")
         .properties(
-            string(FORM)
-                .label("Form")
-                .description("Form to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
+            string(FORM_ID)
+                .label("Form ID")
+                .description("ID of the form whose response to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
                 .required(true),
-            string(RESPONSE)
-                .label("Response")
-                .description("Response to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseOptions)
-                .optionsLookupDependsOn(FORM)
+            string(RESPONSE_ID)
+                .label("Response ID")
+                .description("ID of the response to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getResponseIdOptions)
+                .optionsLookupDependsOn(FORM_ID)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("formId"),
-                        string("responseId"),
-                        string("createTime"),
-                        string("lastSubmittedTime"),
-                        string("respondentEmail"),
-                        object("answers"),
-                        number("totalScore"))))
+        .output()
         .perform(GoogleFormsGetResponseAction::perform);
 
     private GoogleFormsGetResponseAction() {
     }
 
-    protected static Object perform(
+    protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        String formId = inputParameters.getRequiredString(FORM);
-        String responseId = inputParameters.getRequiredString(RESPONSE);
+        String formId = inputParameters.getRequiredString(FORM_ID);
+        String responseId = inputParameters.getRequiredString(RESPONSE_ID);
 
-        return actionContext
+        Map<String, Object> response = actionContext
             .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + formId + "/responses/" + responseId))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        return createCustomResponse(actionContext, formId, response);
     }
 }

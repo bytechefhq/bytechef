@@ -8,6 +8,7 @@ import {useQuery} from '@tanstack/react-query';
 
 export const TaskDispatcherKeys = {
     taskDispatcherDefinition: (request: GetTaskDispatcherDefinitionRequest) => [
+        ...TaskDispatcherKeys.taskDispatcherDefinitions,
         request.taskDispatcherName,
         request.taskDispatcherVersion,
     ],

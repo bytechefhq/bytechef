@@ -81,24 +81,26 @@ public class TaskDispatcherJobTestExecutor {
 
         JobSyncExecutor jobSyncExecutor = new JobSyncExecutor(
             contextService, jobService, syncMessageBroker,
-            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService), List.of(), List.of(),
+            taskCompletionHandlerFactoriesFunction.apply(counterService, taskExecutionService),
+            List.of(), List.of(),
             taskDispatcherResolverFactoriesFunction.apply(
                 event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event),
                 contextService, counterService, taskExecutionService),
-            taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorage,
-            workflowService);
+            taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorage, workflowService);
 
         return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
     }
 
     @FunctionalInterface
     public interface TaskCompletionHandlerFactoriesFunction {
+
         List<TaskCompletionHandlerFactory> apply(
             CounterService counterService, TaskExecutionService taskExecutionService);
     }
 
     @FunctionalInterface
     public interface TaskDispatcherResolverFactoriesFunction {
+
         List<TaskDispatcherResolverFactory> apply(
             ApplicationEventPublisher eventPublisher, ContextService contextService,
             CounterService counterService, TaskExecutionService taskExecutionService);
@@ -106,6 +108,7 @@ public class TaskDispatcherJobTestExecutor {
 
     @FunctionalInterface
     public interface TaskHandlerMapSupplier {
+
         Map<String, TaskHandler<?>> get();
     }
 

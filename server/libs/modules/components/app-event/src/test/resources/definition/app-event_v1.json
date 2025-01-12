@@ -23,8 +23,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -43,28 +43,28 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : {
         "optionsLookupDependsOn" : null,
         "options" : { }
-      }
+      },
+      "controlType" : "SELECT"
     } ],
     "title" : "New Event",
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "dynamicWebhookRefresh" : null,
-    "processErrorResponse" : null,
-    "webhookValidateOnEnable" : null,
-    "workflowNodeDescription" : null,
-    "deduplicate" : null,
-    "poll" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
-    "webhookValidate" : null
+    "webhookValidate" : null,
+    "deduplicate" : null,
+    "poll" : null,
+    "dynamicWebhookRefresh" : null,
+    "processErrorResponse" : null,
+    "webhookValidateOnEnable" : null,
+    "workflowNodeDescription" : null
   } ],
   "unifiedApi" : null,
   "version" : 1,

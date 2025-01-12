@@ -18,8 +18,8 @@ package com.bytechef.platform.workflow.task.dispatcher.definition;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.definition.BaseProperty;
-import com.bytechef.platform.registry.util.SchemaUtils;
-import com.bytechef.platform.registry.util.SchemaUtils.SchemaPropertyFactory;
+import com.bytechef.platform.util.SchemaUtils;
+import com.bytechef.platform.util.SchemaUtils.SchemaPropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableArrayProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableObjectProperty;
 import com.bytechef.platform.workflow.task.dispatcher.definition.TaskDispatcherDsl.ModifiableProperty;

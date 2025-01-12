@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.platform.workflow.task.dispatcher.registry.remote.web.rest.service;
 
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.Valid;

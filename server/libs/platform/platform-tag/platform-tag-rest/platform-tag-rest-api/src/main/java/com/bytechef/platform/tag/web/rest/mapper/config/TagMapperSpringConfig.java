@@ -17,6 +17,7 @@
 package com.bytechef.platform.tag.web.rest.mapper.config;
 
 import com.bytechef.platform.tag.web.rest.adapter.TagConversionServiceAdapter;
+import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,7 +25,7 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    TagConversionServiceAdapter.class
+    DateTimeMapper.class, TagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.platform.tag.web.rest.adapter",

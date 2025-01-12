@@ -6,7 +6,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     apiPackage.set("com.bytechef.platform.workflow.test.web.rest")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
@@ -42,11 +41,6 @@ val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generat
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
     outputDir.set("$rootDir/client/src/shared/middleware/platform/workflow/test")
-    typeMappings.set(
-        mapOf(
-            "DateTime" to "Date"
-        )
-    )
 }
 
 tasks.register("generateOpenAPI") {
@@ -61,7 +55,6 @@ dependencies {
 
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.io.swagger.core.v3.swagger.annotations)
-    implementation(libs.org.openapitools.jackson.databind.nullable)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")
     implementation(libs.org.mapstruct)
@@ -71,6 +64,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
+    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
 

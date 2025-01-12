@@ -16,8 +16,10 @@
 
 package com.bytechef.file.storage.domain;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
@@ -27,6 +29,7 @@ import org.apache.commons.lang3.Validate;
  */
 public class FileEntry {
 
+    private static final String SPLITTER = "_;_";
     private static final char UNIX_NAME_SEPARATOR = '/';
     private static final char WINDOWS_NAME_SEPARATOR = '\\';
 
@@ -67,6 +70,19 @@ public class FileEntry {
         this.url = url;
     }
 
+    public static boolean isFileEntryMap(Map<?, ?> map) {
+        return map.containsKey("extension") && map.containsKey("mimeType") &&
+            map.containsKey("name") && map.containsKey("url");
+    }
+
+    public static FileEntry parse(String id) {
+        String decodedString = new String(EncodingUtils.base64Decode(id), StandardCharsets.UTF_8);
+
+        String[] parts = decodedString.split(SPLITTER);
+
+        return new FileEntry(parts[2], parts[0], parts[1], parts[3]);
+    }
+
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -102,10 +118,18 @@ public class FileEntry {
         return url;
     }
 
+    public String toId() {
+        String string = String.join(SPLITTER, extension, mimeType, name, url);
+
+        return EncodingUtils.base64EncodeToString(string.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     public String toString() {
         return "FileEntry{" +
-            "name='" + name + '\'' +
+            "extension='" + extension + '\'' +
+            ", mimeType='" + mimeType + '\'' +
+            ", name='" + name + '\'' +
             ", url='" + url + '\'' +
             '}';
     }

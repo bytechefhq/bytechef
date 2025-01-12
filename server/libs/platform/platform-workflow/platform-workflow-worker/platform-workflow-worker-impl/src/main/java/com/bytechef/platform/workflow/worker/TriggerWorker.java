@@ -33,7 +33,7 @@ import com.bytechef.platform.workflow.worker.executor.TriggerWorkerExecutor;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerResolver;
 import java.time.Duration;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
@@ -75,7 +75,9 @@ public class TriggerWorker {
     }
 
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
-        logger.debug("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
+        }
 
         TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
         CountDownLatch latch = new CountDownLatch(1);
@@ -167,7 +169,7 @@ public class TriggerWorker {
             }
         }
 
-        triggerExecution.setEndDate(LocalDateTime.now());
+        triggerExecution.setEndDate(Instant.now());
         triggerExecution.setExecutionTime(System.currentTimeMillis() - startTime);
         triggerExecution.setStatus(TriggerExecution.Status.COMPLETED);
 

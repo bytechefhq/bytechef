@@ -120,12 +120,10 @@ const ConnectionDialog = ({
         isLoading: connectionDefinitionLoading,
     } = useGetConnectionDefinitionQuery({
         componentName: (selectedComponentDefinition?.name as string) || (connection?.componentName as string),
-        componentVersion: 1,
     });
 
     const {data: connectionDefinitions} = useGetConnectionDefinitionsQuery({
         componentName: selectedComponentDefinition?.name as string,
-        componentVersion: 1,
     });
 
     const {
@@ -168,7 +166,9 @@ const ConnectionDialog = ({
         () =>
             connectionDefinition && connectionDefinition.authorizations
                 ? [
-                      ...(connectionDefinition.authorizationRequired === false ? [{label: 'None', value: 'none'}] : []),
+                      ...(connectionDefinition.authorizationRequired === false
+                          ? [{label: 'None', value: undefined}]
+                          : []),
                       ...connectionDefinition.authorizations.map((authorization) => ({
                           label: authorization?.title as string,
                           value: authorization.name as string,

@@ -12,18 +12,18 @@ tasks:
     - key: "c1"
       tasks:
       - name: "output"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: "hello"
     - key: "c2"
       tasks:
       - name: "output"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: "bye"
     default:
     - name: "output"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "other"
 - type: "time/sleep"

@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Counter;
 import com.bytechef.atlas.execution.repository.CounterRepository;
+import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Modifying;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -35,7 +36,7 @@ public interface JdbcCounterRepository
 
     @Override
     @Query("SELECT value FROM counter WHERE id = :id FOR UPDATE")
-    Long findValueByIdForUpdate(@Param("id") Long id);
+    Optional<Long> findValueByIdForUpdate(@Param("id") Long id);
 
     @Modifying
     @Query("UPDATE counter SET value = :value WHERE id = :id")

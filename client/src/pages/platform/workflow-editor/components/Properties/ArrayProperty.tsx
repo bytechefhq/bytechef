@@ -4,10 +4,11 @@ import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
-import isObject from 'isobject';
 import resolvePath from 'object-resolve-path';
 import {Fragment, useEffect, useState} from 'react';
 
+import {encodeParameters, encodePath} from '../../utils/encodingUtils';
+import getParameterItemType from '../../utils/getParameterItemType';
 import ArrayPropertyItem from './components/ArrayPropertyItem';
 import SubPropertyPopover from './components/SubPropertyPopover';
 
@@ -35,7 +36,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
     let items = property.items;
 
-    if (!items?.length && parentArrayItems?.[0].items?.length) {
+    if (!items?.length && parentArrayItems?.[0]?.items?.length) {
         items = parentArrayItems?.[0].items;
     }
 
@@ -76,7 +77,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             return;
         }
 
-        const clickedItemParameterValue = resolvePath(currentComponent.parameters, path);
+        const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
         if (clickedItemParameterValue !== undefined) {
             onDeleteClick(path);
@@ -93,7 +94,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
         const processItems = (items: Array<PropertyAllType>) =>
             items.reduce((types: Array<{label: string; value: string}>, item) => {
-                if (item.type) {
+                if (item && item.type) {
                     if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
                             label: item.label!,
@@ -149,7 +150,11 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             return;
         }
 
-        const parameterValue = resolvePath(currentComponent.parameters, path);
+        const encodedParameters = encodeParameters(currentComponent.parameters);
+
+        const encodedPath = encodePath(path);
+
+        const parameterValue = resolvePath(encodedParameters, encodedPath);
 
         if (parameterValue === undefined) {
             return;
@@ -218,12 +223,8 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
                 let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[subPropertyPath];
 
-                if (isObject(parameterItemValue) && !parameterItemType) {
-                    parameterItemType = 'OBJECT';
-                }
-
-                if (Array.isArray(parameterItemValue) && !parameterItemType) {
-                    parameterItemType = 'ARRAY';
+                if (!parameterItemType) {
+                    parameterItemType = getParameterItemType(parameterItemValue);
                 }
 
                 const controlType: ControlType =
@@ -255,8 +256,12 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                     const customSubProperties = Object.keys(parameterItemValue).map((key) => {
                         const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
-                        const subPropertyParameterItemType =
+                        let subPropertyParameterItemType =
                             currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${key}`];
+
+                        if (!subPropertyParameterItemType) {
+                            subPropertyParameterItemType = getParameterItemType(subPropertyParameterValue);
+                        }
 
                         return {
                             controlType: VALUE_PROPERTY_CONTROL_TYPES[
@@ -334,7 +339,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
-                    buttonLabel={property.placeholder ?? parentArrayItems?.[0].placeholder}
+                    buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
                     condition={currentComponent?.componentName === 'condition'}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}

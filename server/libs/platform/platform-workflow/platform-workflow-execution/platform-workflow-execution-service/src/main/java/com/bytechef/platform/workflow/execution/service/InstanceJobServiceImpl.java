@@ -21,7 +21,7 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.repository.InstanceJobRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -82,7 +82,7 @@ public class InstanceJobServiceImpl implements InstanceJobService {
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, ModeType type,
+        Status status, Instant startDate, Instant endDate, List<Long> instanceIds, ModeType type,
         List<String> workflowIds, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, InstanceJobRepository.DEFAULT_PAGE_SIZE);

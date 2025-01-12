@@ -19,8 +19,8 @@ package com.bytechef.platform.component.domain;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.definition.PropertyFactory;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +32,7 @@ import org.springframework.lang.Nullable;
 @SuppressFBWarnings("EI")
 public class TriggerDefinition extends TriggerDefinitionBasic {
 
+    private boolean outputFunctionDefined;
     private boolean outputDefined;
     private OutputResponse outputResponse;
     private List<? extends Property> properties;
@@ -52,6 +53,9 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
         this.outputDefined = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputDefinition(), outputDefinition -> true, false);
+        this.outputFunctionDefined = OptionalUtils.mapOrElse(
+            triggerDefinition.getOutputDefinition(),
+            outputDefinition -> OptionalUtils.mapOrElse(outputDefinition.getOutput(), output -> true, false), false);
         this.outputResponse = OptionalUtils.mapOrElse(
             triggerDefinition.getOutputDefinition(), TriggerDefinition::toOutputResponse, null);
         this.properties = CollectionUtils.map(
@@ -97,6 +101,10 @@ public class TriggerDefinition extends TriggerDefinitionBasic {
 
     public boolean isOutputDefined() {
         return outputDefined;
+    }
+
+    public boolean isOutputFunctionDefined() {
+        return outputFunctionDefined;
     }
 
     public boolean isWebhookRawBody() {

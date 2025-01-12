@@ -17,28 +17,19 @@
 package com.bytechef.embedded.configuration.exception;
 
 import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
-import com.bytechef.platform.exception.ErrorType;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum IntegrationInstanceConfigurationErrorType implements ErrorType {
+public class IntegrationInstanceConfigurationErrorType extends AbstractErrorType {
 
-    CREATE_INTEGRATION_INSTANCE_CONFIGURATION(100), REQUIRED_WORKFLOW_CONNECTIONS(101);
+    public static final IntegrationInstanceConfigurationErrorType CREATE_INTEGRATION_INSTANCE_CONFIGURATION =
+        new IntegrationInstanceConfigurationErrorType(100);
+    public static final IntegrationInstanceConfigurationErrorType REQUIRED_WORKFLOW_CONNECTIONS =
+        new IntegrationInstanceConfigurationErrorType(101);
 
-    private final int errorKey;
-
-    IntegrationInstanceConfigurationErrorType(int errorKey) {
-        this.errorKey = errorKey;
-    }
-
-    @Override
-    public Class<?> getErrorClass() {
-        return IntegrationInstanceConfiguration.class;
-    }
-
-    @Override
-    public int getErrorKey() {
-        return errorKey;
+    private IntegrationInstanceConfigurationErrorType(int errorKey) {
+        super(IntegrationInstanceConfiguration.class, errorKey);
     }
 }

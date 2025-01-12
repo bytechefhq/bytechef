@@ -79,9 +79,11 @@ const WorkflowNodesPopoverMenu = ({
             queryFn: () =>
                 new ComponentDefinitionApi().getComponentDefinition({
                     componentName: clickedItem.name,
+                    componentVersion: clickedItem.componentVersion || clickedItem.version,
                 }),
             queryKey: ComponentDefinitionKeys.componentDefinition({
                 componentName: clickedItem.name,
+                componentVersion: clickedItem.componentVersion || clickedItem.version,
             }),
         });
 

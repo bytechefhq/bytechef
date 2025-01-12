@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:59.239958+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:59.057170+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "component-definition", description = "The Platform Component Definition Internal API")
 public interface ComponentDefinitionApi {
@@ -44,11 +44,11 @@ public interface ComponentDefinitionApi {
     }
 
     /**
-     * GET /component-definitions/{componentName} : Get a component definition
+     * GET /component-definitions/{componentName}/versions/{componentVersion} : Get a component definition
      * Get a component definition.
      *
      * @param componentName The name of a component to get. (required)
-     * @param componentVersion The version of a component to get. If not set, teh latest version is returned. (optional)
+     * @param componentVersion The version of a component to get. (required)
      * @return Successful operation. (status code 200)
      */
     @Operation(
@@ -64,18 +64,18 @@ public interface ComponentDefinitionApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/component-definitions/{componentName}",
+        value = "/component-definitions/{componentName}/versions/{componentVersion}",
         produces = { "application/json" }
     )
     
     default ResponseEntity<ComponentDefinitionModel> getComponentDefinition(
         @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
-        @Parameter(name = "componentVersion", description = "The version of a component to get. If not set, teh latest version is returned.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "componentVersion", required = false) Integer componentVersion
+        @Parameter(name = "componentVersion", description = "The version of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"icon\" : \"icon\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"triggers\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" } ], \"version\" : 6, \"tags\" : [ \"tags\", \"tags\" ], \"dataStreamSupported\" : true, \"connectionRequired\" : true, \"name\" : \"name\", \"connection\" : { \"componentTitle\" : \"componentTitle\", \"componentDescription\" : \"componentDescription\", \"componentName\" : \"componentName\", \"version\" : 0 }, \"categories\" : [ { \"label\" : \"label\", \"key\" : \"key\" }, { \"label\" : \"label\", \"key\" : \"key\" } ], \"actions\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" } ], \"unifiedApiCategory\" : \"ACCOUNTING\" }";
+                    String exampleString = "{ \"icon\" : \"icon\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"triggers\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" } ], \"version\" : 0, \"tags\" : [ \"tags\", \"tags\" ], \"dataStreamSupported\" : true, \"connectionRequired\" : true, \"name\" : \"name\", \"connection\" : { \"componentTitle\" : \"componentTitle\", \"componentDescription\" : \"componentDescription\", \"componentName\" : \"componentName\", \"version\" : 0 }, \"categories\" : [ { \"label\" : \"label\", \"key\" : \"key\" }, { \"label\" : \"label\", \"key\" : \"key\" } ], \"actions\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" } ], \"unifiedApiCategory\" : \"ACCOUNTING\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -166,6 +166,49 @@ public interface ComponentDefinitionApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "[ { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 }, { \"icon\" : \"icon\", \"name\" : \"name\", \"actionsCount\" : 0, \"description\" : \"description\", \"title\" : \"title\", \"version\" : 1, \"triggersCount\" : 6 } ]";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    /**
+     * GET /component-definitions/{componentName}/connection-versions/{connectionVersion} : Get a connection component definition
+     * Get a connection component definition.
+     *
+     * @param componentName The name of a component to get. (required)
+     * @param connectionVersion The version of a component connection to get. (required)
+     * @return Successful operation. (status code 200)
+     */
+    @Operation(
+        operationId = "getConnectionComponentDefinition",
+        summary = "Get a connection component definition",
+        description = "Get a connection component definition.",
+        tags = { "component-definition" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = ComponentDefinitionModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.GET,
+        value = "/component-definitions/{componentName}/connection-versions/{connectionVersion}",
+        produces = { "application/json" }
+    )
+    
+    default ResponseEntity<ComponentDefinitionModel> getConnectionComponentDefinition(
+        @Parameter(name = "componentName", description = "The name of a component to get.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
+        @Parameter(name = "connectionVersion", description = "The version of a component connection to get.", required = true, in = ParameterIn.PATH) @PathVariable("connectionVersion") Integer connectionVersion
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"icon\" : \"icon\", \"description\" : \"description\", \"resources\" : { \"documentationUrl\" : \"documentationUrl\" }, \"title\" : \"title\", \"triggers\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\", \"type\" : \"STATIC_WEBHOOK\" } ], \"version\" : 0, \"tags\" : [ \"tags\", \"tags\" ], \"dataStreamSupported\" : true, \"connectionRequired\" : true, \"name\" : \"name\", \"connection\" : { \"componentTitle\" : \"componentTitle\", \"componentDescription\" : \"componentDescription\", \"componentName\" : \"componentName\", \"version\" : 0 }, \"categories\" : [ { \"label\" : \"label\", \"key\" : \"key\" }, { \"label\" : \"label\", \"key\" : \"key\" } ], \"actions\" : [ { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" }, { \"help\" : { \"body\" : \"body\", \"learnMoreUrl\" : \"learnMoreUrl\" }, \"name\" : \"name\", \"description\" : \"description\", \"title\" : \"title\" } ], \"unifiedApiCategory\" : \"ACCOUNTING\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

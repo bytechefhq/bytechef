@@ -19,6 +19,7 @@
 package com.bytechef.atlas.execution.repository;
 
 import com.bytechef.atlas.execution.domain.Context;
+import java.util.Optional;
 import org.springframework.data.repository.NoRepositoryBean;
 
 /**
@@ -33,11 +34,9 @@ import org.springframework.data.repository.NoRepositoryBean;
 @NoRepositoryBean
 public interface ContextRepository {
 
-    Iterable<Context> findAll();
+    Optional<Context> findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
 
-    Context findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(long stackId, int classnameId);
-
-    Context findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+    Optional<Context> findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
         long stackId, int subStackId, int classnameId);
 
     Context save(Context context);

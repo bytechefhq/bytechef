@@ -35,8 +35,9 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
+import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -130,15 +131,15 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
             subTaskExecution = taskExecutionService.create(subTaskExecution);
 
             contextService.push(
-                Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION,
+                Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION,
                 taskFileStorage.storeContextValue(
-                    Validate.notNull(taskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
+                    Validate.notNull(subTaskExecution.getId(), "id"), Classname.TASK_EXECUTION, context));
 
             taskDispatcher.dispatch(subTaskExecution);
         }
         // no more tasks to execute -- complete the branch
         else {
-            branchTaskExecution.setEndDate(LocalDateTime.now());
+            branchTaskExecution.setEndDate(Instant.now());
 
             taskCompletionHandler.handle(branchTaskExecution);
         }
@@ -146,18 +147,16 @@ public class BranchTaskCompletionHandler implements TaskCompletionHandler {
 
     private List<WorkflowTask> resolveCase(TaskExecution taskExecution) {
         Object expression = MapUtils.getRequired(taskExecution.getParameters(), EXPRESSION);
-        List<WorkflowTask> caseWorkflowTasks = MapUtils.getList(
-            taskExecution.getParameters(), CASES, WorkflowTask.class, Collections.emptyList());
+        List<Map<String, ?>> branchCases = MapUtils.getList(
+            taskExecution.getParameters(), CASES, new TypeReference<>() {}, Collections.emptyList());
 
-        Validate.notNull(caseWorkflowTasks, "you must specify 'cases' in a branch statement");
+        Validate.notNull(branchCases, "you must specify 'cases' in a branch statement");
 
-        for (WorkflowTask caseWorkflowTask : caseWorkflowTasks) {
-            Object key = MapUtils.getRequired(caseWorkflowTask.getParameters(), KEY);
-            List<WorkflowTask> subWorkflowTasks = MapUtils.getList(
-                caseWorkflowTask.getParameters(), TASKS, WorkflowTask.class, Collections.emptyList());
+        for (Map<String, ?> branchCase : branchCases) {
+            Object key = MapUtils.getRequired(branchCase, KEY);
 
             if (key.equals(expression)) {
-                return subWorkflowTasks;
+                return MapUtils.getList(branchCase, TASKS, WorkflowTask.class, Collections.emptyList());
             }
         }
 

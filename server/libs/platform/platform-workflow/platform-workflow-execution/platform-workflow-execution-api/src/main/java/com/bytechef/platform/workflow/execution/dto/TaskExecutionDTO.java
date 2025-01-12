@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.error.ExecutionError;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Map;
 
 /**
@@ -28,10 +28,10 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record TaskExecutionDTO(
-    String createdBy, LocalDateTime createdDate, LocalDateTime endDate, ExecutionError error, long executionTime,
-    String icon, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy, LocalDateTime lastModifiedDate,
+    String createdBy, Instant createdDate, Instant endDate, ExecutionError error, long executionTime,
+    String icon, Long id, Map<String, ?> input, Long jobId, String lastModifiedBy, Instant lastModifiedDate,
     int maxRetries, Object output, Long parentId, int priority, int progress, int retryAttempts, String retryDelay,
-    int retryDelayFactor, long retryDelayMillis, LocalDateTime startDate, TaskExecution.Status status, int taskNumber,
+    int retryDelayFactor, long retryDelayMillis, Instant startDate, TaskExecution.Status status, int taskNumber,
     String title, String type, WorkflowTask workflowTask) {
 
     public TaskExecutionDTO(

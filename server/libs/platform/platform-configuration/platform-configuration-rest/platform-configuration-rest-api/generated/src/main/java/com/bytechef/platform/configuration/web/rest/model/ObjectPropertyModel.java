@@ -17,7 +17,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -34,15 +36,17 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:59.239958+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:59.057170+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
   private List<@Valid PropertyModel> additionalProperties = new ArrayList<>();
 
-  private Object defaultValue;
+  @Valid
+  private Map<String, Object> defaultValue = new HashMap<>();
 
-  private Object exampleValue;
+  @Valid
+  private Map<String, Object> exampleValue = new HashMap<>();
 
   private Boolean multipleValues;
 
@@ -93,8 +97,16 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     this.additionalProperties = additionalProperties;
   }
 
-  public ObjectPropertyModel defaultValue(Object defaultValue) {
+  public ObjectPropertyModel defaultValue(Map<String, Object> defaultValue) {
     this.defaultValue = defaultValue;
+    return this;
+  }
+
+  public ObjectPropertyModel putDefaultValueItem(String key, Object defaultValueItem) {
+    if (this.defaultValue == null) {
+      this.defaultValue = new HashMap<>();
+    }
+    this.defaultValue.put(key, defaultValueItem);
     return this;
   }
 
@@ -105,16 +117,24 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "defaultValue", description = "The property default value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("defaultValue")
-  public Object getDefaultValue() {
+  public Map<String, Object> getDefaultValue() {
     return defaultValue;
   }
 
-  public void setDefaultValue(Object defaultValue) {
+  public void setDefaultValue(Map<String, Object> defaultValue) {
     this.defaultValue = defaultValue;
   }
 
-  public ObjectPropertyModel exampleValue(Object exampleValue) {
+  public ObjectPropertyModel exampleValue(Map<String, Object> exampleValue) {
     this.exampleValue = exampleValue;
+    return this;
+  }
+
+  public ObjectPropertyModel putExampleValueItem(String key, Object exampleValueItem) {
+    if (this.exampleValue == null) {
+      this.exampleValue = new HashMap<>();
+    }
+    this.exampleValue.put(key, exampleValueItem);
     return this;
   }
 
@@ -125,11 +145,11 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   
   @Schema(name = "exampleValue", description = "The property sample value.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("exampleValue")
-  public Object getExampleValue() {
+  public Map<String, Object> getExampleValue() {
     return exampleValue;
   }
 
-  public void setExampleValue(Object exampleValue) {
+  public void setExampleValue(Map<String, Object> exampleValue) {
     this.exampleValue = exampleValue;
   }
 

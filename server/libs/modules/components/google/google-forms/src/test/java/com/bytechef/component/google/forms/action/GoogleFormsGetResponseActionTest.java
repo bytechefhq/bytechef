@@ -16,32 +16,42 @@
 
 package com.bytechef.component.google.forms.action;
 
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.google.forms.util.GoogleFormsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.HashMap;
 import java.util.Map;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Vihar Shah
+ * @author Monika Kušter
  */
 class GoogleFormsGetResponseActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<String> formIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FORM, "formId", RESPONSE, "responseId"));
+        Map.of(FORM_ID, "formId", RESPONSE_ID, "responseId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Map> responseArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final Map<String, Object> map = new HashMap<>();
 
     @Test
     void testPerform() {
@@ -52,10 +62,21 @@ class GoogleFormsGetResponseActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(mockedObject);
+            .thenReturn(map);
 
-        Object result = GoogleFormsGetResponseAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+        try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class)) {
+            googleFormsUtilsMockedStatic
+                .when(() -> GoogleFormsUtils.createCustomResponse(contextArgumentCaptor.capture(),
+                    formIdArgumentCaptor.capture(), responseArgumentCaptor.capture()))
+                .thenReturn(map);
 
-        Assertions.assertEquals(mockedObject, result);
+            Map<String, Object> result =
+                GoogleFormsGetResponseAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+
+            assertEquals(map, result);
+            assertEquals("formId", formIdArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
+            assertEquals(map, responseArgumentCaptor.getValue());
+        }
     }
 }

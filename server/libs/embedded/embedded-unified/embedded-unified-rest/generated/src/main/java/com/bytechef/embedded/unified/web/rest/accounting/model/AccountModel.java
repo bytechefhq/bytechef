@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.187813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.815404+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class AccountModel {
 
   private JsonNullable<String> accountNumber = JsonNullable.<String>undefined();
@@ -61,10 +61,10 @@ public class AccountModel {
   private JsonNullable<Object> remoteData = JsonNullable.<Object>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> createdDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> createdDate = JsonNullable.<OffsetDateTime>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   public AccountModel accountNumber(String accountNumber) {
     this.accountNumber = JsonNullable.of(accountNumber);
@@ -354,7 +354,7 @@ public class AccountModel {
     this.remoteData = remoteData;
   }
 
-  public AccountModel createdDate(LocalDateTime createdDate) {
+  public AccountModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = JsonNullable.of(createdDate);
     return this;
   }
@@ -366,15 +366,15 @@ public class AccountModel {
   @Valid 
   @Schema(name = "createdDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public JsonNullable<LocalDateTime> getCreatedDate() {
+  public JsonNullable<OffsetDateTime> getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(JsonNullable<LocalDateTime> createdDate) {
+  public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
 
-  public AccountModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public AccountModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -386,11 +386,11 @@ public class AccountModel {
   @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

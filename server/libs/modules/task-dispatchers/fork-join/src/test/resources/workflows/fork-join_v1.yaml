@@ -6,18 +6,18 @@ tasks:
   parameters:
     branches:
     - - name: "var1"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: 50
       - name: "sumVar1"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: "${35 + var1}"
     - - name: "var2"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: 100
       - name: "sumVar2"
-        type: "var"
+        type: "var/v1/set"
         parameters:
           value: "${12 + var2}"

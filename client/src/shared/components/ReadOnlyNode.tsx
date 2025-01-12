@@ -7,7 +7,11 @@ import styles from '../styles/WorkflowNode.module.css';
 
 const ReadOnlyNode = ({data}: NodeProps) => (
     <div className="relative flex cursor-grab items-center justify-center">
-        <Button className="size-16 cursor-grab rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:bg-white">
+        <Button
+            className={twMerge(
+                'h-18 w-18 cursor-grab rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:bg-white [&_svg]:size-9'
+            )}
+        >
             {data.icon}
         </Button>
 

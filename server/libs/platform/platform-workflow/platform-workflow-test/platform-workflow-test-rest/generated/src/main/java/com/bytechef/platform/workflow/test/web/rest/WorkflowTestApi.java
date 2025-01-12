@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.workflow.test.web.rest;
 
+import com.bytechef.platform.workflow.test.web.rest.model.TestWorkflowRequestModel;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:00.738032+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.343766+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "workflow-test", description = "The Platform Workflow Test Internal API")
 public interface WorkflowTestApi {
@@ -46,6 +47,7 @@ public interface WorkflowTestApi {
      * Execute a workflow synchronously for testing purposes.
      *
      * @param id Id of the workflow to execute. (required)
+     * @param testWorkflowRequestModel  (optional)
      * @return The output expected by the workflow. (status code 200)
      */
     @Operation(
@@ -62,11 +64,13 @@ public interface WorkflowTestApi {
     @RequestMapping(
         method = RequestMethod.POST,
         value = "/workflows/{id}/tests",
-        produces = { "application/json" }
+        produces = { "application/json" },
+        consumes = { "application/json" }
     )
     
     default ResponseEntity<WorkflowTestExecutionModel> testWorkflow(
-        @Parameter(name = "id", description = "Id of the workflow to execute.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id
+        @Parameter(name = "id", description = "Id of the workflow to execute.", required = true, in = ParameterIn.PATH) @PathVariable("id") String id,
+        @Parameter(name = "TestWorkflowRequestModel", description = "") @Valid @RequestBody(required = false) TestWorkflowRequestModel testWorkflowRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

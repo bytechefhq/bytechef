@@ -29,6 +29,7 @@ import org.springframework.boot.jackson.JsonComponent;
  */
 @JsonComponent
 public class WorkflowNodeOutputModelJsonSerializer extends JsonSerializer<WorkflowNodeOutputModel> {
+
     @Override
     public void serialize(WorkflowNodeOutputModel value, JsonGenerator jsonGenerator, SerializerProvider serializers)
         throws IOException {

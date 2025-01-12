@@ -18,12 +18,17 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody.ContentType;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.definition.WebhookResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -34,29 +39,30 @@ import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorReg
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
+import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
+import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.lang.Nullable;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeType;
 import org.springframework.util.MultiValueMap;
@@ -73,6 +79,7 @@ public abstract class AbstractWebhookTriggerController {
 
     private final FilesFileStorage filesFileStorage;
     private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final String publicUrld;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowExecutor workflowExecutor;
     private final WorkflowService workflowService;
@@ -80,36 +87,48 @@ public abstract class AbstractWebhookTriggerController {
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     protected AbstractWebhookTriggerController(
-        FilesFileStorage filesFileStorage, InstanceAccessorRegistry instanceAccessorRegistry,
+        FilesFileStorage filesFileStorage, InstanceAccessorRegistry instanceAccessorRegistry, String publicUrld,
         TriggerDefinitionService triggerDefinitionService, WorkflowExecutor workflowExecutor,
         WorkflowService workflowService) {
 
         this.filesFileStorage = filesFileStorage;
         this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.publicUrld = publicUrld;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowExecutor = workflowExecutor;
         this.workflowService = workflowService;
     }
 
     protected ResponseEntity<Object> doProcessTrigger(
-        WorkflowExecutionId workflowExecutionId, HttpServletRequest httpServletRequest)
+        WorkflowExecutionId workflowExecutionId, @Nullable WebhookRequest webhookRequest,
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException, ServletException {
 
         ResponseEntity<Object> responseEntity;
         WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
 
-        WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+        if (webhookRequest == null) {
+            webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+        }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
-                "webhooks: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId, webhookRequest,
-                webhookTriggerFlags);
+        if (logger.isTraceEnabled()) {
+            logger.trace(
+                "doProcessTrigger: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId,
+                webhookRequest, webhookTriggerFlags);
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            responseEntity = ResponseEntity.ok(workflowExecutor.executeSync(workflowExecutionId, webhookRequest));
+            Object outputs = workflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+
+            if (outputs instanceof Map<?, ?> responseMap &&
+                responseMap.containsKey(WebhookConstants.WEBHOOK_RESPONSE)) {
+
+                responseEntity = processWebhookResponse(httpServletResponse, responseMap);
+            } else {
+                responseEntity = ResponseEntity.ok(outputs);
+            }
         } else if (webhookTriggerFlags.workflowSyncValidation()) {
-            responseEntity = doValidateAndExecuteAsync(workflowExecutionId, webhookRequest);
+            responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
             workflowExecutor.execute(workflowExecutionId, webhookRequest);
 
@@ -127,18 +146,19 @@ public abstract class AbstractWebhookTriggerController {
         WebhookBodyImpl body = null;
         String contentType = httpServletRequest.getContentType();
         Map<String, List<String>> headers = getHeaderMap(httpServletRequest);
-        Map<String, List<String>> parameters = toMap(httpServletRequest.getParameterMap());
+        Map<String, List<String>> parameters;
 
-        if (contentType != null) {
+        if (contentType == null) {
+            parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
+        } else {
             BodyAndParameters bodyAndParameters = getBodyAndParameters(
-                httpServletRequest, contentType, parameters, webhookTriggerFlags);
+                httpServletRequest, contentType, webhookTriggerFlags);
 
             body = bodyAndParameters.body;
             parameters = bodyAndParameters.parameters;
         }
 
-        return new WebhookRequest(
-            headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
+        return new WebhookRequest(headers, parameters, body, WebhookMethod.valueOf(httpServletRequest.getMethod()));
     }
 
     protected WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
@@ -149,72 +169,36 @@ public abstract class AbstractWebhookTriggerController {
             workflowNodeType.componentOperationName());
     }
 
-    protected boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId) {
+    protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
         InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.isWorkflowEnabled(
+        return !instanceAccessor.isWorkflowEnabled(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
-    private Object convertString(String str) {
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
+    private Object checkBody(Object body) {
+        if (body instanceof Map) {
+            walkThroughMap((Map<?, ?>) body);
+        } else if (body instanceof List) {
+            walkThroughList((List<?>) body);
         }
 
-        try {
-            return Double.parseDouble(str);
-        } catch (NumberFormatException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
-        }
-
-        if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
-            return Boolean.parseBoolean(str);
-        }
-
-        try {
-            return LocalDateTime.parse(str);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
-        }
-
-        try {
-            return LocalDate.parse(str);
-        } catch (DateTimeParseException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
-            }
-        }
-
-        return str;
+        return body;
     }
 
-    private ResponseEntity<Object> doValidateAndExecuteAsync(
-        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+    @SuppressWarnings("unchecked")
+    private String convertToFileEntryUrl(Map<?, ?> map) {
+        FileEntry fileEntry = new FileEntry((Map<String, ?>) map);
 
-        TriggerDefinition.WebhookValidateResponse response = workflowExecutor.validateAndExecuteAsync(
-            workflowExecutionId, webhookRequest);
-
-        return ResponseEntity.status(response.status())
-            .headers(
-                response.headers() == null
-                    ? null
-                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
-            .body(response.body());
+        return publicUrld + "/file-entries/%s/content".formatted(fileEntry.toId());
     }
 
     private BodyAndParameters getBodyAndParameters(
-        HttpServletRequest httpServletRequest, String contentType, Map<String, List<String>> parameters,
-        WebhookTriggerFlags webhookTriggerFlags) throws IOException, ServletException {
+        HttpServletRequest httpServletRequest, String contentType, WebhookTriggerFlags webhookTriggerFlags)
+        throws IOException, ServletException {
 
         WebhookBodyImpl body;
+        Map<String, List<String>> parameters;
 
         if (contentType.startsWith(MediaType.MULTIPART_FORM_DATA_VALUE)) {
             MultiValueMap<String, Object> multipartFormDataMap = new LinkedMultiValueMap<>();
@@ -235,10 +219,7 @@ public abstract class AbstractWebhookTriggerController {
 
             body = new WebhookBodyImpl(
                 multipartFormDataMap, ContentType.FORM_DATA, httpServletRequest.getContentType(), null);
-
-            UriComponents uriComponents = getUriComponents(httpServletRequest);
-
-            parameters = toMap(uriComponents.getQueryParams());
+            parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
         } else if (contentType.startsWith(MediaType.APPLICATION_FORM_URLENCODED_VALUE)) {
             Map<String, String[]> parameterMap = httpServletRequest.getParameterMap();
 
@@ -253,7 +234,7 @@ public abstract class AbstractWebhookTriggerController {
             body = new WebhookBodyImpl(
                 parseFormUrlencodedParams(parameterMap), ContentType.FORM_URL_ENCODED,
                 httpServletRequest.getContentType(), null);
-            parameters = toMap(queryParams);
+            parameters = new HashMap<>(queryParams);
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_JSON)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
                 Object content;
@@ -266,6 +247,7 @@ public abstract class AbstractWebhookTriggerController {
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.JSON, httpServletRequest.getContentType(), rawContent);
+                parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
             }
         } else if (contentType.startsWith(MimeTypeUtils.MIME_APPLICATION_XML)) {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
@@ -279,17 +261,20 @@ public abstract class AbstractWebhookTriggerController {
                 }
 
                 body = new WebhookBodyImpl(content, ContentType.XML, httpServletRequest.getContentType(), rawContent);
+                parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
             }
         } else if (contentType.startsWith("application/")) {
             body = new WebhookBodyImpl(
                 filesFileStorage.storeFileContent(
                     getFilename(httpServletRequest.getContentType()), httpServletRequest.getInputStream()),
                 ContentType.BINARY, httpServletRequest.getContentType(), null);
+            parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
         } else {
             try (InputStream inputStream = httpServletRequest.getInputStream()) {
                 String rawContent = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
 
                 body = new WebhookBodyImpl(rawContent, ContentType.RAW, httpServletRequest.getContentType(), null);
+                parameters = MapUtils.toMap(httpServletRequest.getParameterMap());
             }
         }
 
@@ -319,7 +304,7 @@ public abstract class AbstractWebhookTriggerController {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
 
-            headerMap.put(headerName, toList(httpServletRequest.getHeaders(headerName)));
+            headerMap.put(headerName, CollectionUtils.toList(httpServletRequest.getHeaders(headerName)));
         }
 
         return headerMap;
@@ -366,7 +351,7 @@ public abstract class AbstractWebhookTriggerController {
                     // If we're at the last key, add the value
 
                     List<Object> convertedValues = Arrays.stream(values)
-                        .map(string -> (string == null || string.isBlank()) ? null : convertString(string))
+                        .map(string -> (string == null || string.isBlank()) ? null : ConvertUtils.convertString(string))
                         .toList();
 
                     currentMap.put(
@@ -386,24 +371,97 @@ public abstract class AbstractWebhookTriggerController {
         return multiMap;
     }
 
-    private static List<String> toList(Enumeration<String> enumeration) {
-        List<String> list = new ArrayList<>();
+    private ResponseEntity<Object> processWebhookResponse(
+        HttpServletResponse httpServletResponse, Map<?, ?> responseMap) throws IOException {
 
-        while (enumeration.hasMoreElements()) {
-            list.add(enumeration.nextElement());
+        ResponseEntity<Object> responseEntity;
+
+        @SuppressWarnings("unchecked")
+        WebhookResponse webhookResponse = MapUtils.getRequired(
+            (Map<String, ?>) responseMap, WebhookConstants.WEBHOOK_RESPONSE, new TypeReference<>() {});
+
+        Map<String, String> headers = webhookResponse.getHeaders();
+
+        for (Map.Entry<String, String> entry : headers.entrySet()) {
+            httpServletResponse.addHeader(entry.getKey(), entry.getValue());
         }
 
-        return list;
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.status(webhookResponse.getStatusCode());
+
+        switch (webhookResponse.getType()) {
+            case BINARY:
+                @SuppressWarnings("unchecked")
+                FileEntry fileEntry = new FileEntry((Map<String, ?>) webhookResponse.getBody());
+
+                bodyBuilder.contentType(MediaType.asMediaType(MimeType.valueOf(fileEntry.getMimeType())));
+
+                responseEntity = bodyBuilder.body(new InputStreamResource(filesFileStorage.getFileStream(fileEntry)));
+
+                break;
+            case JSON:
+                bodyBuilder.contentType(MediaType.APPLICATION_JSON);
+
+                responseEntity = bodyBuilder.body(checkBody(webhookResponse.getBody()));
+
+                break;
+            case RAW:
+                bodyBuilder.contentType(MediaType.TEXT_PLAIN);
+
+                responseEntity = bodyBuilder.body(String.valueOf(webhookResponse.getBody()));
+
+                break;
+            case REDIRECT:
+                responseEntity = ResponseEntity.noContent()
+                    .build();
+
+                httpServletResponse.sendRedirect(String.valueOf(webhookResponse.getBody()));
+
+                break;
+            default:
+                responseEntity = bodyBuilder.build();
+        }
+        return responseEntity;
     }
 
-    private static Map<String, List<String>> toMap(Map<String, String[]> map) {
-        return map.entrySet()
-            .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, entry -> Arrays.asList(entry.getValue())));
+    private ResponseEntity<Object> validateAndExecuteAsync(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest) {
+
+        TriggerDefinition.WebhookValidateResponse response = workflowExecutor.validateAndExecuteAsync(
+            workflowExecutionId, webhookRequest);
+
+        return ResponseEntity.status(response.status())
+            .headers(
+                response.headers() == null
+                    ? null
+                    : HttpHeaders.readOnlyHttpHeaders(new MultiValueMapAdapter<>(response.headers())))
+            .body(response.body());
     }
 
-    private static Map<String, List<String>> toMap(MultiValueMap<String, String> multiValueMap) {
-        return new HashMap<>(multiValueMap);
+    @SuppressWarnings("unchecked")
+    private void walkThroughMap(Map<?, ?> map) {
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (entry.getValue() instanceof Map<?, ?> nestedMap) {
+                if (FileEntry.isFileEntryMap(nestedMap)) {
+                    String fileEntryUrl = convertToFileEntryUrl(nestedMap);
+
+                    ((Map<Object, Object>) map).put(entry.getKey(), fileEntryUrl);
+                }
+
+                walkThroughMap(nestedMap);
+            } else if (entry.getValue() instanceof List) {
+                walkThroughList((List<?>) entry.getValue());
+            }
+        }
+    }
+
+    private void walkThroughList(List<?> list) {
+        for (Object item : list) {
+            if (item instanceof Map) {
+                walkThroughMap((Map<?, ?>) item);
+            } else if (item instanceof List) {
+                walkThroughList((List<?>) item);
+            }
+        }
     }
 
     private record BodyAndParameters(WebhookBodyImpl body, Map<String, List<String>> parameters) {

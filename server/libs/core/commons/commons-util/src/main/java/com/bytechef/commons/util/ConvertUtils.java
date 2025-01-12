@@ -23,11 +23,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import java.lang.reflect.Type;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class ConvertUtils {
+
+    private static final Logger logger = LoggerFactory.getLogger(ConvertUtils.class);
 
     public static boolean canConvert(Object fromValue, Class<?> toValueType) {
         try {
@@ -63,5 +70,45 @@ public class ConvertUtils {
 
     public static <T> T convertValue(Object fromValue, TypeReference<T> toValueTypeRef) {
         return OBJECT_MAPPER.convertValue(fromValue, toValueTypeRef);
+    }
+
+    public static Object convertString(String str) {
+        try {
+            return Integer.parseInt(str);
+        } catch (NumberFormatException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
+        }
+
+        try {
+            return Double.parseDouble(str);
+        } catch (NumberFormatException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
+        }
+
+        if (str.equalsIgnoreCase("true") || str.equalsIgnoreCase("false")) {
+            return Boolean.parseBoolean(str);
+        }
+
+        try {
+            return LocalDateTime.parse(str);
+        } catch (DateTimeParseException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
+        }
+
+        try {
+            return LocalDate.parse(str);
+        } catch (DateTimeParseException e) {
+            if (logger.isTraceEnabled()) {
+                logger.trace(e.getMessage(), e);
+            }
+        }
+
+        return str;
     }
 }

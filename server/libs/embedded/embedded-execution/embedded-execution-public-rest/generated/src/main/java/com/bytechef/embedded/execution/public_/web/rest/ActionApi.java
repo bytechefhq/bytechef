@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.074921+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.706207+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "action", description = "The Embedded Component Action Public API")
 public interface ActionApi {
@@ -89,7 +89,7 @@ public interface ActionApi {
         @Parameter(name = "componentName", description = "The component name.", required = true, in = ParameterIn.PATH) @PathVariable("componentName") String componentName,
         @Parameter(name = "componentVersion", description = "The component version.", required = true, in = ParameterIn.PATH) @PathVariable("componentVersion") Integer componentVersion,
         @Parameter(name = "actionName", description = "The name of the action to call.", required = true, in = ParameterIn.PATH) @PathVariable("actionName") String actionName,
-        @Parameter(name = "x-environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "x-environment", required = false) EnvironmentModel xEnvironment,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) EnvironmentModel xEnvironment,
         @Parameter(name = "x-instance-id", description = "The integration instance Id that uniquely identifies the connected user's specific integration instance", in = ParameterIn.HEADER) @RequestHeader(value = "x-instance-id", required = false) Long xInstanceId,
         @Parameter(name = "ExecuteActionRequestModel", description = "") @Valid @RequestBody(required = false) ExecuteActionRequestModel executeActionRequestModel
     ) {

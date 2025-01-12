@@ -1,19 +1,23 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
-import {Textarea, TextareaProps} from '@/components/ui/textarea';
+import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-interface PropertyTextAreaProps extends TextareaProps {
+interface PropertyTextAreaProps {
+    className?: string;
     description?: string;
+    disabled?: boolean;
     error: boolean;
     errorMessage?: string;
     label?: string;
     leadingIcon?: ReactNode;
     name: string;
     onChange?: (event: ChangeEvent<HTMLTextAreaElement>) => void;
+    required?: boolean;
+    title?: string;
     value?: string;
 }
 

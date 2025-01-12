@@ -17,11 +17,12 @@
 package com.bytechef.platform.workflow.test.facade;
 
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecution;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowTestFacade {
 
-    WorkflowTestExecution testWorkflow(String workflowId);
+    WorkflowTestExecution testWorkflow(String workflowId, Map<String, Object> inputs);
 }

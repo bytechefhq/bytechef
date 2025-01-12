@@ -4,18 +4,18 @@ info:
   title: "The Embedded Public V1 API"
   version: "1"
 servers:
-- url: "/api/embedded/v1"
+  - url: "/api/embedded/v1"
 tags:
-- name: "connection"
-  description: "The Embedded Connection Public API"
-- name: "frontend-integration"
-  description: "The Embedded Frontend Integration Public API"
-- name: "integration"
-  description: "The Embedded Integration Public API"
-- name: "integration-instance"
-  description: "The Embedded Integration Instance Public API"
-- name: "workflow"
-  description: "The Embedded Workflow Public API"
+  - name: "connection"
+    description: "The Embedded Connection Public API"
+  - name: "frontend-integration"
+    description: "The Embedded Frontend Integration Public API"
+  - name: "integration"
+    description: "The Embedded Integration Public API"
+  - name: "integration-instance"
+    description: "The Embedded Integration Instance Public API"
+  - name: "workflow"
+    description: "The Embedded Workflow Public API"
 paths:
 #  /connections:
 #    get:
@@ -25,7 +25,7 @@ paths:
 #        - "connection"
 #      operationId: "getConnections"
 #      parameters:
-#        - name: "x-environment"
+#        - name: "X-Environment"
 #          description: "The environment."
 #          in: "header"
 #          required: false
@@ -48,7 +48,7 @@ paths:
         - "frontend-integration"
       operationId: "getFrontendIntegrations"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -75,7 +75,7 @@ paths:
         - "frontend-integration"
       operationId: "getFrontendIntegration"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -107,7 +107,7 @@ paths:
         - "integration"
       operationId: "getIntegrations"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -140,7 +140,7 @@ paths:
 #        - "integration-instance"
 #      operationId: "getIntegrationInstances"
 #      parameters:
-#        - name: "x-environment"
+#        - name: "X-Environment"
 #          description: "The environment."
 #          in: "header"
 #          required: false

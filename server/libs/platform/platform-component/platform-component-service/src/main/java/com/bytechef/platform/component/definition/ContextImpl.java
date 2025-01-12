@@ -17,15 +17,17 @@
 package com.bytechef.platform.component.definition;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
-import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.domain.ComponentConnection;
+import com.bytechef.platform.component.util.JsonSchemaUtils;
 import com.bytechef.platform.file.storage.FilesFileStorage;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.util.SchemaUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,7 @@ class ContextImpl implements Context {
     private final Http http;
     private final Json json;
     private final Logger logger;
+    private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final Xml xml;
 
@@ -65,6 +68,7 @@ class ContextImpl implements Context {
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
         this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
     }
@@ -100,6 +104,15 @@ class ContextImpl implements Context {
     public void logger(ContextConsumer<Logger> loggerConsumer) {
         try {
             loggerConsumer.accept(logger);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeContextFunction) {
+        try {
+            return mimeTypeContextFunction.apply(mimeType);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -614,9 +627,30 @@ class ContextImpl implements Context {
     private record OutputSchemaImpl() implements OutputSchema {
 
         @Override
-        public BaseProperty.BaseValueProperty<?> getOutputSchema(Object value) {
-            return (BaseProperty.BaseValueProperty<?>) SchemaUtils.getOutputSchema(
-                value, PropertyFactory.PROPERTY_FACTORY);
+        public ValueProperty<?> getOutputSchema(String jsonSchema) {
+            return JsonSchemaUtils.getProperty(jsonSchema);
+        }
+
+        @Override
+        public ValueProperty<?> getOutputSchema(String propertyName, String jsonSchema) {
+            return JsonSchemaUtils.getProperty(propertyName, jsonSchema);
+        }
+
+        @Override
+        public ValueProperty<?> getOutputSchema(Object value) {
+            return (ValueProperty<?>) SchemaUtils.getOutputSchema(value, PropertyFactory.PROPERTY_FACTORY);
+        }
+    }
+
+    private record MimeTypeImpl() implements MimeType {
+        @Override
+        public String lookupMimeType(String ext) {
+            return MimeTypeUtils.lookupMimeType(ext);
+        }
+
+        @Override
+        public String lookupExt(String mimeType) {
+            return MimeTypeUtils.lookupExt(mimeType);
         }
     }
 

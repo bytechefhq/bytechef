@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.web.rest.error;
 
-import com.bytechef.platform.exception.AbstractException;
+import com.bytechef.exception.AbstractException;
 import com.bytechef.platform.web.rest.error.constant.ErrorConstants;
 import java.net.URI;
 import java.util.List;

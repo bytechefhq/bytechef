@@ -30,7 +30,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.registry.domain.OutputResponse;
+import com.bytechef.platform.domain.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -66,21 +66,22 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
     @Override
     public List<Property> executeDynamicProperties(
         @NonNull String componentName, int componentVersion, @NonNull String actionName, @NonNull String propertyName,
-        Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths, Long connectionId) {
+        String workflowId, Map<String, ?> inputParameters, @NonNull List<String> lookupDependsOnPaths,
+        Long connectionId) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 
         ActionContext actionContext = contextFactory.createActionContext(
-            componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true);
+            componentName, componentVersion, actionName, null, null, null, workflowId, null, componentConnection, true);
 
         return tokenRefreshHelper.executeSingleConnectionFunction(
             componentName, componentVersion, componentConnection, actionContext,
             ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES,
-            (curComponentConnection, curActionContext) -> actionDefinitionService.executeDynamicProperties(
+            (componentConnection1, actionContext1) -> actionDefinitionService.executeDynamicProperties(
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
-                curComponentConnection, curActionContext),
+                componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true));
+                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
     }
 
     @Override
@@ -101,7 +102,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
                 componentName, componentVersion, actionName, propertyName, inputParameters, lookupDependsOnPaths,
                 searchText, componentConnection1, actionContext1),
             componentConnection1 -> contextFactory.createActionContext(
-                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection, true));
+                componentName, componentVersion, actionName, null, null, null, null, null, componentConnection1, true));
     }
 
     @Override
@@ -181,7 +182,7 @@ public class ActionDefinitionFacadeImpl implements ActionDefinitionFacade {
             componentConnection1 -> contextFactory.createActionContext(
                 componentName, componentVersion, actionName, actionContextAware.getType(),
                 actionContextAware.getInstanceId(), actionContextAware.getInstanceWorkflowId(),
-                actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection,
+                actionContextAware.getWorkflowId(), actionContextAware.getJobId(), componentConnection1,
                 actionContextAware.isDevEnvironment()));
     }
 

@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:20:01.205788+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.804935+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class TriggerExecutionModel {
 
   private Boolean batch;
@@ -35,10 +35,10 @@ public class TriggerExecutionModel {
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime endDate;
+  private OffsetDateTime endDate;
 
   private ExecutionErrorModel error;
 
@@ -54,7 +54,7 @@ public class TriggerExecutionModel {
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   private Integer maxRetries;
 
@@ -71,7 +71,7 @@ public class TriggerExecutionModel {
   private Long retryDelayMillis;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime startDate;
+  private OffsetDateTime startDate;
 
   /**
    * The current status of a task.
@@ -129,7 +129,7 @@ public class TriggerExecutionModel {
   /**
    * Constructor with only required parameters
    */
-  public TriggerExecutionModel(Integer priority, LocalDateTime startDate, StatusEnum status) {
+  public TriggerExecutionModel(Integer priority, OffsetDateTime startDate, StatusEnum status) {
     this.priority = priority;
     this.startDate = startDate;
     this.status = status;
@@ -175,7 +175,7 @@ public class TriggerExecutionModel {
     this.createdBy = createdBy;
   }
 
-  public TriggerExecutionModel createdDate(LocalDateTime createdDate) {
+  public TriggerExecutionModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -187,15 +187,15 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
-  public TriggerExecutionModel endDate(LocalDateTime endDate) {
+  public TriggerExecutionModel endDate(OffsetDateTime endDate) {
     this.endDate = endDate;
     return this;
   }
@@ -207,11 +207,11 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "endDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance ended (CANCELLED, FAILED, COMPLETED).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endDate")
-  public LocalDateTime getEndDate() {
+  public OffsetDateTime getEndDate() {
     return endDate;
   }
 
-  public void setEndDate(LocalDateTime endDate) {
+  public void setEndDate(OffsetDateTime endDate) {
     this.endDate = endDate;
   }
 
@@ -343,7 +343,7 @@ public class TriggerExecutionModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public TriggerExecutionModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public TriggerExecutionModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -355,11 +355,11 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 
@@ -503,7 +503,7 @@ public class TriggerExecutionModel {
     this.retryDelayMillis = retryDelayMillis;
   }
 
-  public TriggerExecutionModel startDate(LocalDateTime startDate) {
+  public TriggerExecutionModel startDate(OffsetDateTime startDate) {
     this.startDate = startDate;
     return this;
   }
@@ -515,11 +515,11 @@ public class TriggerExecutionModel {
   @Valid 
   @Schema(name = "startDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The time when a task instance was started.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("startDate")
-  public LocalDateTime getStartDate() {
+  public OffsetDateTime getStartDate() {
     return startDate;
   }
 
-  public void setStartDate(LocalDateTime startDate) {
+  public void setStartDate(OffsetDateTime startDate) {
     this.startDate = startDate;
   }
 

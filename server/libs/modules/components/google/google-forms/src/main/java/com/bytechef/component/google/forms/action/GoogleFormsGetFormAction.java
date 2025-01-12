@@ -18,18 +18,15 @@ package com.bytechef.component.google.forms.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
+import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getForm;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -40,40 +37,20 @@ public class GoogleFormsGetFormAction {
         .title("Get Form")
         .description("Get the information about a form.")
         .properties(
-            string(FORM)
-                .label("Form")
-                .description("Form to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormOptions)
+            string(FORM_ID)
+                .label("Form ID")
+                .description("ID of the form to retrieve.")
+                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("formId"),
-                        object("info")
-                            .properties(
-                                string("title"),
-                                string("documentTitle")),
-                        string("revisionId"),
-                        string("respondeUri"),
-                        array("items")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("itemdId"),
-                                        string("title"))))))
+        .output()
         .perform(GoogleFormsGetFormAction::perform);
 
     private GoogleFormsGetFormAction() {
     }
 
-    public static Object perform(
+    public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext
-            .http(http -> http.get("https://forms.googleapis.com/v1/forms/" + inputParameters.getRequiredString(FORM)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        return getForm(inputParameters.getRequiredString(FORM_ID), actionContext);
     }
 }

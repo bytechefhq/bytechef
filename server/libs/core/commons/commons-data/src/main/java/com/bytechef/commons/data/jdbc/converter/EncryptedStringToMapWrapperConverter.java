@@ -19,6 +19,7 @@ package com.bytechef.commons.data.jdbc.converter;
 import com.bytechef.commons.data.jdbc.wrapper.EncryptedMapWrapper;
 import com.bytechef.encryption.Encryption;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -43,9 +44,9 @@ public class EncryptedStringToMapWrapperConverter implements Converter<String, E
         return source == null ? null : new EncryptedMapWrapper(read(objectMapper, encryption.decrypt(source)));
     }
 
-    private Map read(ObjectMapper objectMapper, String json) {
+    private Map<String, Object> read(ObjectMapper objectMapper, String json) {
         try {
-            return objectMapper.readValue(json, Map.class);
+            return objectMapper.readValue(json, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

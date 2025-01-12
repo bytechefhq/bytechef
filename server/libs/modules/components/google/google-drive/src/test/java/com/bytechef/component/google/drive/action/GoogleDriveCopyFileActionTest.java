@@ -53,7 +53,8 @@ class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
         when(mockedCopy.execute())
             .thenReturn(testFile);
 
-        File copiedFile = GoogleDriveCopyFileAction.perform(mockInputParameters, mockInputParameters, mockedContext);
+        File copiedFile =
+            GoogleDriveCopyFileAction.perform(mockInputParameters, mockInputParameters, mockedActionContext);
 
         verify(mockedDrive.files()).get("originalFileId");
         verify(mockedFiles).copy("originalFileId", testFile);

@@ -71,7 +71,7 @@ public class ForkJoinTaskDispatcherIntTest {
                     (taskDispatcher) -> new ForkJoinTaskDispatcher(
                         messageBroker, contextService, counterService, taskDispatcher, taskExecutionService,
                         taskFileStorage)),
-            () -> Map.of("var", testVarTaskHandler));
+            () -> Map.of("var/v1/set", testVarTaskHandler));
 
         Assertions.assertEquals(85, testVarTaskHandler.get("sumVar1"));
         Assertions.assertEquals(112, testVarTaskHandler.get("sumVar2"));

@@ -44,6 +44,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.resend.util.ResendUtils;
@@ -99,11 +100,13 @@ public final class ResendSendEmailAction {
                 .label("HTML")
                 .description("The HTML version of the message.")
                 .displayCondition("%s == %s".formatted(CONTENT_TYPE, 1))
+                .controlType(Property.ControlType.RICH_TEXT)
                 .required(false),
             string(TEXT)
                 .label("Text")
                 .description("The plain text version of the message.")
                 .displayCondition("%s == %s".formatted(CONTENT_TYPE, 2))
+                .controlType(ControlType.TEXT_AREA)
                 .required(false),
             object(HEADERS)
                 .label("Headers")

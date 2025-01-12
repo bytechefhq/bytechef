@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.coordinator.event;
 
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.workflow.coordinator.message.route.TriggerCoordinatorMessageRoute;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public abstract class AbstractEvent implements MessageEvent<TriggerCoordinatorMessageRoute> {
 
-    protected LocalDateTime createDate;
+    protected Instant createDate;
     protected Map<String, Object> metadata = new HashMap<>();
     protected TriggerCoordinatorMessageRoute route;
 
@@ -36,12 +36,12 @@ public abstract class AbstractEvent implements MessageEvent<TriggerCoordinatorMe
     }
 
     public AbstractEvent(TriggerCoordinatorMessageRoute route) {
-        this.createDate = LocalDateTime.now();
+        this.createDate = Instant.now();
         this.route = route;
     }
 
     @Override
-    public LocalDateTime getCreateDate() {
+    public Instant getCreateDate() {
         return createDate;
     }
 

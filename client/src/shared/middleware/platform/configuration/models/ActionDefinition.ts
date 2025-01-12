@@ -71,6 +71,12 @@ export interface ActionDefinition {
      */
     outputDefined: boolean;
     /**
+     * Does action define output function.
+     * @type {boolean}
+     * @memberof ActionDefinition
+     */
+    outputFunctionDefined?: boolean;
+    /**
      * The list of action properties.
      * @type {Array<Property>}
      * @memberof ActionDefinition
@@ -115,6 +121,7 @@ export function ActionDefinitionFromJSONTyped(json: any, ignoreDiscriminator: bo
         'help': json['help'] == null ? undefined : HelpFromJSON(json['help']),
         'name': json['name'],
         'outputDefined': json['outputDefined'],
+        'outputFunctionDefined': json['outputFunctionDefined'] == null ? undefined : json['outputFunctionDefined'],
         'properties': json['properties'] == null ? undefined : ((json['properties'] as Array<any>).map(PropertyFromJSON)),
         'title': json['title'] == null ? undefined : json['title'],
         'workflowNodeDescriptionDefined': json['workflowNodeDescriptionDefined'] == null ? undefined : json['workflowNodeDescriptionDefined'],
@@ -138,6 +145,7 @@ export function ActionDefinitionToJSONTyped(value?: ActionDefinition | null, ign
         'help': HelpToJSON(value['help']),
         'name': value['name'],
         'outputDefined': value['outputDefined'],
+        'outputFunctionDefined': value['outputFunctionDefined'],
         'properties': value['properties'] == null ? undefined : ((value['properties'] as Array<any>).map(PropertyToJSON)),
         'title': value['title'],
         'workflowNodeDescriptionDefined': value['workflowNodeDescriptionDefined'],

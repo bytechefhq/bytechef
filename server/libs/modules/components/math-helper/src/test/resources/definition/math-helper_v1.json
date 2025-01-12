@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "Math Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -559,7 +560,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

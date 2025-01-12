@@ -172,6 +172,6 @@ public class ConditionTaskDispatcherIntTest {
     }
 
     private Map<String, TaskHandler<?>> getTaskHandlerMap() {
-        return Map.of("var", testVarTaskHandler);
+        return Map.of("var/v1/set", testVarTaskHandler);
     }
 }

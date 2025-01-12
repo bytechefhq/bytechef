@@ -13,7 +13,7 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.domain.InstanceJob;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -81,7 +81,7 @@ public class RemoteInstanceJobServiceClient implements InstanceJobService {
 
     @Override
     public Page<Long> getJobIds(
-        Status status, LocalDateTime startDate, LocalDateTime endDate, List<Long> instanceIds, ModeType type,
+        Status status, Instant startDate, Instant endDate, List<Long> instanceIds, ModeType type,
         List<String> workflowIds, int pageNumber) {
 
         throw new UnsupportedOperationException();

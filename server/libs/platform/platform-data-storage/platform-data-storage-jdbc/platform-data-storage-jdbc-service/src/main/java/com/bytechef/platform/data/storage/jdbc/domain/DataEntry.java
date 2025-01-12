@@ -19,7 +19,7 @@ package com.bytechef.platform.data.storage.jdbc.domain;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.domain.ValueWrapper;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.annotation.CreatedBy;
@@ -46,7 +46,7 @@ public class DataEntry {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Id
     private Long id;
@@ -60,7 +60,7 @@ public class DataEntry {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column
     private int scope;
@@ -99,7 +99,7 @@ public class DataEntry {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -115,7 +115,7 @@ public class DataEntry {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

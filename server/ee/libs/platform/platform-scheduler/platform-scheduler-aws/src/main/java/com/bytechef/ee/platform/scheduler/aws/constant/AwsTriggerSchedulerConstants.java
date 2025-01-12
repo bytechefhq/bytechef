@@ -15,7 +15,7 @@ package com.bytechef.ee.platform.scheduler.aws.constant;
 public class AwsTriggerSchedulerConstants {
 
     public static final String DYNAMIC_WEBHOOK_TRIGGER_REFRESH = "DynamicWebhookTriggerRefresh";
-    public static final String SPLITTER_PATTERN = "\\|_\\$plitter_\\|";
+    public static final String SPLITTER = "_;_";
     public static final String SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE =
         "scheduler-dynamic_webhook_trigger_refresh_queue";
     public static final String SCHEDULER_POLLING_TRIGGER_QUEUE = "scheduler-polling_trigger_queue";

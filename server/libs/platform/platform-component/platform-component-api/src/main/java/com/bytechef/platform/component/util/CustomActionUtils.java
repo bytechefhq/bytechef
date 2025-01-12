@@ -28,6 +28,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
+import static com.bytechef.component.definition.Context.Http;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
@@ -36,10 +37,10 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.RequestMethod;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.Parameters;
@@ -79,13 +80,13 @@ public class CustomActionUtils {
                     .label("Method")
                     .description("The http method.")
                     .options(
-                        option(Http.RequestMethod.DELETE.name(), Http.RequestMethod.DELETE.name()),
-                        option(Http.RequestMethod.GET.name(), Http.RequestMethod.GET.name()),
-                        option(Http.RequestMethod.PATCH.name(), Http.RequestMethod.PATCH.name()),
-                        option(Http.RequestMethod.POST.name(), Http.RequestMethod.POST.name()),
-                        option(Http.RequestMethod.PUT.name(), Http.RequestMethod.PUT.name()))
+                        option(RequestMethod.DELETE.name(), RequestMethod.DELETE.name()),
+                        option(RequestMethod.GET.name(), RequestMethod.GET.name()),
+                        option(RequestMethod.PATCH.name(), RequestMethod.PATCH.name()),
+                        option(RequestMethod.POST.name(), RequestMethod.POST.name()),
+                        option(RequestMethod.PUT.name(), RequestMethod.PUT.name()))
                     .required(true)
-                    .defaultValue(Http.RequestMethod.GET.name()),
+                    .defaultValue(RequestMethod.GET.name()),
 
                 //
                 // Header parameters properties
@@ -122,22 +123,22 @@ public class CustomActionUtils {
                     .description("Content-Type to use when sending body parameters.")
                     .displayCondition(
                         "{'%s','%s','%s'}.contains(%s)".formatted(
-                            Http.RequestMethod.PATCH.name(), Http.RequestMethod.POST.name(),
-                            Http.RequestMethod.PUT.name(), METHOD))
+                            RequestMethod.PATCH.name(), RequestMethod.POST.name(),
+                            RequestMethod.PUT.name(), METHOD))
                     .options(
                         option("None", ""),
-                        option("JSON", Http.BodyContentType.JSON.name()),
+                        option("JSON", BodyContentType.JSON.name()),
                         option("XML", BodyContentType.XML.name()),
-                        option("Form-Data", Http.BodyContentType.FORM_DATA.name()),
-                        option("Form-Urlencoded", Http.BodyContentType.FORM_URL_ENCODED.name()),
-                        option("Raw", Http.BodyContentType.RAW.name()),
-                        option("Binary", Http.BodyContentType.BINARY.name()))
+                        option("Form-Data", BodyContentType.FORM_DATA.name()),
+                        option("Form-Urlencoded", BodyContentType.FORM_URL_ENCODED.name()),
+                        option("Raw", BodyContentType.RAW.name()),
+                        option("Binary", BodyContentType.BINARY.name()))
                     .defaultValue(""),
 
                 object(BODY_CONTENT)
                     .label("Body Content - JSON")
                     .description("Body Parameters to send.")
-                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.JSON.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
                     .additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
                         time())
@@ -145,7 +146,7 @@ public class CustomActionUtils {
                 object(BODY_CONTENT)
                     .label("Body Content - XML")
                     .description("XML content to send.")
-                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.XML.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
                     .additionalProperties(
                         array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(),
                         time())
@@ -153,20 +154,20 @@ public class CustomActionUtils {
                 object(BODY_CONTENT)
                     .label("Body Content - Form Data")
                     .description("Body parameters to send.")
-                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_DATA.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
                     .placeholder("Add Parameter")
                     .additionalProperties(string(), fileEntry()),
                 object(BODY_CONTENT)
                     .label("Body Content - Form URL-Encoded")
                     .description("Body parameters to send.")
                     .displayCondition(
-                        "%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.FORM_URL_ENCODED.name()))
+                        "%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
                     .placeholder("Add Parameter")
                     .additionalProperties(string()),
                 string(BODY_CONTENT)
                     .label("Body Content - Raw")
                     .description("The raw text to send.")
-                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, Http.BodyContentType.RAW.name()))
+                    .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
                     .controlType(Property.ControlType.TEXT_AREA),
 
                 string(BODY_CONTENT_MIME_TYPE)
@@ -174,8 +175,8 @@ public class CustomActionUtils {
                     .description("Mime-Type to use when sending raw body content.")
                     .displayCondition(
                         "'%s' == %s or '%s' == %s".formatted(
-                            Http.BodyContentType.BINARY.name(), BODY_CONTENT_TYPE,
-                            Http.BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
+                            BodyContentType.BINARY.name(), BODY_CONTENT_TYPE,
+                            BodyContentType.RAW.name(), BODY_CONTENT_TYPE))
                     .defaultValue("text/plain")
                     .placeholder("text/plain"),
 
@@ -185,21 +186,21 @@ public class CustomActionUtils {
                     .options(
                         option(
                             "JSON",
-                            Http.ResponseType.JSON.name(),
+                            ResponseType.JSON.name(),
                             "The response is automatically converted to object/array."),
                         option(
                             "XML",
-                            Http.ResponseType.XML.name(),
+                            ResponseType.XML.name(),
                             "The response is automatically converted to object/array."),
-                        option("Text", Http.ResponseType.TEXT.name(), "The response is returned as a text."),
+                        option("Text", ResponseType.TEXT.name(), "The response is returned as a text."),
                         option(
-                            "File", Http.ResponseType.BINARY.name(),
+                            "File", ResponseType.BINARY.name(),
                             "The response is returned as a file object."))
-                    .defaultValue(Http.ResponseType.JSON.name()),
+                    .defaultValue(ResponseType.JSON.name()),
                 string(RESPONSE_FILENAME)
                     .label("Response Filename")
                     .description("The name of the file if the response is returned as a file object.")
-                    .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, Http.ResponseType.BINARY.name())))
+                    .displayCondition("%s == '%s'".formatted(RESPONSE_FORMAT, ResponseType.BINARY.name())))
             .output()
             .perform(CustomActionUtils::perform);
 
@@ -223,7 +224,7 @@ public class CustomActionUtils {
                 MapUtils.getRequiredString(inputParameters, PATH),
                 MapUtils.getRequired(inputParameters, METHOD, RequestMethod.class)))
             .configuration(
-                Http.responseType(Http.ResponseType.JSON)
+                Http.responseType(ResponseType.JSON)
                     .responseType(getResponseType(inputParameters))
                     .filename(inputParameters.getString(RESPONSE_FILENAME)))
             .headers(MapUtils.toMap(headers, Map.Entry::getKey, entry -> List.of((String) entry.getValue())))
@@ -237,20 +238,20 @@ public class CustomActionUtils {
         Body body = null;
 
         if (bodyContentType != null) {
-            if (bodyContentType == Http.BodyContentType.BINARY) {
-                body = Http.Body.of(
+            if (bodyContentType == BodyContentType.BINARY) {
+                body = Body.of(
                     MapUtils.getRequired(inputParameters, BODY_CONTENT, FileEntry.class),
                     MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE));
-            } else if (bodyContentType == Http.BodyContentType.FORM_DATA) {
-                body = Http.Body.of(
+            } else if (bodyContentType == BodyContentType.FORM_DATA) {
+                body = Body.of(
                     MapUtils.getMap(inputParameters, BODY_CONTENT, List.of(FileEntry.class), Map.of()),
                     bodyContentType);
-            } else if (bodyContentType == Http.BodyContentType.FORM_URL_ENCODED) {
-                body = Http.Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
-            } else if (bodyContentType == Http.BodyContentType.JSON || bodyContentType == Http.BodyContentType.XML) {
-                body = Http.Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
-            } else if (bodyContentType == Http.BodyContentType.RAW) {
-                body = Http.Body.of(
+            } else if (bodyContentType == BodyContentType.FORM_URL_ENCODED) {
+                body = Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.JSON || bodyContentType == BodyContentType.XML) {
+                body = Body.of(MapUtils.getMap(inputParameters, BODY_CONTENT, Map.of()), bodyContentType);
+            } else if (bodyContentType == BodyContentType.RAW) {
+                body = Body.of(
                     MapUtils.getString(inputParameters, BODY_CONTENT),
                     MapUtils.getString(inputParameters, BODY_CONTENT_MIME_TYPE, "text/plain"));
             }
@@ -259,8 +260,8 @@ public class CustomActionUtils {
         return body;
     }
 
-    private static Http.ResponseType getResponseType(Parameters inputParameters) {
+    private static ResponseType getResponseType(Parameters inputParameters) {
         return inputParameters.containsKey(RESPONSE_FORMAT)
-            ? Http.ResponseType.valueOf(inputParameters.getString(RESPONSE_FORMAT)) : Http.ResponseType.JSON;
+            ? ResponseType.valueOf(inputParameters.getString(RESPONSE_FORMAT)) : ResponseType.JSON;
     }
 }

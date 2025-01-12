@@ -16,6 +16,7 @@
 
 package com.bytechef.embedded.configuration.domain;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -54,7 +55,7 @@ public final class IntegrationWorkflow {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Column("last_modified_by")
     @LastModifiedBy
@@ -126,7 +127,7 @@ public final class IntegrationWorkflow {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 

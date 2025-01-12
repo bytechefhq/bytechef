@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.user.exception;
 
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.exception.AbstractException;
 
 /**
  * @author Ivica Cardic
  */
-public class InvalidEmailException extends PlatformException {
+public class InvalidEmailException extends AbstractException {
 
     public InvalidEmailException(String email) {
         super("Email %s is invalid".formatted(email), UserErrorType.INVALID_EMAIL);

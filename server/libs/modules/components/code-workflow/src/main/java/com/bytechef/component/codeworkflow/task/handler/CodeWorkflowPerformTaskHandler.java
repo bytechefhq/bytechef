@@ -20,7 +20,7 @@ import static com.bytechef.component.codeworkflow.constant.CodeWorkflowConstants
 import static com.bytechef.component.codeworkflow.constant.CodeWorkflowConstants.PERFORM;
 
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.task.handler.AbstractTaskHandler;
+import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
 /**

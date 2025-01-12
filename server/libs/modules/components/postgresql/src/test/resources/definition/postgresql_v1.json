@@ -60,8 +60,6 @@
       "title" : null,
       "type" : "CUSTOM",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -71,7 +69,9 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null
+      "refreshToken" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null
     } ],
     "properties" : [ {
       "advancedOption" : null,
@@ -276,9 +276,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Query",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -608,9 +608,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Insert",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -960,9 +960,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1271,9 +1271,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1645,10 +1645,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Execute",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "triggers" : null,
   "dataStream" : {
     "reader" : null,
     "writer" : {
@@ -1657,6 +1658,5 @@
       "dataStreamItemWriter" : { }
     }
   },
-  "triggers" : null,
   "unifiedApi" : null
 }

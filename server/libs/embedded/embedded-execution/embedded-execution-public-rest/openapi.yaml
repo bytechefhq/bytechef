@@ -4,20 +4,20 @@ info:
   title: "The Embedded Public V1 API"
   version: "1"
 servers:
-- url: "/api/embedded/v1"
+  - url: "/api/embedded/v1"
 tags:
-- name: "action"
-  description: "The Embedded Component Action Public API"
-- name: "app-event-trigger"
-  description: "The Embedded App Event Trigger Public API"
-- name: "component"
-  description: "The Embedded Component Public API"
-- name: "request-trigger"
-  description: "The Embedded Request Trigger Public API"
-- name: "trigger"
-  description: "The Embedded Component Trigger Public API"
-- name: "trigger-subscription"
-  description: "The Embedded Component Trigger Subscription Public API"
+  - name: "action"
+    description: "The Embedded Component Action Public API"
+  - name: "app-event-trigger"
+    description: "The Embedded App Event Trigger Public API"
+  - name: "component"
+    description: "The Embedded Component Public API"
+  - name: "request-trigger"
+    description: "The Embedded Request Trigger Public API"
+  - name: "trigger"
+    description: "The Embedded Component Trigger Public API"
+  - name: "trigger-subscription"
+    description: "The Embedded Component Trigger Subscription Public API"
 paths:
 #  /components:
 #    get:
@@ -96,7 +96,7 @@ paths:
         - "app-event-trigger"
       operationId: "executeWorkflows"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -113,7 +113,7 @@ paths:
         - "action"
       operationId: "executeAction"
       parameters:
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false
@@ -235,7 +235,7 @@ paths:
           required: true
           schema:
             type: "string"
-        - name: "x-environment"
+        - name: "X-Environment"
           description: "The environment."
           in: "header"
           required: false

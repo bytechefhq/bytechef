@@ -29,20 +29,30 @@ import org.apache.commons.lang3.Validate;
 /**
  * @author Ivica Cardic
  */
-class TriggerContextImpl extends ContextImpl implements TriggerContext {
+class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerContextAware {
 
     private final Data data;
+    private final boolean devEnvironment;
+    private final Long instanceId;
+    private final String triggerName;
+    private final ModeType type;
+    private final String workflowReferenceCode;
 
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
-        String componentName, int componentVersion, String triggerName, ModeType type, String workflowReferenceCode,
-        ComponentConnection connection, DataStorage dataStorage, FilesFileStorage filesFileStorage,
-        HttpClientExecutor httpClientExecutor) {
+        String componentName, int componentVersion, String triggerName, ModeType type, Long instanceId,
+        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment, DataStorage dataStorage,
+        FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
 
         this.data = new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
+        this.devEnvironment = devEnvironment;
+        this.instanceId = instanceId;
+        this.triggerName = triggerName;
+        this.type = type;
+        this.workflowReferenceCode = workflowReferenceCode;
     }
 
     @Override
@@ -52,6 +62,31 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext {
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public Long getInstanceId() {
+        return instanceId;
+    }
+
+    @Override
+    public String getTriggerName() {
+        return triggerName;
+    }
+
+    @Override
+    public ModeType getType() {
+        return type;
+    }
+
+    @Override
+    public String getWorkflowReferenceCode() {
+        return workflowReferenceCode;
+    }
+
+    @Override
+    public boolean isDevEnvironment() {
+        return devEnvironment;
     }
 
     private record DataImpl(

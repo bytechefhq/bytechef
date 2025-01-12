@@ -50,6 +50,7 @@ public class ApplicationProperties {
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
     private HelpHub helpHub = new HelpHub();
+    private Loki loki = new Loki();
     private Mail mail = new Mail();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
@@ -116,6 +117,10 @@ public class ApplicationProperties {
 
     public HelpHub getHelpHub() {
         return helpHub;
+    }
+
+    public Loki getLoki() {
+        return loki;
     }
 
     public Mail getMail() {
@@ -218,6 +223,10 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
+    public void setLoki(Loki loki) {
+        this.loki = loki;
+    }
+
     public void setMail(Mail mail) {
         this.mail = mail;
     }
@@ -262,28 +271,91 @@ public class ApplicationProperties {
         this.workflow = workflow;
     }
 
+    public static class Loki {
+        private Appender appender = new Appender();
+
+        public Appender getAppender() {
+            return appender;
+        }
+
+        public void setAppender(Appender appender) {
+            this.appender = appender;
+        }
+
+        public static class Appender {
+            private Level level = Level.OFF;
+
+            public enum Level {
+                DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
+            }
+
+            public Level getLevel() {
+                return level;
+            }
+
+            public void setLevel(Level level) {
+                this.level = level;
+            }
+        }
+    }
+
     /**
      * Ai properties.
      */
     public static class Ai {
 
-        private boolean enabled;
-        private OpenAi openAi = new OpenAi();
+        private Component component = new Component();
+        private Copilot copilot = new Copilot();
 
-        public boolean isEnabled() {
-            return enabled;
+        public Copilot getCopilot() {
+            return copilot;
         }
 
-        public OpenAi getOpenAi() {
-            return openAi;
+        public Component getComponent() {
+            return component;
         }
 
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
+        public void setCopilot(Copilot copilot) {
+            this.copilot = copilot;
         }
 
-        public void setOpenAi(OpenAi openAi) {
-            this.openAi = openAi;
+        public void setComponent(Component component) {
+            this.component = component;
+        }
+
+        public static class Copilot {
+
+            public enum Provider {
+                OPENAI, ANTHROPIC
+            }
+
+            private boolean enabled;
+            private OpenAi openAi = new OpenAi();
+            private Provider provider = Provider.OPENAI;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public Provider getProvider() {
+                return provider;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public void setProvider(Provider provider) {
+                this.provider = provider;
+            }
         }
 
         public static class OpenAi {
@@ -330,6 +402,215 @@ public class ApplicationProperties {
                     public void setModel(String model) {
                         this.model = model;
                     }
+                }
+            }
+        }
+
+        public static class Component {
+            private AmazonBedrock amazonBedrock = new AmazonBedrock();
+
+            public AmazonBedrock getAmazonBedrock() {
+                return amazonBedrock;
+            }
+
+            public void setAmazonBedrock(AmazonBedrock amazonBedrock) {
+                this.amazonBedrock = amazonBedrock;
+            }
+
+            public static class AmazonBedrock {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private Anthropic anthropic = new Anthropic();
+
+            public Anthropic getAnthropic() {
+                return anthropic;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            public static class Anthropic {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+            public AzureOpenAi getAzureOpenAi() {
+                return azureOpenAi;
+            }
+
+            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                this.azureOpenAi = azureOpenAi;
+            }
+
+            public static class AzureOpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private Groq groq = new Groq();
+
+            public Groq getGroq() {
+                return groq;
+            }
+
+            public void setGroq(Groq groq) {
+                this.groq = groq;
+            }
+
+            public static class Groq {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private Nvidia nvidia = new Nvidia();
+
+            public Nvidia getNvidia() {
+                return nvidia;
+            }
+
+            public void setNvidia(Nvidia nvidia) {
+                this.nvidia = nvidia;
+            }
+
+            public static class Nvidia {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private HuggingFace huggingFace = new HuggingFace();
+
+            public HuggingFace getHuggingFace() {
+                return huggingFace;
+            }
+
+            public void setHuggingFace(HuggingFace huggingFace) {
+                this.huggingFace = huggingFace;
+            }
+
+            public static class HuggingFace {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private Mistral mistral = new Mistral();
+
+            public Mistral getMistral() {
+                return mistral;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            public static class Mistral {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private OpenAi openAi = new OpenAi();
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public static class OpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            private VertexGemini vertexGemini = new VertexGemini();
+
+            public VertexGemini getVertexGemini() {
+                return vertexGemini;
+            }
+
+            public void setVertexGemini(VertexGemini vertexGemini) {
+                this.vertexGemini = vertexGemini;
+            }
+
+            public static class VertexGemini {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
                 }
             }
         }

@@ -23,6 +23,17 @@ paths:
           schema:
             type: "string"
           required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                inputs:
+                  description: "The input parameters used as workflow input values."
+                  type: "object"
+                  additionalProperties:
+                    type: "object"
       responses:
         "200":
           description: "The output expected by the workflow."

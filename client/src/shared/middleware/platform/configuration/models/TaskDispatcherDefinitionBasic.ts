@@ -57,6 +57,12 @@ export interface TaskDispatcherDefinitionBasic {
      * @memberof TaskDispatcherDefinitionBasic
      */
     title?: string;
+    /**
+     * The version of a task dispatcher.
+     * @type {number}
+     * @memberof TaskDispatcherDefinitionBasic
+     */
+    version: number;
 }
 
 /**
@@ -64,6 +70,7 @@ export interface TaskDispatcherDefinitionBasic {
  */
 export function instanceOfTaskDispatcherDefinitionBasic(value: object): value is TaskDispatcherDefinitionBasic {
     if (!('name' in value) || value['name'] === undefined) return false;
+    if (!('version' in value) || value['version'] === undefined) return false;
     return true;
 }
 
@@ -82,6 +89,7 @@ export function TaskDispatcherDefinitionBasicFromJSONTyped(json: any, ignoreDisc
         'name': json['name'],
         'resources': json['resources'] == null ? undefined : ResourcesFromJSON(json['resources']),
         'title': json['title'] == null ? undefined : json['title'],
+        'version': json['version'],
     };
 }
 
@@ -101,6 +109,7 @@ export function TaskDispatcherDefinitionBasicToJSONTyped(value?: TaskDispatcherD
         'name': value['name'],
         'resources': ResourcesToJSON(value['resources']),
         'title': value['title'],
+        'version': value['version'],
     };
 }
 

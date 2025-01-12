@@ -41,7 +41,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
             workflow.getSourceType(), workflow.getMaxRetries(),
             CollectionUtils.map(
-                workflow.getAllTasks(), workflowTask -> new WorkflowTaskDTO(workflowTask, List.of(), null)),
+                workflow.getTasks(true), workflowTask -> new WorkflowTaskDTO(workflowTask, List.of(), null)),
             List.of(), workflow.getVersion(), workflow);
 
         this.projectWorkflowId = projectWorkflow.getId();

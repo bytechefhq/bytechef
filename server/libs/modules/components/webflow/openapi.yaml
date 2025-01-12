@@ -1,0 +1,96 @@
+---
+openapi: "3.0.1"
+info:
+  title: "Webflow"
+  description: "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code."
+  version: "v1"
+servers:
+  - url: "https://api.webflow.com/v2"
+paths:
+  /sites/{siteId}/orders/{orderId}/fulfill:
+    post:
+      summary: "Fulfill Order"
+      description: "Updates an order's status to fulfilled."
+      operationId: "fulfillOrder"
+      parameters:
+        - name: "siteId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Site"
+        - name: "orderId"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+            title: "Order"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      orderId:
+                        type: "string"
+                      status:
+                        type: "string"
+  /collections/{collectionId}/items/{itemId}:
+    get:
+      summary: "Get Collection Item"
+      description: "Get collection item in a collection."
+      operationId: "getCollectionItem"
+      parameters:
+        - name: "collectionId"
+          in: "path"
+          description: ""
+          required: true
+          schema:
+            type: "string"
+            title: "Collection"
+        - name: "itemId"
+          in: "path"
+          description: ""
+          required: true
+          schema:
+            type: "string"
+            title: "Item"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      fieldData:
+                        type: "object"
+                        properties:
+                          name:
+                            type: "string"
+                          slug:
+                            type: "string"
+components:
+  securitySchemes:
+    oauth2:
+      type: "oauth2"
+      flows:
+        authorizationCode:
+          authorizationUrl: "https://webflow.com/oauth/authorize"
+          tokenUrl: "https://api.webflow.com/oauth/access_token"
+          refreshUrl: "https://api.webflow.com/oauth/access_token"
+          scopes:
+            cms:read: " "
+            ecommerce:read: " "
+            ecommerce:write: " "
+            sites:read: ""

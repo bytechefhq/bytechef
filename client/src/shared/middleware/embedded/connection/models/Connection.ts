@@ -76,7 +76,7 @@ export interface Connection {
      * @type {number}
      * @memberof Connection
      */
-    connectionVersion?: number;
+    connectionVersion: number;
     /**
      * The created by.
      * @type {string}
@@ -152,6 +152,7 @@ export interface Connection {
  */
 export function instanceOfConnection(value: object): value is Connection {
     if (!('componentName' in value) || value['componentName'] === undefined) return false;
+    if (!('connectionVersion' in value) || value['connectionVersion'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('parameters' in value) || value['parameters'] === undefined) return false;
     return true;
@@ -172,7 +173,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'authorizationParameters': json['authorizationParameters'] == null ? undefined : json['authorizationParameters'],
         'componentName': json['componentName'],
         'connectionParameters': json['connectionParameters'] == null ? undefined : json['connectionParameters'],
-        'connectionVersion': json['connectionVersion'] == null ? undefined : json['connectionVersion'],
+        'connectionVersion': json['connectionVersion'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),

@@ -28,7 +28,13 @@ public class WorkflowNodeDescriptionUtils {
 
         StringBuilder sb = new StringBuilder();
 
+        sb.append("<table class=\"w-full");
+        sb.append(inputParameters.isEmpty() ? "" : " mt-4");
+        sb.append(" \">");
+
         renderProperties(null, inputParameters, sb);
+
+        sb.append("</table>");
 
         return """
             <div class="flex flex-col w-full">%n\
@@ -44,7 +50,11 @@ public class WorkflowNodeDescriptionUtils {
     public static String renderTaskDispatcherProperties(Map<String, ?> inputParameters, String taskDispatcherTitle) {
         StringBuilder sb = new StringBuilder();
 
+        sb.append("<table class=\"w-full mt-4\">");
+
         renderProperties(null, inputParameters, sb);
+
+        sb.append("</table>");
 
         return """
             <div class="flex flex-col w-full">%n\
@@ -60,8 +70,6 @@ public class WorkflowNodeDescriptionUtils {
         if (parameterMap.isEmpty()) {
             return;
         }
-
-        sb.append("<table class=\"w-full mt-4\">");
 
         for (Map.Entry<?, ?> entry : parameterMap.entrySet()) {
             String name = (String) entry.getKey();
@@ -84,12 +92,10 @@ public class WorkflowNodeDescriptionUtils {
 
             sb.append("""
                 <tr>%n\
-                    <td class="text-muted-foreground pr-4 pt-0.5 pb-0.5">%s:</td>%n\
+                    <td class="text-muted-foreground pr-4 pb-1">%s:</td>%n\
                     <td>%s</td>%n\
                 </tr>%n\
                 """.formatted(name, value));
         }
-
-        sb.append("</table>");
     }
 }

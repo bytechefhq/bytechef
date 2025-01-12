@@ -50,10 +50,10 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
-import com.bytechef.platform.workflow.task.dispatcher.registry.domain.TaskDispatcherDefinition;
-import com.bytechef.platform.workflow.task.dispatcher.registry.service.TaskDispatcherDefinitionService;
+import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -142,7 +142,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     @Override
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
-        Environment environment, Status jobStatus, LocalDateTime jobStartDate, LocalDateTime jobEndDate, Long projectId,
+        Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
         Long projectInstanceId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();

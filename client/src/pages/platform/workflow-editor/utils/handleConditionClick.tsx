@@ -1,7 +1,6 @@
 import {TaskDispatcherDefinitionApi, Workflow} from '@/shared/middleware/platform/configuration';
-import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {ClickedDefinitionType, NodeType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
+import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
+import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
 import InlineSVG from 'react-inlinesvg';
@@ -10,11 +9,12 @@ import {Node} from 'reactflow';
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
+import handleComponentAddedSuccess from './handleComponentAddedSuccess';
 import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
-    currentNode?: NodeType;
+    currentNode?: NodeDataType;
     edge?: boolean;
     getNodes: () => Array<Node>;
     queryClient: QueryClient;
@@ -39,8 +39,9 @@ export default async function handleConditionClick({
                 taskDispatcherName: clickedItem.name,
                 taskDispatcherVersion: clickedItem.version,
             }),
-        queryKey: ComponentDefinitionKeys.componentDefinition({
-            componentName: clickedItem.name,
+        queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
+            taskDispatcherName: clickedItem.name,
+            taskDispatcherVersion: clickedItem.version,
         }),
     });
 
@@ -52,7 +53,7 @@ export default async function handleConditionClick({
 
     const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 
-    const newConditionNodeData = {
+    const newConditionNodeData: NodeDataType = {
         ...clickedTaskDispatcherDefinition,
         componentName: clickedItem.name,
         icon: (
@@ -68,6 +69,7 @@ export default async function handleConditionClick({
         name: workflowNodeName,
         taskDispatcher: true,
         type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
+        workflowNodeName,
     };
 
     const {tasks} = workflow;
@@ -109,16 +111,16 @@ export default async function handleConditionClick({
                 caseFalse: [],
                 caseTrue: [],
             },
+            workflowNodeName,
         },
         nodeIndex: taskIndex,
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
-                    id: workflow.id!,
-                    lastWorkflowNodeName: currentNode?.name,
-                }),
-            });
-        },
+        onSuccess: () =>
+            handleComponentAddedSuccess({
+                currentNode,
+                nodeData: newConditionNodeData,
+                queryClient,
+                workflow,
+            }),
         placeholderId: sourceNodeId,
         queryClient,
         updateWorkflowMutation,

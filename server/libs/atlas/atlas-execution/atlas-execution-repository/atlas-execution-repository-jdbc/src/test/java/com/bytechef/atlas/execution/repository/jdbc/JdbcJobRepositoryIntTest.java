@@ -23,11 +23,9 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.config.WorkflowExecutionRepositoryIntTestConfiguration;
-import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import org.apache.commons.lang3.Validate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -98,14 +96,14 @@ public class JdbcJobRepositoryIntTest {
 
         Instant now = Instant.now();
 
-        job.setEndDate(LocalDateTimeUtils.toLocalDateTime(now.minus(1, DAYS)));
+        job.setEndDate(now.minus(1, DAYS));
 
         jobRepository.save(job);
 
         for (int i = 0; i < 5; i++) {
             Job completedJobToday = jobRepository.save(getJob(Job.Status.COMPLETED));
 
-            completedJobToday.setEndDate(LocalDateTime.now());
+            completedJobToday.setEndDate(Instant.now());
 
             jobRepository.save(completedJobToday);
         }
@@ -133,7 +131,7 @@ public class JdbcJobRepositoryIntTest {
 
             Instant now = Instant.now();
 
-            completedJobYesterday.setEndDate(LocalDateTimeUtils.toLocalDateTime(now.minus(1, DAYS)));
+            completedJobYesterday.setEndDate(now.minus(1, DAYS));
 
             jobRepository.save(completedJobYesterday);
         }
@@ -150,7 +148,7 @@ public class JdbcJobRepositoryIntTest {
 
         completedJobToday = jobRepository.save(completedJobToday);
 
-        completedJobToday.setEndDate(LocalDateTime.now());
+        completedJobToday.setEndDate(Instant.now());
         completedJobToday.setId(null);
 
         jobRepository.save(completedJobToday);

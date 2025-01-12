@@ -4,7 +4,7 @@ description: "How to create an action for a component."
 ---
 
 In `server/libs/modules/components/newcomponent/src/main/java/com/bytechef/component/newcomponent/action` package, the
-`NewComponentDummyAction` class defines the connection. The `ACTION_DEFINITION` constant contains all the details about
+`NewComponentDummyAction` class defines the action. The `ACTION_DEFINITION` constant contains all the details about
 the action, including its name, title, description, properties and others.
 
 ``` java

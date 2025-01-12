@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:57.351813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.978177+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class OpportunityModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
@@ -33,14 +33,14 @@ public class OpportunityModel {
   private JsonNullable<Integer> amount = JsonNullable.<Integer>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> closeDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> closeDate = JsonNullable.<OffsetDateTime>undefined();
 
   private JsonNullable<String> description = JsonNullable.<String>undefined();
 
   private String id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> lastActivityDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> lastActivityDate = JsonNullable.<OffsetDateTime>undefined();
 
   private JsonNullable<String> name = JsonNullable.<String>undefined();
 
@@ -53,10 +53,10 @@ public class OpportunityModel {
   private JsonNullable<String> status = JsonNullable.<String>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private JsonNullable<LocalDateTime> createdDate = JsonNullable.<LocalDateTime>undefined();
+  private JsonNullable<OffsetDateTime> createdDate = JsonNullable.<OffsetDateTime>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   public OpportunityModel() {
     super();
@@ -65,7 +65,7 @@ public class OpportunityModel {
   /**
    * Constructor with only required parameters
    */
-  public OpportunityModel(Integer amount, String description, String id, LocalDateTime lastActivityDate, String name, String ownerId, String pipeline, String stage, String status, LocalDateTime createdDate, LocalDateTime lastModifiedDate) {
+  public OpportunityModel(Integer amount, String description, String id, OffsetDateTime lastActivityDate, String name, String ownerId, String pipeline, String stage, String status, OffsetDateTime createdDate, OffsetDateTime lastModifiedDate) {
     this.amount = JsonNullable.of(amount);
     this.description = JsonNullable.of(description);
     this.id = id;
@@ -119,7 +119,7 @@ public class OpportunityModel {
     this.amount = amount;
   }
 
-  public OpportunityModel closeDate(LocalDateTime closeDate) {
+  public OpportunityModel closeDate(OffsetDateTime closeDate) {
     this.closeDate = JsonNullable.of(closeDate);
     return this;
   }
@@ -131,11 +131,11 @@ public class OpportunityModel {
   @Valid 
   @Schema(name = "closeDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("closeDate")
-  public JsonNullable<LocalDateTime> getCloseDate() {
+  public JsonNullable<OffsetDateTime> getCloseDate() {
     return closeDate;
   }
 
-  public void setCloseDate(JsonNullable<LocalDateTime> closeDate) {
+  public void setCloseDate(JsonNullable<OffsetDateTime> closeDate) {
     this.closeDate = closeDate;
   }
 
@@ -179,7 +179,7 @@ public class OpportunityModel {
     this.id = id;
   }
 
-  public OpportunityModel lastActivityDate(LocalDateTime lastActivityDate) {
+  public OpportunityModel lastActivityDate(OffsetDateTime lastActivityDate) {
     this.lastActivityDate = JsonNullable.of(lastActivityDate);
     return this;
   }
@@ -191,11 +191,11 @@ public class OpportunityModel {
   @NotNull @Valid 
   @Schema(name = "lastActivityDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastActivityDate")
-  public JsonNullable<LocalDateTime> getLastActivityDate() {
+  public JsonNullable<OffsetDateTime> getLastActivityDate() {
     return lastActivityDate;
   }
 
-  public void setLastActivityDate(JsonNullable<LocalDateTime> lastActivityDate) {
+  public void setLastActivityDate(JsonNullable<OffsetDateTime> lastActivityDate) {
     this.lastActivityDate = lastActivityDate;
   }
 
@@ -299,7 +299,7 @@ public class OpportunityModel {
     this.status = status;
   }
 
-  public OpportunityModel createdDate(LocalDateTime createdDate) {
+  public OpportunityModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = JsonNullable.of(createdDate);
     return this;
   }
@@ -311,15 +311,15 @@ public class OpportunityModel {
   @NotNull @Valid 
   @Schema(name = "createdDate", example = "2023-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("createdDate")
-  public JsonNullable<LocalDateTime> getCreatedDate() {
+  public JsonNullable<OffsetDateTime> getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(JsonNullable<LocalDateTime> createdDate) {
+  public void setCreatedDate(JsonNullable<OffsetDateTime> createdDate) {
     this.createdDate = createdDate;
   }
 
-  public OpportunityModel lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public OpportunityModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -331,11 +331,11 @@ public class OpportunityModel {
   @NotNull @Valid 
   @Schema(name = "lastModifiedDate", example = "2022-02-27T00:00Z", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

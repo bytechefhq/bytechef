@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.codeworkflow.domain;
 
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
@@ -45,7 +45,7 @@ public class ProjectCodeWorkflow {
 
     @Column("created_date")
     @CreatedDate
-    private LocalDateTime createdDate;
+    private Instant createdDate;
 
     @Id
     private Long id;
@@ -56,7 +56,7 @@ public class ProjectCodeWorkflow {
 
     @Column("last_modified_date")
     @LastModifiedDate
-    private LocalDateTime lastModifiedDate;
+    private Instant lastModifiedDate;
 
     @Column("project_id")
     private AggregateReference<Project, Long> projectId;
@@ -97,7 +97,7 @@ public class ProjectCodeWorkflow {
         return createdBy;
     }
 
-    public LocalDateTime getCreatedDate() {
+    public Instant getCreatedDate() {
         return createdDate;
     }
 
@@ -105,7 +105,7 @@ public class ProjectCodeWorkflow {
         return lastModifiedBy;
     }
 
-    public LocalDateTime getLastModifiedDate() {
+    public Instant getLastModifiedDate() {
         return lastModifiedDate;
     }
 

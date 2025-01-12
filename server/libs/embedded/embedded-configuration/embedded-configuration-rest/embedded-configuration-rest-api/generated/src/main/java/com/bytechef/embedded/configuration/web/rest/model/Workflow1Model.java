@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,13 +31,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-11-26T21:19:58.475444+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class Workflow1Model implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
   private String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime createdDate;
+  private OffsetDateTime createdDate;
 
   private Integer connectionsCount;
 
@@ -59,7 +59,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   private String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private LocalDateTime lastModifiedDate;
+  private OffsetDateTime lastModifiedDate;
 
   @Valid
   private List<@Valid WorkflowOutputModel> outputs = new ArrayList<>();
@@ -141,7 +141,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
     this.createdBy = createdBy;
   }
 
-  public Workflow1Model createdDate(LocalDateTime createdDate) {
+  public Workflow1Model createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -153,11 +153,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
-  public LocalDateTime getCreatedDate() {
+  public OffsetDateTime getCreatedDate() {
     return createdDate;
   }
 
-  public void setCreatedDate(LocalDateTime createdDate) {
+  public void setCreatedDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
   }
 
@@ -349,7 +349,7 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public Workflow1Model lastModifiedDate(LocalDateTime lastModifiedDate) {
+  public Workflow1Model lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -361,11 +361,11 @@ public class Workflow1Model implements com.bytechef.platform.configuration.web.r
   @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
-  public LocalDateTime getLastModifiedDate() {
+  public OffsetDateTime getLastModifiedDate() {
     return lastModifiedDate;
   }
 
-  public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
+  public void setLastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
   }
 

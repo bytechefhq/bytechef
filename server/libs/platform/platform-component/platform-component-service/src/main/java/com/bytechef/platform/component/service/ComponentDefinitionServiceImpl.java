@@ -18,6 +18,7 @@ package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.DataStreamDefinition;
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.component.definition.DataStreamItemWriter;
@@ -37,6 +38,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -95,6 +97,32 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
             .stream()
             .map(ComponentDefinition::new)
             .toList();
+    }
+
+    @Override
+    public ComponentDefinition getConnectionComponentDefinition(@NonNull String name, int connectionVersion) {
+        return componentDefinitionRegistry.getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> {
+                if (name.equals(componentDefinition.getName())) {
+                    Optional<ConnectionDefinition> connectionDefinitionOptional = componentDefinition.getConnection();
+
+                    if (connectionDefinitionOptional.isEmpty()) {
+                        return false;
+                    }
+
+                    ConnectionDefinition connectionDefinition = connectionDefinitionOptional.get();
+
+                    return connectionDefinition.getVersion() == connectionVersion;
+                }
+
+                return false;
+            })
+            .findFirst()
+            .map(ComponentDefinition::new)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Connection component definition with name: %s, connectionVersion: %d not found".formatted(
+                    name, connectionVersion)));
     }
 
     @Override

@@ -35,7 +35,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.fork.join.constant.ForkJoinTaskDispatcherConstants;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -112,14 +112,14 @@ public class ForkJoinTaskDispatcher implements TaskDispatcher<TaskExecution>, Ta
             .map(source -> CollectionUtils.map(source, WorkflowTask::new))
             .toList();
 
-        taskExecution.setStartDate(LocalDateTime.now());
+        taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
 
         if (branchesWorkflowTasks.isEmpty()) {
-            taskExecution.setStartDate(LocalDateTime.now());
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));

@@ -12,7 +12,7 @@ import {
     WorkflowNodeOutputKeys,
     useGetWorkflowNodeOutputQuery,
 } from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {NodeType, PropertyAllType} from '@/shared/types';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
@@ -24,7 +24,7 @@ import OutputTabSampleDataDialog from './OutputTabSampleDataDialog';
 
 interface OutputTabProps {
     connectionMissing: boolean;
-    currentNode: NodeType;
+    currentNode: NodeDataType;
     outputDefined: boolean;
     workflowId: string;
 }
@@ -34,7 +34,7 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
 
     const [copiedValue, copyToClipboard] = useCopyToClipboard();
 
-    const {data: workflowNodeOutput} = useGetWorkflowNodeOutputQuery({
+    const {data: workflowNodeOutput, isFetching: workflowNodeOutputIsFetching} = useGetWorkflowNodeOutputQuery({
         id: workflowId!,
         workflowNodeName: currentNode?.name as string,
     });
@@ -90,6 +90,14 @@ const OutputTab = ({connectionMissing, currentNode, outputDefined = false, workf
 
         setShowUploadDialog(false);
     };
+
+    if (workflowNodeOutputIsFetching) {
+        return (
+            <div className="flex size-full items-center justify-center">
+                <LoadingIcon /> Loading...
+            </div>
+        );
+    }
 
     return (
         <div className="h-full p-4">

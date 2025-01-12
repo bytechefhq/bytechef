@@ -125,7 +125,7 @@ class GoogleDriveUtilsTest {
         PollOutput pollOutput =
             GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
 
-        assertEquals(files, pollOutput.getRecords());
+        assertEquals(files, pollOutput.records());
         assertFalse(pollOutput.pollImmediately());
 
         assertEquals(

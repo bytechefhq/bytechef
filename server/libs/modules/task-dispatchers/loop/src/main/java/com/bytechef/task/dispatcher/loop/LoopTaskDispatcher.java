@@ -35,7 +35,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +79,7 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
             MapUtils.getRequiredList(taskExecution.getParameters(), ITERATEE, WorkflowTask.class);
         List<?> list = MapUtils.getList(taskExecution.getParameters(), ITEMS, Collections.emptyList());
 
-        taskExecution.setStartDate(LocalDateTime.now());
+        taskExecution.setStartDate(Instant.now());
         taskExecution.setStatus(TaskExecution.Status.STARTED);
 
         taskExecution = taskExecutionService.update(taskExecution);
@@ -119,8 +119,8 @@ public class LoopTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDi
 
             taskDispatcher.dispatch(subTaskExecution);
         } else {
-            taskExecution.setStartDate(LocalDateTime.now());
-            taskExecution.setEndDate(LocalDateTime.now());
+            taskExecution.setStartDate(Instant.now());
+            taskExecution.setEndDate(Instant.now());
             taskExecution.setExecutionTime(0);
 
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));

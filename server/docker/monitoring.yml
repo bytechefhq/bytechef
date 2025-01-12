@@ -1,0 +1,36 @@
+# This configuration is intended for development purpose
+name: bytechef-monitoring
+services:
+  prometheus:
+    image: prom/prometheus:v3.0.1
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+    command:
+      - --config.file=/etc/prometheus/prometheus-${profile:-dev}.yml
+    ports:
+      - 9090:9090
+
+  loki:
+    image: grafana/loki:3.2.2
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    volumes:
+      - ./loki/:/etc/loki/
+    command:
+      - --config.file=/etc/loki/loki-${profile:-dev}.yml
+    ports:
+      - 3100:3100
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    extra_hosts: [ 'host.docker.internal:host-gateway' ]
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning/grafana-datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/grafana-dashboards:/etc/grafana/provisioning/dashboards
+    ports:
+      - 3000:3000

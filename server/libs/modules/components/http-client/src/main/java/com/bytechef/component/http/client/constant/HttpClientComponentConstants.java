@@ -18,19 +18,11 @@ package com.bytechef.component.http.client.constant;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
-import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
-import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,6 +34,7 @@ import java.util.List;
 public class HttpClientComponentConstants {
 
     public static final String ALLOW_UNAUTHORIZED_CERTS = "allowUnauthorizedCerts";
+    public static final String BODY = "body";
     public static final String BODY_CONTENT = "bodyContent";
     public static final String BODY_CONTENT_MIME_TYPE = "bodyContentMimeType";
     public static final String BODY_CONTENT_TYPE = "bodyContentType";
@@ -56,47 +49,6 @@ public class HttpClientComponentConstants {
     public static final String RESPONSE_FORMAT = "responseType";
     public static final String TIMEOUT = "timeout";
     public static final String URI = "uri";
-
-    public static final List<? extends Property> BODY_CONTENT_PROPERTIES = Collections.unmodifiableList(
-        Arrays.asList(
-            object(BODY_CONTENT)
-                .label("Body Content - JSON")
-                .description("Body Parameters to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.JSON.name()))
-                .additionalProperties(
-                    array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
-                .placeholder("Add Parameter")
-                .advancedOption(true),
-            object(BODY_CONTENT)
-                .label("Body Content - XML")
-                .description("XML content to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.XML.name()))
-                .placeholder("Add Parameter")
-                .advancedOption(true),
-            object(BODY_CONTENT)
-                .label("Body Content - Form Data")
-                .description("Body parameters to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_DATA.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(string(), fileEntry())
-                .advancedOption(true),
-            object(BODY_CONTENT)
-                .label("Body Content - Form URL-Encoded")
-                .description("Body parameters to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.FORM_URL_ENCODED.name()))
-                .placeholder("Add Parameter")
-                .additionalProperties(string())
-                .advancedOption(true),
-            string(BODY_CONTENT)
-                .label("Body Content - Raw")
-                .description("The raw text to send.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.RAW.name()))
-                .advancedOption(true),
-            fileEntry(BODY_CONTENT)
-                .label("Body Content - Binary")
-                .description("The object property which contains a reference to the file to upload.")
-                .displayCondition("%s == '%s'".formatted(BODY_CONTENT_TYPE, BodyContentType.BINARY.name()))
-                .advancedOption(true)));
 
     public static final List<? extends Property> COMMON_PROPERTIES = Collections.unmodifiableList(
         Arrays.asList(
@@ -116,7 +68,8 @@ public class HttpClientComponentConstants {
             bool(ALLOW_UNAUTHORIZED_CERTS)
                 .label("Allow Unauthorized Certs")
                 .description("Download the response even if SSL certificate validation is not possible.")
-                .defaultValue(false),
+                .defaultValue(false)
+                .advancedOption(true),
             string(RESPONSE_FORMAT)
                 .label("Response Format")
                 .description("The format in which the data gets returned from the URL.")

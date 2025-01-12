@@ -14,6 +14,7 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedule
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,7 +39,6 @@ public class AwsTriggerScheduler implements TriggerScheduler {
 
     private static final String SCHEDULE_TRIGGER = "ScheduleTrigger";
     private static final String POLLING_TRIGGER = "PollingTrigger";
-    private static final String SPLITTER = "|_$plitter_|";
 
     private final SchedulerClient schedulerClient;
     private final String sqsArn;
@@ -91,7 +91,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
-            .input(workflowExecutionIdString + SPLITTER + connectionId)
+            .input(workflowExecutionIdString + AwsTriggerSchedulerConstants.SPLITTER + connectionId)
             .build();
 
         schedulerClient.createSchedule(request -> request.clientToken(workflowExecutionIdString.substring(16))
@@ -130,7 +130,7 @@ public class AwsTriggerScheduler implements TriggerScheduler {
         Target sqsTarget = Target.builder()
             .roleArn(roleArn)
             .arn(sqsArn + ":" + SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
-            .input(workflowExecutionIdString + SPLITTER + JsonUtils.write(output))
+            .input(workflowExecutionIdString + AwsTriggerSchedulerConstants.SPLITTER + JsonUtils.write(output))
             .deadLetterConfig(builder -> builder.arn(sqsArn + ":" + SCHEDULER_SCHEDULE_TRIGGER_QUEUE)
                 .build())
             .build();

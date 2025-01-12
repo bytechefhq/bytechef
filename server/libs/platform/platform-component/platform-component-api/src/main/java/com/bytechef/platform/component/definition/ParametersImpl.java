@@ -93,6 +93,11 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public Object[] getArray(String key, List<?> defaultValue) {
+        return MapUtils.getArray(map, key, defaultValue.toArray(new Object[0]));
+    }
+
+    @Override
     public <T> T[] getArray(String key, Class<T> elementType) {
         return MapUtils.getArray(map, key, elementType);
     }
@@ -100,6 +105,12 @@ public final class ParametersImpl implements Parameters {
     @Override
     public <T> T[] getArray(String key, Class<T> elementType, T[] defaultValue) {
         return MapUtils.getArray(map, key, elementType, defaultValue);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T[] getArray(String key, Class<T> elementType, List<T> defaultValue) {
+        return (T[]) MapUtils.getArray(map, key, defaultValue.toArray(new Object[0]));
     }
 
     @Override
@@ -148,6 +159,11 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public List<FileEntry> getFileEntries(String key) {
+        return getList(key, FileEntry.class);
+    }
+
+    @Override
     public List<FileEntry> getFileEntries(String key, List<FileEntry> defaultValue) {
         return getList(key, FileEntry.class, defaultValue);
     }
@@ -163,8 +179,38 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> T getFromPath(String path) {
-        return MapUtils.getFromPath(map, path);
+    public <T> T getFromPath(String path, Class<T> elementType) {
+        return MapUtils.getFromPath(map, path, elementType);
+    }
+
+    @Override
+    public <T> T getFromPath(String path, Class<T> elementType, T defaultValue) {
+        return MapUtils.getFromPath(map, path, elementType, defaultValue);
+    }
+
+    @Override
+    public <T> T getFromPath(String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
+        return MapUtils.getFromPath(map, path, new TypeReference<>() {
+
+            @Override
+            @NonNull
+            public Type getType() {
+                return elementTypeReference.getType();
+            }
+        });
+    }
+
+    @Override
+    public <T> T getFromPath(
+        String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference, T defaultValue) {
+        return MapUtils.getFromPath(map, path, new TypeReference<>() {
+
+            @Override
+            @NonNull
+            public Type getType() {
+                return elementTypeReference.getType();
+            }
+        }, defaultValue);
     }
 
     @Override
@@ -331,6 +377,16 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes) {
+        return MapUtils.getMapFromPath(map, path, valueTypes);
+    }
+
+    @Override
+    public Map<String, ?> getMapFromPath(String path, List<Class<?>> valueTypes, Map<String, ?> defaultValue) {
+        return MapUtils.getMapFromPath(map, path, valueTypes, defaultValue);
+    }
+
+    @Override
     public Object getRequired(String key) {
         return MapUtils.getRequired(map, key);
     }
@@ -376,8 +432,22 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
-    public <T> T getRequiredFromPath(String path) {
-        return MapUtils.getRequiredFromPath(map, path);
+    public <T> T getRequiredFromPath(String path, Class<T> elementType) {
+        return MapUtils.getRequiredFromPath(map, path, elementType);
+    }
+
+    @Override
+    public <T> T getRequiredFromPath(
+        String path, com.bytechef.component.definition.TypeReference<T> elementTypeReference) {
+
+        return MapUtils.getFromPath(map, path, new TypeReference<>() {
+
+            @Override
+            @NonNull
+            public Type getType() {
+                return elementTypeReference.getType();
+            }
+        });
     }
 
     @Override

@@ -57,20 +57,22 @@ public class ContextServiceImpl implements ContextService {
     @Override
     @Transactional(readOnly = true)
     public FileEntry peek(long stackId, @NonNull Context.Classname classname) {
-        Context context = contextRepository.findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(
-            stackId, classname.ordinal());
-
-        Validate.notNull(context, "context");
+        Context context = contextRepository
+            .findTop1ByStackIdAndClassnameIdOrderByCreatedDateDesc(stackId, classname.ordinal())
+            .orElseThrow(
+                () -> new IllegalArgumentException("Unable to locate context with stackId: %s".formatted(stackId)));
 
         return context.getValue();
     }
 
     @Override
     public FileEntry peek(long stackId, int subStackId, @NonNull Context.Classname classname) {
-        Context context = contextRepository.findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
-            stackId, subStackId, classname.ordinal());
-
-        Validate.notNull(context, "context");
+        Context context = contextRepository
+            .findTop1ByStackIdAndSubStackIdAndClassnameIdOrderByCreatedDateDesc(
+                stackId, subStackId, classname.ordinal())
+            .orElseThrow(
+                () -> new IllegalArgumentException(
+                    "Unable to locate context with stackId: %s, subStackId: %s".formatted(stackId, subStackId)));
 
         return context.getValue();
     }

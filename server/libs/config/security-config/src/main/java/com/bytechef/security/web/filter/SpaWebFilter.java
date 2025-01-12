@@ -45,6 +45,7 @@ public class SpaWebFilter extends OncePerRequestFilter {
             !path.startsWith("/actuator") &&
             !path.startsWith("/auditevents") &&
             !path.startsWith("/v3/api-docs") &&
+            !path.startsWith("/file-entries") &&
             !path.startsWith("/webhooks") &&
             !path.contains(".") &&
             path.matches("/(.*)")) {

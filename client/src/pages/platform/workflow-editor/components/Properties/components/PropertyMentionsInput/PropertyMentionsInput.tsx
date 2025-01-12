@@ -1,45 +1,21 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getRandomId} from '@/shared/util/random-utils';
+import {ForwardedRef, ReactNode, forwardRef, memo, useEffect, useMemo, useState} from 'react';
 
-import 'quill-mention';
-import {KeyboardEvent, ReactNode, Ref, forwardRef, memo, useEffect, useMemo, useState} from 'react';
-import ReactQuill, {Quill} from 'react-quill';
-
-import 'quill-paste-smart';
-
-import './propertyMentionsInput.css';
+import './PropertyMentionsInput.css';
 
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
+import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/PropertyMentionsInputEditor';
+import PropertyMentionsInputEditorSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/PropertyMentionsInputEditorSheet';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ControlType} from '@/shared/middleware/platform/configuration';
-import {DataPillType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
+import {Editor} from '@tiptap/react';
 import {twMerge} from 'tailwind-merge';
-
-import PropertyMentionsInputBlot from './PropertyMentionsInputBlot';
-
-Quill.register('formats/property-mention', PropertyMentionsInputBlot);
-
-const isAlphaNumericalKeyCode = (event: KeyboardEvent) =>
-    (event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 65 && event.keyCode <= 90);
-
-const MentionInputListItem = (item: DataPillType) => {
-    const div = document.createElement('div');
-
-    div.innerHTML = `
-        <div>
-            <span>${item.componentIcon}</span>
-
-            <span>${item.value}</span>
-        </div>
-    `;
-
-    return div;
-};
 
 interface PropertyMentionsInputProps {
     className?: string;
@@ -50,17 +26,16 @@ interface PropertyMentionsInputProps {
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     leadingIcon?: ReactNode;
-    onChange?: (value: string) => void;
-    onKeyPress?: (event: KeyboardEvent) => void;
-    overriddenDataPills?: Array<DataPillType>;
+    onChange: (value: string) => void;
+    path?: string;
     placeholder?: string;
     required?: boolean;
-    singleMention?: boolean;
     showInputTypeSwitchButton?: boolean;
+    type?: string;
     value?: string;
 }
 
-const PropertyMentionsInput = forwardRef(
+const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
     (
         {
             className,
@@ -72,202 +47,39 @@ const PropertyMentionsInput = forwardRef(
             label,
             leadingIcon,
             onChange,
-            onKeyPress,
-            overriddenDataPills,
+            path,
             placeholder,
             required = false,
             showInputTypeSwitchButton = false,
-            singleMention = false,
+            type = 'STRING',
             value,
-        }: PropertyMentionsInputProps,
-        ref: Ref<ReactQuill>
+        },
+        ref: ForwardedRef<Editor>
     ) => {
+        const [initialized, setInitialized] = useState(false);
         const [isFocused, setIsFocused] = useState(false);
-        const [mentionOccurences, setMentionOccurences] = useState(0);
 
-        let {dataPills} = useWorkflowDataStore();
+        const {componentDefinitions, dataPills} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
+        const {workflow} = useWorkflowDataStore();
+
+        const onFocus = (editor: Editor) => {
+            setFocusedInput(editor);
+
+            if (workflowNodeDetailsPanelOpen) {
+                setDataPillPanelOpen(true);
+            }
+        };
 
         const elementId = useMemo(() => `mentions-input-${getRandomId()}`, []);
-
-        const modules = {
-            clipboard: {
-                keepSelection: true,
-                matchVisual: false,
-            },
-            mention: {
-                blotName: 'property-mention',
-                dataAttributes: ['componentIcon'],
-                fixMentionsToQuill: true,
-                mentionDenotationChars: ['{'],
-                onOpen: () => {
-                    // @ts-expect-error Quill false positive
-                    if (!ref?.current) {
-                        return;
-                    }
-
-                    const editorContainer =
-                        // @ts-expect-error Quill false positive
-                        ref.current.getEditor().container;
-
-                    const {height} = editorContainer.getBoundingClientRect();
-
-                    const mentionListParentElement = editorContainer.querySelector('#quill-mention-list').parentNode;
-
-                    mentionListParentElement.style.top = `${height + editorContainer.offsetTop + 10}px`;
-                },
-                onSelect: (
-                    item: DataPillType,
-                    insertItem: (data: DataPillType, programmaticInsert: boolean, overriddenOptions: object) => void
-                ) => {
-                    // @ts-expect-error Quill false positive
-                    const editor = ref.current.getEditor();
-
-                    const selection = editor.getSelection();
-
-                    const [leaf, offset] = editor.getLeaf(selection?.index || 0);
-
-                    if (leaf && singleMention && mentionOccurences) {
-                        editor.deleteText(0, editor.getLength());
-
-                        editor.setText(' ');
-
-                        leaf.deleteAt(0, offset);
-                    }
-
-                    insertItem(
-                        {
-                            componentIcon: item.componentIcon,
-                            id: item.id,
-                            value: item.value,
-                        },
-                        false,
-                        {
-                            blotName: 'property-mention',
-                        }
-                    );
-                },
-                renderItem: (item: DataPillType) => MentionInputListItem(item),
-                showDenotationChar: false,
-                source: (searchTerm: string, renderList: (arg1: Array<object>, arg2: string) => void) => {
-                    if (overriddenDataPills) {
-                        dataPills = overriddenDataPills;
-                    }
-
-                    if (!dataPills) {
-                        return;
-                    }
-
-                    const formattedDataPills = dataPills.map((dataPill) => {
-                        const {componentIcon, componentName, id, value} = dataPill;
-
-                        return {
-                            componentIcon: componentIcon || '📄',
-                            componentName,
-                            id,
-                            value,
-                        };
-                    });
-
-                    if (searchTerm.length === 0) {
-                        renderList(formattedDataPills, searchTerm);
-                    } else {
-                        const matches = formattedDataPills.filter(
-                            (datum) => ~datum.value.toLowerCase().indexOf(searchTerm.toLowerCase())
-                        );
-
-                        renderList(matches, searchTerm);
-                    }
-                },
-                spaceAfterInsert: false,
-            },
-            toolbar: false,
-        };
-
-        const handleOnChange = (value: string) => {
-            if (onChange) {
-                onChange(value);
-            }
-
-            setMentionOccurences(value.match(/property-mention/g)?.length || 0);
-        };
-
-        const handleOnKeyDown = (event: KeyboardEvent) => {
-            // @ts-expect-error Quill false positive
-            const editor = ref.current.getEditor();
-
-            if (!editor) {
-                return;
-            }
-
-            if (mentionOccurences && isAlphaNumericalKeyCode(event) && singleMention) {
-                const selection = editor.getSelection();
-
-                const [leaf] = editor.getLeaf(selection?.index || 0);
-
-                if (leaf) {
-                    const length = editor.getLength();
-
-                    editor.deleteText(0, length);
-
-                    editor.insertText(0, '');
-
-                    editor.setSelection(length);
-                }
-            }
-
-            if (singleMention && mentionOccurences) {
-                event.preventDefault();
-            }
-        };
-
-        const handleOnFocus = () => {
-            // @ts-expect-error Quill false positive
-            if (ref?.current && !isFocused) {
-                setTimeout(() => {
-                    // @ts-expect-error Quill false positive
-                    setFocusedInput(ref.current!);
-
-                    setIsFocused(true);
-
-                    if (workflowNodeDetailsPanelOpen) {
-                        setDataPillPanelOpen(true);
-                    }
-                }, 50);
-            }
-        };
-
-        const handleOnBlur = () => {
-            setFocusedInput(null);
-
-            setIsFocused(false);
-        };
-
-        useEffect(() => {
-            // @ts-expect-error Quill false positive
-            if (!ref?.current) {
-                return;
-            }
-
-            // @ts-expect-error Quill false positive
-            const editor = ref.current.getEditor();
-
-            if (!editor) {
-                return;
-            }
-
-            const keyboard = editor.getModule('keyboard');
-
-            delete keyboard.bindings[9];
-        }, [ref]);
 
         useEffect(() => {
             if (!focusedInput) {
                 return;
             }
 
-            setIsFocused(focusedInput.props.id === elementId);
+            setIsFocused((focusedInput.view.props.attributes as {[name: string]: string}).id === elementId);
         }, [focusedInput, elementId]);
 
         return (
@@ -295,6 +107,22 @@ const PropertyMentionsInput = forwardRef(
                         )}
 
                         <div className="flex items-center">
+                            {(controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA') && (
+                                <PropertyMentionsInputEditorSheet
+                                    componentDefinitions={componentDefinitions}
+                                    controlType={controlType}
+                                    dataPills={dataPills}
+                                    onChange={onChange}
+                                    onClose={() => setInitialized(false)}
+                                    placeholder={placeholder}
+                                    setInitialized={setInitialized}
+                                    title={label ?? ''}
+                                    type={type}
+                                    value={value}
+                                    workflow={workflow}
+                                />
+                            )}
+
                             {showInputTypeSwitchButton && handleInputTypeSwitchButtonClick && (
                                 <InputTypeSwitchButton handleClick={handleInputTypeSwitchButtonClick} mentionInput />
                             )}
@@ -319,30 +147,31 @@ const PropertyMentionsInput = forwardRef(
                         </span>
                     )}
 
-                    <ReactQuill
+                    <div
                         className={twMerge(
-                            'h-full w-full rounded-md bg-white',
+                            'property-mentions-editor flex h-full min-h-[34px] w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pl-10',
-                            controlType === 'TEXT_AREA' && 'min-h-32',
                             className
                         )}
-                        defaultValue={defaultValue}
-                        formats={['property-mention', 'mention']}
-                        id={elementId}
-                        key={elementId}
-                        // eslint-disable-next-line react-hooks/exhaustive-deps -- put data as dependency and it will render empty editor, but it will update available datapills
-                        modules={useMemo(() => modules, [])}
-                        onBlur={handleOnBlur}
-                        onChange={handleOnChange}
-                        onFocus={handleOnFocus}
-                        onKeyDown={handleOnKeyDown}
-                        onKeyPress={onKeyPress}
-                        placeholder={
-                            placeholder ? `${placeholder} (Show data pills using '{')` : "Show data pills using '{'"
-                        }
-                        ref={ref}
-                        value={value}
-                    />
+                    >
+                        <PropertyMentionsInputEditor
+                            className="px-2 py-[0.44rem]"
+                            componentDefinitions={componentDefinitions}
+                            controlType={controlType}
+                            dataPills={dataPills}
+                            elementId={elementId}
+                            initialized={initialized}
+                            onChange={onChange}
+                            onFocus={onFocus}
+                            path={path}
+                            placeholder={placeholder}
+                            ref={ref}
+                            setInitialized={setInitialized}
+                            type={type}
+                            value={value || defaultValue}
+                            workflow={workflow}
+                        />
+                    </div>
                 </div>
             </fieldset>
         );

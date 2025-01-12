@@ -7,7 +7,7 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.org.openapitools.jackson.databind.nullable)
+    implementation(libs.loki.logback.appender)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -34,7 +34,6 @@ dependencies {
     implementation(project(":server:libs:config:jdbc-config"))
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:config:logback-config"))
-    implementation(project(":server:libs:config:rest-config"))
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
@@ -45,7 +44,6 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-service"))
     implementation(project(":server:libs:embedded:embedded-swagger"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
-    implementation(project(":server:libs:platform:platform-component:platform-component-rest"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))

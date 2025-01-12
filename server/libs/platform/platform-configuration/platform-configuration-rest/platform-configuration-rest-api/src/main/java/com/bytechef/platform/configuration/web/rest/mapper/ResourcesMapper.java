@@ -36,9 +36,9 @@ public interface ResourcesMapper {
 
     @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
     interface TaskDispatcherResourcesMapper
-        extends Converter<com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources, ResourcesModel> {
+        extends Converter<com.bytechef.platform.workflow.task.dispatcher.domain.Resources, ResourcesModel> {
 
         @Override
-        ResourcesModel convert(com.bytechef.platform.workflow.task.dispatcher.registry.domain.Resources resources);
+        ResourcesModel convert(com.bytechef.platform.workflow.task.dispatcher.domain.Resources resources);
     }
 }

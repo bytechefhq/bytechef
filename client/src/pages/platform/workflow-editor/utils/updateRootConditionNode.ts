@@ -1,5 +1,5 @@
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
-import {NodeType} from '@/shared/types';
+import {NodeDataType} from '@/shared/types';
 import {Node} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
@@ -10,7 +10,7 @@ interface UpdateRootConditionNodeProps {
     conditionId: string;
     nodeIndex: number;
     tasks: Array<WorkflowTask>;
-    updatedParentConditionNodeData: NodeType;
+    updatedParentConditionNodeData: NodeDataType;
     updatedParentConditionTask: WorkflowTask;
     nodes: Array<Node>;
     workflow: Workflow & WorkflowTaskDataType;
@@ -23,7 +23,7 @@ export default function updateRootConditionNode({
     updatedParentConditionNodeData,
     updatedParentConditionTask,
     workflow,
-}: UpdateRootConditionNodeProps): NodeType {
+}: UpdateRootConditionNodeProps): NodeDataType {
     let currentTaskNode = updatedParentConditionNodeData;
 
     let currentTaskNodeConditionData = updatedParentConditionNodeData.conditionData;
@@ -48,7 +48,7 @@ export default function updateRootConditionNode({
 
         const workflowTasks = workflow.tasks;
 
-        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNode.id);
+        let currentTask = workflowTasks?.find((task) => task.name === currentTaskNode.componentName);
 
         if (!currentTask) {
             currentTask = updatedParentConditionTask;
@@ -69,6 +69,7 @@ export default function updateRootConditionNode({
 
         currentTaskNode = {
             ...parentConditionTaskNode,
+            componentName: parentConditionTaskNode.data.componentName,
             name: parentConditionTaskNode.id,
             type: parentConditionTaskNode.type || 'workflow',
             version: parentConditionTaskNode.data.type.split('/v')[1],

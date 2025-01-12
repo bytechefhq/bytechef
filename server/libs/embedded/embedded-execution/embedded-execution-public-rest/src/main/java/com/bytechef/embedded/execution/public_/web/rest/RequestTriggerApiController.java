@@ -20,6 +20,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
@@ -41,41 +42,47 @@ import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Ivica Cardic
  */
-@Controller
+@RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.embedded:}/v1")
 @ConditionalOnCoordinator
 public class RequestTriggerApiController extends AbstractWebhookTriggerController implements RequestTriggerApi {
 
     private final ConnectedUserService connectedUserService;
     private final HttpServletRequest httpServletRequest;
+    private final HttpServletResponse httpServletResponse;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationWorkflowService integrationWorkflowService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public RequestTriggerApiController(
-        ConnectedUserService connectedUserService, FilesFileStorage filesFileStorage,
-        HttpServletRequest httpServletRequest, InstanceAccessorRegistry instanceAccessorRegistry,
+        ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
+        FilesFileStorage filesFileStorage, HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse, InstanceAccessorRegistry instanceAccessorRegistry,
         TriggerDefinitionService triggerDefinitionService, WorkflowExecutor workflowExecutor,
         WorkflowService workflowService, IntegrationInstanceService integrationInstanceService,
         IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService1) {
 
-        super(filesFileStorage, instanceAccessorRegistry, triggerDefinitionService, workflowExecutor, workflowService);
+        super(
+            filesFileStorage, instanceAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
+            workflowExecutor, workflowService);
 
         this.connectedUserService = connectedUserService;
         this.httpServletRequest = httpServletRequest;
+        this.httpServletResponse = httpServletResponse;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationWorkflowService = integrationWorkflowService;
         this.workflowService = workflowService1;
@@ -103,12 +110,12 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         ResponseEntity<Object> responseEntity;
 
-        if (!isWorkflowEnabled(workflowExecutionId)) {
+        if (isWorkflowDisabled(workflowExecutionId)) {
             responseEntity = ResponseEntity.ok()
                 .build();
         } else {
             try {
-                responseEntity = doProcessTrigger(workflowExecutionId, httpServletRequest);
+                responseEntity = doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse);
             } catch (IOException | ServletException e) {
                 throw new RuntimeException(e);
             }

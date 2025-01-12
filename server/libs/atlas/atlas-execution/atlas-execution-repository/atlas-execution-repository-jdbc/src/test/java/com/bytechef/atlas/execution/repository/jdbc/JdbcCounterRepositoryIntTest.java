@@ -76,20 +76,26 @@ public class JdbcCounterRepositoryIntTest {
 
     @Test
     public void testFindValueById() {
-        Long value = counterRepository.findValueByIdForUpdate(counter.getId());
+        Long value = counterRepository
+            .findValueByIdForUpdate(counter.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(counter.getValue(), value);
     }
 
     @Test
     public void testUpdate() {
-        Long value = counterRepository.findValueByIdForUpdate(counter.getId());
+        Long value = counterRepository
+            .findValueByIdForUpdate(counter.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(counter.getValue(), value);
 
         counterRepository.update(counter.getId(), 5);
 
-        value = counterRepository.findValueByIdForUpdate(counter.getId());
+        value = counterRepository
+            .findValueByIdForUpdate(counter.getId())
+            .orElseThrow();
 
         Assertions.assertEquals(5, value);
     }

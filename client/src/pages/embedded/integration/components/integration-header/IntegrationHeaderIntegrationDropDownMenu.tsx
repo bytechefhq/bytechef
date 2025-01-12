@@ -66,8 +66,8 @@ const IntegrationHeaderIntegrationDropDownMenu = ({
                     <div>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button className="hover:bg-background/70" size="icon" variant="ghost">
-                                    <SettingsIcon className="h-5" />
+                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
+                                    <SettingsIcon />
                                 </Button>
                             </TooltipTrigger>
 

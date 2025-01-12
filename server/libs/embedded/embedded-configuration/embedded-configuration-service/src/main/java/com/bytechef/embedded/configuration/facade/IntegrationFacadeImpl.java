@@ -29,6 +29,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
@@ -69,6 +70,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
+    private final IntegrationInstanceConfigurationServiceImpl integrationInstanceConfigurationServiceImpl;
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
@@ -79,7 +81,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService,
+        IntegrationInstanceConfigurationServiceImpl integrationInstanceConfigurationServiceImpl) {
 
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
@@ -93,6 +96,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
+        this.integrationInstanceConfigurationServiceImpl = integrationInstanceConfigurationServiceImpl;
     }
 
     @Override
@@ -266,21 +270,21 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id) {
-        List<IntegrationWorkflowDTO> workflowDTOs = List.of();
-
         Integration integration = integrationService.getIntegration(id);
 
-        List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
-            integration.getId(), integration.getLastIntegrationVersion());
+        return integrationWorkflowService
+            .getIntegrationWorkflows(integration.getId(), integration.getLastIntegrationVersion())
+            .stream()
+            .map(integrationWorkflow -> new IntegrationWorkflowDTO(
+                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow))
+            .sorted(
+                (integrationWorkflow1, integrationWorkflow2) -> {
+                    String label1 = integrationWorkflow1.getLabel();
+                    String label2 = integrationWorkflow2.getLabel();
 
-        if (!integrationWorkflows.isEmpty()) {
-            workflowDTOs = CollectionUtils.map(
-                integrationWorkflows,
-                integrationWorkflow -> new IntegrationWorkflowDTO(
-                    workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
-        }
-
-        return workflowDTOs;
+                    return label1.compareToIgnoreCase(label2);
+                })
+            .toList();
     }
 
     @Override

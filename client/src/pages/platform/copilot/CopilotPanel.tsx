@@ -1,17 +1,25 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {CopilotRuntimeProvider} from '@/pages/platform/copilot/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
-import {Thread, useAssistantRuntime} from '@assistant-ui/react';
-import {LocalRuntime} from '@assistant-ui/react/dist/runtimes/local/useLocalRuntime';
+import {Thread} from '@assistant-ui/react';
 import {Cross2Icon} from '@radix-ui/react-icons';
 import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
-
-export type MessageType = {text: string; sender: 'ai' | 'user'};
+import {useEffect} from 'react';
 
 const CopilotPanel = () => {
-    const {setShowCopilot} = useCopilotStore();
+    const {generateConversationId, resetMessages, setCopilotPanelOpen} = useCopilotStore();
 
-    const runtime = useAssistantRuntime();
+    const handleCleanMessages = () => {
+        resetMessages();
+
+        generateConversationId();
+    };
+
+    useEffect(() => {
+        generateConversationId();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     return (
         <div className="relative h-full min-h-[50vh] w-[450px]">
@@ -23,7 +31,7 @@ const CopilotPanel = () => {
                 <div className="flex">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <Button onClick={() => (runtime as LocalRuntime).reset()} size="icon" variant="ghost">
+                            <Button onClick={handleCleanMessages} size="icon" variant="ghost">
                                 <MessageSquareOffIcon className="size-4" />
                             </Button>
                         </TooltipTrigger>
@@ -31,14 +39,16 @@ const CopilotPanel = () => {
                         <TooltipContent>Clean messages</TooltipContent>
                     </Tooltip>
 
-                    <Button onClick={() => setShowCopilot(false)} size="icon" variant="ghost">
+                    <Button onClick={() => setCopilotPanelOpen(false)} size="icon" variant="ghost">
                         <Cross2Icon />
                     </Button>
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 top-16">
-                <Thread />
+            <div className="absolute inset-x-0 bottom-0 top-16 text-sm">
+                <CopilotRuntimeProvider>
+                    <Thread />
+                </CopilotRuntimeProvider>
             </div>
         </div>
     );

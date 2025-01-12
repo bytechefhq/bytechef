@@ -48,7 +48,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.exception.PlatformException;
+import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -57,7 +57,7 @@ import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
 import com.bytechef.platform.workflow.execution.service.InstanceJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -129,13 +129,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         Project project = projectService.getProject(projectId);
 
         if (!project.isPublished()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Project id=%s is not published".formatted(projectId),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
 
         if (project.getLastProjectVersion() == projectInstance.getProjectVersion()) {
-            throw new PlatformException(
+            throw new ConfigurationException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectInstance.getProjectVersion()),
                 ProjectInstanceErrorType.CREATE_PROJECT_INSTANCE);
         }
@@ -468,7 +468,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                         workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
                     .filter(WorkflowConnection::required)
                     .toList(),
-                workflow.getAllTasks()
+                workflow.getTasks(true)
                     .stream()
                     .flatMap(workflowTask -> CollectionUtils.stream(
                         workflowConnectionFacade.getWorkflowConnections(workflowTask)))
@@ -476,7 +476,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
                     .toList());
 
             if (requiredWorkflowConnections.size() != projectInstanceWorkflow.getConnectionsCount()) {
-                throw new PlatformException(
+                throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     ProjectInstanceErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
             }
@@ -543,13 +543,13 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
             .orElse(null);
     }
 
-    private LocalDateTime getJobEndDate(Long jobId) {
+    private Instant getJobEndDate(Long jobId) {
         Job job = jobService.getJob(jobId);
 
         return job.getEndDate();
     }
 
-    private LocalDateTime getProjectInstanceLastExecutionDate(long projectInstanceId) {
+    private Instant getProjectInstanceLastExecutionDate(long projectInstanceId) {
         return OptionalUtils.mapOrElse(
             instanceJobService.fetchLastJobId(projectInstanceId, ModeType.AUTOMATION), this::getJobEndDate, null);
     }
@@ -647,7 +647,7 @@ public class ProjectInstanceFacadeImpl implements ProjectInstanceFacade {
         return webhookUrl.replace("{id}", workflowExecutionId.toString());
     }
 
-    private LocalDateTime getWorkflowLastExecutionDate(String workflowId) {
+    private Instant getWorkflowLastExecutionDate(String workflowId) {
         return OptionalUtils.mapOrElse(jobService.fetchLastWorkflowJob(workflowId), Job::getEndDate, null);
     }
 

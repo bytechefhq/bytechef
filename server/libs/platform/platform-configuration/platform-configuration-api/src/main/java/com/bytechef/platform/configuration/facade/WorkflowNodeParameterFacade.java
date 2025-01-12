@@ -29,5 +29,6 @@ public interface WorkflowNodeParameterFacade {
     Map<String, Boolean> getDisplayConditions(String workflowId, String workflowNodeName);
 
     UpdateParameterResultDTO updateParameter(
-        String workflowId, String workflowNodeName, String path, Object value, String type, boolean includeInMetadata);
+        String workflowId, String workflowNodeName, String parameterPath, Object value, String type,
+        boolean includeInMetadata);
 }

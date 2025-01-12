@@ -18,12 +18,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "equalsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_2"
@@ -36,12 +36,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "notEqualsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "notEqualsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_3"
@@ -54,12 +54,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "containsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "containsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_4"
@@ -72,12 +72,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "notContainsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "notContainsResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_5"
@@ -90,12 +90,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "startsWithResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "startsWithResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_6"
@@ -108,12 +108,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "endsWithResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "endsWithResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_7"
@@ -126,12 +126,12 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "isEmptyResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "isEmptyResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"
 - name: "condition_8"
@@ -144,11 +144,11 @@ tasks:
         value2: "${value2}"
     caseTrue:
     - name: "regexResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "true branch"
     caseFalse:
     - name: "regexResult"
-      type: "var"
+      type: "var/v1/set"
       parameters:
         value: "false branch"

@@ -6,7 +6,6 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     apiPackage.set("com.bytechef.platform.workflow.execution.web.rest")
     configOptions.set(
         mapOf(
-            "dateLibrary" to "java8-localdatetime",
             "interfaceOnly" to "true",
             "useSpringBoot3" to "true",
             "useTags" to "true"
@@ -33,11 +32,6 @@ val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generat
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
     outputDir.set("$rootDir/client/src/shared/middleware/platform/workflow/execution")
-    typeMappings.set(
-        mapOf(
-            "DateTime" to "Date"
-        )
-    )
 }
 
 tasks.register("generateOpenAPI") {
@@ -52,7 +46,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
-    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")

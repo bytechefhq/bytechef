@@ -45,10 +45,10 @@ import com.bytechef.platform.component.domain.ComponentConnection;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
-import com.bytechef.platform.component.exception.ComponentConfigurationException;
-import com.bytechef.platform.component.exception.ComponentExecutionException;
-import com.bytechef.platform.registry.domain.OutputResponse;
-import com.bytechef.platform.registry.util.SchemaUtils;
+import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.exception.ConfigurationException;
+import com.bytechef.platform.exception.ExecutionException;
+import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -96,7 +96,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentConfigurationException(
+            throw new ConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_DYNAMIC_PROPERTIES);
         }
     }
@@ -121,7 +121,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
                     return toOutputResponse(outputResponse);
                 } catch (Exception e) {
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
@@ -145,7 +145,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 ParametersFactory.createParameters(inputParameters), connections,
                 ParametersFactory.createParameters(extensions), context);
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 
@@ -174,7 +174,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
         }
     }
 
@@ -196,7 +196,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 return ProviderException.getProviderException(statusCode, body);
             }
         } catch (Exception e) {
-            throw new ComponentExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
+            throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
         }
     }
 
@@ -225,7 +225,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                         throw (ProviderException) e;
                     }
 
-                    throw new ComponentConfigurationException(
+                    throw new ConfigurationException(
                         e, inputParameters, ActionDefinitionErrorType.EXECUTE_OUTPUT);
                 }
             })
@@ -255,8 +255,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
                 throw (ProviderException) e;
             }
 
-            throw new ComponentExecutionException(
-                e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
+            throw new ExecutionException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_PERFORM);
         }
     }
 
@@ -271,7 +270,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return workflowNodeDescriptionFunction.apply(ParametersFactory.createParameters(inputParameters), context);
         } catch (Exception e) {
-            throw new ComponentConfigurationException(
+            throw new ConfigurationException(
                 e, inputParameters, ActionDefinitionErrorType.EXECUTE_WORKFLOW_NODE_DESCRIPTION);
         }
     }

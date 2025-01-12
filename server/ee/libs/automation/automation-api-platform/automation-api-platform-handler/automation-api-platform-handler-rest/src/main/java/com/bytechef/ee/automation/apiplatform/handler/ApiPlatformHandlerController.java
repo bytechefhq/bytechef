@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.apiplatform.handler;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.MapUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
@@ -23,31 +24,36 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.tenant.TenantContext;
 import com.bytechef.platform.tenant.util.TenantUtils;
+import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.web.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@Controller
+@RestController
 @RequestMapping(ApiPlatformHandlerController.API_PLATFORM_BASE_PATH + "/**")
+@CrossOrigin
 @ConditionalOnCoordinator
 public class ApiPlatformHandlerController extends AbstractWebhookTriggerController {
 
@@ -57,56 +63,69 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
-    private final ApiPlatformHandlerExecutor apiPlatformHandlerExecutor;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        ApiPlatformHandlerExecutor apiPlatformHandlerExecutor, FilesFileStorage filesFileStorage,
+        ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
         InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, WorkflowExecutor workflowExecutor) {
 
-        super(filesFileStorage, instanceAccessorRegistry, triggerDefinitionService, null, workflowService);
+        super(
+            filesFileStorage, instanceAccessorRegistry, applicationProperties.getPublicUrl(),
+            triggerDefinitionService, workflowExecutor, workflowService);
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
-        this.apiPlatformHandlerExecutor = apiPlatformHandlerExecutor;
     }
 
     @DeleteMapping(produces = "application/json")
-    public Object handleDeleteMethod(final HttpServletRequest request) {
-        return null;
+    public ResponseEntity<?> handleDeleteMethod(
+        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @GetMapping(produces = "application/json")
-    public Object handleGetMethod(final HttpServletRequest request) {
-        return doHandle(request);
+    public ResponseEntity<?> handleGetMethod(
+        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PatchMapping(produces = "application/json")
-    public Object handlePatchMethod(final HttpServletRequest request) {
-        return null;
+    public ResponseEntity<?> handlePatchMethod(
+        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PostMapping(produces = "application/json")
-    public Object handlePostMethod(final HttpServletRequest request) {
-        return null;
+    public ResponseEntity<?> handlePostMethod(
+        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PutMapping(produces = "application/json")
-    public Object handlePutMethod(final HttpServletRequest request) {
-        return null;
+    public ResponseEntity<?> handlePutMethod(
+        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
+        return doHandle(httpServletRequest, httpServletResponse);
     }
 
-    private Object doHandle(HttpServletRequest request) {
+    private ResponseEntity<Object> doHandle(
+        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+
         return TenantUtils.callWithTenantId(TenantContext.getCurrentTenantId(), () -> {
             Map<String, List<String>> variables;
 
-            String requestURI = request.getRequestURI();
+            String requestURI = httpServletRequest.getRequestURI();
 
             String path = requestURI.replace(API_PLATFORM_BASE_PATH, "");
 
-            ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(path, getEnvironment(request));
+            ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(
+                path, getEnvironment(httpServletRequest));
 
             ApiCollection apiCollection = apiCollectionService.getApiCollection(
                 apiCollectionEndpoint.getApiCollectionId());
@@ -121,7 +140,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
             // TODO fetch from New API Request Trigger
             WebhookTriggerFlags webhookTriggerFlags = new WebhookTriggerFlags(false, true, false, false);
 
-            WebhookRequest webhookRequest = getWebhookRequest(request, webhookTriggerFlags);
+            WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
             webhookRequest = new WebhookRequest(
                 webhookRequest.headers(), MapUtils.concat(webhookRequest.parameters(), variables),
@@ -131,9 +150,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 ModeType.AUTOMATION, apiCollection.getProjectInstanceId(),
                 apiCollectionEndpoint.getWorkflowReferenceCode(), "trigger_1");
 
-            // TODO return response from ResponseToAPIRequest action
-
-            return apiPlatformHandlerExecutor.execute(workflowExecutionId, webhookRequest);
+            return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
         });
     }
 

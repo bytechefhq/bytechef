@@ -51,9 +51,8 @@ Ask anything you want.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
-| Messages | [{STRING\(content), STRING\(role)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response format | INTEGER | SELECT  |  In which format do you want the response to be in?  |
-| Response Schema | STRING | TEXT_AREA  |  Define the JSON schema for the response.  |
+| Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
+| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Keep alive for | STRING | TEXT  |  Controls how long the model will stay loaded into memory following the request  |
 | Num predict | INTEGER | INTEGER  |  Maximum number of tokens to predict when generating text. (-1 = infinite generation, -2 = fill context)  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
@@ -62,7 +61,6 @@ Ask anything you want.
 | Frequency Penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.  |
 | Presence Penalty | NUMBER | NUMBER  |  Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.  |
 | Stop | [STRING] | ARRAY_BUILDER  |  Up to 4 sequences where the API will stop generating further tokens.  |
-| Functions | [STRING] | ARRAY_BUILDER  |  Enter the names of functions you want to use.  |
 | Seed | INTEGER | INTEGER  |  Keeping the same seed would output the same response.  |
 | Use NUMA | BOOLEAN | SELECT  |  Whether to use NUMA.  |
 | Num CTX | INTEGER | INTEGER  |  Sets the size of the context window used to generate the next token.  |
