@@ -58,6 +58,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFacade {
 
+    protected static final Pattern ARRAY_INDEX_VALUE_PATTERN = Pattern.compile("\\[(\\d+)]");
     private static final Pattern ARRAY_INDEXES_PATTERN =
         Pattern.compile("^.*(\\b\\w+\\b)((\\[index])+)(\\.\\b\\w+\\b.*)|.*((\\[index])+)(\\.\\b\\w+\\b.*)$");
     private static final String DYNAMIC_PROPERTY_TYPES = "dynamicPropertyTypes";
@@ -158,18 +159,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             workflow.getId());
 
         Map<String, Boolean> displayConditionMap = checkDisplayConditionsAndParameters(
-            parameterPathParts[0], workflowNodeName, workflow, workflowNodeStructure.operationType,
-            workflowNodeStructure.parameterMap,
-            inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties, true);
+            parameterPath, workflowNodeName, workflow, workflowNodeStructure.operationType,
+            workflowNodeStructure.parameterMap, inputMap, dynamicPropertyTypesMap, workflowNodeStructure.properties,
+            true);
 
         if (includeInMetadata) {
             setDynamicPropertyTypeItem(parameterPath, type, metadataMap);
         }
-
-        // Set value again af it will be deleted during parameters check as some connectors like http-client have
-        // defined multiple properties with the same name and only one is used based on the display condition
-
-        setParameter(parameterPathParts, value, false, workflowNodeStructure.parameterMap);
 
         workflowService.update(
             workflowId, JsonUtils.writeWithDefaultPrettyPrinter(definitionMap, true), workflow.getVersion());
@@ -177,17 +173,23 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         return new UpdateParameterResultDTO(displayConditionMap, metadataMap, workflowNodeStructure.parameterMap);
     }
 
-    protected static boolean hasExpressionVariable(String expression, String variableName) {
+    protected static boolean hasExpressionVariable(String expression, String variableName, List<Integer> indexes) {
         if ((expression == null) || expression.isEmpty()) {
             return false;
         }
 
-        String regex = "(^|.*\\W)" + variableName + "(\\W.*|$)";
+        if (indexes != null) {
+            expression = replaceIndexes(expression, indexes);
 
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(expression);
+            return expression.contains(variableName);
+        } else {
+            String regex = "(^|.*\\W)" + variableName + "(\\W.*|$)";
 
-        return matcher.find();
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(expression);
+
+            return matcher.find();
+        }
     }
 
     protected static boolean evaluate(
@@ -205,7 +207,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     protected static void evaluateArray(
         String displayCondition, Map<String, Boolean> displayConditionMap, Map<String, Object> inputMap,
-        Map<String, Object> outputs, String propertyName, Map<String, ?> parameterMap, boolean removeParameters) {
+        Map<String, Object> outputs, Map<String, ?> parameterMap) {
 
         List<List<Integer>> indexesList = findIndexes(parameterMap, displayCondition);
 
@@ -220,8 +222,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (result) {
                 displayConditionMap.put(updatedDisplayCondition, true);
-            } else if (removeParameters) {
-                removeParameter(propertyName, indexes, parameterMap);
             }
         }
     }
@@ -260,7 +260,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private Map<String, Boolean> checkDisplayConditionsAndParameters(
-        String rootParameterName, String workflowNodeName, Workflow workflow,
+        String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, ?> dynamicPropertyTypesMap,
         List<? extends BaseProperty> properties, boolean removeParameters) {
@@ -268,7 +268,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         checkDisplayConditionsAndParameters(
-            rootParameterName, workflowNodeName, workflow, operationType, parameterMap, inputMap,
+            parameterPath, workflowNodeName, workflow, operationType, parameterMap, inputMap,
             displayConditionMap, dynamicPropertyTypesMap, properties, removeParameters);
 
         return displayConditionMap;
@@ -276,7 +276,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private void checkDisplayConditionsAndParameters(
-        String rootParameterName, String workflowNodeName, Workflow workflow,
+        String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, ?> inputMap, Map<String, Boolean> displayConditionMap,
         Map<String, ?> dynamicPropertyTypesMap, List<? extends BaseProperty> properties, boolean removeParameters) {
@@ -284,46 +284,46 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         for (BaseProperty property : properties) {
             if (property instanceof ArrayProperty arrayProperty) {
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
                     removeParameters);
 
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(), removeParameters);
             }
             if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ArrayProperty arrayProperty) {
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty,
                     removeParameters);
 
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     inputMap, displayConditionMap, dynamicPropertyTypesMap, arrayProperty.getItems(), removeParameters);
             } else if (property instanceof ObjectProperty objectProperty) {
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
                     removeParameters);
 
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
                     removeParameters);
             } else if (property instanceof com.bytechef.platform.workflow.task.dispatcher.domain.ObjectProperty objectProperty) {
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty,
                     removeParameters);
 
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     inputMap, displayConditionMap, dynamicPropertyTypesMap, objectProperty.getProperties(),
                     removeParameters);
             } else {
                 checkDisplayConditionsAndParameters(
-                    rootParameterName, workflowNodeName, workflow, operationType, parameterMap,
+                    parameterPath, workflowNodeName, workflow, operationType, parameterMap,
                     (Map<String, Object>) inputMap, displayConditionMap, dynamicPropertyTypesMap, property,
                     removeParameters);
             }
@@ -332,7 +332,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
     @SuppressWarnings("unchecked")
     private void checkDisplayConditionsAndParameters(
-        String rootParameterName, String workflowNodeName, Workflow workflow,
+        String parameterPath, String workflowNodeName, Workflow workflow,
         WorkflowNodeStructure.OperationType operationType,
         Map<String, ?> parameterMap, Map<String, Object> inputMap, Map<String, Boolean> displayConditionMap,
         Map<String, ?> dynamicPropertyTypesMap, BaseProperty property, boolean removeParameters) {
@@ -341,9 +341,19 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             return;
         }
 
+        List<Integer> indexes = null;
+
+        if (parameterPath.contains("[")) {
+            indexes = extractIndexes(parameterPath);
+        }
+
         String displayCondition = property.getDisplayCondition();
 
-        if (hasExpressionVariable(displayCondition, rootParameterName)) {
+        if (hasExpressionVariable(displayCondition, parameterPath, indexes)) {
+            if (removeParameters) {
+                removeParameter(property.getName(), indexes, parameterMap);
+            }
+
             checkDynamicPropertyType(property.getName(), dynamicPropertyTypesMap);
         }
 
@@ -359,16 +369,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (displayCondition.contains("[index]")) {
                 evaluateArray(
-                    displayCondition, displayConditionMap, inputMap, (Map<String, Object>) outputs, property.getName(),
-                    parameterMap, removeParameters);
+                    displayCondition, displayConditionMap, inputMap, (Map<String, Object>) outputs, parameterMap);
             } else {
-                result = evaluate(
-                    displayCondition, inputMap, (Map<String, Object>) outputs, parameterMap);
+                result = evaluate(displayCondition, inputMap, (Map<String, Object>) outputs, parameterMap);
 
                 if (result) {
                     displayConditionMap.put(displayCondition, true);
-                } else if (removeParameters) {
-                    removeParameter(property.getName(), null, parameterMap);
                 }
             }
         } else {
@@ -376,8 +382,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             if (result) {
                 displayConditionMap.put(displayCondition, true);
-            } else if (removeParameters) {
-                removeParameter(property.getName(), null, parameterMap);
             }
         }
     }
@@ -406,7 +410,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 } else if (subList.get(index) instanceof List<?> subList2) {
                     indexes.removeFirst();
 
-                    if (subList2.get(index) instanceof Map<?, ?> subParameterMap) {
+                    if (subList2.get(indexes.getFirst()) instanceof Map<?, ?> subParameterMap) {
                         indexes.removeFirst();
 
                         removeParameter(parameterName, indexes, subParameterMap);
@@ -437,6 +441,18 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Object displayConditionResult = result.get("displayCondition");
 
         return !(displayConditionResult instanceof String) && (boolean) displayConditionResult;
+    }
+
+    private static List<Integer> extractIndexes(String expression) {
+        List<Integer> indexes = new ArrayList<>();
+
+        Matcher matcher = ARRAY_INDEX_VALUE_PATTERN.matcher(expression);
+
+        while (matcher.find()) {
+            indexes.add(Integer.parseInt(matcher.group(1)));
+        }
+
+        return indexes;
     }
 
     private static List<List<Integer>> findIndexes(Map<String, ?> map, String expression) {
@@ -744,8 +760,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     map.put(name, list);
                 }
 
-                Pattern pattern = Pattern.compile("\\[(\\d+)]");
-                Matcher matcher = pattern.matcher(arrays);
+                Matcher matcher = ARRAY_INDEX_VALUE_PATTERN.matcher(arrays);
 
                 List<Integer> arrayIndexes = new ArrayList<>();
 

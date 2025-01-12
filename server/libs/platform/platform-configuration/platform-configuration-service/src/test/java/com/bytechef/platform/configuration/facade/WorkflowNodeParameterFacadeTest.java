@@ -54,8 +54,8 @@ public class WorkflowNodeParameterFacadeTest {
         Map<String, Boolean> displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
-            parametersMap, false);
+            "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
 
         Assertions.assertEquals(2, displayConditionMap.size());
         Assertions.assertEquals(
@@ -65,8 +65,8 @@ public class WorkflowNodeParameterFacadeTest {
         displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(), "conditions[0]",
-            parametersMap, false);
+            "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
+            parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
@@ -81,7 +81,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
             "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(), Map.of(),
-            "conditions[0]", parametersMap, false);
+            parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(
@@ -98,7 +98,7 @@ public class WorkflowNodeParameterFacadeTest {
         for (String expression : expressions) {
             Assertions.assertTrue(
                 WorkflowNodeParameterFacadeImpl.hasExpressionVariable(
-                    expression, "variableName"),
+                    expression, "variableName", null),
                 expression + " contains variableName");
         }
 
@@ -110,7 +110,7 @@ public class WorkflowNodeParameterFacadeTest {
         for (String noVariableExpression : noVariableNameExpressions) {
             Assertions.assertFalse(
                 WorkflowNodeParameterFacadeImpl.hasExpressionVariable(
-                    noVariableExpression, "variableName"),
+                    noVariableExpression, "variableName", null),
                 noVariableExpression + " doesn't contain variableName");
         }
     }
