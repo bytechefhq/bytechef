@@ -596,7 +596,7 @@ const Property = ({
             if (propertyParameterValue === null) {
                 setSelectValue('null');
             } else if (propertyParameterValue !== undefined) {
-                if (type === 'BOOLEAN' || type === 'INTEGER' || type === 'NUMBER') {
+                if (type === 'BOOLEAN') {
                     setSelectValue(propertyParameterValue.toString());
                 } else {
                     setSelectValue(propertyParameterValue);
