@@ -437,7 +437,13 @@ const Property = ({
 
         setPropertyParameterValue(value);
 
-        let actualValue: string | boolean | null = type === 'BOOLEAN' ? value === 'true' : value;
+        let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
+
+        if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+            actualValue = parseInt(value);
+        } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+            actualValue = parseFloat(value);
+        }
 
         if (value === 'null') {
             actualValue = null;
@@ -590,7 +596,7 @@ const Property = ({
             if (propertyParameterValue === null) {
                 setSelectValue('null');
             } else if (propertyParameterValue !== undefined) {
-                if (type === 'BOOLEAN') {
+                if (type === 'BOOLEAN' || type === 'INTEGER' || type === 'NUMBER') {
                     setSelectValue(propertyParameterValue.toString());
                 } else {
                     setSelectValue(propertyParameterValue);
