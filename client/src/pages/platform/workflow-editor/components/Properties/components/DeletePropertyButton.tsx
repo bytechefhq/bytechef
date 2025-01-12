@@ -12,7 +12,7 @@ const DeletePropertyButton = ({onClick, propertyName}: DeletePropertyButtonProps
     <Tooltip>
         <TooltipTrigger asChild>
             <Button className="size-auto p-1" onClick={() => onClick()} size="icon" variant="ghost">
-                <XIcon className="size-4 cursor-pointer text-gray-600 hover:text-red-500" />
+                <XIcon className="size-4 cursor-pointer text-destructive" />
             </Button>
         </TooltipTrigger>
 
