@@ -17,7 +17,6 @@ dependencies {
     implementation(project(":server:libs:config:messages-config"))
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:config:logback-config"))
-    implementation(project(":server:libs:config:observability-config"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-amqp"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-kafka"))
     implementation(project(":server:libs:core:message:message-broker:message-broker-redis"))
@@ -25,6 +24,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
 
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-rest"))
