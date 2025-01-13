@@ -22,11 +22,15 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.COLUMN;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_WHOLE_ROW;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUE;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.VALUES;
 
 import com.bytechef.component.definition.ActionContext;
@@ -37,6 +41,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
+import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
@@ -79,25 +84,92 @@ public class GoogleSheetsUtils {
         return sheetName + "!" + rowNumber + ":" + rowNumber;
     }
 
+    public static List<ValueProperty<?>> createPropertiesToUpdateRow(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        ActionContext actionContext) throws Exception {
+
+        boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
+        boolean updateWholeRow = inputParameters.getRequiredBoolean(UPDATE_WHOLE_ROW);
+
+        if (isFirstRowHeader) {
+            List<ModifiableValueProperty<?, ?>> propertiesBasedOnHeader =
+                createPropertiesBasedOnHeader(inputParameters, connectionParameters);
+
+            if (updateWholeRow) {
+                return List.of(
+                    object(VALUES)
+                        .label("Values")
+                        .properties(propertiesBasedOnHeader)
+                        .required(true));
+            } else
+                return List.of(
+                    array(VALUES)
+                        .label("Values")
+                        .items(
+                            object()
+                                .properties(
+                                    string(COLUMN)
+                                        .label("Column")
+                                        .description("Column to update.")
+                                        .options(getColumnOptions(inputParameters, connectionParameters))
+                                        .required(true),
+                                    string(VALUE)
+                                        .label("Column Value")
+                                        .required(true))));
+        } else {
+            if (updateWholeRow) {
+                return List.of(
+                    array(VALUES)
+                        .label("Values")
+                        .items(bool(), number(), string())
+                        .required(true));
+            } else {
+                return List.of(
+                    array(VALUES)
+                        .label("Values")
+                        .items(
+                            object()
+                                .properties(
+                                    string(COLUMN)
+                                        .label("Column Label")
+                                        .description("Label of the column to update. Example: A, B, C, ...")
+                                        .exampleValue("A")
+                                        .required(true),
+                                    string(VALUE)
+                                        .label("Column Value")
+                                        .defaultValue("")
+                                        .required(true))));
+            }
+        }
+    }
+
+    private static List<ModifiableValueProperty<?, ?>> createPropertiesBasedOnHeader(
+        Parameters inputParameters, Parameters connectionParameters) throws Exception {
+
+        List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
+            GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
+            inputParameters.getRequiredString(SHEET_NAME), 1);
+
+        List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
+
+        for (Object value : firstRow) {
+            String label = value.toString();
+            list.add(
+                string(label.replaceAll(" ", "_"))
+                    .label(label)
+                    .defaultValue(""));
+        }
+        return list;
+    }
+
     public static ActionPropertiesFunction createPropertiesForNewRows(boolean insertOneRow) {
         return (inputParameters, connectionParameters, dependencyPaths, context) -> {
 
             boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
 
             if (isFirstRowHeader) {
-                List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
-                    GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
-                    inputParameters.getRequiredString(SHEET_NAME), 1);
-
-                List<ModifiableValueProperty<?, ?>> list = new ArrayList<>();
-
-                for (Object value : firstRow) {
-                    String label = value.toString();
-                    list.add(
-                        string(label.replaceAll(" ", "_"))
-                            .label(label)
-                            .defaultValue(""));
-                }
+                List<ModifiableValueProperty<?, ?>> list =
+                    createPropertiesBasedOnHeader(inputParameters, connectionParameters);
 
                 ModifiableObjectProperty updatedRow = object(VALUES)
                     .label("Values")
@@ -277,6 +349,71 @@ public class GoogleSheetsUtils {
             .getValues();
     }
 
+    public static List<Object> getUpdatedRowValues(Parameters inputParameters, Parameters connectionParameters)
+        throws Exception {
+
+        List<Object> row = new ArrayList<>();
+
+        if (inputParameters.get(ROW) instanceof Map<?, ?> rowMap) {
+            Object values = rowMap.get(VALUES);
+
+            if (values instanceof Map<?, ?> map) {
+                row = map.values()
+                    .stream()
+                    .map(value -> Objects.requireNonNullElse(value, ""))
+                    .toList();
+            } else if (values instanceof List<?> list) {
+                Sheets sheets = GoogleServices.getSheets(connectionParameters);
+                String spreadSheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
+                String sheetName = inputParameters.getRequiredString(SHEET_NAME);
+
+                List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
+                    sheets, spreadSheetId, sheetName, inputParameters.getRequiredInteger(ROW_NUMBER));
+
+                boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
+
+                if (isFirstRowHeader) {
+                    List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(sheets, spreadSheetId, sheetName, 1);
+
+                    for (Object o : list) {
+                        if (o instanceof Map<?, ?> map) {
+                            int indexOfColumnToUpdate = firstRow.indexOf(map.get(COLUMN));
+
+                            rowToUpdate.set(indexOfColumnToUpdate, map.get(VALUE));
+                        }
+                    }
+
+                    return rowToUpdate;
+                } else {
+                    if (inputParameters.getRequiredBoolean(UPDATE_WHOLE_ROW)) {
+                        row = list.stream()
+                            .map(item -> Objects.requireNonNullElse(item, ""))
+                            .toList();
+
+                    } else {
+                        for (Object o : list) {
+                            if (o instanceof Map<?, ?> map) {
+                                int indexOfColumnToUpdate = labelToColum((String) map.get(COLUMN)) - 1;
+
+                                if (indexOfColumnToUpdate >= rowToUpdate.size()) {
+                                    for (int i = rowToUpdate.size(); i <= indexOfColumnToUpdate; i++) {
+                                        rowToUpdate.add("");
+                                    }
+                                }
+
+                                rowToUpdate.set(indexOfColumnToUpdate, map.get("value"));
+                            }
+                        }
+
+                        return rowToUpdate;
+                    }
+                }
+            }
+        }
+
+        return row;
+    }
+
     /**
      * Returns column name in <code>A,B,C,..,AA,AB</code> naming convention.
      *
@@ -293,5 +430,32 @@ public class GoogleSheetsUtils {
         }
 
         return columnName.toString();
+    }
+
+    private static List<Option<String>> getColumnOptions(Parameters inputParameters, Parameters connectionParameters)
+        throws Exception {
+
+        List<Option<String>> options = new ArrayList<>();
+
+        List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(
+            GoogleServices.getSheets(connectionParameters), inputParameters.getRequiredString(SPREADSHEET_ID),
+            inputParameters.getRequiredString(SHEET_NAME), 1);
+
+        for (Object value : firstRow) {
+            String label = value.toString();
+            options.add(option(label, label));
+        }
+
+        return options;
+    }
+
+    private static Integer labelToColum(String label) {
+        int columnNumber = 0;
+
+        for (int i = 0; i < label.length(); i++) {
+            columnNumber = columnNumber * 26 + label.charAt(i) - 'A' + 1;
+        }
+
+        return columnNumber;
     }
 }
