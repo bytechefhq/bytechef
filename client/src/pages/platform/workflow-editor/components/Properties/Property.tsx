@@ -325,14 +325,24 @@ const Property = ({
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
 
-        if (isNumericalInput) {
-            const valueTooLow = minValue && parseFloat(value) < minValue;
-            const valueTooHigh = maxValue && parseFloat(value) > maxValue;
+        if (isNumericalInput && value) {
+            const numericValue = parseFloat(value);
+
+            const valueTooLow = minValue ? numericValue < minValue : numericValue < Number.MIN_SAFE_INTEGER;
+            const valueTooHigh = maxValue ? numericValue > maxValue : numericValue > Number.MAX_SAFE_INTEGER;
 
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
 
                 setErrorMessage('Incorrect value');
+            } else if (controlType === 'INTEGER' && !/^-?\d+$/.test(value)) {
+                setHasError(true);
+
+                setErrorMessage('Value must be a valid integer');
+            } else if (controlType === 'NUMBER' && !/^-?\d+(\.\d+)?$/.test(value)) {
+                setHasError(true);
+
+                setErrorMessage('Value must be a valid number');
             } else {
                 setHasError(false);
             }
@@ -344,6 +354,7 @@ const Property = ({
             }
 
             setInputValue(onlyNumericValue);
+
             latestValueRef.current = onlyNumericValue;
         } else {
             const valueTooShort = minLength && value.length < minLength;
