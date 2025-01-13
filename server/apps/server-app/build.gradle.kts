@@ -51,7 +51,7 @@ dependencies {
     implementation(project(":server:libs:config:liquibase-config"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:config:messages-config"))
-    implementation(project(":server:libs:config:observability-config"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:libs:config:security-config"))
     implementation(project(":server:libs:config:static-resources-config"))
     implementation(project(":server:libs:config:tenant-single-security-config"))
