@@ -60,20 +60,20 @@ public class GoogleSheetsConstants {
         .required(true);
 
     public static final ModifiableStringProperty SPREADSHEET_ID_PROPERTY = string(SPREADSHEET_ID)
-        .label("Spreadsheet")
-        .description("The spreadsheet to apply the updates to.")
+        .label("Spreadsheet ID")
+        .description("The ID of the spreadsheet to apply the updates to.")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
         .required(true);
 
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
-        .label("Sheet")
-        .description("The name of the sheet.")
+        .label("Sheet ID")
+        .description("The ID of the sheet.")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetIdOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
         .required(true);
 
     public static final ModifiableStringProperty SHEET_NAME_PROPERTY = string(SHEET_NAME)
-        .label("Sheet")
+        .label("Sheet Name")
         .description("The name of the sheet.")
         .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
         .optionsLookupDependsOn(SPREADSHEET_ID)
