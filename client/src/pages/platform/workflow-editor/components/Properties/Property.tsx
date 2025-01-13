@@ -98,7 +98,6 @@ const Property = ({
     const [mentionInput, setMentionInput] = useState(
         !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
     );
-    const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(
         property.defaultValue !== undefined ? property.defaultValue : 'null'
@@ -110,6 +109,7 @@ const Property = ({
 
     const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
 
     const {currentComponent, currentNode, setCurrentComponent, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -218,7 +218,7 @@ const Property = ({
             return;
         }
 
-        const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
+        const valueToSave = latestValueRef.current;
 
         saveProperty({
             currentComponent,
@@ -227,7 +227,7 @@ const Property = ({
             setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
-            value: isNumericalInput ? numericValueToSave : inputValue,
+            value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
             workflowId: workflow.id!,
         });
     }, 200);
@@ -343,16 +343,17 @@ const Property = ({
                 return;
             }
 
-            setNumericValue(onlyNumericValue);
+            setInputValue(onlyNumericValue);
+            latestValueRef.current = onlyNumericValue;
         } else {
-            const valueTooShort = minLength && inputValue.length < minLength;
-            const valueTooLong = maxLength && inputValue.length > maxLength;
+            const valueTooShort = minLength && value.length < minLength;
+            const valueTooLong = maxLength && value.length > maxLength;
 
             setHasError(!!valueTooShort || !!valueTooLong);
-
             setErrorMessage('Incorrect value');
+            setInputValue(value);
 
-            setInputValue(event.target.value);
+            latestValueRef.current = value;
         }
 
         saveInputValue();
@@ -360,6 +361,8 @@ const Property = ({
 
     const handleMentionsInputChange = (value: string) => {
         setMentionInputValue(value);
+
+        latestValueRef.current = value;
 
         saveMentionInputValue();
     };
@@ -373,14 +376,12 @@ const Property = ({
             setTimeout(() => {
                 if (inputRef.current) {
                     inputRef.current.value = '';
-
                     inputRef.current.focus();
                 }
             }, 50);
         } else {
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
-
                 editorRef.current?.commands.setContent('');
                 editorRef.current?.commands.focus();
 
@@ -398,7 +399,7 @@ const Property = ({
 
         if (mentionInput && !mentionInputValue) {
             return;
-        } else if (!mentionInput && isNumericalInput && !numericValue) {
+        } else if (!mentionInput && isNumericalInput && !inputValue) {
             return;
         } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
             return;
@@ -411,7 +412,6 @@ const Property = ({
             path,
             setCurrentComponent,
             successCallback: () => {
-                setNumericValue('');
                 setInputValue('');
                 setMentionInputValue('');
                 setSelectValue('');
@@ -434,7 +434,6 @@ const Property = ({
         }
 
         setSelectValue(value);
-
         setPropertyParameterValue(value);
 
         let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
@@ -576,7 +575,7 @@ const Property = ({
 
                 setSelectValue('');
 
-                setNumericValue('');
+                setPropertyParameterValue('');
             }
         }
 
@@ -606,20 +605,20 @@ const Property = ({
 
         if (
             isNumericalInput &&
-            (numericValue === null || numericValue === undefined) &&
+            (inputValue === null || inputValue === undefined) &&
             (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
             parameterValue
         ) {
-            setNumericValue(propertyParameterValue);
+            setInputValue(propertyParameterValue);
         }
 
         if (
             isNumericalInput &&
-            (numericValue !== null || numericValue !== undefined) &&
+            (inputValue !== null || inputValue !== undefined) &&
             (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
-            propertyParameterValue !== numericValue
+            propertyParameterValue !== inputValue
         ) {
-            setNumericValue(propertyParameterValue);
+            setInputValue(propertyParameterValue);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -705,7 +704,7 @@ const Property = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
-            setNumericValue(parameterDefaultValue);
+            setPropertyParameterValue(parameterDefaultValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
@@ -1004,7 +1003,7 @@ const Property = ({
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             title={type}
                             type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                            value={isNumericalInput ? numericValue : inputValue}
+                            value={inputValue}
                         />
                     )}
 
