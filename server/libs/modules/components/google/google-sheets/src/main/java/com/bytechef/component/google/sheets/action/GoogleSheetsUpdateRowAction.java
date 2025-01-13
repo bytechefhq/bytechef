@@ -18,26 +18,30 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_WHOLE_ROW;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getMapOfValuesForRow;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRowValues;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getUpdatedRowValues;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -45,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleSheetsUpdateRowAction {
 
@@ -61,7 +65,15 @@ public class GoogleSheetsUpdateRowAction {
                 .description("The row number to update.")
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            ROW_PROPERTY)
+            bool(UPDATE_WHOLE_ROW)
+                .label("Update Whole Row")
+                .description("Whether to update the whole row or just specific columns.")
+                .defaultValue(true)
+                .required(true),
+            dynamicProperties(ROW)
+                .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
+                .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
+                .required(true))
         .output(
             outputSchema(
                 object()
@@ -76,7 +88,7 @@ public class GoogleSheetsUpdateRowAction {
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
         String range = createRange(
             inputParameters.getRequiredString(SHEET_NAME), inputParameters.getRequiredInteger(ROW_NUMBER));
-        List<Object> row = getRowValues(inputParameters);
+        List<Object> row = getUpdatedRowValues(inputParameters, connectionParameters);
 
         ValueRange valueRange = new ValueRange()
             .setValues(List.of(row))

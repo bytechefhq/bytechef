@@ -34,6 +34,7 @@ import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
  */
 public class GoogleSheetsConstants {
 
+    public static final String COLUMN = "column";
     public static final String HEADERS = "headers";
     public static final String INCLUDE_ITEMS_FROM_ALL_DRIVES = "includeItemsFromAllDrives";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
@@ -43,7 +44,9 @@ public class GoogleSheetsConstants {
     public static final String SHEET_ID = "sheetId";
     public static final String SHEET_NAME = "sheetName";
     public static final String SPREADSHEET_ID = "spreadsheetId";
+    public static final String UPDATE_WHOLE_ROW = "updateWholeRow";
     public static final String VALUE_INPUT_OPTION = "valueInputOption";
+    public static final String VALUE = "value";
     public static final String VALUES = "values";
 
     public static final ModifiableBooleanProperty INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY =
