@@ -59,6 +59,7 @@ public class AiTextConstants {
     public static final String CHUNK_SIZE = "chunkSize";
     public static final String PROVIDER = "provider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
+    public static final String TEXT_GENERATION = "textGeneration";
     public static final String SIMILARITY_SEARCH = "similaritySearch";
     public static final String CLASSIFY_TEXT = "classifyText";
     public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
