@@ -237,13 +237,13 @@
     } ],
     "title" : "Classify Text",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -402,13 +402,13 @@
     } ],
     "title" : "Sentiment Analysis",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -696,13 +696,13 @@
     } ],
     "title" : "Score",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -921,13 +921,13 @@
     } ],
     "title" : "Summarize Text",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1144,13 +1144,230 @@
     } ],
     "title" : "Similarity Search",
     "perform" : { },
+    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
     },
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "AI generates text based on the given prompt.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "textGeneration",
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "modelProvider",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model provider",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Amazon Bedrock: Anthropic 2",
+        "value" : 0
+      }, {
+        "description" : null,
+        "label" : "Amazon Bedrock: Anthropic 3",
+        "value" : 1
+      }, {
+        "description" : null,
+        "label" : "Amazon Bedrock: Cohere",
+        "value" : 2
+      }, {
+        "description" : null,
+        "label" : "Amazon Bedrock: Jurassic 2",
+        "value" : 3
+      }, {
+        "description" : null,
+        "label" : "Amazon Bedrock: Llama",
+        "value" : 4
+      }, {
+        "description" : null,
+        "label" : "Amazon Bedrock: Titan",
+        "value" : 5
+      }, {
+        "description" : null,
+        "label" : "Anthropic",
+        "value" : 6
+      }, {
+        "description" : null,
+        "label" : "Azure Open AI",
+        "value" : 7
+      }, {
+        "description" : null,
+        "label" : "Groq",
+        "value" : 8
+      }, {
+        "description" : null,
+        "label" : "NVIDIA",
+        "value" : 9
+      }, {
+        "description" : null,
+        "label" : "Hugging Face",
+        "value" : 10
+      }, {
+        "description" : null,
+        "label" : "Mistral",
+        "value" : 11
+      }, {
+        "description" : null,
+        "label" : "Open AI",
+        "value" : 12
+      }, {
+        "description" : null,
+        "label" : "Vertex Gemini",
+        "value" : 13
+      } ],
+      "controlType" : "SELECT",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the model to use.",
+      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the model to use.",
+      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Url of the inference endpoint.",
+      "displayCondition" : "modelProvider == 10",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "URL",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Write your prompt for generating text.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "prompt",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Prompt",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "maxTokens",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Max Tokens",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "temperature",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Temperature",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : 0.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
+    } ],
+    "title" : "Text Generation",
+    "perform" : { },
     "processErrorResponse" : null,
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "workflowNodeDescription" : null
   } ],
   "categories" : [ {
