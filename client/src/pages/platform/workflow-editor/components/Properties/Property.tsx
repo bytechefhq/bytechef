@@ -695,13 +695,14 @@ const Property = ({
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
-        // debouncedSetPropertyParameterValue();
-
         if (!workflow.definition || !currentNode?.name || !name || !path) {
             return;
         }
 
-        setPropertyParameterValue(resolvePath(memoizedWorkflowTask?.parameters, path));
+        const encodedParameters = encodeParameters(memoizedWorkflowTask?.parameters ?? {});
+        const encodedPath = encodePath(path);
+
+        setPropertyParameterValue(resolvePath(encodedParameters, encodedPath));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);

@@ -169,6 +169,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
                 const matchingItem = items?.find((item) => item.name === parameterItem.type);
 
+                if (!matchingItem) {
+                    return parameterItem;
+                }
+
                 const subProperties = (matchingItem as ObjectProperty).properties?.map((property) =>
                     Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
                         ? {

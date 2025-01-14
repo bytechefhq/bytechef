@@ -195,18 +195,11 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set default values for subProperties when they are created
     useEffect(() => {
-        if (
-            !subProperties ||
-            !path ||
-            !currentComponent ||
-            !currentComponent.parameters ||
-            !updateWorkflowNodeParameterMutation ||
-            !workflow.id
-        ) {
+        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedParameters = encodeParameters(currentComponent.parameters ?? {});
         const encodedPath = encodePath(path);
 
         const existingObject = resolvePath(encodedParameters, encodedPath);
