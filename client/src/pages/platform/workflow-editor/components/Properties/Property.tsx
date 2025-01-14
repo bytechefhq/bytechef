@@ -455,7 +455,7 @@ const Property = ({
             actualValue = parseFloat(value);
         }
 
-        if (value === 'null') {
+        if (value === 'null' || value === '') {
             actualValue = null;
         }
 
