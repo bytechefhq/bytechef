@@ -92,7 +92,17 @@ const Property = ({
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState(property.defaultValue || '');
+    const [inputValue, setInputValue] = useState(() => {
+        if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+            return '';
+        }
+
+        if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+            return '';
+        }
+
+        return property.defaultValue || '';
+    });
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
@@ -127,7 +137,9 @@ const Property = ({
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
-    const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
+    const defaultValue = useMemo(() => {
+        return property.defaultValue !== undefined ? property.defaultValue : '';
+    }, [property.defaultValue, isDisplayConditionFetched]);
 
     const {
         controlType,
@@ -312,9 +324,7 @@ const Property = ({
             includeInMetadata: property.custom,
             path,
             setCurrentComponent,
-            successCallback: () => {
-                setInputValue(JSON.stringify(value));
-            },
+            successCallback: () => setInputValue(JSON.stringify(value)),
             type,
             updateWorkflowNodeParameterMutation,
             value: JSON.stringify(value),
@@ -361,7 +371,9 @@ const Property = ({
             const valueTooLong = maxLength && value.length > maxLength;
 
             setHasError(!!valueTooShort || !!valueTooLong);
+
             setErrorMessage('Incorrect value');
+
             setInputValue(value);
 
             latestValueRef.current = value;
@@ -594,7 +606,13 @@ const Property = ({
             setMentionInputValue(propertyParameterValue);
         }
 
-        if (!mentionInput && inputValue === '' && propertyParameterValue) {
+        if (
+            !mentionInput &&
+            controlType &&
+            INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
+            inputValue === '' &&
+            propertyParameterValue
+        ) {
             setInputValue(propertyParameterValue);
         }
 
