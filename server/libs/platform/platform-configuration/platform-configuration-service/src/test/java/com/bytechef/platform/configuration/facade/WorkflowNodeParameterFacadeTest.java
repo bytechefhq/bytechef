@@ -51,25 +51,25 @@ public class WorkflowNodeParameterFacadeTest {
                 List.of(Map.of("operation", "REGEX"), Map.of("operation", "EMPTY")),
                 List.of(Map.of("operation", "REGEX"))));
 
-        Map<String, Boolean> displayConditionMap = new HashMap<>();
+        Map<String, String> displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
+            "name", "conditions[index][index].operation != 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
             parametersMap);
 
         Assertions.assertEquals(2, displayConditionMap.size());
         Assertions.assertEquals(
-            Map.of("conditions[0][0].operation != 'EMPTY'", true, "conditions[1][0].operation != 'EMPTY'", true),
+            Map.of("conditions[0][0].operation != 'EMPTY'", "name", "conditions[1][0].operation != 'EMPTY'", "name"),
             displayConditionMap);
 
         displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
+            "name", "conditions[index][index].operation == 'EMPTY'", displayConditionMap, Map.of(), Map.of(),
             parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
-        Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", true), displayConditionMap);
+        Assertions.assertEquals(Map.of("conditions[0][1].operation == 'EMPTY'", "name"), displayConditionMap);
 
         parametersMap = Map.of(
             "conditions",
@@ -80,12 +80,12 @@ public class WorkflowNodeParameterFacadeTest {
         displayConditionMap = new HashMap<>();
 
         WorkflowNodeParameterFacadeImpl.evaluateArray(
-            "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(), Map.of(),
-            parametersMap);
+            "name", "!{'EMPTY','REGEX'}.contains(conditions[index][index].operation)", displayConditionMap, Map.of(),
+            Map.of(), parametersMap);
 
         Assertions.assertEquals(1, displayConditionMap.size());
         Assertions.assertEquals(
-            Map.of("!{'EMPTY','REGEX'}.contains(conditions[1][0].operation)", true), displayConditionMap);
+            Map.of("!{'EMPTY','REGEX'}.contains(conditions[1][0].operation)", "name"), displayConditionMap);
     }
 
     @Test
@@ -97,8 +97,7 @@ public class WorkflowNodeParameterFacadeTest {
 
         for (String expression : expressions) {
             Assertions.assertTrue(
-                WorkflowNodeParameterFacadeImpl.hasExpressionVariable(
-                    expression, "variableName", null),
+                WorkflowNodeParameterFacadeImpl.hasExpressionVariable(expression, "variableName"),
                 expression + " contains variableName");
         }
 
