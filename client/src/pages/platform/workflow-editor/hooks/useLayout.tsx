@@ -2,12 +2,13 @@ import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, EDGE_STYLES} from '@/shared/c
 import defaultNodes from '@/shared/defaultNodes';
 import {WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {NodeDataType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import Dagre from '@dagrejs/dagre';
+import {Edge, Node, useReactFlow} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {Edge, Node, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -197,8 +198,12 @@ export default function useLayout({
     // Prepare auxiliary nodes
     taskNodes.forEach((taskNode) => {
         if (taskNode.data.componentName === 'condition') {
-            caseTrueTaskNames = taskNode.data.parameters.caseTrue.map((task: WorkflowTask) => task.name);
-            caseFalseTaskNames = taskNode.data.parameters.caseFalse.map((task: WorkflowTask) => task.name);
+            caseTrueTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseTrue.map(
+                (task: WorkflowTask) => task.name
+            );
+            caseFalseTaskNames = (taskNode.data as NodeDataType)?.parameters?.caseFalse.map(
+                (task: WorkflowTask) => task.name
+            );
 
             conditionChildTasks[taskNode.id] = {
                 caseFalse: caseFalseTaskNames,
@@ -255,7 +260,7 @@ export default function useLayout({
                 data: {...taskNode.data, conditionData: {conditionCase, conditionId, index}},
             };
 
-            if (conditionChildTaskNode.data.componentName === 'condition') {
+            if ((conditionChildTaskNode.data as NodeDataType).componentName === 'condition') {
                 allNodes = createConditionNode({
                     allNodes,
                     belowPlaceholderNode,
@@ -308,8 +313,8 @@ export default function useLayout({
             const conditionCases = conditionChildTasks[key];
 
             return (
-                conditionCases.caseTrue.includes(taskNode.data.conditionId) ||
-                conditionCases.caseFalse.includes(taskNode.data.conditionId)
+                conditionCases.caseTrue.includes((taskNode.data as NodeDataType)?.conditionId ?? '') ||
+                conditionCases.caseFalse.includes((taskNode.data as NodeDataType)?.conditionId ?? '')
             );
         });
 
@@ -373,10 +378,13 @@ export default function useLayout({
                 .find(
                     (node) =>
                         !node.id.includes('placeholder') &&
-                        node.data.conditionData?.conditionCase === placeholderNodeConditionCase
+                        (node.data as NodeDataType).conditionData?.conditionCase === placeholderNodeConditionCase
                 );
 
-            if (nextTaskNode && nextTaskNode.data.conditionData?.conditionId === taskNode.data.conditionId) {
+            if (
+                nextTaskNode &&
+                (nextTaskNode.data as NodeDataType).conditionData?.conditionId === taskNode.data.conditionId
+            ) {
                 taskEdges.push({
                     id: `${taskNode.id}=>${nextTaskNode.id}`,
                     source: taskNode.id,
@@ -407,7 +415,7 @@ export default function useLayout({
 
         // Create edges for the Condition child node
         if (taskNode.data.conditionData && !taskNode.id.includes('placeholder')) {
-            const {conditionCase, conditionId, index} = taskNode.data.conditionData;
+            const {conditionCase, conditionId, index} = (taskNode.data as NodeDataType).conditionData!;
 
             const sourcePlaceholderId = `${conditionId}-${
                 conditionCase === CONDITION_CASE_TRUE ? 'left' : 'right'

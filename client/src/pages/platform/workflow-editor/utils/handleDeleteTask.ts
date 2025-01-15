@@ -10,7 +10,7 @@ import {
     WorkflowTaskType,
 } from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
-import {Node, NodeProps} from 'reactflow';
+import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -19,7 +19,7 @@ import getParentConditionTask from './getParentConditionTask';
 interface HandleDeleteTaskProps {
     currentComponent?: ComponentType;
     currentNode?: NodeDataType;
-    data: NodeProps['data'];
+    data: NodeDataType;
     getNode: (id: string) => Node | undefined;
     id: string;
     queryClient: QueryClient;
@@ -75,7 +75,7 @@ export default function handleDeleteTask({
             }) as Array<WorkflowTaskType>;
         } else {
             updatedTasks = workflowTasks.map((task) => {
-                if (task.name !== data.conditionData.conditionId) {
+                if (task.name !== data.conditionData?.conditionId) {
                     return task;
                 }
 

@@ -3,8 +3,8 @@ import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefini
 import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
+import {Node} from '@xyflow/react';
 import InlineSVG from 'react-inlinesvg';
-import {Node} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';

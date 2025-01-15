@@ -2,15 +2,9 @@ import defaultEdges from '@/shared/defaultEdges';
 import defaultNodes from '@/shared/defaultNodes';
 
 /* eslint-disable sort-keys */
-import {
-    ComponentDefinitionBasic,
-    TaskDispatcherDefinition,
-    Workflow,
-    WorkflowTask,
-    WorkflowTrigger,
-} from '@/shared/middleware/platform/configuration';
+import {ComponentDefinitionBasic, TaskDispatcherDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {ComponentOperationType, DataPillType} from '@/shared/types';
-import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from 'reactflow';
+import {Edge, Node, OnEdgesChange, OnNodesChange, applyEdgeChanges, applyNodeChanges} from '@xyflow/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
@@ -102,8 +96,8 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             },
             setWorkflow: (workflow) =>
                 set((state) => {
-                    const workflowComponents: Array<WorkflowTrigger & WorkflowTask> = [
-                        workflow.triggers?.[0] || defaultNodes[0].data,
+                    const workflowComponents: Array<{name: string; type: string}> = [
+                        workflow.triggers?.[0] || (defaultNodes[0].data as {name: string; type: string}),
                         ...(workflow?.tasks || []),
                     ];
 

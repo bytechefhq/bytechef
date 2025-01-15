@@ -1,11 +1,12 @@
 import {Button} from '@/components/ui/button';
+import {NodeDataType} from '@/shared/types';
+import {Handle, Position} from '@xyflow/react';
 import {memo} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import styles from '../styles/WorkflowNode.module.css';
 
-const ReadOnlyNode = ({data}: NodeProps) => (
+const ReadOnlyNode = ({data}: {data: NodeDataType}) => (
     <div className="relative flex cursor-grab items-center justify-center">
         <Button
             className={twMerge(

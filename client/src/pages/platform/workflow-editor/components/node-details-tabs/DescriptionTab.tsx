@@ -50,7 +50,9 @@ const DescriptionTab = ({
             }
 
             const conditionCase = currentNode.conditionData.conditionCase;
-            const conditionParameters: Array<WorkflowTask> = parentConditionNode.data.parameters[conditionCase];
+            const conditionParameters: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)?.parameters?.[
+                conditionCase
+            ];
 
             if (conditionParameters) {
                 const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
@@ -81,7 +83,7 @@ const DescriptionTab = ({
                         nodeIndex: taskIndex,
                         nodes,
                         tasks,
-                        updatedParentConditionNodeData: parentConditionNode.data,
+                        updatedParentConditionNodeData: parentConditionNode.data as NodeDataType,
                         updatedParentConditionTask,
                         workflow,
                     });

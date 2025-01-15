@@ -1,7 +1,8 @@
-import {Node} from 'reactflow';
+import {NodeDataType} from '@/shared/types';
+import {Node} from '@xyflow/react';
 
 export default function getFormattedName(itemName: string, nodes: Node[]): string {
-    const nodeNames = nodes.map((node) => node.data.name);
+    const nodeNames = nodes.map((node) => (node.data as NodeDataType).name);
 
     const existingNodes = nodeNames.filter((name) => name?.includes(itemName));
 

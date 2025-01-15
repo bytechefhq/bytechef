@@ -98,7 +98,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     <Input
                         name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter action, triggers and flows"
+                        placeholder="Filter actions, triggers and flows"
                         value={filter}
                     />
 

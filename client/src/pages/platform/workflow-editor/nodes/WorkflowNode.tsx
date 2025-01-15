@@ -3,11 +3,12 @@ import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
+import {NodeDataType} from '@/shared/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
+import {Handle, Position, useReactFlow} from '@xyflow/react';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
-import {Handle, NodeProps, Position, useReactFlow} from 'reactflow';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 
@@ -17,7 +18,7 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import handleDeleteTask from '../utils/handleDeleteTask';
 import styles from './NodeTypes.module.css';
 
-const WorkflowNode = ({data, id}: NodeProps) => {
+const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
