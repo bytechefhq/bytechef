@@ -19,10 +19,10 @@ package com.bytechef.component.ai.image.action.definition;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
+import com.bytechef.component.ai.image.action.AiImageAction;
 import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateImageAction;
 import com.bytechef.component.ai.llm.stability.action.StabilityCreateImageAction;
-import com.bytechef.component.ai.image.action.AiImageAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;

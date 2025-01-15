@@ -16,7 +16,6 @@
 
 package com.bytechef.component.ai.image;
 
-import com.bytechef.component.ai.image.AiImageComponentHandler;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
