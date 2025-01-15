@@ -419,6 +419,7 @@ public class ApplicationProperties {
             private Mistral mistral = new Mistral();
             private Nvidia nvidia = new Nvidia();
             private OpenAi openAi = new OpenAi();
+            private Stability stability = new Stability();
             private VertexGemini vertexGemini = new VertexGemini();
 
             public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
@@ -527,6 +528,14 @@ public class ApplicationProperties {
 
             public void setOpenAi(OpenAi openAi) {
                 this.openAi = openAi;
+            }
+
+            public Stability getStability() {
+                return stability;
+            }
+
+            public void setStability(Stability stability) {
+                this.stability = stability;
             }
 
             public VertexGemini getVertexGemini() {
@@ -694,6 +703,19 @@ public class ApplicationProperties {
             }
 
             public static class OpenAi {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class Stability {
 
                 private String apiKey;
 

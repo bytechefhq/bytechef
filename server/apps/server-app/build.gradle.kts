@@ -118,6 +118,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:active-campaign"))
     implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:ai:ai-agent"))
+    implementation(project(":server:libs:modules:components:ai:ai-image"))
     implementation(project(":server:libs:modules:components:ai:ai-text"))
     implementation(project(":server:libs:modules:components:ai:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:ai:llm:anthropic"))

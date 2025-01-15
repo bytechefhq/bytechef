@@ -145,7 +145,7 @@ public class AzureOpenAiCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
         Integer[] size = inputParameters.getArray(SIZE, Integer.class);
         Style style = inputParameters.get(STYLE, Style.class, NATURAL);

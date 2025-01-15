@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.component.ai.image.action;
+
+import com.bytechef.component.definition.Parameters;
 
 /**
- * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
-public interface AiComponentDefinition extends PlatformComponentDefinition {
+public interface AiImageAction {
 
-    /**
-     *
-     */
-    String AI_TEXT = "aiText";
-    String AI_IMAGE = "aiImage";
+    Parameters createParameters(Parameters inputParameters);
 }

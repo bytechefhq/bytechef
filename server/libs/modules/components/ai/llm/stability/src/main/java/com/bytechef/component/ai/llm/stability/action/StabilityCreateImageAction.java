@@ -157,7 +157,7 @@ public class StabilityCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
         new StabilityAiApi(connectionParameters.getString(TOKEN)),
         StabilityAiImageOptions.builder()
             .cfgScale(inputParameters.getFloat(CFG_SCALE))
