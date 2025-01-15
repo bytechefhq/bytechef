@@ -13,7 +13,7 @@ export function CopilotRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {conversationId, messages, setMessage} = useCopilotStore();
+    const {addMessage, conversationId, messages} = useCopilotStore();
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -22,7 +22,7 @@ export function CopilotRuntimeProvider({
 
         const input = message.content[0].text;
 
-        setMessage({content: input, role: 'user'});
+        addMessage({content: input, role: 'user'});
         setIsRunning(true);
 
         const result = await fetch('/api/platform/internal/ai/chat', {
@@ -40,7 +40,7 @@ export function CopilotRuntimeProvider({
 
         const responses: {text: string}[] = await result.json();
 
-        setMessage({
+        addMessage({
             content: responses.map((message) => message.text).join(''),
             role: 'assistant',
         });

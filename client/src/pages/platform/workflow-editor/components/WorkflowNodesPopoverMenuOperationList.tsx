@@ -5,10 +5,10 @@ import {ClickedOperationType, NodeDataType, PropertyAllType} from '@/shared/type
 import {getRandomId} from '@/shared/util/random-utils';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
+import {useReactFlow} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import {useReactFlow} from 'reactflow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';

@@ -5,8 +5,8 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
+import {Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
-import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
 
 import ConditionEdge from '../edges/ConditionEdge';

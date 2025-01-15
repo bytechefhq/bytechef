@@ -2,11 +2,11 @@ import {Button} from '@/components/ui/button';
 import DataPill from '@/pages/platform/workflow-editor/components/DataPill';
 import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFilteredProperties';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
-import {PropertyAllType} from '@/shared/types';
+import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
+import {useReactFlow} from '@xyflow/react';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {useReactFlow} from 'reactflow';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -48,8 +48,8 @@ const DataPillPanelBodyPropertiesItem = ({
     const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === workflowNodeName);
 
     const handleOutputTabRedirectClick = useNodeClickHandler(
-        redirectTargetNode?.data,
-        redirectTargetNode?.data.name,
+        redirectTargetNode?.data as NodeDataType,
+        redirectTargetNode?.data.name as string,
         'output'
     );
 

@@ -2,9 +2,9 @@ import {Workflow} from '@/shared/middleware/automation/configuration';
 import {ActionDefinition} from '@/shared/middleware/platform/configuration';
 import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
+import {Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {Node} from 'reactflow';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';

@@ -1,5 +1,5 @@
+import {Node} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
-import {Node} from 'reactflow';
 
 const defaultNodes: Node[] = [
     {

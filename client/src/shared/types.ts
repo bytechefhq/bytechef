@@ -111,6 +111,7 @@ export type NodeDataType = {
         index: number;
     };
     connections?: Array<WorkflowConnection>;
+    conditionId?: string;
     connectionId?: number;
     description?: string;
     icon?: JSX.Element | ReactNode | string;
@@ -125,6 +126,7 @@ export type NodeDataType = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters?: {[key: string]: any};
     taskDispatcher?: boolean;
+    title?: string;
     trigger?: boolean;
     type?: string;
     version?: number;

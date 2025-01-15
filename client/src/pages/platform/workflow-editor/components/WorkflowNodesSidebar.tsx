@@ -62,7 +62,7 @@ const WorkflowNodesSidebar = ({
                 <Input
                     name="workflowNodeFilter"
                     onChange={(event) => setFilter(event.target.value)}
-                    placeholder="Filter workflow nodes"
+                    placeholder="Filter actions and flows"
                     value={filter}
                 />
             </header>

@@ -3,8 +3,8 @@ import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/p
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
+import {useReactFlow} from '@xyflow/react';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
-import {useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';

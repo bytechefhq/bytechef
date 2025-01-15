@@ -1,4 +1,4 @@
-import {EdgeProps} from 'reactflow';
+import {EdgeProps} from '@xyflow/react';
 
 export default function ConditionEdge({id, sourceX, sourceY, targetX, targetY}: EdgeProps) {
     const offsetY = 30;
