@@ -50,7 +50,7 @@ public class ApplicationProperties {
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
     private HelpHub helpHub = new HelpHub();
-    private Loki loki = new Loki();
+    private Observability observability = new Observability();
     private Mail mail = new Mail();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
@@ -119,8 +119,8 @@ public class ApplicationProperties {
         return helpHub;
     }
 
-    public Loki getLoki() {
-        return loki;
+    public Observability getObservability() {
+        return observability;
     }
 
     public Mail getMail() {
@@ -223,8 +223,8 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
-    public void setLoki(Loki loki) {
-        this.loki = loki;
+    public void setObservability(Observability observability) {
+        this.observability = observability;
     }
 
     public void setMail(Mail mail) {
@@ -271,50 +271,71 @@ public class ApplicationProperties {
         this.workflow = workflow;
     }
 
-    public static class Loki {
-        private Appender appender = new Appender();
+    public static class Observability {
+        private boolean enabled;
+        private Loki loki;
 
-        public Appender getAppender() {
-            return appender;
+        public boolean isEnabled() {
+            return enabled;
         }
 
-        public void setAppender(Appender appender) {
-            this.appender = appender;
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
-        public static class Appender {
-            private Http http;
-            private Level level = Level.OFF;
+        public Loki getLoki() {
+            return loki;
+        }
 
-            public Http getHttp() {
-                return http;
+        public void setLoki(Loki loki) {
+            this.loki = loki;
+        }
+
+        public static class Loki {
+            private Appender appender = new Appender();
+
+            public Appender getAppender() {
+                return appender;
             }
 
-            public void setHttp(Http http) {
-                this.http = http;
+            public void setAppender(Appender appender) {
+                this.appender = appender;
             }
 
-            public enum Level {
-                DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
-            }
+            public static class Appender {
+                private Http http;
+                private Level level = Level.OFF;
 
-            public Level getLevel() {
-                return level;
-            }
-
-            public void setLevel(Level level) {
-                this.level = level;
-            }
-
-            public static class Http {
-                private String url;
-
-                public String getUrl() {
-                    return url;
+                public Http getHttp() {
+                    return http;
                 }
 
-                public void setUrl(String url) {
-                    this.url = url;
+                public void setHttp(Http http) {
+                    this.http = http;
+                }
+
+                public enum Level {
+                    OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+                }
+
+                public Level getLevel() {
+                    return level;
+                }
+
+                public void setLevel(Level level) {
+                    this.level = level;
+                }
+
+                public static class Http {
+                    private String url;
+
+                    public String getUrl() {
+                        return url;
+                    }
+
+                    public void setUrl(String url) {
+                        this.url = url;
+                    }
                 }
             }
         }
