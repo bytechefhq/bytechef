@@ -86,6 +86,16 @@ module.exports = {
                     foreground: 'hsl(var(--secondary-foreground))',
                 },
                 skeleton: 'hsl(var(--skeleton))',
+                stroke: {
+                    brand: {
+                        primary: 'hsl(var(--stroke-brand-primary))',
+                        'secondary-hover': 'hsl(var(--stroke-brand-secondary-hover))',
+                    },
+                    neutral: {
+                        primary: 'hsl(var(--stroke-neutral-primary))',
+                        secondary: 'hsl(var(--stroke-neutral-secondary))',
+                    },
+                },
                 success: {
                     DEFAULT: 'hsl(var(--success))',
                     foreground: 'hsl(var(--success-foreground))',
@@ -95,6 +105,11 @@ module.exports = {
                         primary: 'hsl(var(--surface-brand-primary))',
                         'primary-hover': 'hsl(var(--surface-brand-primary-hover))',
                         'primary-pressed': 'hsl(var(--surface-brand-primary-pressed))',
+                        secondary: 'hsl(var(--surface-brand-secondary))',
+                        'secondary-hover': 'hsl(var(--surface-brand-secondary-hover))',
+                    },
+                    neutral: {
+                        secondary: 'hsl(var(--surface-neutral-secondary))',
                     },
                 },
             },
