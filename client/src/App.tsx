@@ -179,6 +179,7 @@ function App() {
         getApplicationInfo();
     }, [getApplicationInfo]);
 
+    // Prevent URL hopping
     useEffect(() => {
         if (showLogin && !key) {
             navigate('/login');
