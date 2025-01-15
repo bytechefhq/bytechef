@@ -4,4 +4,5 @@ dependencies {
     implementation(libs.io.zipkin.contrib.otel.encoder.brave)
     implementation(libs.loki.logback.appender)
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
 }
