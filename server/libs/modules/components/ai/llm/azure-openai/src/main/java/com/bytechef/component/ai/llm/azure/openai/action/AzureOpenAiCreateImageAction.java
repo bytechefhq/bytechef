@@ -138,7 +138,7 @@ public class AzureOpenAiCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         OpenAIClient openAIClient = new OpenAIClientBuilder()
             .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
             .endpoint(connectionParameters.getString(ENDPOINT))

@@ -136,7 +136,7 @@ public class OpenAiCreateImageAction {
                                         string("revisedPrompt"))))))
         .perform(OpenAiCreateImageAction::perform);
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         Integer[] size = inputParameters.getArray(SIZE, Integer.class);
 
         return new OpenAiImageModel(

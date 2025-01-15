@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.definition;
+package com.bytechef.component.ai.image;
+
+import com.bytechef.component.ai.image.AiImageComponentHandler;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.test.jsonasssert.JsonFileAssert;
+import org.junit.jupiter.api.Test;
 
 /**
- * @author Ivica Cardic
+ * @author Marko Krišković
  */
-public interface AiComponentDefinition extends PlatformComponentDefinition {
+class AiImageComponentHandlerTest {
 
-    /**
-     *
-     */
-    String AI_TEXT = "aiTextAnalysis";
-    String AI_IMAGE = "aiImageAnalysis";
+    @Test
+    void testGetComponentDefinition() {
+        JsonFileAssert.assertEquals(
+            "definition/ai_image_v1.json",
+            new AiImageComponentHandler(new ApplicationProperties()).getDefinition());
+    }
 }

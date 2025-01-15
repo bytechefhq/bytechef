@@ -591,6 +591,29 @@ public class ApplicationProperties {
                 }
             }
 
+            private Stability stability = new Stability();
+
+            public Stability getStability() {
+                return stability;
+            }
+
+            public void setStability(Stability stability) {
+                this.stability = stability;
+            }
+
+            public static class Stability {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
             private VertexGemini vertexGemini = new VertexGemini();
 
             public VertexGemini getVertexGemini() {
