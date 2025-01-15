@@ -214,11 +214,6 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
-  loki:
-    appender:
-      level: "OFF"
-      http:
-        url: http://localhost:3100/loki/api/v1/push
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
@@ -231,6 +226,13 @@ bytechef:
 #        clientId: 123456789
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
+  observability:
+    loki:
+      appender:
+        level: "ALL"
+        http:
+          url: http://localhost:3100/loki/api/v1/push
+    enabled: false
   public-url: http://127.0.0.1:5173
   resources:
     web: file:///opt/bytechef/client/
