@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.image.util.AiTextAnalysisUtil;
+import com.bytechef.component.ai.image.util.AiImageAnalysisUtil;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource;
@@ -31,7 +31,6 @@ import com.bytechef.component.definition.OptionsDataSource;
  */
 public class AiImageConstants {
 
-    public static final String TEXT = "text";
     public static final String PROMPT = "prompt";
 
     public static final String MODEL_PROVIDER = "modelProvider";
@@ -48,15 +47,15 @@ public class AiImageConstants {
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) AiTextAnalysisUtil::getModelOptions)
+        .options((OptionsDataSource.ActionOptionsFunction<String>) AiImageAnalysisUtil::getModelOptions)
         .optionsLookupDependsOn(MODEL_PROVIDER)
-        .displayCondition("modelProvider >= 1 && modelProvider <= 2")
+        .displayCondition("modelProvider >= 0 && modelProvider <= 1")
         .required(true);
 
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("modelProvider == 0")
+        .displayCondition("modelProvider == 2")
         .required(true);
 
     private AiImageConstants() {

@@ -24,6 +24,8 @@ import static com.bytechef.component.ai.llm.ImageModel.Style.NATURAL;
 import static com.bytechef.component.ai.llm.ImageModel.Style.VIVID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
@@ -52,6 +54,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.stream.Collectors;
+
+import com.bytechef.component.openai.constant.OpenAiConstants;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -70,12 +74,7 @@ public class OpenAiCreateImageAction {
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiImageApi.ImageModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
+                .options(OpenAiConstants.IMAGE_MODELS)
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
@@ -98,22 +97,8 @@ public class OpenAiCreateImageAction {
                         1024, 1792
                     }))
                 .required(true),
-            integer(N)
-                .label("Number of responses")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-                .defaultValue(1)
-                .minValue(1)
-                .maxValue(10)
-                .advancedOption(true),
-            string(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("The format in which the generated images are returned.")
-                .options(
-                    option("URL", URL.name()),
-                    option("B64_JSON", B64_JSON.name()))
-                .defaultValue(URL.getValue())
-                .advancedOption(true),
+            IMAGE_N_PROPERTY,
+            IMAGE_RESPONSE_PROPERTY,
             string(QUALITY)
                 .label("Quality")
                 .description("The quality of the image that will be generated.")

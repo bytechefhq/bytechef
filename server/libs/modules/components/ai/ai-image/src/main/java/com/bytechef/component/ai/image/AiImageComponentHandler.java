@@ -52,7 +52,7 @@ public class AiImageComponentHandler implements ComponentHandler {
 
         private AiImageComponentDefinitionImpl(ApplicationProperties.Ai.Component component) {
             super(
-                component(AI_TEXT)
+                component(AI_IMAGE)
                     .title("AI Image")
                     .description("AI Helper component for image analysis and generation.")
                     .icon("path:assets/ai-image.svg")

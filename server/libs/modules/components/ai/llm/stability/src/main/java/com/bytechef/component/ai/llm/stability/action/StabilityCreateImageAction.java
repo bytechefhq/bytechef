@@ -18,6 +18,8 @@ package com.bytechef.component.ai.llm.stability.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
@@ -81,21 +83,8 @@ public class StabilityCreateImageAction {
                     "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
                 .defaultValue(512)
                 .required(true),
-            integer(N)
-                .label("Number of responses")
-                .description("The number of images to be generated. Must be between 1 and 10.")
-                .defaultValue(1)
-                .minValue(1)
-                .maxValue(10)
-                .advancedOption(true),
-            string(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("The format in which the generated images are returned.")
-                .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("url")
-                .advancedOption(true),
+            IMAGE_N_PROPERTY,
+            IMAGE_RESPONSE_PROPERTY,
             string(STYLE)
                 .label("Style")
                 .description(

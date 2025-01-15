@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiImageApi;
 
 /**
  * @author Monika Domiter
@@ -31,9 +32,15 @@ public final class OpenAiConstants {
 
     public static final String QUALITY = "quality";
 
-    public static final List<Option<String>> MODELS = LLMUtils.getEnumOptions(
+    public static final List<Option<String>> TEXT_MODELS = LLMUtils.getEnumOptions(
         Arrays.stream(OpenAiApi.ChatModel.values())
             .collect(Collectors.toMap(OpenAiApi.ChatModel::getValue, OpenAiApi.ChatModel::getValue)));
+
+    public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
+        Arrays.stream(OpenAiImageApi.ImageModel.values())
+            .collect(
+                Collectors.toMap(
+                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue)));
 
     private OpenAiConstants() {
     }
