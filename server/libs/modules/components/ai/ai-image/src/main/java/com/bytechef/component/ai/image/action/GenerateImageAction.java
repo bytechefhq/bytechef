@@ -16,15 +16,13 @@
 
 package com.bytechef.component.ai.image.action;
 
-import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.PROMPT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -70,7 +68,9 @@ public class GenerateImageAction implements AiImageAction {
             List.of(
                 Map.of("content", inputParameters.getString(PROMPT))));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
-        modelInputParametersMap.put("size", new Integer[] {1024, 1024});
+        modelInputParametersMap.put("size", new Integer[] {
+            1024, 1024
+        });
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }

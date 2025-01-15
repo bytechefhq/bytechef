@@ -6,62 +6,13 @@
   "customAction" : null,
   "customActionHelp" : null,
   "description" : "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",
-  "icon" : "path:assets/open-ai.svg",
+  "icon" : "path:assets/openai.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "openAi",
+  "name" : "openai",
   "resources" : null,
   "version" : 1,
   "title" : "OpenAI",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -207,19 +158,19 @@
           "options" : [ {
             "description" : null,
             "label" : "System",
-            "value" : "SYSTEM"
+            "value" : "system"
           }, {
             "description" : null,
             "label" : "User",
-            "value" : "USER"
+            "value" : "user"
           }, {
             "description" : null,
             "label" : "Assistant",
-            "value" : "ASSISTANT"
+            "value" : "assistant"
           }, {
             "description" : null,
             "label" : "Tool",
-            "value" : "TOOL"
+            "value" : "tool"
           } ],
           "optionsDataSource" : null
         }, {
@@ -245,7 +196,7 @@
         }, {
           "advancedOption" : null,
           "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
-          "displayCondition" : "messages[index].role == 'USER'",
+          "displayCondition" : "messages[index].role == 'user'",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
@@ -395,29 +346,28 @@
         "metadata" : { },
         "required" : false,
         "name" : "responseFormat",
-        "type" : "STRING",
-        "defaultValue" : "TEXT",
+        "type" : "INTEGER",
+        "defaultValue" : 1,
         "exampleValue" : null,
         "label" : "Response Format",
         "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
+        "maxValue" : null,
+        "minValue" : null,
         "options" : [ {
           "description" : "Text response",
           "label" : "Text",
-          "value" : "TEXT"
+          "value" : 1
         }, {
           "description" : "JSON response with key-value pairs",
           "label" : "JSON",
-          "value" : "JSON"
+          "value" : 2
         } ],
+        "controlType" : "SELECT",
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Define the JSON schema for the response.",
-        "displayCondition" : "response.responseFormat == 'JSON'",
+        "displayCondition" : "response.responseFormat == 2",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -668,9 +618,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Ask",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1120,7 +1070,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
-      "description" : "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.",
+      "description" : "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1130,7 +1080,7 @@
       "type" : "INTEGER",
       "defaultValue" : 1,
       "exampleValue" : null,
-      "label" : "Number of responses",
+      "label" : "Number of Responses",
       "placeholder" : null,
       "maxValue" : 10,
       "minValue" : 1,
@@ -1147,9 +1097,9 @@
       "required" : null,
       "name" : "responseFormat",
       "type" : "STRING",
-      "defaultValue" : "url",
+      "defaultValue" : "URL",
       "exampleValue" : null,
-      "label" : "Response format",
+      "label" : "Response Format",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1158,11 +1108,11 @@
       "options" : [ {
         "description" : null,
         "label" : "URL",
-        "value" : "URL"
+        "value" : "url"
       }, {
         "description" : null,
         "label" : "B64_JSON",
-        "value" : "B64_JSON"
+        "value" : "b64_json"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1175,7 +1125,7 @@
       "required" : null,
       "name" : "quality",
       "type" : "STRING",
-      "defaultValue" : "STANDARD",
+      "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Quality",
       "placeholder" : null,
@@ -1185,25 +1135,25 @@
       "minLength" : null,
       "options" : [ {
         "description" : null,
-        "label" : "Standard",
-        "value" : "STANDARD"
+        "label" : "standard",
+        "value" : "standard"
       }, {
         "description" : null,
-        "label" : "HD",
-        "value" : "HD"
+        "label" : "hd",
+        "value" : "hd"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.",
-      "displayCondition" : "model == 'dall-e-3'",
+      "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : null,
       "name" : "style",
       "type" : "STRING",
-      "defaultValue" : "NATURAL",
+      "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Style",
       "placeholder" : null,
@@ -1214,11 +1164,11 @@
       "options" : [ {
         "description" : null,
         "label" : "vivid",
-        "value" : "VIVID"
+        "value" : "vivid"
       }, {
         "description" : null,
         "label" : "natural",
-        "value" : "NATURAL"
+        "value" : "natural"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1243,9 +1193,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Image",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1606,9 +1556,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Text-To-Speech",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1763,231 +1713,231 @@
       "options" : [ {
         "description" : null,
         "label" : "Afrikaans",
-        "value" : "AF"
+        "value" : "af"
       }, {
         "description" : null,
         "label" : "Arabic",
-        "value" : "AR"
+        "value" : "ar"
       }, {
         "description" : null,
         "label" : "Armenian",
-        "value" : "HY"
+        "value" : "hy"
       }, {
         "description" : null,
         "label" : "Azerbaijani",
-        "value" : "AZ"
+        "value" : "az"
       }, {
         "description" : null,
         "label" : "Belarusian",
-        "value" : "BE"
+        "value" : "be"
       }, {
         "description" : null,
         "label" : "Bosnian",
-        "value" : "BS"
+        "value" : "bs"
       }, {
         "description" : null,
         "label" : "Bulgarian",
-        "value" : "BG"
+        "value" : "bg"
       }, {
         "description" : null,
         "label" : "Catalan",
-        "value" : "CA"
+        "value" : "ca"
       }, {
         "description" : null,
-        "label" : "Chinese",
-        "value" : "ZH"
+        "label" : "Chinese (Simplified)",
+        "value" : "zh"
       }, {
         "description" : null,
         "label" : "Croatian",
-        "value" : "HR"
+        "value" : "hr"
       }, {
         "description" : null,
         "label" : "Czech",
-        "value" : "CS"
+        "value" : "cs"
       }, {
         "description" : null,
         "label" : "Danish",
-        "value" : "DA"
+        "value" : "da"
       }, {
         "description" : null,
         "label" : "Dutch",
-        "value" : "NL"
+        "value" : "nl"
       }, {
         "description" : null,
         "label" : "Greek",
-        "value" : "EL"
+        "value" : "el"
       }, {
         "description" : null,
         "label" : "Estonian",
-        "value" : "ET"
+        "value" : "et"
       }, {
         "description" : null,
         "label" : "English",
-        "value" : "EN"
+        "value" : "en"
       }, {
         "description" : null,
         "label" : "Finnish",
-        "value" : "FI"
+        "value" : "fi"
       }, {
         "description" : null,
         "label" : "French",
-        "value" : "FR"
+        "value" : "fr"
       }, {
         "description" : null,
         "label" : "Galician",
-        "value" : "GL"
+        "value" : "gl"
       }, {
         "description" : null,
         "label" : "German",
-        "value" : "DE"
+        "value" : "de"
       }, {
         "description" : null,
         "label" : "Hebrew",
-        "value" : "HE"
+        "value" : "he"
       }, {
         "description" : null,
         "label" : "Hindi",
-        "value" : "HI"
+        "value" : "hi"
       }, {
         "description" : null,
         "label" : "Hungarian",
-        "value" : "HU"
+        "value" : "hu"
       }, {
         "description" : null,
         "label" : "Icelandic",
-        "value" : "IS"
+        "value" : "is"
       }, {
         "description" : null,
         "label" : "Indonesian",
-        "value" : "ID"
+        "value" : "id"
       }, {
         "description" : null,
         "label" : "Italian",
-        "value" : "IT"
+        "value" : "it"
       }, {
         "description" : null,
         "label" : "Japanese",
-        "value" : "JA"
+        "value" : "ja"
       }, {
         "description" : null,
         "label" : "Kazakh",
-        "value" : "KK"
+        "value" : "kk"
       }, {
         "description" : null,
         "label" : "Kannada",
-        "value" : "KN"
+        "value" : "kn"
       }, {
         "description" : null,
         "label" : "Korean",
-        "value" : "KO"
+        "value" : "ko"
       }, {
         "description" : null,
         "label" : "Lithuanian",
-        "value" : "LT"
+        "value" : "lt"
       }, {
         "description" : null,
         "label" : "Latvian",
-        "value" : "LV"
+        "value" : "lv"
       }, {
         "description" : null,
-        "label" : "Marathi",
-        "value" : "MA"
+        "label" : "Maori",
+        "value" : "ma"
       }, {
         "description" : null,
         "label" : "Macedonian",
-        "value" : "MK"
+        "value" : "mk"
       }, {
         "description" : null,
         "label" : "Marathi",
-        "value" : "MR"
+        "value" : "mr"
       }, {
         "description" : null,
         "label" : "Malay",
-        "value" : "MS"
+        "value" : "ms"
       }, {
         "description" : null,
         "label" : "Nepali",
-        "value" : "NE"
+        "value" : "ne"
       }, {
         "description" : null,
         "label" : "Norwegian",
-        "value" : "NO"
+        "value" : "no"
       }, {
         "description" : null,
         "label" : "Persian",
-        "value" : "FA"
+        "value" : "fa"
       }, {
         "description" : null,
         "label" : "Polish",
-        "value" : "PL"
+        "value" : "pl"
       }, {
         "description" : null,
         "label" : "Portuguese",
-        "value" : "PT"
+        "value" : "pt"
       }, {
         "description" : null,
         "label" : "Romanian",
-        "value" : "RO"
+        "value" : "ro"
       }, {
         "description" : null,
         "label" : "Russian",
-        "value" : "RU"
+        "value" : "ru"
       }, {
         "description" : null,
         "label" : "Slovak",
-        "value" : "SK"
+        "value" : "sk"
       }, {
         "description" : null,
         "label" : "Slovenian",
-        "value" : "SL"
+        "value" : "sl"
       }, {
         "description" : null,
         "label" : "Serbian",
-        "value" : "SR"
+        "value" : "sr"
       }, {
         "description" : null,
         "label" : "Spanish",
-        "value" : "ES"
+        "value" : "es"
       }, {
         "description" : null,
         "label" : "Swedish",
-        "value" : "SV"
+        "value" : "sv"
       }, {
         "description" : null,
         "label" : "Swahili",
-        "value" : "SW"
+        "value" : "sw"
       }, {
         "description" : null,
         "label" : "Tamil",
-        "value" : "TA"
+        "value" : "ta"
       }, {
         "description" : null,
         "label" : "Tagalog",
-        "value" : "TL"
+        "value" : "tl"
       }, {
         "description" : null,
         "label" : "Thai",
-        "value" : "TH"
+        "value" : "th"
       }, {
         "description" : null,
         "label" : "Turkish",
-        "value" : "TR"
+        "value" : "tr"
       }, {
         "description" : null,
         "label" : "Ukrainian",
-        "value" : "UK"
+        "value" : "uk"
       }, {
         "description" : null,
         "label" : "Urdu",
-        "value" : "UR"
+        "value" : "ur"
       }, {
         "description" : null,
         "label" : "Vietnamese",
-        "value" : "VI"
+        "value" : "vi"
       }, {
         "description" : null,
         "label" : "Welsh",
-        "value" : "CY"
+        "value" : "cy"
       } ],
       "optionsDataSource" : null
     }, {
@@ -2074,10 +2024,59 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Transcriptions",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

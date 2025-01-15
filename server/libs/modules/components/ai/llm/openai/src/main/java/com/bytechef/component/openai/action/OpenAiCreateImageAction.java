@@ -52,9 +52,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import com.bytechef.component.openai.constant.OpenAiConstants;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
