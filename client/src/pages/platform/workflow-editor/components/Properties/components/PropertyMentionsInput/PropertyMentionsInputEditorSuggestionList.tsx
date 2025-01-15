@@ -78,7 +78,7 @@ const PropertyMentionsInputEditorSuggestionList = forwardRef<
                     </button>
                 ))
             ) : (
-                <div className="text-sm">No result</div>
+                <p className="text-sm">No data pills found.</p>
             )}
         </div>
     );
