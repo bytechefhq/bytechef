@@ -19,6 +19,8 @@ package com.bytechef.component.ai.llm.azure.openai.action;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
@@ -39,6 +41,7 @@ import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ImageModel;
+import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -62,13 +65,7 @@ public class AzureOpenAiCreateImageAction {
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    AzureOpenAiImageOptions.ImageModel::getValue,
-                                    AzureOpenAiImageOptions.ImageModel::getValue))))
+                .options(AzureOpenAiConstants.MODELS)
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
             object(SIZE)
@@ -91,22 +88,8 @@ public class AzureOpenAiCreateImageAction {
                         1024, 1792
                     }))
                 .required(true),
-            integer(N)
-                .label("Number of Responses")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
-                .defaultValue(1)
-                .minValue(1)
-                .maxValue(10)
-                .advancedOption(true),
-            string(RESPONSE_FORMAT)
-                .label("Response Format")
-                .description("The format in which the generated images are returned.")
-                .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("URL")
-                .advancedOption(true),
+            IMAGE_N_PROPERTY,
+            IMAGE_RESPONSE_PROPERTY,
             string(STYLE)
                 .label("Style")
                 .description(

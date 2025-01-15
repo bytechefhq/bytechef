@@ -52,7 +52,7 @@ public class AiTextAnalysisUtil {
             case 5 -> AmazonBedrockConstants.TITAN_MODELS;
             case 6 -> AnthropicConstants.MODELS;
             case 11 -> MistralConstants.MODELS;
-            case 12 -> OpenAiConstants.MODELS;
+            case 12 -> OpenAiConstants.TEXT_MODELS;
             case 13 -> VertexGeminiConstants.MODELS;
             default -> throw new IllegalStateException("Unexpected value: " + modelProvider);
         };

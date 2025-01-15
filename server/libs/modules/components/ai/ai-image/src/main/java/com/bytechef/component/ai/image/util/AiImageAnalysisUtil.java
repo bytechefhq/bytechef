@@ -18,10 +18,7 @@ package com.bytechef.component.ai.image.util;
 
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_PROVIDER;
 
-import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
-import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
-import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
-import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
+import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -32,9 +29,9 @@ import java.util.Map;
 /**
  * @author Marko Kriskovic
  */
-public class AiTextAnalysisUtil {
+public class AiImageAnalysisUtil {
 
-    private AiTextAnalysisUtil() {
+    private AiImageAnalysisUtil() {
     }
 
     public static List<? extends Option<String>> getModelOptions(
@@ -44,20 +41,9 @@ public class AiTextAnalysisUtil {
         Integer modelProvider = inputParameters.getInteger(MODEL_PROVIDER);
 
         return switch (modelProvider) {
-            case 0 -> AmazonBedrockConstants.ANTHROPIC2_MODELS;
-            case 1 -> AmazonBedrockConstants.ANTHROPIC3_MODELS;
-            case 2 -> AmazonBedrockConstants.COHERE_MODELS;
-            case 3 -> AmazonBedrockConstants.JURASSIC2_MODELS;
-            case 4 -> AmazonBedrockConstants.LLAMA_MODELS;
-            case 5 -> AmazonBedrockConstants.TITAN_MODELS;
-            case 6 -> AnthropicConstants.MODELS;
-            case 11 -> MistralConstants.MODELS;
-            case 12 -> OpenAiConstants.MODELS;
-            case 13 -> VertexGeminiConstants.MODELS;
+            case 0 -> AzureOpenAiConstants.MODELS;
+            case 1 -> OpenAiConstants.IMAGE_MODELS;
             default -> throw new IllegalStateException("Unexpected value: " + modelProvider);
         };
-    }
-
-    public record Criteria(String criterion, double lowestScore, double highestScore, boolean isDecimal) {
     }
 }

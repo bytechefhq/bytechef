@@ -284,6 +284,24 @@ public class LLMConstants {
         .required(false)
         .advancedOption(true);
 
+    public static final ModifiableStringProperty IMAGE_RESPONSE_PROPERTY = string(RESPONSE_FORMAT)
+        .label("Response Format")
+        .description("The format in which the generated images are returned.")
+        .options(
+            option("URL", "url"),
+            option("B64_JSON", "b64_json"))
+        .defaultValue("URL")
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty IMAGE_N_PROPERTY = integer(N)
+        .label("Number of Responses")
+        .description(
+            "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
+        .defaultValue(1)
+        .minValue(1)
+        .maxValue(10)
+        .advancedOption(true);
+
     private LLMConstants() {
     }
 }
