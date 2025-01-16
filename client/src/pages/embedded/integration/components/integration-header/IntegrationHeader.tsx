@@ -1,7 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import IntegrationVersionHistorySheet from '@/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeaderDeleteIntegrationAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteIntegrationAlertDialog';
 import IntegrationHeaderDeleteWorkflowAlertDialog from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderDeleteWorkflowAlertDialog';
+import IntegrationHeaderHistoryButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderHistoryButton';
 import IntegrationHeaderIntegrationDropDownMenu from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderIntegrationDropDownMenu';
 import IntegrationHeaderOutputButton from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderOutputButton';
 import IntegrationHeaderPublishPopover from '@/pages/embedded/integration/components/integration-header/IntegrationHeaderPublishPopover';
@@ -53,6 +55,7 @@ const IntegrationHeader = ({
     const [showDeleteIntegrationAlertDialog, setShowDeleteIntegrationAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditIntegrationDialog, setShowEditIntegrationDialog] = useState(false);
+    const [showIntegrationVersionHistorySheet, setShowIntegrationVersionHistorySheet] = useState(false);
 
     const {
         setShowBottomPanelOpen,
@@ -186,7 +189,7 @@ const IntegrationHeader = ({
     };
 
     return (
-        <header className="flex items-center border-b border-b-border/50 py-2.5 pl-3 pr-2.5">
+        <header className="flex items-center px-3 py-2.5">
             <div className="flex flex-1">{integration && <IntegrationHeaderTitle integration={integration} />}</div>
 
             <div className="flex items-center space-x-12">
@@ -234,6 +237,8 @@ const IntegrationHeader = ({
                     <div className="flex space-x-1">
                         <IntegrationHeaderPublishPopover integration={integration} />
 
+                        <IntegrationHeaderHistoryButton onClick={() => setShowIntegrationVersionHistorySheet(true)} />
+
                         <IntegrationHeaderIntegrationDropDownMenu
                             integrationId={integrationId}
                             onDelete={() => setShowDeleteIntegrationAlertDialog(true)}
@@ -267,6 +272,15 @@ const IntegrationHeader = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showIntegrationVersionHistorySheet && (
+                <IntegrationVersionHistorySheet
+                    integrationId={+integrationId!}
+                    onClose={() => {
+                        setShowIntegrationVersionHistorySheet(false);
+                    }}
                 />
             )}
         </header>

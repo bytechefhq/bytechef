@@ -1,6 +1,5 @@
 import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import IntegrationVersionHistorySheet from '@/pages/embedded/integration/components/IntegrationVersionHistorySheet';
 import IntegrationHeader from '@/pages/embedded/integration/components/integration-header/IntegrationHeader';
 import IntegrationsSidebar from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
 import IntegrationsSidebarHeader from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
@@ -45,21 +44,25 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
+import {CableIcon, Code2Icon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
 const Integration = () => {
-    const [showIntegrationVersionHistorySheet, setShowIntegrationVersionHistorySheet] = useState(false);
-    const [showWorkflowCodeEditorSheet, setShowWorkflowCodeEditorSheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
     const {leftSidebarOpen} = useIntegrationsLeftSidebarStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
-    const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
+    const {
+        setShowBottomPanelOpen,
+        setShowEditWorkflowDialog,
+        setShowWorkflowCodeEditorSheet,
+        showWorkflowCodeEditorSheet,
+        workflowIsRunning,
+        workflowTestExecution,
+    } = useWorkflowEditorStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {setComponentDefinitions, setTaskDispatcherDefinitions, setWorkflow, workflow} = useWorkflowDataStore();
@@ -76,13 +79,6 @@ const Integration = () => {
         onClick?: () => void;
         separator?: boolean;
     }[] = [
-        {
-            icon: HistoryIcon,
-            name: 'Integration Version History',
-            onClick: () => {
-                setShowIntegrationVersionHistorySheet(true);
-            },
-        },
         {
             icon: PuzzleIcon,
             name: 'Components & Flow Controls',
@@ -256,26 +252,10 @@ const Integration = () => {
             <LayoutContainer
                 className="bg-muted/50"
                 leftSidebarBody={<IntegrationsSidebar integrationId={+integrationId!} />}
-                leftSidebarClass="bg-muted"
+                leftSidebarClass="bg-background"
                 leftSidebarHeader={<Header right={<IntegrationsSidebarHeader />} title="Integrations" />}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
-                rightSidebarBody={
-                    componentDefinitions &&
-                    taskDispatcherDefinitions && (
-                        <WorkflowNodesSidebar
-                            data={{
-                                componentDefinitions,
-                                taskDispatcherDefinitions,
-                            }}
-                        />
-                    )
-                }
-                rightSidebarOpen={rightSidebarOpen}
-                rightSidebarWidth="96"
-                rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l border-l-border/50"
-                rightToolbarOpen={true}
                 topHeader={
                     integrationId && (
                         <IntegrationHeader
@@ -314,20 +294,48 @@ const Integration = () => {
                                                 updateWorkflowNodeParameterMutation,
                                             }}
                                         >
-                                            <WorkflowEditorLayout
-                                                componentDefinitions={componentDefinitions}
-                                                leftSidebarOpen={leftSidebarOpen}
-                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
+                                            <div className="flex size-full">
+                                                <WorkflowEditorLayout
+                                                    componentDefinitions={componentDefinitions}
+                                                    leftSidebarOpen={leftSidebarOpen}
+                                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                                    updateWorkflowMutation={updateWorkflowMutation}
+                                                />
+
+                                                {rightSidebarOpen &&
+                                                    componentDefinitions &&
+                                                    taskDispatcherDefinitions && (
+                                                        <aside className="mb-4 flex w-96">
+                                                            <div className="flex-1">
+                                                                <WorkflowNodesSidebar
+                                                                    data={{
+                                                                        componentDefinitions,
+                                                                        taskDispatcherDefinitions,
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </aside>
+                                                    )}
+
+                                                <aside>
+                                                    <RightSidebar
+                                                        className="mx-1.5 rounded-lg border"
+                                                        navigation={rightSidebarNavigation}
+                                                    />
+                                                </aside>
+                                            </div>
                                         </WorkflowNodeParameterMutationProvider>
                                     </WorkflowMutationProvider>
                                 </ConnectionReactQueryProvider>
                             </ResizablePanel>
 
-                            <ResizableHandle />
+                            <ResizableHandle className="bg-muted" />
 
-                            <ResizablePanel className="bg-white" defaultSize={0} ref={bottomResizablePanelRef}>
+                            <ResizablePanel
+                                className="border-r border-r-border/50 bg-background"
+                                defaultSize={0}
+                                ref={bottomResizablePanelRef}
+                            >
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={() => {
                                         setShowBottomPanelOpen(false);
@@ -347,15 +355,6 @@ const Integration = () => {
 
             {workflow && (
                 <>
-                    {showIntegrationVersionHistorySheet && (
-                        <IntegrationVersionHistorySheet
-                            integrationId={+integrationId!}
-                            onClose={() => {
-                                setShowIntegrationVersionHistorySheet(false);
-                            }}
-                        />
-                    )}
-
                     {showWorkflowCodeEditorSheet && (
                         <ConnectionReactQueryProvider
                             value={{

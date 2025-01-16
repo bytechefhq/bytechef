@@ -1,7 +1,9 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
+import ProjectHeaderHistoryButton from '@/pages/automation/project/components/project-header/ProjectHeaderHistoryButton';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
 import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderProjectDropDownMenu';
 import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
@@ -59,6 +61,7 @@ const ProjectHeader = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
+    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
     const {
         setShowBottomPanelOpen,
@@ -214,7 +217,7 @@ const ProjectHeader = ({
     }, [handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
     return (
-        <header className="flex items-center border-b border-b-border/50 py-2.5 pl-3 pr-2.5">
+        <header className="flex items-center px-3 py-2.5">
             <div className="flex flex-1">{project && <ProjectHeaderTitle project={project} />}</div>
 
             <div className="flex items-center space-x-12">
@@ -270,6 +273,8 @@ const ProjectHeader = ({
                     <div className="flex space-x-1">
                         <ProjectHeaderPublishPopover project={project} />
 
+                        <ProjectHeaderHistoryButton onClick={() => setShowProjectVersionHistorySheet(true)} />
+
                         <ProjectHeaderProjectDropDownMenu
                             onDelete={() => setShowDeleteProjectAlertDialog(true)}
                             onEdit={() => setShowEditProjectDialog(true)}
@@ -303,6 +308,15 @@ const ProjectHeader = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showProjectVersionHistorySheet && (
+                <ProjectVersionHistorySheet
+                    onClose={() => {
+                        setShowProjectVersionHistorySheet(false);
+                    }}
+                    projectId={+projectId!}
                 />
             )}
         </header>

@@ -34,11 +34,7 @@ const IntegrationsSidebarHeader = () => {
                     <div>
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Button
-                                    className="size-8 hover:bg-background/50 [&_svg]:size-5"
-                                    size="icon"
-                                    variant="ghost"
-                                >
+                                <Button className="size-8 hover:bg-muted [&_svg]:size-5" size="icon" variant="ghost">
                                     <FilterIcon />
                                 </Button>
                             </TooltipTrigger>
@@ -57,7 +53,7 @@ const IntegrationsSidebarHeader = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            className="hover:bg-background/70 [&_svg]:size-5"
+                            className="hover:bg-muted [&_svg]:size-5"
                             onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
                             size="icon"
                             variant="ghost"

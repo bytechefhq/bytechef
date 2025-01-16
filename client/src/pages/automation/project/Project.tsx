@@ -46,7 +46,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CableIcon, Code2Icon, HistoryIcon, PuzzleIcon, SlidersIcon} from 'lucide-react';
+import {CableIcon, Code2Icon, PuzzleIcon, SlidersIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
@@ -56,15 +56,16 @@ const Project = () => {
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
-    const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
+    const {leftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {
         setShowBottomPanelOpen,
         setShowEditWorkflowDialog,
         setShowWorkflowCodeEditorSheet,
         showWorkflowCodeEditorSheet,
+        workflowIsRunning,
+        workflowTestExecution,
     } = useWorkflowEditorStore();
-    const {leftSidebarOpen} = useProjectsLeftSidebarStore();
-    const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {setWorkflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {setWorkflowTestChatPanelOpen} = useWorkflowTestChatStore();
     const {currentWorkspaceId} = useWorkspaceStore();
@@ -138,11 +139,6 @@ const Project = () => {
     const rightSidebarNavigation = useMemo(
         () =>
             [
-                {
-                    icon: HistoryIcon,
-                    name: 'Project Version History',
-                    onClick: () => setShowProjectVersionHistorySheet(true),
-                },
                 {
                     icon: PuzzleIcon,
                     name: 'Components & Flow Controls',
@@ -273,26 +269,10 @@ const Project = () => {
             <LayoutContainer
                 className="bg-muted/50"
                 leftSidebarBody={<ProjectsSidebar projectId={+projectId!} />}
-                leftSidebarClass="bg-muted"
+                leftSidebarClass="bg-background"
                 leftSidebarHeader={<Header right={<ProjectsSidebarHeader />} title="Projects" />}
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
-                rightSidebarBody={
-                    componentDefinitions &&
-                    taskDispatcherDefinitions && (
-                        <WorkflowNodesSidebar
-                            data={{
-                                componentDefinitions,
-                                taskDispatcherDefinitions,
-                            }}
-                        />
-                    )
-                }
-                rightSidebarOpen={rightSidebarOpen}
-                rightSidebarWidth="96"
-                rightToolbarBody={<RightSidebar navigation={rightSidebarNavigation} />}
-                rightToolbarClass="border-l border-l-border/50"
-                rightToolbarOpen={true}
                 topHeader={
                     projectId && (
                         <ProjectHeader
@@ -343,20 +323,48 @@ const Project = () => {
                                                 updateWorkflowNodeParameterMutation,
                                             }}
                                         >
-                                            <WorkflowEditorLayout
-                                                componentDefinitions={componentDefinitions}
-                                                leftSidebarOpen={leftSidebarOpen}
-                                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                                updateWorkflowMutation={updateWorkflowMutation}
-                                            />
+                                            <div className="flex size-full">
+                                                <WorkflowEditorLayout
+                                                    componentDefinitions={componentDefinitions}
+                                                    leftSidebarOpen={leftSidebarOpen}
+                                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                                    updateWorkflowMutation={updateWorkflowMutation}
+                                                />
+
+                                                {rightSidebarOpen &&
+                                                    componentDefinitions &&
+                                                    taskDispatcherDefinitions && (
+                                                        <aside className="mb-4 flex w-96">
+                                                            <div className="flex-1">
+                                                                <WorkflowNodesSidebar
+                                                                    data={{
+                                                                        componentDefinitions,
+                                                                        taskDispatcherDefinitions,
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </aside>
+                                                    )}
+
+                                                <aside>
+                                                    <RightSidebar
+                                                        className="mx-1.5 rounded-lg border"
+                                                        navigation={rightSidebarNavigation}
+                                                    />
+                                                </aside>
+                                            </div>
                                         </WorkflowNodeParameterMutationProvider>
                                     </WorkflowMutationProvider>
                                 </ConnectionReactQueryProvider>
                             </ResizablePanel>
 
-                            <ResizableHandle />
+                            <ResizableHandle className="bg-muted" />
 
-                            <ResizablePanel className="bg-white" defaultSize={0} ref={bottomResizablePanelRef}>
+                            <ResizablePanel
+                                className="border-r border-r-border/50 bg-background"
+                                defaultSize={0}
+                                ref={bottomResizablePanelRef}
+                            >
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={() => {
                                         setShowBottomPanelOpen(false);

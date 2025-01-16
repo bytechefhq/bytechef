@@ -197,7 +197,7 @@ const WorkflowCodeEditorSheet = ({
                             />
                         </ResizablePanel>
 
-                        <ResizableHandle />
+                        <ResizableHandle className="bg-muted" />
 
                         <ResizablePanel defaultSize={30}>
                             {workflowIsRunning ? (

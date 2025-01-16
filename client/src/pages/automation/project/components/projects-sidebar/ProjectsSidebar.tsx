@@ -25,8 +25,8 @@ const ProjectsSidebar = ({projectId}: {projectId: number}) => {
                 projects.map((curProject) => (
                     <div
                         className={twMerge(
-                            'flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 text-sm hover:bg-background/50',
-                            curProject.id === projectId && 'bg-background/50'
+                            'flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 text-sm hover:bg-muted',
+                            curProject.id === projectId && 'bg-muted/50'
                         )}
                         key={curProject.id}
                         onClick={() =>
