@@ -23,7 +23,7 @@ const CopilotPanel = () => {
 
     return (
         <div className="relative h-full min-h-[50vh] w-[450px]">
-            <div className="flex items-center justify-between px-3 py-5">
+            <div className="flex items-center justify-between p-3">
                 <div className="flex items-center space-x-1">
                     <BotMessageSquareIcon className="size-6" /> <h4>AI Copilot</h4>
                 </div>

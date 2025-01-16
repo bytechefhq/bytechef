@@ -127,7 +127,7 @@ const WorkflowExecutionsTestOutput = ({
                             {workflowTestExecution?.job ? (
                                 <ResizablePanelGroup direction="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
-                                        <ul className="divide-y divide-muted">
+                                        <ul className="mx-2 space-y-0.5">
                                             {triggerExecution && (
                                                 <WorkflowTriggerExecutionItem
                                                     key={triggerExecution.id}
@@ -149,7 +149,7 @@ const WorkflowExecutionsTestOutput = ({
                                         </ul>
                                     </ResizablePanel>
 
-                                    <ResizableHandle />
+                                    <ResizableHandle className="bg-muted" />
 
                                     <ResizablePanel className="space-y-4 overflow-y-auto p-4">
                                         <WorkflowExecutionContent {...content} />

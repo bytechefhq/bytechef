@@ -16,34 +16,30 @@ export function RightSidebar({
 }) {
     return (
         <div className={twMerge('hidden lg:flex lg:shrink-0', className)}>
-            <div className="flex w-sidebar-width">
-                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-                    <div className="flex-1">
-                        <nav aria-label="Sidebar" className="flex flex-col items-center py-3">
-                            {navigation.map((item, index) =>
-                                item.separator ? (
-                                    <div className="my-2 w-8/12 border-b" key={`right-sidebar-separator-${index}`} />
-                                ) : (
-                                    <button
-                                        className="flex items-center rounded-lg p-3 hover:text-blue-600 [&_svg]:size-5"
-                                        key={item.name}
-                                        onClick={item.onClick}
-                                    >
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                {item.icon && <item.icon aria-hidden="true" />}
-                                            </TooltipTrigger>
+            <div className="flex min-h-0 flex-col overflow-y-auto">
+                <nav aria-label="Sidebar" className="flex flex-col items-center rounded-lg py-3">
+                    {navigation.map((item, index) =>
+                        item.separator ? (
+                            <div className="my-2 w-8/12 border-b" key={`right-sidebar-separator-${index}`} />
+                        ) : (
+                            <button
+                                className="flex items-center rounded-lg p-3 hover:text-blue-600 [&_svg]:size-5"
+                                key={item.name}
+                                onClick={item.onClick}
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        {item.icon && <item.icon aria-hidden="true" />}
+                                    </TooltipTrigger>
 
-                                            <TooltipContent side="left">{item.name}</TooltipContent>
-                                        </Tooltip>
+                                    <TooltipContent side="left">{item.name}</TooltipContent>
+                                </Tooltip>
 
-                                        <span className="sr-only">{item.name}</span>
-                                    </button>
-                                )
-                            )}
-                        </nav>
-                    </div>
-                </div>
+                                <span className="sr-only">{item.name}</span>
+                            </button>
+                        )
+                    )}
+                </nav>
             </div>
         </div>
     );
