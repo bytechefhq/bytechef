@@ -139,7 +139,7 @@ const Property = ({
 
     const defaultValue = useMemo(() => {
         return property.defaultValue !== undefined ? property.defaultValue : '';
-    }, [property.defaultValue, isDisplayConditionFetched]);
+    }, [property.defaultValue]);
 
     const {
         controlType,

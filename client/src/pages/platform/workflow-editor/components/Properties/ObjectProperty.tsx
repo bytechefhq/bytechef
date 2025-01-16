@@ -31,10 +31,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
         (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
     );
+    const [parameterObject, setParameterObject] = useState<{[key: string]: object[] | undefined}>({});
 
     const {currentComponent, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
-
     const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
     const {additionalProperties, label, name, properties} = property;
@@ -110,26 +110,25 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         [onDeleteClick, path]
     );
 
+    const objectParameterKeys = useMemo(() => {
+        return properties?.length ? properties?.map((property) => property.name) : Object.keys(parameterObject);
+    }, [properties, parameterObject]);
+
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (!name || !path || !currentComponent?.parameters) {
+        if (
+            !name ||
+            !path ||
+            !currentComponent?.parameters ||
+            !properties ||
+            !parameterObject ||
+            !isObject(parameterObject)
+        ) {
             return;
         }
 
-        const parameterObject = resolvePath(currentComponent.parameters ?? {}, path);
-
-        if (!parameterObject || !isObject(parameterObject)) {
-            return;
-        }
-
-        const objectParameterKeys = properties?.length
-            ? properties?.map((property) => property.name)
-            : Object.keys(parameterObject);
-
-        const preexistingProperties = objectParameterKeys.map((parameterKey) => {
-            const matchingProperty = (properties as Array<PropertyAllType>)?.find(
-                (property) => property.name === parameterKey
-            );
+        const preexistingProperties = objectParameterKeys.map((parameterKey, index) => {
+            const matchingProperty = (properties as Array<PropertyAllType>)[index] as PropertyAllType;
 
             let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[`${path}.${parameterKey}`];
 
@@ -179,11 +178,11 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         });
 
         if (preexistingProperties.length) {
-            setSubProperties(preexistingProperties);
+            setSubProperties(preexistingProperties as Array<PropertyAllType>);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [parameterObject]);
 
     // set subProperties in cases where the ObjectProperty has predefined properties
     useEffect(() => {
@@ -227,6 +226,15 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subProperties]);
+
+    // update parameterObject when workflowDefinition changes
+    useEffect(() => {
+        if (workflow.definition && path) {
+            const resolvedParameterObject = resolvePath(currentComponent?.parameters ?? {}, path);
+
+            setParameterObject(resolvedParameterObject);
+        }
+    }, [workflow.definition, path, currentComponent?.parameters]);
 
     return (
         <Fragment key={name}>
