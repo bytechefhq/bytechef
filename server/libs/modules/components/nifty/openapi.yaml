@@ -105,6 +105,57 @@ paths:
                       due_date:
                         type: "string"
                         format: "date-time"
+  /taskgroups:
+    post:
+      summary: "Create Status"
+      description: "Creates new status"
+      operationId: "createStatus"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              title: "Status"
+              properties:
+                name:
+                  type: "string"
+                  description: "Name of the status."
+                project_id:
+                  type: "string"
+                  description: "Project ID that the status belongs to."
+                  title: "Project ID"
+              required:
+                - "name"
+                - "project_id"
+      responses:
+        201:
+          description: "Creation confirmation."
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      message:
+                        type: "string"
+                      task_group:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "string"
+                          name:
+                            type: "string"
+                          color:
+                            type: "string"
+                          created_by:
+                            type: "string"
+                          project:
+                            type: "string"
+                          order:
+                            type: "integer"
 components:
   securitySchemes:
     oauth2:

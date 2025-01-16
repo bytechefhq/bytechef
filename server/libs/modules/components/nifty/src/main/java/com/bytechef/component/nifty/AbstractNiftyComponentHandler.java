@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.nifty.action.NiftyCreateProjectAction;
+import com.bytechef.component.nifty.action.NiftyCreateStatusAction;
 import com.bytechef.component.nifty.action.NiftyCreateTaskAction;
 import com.bytechef.component.nifty.connection.NiftyConnection;
 
@@ -36,7 +37,7 @@ public abstract class AbstractNiftyComponentHandler implements OpenApiComponentH
             .description(
                 "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity."))
                     .actions(modifyActions(NiftyCreateProjectAction.ACTION_DEFINITION,
-                        NiftyCreateTaskAction.ACTION_DEFINITION))
+                        NiftyCreateTaskAction.ACTION_DEFINITION, NiftyCreateStatusAction.ACTION_DEFINITION))
                     .connection(modifyConnection(NiftyConnection.CONNECTION_DEFINITION))
                     .triggers(getTriggers());
 
