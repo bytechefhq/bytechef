@@ -370,7 +370,7 @@ class GoogleSheetsUtilsTest {
     void testGetRowValuesWhereFirstSpreadsheetRowValuesHeaders() {
         Map<String, Object> rowMap = Map.of(VALUES, Map.of("name", "name", "email", "email"));
 
-        when(mockedParameters.getRequiredMap(ROW, Object.class))
+        when(mockedParameters.get(ROW))
             .thenReturn(rowMap);
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
@@ -385,7 +385,7 @@ class GoogleSheetsUtilsTest {
 
         Map<String, Object> rowMap = Map.of(VALUES, rowList);
 
-        when(mockedParameters.getRequiredMap(ROW, Object.class))
+        when(mockedParameters.get(ROW))
             .thenReturn(rowMap);
 
         List<Object> rowValues = GoogleSheetsUtils.getRowValues(mockedParameters);
