@@ -1,5 +1,5 @@
 import {memo, useState} from 'react';
-import {Handle, NodeProps, Position} from 'reactflow';
+import {Handle, NodeProps, Position, useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
@@ -8,8 +8,20 @@ import styles from './NodeTypes.module.css';
 const PlaceholderNode = ({data, id}: NodeProps) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
 
+    const {getNodes} = useReactFlow();
+
+    const nodes = getNodes();
+
+    const nodeIndex = nodes.findIndex((node) => node.id === id);
+
     return (
-        <WorkflowNodesPopoverMenu conditionId={data.conditionId} hideTriggerComponents sourceNodeId={id}>
+        <WorkflowNodesPopoverMenu
+            conditionId={data.conditionId}
+            hideTriggerComponents
+            key={`${id}-${nodeIndex}`}
+            nodeIndex={nodeIndex}
+            sourceNodeId={id}
+        >
             <div
                 className={twMerge(
                     'mx-placeholder-node-position flex cursor-pointer items-center justify-center rounded-md text-lg text-gray-500 shadow-none hover:scale-110 hover:bg-gray-500 hover:text-white',

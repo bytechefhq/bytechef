@@ -3,7 +3,7 @@ import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/p
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {PropsWithChildren, useEffect, useState} from 'react';
+import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {useReactFlow} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
@@ -16,11 +16,12 @@ import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOpe
 
 interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     conditionId?: string;
-    sourceNodeId: string;
     edge?: boolean;
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    nodeIndex?: number;
+    sourceNodeId: string;
 }
 
 const WorkflowNodesPopoverMenu = ({
@@ -30,6 +31,7 @@ const WorkflowNodesPopoverMenu = ({
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
+    nodeIndex,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
     const [actionPanelOpen, setActionPanelOpen] = useState(false);
@@ -38,7 +40,6 @@ const WorkflowNodesPopoverMenu = ({
     const [trigger, setTrigger] = useState(false);
 
     const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
-
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {getNodes} = useReactFlow();
@@ -47,50 +48,56 @@ const WorkflowNodesPopoverMenu = ({
 
     const queryClient = useQueryClient();
 
-    const handleActionPanelClose = () => {
+    const memoizedComponentDefinitions = useMemo(() => componentDefinitions, [componentDefinitions]);
+    const memoizedTaskDispatcherDefinitions = useMemo(() => taskDispatcherDefinitions, [taskDispatcherDefinitions]);
+
+    const handleActionPanelClose = useCallback(() => {
         setActionPanelOpen(false);
 
         setComponentDefinitionToBeAdded(null);
-    };
+    }, []);
 
-    const handleComponentClick = async (clickedItem: ClickedDefinitionType) => {
-        if (clickedItem.name.includes('condition')) {
-            await handleConditionClick({
-                clickedItem,
-                currentNode,
-                edge,
-                getNodes,
-                queryClient,
-                sourceNodeId,
-                updateWorkflowMutation,
-                workflow,
-            });
+    const handleComponentClick = useCallback(
+        async (clickedItem: ClickedDefinitionType) => {
+            if (clickedItem.name.includes('condition')) {
+                await handleConditionClick({
+                    clickedItem,
+                    currentNode,
+                    edge,
+                    getNodes,
+                    queryClient,
+                    sourceNodeId,
+                    updateWorkflowMutation,
+                    workflow,
+                });
 
-            setPopoverOpen(false);
+                setPopoverOpen(false);
+                return;
+            }
 
-            return;
-        }
+            if (clickedItem.trigger) {
+                setTrigger(true);
+            }
 
-        if (clickedItem.trigger) {
-            setTrigger(true);
-        }
-
-        const clickedComponentDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new ComponentDefinitionApi().getComponentDefinition({
+            const clickedComponentDefinition = await queryClient.fetchQuery({
+                queryFn: () =>
+                    new ComponentDefinitionApi().getComponentDefinition({
+                        componentName: clickedItem.name,
+                        componentVersion: clickedItem.componentVersion || clickedItem.version,
+                    }),
+                queryKey: ComponentDefinitionKeys.componentDefinition({
                     componentName: clickedItem.name,
                     componentVersion: clickedItem.componentVersion || clickedItem.version,
                 }),
-            queryKey: ComponentDefinitionKeys.componentDefinition({
-                componentName: clickedItem.name,
-                componentVersion: clickedItem.componentVersion || clickedItem.version,
-            }),
-        });
+            });
 
-        if (clickedComponentDefinition) {
-            setComponentDefinitionToBeAdded(clickedComponentDefinition);
-        }
-    };
+            if (clickedComponentDefinition) {
+                setComponentDefinitionToBeAdded(clickedComponentDefinition);
+            }
+        },
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [sourceNodeId, nodeIndex]
+    );
 
     useEffect(() => {
         if (componentDefinitionToBeAdded?.name) {
@@ -98,8 +105,18 @@ const WorkflowNodesPopoverMenu = ({
         }
     }, [componentDefinitionToBeAdded?.name]);
 
+    useEffect(() => {
+        return () => {
+            setActionPanelOpen(false);
+            setComponentDefinitionToBeAdded(null);
+            setPopoverOpen(false);
+            setTrigger(false);
+        };
+    }, []);
+
     return (
         <Popover
+            key={`${sourceNodeId}-popoverMenu-${nodeIndex}`}
             onOpenChange={(open) => {
                 setPopoverOpen(open);
 
@@ -123,10 +140,9 @@ const WorkflowNodesPopoverMenu = ({
                 sideOffset={-34}
             >
                 <div className="nowheel flex w-full rounded-lg bg-gray-100">
-                    {typeof componentDefinitions === 'undefined' ||
-                        (typeof taskDispatcherDefinitions === 'undefined' && (
-                            <div className="px-3 py-2 text-xs">Something went wrong.</div>
-                        ))}
+                    {(!memoizedComponentDefinitions || !memoizedTaskDispatcherDefinitions) && (
+                        <div className="px-3 py-2 text-xs">Something went wrong.</div>
+                    )}
 
                     <WorkflowNodesPopoverMenuComponentList
                         actionPanelOpen={actionPanelOpen}
