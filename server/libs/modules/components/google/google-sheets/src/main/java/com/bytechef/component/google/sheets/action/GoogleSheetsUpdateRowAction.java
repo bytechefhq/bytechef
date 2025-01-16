@@ -20,10 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
@@ -74,10 +70,7 @@ public class GoogleSheetsUpdateRowAction {
                 .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER, UPDATE_WHOLE_ROW)
                 .properties(GoogleSheetsUtils::createPropertiesToUpdateRow)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .additionalProperties(bool(), number(), string())))
+        .output()
         .perform(GoogleSheetsUpdateRowAction::perform);
 
     private GoogleSheetsUpdateRowAction() {

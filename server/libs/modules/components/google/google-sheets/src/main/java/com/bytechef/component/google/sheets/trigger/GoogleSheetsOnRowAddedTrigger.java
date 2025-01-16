@@ -16,9 +16,6 @@
 
 package com.bytechef.component.google.sheets.trigger;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
@@ -71,12 +68,7 @@ public class GoogleSheetsOnRowAddedTrigger {
                 .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSheetNameOptions)
                 .optionsLookupDependsOn(SPREADSHEET_ID)
                 .required(true))
-        .output(
-            outputSchema(
-                array()
-                    .items(
-                        object()
-                            .additionalProperties(string(), array().items(string())))))
+        .output()
         .webhookEnable(GoogleSheetsOnRowAddedTrigger::webhookEnable)
         .webhookDisable(GoogleSheetsOnRowAddedTrigger::webhookDisable)
         .webhookRequest(GoogleSheetsOnRowAddedTrigger::webhookRequest);

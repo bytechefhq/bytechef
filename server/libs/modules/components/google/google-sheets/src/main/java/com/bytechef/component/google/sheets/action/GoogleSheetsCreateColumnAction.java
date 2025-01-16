@@ -17,11 +17,6 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
@@ -61,14 +56,7 @@ public class GoogleSheetsCreateColumnAction {
                 .label("Column Name")
                 .description("Name of the new column.")
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(SPREADSHEET_ID),
-                        string(SHEET_NAME),
-                        array(HEADERS)
-                            .items(bool(), number(), string()))))
+        .output()
         .perform(GoogleSheetsCreateColumnAction::perform);
 
     private GoogleSheetsCreateColumnAction() {
