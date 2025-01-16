@@ -90,6 +90,9 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
                 } else if (Objects.equals(baseProperty.getName(), "template_id")) {
                     ((ModifiableStringProperty) baseProperty)
                         .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectTemplateOptions);
+                } else if (Objects.equals(baseProperty.getName(), "project_id")) {
+                    ((ModifiableStringProperty) baseProperty)
+                        .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions);
                 }
             }
         }
