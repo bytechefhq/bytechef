@@ -67,7 +67,7 @@ class GoogleSheetsUpdateRowActionTest {
                 .when(() -> GoogleServices.getSheets(parameters))
                 .thenReturn(mockedSheets);
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getRowValues(parameters))
+                .when(() -> GoogleSheetsUtils.getUpdatedRowValues(parameters, parameters))
                 .thenReturn(row);
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(), any()))
