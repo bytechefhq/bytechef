@@ -22,8 +22,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isHovered, setIsHovered] = useState(false);
     const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore();
+    const {currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
 
     const handleNodeClick = useNodeClickHandler(data, id);
@@ -44,19 +43,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
-    const handleDeleteNodeClick = () => {
-        handleDeleteTask({
-            currentComponent,
-            currentNode,
-            data,
-            getNode,
-            id,
-            queryClient,
-            setCurrentComponent,
-            setCurrentNode,
-            updateWorkflowMutation,
-            workflow,
-        });
+    const handleDeleteNodeClick = (data: NodeDataType) => {
+        if (data) {
+            handleDeleteTask({
+                currentNode,
+                data,
+                getNode,
+                id,
+                queryClient,
+                updateWorkflowMutation,
+                workflow,
+            });
+        }
     };
 
     return (
@@ -82,7 +80,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     ) : (
                         <Button
                             className="bg-white p-2 shadow-md hover:text-red-500 hover:shadow-sm"
-                            onClick={handleDeleteNodeClick}
+                            onClick={() => handleDeleteNodeClick(data)}
                             title="Delete a node"
                             variant="outline"
                         >

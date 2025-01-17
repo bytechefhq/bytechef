@@ -2,13 +2,7 @@ import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/us
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, SPACE} from '@/shared/constants';
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {
-    ComponentType,
-    ConditionTaskDispatcherType,
-    NodeDataType,
-    WorkflowDefinitionType,
-    WorkflowTaskType,
-} from '@/shared/types';
+import {ConditionTaskDispatcherType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {Node} from '@xyflow/react';
 
@@ -17,27 +11,21 @@ import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPa
 import getParentConditionTask from './getParentConditionTask';
 
 interface HandleDeleteTaskProps {
-    currentComponent?: ComponentType;
     currentNode?: NodeDataType;
     data: NodeDataType;
     getNode: (id: string) => Node | undefined;
     id: string;
     queryClient: QueryClient;
-    setCurrentComponent: (component: ComponentType | undefined) => void;
-    setCurrentNode: (node: NodeDataType | undefined) => void;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
 }
 
 export default function handleDeleteTask({
-    currentComponent,
     currentNode,
     data,
     getNode,
     id,
     queryClient,
-    setCurrentComponent,
-    setCurrentNode,
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
@@ -128,14 +116,8 @@ export default function handleDeleteTask({
                 });
 
                 if (currentNode?.name === data.name) {
-                    setCurrentNode(undefined);
-
-                    useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(false);
+                    useWorkflowNodeDetailsPanelStore.getState().reset();
                     useWorkflowTestChatStore.getState().setWorkflowTestChatPanelOpen(false);
-                }
-
-                if (currentComponent?.workflowNodeName === data.name) {
-                    setCurrentComponent(undefined);
                 }
             },
         }

@@ -339,7 +339,7 @@ const WorkflowNodeDetailsPanel = ({
 
         saveWorkflowDefinition({
             nodeData,
-            onSuccess: () => {
+            onSuccess: () =>
                 setCurrentComponent({
                     ...currentComponent,
                     displayConditions: {},
@@ -349,8 +349,7 @@ const WorkflowNodeDetailsPanel = ({
                         properties: currentOperationProperties as Array<PropertyAllType>,
                     }),
                     type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                });
-            },
+                }),
             queryClient,
             subtask: !!currentNode?.conditionData,
             updateWorkflowMutation,
