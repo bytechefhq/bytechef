@@ -26,6 +26,7 @@ import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDoc
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.Document;
@@ -36,7 +37,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleDocsCreateDocumentAction {
 
@@ -51,6 +52,7 @@ public class GoogleDocsCreateDocumentAction {
             string(BODY)
                 .label("Content")
                 .description("Document content.")
+                .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .perform(GoogleDocsCreateDocumentAction::perform);
 
