@@ -32,11 +32,11 @@ import java.io.IOException;
 /**
  * @author Monika Kušter
  */
-public class GoogleDocsReadDocumentAction {
+public class GoogleDocsGetDocumentAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("readDocument")
-        .title("Read Document")
-        .description("Read a document from Google Docs.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("getDocument")
+        .title("Get Document")
+        .description("Retrieve a specified document from your Google Drive.")
         .properties(
             string(DOCUMENT_ID)
                 .label("Document Id")
@@ -44,9 +44,9 @@ public class GoogleDocsReadDocumentAction {
                 .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
                 .required(true))
         .output()
-        .perform(GoogleDocsReadDocumentAction::perform);
+        .perform(GoogleDocsGetDocumentAction::perform);
 
-    private GoogleDocsReadDocumentAction() {
+    private GoogleDocsGetDocumentAction() {
     }
 
     public static Object perform(
