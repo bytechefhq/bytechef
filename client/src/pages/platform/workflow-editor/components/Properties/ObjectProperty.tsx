@@ -216,9 +216,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         }, {});
 
         saveProperty({
-            currentComponent,
             path,
-            setCurrentComponent,
             type: 'OBJECT',
             updateWorkflowNodeParameterMutation,
             value: defaultValueObject,
