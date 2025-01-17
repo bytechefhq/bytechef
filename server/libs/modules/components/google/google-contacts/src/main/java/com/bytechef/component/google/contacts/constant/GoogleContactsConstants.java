@@ -36,6 +36,8 @@ public class GoogleContactsConstants {
     public static final String NAME = "name";
     public static final String PHONE_NUMBER = "phoneNumber";
     public static final String RESOURCE_NAME = "resourceName";
+    public static final String QUERY = "query";
+    public static final String CONTACTS = "contacts";
 
     public static final ModifiableObjectProperty CONTACT_OUTPUT_PROPERTY =
         object()
@@ -63,6 +65,37 @@ public class GoogleContactsConstants {
                         object()
                             .properties(
                                 string("value"))));
+
+    public static final ModifiableObjectProperty CONTACT_LIST_OUTPUT_PROPERTY =
+        object()
+            .properties(
+                array(CONTACTS)
+                    .items(
+                        object()
+                            .properties(
+                                array("names")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string(FIRST_NAME),
+                                                string(MIDDLE_NAME),
+                                                string(LAST_NAME))),
+                                array("organizations")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string(COMPANY),
+                                                string(JOB_TITLE))),
+                                array("emailAddresses")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("value"))),
+                                array("phoneNumbers")
+                                    .items(
+                                        object()
+                                            .properties(
+                                                string("value"))))));
 
     private GoogleContactsConstants() {
     }
