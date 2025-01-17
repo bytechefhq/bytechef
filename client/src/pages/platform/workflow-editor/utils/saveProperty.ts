@@ -15,7 +15,7 @@ interface SavePropertyProps {
     successCallback?: () => void;
     type: string;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200Response & {workflowNodeName: string},
+        UpdateWorkflowNodeParameter200Response & {workflowNodeName?: string},
         Error,
         UpdateWorkflowNodeParameterOperationRequest,
         unknown
@@ -57,7 +57,7 @@ export default function saveProperty({
                     successCallback();
                 }
 
-                if (response.workflowNodeName === currentComponent.name) {
+                if (!response.workflowNodeName || response.workflowNodeName === currentComponent.name) {
                     setCurrentComponent({
                         ...currentComponent,
                         displayConditions: response.displayConditions,

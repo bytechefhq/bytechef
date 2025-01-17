@@ -95,10 +95,12 @@ const WorkflowEditorLayout = ({
     // update display conditions when currentNode changes
     useEffect(() => {
         if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
-            setCurrentComponent({
-                ...currentComponent,
-                displayConditions: workflowNodeParameterDisplayConditions?.displayConditions!,
-            });
+            if (currentComponent.workflowNodeName === currentNode?.name) {
+                setCurrentComponent({
+                    ...currentComponent,
+                    displayConditions: workflowNodeParameterDisplayConditions?.displayConditions!,
+                });
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
