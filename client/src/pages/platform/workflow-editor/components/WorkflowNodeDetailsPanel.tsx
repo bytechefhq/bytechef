@@ -40,7 +40,7 @@ import {
 import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -102,6 +102,8 @@ const WorkflowNodeDetailsPanel = ({
 
     const {componentActions, nodes, setDataPills, workflow} = useWorkflowDataStore();
 
+    const queryClient = useQueryClient();
+
     const {data: currentComponentDefinition} = useGetComponentDefinitionQuery(
         {
             componentName: currentNode?.componentName || '',
@@ -118,10 +120,15 @@ const WorkflowNodeDetailsPanel = ({
         !!workflow.id && !!currentNode
     );
 
-    const matchingOperation = [
-        ...(currentComponentDefinition?.actions || []),
-        ...(currentComponentDefinition?.triggers || []),
-    ].find((action) => action.name === currentOperationName);
+    const {nodeNames} = workflow;
+
+    const matchingOperation = useMemo(
+        () =>
+            [...(currentComponentDefinition?.actions || []), ...(currentComponentDefinition?.triggers || [])].find(
+                (action) => action.name === currentOperationName
+            ),
+        [currentComponentDefinition, currentOperationName]
+    );
 
     const {data: currentActionDefinition, isFetched: currentActionFetched} = useGetComponentActionDefinitionQuery(
         {
@@ -132,13 +139,13 @@ const WorkflowNodeDetailsPanel = ({
         !!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation
     );
 
-    const getTriggerName = (): string => {
+    const getTriggerName = useCallback((): string => {
         const currentComponentTriggerNames = currentComponentDefinition?.triggers?.map((trigger) => trigger.name);
 
         return currentComponentTriggerNames?.includes(currentOperationName)
             ? currentOperationName
             : (currentComponentDefinition?.triggers?.[0]?.name as string);
-    };
+    }, [currentComponentDefinition, currentOperationName]);
 
     const {data: currentTriggerDefinition, isFetched: currentTriggerFetched} = useGetTriggerDefinitionQuery(
         {
@@ -157,214 +164,269 @@ const WorkflowNodeDetailsPanel = ({
         !!currentNode && !!currentNode.taskDispatcher
     );
 
-    const currentNodeDefinition = currentNode?.trigger
-        ? currentTriggerDefinition
-        : currentNode?.taskDispatcher
-          ? currentTaskDispatcherDefinition
-          : currentActionDefinition;
-
-    const {nodeNames} = workflow;
-
-    const currentNodeIndex = currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName);
-
-    const previousNodeNames = nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : [];
-
-    const previousComponentProperties: Array<ComponentPropertiesType> = previousComponentDefinitions?.map(
-        (componentDefinition, index) => {
-            const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs[index]?.outputSchema;
-
-            const properties = outputSchemaDefinition?.properties?.length
-                ? outputSchemaDefinition.properties
-                : outputSchemaDefinition?.items;
-
-            return {
-                componentDefinition,
-                properties,
-            };
-        }
+    const currentNodeDefinition = useMemo(
+        () =>
+            currentNode?.trigger
+                ? currentTriggerDefinition
+                : currentNode?.taskDispatcher
+                  ? currentTaskDispatcherDefinition
+                  : currentActionDefinition,
+        [currentNode, currentTriggerDefinition, currentTaskDispatcherDefinition, currentActionDefinition]
+    );
+    const currentNodeIndex = useMemo(
+        () => currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName),
+        [currentNode, nodeNames]
     );
 
-    const hasOutputData = currentNodeDefinition?.outputDefined;
-    const currentWorkflowTrigger = workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName);
-    const currentWorkflowTask = workflow.tasks?.find((task) => task.name === currentNode?.workflowNodeName);
+    const previousNodeNames = useMemo(
+        () => (nodeNames.length > 1 ? nodeNames?.slice(0, currentNodeIndex) : []),
+        [nodeNames, currentNodeIndex]
+    );
 
-    const componentConnections: WorkflowConnection[] =
-        currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [];
+    const previousComponentProperties: Array<ComponentPropertiesType> = useMemo(
+        () =>
+            previousComponentDefinitions?.map((componentDefinition, index) => {
+                const outputSchemaDefinition: PropertyAllType | undefined = workflowNodeOutputs[index]?.outputSchema;
 
-    const nodeTabs = TABS.filter(({name}) => {
-        if (name === 'connection') {
-            return componentConnections.length > 0;
-        }
+                const properties = outputSchemaDefinition?.properties?.length
+                    ? outputSchemaDefinition.properties
+                    : outputSchemaDefinition?.items;
 
-        if (name === 'dataStreamComponents') {
-            return currentComponentDefinition?.name === 'dataStream';
-        }
-
-        if (name === 'output') {
-            return hasOutputData;
-        }
-
-        if (name === 'properties') {
-            return currentNode?.taskDispatcher
-                ? currentTaskDispatcherDefinition?.properties?.length
-                : currentOperationProperties?.length;
-        }
-
-        return true;
-    });
-
-    const currentTaskData = currentComponentDefinition || currentTaskDispatcherDefinition;
-    const currentOperationFetched = currentActionFetched || currentTriggerFetched;
-
-    const operationDataMissing =
-        currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched);
-
-    const tabDataExists =
-        (!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
-        currentNode?.taskDispatcher ||
-        (currentNode?.trigger &&
-            currentTriggerFetched &&
-            nodeTabs.length > 1 &&
-            currentNode.componentName !== 'manual');
-
-    const queryClient = useQueryClient();
-
-    const handleOperationSelectChange = async (newOperationName: string) => {
-        setCurrentOperationName(newOperationName);
-
-        if (!currentComponentDefinition || !currentComponent) {
-            return;
-        }
-
-        queryClient.invalidateQueries({
-            queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
-        });
-
-        queryClient.invalidateQueries({
-            queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
-        });
-
-        let operationData;
-
-        if (currentNode?.trigger) {
-            const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
-                componentName: currentComponentDefinition?.name,
-                componentVersion: currentComponentDefinition?.version,
-                triggerName: newOperationName,
-            };
-
-            operationData = await queryClient.fetchQuery({
-                queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
-                queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
-            });
-        } else {
-            const componentActionDefinitionRequest: GetComponentActionDefinitionRequest = {
-                actionName: newOperationName,
-                componentName: currentComponentDefinition.name,
-                componentVersion: currentComponentDefinition.version,
-            };
-
-            operationData = await queryClient.fetchQuery({
-                queryFn: () => new ActionDefinitionApi().getComponentActionDefinition(componentActionDefinitionRequest),
-                queryKey: ActionDefinitionKeys.actionDefinition(componentActionDefinitionRequest),
-            });
-        }
-
-        const {componentName, description, label, workflowNodeName} = currentComponent;
-
-        let nodeData: NodeDataType = {
-            componentName,
-            description,
-            label,
-            name: workflowNodeName || currentNode?.workflowNodeName || '',
-            operationName: newOperationName,
-            parameters: getParametersWithDefaultValues({
-                properties: operationData.properties as Array<PropertyAllType>,
+                return {
+                    componentDefinition,
+                    properties,
+                };
             }),
-            trigger: currentNode?.trigger,
-            type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-            workflowNodeName,
-        };
+        [previousComponentDefinitions, workflowNodeOutputs]
+    );
 
-        if (currentNode?.conditionData) {
-            const parentConditionNode = nodes.find(
-                (node) => node.data.name === currentNode?.conditionData?.conditionId
-            );
+    const hasOutputData = useMemo(() => currentNodeDefinition?.outputDefined, [currentNodeDefinition]);
 
-            if (!parentConditionNode) {
+    const currentWorkflowTrigger = useMemo(
+        () => workflow.triggers?.find((trigger) => trigger.name === currentNode?.workflowNodeName),
+        [workflow.triggers, currentNode]
+    );
+
+    const currentWorkflowTask = useMemo(
+        () => workflow.tasks?.find((task) => task.name === currentNode?.workflowNodeName),
+        [workflow.tasks, currentNode]
+    );
+
+    const componentConnections: WorkflowConnection[] = useMemo(
+        () => currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [],
+        [currentWorkflowTask, currentWorkflowTrigger]
+    );
+
+    const nodeTabs = useMemo(() => {
+        return TABS.filter(({name}) => {
+            if (name === 'connection') {
+                return componentConnections.length > 0;
+            }
+
+            if (name === 'dataStreamComponents') {
+                return currentComponentDefinition?.name === 'dataStream';
+            }
+
+            if (name === 'output') {
+                return hasOutputData;
+            }
+
+            if (name === 'properties') {
+                return currentNode?.taskDispatcher
+                    ? currentTaskDispatcherDefinition?.properties?.length
+                    : currentOperationProperties?.length;
+            }
+
+            return true;
+        });
+    }, [
+        componentConnections,
+        currentComponentDefinition,
+        hasOutputData,
+        currentNode,
+        currentTaskDispatcherDefinition,
+        currentOperationProperties,
+    ]);
+
+    const currentTaskData = useMemo(
+        () => currentComponentDefinition || currentTaskDispatcherDefinition,
+        [currentComponentDefinition, currentTaskDispatcherDefinition]
+    );
+
+    const currentOperationFetched = useMemo(
+        () => currentActionFetched || currentTriggerFetched,
+        [currentActionFetched, currentTriggerFetched]
+    );
+
+    const operationDataMissing = useMemo(
+        () => currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched),
+        [currentComponent, matchingOperation, currentOperationFetched]
+    );
+
+    const tabDataExists = useMemo(
+        () =>
+            (!currentNode?.trigger && !currentNode?.taskDispatcher && currentActionFetched) ||
+            currentNode?.taskDispatcher ||
+            (currentNode?.trigger &&
+                currentTriggerFetched &&
+                nodeTabs.length > 1 &&
+                currentNode.componentName !== 'manual'),
+        [currentNode, currentActionFetched, currentTriggerFetched, nodeTabs]
+    );
+
+    const nodeDefinition = useMemo(
+        () => currentComponentDefinition || currentTaskDispatcherDefinition || currentTriggerDefinition,
+        [currentComponentDefinition, currentTaskDispatcherDefinition, currentTriggerDefinition]
+    );
+
+    const currentTaskDataOperations = useMemo(
+        () => (currentTaskData as ComponentDefinition)?.actions ?? (currentTaskData as ComponentDefinition)?.triggers,
+        [currentTaskData]
+    );
+
+    const handleOperationSelectChange = useCallback(
+        async (newOperationName: string) => {
+            setCurrentOperationName(newOperationName);
+
+            if (!currentComponentDefinition || !currentComponent) {
                 return;
             }
 
-            const conditionCase = currentNode.conditionData.conditionCase;
-            const conditionParameters: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)?.parameters?.[
-                conditionCase
-            ];
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties,
+            });
 
-            if (conditionParameters) {
-                const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
+            });
 
-                if (taskIndex !== -1) {
-                    conditionParameters[taskIndex] = {
-                        ...conditionParameters[taskIndex],
-                        type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                    };
+            let operationData;
 
-                    if (!workflow.definition) {
-                        return;
+            if (currentNode?.trigger) {
+                const triggerDefinitionRequest: GetComponentTriggerDefinitionRequest = {
+                    componentName: currentComponentDefinition?.name,
+                    componentVersion: currentComponentDefinition?.version,
+                    triggerName: newOperationName,
+                };
+
+                operationData = await queryClient.fetchQuery({
+                    queryFn: () => new TriggerDefinitionApi().getComponentTriggerDefinition(triggerDefinitionRequest),
+                    queryKey: TriggerDefinitionKeys.triggerDefinition(triggerDefinitionRequest),
+                });
+            } else {
+                const componentActionDefinitionRequest: GetComponentActionDefinitionRequest = {
+                    actionName: newOperationName,
+                    componentName: currentComponentDefinition.name,
+                    componentVersion: currentComponentDefinition.version,
+                };
+
+                operationData = await queryClient.fetchQuery({
+                    queryFn: () =>
+                        new ActionDefinitionApi().getComponentActionDefinition(componentActionDefinitionRequest),
+                    queryKey: ActionDefinitionKeys.actionDefinition(componentActionDefinitionRequest),
+                });
+            }
+
+            const {componentName, description, label, workflowNodeName} = currentComponent;
+
+            let nodeData: NodeDataType = {
+                componentName,
+                description,
+                label,
+                name: workflowNodeName || currentNode?.workflowNodeName || '',
+                operationName: newOperationName,
+                parameters: getParametersWithDefaultValues({
+                    properties: operationData.properties as Array<PropertyAllType>,
+                }),
+                trigger: currentNode?.trigger,
+                type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                workflowNodeName,
+            };
+
+            if (currentNode?.conditionData) {
+                const parentConditionNode = nodes.find(
+                    (node) => node.data.name === currentNode?.conditionData?.conditionId
+                );
+
+                if (!parentConditionNode) {
+                    return;
+                }
+
+                const conditionCase = currentNode.conditionData.conditionCase;
+                const conditionParameters: Array<WorkflowTask> = (parentConditionNode.data as NodeDataType)
+                    ?.parameters?.[conditionCase];
+
+                if (conditionParameters) {
+                    const taskIndex = conditionParameters.findIndex((subtask) => subtask.name === currentNode.name);
+
+                    if (taskIndex !== -1) {
+                        conditionParameters[taskIndex] = {
+                            ...conditionParameters[taskIndex],
+                            type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                        };
+
+                        if (!workflow.definition) {
+                            return;
+                        }
+
+                        const tasks = JSON.parse(workflow.definition).tasks;
+
+                        const updatedParentConditionTask = workflow.tasks?.find(
+                            (task) => task.name === currentNode.conditionData?.conditionId
+                        );
+
+                        if (!updatedParentConditionTask) {
+                            return;
+                        }
+
+                        nodeData = updateRootConditionNode({
+                            conditionCase,
+                            conditionId: currentNode.conditionData.conditionId,
+                            nodeIndex: taskIndex,
+                            nodes,
+                            tasks,
+                            updatedParentConditionNodeData: parentConditionNode.data as NodeDataType,
+                            updatedParentConditionTask,
+                            workflow,
+                        });
                     }
-
-                    const tasks = JSON.parse(workflow.definition).tasks;
-
-                    const updatedParentConditionTask = workflow.tasks?.find(
-                        (task) => task.name === currentNode.conditionData?.conditionId
-                    );
-
-                    if (!updatedParentConditionTask) {
-                        return;
-                    }
-
-                    nodeData = updateRootConditionNode({
-                        conditionCase,
-                        conditionId: currentNode.conditionData.conditionId,
-                        nodeIndex: taskIndex,
-                        nodes,
-                        tasks,
-                        updatedParentConditionNodeData: parentConditionNode.data as NodeDataType,
-                        updatedParentConditionTask,
-                        workflow,
-                    });
                 }
             }
-        }
 
-        saveWorkflowDefinition({
-            nodeData,
-            onSuccess: () =>
-                setCurrentComponent({
-                    ...currentComponent,
-                    displayConditions: {},
-                    metadata: {},
-                    operationName: newOperationName,
-                    parameters: getParametersWithDefaultValues({
-                        properties: currentOperationProperties as Array<PropertyAllType>,
-                    }),
-                    type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                }),
+            saveWorkflowDefinition({
+                nodeData,
+                onSuccess: () => {
+                    setCurrentComponent({
+                        ...currentComponent,
+                        displayConditions: {},
+                        metadata: {},
+                        operationName: newOperationName,
+                        parameters: getParametersWithDefaultValues({
+                            properties: currentOperationProperties as Array<PropertyAllType>,
+                        }),
+                        type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
+                    });
+                },
+                queryClient,
+                subtask: !!currentNode?.conditionData,
+                updateWorkflowMutation,
+                workflow,
+            });
+        },
+        [
+            currentComponentDefinition,
+            currentComponent,
+            currentNode,
+            currentOperationProperties,
+            nodes,
             queryClient,
-            subtask: !!currentNode?.conditionData,
+            setCurrentComponent,
             updateWorkflowMutation,
             workflow,
-        });
-    };
+        ]
+    );
 
-    const handlePanelClose = () => {
-        useWorkflowNodeDetailsPanelStore.getState().reset();
-    };
-
-    const nodeDefinition = currentComponentDefinition || currentTaskDispatcherDefinition || currentTriggerDefinition;
-
-    const currentTaskDataOperations =
-        (currentTaskData as ComponentDefinition)?.actions ?? (currentTaskData as ComponentDefinition)?.triggers;
+    const handlePanelClose = useCallback(() => useWorkflowNodeDetailsPanelStore.getState().reset(), []);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
@@ -477,14 +539,16 @@ const WorkflowNodeDetailsPanel = ({
 
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
-        if (componentActions?.length) {
-            const currentComponentAction = componentActions.find(
-                (action) => action.workflowNodeName === currentNode?.workflowNodeName
-            );
+        if (!componentActions?.length) {
+            return;
+        }
 
-            if (currentComponentAction) {
-                setCurrentOperationName(currentComponentAction.operationName);
-            }
+        const currentComponentAction = componentActions.find(
+            (action) => action.workflowNodeName === currentNode?.workflowNodeName
+        );
+
+        if (currentComponentAction?.operationName) {
+            setCurrentOperationName(currentComponentAction.operationName);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.workflowNodeName]);
