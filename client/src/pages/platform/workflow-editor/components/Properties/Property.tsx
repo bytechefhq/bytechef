@@ -31,7 +31,7 @@ import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {decode} from 'html-entities';
 import resolvePath from 'object-resolve-path';
-import {ChangeEvent, ReactNode, useEffect, useMemo, useRef, useState} from 'react';
+import {ChangeEvent, ReactNode, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import sanitizeHtml from 'sanitize-html';
 import {TYPE_ICONS} from 'shared/typeIcons';
@@ -121,7 +121,7 @@ const Property = ({
     const inputRef = useRef<HTMLInputElement>(null);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
 
-    const {currentComponent, currentNode, setCurrentComponent, setFocusedInput, workflowNodeDetailsPanelOpen} =
+    const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
@@ -298,15 +298,12 @@ const Property = ({
         });
     }, 200);
 
-    const handleDeleteCustomPropertyClick = (path: string) => {
-        deleteProperty(
-            workflow.id!,
-            path,
-            currentComponent!,
-            setCurrentComponent,
-            deleteWorkflowNodeParameterMutation!
-        );
-    };
+    const handleDeleteCustomPropertyClick = useCallback(
+        (path: string) => {
+            deleteProperty(workflow.id!, path!, deleteWorkflowNodeParameterMutation!);
+        },
+        [deleteWorkflowNodeParameterMutation, workflow.id]
+    );
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
         if (!currentComponent || !name || !path || !updateWorkflowNodeParameterMutation || !workflow.id) {
