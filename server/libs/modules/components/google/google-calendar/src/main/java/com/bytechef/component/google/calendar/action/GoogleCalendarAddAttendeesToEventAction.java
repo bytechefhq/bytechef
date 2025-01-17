@@ -52,8 +52,8 @@ public class GoogleCalendarAddAttendeesToEventAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)
-                .label("Event")
-                .description("Event to add attendees to.")
+                .label("Event ID")
+                .description("ID of the event to add attendees to.")
                 .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true),
