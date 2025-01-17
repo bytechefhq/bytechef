@@ -33,7 +33,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     );
     const [parameterObject, setParameterObject] = useState<{[key: string]: object[] | undefined}>({});
 
-    const {currentComponent, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
     const {workflow} = useWorkflowDataStore();
     const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 

@@ -173,6 +173,7 @@ const WorkflowNodeDetailsPanel = ({
                   : currentActionDefinition,
         [currentNode, currentTriggerDefinition, currentTaskDispatcherDefinition, currentActionDefinition]
     );
+
     const currentNodeIndex = useMemo(
         () => currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName),
         [currentNode, nodeNames]
@@ -542,7 +543,6 @@ const WorkflowNodeDetailsPanel = ({
         if (!componentActions?.length) {
             return;
         }
-
         const currentComponentAction = componentActions.find(
             (action) => action.workflowNodeName === currentNode?.workflowNodeName
         );

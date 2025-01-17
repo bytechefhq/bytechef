@@ -168,6 +168,7 @@ const Project = () => {
                     onClick: () => setShowWorkflowCodeEditorSheet(true),
                 },
             ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true)),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         [ff_1840, rightSidebarOpen]
     );
 
