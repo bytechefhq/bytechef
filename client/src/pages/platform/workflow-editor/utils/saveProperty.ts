@@ -2,10 +2,9 @@ import {
     UpdateWorkflowNodeParameter200Response,
     UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
-import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
 
 interface SavePropertyProps {
