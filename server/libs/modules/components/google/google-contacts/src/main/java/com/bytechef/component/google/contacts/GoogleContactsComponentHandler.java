@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.contacts.action.GoogleContactsCreateContactAction;
 import com.bytechef.component.google.contacts.action.GoogleContactsCreateGroupAction;
+import com.bytechef.component.google.contacts.action.GoogleContactsSearchContactsAction;
 import com.bytechef.component.google.contacts.action.GoogleContactsUpdateContactAction;
 import com.google.auto.service.AutoService;
 
@@ -45,7 +46,8 @@ public class GoogleContactsComponentHandler implements ComponentHandler {
         .actions(
             GoogleContactsCreateContactAction.ACTION_DEFINITION,
             GoogleContactsCreateGroupAction.ACTION_DEFINITION,
-            GoogleContactsUpdateContactAction.ACTION_DEFINITION);
+            GoogleContactsUpdateContactAction.ACTION_DEFINITION,
+            GoogleContactsSearchContactsAction.ACTION_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
