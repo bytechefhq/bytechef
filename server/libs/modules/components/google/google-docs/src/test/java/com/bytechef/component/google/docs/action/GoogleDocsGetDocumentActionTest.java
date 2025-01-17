@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Domiter
  */
-class GoogleDocsReadDocumentActionTest extends AbstractGoogleDocsActionTest {
+class GoogleDocsGetDocumentActionTest extends AbstractGoogleDocsActionTest {
 
     private final ArgumentCaptor<String> documentIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Document mockedDocument = mock(Document.class);
@@ -49,7 +49,7 @@ class GoogleDocsReadDocumentActionTest extends AbstractGoogleDocsActionTest {
         when(mockedGet.execute())
             .thenReturn(mockedDocument);
 
-        Object result = GoogleDocsReadDocumentAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = GoogleDocsGetDocumentAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedDocument, result);
         assertEquals("documentId", documentIdArgumentCaptor.getValue());
