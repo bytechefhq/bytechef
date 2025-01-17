@@ -278,11 +278,9 @@ const WorkflowTestConfigurationDialog = ({
                                                             connections={connections}
                                                             form={form}
                                                             index={index}
-                                                            key={
-                                                                workflowConnection.workflowNodeName +
-                                                                '_' +
+                                                            key={`${workflowConnection.workflowNodeName}_${
                                                                 workflowConnection.key
-                                                            }
+                                                            }`}
                                                             setShowNewConnectionDialog={setShowNewConnectionDialog}
                                                             setWorkflowConnection={setWorkflowConnection}
                                                             workflowConnection={workflowConnection}
