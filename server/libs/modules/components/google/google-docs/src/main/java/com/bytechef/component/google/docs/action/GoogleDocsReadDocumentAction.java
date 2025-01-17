@@ -22,13 +22,15 @@ import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DO
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.docs.util.GoogleDocsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
 import java.io.IOException;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleDocsReadDocumentAction {
 
@@ -39,7 +41,9 @@ public class GoogleDocsReadDocumentAction {
             string(DOCUMENT_ID)
                 .label("Document Id")
                 .description("The ID of the document to read.")
+                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
                 .required(true))
+        .output()
         .perform(GoogleDocsReadDocumentAction::perform);
 
     private GoogleDocsReadDocumentAction() {

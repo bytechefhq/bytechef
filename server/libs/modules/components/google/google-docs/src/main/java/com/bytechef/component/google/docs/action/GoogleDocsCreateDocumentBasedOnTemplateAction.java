@@ -26,7 +26,9 @@ import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDoc
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.docs.util.GoogleDocsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
@@ -39,7 +41,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleDocsCreateDocumentBasedOnTemplateAction {
 
@@ -48,8 +50,9 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
         .description("Edit a template file and replace the values with the ones provided.")
         .properties(
             string(DESTINATION_FILE)
-                .label("Destination File")
+                .label("Template File ID")
                 .description("The ID of the file to replace the values.")
+                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
                 .required(true),
             object(VALUES)
                 .label("Variables")
