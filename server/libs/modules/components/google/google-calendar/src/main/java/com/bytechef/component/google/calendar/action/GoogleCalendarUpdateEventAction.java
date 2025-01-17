@@ -61,8 +61,8 @@ public class GoogleCalendarUpdateEventAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)
-                .label("Event")
-                .description("Event to update.")
+                .label("Event ID")
+                .description("ID of the event to update.")
                 .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true),

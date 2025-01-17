@@ -42,8 +42,8 @@ public class GoogleCalendarDeleteEventAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT_ID)
-                .label("Event")
-                .description("Event to delete.")
+                .label("Event ID")
+                .description("ID of the event to delete.")
                 .options((ActionOptionsFunction<String>) GoogleCalendarUtils::getEventIdOptions)
                 .optionsLookupDependsOn(CALENDAR_ID)
                 .required(true))
