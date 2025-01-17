@@ -17,9 +17,11 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_PROPERTY;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
@@ -34,6 +36,7 @@ import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.getRow
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -41,7 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleSheetsInsertRowAction {
 
@@ -54,7 +57,10 @@ public class GoogleSheetsInsertRowAction {
             SHEET_NAME_PROPERTY,
             VALUE_INPUT_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
-            ROW_PROPERTY)
+            dynamicProperties(ROW)
+                .propertiesLookupDependsOn(SPREADSHEET_ID, SHEET_NAME, IS_THE_FIRST_ROW_HEADER)
+                .properties(GoogleSheetsUtils.createPropertiesForNewRows(true))
+                .required(true))
         .output()
         .perform(GoogleSheetsInsertRowAction::perform);
 
@@ -76,5 +82,4 @@ public class GoogleSheetsInsertRowAction {
 
         return getMapOfValuesForRow(inputParameters, sheets, row);
     }
-
 }
