@@ -233,10 +233,8 @@ const Property = ({
         const valueToSave = latestValueRef.current;
 
         saveProperty({
-            currentComponent,
             includeInMetadata: custom,
             path,
-            setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
             value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
@@ -276,10 +274,8 @@ const Property = ({
         }
 
         saveProperty({
-            currentComponent,
             includeInMetadata: custom,
             path,
-            setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
             value: value || null,
@@ -293,10 +289,8 @@ const Property = ({
         }
 
         saveProperty({
-            currentComponent,
             includeInMetadata: custom,
             path,
-            setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
             value,
@@ -320,10 +314,8 @@ const Property = ({
         }
 
         saveProperty({
-            currentComponent,
             includeInMetadata: property.custom,
             path,
-            setCurrentComponent,
             successCallback: () => setInputValue(JSON.stringify(value)),
             type,
             updateWorkflowNodeParameterMutation,
@@ -431,9 +423,7 @@ const Property = ({
         }
 
         saveProperty({
-            currentComponent,
             path,
-            setCurrentComponent,
             successCallback: () => {
                 setInputValue('');
                 setMentionInputValue('');
@@ -472,10 +462,8 @@ const Property = ({
         }
 
         saveProperty({
-            currentComponent,
             includeInMetadata: custom,
             path,
-            setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
             value: actualValue,
@@ -570,9 +558,7 @@ const Property = ({
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
-                    currentComponent,
                     path,
-                    setCurrentComponent,
                     type,
                     updateWorkflowNodeParameterMutation,
                     value: defaultValue,
@@ -750,10 +736,8 @@ const Property = ({
         ) {
             const saveDefaultValue = () => {
                 saveProperty({
-                    currentComponent,
                     includeInMetadata: custom,
                     path,
-                    setCurrentComponent,
                     type,
                     updateWorkflowNodeParameterMutation,
                     value: null,
