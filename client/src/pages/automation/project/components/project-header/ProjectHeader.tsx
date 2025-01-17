@@ -1,5 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ProjectHeaderCopilotButton from '@/pages/automation/project/components/project-header/ProjectHeaderCopilotButton';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
@@ -260,6 +261,8 @@ const ProjectHeader = ({
                     )}
 
                     <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
+
+                    <ProjectHeaderCopilotButton />
                 </div>
 
                 {project && (

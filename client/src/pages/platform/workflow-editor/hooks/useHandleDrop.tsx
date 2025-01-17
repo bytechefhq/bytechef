@@ -15,9 +15,9 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {ClickedDefinitionType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {useQueryClient} from '@tanstack/react-query';
+import {Edge, Node, useReactFlow} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {Edge, Node, useReactFlow} from 'reactflow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';

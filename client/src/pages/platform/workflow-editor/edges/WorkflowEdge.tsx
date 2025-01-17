@@ -1,5 +1,5 @@
+import {EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {useState} from 'react';
-import {EdgeProps, getSmoothStepPath} from 'reactflow';
 import {twMerge} from 'tailwind-merge';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';

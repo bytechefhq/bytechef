@@ -13,7 +13,6 @@ const PropertyCodeEditorSheetRightPanel = ({
     workflowConnections,
     workflowNodeName,
 }: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
-    console.log(workflow.tasks?.find((task) => task.name === workflowNodeName)?.parameters);
     return (
         <div className="flex w-96 flex-col divide-y divide-solid divide-muted">
             <div className="flex-1">

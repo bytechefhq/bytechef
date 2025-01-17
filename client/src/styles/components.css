@@ -1,6 +1,5 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
 @layer components {
     .heading-tertiary {
@@ -78,9 +77,7 @@
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
     }
-}
 
-@layer base {
     * {
         @apply border-border;
     }

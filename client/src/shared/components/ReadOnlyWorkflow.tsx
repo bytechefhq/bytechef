@@ -1,8 +1,8 @@
 import defaultNodes from '@/shared/defaultNodes';
+import {Controls, Edge, MiniMap, Node, ReactFlow} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
-import ReactFlow, {Controls, Edge, MiniMap, Node} from 'reactflow';
 
 import {ComponentDefinitionBasic, Workflow} from '../middleware/platform/configuration';
 import ReadOnlyEdge from './ReadOnlyEdge';
@@ -37,10 +37,10 @@ const ReadOnlyWorkflowEditor = ({
         const workflowTasks = workflow.tasks?.filter((task) => task.name);
         const workflowTrigger = workflow.triggers?.[0] || defaultNodes[0].data;
 
-        let workflowComponents = workflowTasks;
+        let workflowComponents: Array<{name: string; type: string}> | undefined = workflowTasks;
 
         if (workflowTrigger) {
-            workflowComponents = [workflowTrigger, ...(workflowTasks || [])];
+            workflowComponents = [workflowTrigger as {name: string; type: string}, ...(workflowTasks || [])];
         }
 
         const workflowNodes = workflowComponents?.map((component, index) => {

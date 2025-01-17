@@ -5,8 +5,8 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType} from '@/shared/types';
+import {Controls, MiniMap, ReactFlow, useReactFlow} from '@xyflow/react';
 import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
-import ReactFlow, {Controls, MiniMap, useReactFlow} from 'reactflow';
 import {useShallow} from 'zustand/react/shallow';
 
 import ConditionEdge from '../edges/ConditionEdge';
@@ -69,7 +69,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
         event.dataTransfer.dropEffect = 'move';
     }, []);
 
-    const onDrop: DragEventHandler = (event) => {
+    const onDrop: DragEventHandler = useCallback((event) => {
         const droppedNodeData = event.dataTransfer.getData('application/reactflow');
 
         let droppedNodeType = '';
@@ -77,7 +77,6 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
         if (droppedNodeData.includes('--')) {
             droppedNodeName = droppedNodeData.split('--')[0];
-
             droppedNodeType = droppedNodeData.split('--')[1];
         } else {
             droppedNodeName = droppedNodeData;
@@ -91,10 +90,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             const taskDispatcherNode = taskDispatcherDefinitions.find((node) => node.name === droppedNodeName);
 
             if (taskDispatcherNode) {
-                droppedNode = {
-                    ...taskDispatcherNode,
-                    taskDispatcher: true,
-                } as ClickedDefinitionType;
+                droppedNode = {...taskDispatcherNode, taskDispatcher: true} as ClickedDefinitionType;
             }
         }
 
@@ -164,18 +160,19 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
                 if (targetEdge) {
                     handleDropOnWorkflowEdge(targetEdge, droppedNode);
-
                     return;
                 }
             }
         }
-    };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     let canvasWidth = window.innerWidth - 120;
 
     if (copilotPanelOpen) {
         canvasWidth -= 450;
     }
+
     if (leftSidebarOpen) {
         canvasWidth -= 384;
     }

@@ -92,13 +92,22 @@ const Property = ({
 }: PropertyProps) => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState(property.defaultValue || '');
+    const [inputValue, setInputValue] = useState(() => {
+        if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+            return '';
+        }
+
+        if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
+            return '';
+        }
+
+        return property.defaultValue || '';
+    });
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<string> | undefined>();
     const [mentionInputValue, setMentionInputValue] = useState(property.defaultValue || '');
     const [mentionInput, setMentionInput] = useState(
         !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
     );
-    const [numericValue, setNumericValue] = useState(property.defaultValue || '');
     const [propertyParameterValue, setPropertyParameterValue] = useState(parameterValue || property.defaultValue || '');
     const [selectValue, setSelectValue] = useState(
         property.defaultValue !== undefined ? property.defaultValue : 'null'
@@ -110,6 +119,7 @@ const Property = ({
 
     const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
 
     const {currentComponent, currentNode, setCurrentComponent, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore();
@@ -127,7 +137,9 @@ const Property = ({
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
-    const defaultValue = property.defaultValue !== undefined ? property.defaultValue : '';
+    const defaultValue = useMemo(() => {
+        return property.defaultValue !== undefined ? property.defaultValue : '';
+    }, [property.defaultValue]);
 
     const {
         controlType,
@@ -218,7 +230,7 @@ const Property = ({
             return;
         }
 
-        const numericValueToSave = controlType === 'NUMBER' ? parseFloat(numericValue) : parseInt(numericValue, 10);
+        const valueToSave = latestValueRef.current;
 
         saveProperty({
             currentComponent,
@@ -227,7 +239,7 @@ const Property = ({
             setCurrentComponent,
             type,
             updateWorkflowNodeParameterMutation,
-            value: isNumericalInput ? numericValueToSave : inputValue,
+            value: isNumericalInput ? parseFloat(valueToSave as string) : valueToSave,
             workflowId: workflow.id!,
         });
     }, 200);
@@ -312,9 +324,7 @@ const Property = ({
             includeInMetadata: property.custom,
             path,
             setCurrentComponent,
-            successCallback: () => {
-                setInputValue(JSON.stringify(value));
-            },
+            successCallback: () => setInputValue(JSON.stringify(value)),
             type,
             updateWorkflowNodeParameterMutation,
             value: JSON.stringify(value),
@@ -325,14 +335,24 @@ const Property = ({
     const handleInputChange = (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>) => {
         const {value} = event.target;
 
-        if (isNumericalInput) {
-            const valueTooLow = minValue && parseFloat(value) < minValue;
-            const valueTooHigh = maxValue && parseFloat(value) > maxValue;
+        if (isNumericalInput && value) {
+            const numericValue = parseFloat(value);
+
+            const valueTooLow = minValue ? numericValue < minValue : numericValue < Number.MIN_SAFE_INTEGER;
+            const valueTooHigh = maxValue ? numericValue > maxValue : numericValue > Number.MAX_SAFE_INTEGER;
 
             if (valueTooLow || valueTooHigh) {
                 setHasError(true);
 
                 setErrorMessage('Incorrect value');
+            } else if (controlType === 'INTEGER' && !/^-?\d+$/.test(value)) {
+                setHasError(true);
+
+                setErrorMessage('Value must be a valid integer');
+            } else if (controlType === 'NUMBER' && !/^-?\d+(\.\d+)?$/.test(value)) {
+                setHasError(true);
+
+                setErrorMessage('Value must be a valid number');
             } else {
                 setHasError(false);
             }
@@ -343,16 +363,20 @@ const Property = ({
                 return;
             }
 
-            setNumericValue(onlyNumericValue);
+            setInputValue(onlyNumericValue);
+
+            latestValueRef.current = onlyNumericValue;
         } else {
-            const valueTooShort = minLength && inputValue.length < minLength;
-            const valueTooLong = maxLength && inputValue.length > maxLength;
+            const valueTooShort = minLength && value.length < minLength;
+            const valueTooLong = maxLength && value.length > maxLength;
 
             setHasError(!!valueTooShort || !!valueTooLong);
 
             setErrorMessage('Incorrect value');
 
-            setInputValue(event.target.value);
+            setInputValue(value);
+
+            latestValueRef.current = value;
         }
 
         saveInputValue();
@@ -360,6 +384,8 @@ const Property = ({
 
     const handleMentionsInputChange = (value: string) => {
         setMentionInputValue(value);
+
+        latestValueRef.current = value;
 
         saveMentionInputValue();
     };
@@ -373,14 +399,12 @@ const Property = ({
             setTimeout(() => {
                 if (inputRef.current) {
                     inputRef.current.value = '';
-
                     inputRef.current.focus();
                 }
             }, 50);
         } else {
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
-
                 editorRef.current?.commands.setContent('');
                 editorRef.current?.commands.focus();
 
@@ -398,7 +422,7 @@ const Property = ({
 
         if (mentionInput && !mentionInputValue) {
             return;
-        } else if (!mentionInput && isNumericalInput && !numericValue) {
+        } else if (!mentionInput && isNumericalInput && !inputValue) {
             return;
         } else if (!mentionInput && controlType === 'SELECT' && !selectValue) {
             return;
@@ -411,7 +435,6 @@ const Property = ({
             path,
             setCurrentComponent,
             successCallback: () => {
-                setNumericValue('');
                 setInputValue('');
                 setMentionInputValue('');
                 setSelectValue('');
@@ -434,7 +457,6 @@ const Property = ({
         }
 
         setSelectValue(value);
-
         setPropertyParameterValue(value);
 
         let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
@@ -445,7 +467,7 @@ const Property = ({
             actualValue = parseFloat(value);
         }
 
-        if (value === 'null') {
+        if (value === 'null' || value === '') {
             actualValue = null;
         }
 
@@ -576,7 +598,7 @@ const Property = ({
 
                 setSelectValue('');
 
-                setNumericValue('');
+                setPropertyParameterValue('');
             }
         }
 
@@ -584,7 +606,13 @@ const Property = ({
             setMentionInputValue(propertyParameterValue);
         }
 
-        if (!mentionInput && inputValue === '' && propertyParameterValue) {
+        if (
+            !mentionInput &&
+            controlType &&
+            INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
+            inputValue === '' &&
+            propertyParameterValue
+        ) {
             setInputValue(propertyParameterValue);
         }
 
@@ -606,20 +634,20 @@ const Property = ({
 
         if (
             isNumericalInput &&
-            (numericValue === null || numericValue === undefined) &&
+            (inputValue === null || inputValue === undefined) &&
             (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
             parameterValue
         ) {
-            setNumericValue(propertyParameterValue);
+            setInputValue(propertyParameterValue);
         }
 
         if (
             isNumericalInput &&
-            (numericValue !== null || numericValue !== undefined) &&
+            (inputValue !== null || inputValue !== undefined) &&
             (propertyParameterValue !== null || propertyParameterValue !== undefined) &&
-            propertyParameterValue !== numericValue
+            propertyParameterValue !== inputValue
         ) {
-            setNumericValue(propertyParameterValue);
+            setInputValue(propertyParameterValue);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -685,13 +713,14 @@ const Property = ({
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
-        // debouncedSetPropertyParameterValue();
-
         if (!workflow.definition || !currentNode?.name || !name || !path) {
             return;
         }
 
-        setPropertyParameterValue(resolvePath(memoizedWorkflowTask?.parameters, path));
+        const encodedParameters = encodeParameters(memoizedWorkflowTask?.parameters ?? {});
+        const encodedPath = encodePath(path);
+
+        setPropertyParameterValue(resolvePath(encodedParameters, encodedPath));
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflow.definition]);
@@ -705,7 +734,7 @@ const Property = ({
             setInputValue(parameterDefaultValue);
             setMentionInputValue(parameterDefaultValue);
             setSelectValue(parameterDefaultValue.toString());
-            setNumericValue(parameterDefaultValue);
+            setPropertyParameterValue(parameterDefaultValue);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
@@ -1004,7 +1033,7 @@ const Property = ({
                             showInputTypeSwitchButton={showInputTypeSwitchButton}
                             title={type}
                             type={hidden ? 'hidden' : getInputHTMLType(controlType)}
-                            value={isNumericalInput ? numericValue : inputValue}
+                            value={inputValue}
                         />
                     )}
 

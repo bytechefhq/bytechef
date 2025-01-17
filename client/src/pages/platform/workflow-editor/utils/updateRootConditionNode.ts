@@ -1,6 +1,6 @@
 import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {NodeDataType} from '@/shared/types';
-import {Node} from 'reactflow';
+import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getParentConditionTask from './getParentConditionTask';
@@ -44,7 +44,7 @@ export default function updateRootConditionNode({
         const currentConditionCase = currentTaskNodeConditionData.conditionCase;
 
         const parentConditionCaseTasks: Array<WorkflowTask> =
-            parentConditionTaskNode.data.parameters[currentConditionCase] || [];
+            (parentConditionTaskNode.data as NodeDataType)?.parameters?.[currentConditionCase] || [];
 
         const workflowTasks = workflow.tasks;
 
@@ -63,20 +63,20 @@ export default function updateRootConditionNode({
         }
 
         parentConditionTaskNode.data.parameters = {
-            ...parentConditionTaskNode.data.parameters,
+            ...(parentConditionTaskNode.data as NodeDataType).parameters,
             [currentConditionCase]: parentConditionCaseTasks,
         };
 
         currentTaskNode = {
             ...parentConditionTaskNode,
-            componentName: parentConditionTaskNode.data.componentName,
+            componentName: (parentConditionTaskNode.data as NodeDataType).componentName,
             name: parentConditionTaskNode.id,
             type: parentConditionTaskNode.type || 'workflow',
-            version: parentConditionTaskNode.data.type.split('/v')[1],
+            version: Number((parentConditionTaskNode.data as NodeDataType)?.type?.split('/v')[1]),
             workflowNodeName: parentConditionTaskNode.id,
         };
 
-        currentTaskNodeConditionData = parentConditionTaskNode.data.conditionData;
+        currentTaskNodeConditionData = (parentConditionTaskNode.data as NodeDataType).conditionData;
     }
 
     return currentTaskNode;

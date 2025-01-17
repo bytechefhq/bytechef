@@ -172,7 +172,7 @@ const PropertyComboBox = ({
                     <Button
                         aria-expanded={open}
                         className={twMerge(
-                            'relative w-full justify-between whitespace-normal',
+                            'relative w-full justify-between whitespace-normal font-normal',
                             showInputTypeSwitchButton && 'mt-0'
                         )}
                         disabled={isRefetching || noOptionsAvailable || !!missingConnection}
@@ -205,7 +205,12 @@ const PropertyComboBox = ({
                         {((lookupDependsOnValues && !isLoading) || !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
-                                    <span className={twMerge('flex w-full items-center', leadingIcon && 'ml-9')}>
+                                    <span
+                                        className={twMerge(
+                                            'flex w-full items-center font-normal',
+                                            leadingIcon && 'ml-9'
+                                        )}
+                                    >
                                         {currentOption?.icon && (
                                             <InlineSVG className="mr-2 size-6 flex-none" src={currentOption?.icon} />
                                         )}
@@ -243,7 +248,7 @@ const PropertyComboBox = ({
 
                             <CommandGroup>
                                 <CommandItem
-                                    className="cursor-pointer hover:bg-muted"
+                                    className="cursor-pointer font-normal hover:bg-muted"
                                     key="resetOption"
                                     onSelect={() => {
                                         setOpen(false);
@@ -261,7 +266,7 @@ const PropertyComboBox = ({
 
                                 {(options as Array<ComboBoxItemType>)?.map((option) => (
                                     <CommandItem
-                                        className="cursor-pointer hover:bg-muted"
+                                        className="cursor-pointer font-normal hover:bg-muted"
                                         key={option.value}
                                         onSelect={() => {
                                             setOpen(false);

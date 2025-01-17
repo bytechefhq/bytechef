@@ -5,14 +5,26 @@ import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+export type ContextType = {
+    source: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    parameters: Record<string, any>;
+    workflowId: string;
+};
+
 interface CopilotStateI {
     conversationId: string | undefined;
     generateConversationId: () => void;
+
+    context: ContextType | undefined;
+    setContext: (context: ContextType) => void;
+
     copilotPanelOpen: boolean;
-    messages: ThreadMessageLike[];
-    setMessage: (message: ThreadMessageLike) => void;
-    resetMessages: () => void;
     setCopilotPanelOpen: (showCopilot: boolean) => void;
+
+    messages: ThreadMessageLike[];
+    addMessage: (message: ThreadMessageLike) => void;
+    resetMessages: () => void;
 }
 
 export const useCopilotStore = create<CopilotStateI>()(
@@ -30,6 +42,15 @@ export const useCopilotStore = create<CopilotStateI>()(
             });
         },
 
+        context: undefined,
+        setContext: (context) =>
+            set((state) => {
+                return {
+                    ...state,
+                    context,
+                };
+            }),
+
         copilotPanelOpen: false,
         setCopilotPanelOpen: (copilotPanelOpen) =>
             set((state) => {
@@ -40,7 +61,7 @@ export const useCopilotStore = create<CopilotStateI>()(
             }),
 
         messages: [],
-        setMessage: (message) =>
+        addMessage: (message) =>
             set((state) => {
                 return {
                     ...state,

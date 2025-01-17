@@ -32,13 +32,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         selectedComponentName,
     }: WorkflowNodesListProps) => {
         const [filter, setFilter] = useState('');
-
-        const {ai} = useApplicationInfoStore();
-        const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
-
-        const ff_797 = useFeatureFlagsStore()('ff-797');
-        const ff_1570 = useFeatureFlagsStore()('ff-1570');
-
         const [filteredActionComponentDefinitions, setFilteredActionComponentDefinitions] = useState<
             Array<ComponentDefinitionBasic>
         >([]);
@@ -52,6 +45,11 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         >([]);
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
+        const {ai} = useApplicationInfoStore();
+        const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
+
+        const ff_797 = useFeatureFlagsStore()('ff-797');
+        const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
         useEffect(() => {
             if (taskDispatcherDefinitions) {
@@ -100,7 +98,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     <Input
                         name="workflowNodeFilter"
                         onChange={(event) => setFilter(event.target.value)}
-                        placeholder="Filter action, triggers and flows"
+                        placeholder="Filter actions, triggers and flows"
                         value={filter}
                     />
 

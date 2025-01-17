@@ -1,8 +1,8 @@
-import {ReactFlowProvider} from 'reactflow';
+import {ReactFlowProvider} from '@xyflow/react';
 
 import WorkflowNodeDetailsPanel from './WorkflowNodeDetailsPanel';
 
-import 'reactflow/dist/base.css';
+import '@xyflow/react/dist/base.css';
 
 import './WorkflowEditorLayout.css';
 
