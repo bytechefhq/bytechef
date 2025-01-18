@@ -97,9 +97,10 @@ export const WorkflowExecutions = () => {
             filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
         projectId: filterProjectId,
+        includeAllFields: false,
     });
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!});
+    const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!, includeAllFields: false});
 
     const {
         data: workflowExecutionPage,
@@ -121,6 +122,7 @@ export const WorkflowExecutions = () => {
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(
         filterProjectId!,
         projectInstance?.projectVersion!,
+        false,
         !!projectInstance
     );
 

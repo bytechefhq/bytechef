@@ -4,10 +4,11 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectWorkflowKeys = {
-    projectVersionWorkflows: (projectId: number, projectVersion: number) => [
+    projectVersionWorkflows: (projectId: number, projectVersion: number, includeAllFields: boolean) => [
         ...ProjectKeys.projects,
         projectId,
         projectVersion,
+        includeAllFields,
         'projectWorkflows',
     ],
     projectWorkflow: (projectId: number, projectWorkflowId: number) => [
@@ -39,9 +40,14 @@ export const useGetProjectWorkflowsQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetProjectVersionWorkflowsQuery = (id: number, projectVersion: number, enabled?: boolean) =>
+export const useGetProjectVersionWorkflowsQuery = (
+    id: number,
+    projectVersion: number,
+    includeAllFields: boolean = true,
+    enabled?: boolean
+) =>
     useQuery<Workflow[], Error>({
-        queryKey: ProjectWorkflowKeys.projectVersionWorkflows(id, projectVersion),
-        queryFn: () => new WorkflowApi().getProjectVersionWorkflows({id, projectVersion}),
+        queryKey: ProjectWorkflowKeys.projectVersionWorkflows(id, projectVersion, includeAllFields),
+        queryFn: () => new WorkflowApi().getProjectVersionWorkflows({id, projectVersion, includeAllFields}),
         enabled: enabled === undefined ? true : enabled,
     });

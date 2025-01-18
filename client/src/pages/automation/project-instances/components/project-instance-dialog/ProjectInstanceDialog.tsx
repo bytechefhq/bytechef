@@ -80,6 +80,7 @@ const ProjectInstanceDialog = ({
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(
         getValues().projectId!,
         getValues().projectVersion!,
+        true,
         !!getValues().projectId && !!getValues().projectVersion
     );
 

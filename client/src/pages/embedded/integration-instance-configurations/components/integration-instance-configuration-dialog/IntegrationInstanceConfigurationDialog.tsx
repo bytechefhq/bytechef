@@ -89,6 +89,7 @@ const IntegrationInstanceConfigurationDialog = ({
     const {data: workflows} = useGetIntegrationVersionWorkflowsQuery(
         curIntegrationId!,
         curIntegrationVersion!,
+        true,
         !!curIntegrationId && !!curIntegrationVersion
     );
 

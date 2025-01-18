@@ -1,14 +1,17 @@
 /* eslint-disable sort-keys */
-import {type Environment, ProjectInstance, ProjectInstanceApi} from '@/shared/middleware/automation/configuration';
+import {
+    GetWorkspaceProjectInstancesRequest,
+    ProjectInstance,
+    ProjectInstanceApi,
+} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectInstanceKeys = {
-    filteredProjectInstances: (filters: {
-        id?: number;
-        environment?: Environment;
-        projectId?: number;
-        tagId?: number;
-    }) => [...ProjectInstanceKeys.projectInstances, filters],
+    filteredProjectInstances: (filters: GetWorkspaceProjectInstancesRequest) => [
+        ...ProjectInstanceKeys.projectInstances,
+        filters.id,
+        filters,
+    ],
     projectInstance: (id: number) => [...ProjectInstanceKeys.projectInstances, id],
     projectInstances: ['projectInstances'] as const,
 };
@@ -20,12 +23,7 @@ export const useGetProjectInstanceQuery = (id: number, enabled?: boolean) =>
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetWorkspaceProjectInstancesQuery = (filters: {
-    id: number;
-    environment?: Environment;
-    projectId?: number;
-    tagId?: number;
-}) =>
+export const useGetWorkspaceProjectInstancesQuery = (filters: GetWorkspaceProjectInstancesRequest) =>
     useQuery<ProjectInstance[], Error>({
         queryKey: ProjectInstanceKeys.filteredProjectInstances(filters),
         queryFn: () => new ProjectInstanceApi().getWorkspaceProjectInstances(filters),
