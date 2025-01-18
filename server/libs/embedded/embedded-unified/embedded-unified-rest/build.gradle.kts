@@ -50,7 +50,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //    generatorName.set("typescript-fetch")
 //    inputSpec.set("$projectDir/openapi.yaml")
 //    modelNameSuffix.set("Model")
-//    outputDir.set("$rootDir/client/src/middleware/embedded/unified")
+//    outputDir.set("$rootDir/client/src/shared/middleware/embedded/unified")
 //}
 
 tasks.register("generateOpenAPI") {

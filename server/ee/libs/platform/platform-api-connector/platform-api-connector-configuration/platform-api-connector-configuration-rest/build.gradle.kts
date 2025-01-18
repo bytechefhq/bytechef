@@ -28,7 +28,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/middleware/platform/api-connector")
+    outputDir.set("$rootDir/client/src/ee/shared/middleware/platform/api-connector")
 }
 
 tasks.register("generateOpenAPI") {

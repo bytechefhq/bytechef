@@ -29,7 +29,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //    generatorName.set("typescript-fetch")
 //    inputSpec.set("$projectDir/openapi.yaml")
 //    modelNameSuffix.set("Model")
-//    outputDir.set("$rootDir/client/src/middleware/platform/custom-component")
+//    outputDir.set("$rootDir/client/src/shared/middleware/platform/custom-component")
 //}
 
 tasks.register("generateOpenAPI") {
