@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T22:14:22.561228+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -234,8 +234,9 @@ public interface ProjectApi {
      * Get projects by workspace id.
      *
      * @param id The id of a workspace. (required)
-     * @param categoryId The category id used for filtering projects. (optional)
+     * @param apiCollections Use for filtering projects for which api collections exist. (optional)
      * @param projectDeployments Use for filtering projects for which project deployments exist. (optional)
+     * @param categoryId The category id used for filtering projects. (optional)
      * @param tagId The tag id of used for filtering projects. (optional)
      * @param status Use for filtering projects per status. (optional)
      * @param includeAllFields Use for including all fields or just basic ones. (optional, default to true)
@@ -260,8 +261,9 @@ public interface ProjectApi {
     
     default ResponseEntity<List<ProjectModel>> getWorkspaceProjects(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
+        @Parameter(name = "apiCollections", description = "Use for filtering projects for which api collections exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "apiCollections", required = false) Boolean apiCollections,
         @Parameter(name = "projectDeployments", description = "Use for filtering projects for which project deployments exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectDeployments", required = false) Boolean projectDeployments,
+        @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,
         @Parameter(name = "status", description = "Use for filtering projects per status.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) ProjectStatusModel status,
         @Parameter(name = "includeAllFields", description = "Use for including all fields or just basic ones.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "includeAllFields", required = false, defaultValue = "true") Boolean includeAllFields
