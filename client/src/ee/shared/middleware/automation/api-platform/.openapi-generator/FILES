@@ -1,3 +1,4 @@
+.openapi-generator-ignore
 apis/ApiClientApi.ts
 apis/ApiCollectionApi.ts
 apis/ApiCollectionEndpointApi.ts
