@@ -765,6 +765,18 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "apiCollections"
+          description: "Use for filtering projects for which api collections exist."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+        - name: "projectDeployments"
+          description: "Use for filtering projects for which project deployments exist."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
         - name: "categoryId"
           description: "The category id used for filtering projects."
           in: "query"
@@ -772,12 +784,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "projectDeployments"
-          description: "Use for filtering projects for which project deployments exist."
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
         - name: "tagId"
           description: "The tag id of used for filtering projects."
           in: "query"
