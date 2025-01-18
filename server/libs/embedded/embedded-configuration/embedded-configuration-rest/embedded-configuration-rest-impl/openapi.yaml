@@ -164,6 +164,13 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "includeAllFields"
+          description: "Use for including all fields or just basic ones."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: true
       responses:
         "200":
           description: "The list of integration instance configurations."
@@ -542,6 +549,12 @@ paths:
         required: false
         schema:
           type: "boolean"
+      - name: "status"
+        description: "Use for filtering integrations by status."
+        in: "query"
+        required: false
+        schema:
+          $ref: '#/components/schemas/IntegrationStatus'
       - name: "tagId"
         description: "The tag id of used for filtering integrations."
         in: "query"
@@ -549,12 +562,13 @@ paths:
         schema:
           type: "integer"
           format: "int64"
-      - name: "status"
-        description: "Use for filtering integrations by status."
+      - name: "includeAllFields"
+        description: "Use for including all fields or just basic ones."
         in: "query"
         required: false
         schema:
-          $ref: '#/components/schemas/IntegrationStatus'
+          type: "boolean"
+          default: true
       responses:
         "200":
           description: "The list of integrations."
@@ -752,6 +766,13 @@ paths:
           required: true
           schema:
             type: "integer"
+        - name: "includeAllFields"
+          description: "Use for including all fields or just basic ones."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: true
       responses:
         "200":
           description: "The array of integration workflows."

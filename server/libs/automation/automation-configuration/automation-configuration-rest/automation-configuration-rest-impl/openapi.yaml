@@ -474,6 +474,13 @@ paths:
           required: true
           schema:
             type: "integer"
+        - name: "includeAllFields"
+          description: "Use for including all fields or just basic ones."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: true
       responses:
         "200":
           description: "The array of project workflows."
@@ -727,6 +734,13 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+        - name: "includeAllFields"
+          description: "Use for including all fields or just basic ones."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: true
       responses:
         "200":
           description: "The list of project instances."
@@ -777,6 +791,13 @@ paths:
           required: false
           schema:
             $ref: '#/components/schemas/ProjectStatus'
+        - name: "includeAllFields"
+          description: "Use for including all fields or just basic ones."
+          in: "query"
+          required: false
+          schema:
+            type: "boolean"
+            default: true
       responses:
         "200":
           description: "The list of projects."
