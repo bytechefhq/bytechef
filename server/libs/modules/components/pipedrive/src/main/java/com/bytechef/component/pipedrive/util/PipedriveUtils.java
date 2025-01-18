@@ -50,7 +50,7 @@ public class PipedriveUtils {
                 .execute()
                 .getBody(new TypeReference<>() {});
 
-            context.logger(logger -> logger.debug("Response for path='%s': %s".formatted(path, response)));
+            context.log(log -> log.debug("Response for path='%s': %s".formatted(path, response)));
 
             List<Option<String>> options = new ArrayList<>();
 

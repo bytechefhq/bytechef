@@ -62,7 +62,7 @@ public interface Context {
      *
      * @param logConsumer
      */
-    void logger(ContextConsumer<Logger> logConsumer);
+    void log(ContextConsumer<Log> logConsumer);
 
     /**
      *
@@ -1032,7 +1032,7 @@ public interface Context {
     /**
      *
      */
-    interface Logger {
+    interface Log {
 
         /**
          *

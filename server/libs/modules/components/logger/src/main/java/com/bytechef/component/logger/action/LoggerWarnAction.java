@@ -40,7 +40,7 @@ public class LoggerWarnAction {
 
         Object text = inputParameters.getRequired(TEXT);
 
-        context.logger(logger -> logger.warn(text.toString()));
+        context.log(logger -> logger.warn(text.toString()));
 
         return null;
     }

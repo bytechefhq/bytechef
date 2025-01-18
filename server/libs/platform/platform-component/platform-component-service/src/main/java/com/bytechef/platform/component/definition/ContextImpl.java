@@ -53,7 +53,7 @@ class ContextImpl implements Context {
     private final File file;
     private final Http http;
     private final Json json;
-    private final Logger logger;
+    private final Log log;
     private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final Xml xml;
@@ -67,7 +67,7 @@ class ContextImpl implements Context {
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.log = new LogImpl(componentName, componentOperationName);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
@@ -101,9 +101,9 @@ class ContextImpl implements Context {
     }
 
     @Override
-    public void logger(ContextConsumer<Logger> loggerConsumer) {
+    public void log(ContextConsumer<Log> logConsumer) {
         try {
-            loggerConsumer.accept(logger);
+            logConsumer.accept(log);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -509,11 +509,11 @@ class ContextImpl implements Context {
         }
     }
 
-    private static class LoggerImpl implements Logger {
+    private static class LogImpl implements Log {
 
         private final org.slf4j.Logger logger;
 
-        public LoggerImpl(String componentName, String componentOperationName) {
+        public LogImpl(String componentName, String componentOperationName) {
             logger = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }

@@ -174,14 +174,14 @@ public class CsvFileReadUtils {
         try {
             value = Integer.parseInt(string);
         } catch (NumberFormatException nfe) {
-            context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
+            context.log(log -> log.trace(nfe.getMessage(), nfe));
         }
 
         if (value == null) {
             try {
                 value = Long.parseLong(string);
             } catch (NumberFormatException nfe) {
-                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
+                context.log(log -> log.trace(nfe.getMessage(), nfe));
             }
         }
 
@@ -189,7 +189,7 @@ public class CsvFileReadUtils {
             try {
                 value = Double.parseDouble(string);
             } catch (NumberFormatException nfe) {
-                context.logger(logger -> logger.trace(nfe.getMessage(), nfe));
+                context.log(log -> log.trace(nfe.getMessage(), nfe));
             }
         }
 

@@ -53,8 +53,8 @@ public class DataStreamContextImpl implements DataStreamContext {
     }
 
     @Override
-    public void logger(ContextConsumer<Logger> loggerConsumer) {
-        actionContext.logger(loggerConsumer);
+    public void log(ContextConsumer<Log> logConsumer) {
+        actionContext.log(logConsumer);
     }
 
     @Override

@@ -77,7 +77,7 @@ public class CsvFileDataStreamItemReader implements DataStreamItemReader {
             if (iterator.hasNext()) {
                 Map<String, String> row = (Map<String, String>) iterator.nextValue();
 
-                context.logger(logger -> logger.trace("row: {}", row));
+                context.log(log -> log.trace("row: {}", row));
 
                 return CsvFileReadUtils.getHeaderRow(configuration, context, row, enclosingCharacter);
             }
@@ -85,7 +85,7 @@ public class CsvFileDataStreamItemReader implements DataStreamItemReader {
             if (iterator.hasNext()) {
                 List<String> row = (List<String>) iterator.nextValue();
 
-                context.logger(logger -> logger.trace("row: {}", row));
+                context.log(log -> log.trace("row: {}", row));
 
                 return CsvFileReadUtils.getColumnRow(configuration, context, row, enclosingCharacter);
             }

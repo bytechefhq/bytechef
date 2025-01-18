@@ -56,7 +56,7 @@ public class AirtableUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        context.logger(
+        context.log(
             logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
         if (body.containsKey("error")) {
@@ -86,7 +86,7 @@ public class AirtableUtils {
 
             Map<String, List<AirtableTable>> tablesMap = response.getBody(new TypeReference<>() {});
 
-            context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, tablesMap)));
+            context.log(log -> log.debug("Response for url='%s': %s".formatted(url, tablesMap)));
 
             List<AirtableTable> tables = tablesMap.get("tables");
 
@@ -155,7 +155,7 @@ public class AirtableUtils {
             throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
         }
 
-        context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, body)));
+        context.log(log -> log.debug("Response for url='%s': %s".formatted(url, body)));
 
         return getOptions(body, "tables");
 
