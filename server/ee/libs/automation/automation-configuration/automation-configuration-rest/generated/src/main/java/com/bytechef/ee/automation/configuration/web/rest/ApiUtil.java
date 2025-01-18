@@ -1,4 +1,4 @@
-package com.bytechef.automation.configuration.web.rest;
+package com.bytechef.ee.automation.configuration.web.rest;
 
 import org.springframework.web.context.request.NativeWebRequest;
 

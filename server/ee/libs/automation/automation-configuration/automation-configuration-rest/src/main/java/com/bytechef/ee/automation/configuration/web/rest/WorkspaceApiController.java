@@ -20,7 +20,6 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.WorkspaceService;
-import com.bytechef.automation.configuration.web.rest.WorkspaceApi;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
