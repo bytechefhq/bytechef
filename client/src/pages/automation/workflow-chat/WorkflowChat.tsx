@@ -30,7 +30,7 @@ const WorkflowChat = () => {
                         </div>
                     )}
 
-                    <div className={twMerge('absolute inset-x-0 bottom-0 text-sm', environment === 'test' && 'top-16')}>
+                    <div className={twMerge('absolute inset-x-0 bottom-0', environment === 'test' && 'top-16')}>
                         <Thread />
                     </div>
                 </div>
