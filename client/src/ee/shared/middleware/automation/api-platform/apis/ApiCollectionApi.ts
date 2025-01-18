@@ -26,7 +26,7 @@ import {
 } from '../models/index';
 
 export interface CreateApiCollectionRequest {
-    apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceId'>;
+    apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
 }
 
 export interface DeleteApiCollectionRequest {
@@ -46,7 +46,7 @@ export interface GetWorkspaceApiCollectionsRequest {
 
 export interface UpdateApiCollectionRequest {
     id: number;
-    apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceId'>;
+    apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
 }
 
 /**

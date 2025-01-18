@@ -94,11 +94,11 @@ export interface ApiCollectionEndpoint {
      */
     path: string;
     /**
-     * The project instance workflow id.
+     * The project deployment workflow id.
      * @type {number}
      * @memberof ApiCollectionEndpoint
      */
-    readonly projectInstanceWorkflowId?: number;
+    readonly projectDeploymentWorkflowId?: number;
     /**
      * The workflow reference code.
      * @type {string}
@@ -147,7 +147,7 @@ export function ApiCollectionEndpointFromJSONTyped(json: any, ignoreDiscriminato
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'path': json['path'],
-        'projectInstanceWorkflowId': json['projectInstanceWorkflowId'] == null ? undefined : json['projectInstanceWorkflowId'],
+        'projectDeploymentWorkflowId': json['projectDeploymentWorkflowId'] == null ? undefined : json['projectDeploymentWorkflowId'],
         'workflowReferenceCode': json['workflowReferenceCode'],
         'version': json['__version'] == null ? undefined : json['__version'],
     };
@@ -157,7 +157,7 @@ export function ApiCollectionEndpointToJSON(json: any): ApiCollectionEndpoint {
     return ApiCollectionEndpointToJSONTyped(json, false);
 }
 
-export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiCollectionEndpointToJSONTyped(value?: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentWorkflowId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

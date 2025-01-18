@@ -27,13 +27,13 @@ import {
     JobBasicToJSON,
     JobBasicToJSONTyped,
 } from './JobBasic';
-import type { ProjectInstanceBasic } from './ProjectInstanceBasic';
+import type { ProjectDeploymentBasic } from './ProjectDeploymentBasic';
 import {
-    ProjectInstanceBasicFromJSON,
-    ProjectInstanceBasicFromJSONTyped,
-    ProjectInstanceBasicToJSON,
-    ProjectInstanceBasicToJSONTyped,
-} from './ProjectInstanceBasic';
+    ProjectDeploymentBasicFromJSON,
+    ProjectDeploymentBasicFromJSONTyped,
+    ProjectDeploymentBasicToJSON,
+    ProjectDeploymentBasicToJSONTyped,
+} from './ProjectDeploymentBasic';
 import type { ProjectBasic } from './ProjectBasic';
 import {
     ProjectBasicFromJSON,
@@ -62,10 +62,10 @@ export interface WorkflowExecutionBasic {
     project?: ProjectBasic;
     /**
      * 
-     * @type {ProjectInstanceBasic}
+     * @type {ProjectDeploymentBasic}
      * @memberof WorkflowExecutionBasic
      */
-    projectInstance?: ProjectInstanceBasic;
+    projectDeployment?: ProjectDeploymentBasic;
     /**
      * 
      * @type {JobBasic}
@@ -99,7 +99,7 @@ export function WorkflowExecutionBasicFromJSONTyped(json: any, ignoreDiscriminat
         
         'id': json['id'] == null ? undefined : json['id'],
         'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
-        'projectInstance': json['projectInstance'] == null ? undefined : ProjectInstanceBasicFromJSON(json['projectInstance']),
+        'projectDeployment': json['projectDeployment'] == null ? undefined : ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'job': json['job'] == null ? undefined : JobBasicFromJSON(json['job']),
         'workflow': json['workflow'] == null ? undefined : WorkflowBasicFromJSON(json['workflow']),
     };
@@ -117,7 +117,7 @@ export function WorkflowExecutionBasicToJSONTyped(value?: Omit<WorkflowExecution
     return {
         
         'project': ProjectBasicToJSON(value['project']),
-        'projectInstance': ProjectInstanceBasicToJSON(value['projectInstance']),
+        'projectDeployment': ProjectDeploymentBasicToJSON(value['projectDeployment']),
         'job': JobBasicToJSON(value['job']),
         'workflow': WorkflowBasicToJSON(value['workflow']),
     };

@@ -23,7 +23,7 @@ import {
 } from '../models/index';
 
 export interface CreateApiCollectionEndpointRequest {
-    apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'>;
+    apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentWorkflowId'>;
 }
 
 export interface DeleteApiCollectionEndpointRequest {
@@ -36,7 +36,7 @@ export interface GetApiCollectionEndpointRequest {
 
 export interface UpdateApiCollectionEndpointRequest {
     id: number;
-    apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceWorkflowId'>;
+    apiCollectionEndpoint: Omit<ApiCollectionEndpoint, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentWorkflowId'>;
 }
 
 /**

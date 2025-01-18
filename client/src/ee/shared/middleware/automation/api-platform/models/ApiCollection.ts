@@ -20,13 +20,6 @@ import {
     ApiCollectionEndpointToJSON,
     ApiCollectionEndpointToJSONTyped,
 } from './ApiCollectionEndpoint';
-import type { ProjectInstanceBasic } from './ProjectInstanceBasic';
-import {
-    ProjectInstanceBasicFromJSON,
-    ProjectInstanceBasicFromJSONTyped,
-    ProjectInstanceBasicToJSON,
-    ProjectInstanceBasicToJSONTyped,
-} from './ProjectInstanceBasic';
 import type { Tag } from './Tag';
 import {
     TagFromJSON,
@@ -34,6 +27,13 @@ import {
     TagToJSON,
     TagToJSONTyped,
 } from './Tag';
+import type { ProjectDeploymentBasic } from './ProjectDeploymentBasic';
+import {
+    ProjectDeploymentBasicFromJSON,
+    ProjectDeploymentBasicFromJSONTyped,
+    ProjectDeploymentBasicToJSON,
+    ProjectDeploymentBasicToJSONTyped,
+} from './ProjectDeploymentBasic';
 import type { ProjectBasic } from './ProjectBasic';
 import {
     ProjectBasicFromJSON,
@@ -121,17 +121,17 @@ export interface ApiCollection {
      */
     project?: ProjectBasic;
     /**
-     * The id of an project instance the API collection is connected to.
+     * The id of an project deployment the API collection is connected to.
      * @type {number}
      * @memberof ApiCollection
      */
-    readonly projectInstanceId?: number;
+    readonly projectDeploymentId?: number;
     /**
      * 
-     * @type {ProjectInstanceBasic}
+     * @type {ProjectDeploymentBasic}
      * @memberof ApiCollection
      */
-    projectInstance?: ProjectInstanceBasic;
+    projectDeployment?: ProjectDeploymentBasic;
     /**
      * The version of a project the API collection is connected to.
      * @type {number}
@@ -192,8 +192,8 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'projectId': json['projectId'],
         'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
-        'projectInstanceId': json['projectInstanceId'] == null ? undefined : json['projectInstanceId'],
-        'projectInstance': json['projectInstance'] == null ? undefined : ProjectInstanceBasicFromJSON(json['projectInstance']),
+        'projectDeploymentId': json['projectDeploymentId'] == null ? undefined : json['projectDeploymentId'],
+        'projectDeployment': json['projectDeployment'] == null ? undefined : ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'projectVersion': json['projectVersion'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'workspaceId': json['workspaceId'],
@@ -205,7 +205,7 @@ export function ApiCollectionToJSON(json: any): ApiCollection {
     return ApiCollectionToJSONTyped(json, false);
 }
 
-export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectInstanceId'> | null, ignoreDiscriminator: boolean = false): any {
+export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -219,7 +219,7 @@ export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'
         'name': value['name'],
         'projectId': value['projectId'],
         'project': ProjectBasicToJSON(value['project']),
-        'projectInstance': ProjectInstanceBasicToJSON(value['projectInstance']),
+        'projectDeployment': ProjectDeploymentBasicToJSON(value['projectDeployment']),
         'projectVersion': value['projectVersion'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
         'workspaceId': value['workspaceId'],

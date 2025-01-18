@@ -54,7 +54,7 @@ export interface GetProjectVersionsRequest {
 export interface GetWorkspaceProjectsRequest {
     id: number;
     categoryId?: number;
-    projectInstances?: boolean;
+    projectDeployments?: boolean;
     tagId?: number;
     status?: ProjectStatus;
     includeAllFields?: boolean;
@@ -274,8 +274,8 @@ export class ProjectApi extends runtime.BaseAPI {
             queryParameters['categoryId'] = requestParameters['categoryId'];
         }
 
-        if (requestParameters['projectInstances'] != null) {
-            queryParameters['projectInstances'] = requestParameters['projectInstances'];
+        if (requestParameters['projectDeployments'] != null) {
+            queryParameters['projectDeployments'] = requestParameters['projectDeployments'];
         }
 
         if (requestParameters['tagId'] != null) {

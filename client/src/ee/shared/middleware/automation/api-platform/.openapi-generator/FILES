@@ -11,7 +11,7 @@ models/CreateApiClient200Response.ts
 models/Environment.ts
 models/HttpMethod.ts
 models/ProjectBasic.ts
-models/ProjectInstanceBasic.ts
+models/ProjectDeploymentBasic.ts
 models/ProjectStatus.ts
 models/Tag.ts
 models/UpdateTagsRequest.ts

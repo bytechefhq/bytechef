@@ -25,7 +25,7 @@ import {
     UpdateTagsRequestToJSON,
 } from '../models/index';
 
-export interface UpdateProjectInstanceTagsRequest {
+export interface UpdateProjectDeploymentTagsRequest {
     id: number;
     updateTagsRequest: UpdateTagsRequest;
 }
@@ -33,19 +33,19 @@ export interface UpdateProjectInstanceTagsRequest {
 /**
  * 
  */
-export class ProjectInstanceTagApi extends runtime.BaseAPI {
+export class ProjectDeploymentTagApi extends runtime.BaseAPI {
 
     /**
-     * Get project instance tags.
-     * Get project instance tags
+     * Get project deployment tags.
+     * Get project deployment tags
      */
-    async getProjectInstanceTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+    async getProjectDeploymentTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/project-instances/tags`,
+            path: `/project-deployments/tags`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -55,30 +55,30 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get project instance tags.
-     * Get project instance tags
+     * Get project deployment tags.
+     * Get project deployment tags
      */
-    async getProjectInstanceTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
-        const response = await this.getProjectInstanceTagsRaw(initOverrides);
+    async getProjectDeploymentTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
+        const response = await this.getProjectDeploymentTagsRaw(initOverrides);
         return await response.value();
     }
 
     /**
-     * Updates tags of an existing project instance.
-     * Updates tags of an existing project instance
+     * Updates tags of an existing project deployment.
+     * Updates tags of an existing project deployment
      */
-    async updateProjectInstanceTagsRaw(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateProjectDeploymentTagsRaw(requestParameters: UpdateProjectDeploymentTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
-                'Required parameter "id" was null or undefined when calling updateProjectInstanceTags().'
+                'Required parameter "id" was null or undefined when calling updateProjectDeploymentTags().'
             );
         }
 
         if (requestParameters['updateTagsRequest'] == null) {
             throw new runtime.RequiredError(
                 'updateTagsRequest',
-                'Required parameter "updateTagsRequest" was null or undefined when calling updateProjectInstanceTags().'
+                'Required parameter "updateTagsRequest" was null or undefined when calling updateProjectDeploymentTags().'
             );
         }
 
@@ -89,7 +89,7 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/project-instances/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
+            path: `/project-deployments/{id}/tags`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
@@ -100,11 +100,11 @@ export class ProjectInstanceTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Updates tags of an existing project instance.
-     * Updates tags of an existing project instance
+     * Updates tags of an existing project deployment.
+     * Updates tags of an existing project deployment
      */
-    async updateProjectInstanceTags(requestParameters: UpdateProjectInstanceTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
-        await this.updateProjectInstanceTagsRaw(requestParameters, initOverrides);
+    async updateProjectDeploymentTags(requestParameters: UpdateProjectDeploymentTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+        await this.updateProjectDeploymentTagsRaw(requestParameters, initOverrides);
     }
 
 }

@@ -13,13 +13,6 @@
  */
 
 import { mapValues } from '../runtime';
-import type { ProjectInstanceWorkflow } from './ProjectInstanceWorkflow';
-import {
-    ProjectInstanceWorkflowFromJSON,
-    ProjectInstanceWorkflowFromJSONTyped,
-    ProjectInstanceWorkflowToJSON,
-    ProjectInstanceWorkflowToJSONTyped,
-} from './ProjectInstanceWorkflow';
 import type { Environment } from './Environment';
 import {
     EnvironmentFromJSON,
@@ -27,133 +20,102 @@ import {
     EnvironmentToJSON,
     EnvironmentToJSONTyped,
 } from './Environment';
-import type { Tag } from './Tag';
-import {
-    TagFromJSON,
-    TagFromJSONTyped,
-    TagToJSON,
-    TagToJSONTyped,
-} from './Tag';
 
 /**
  * Contains configurations and connections required for the execution of project workflows.
  * @export
- * @interface ProjectInstance
+ * @interface ProjectDeploymentBasic
  */
-export interface ProjectInstance {
+export interface ProjectDeploymentBasic {
     /**
      * The created by.
      * @type {string}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly createdBy?: string;
     /**
      * The created date.
      * @type {Date}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly createdDate?: Date;
     /**
-     * The description of a project instance.
+     * The description of a project deployment.
      * @type {string}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     description?: string;
     /**
-     * If a project instance is enabled or not.
+     * If a project deployment is enabled or not.
      * @type {boolean}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     enabled?: boolean;
     /**
      * 
      * @type {Environment}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     environment?: Environment;
     /**
-     * The id of a project instance.
+     * The id of a project deployment.
      * @type {number}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly id?: number;
     /**
      * The last execution date.
      * @type {Date}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly lastExecutionDate?: Date;
     /**
      * The last modified by.
      * @type {string}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly lastModifiedBy?: string;
     /**
      * The last modified date.
      * @type {Date}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     readonly lastModifiedDate?: Date;
     /**
-     * The name of a project instance.
+     * The name of a project deployment.
      * @type {string}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     name: string;
     /**
      * The id of a project.
      * @type {number}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     projectId?: number;
     /**
      * The version of a project.
      * @type {number}
-     * @memberof ProjectInstance
+     * @memberof ProjectDeploymentBasic
      */
     projectVersion?: number;
-    /**
-     * 
-     * @type {object}
-     * @memberof ProjectInstance
-     */
-    readonly project?: object;
-    /**
-     * 
-     * @type {Array<ProjectInstanceWorkflow>}
-     * @memberof ProjectInstance
-     */
-    projectInstanceWorkflows?: Array<ProjectInstanceWorkflow>;
-    /**
-     * 
-     * @type {Array<Tag>}
-     * @memberof ProjectInstance
-     */
-    tags?: Array<Tag>;
-    /**
-     * 
-     * @type {number}
-     * @memberof ProjectInstance
-     */
-    version?: number;
 }
 
 
 
 /**
- * Check if a given object implements the ProjectInstance interface.
+ * Check if a given object implements the ProjectDeploymentBasic interface.
  */
-export function instanceOfProjectInstance(value: object): value is ProjectInstance {
+export function instanceOfProjectDeploymentBasic(value: object): value is ProjectDeploymentBasic {
     if (!('name' in value) || value['name'] === undefined) return false;
     return true;
 }
 
-export function ProjectInstanceFromJSON(json: any): ProjectInstance {
-    return ProjectInstanceFromJSONTyped(json, false);
+export function ProjectDeploymentBasicFromJSON(json: any): ProjectDeploymentBasic {
+    return ProjectDeploymentBasicFromJSONTyped(json, false);
 }
 
-export function ProjectInstanceFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstance {
+export function ProjectDeploymentBasicFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectDeploymentBasic {
     if (json == null) {
         return json;
     }
@@ -171,18 +133,14 @@ export function ProjectInstanceFromJSONTyped(json: any, ignoreDiscriminator: boo
         'name': json['name'],
         'projectId': json['projectId'] == null ? undefined : json['projectId'],
         'projectVersion': json['projectVersion'] == null ? undefined : json['projectVersion'],
-        'project': json['project'] == null ? undefined : json['project'],
-        'projectInstanceWorkflows': json['projectInstanceWorkflows'] == null ? undefined : ((json['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowFromJSON)),
-        'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
-        'version': json['__version'] == null ? undefined : json['__version'],
     };
 }
 
-export function ProjectInstanceToJSON(json: any): ProjectInstance {
-    return ProjectInstanceToJSONTyped(json, false);
+export function ProjectDeploymentBasicToJSON(json: any): ProjectDeploymentBasic {
+    return ProjectDeploymentBasicToJSONTyped(json, false);
 }
 
-export function ProjectInstanceToJSONTyped(value?: Omit<ProjectInstance, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'|'project'> | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectDeploymentBasicToJSONTyped(value?: Omit<ProjectDeploymentBasic, 'createdBy'|'createdDate'|'id'|'lastExecutionDate'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -195,9 +153,6 @@ export function ProjectInstanceToJSONTyped(value?: Omit<ProjectInstance, 'create
         'name': value['name'],
         'projectId': value['projectId'],
         'projectVersion': value['projectVersion'],
-        'projectInstanceWorkflows': value['projectInstanceWorkflows'] == null ? undefined : ((value['projectInstanceWorkflows'] as Array<any>).map(ProjectInstanceWorkflowToJSON)),
-        'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),
-        '__version': value['version'],
     };
 }
 

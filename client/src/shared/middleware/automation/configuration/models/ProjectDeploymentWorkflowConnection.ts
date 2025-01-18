@@ -16,44 +16,44 @@ import { mapValues } from '../runtime';
 /**
  * The connection used in a particular action task or trigger.
  * @export
- * @interface ProjectInstanceWorkflowConnection
+ * @interface ProjectDeploymentWorkflowConnection
  */
-export interface ProjectInstanceWorkflowConnection {
+export interface ProjectDeploymentWorkflowConnection {
     /**
      * The connection id
      * @type {number}
-     * @memberof ProjectInstanceWorkflowConnection
+     * @memberof ProjectDeploymentWorkflowConnection
      */
     connectionId: number;
     /**
      * The connection key under which a connection is defined in a workflow definition.
      * @type {string}
-     * @memberof ProjectInstanceWorkflowConnection
+     * @memberof ProjectDeploymentWorkflowConnection
      */
     key: string;
     /**
      * The action/trigger name to which a connection belongs.
      * @type {string}
-     * @memberof ProjectInstanceWorkflowConnection
+     * @memberof ProjectDeploymentWorkflowConnection
      */
     workflowNodeName: string;
 }
 
 /**
- * Check if a given object implements the ProjectInstanceWorkflowConnection interface.
+ * Check if a given object implements the ProjectDeploymentWorkflowConnection interface.
  */
-export function instanceOfProjectInstanceWorkflowConnection(value: object): value is ProjectInstanceWorkflowConnection {
+export function instanceOfProjectDeploymentWorkflowConnection(value: object): value is ProjectDeploymentWorkflowConnection {
     if (!('connectionId' in value) || value['connectionId'] === undefined) return false;
     if (!('key' in value) || value['key'] === undefined) return false;
     if (!('workflowNodeName' in value) || value['workflowNodeName'] === undefined) return false;
     return true;
 }
 
-export function ProjectInstanceWorkflowConnectionFromJSON(json: any): ProjectInstanceWorkflowConnection {
-    return ProjectInstanceWorkflowConnectionFromJSONTyped(json, false);
+export function ProjectDeploymentWorkflowConnectionFromJSON(json: any): ProjectDeploymentWorkflowConnection {
+    return ProjectDeploymentWorkflowConnectionFromJSONTyped(json, false);
 }
 
-export function ProjectInstanceWorkflowConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectInstanceWorkflowConnection {
+export function ProjectDeploymentWorkflowConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean): ProjectDeploymentWorkflowConnection {
     if (json == null) {
         return json;
     }
@@ -65,11 +65,11 @@ export function ProjectInstanceWorkflowConnectionFromJSONTyped(json: any, ignore
     };
 }
 
-export function ProjectInstanceWorkflowConnectionToJSON(json: any): ProjectInstanceWorkflowConnection {
-    return ProjectInstanceWorkflowConnectionToJSONTyped(json, false);
+export function ProjectDeploymentWorkflowConnectionToJSON(json: any): ProjectDeploymentWorkflowConnection {
+    return ProjectDeploymentWorkflowConnectionToJSONTyped(json, false);
 }
 
-export function ProjectInstanceWorkflowConnectionToJSONTyped(value?: ProjectInstanceWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
+export function ProjectDeploymentWorkflowConnectionToJSONTyped(value?: ProjectDeploymentWorkflowConnection | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
