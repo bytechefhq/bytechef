@@ -259,7 +259,6 @@ dependencies {
     implementation(project(":server:ee:libs:core:file-storage:file-storage-aws:file-storage-aws-impl"))
     implementation(project(":server:ee:libs:core:message:message-broker:message-broker-aws"))
     implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
-    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl"))
@@ -272,6 +271,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-impl"))
+    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
     implementation(project(":server:ee:libs:modules:components:code-workflow"))
