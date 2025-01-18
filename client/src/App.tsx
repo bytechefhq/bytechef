@@ -100,7 +100,7 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {ai, getApplicationInfo} = useApplicationInfoStore();
+    const {ai, getApplicationInfo, loading} = useApplicationInfoStore();
     const {
         account,
         authenticated,
@@ -209,7 +209,7 @@ function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authenticated]);
 
-    if (!sessionHasBeenFetched) {
+    if (loading || !sessionHasBeenFetched) {
         return (
             <div className="flex min-h-screen min-w-full items-center justify-center p-5">
                 <div className="flex animate-pulse space-x-2">
