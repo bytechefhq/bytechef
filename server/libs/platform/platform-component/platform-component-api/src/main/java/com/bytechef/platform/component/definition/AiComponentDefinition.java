@@ -24,5 +24,5 @@ public interface AiComponentDefinition extends PlatformComponentDefinition {
     /**
      *
      */
-    String AI_TEXT = "aiTextAnalysis";
+    String AI_TEXT = "aiText";
 }

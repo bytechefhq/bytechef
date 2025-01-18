@@ -6,8 +6,8 @@
   "outputDefinition" : {
     "output" : { },
     "outputResponse" : null,
-    "outputSchema" : null,
-    "sampleOutput" : null
+    "sampleOutput" : null,
+    "outputSchema" : null
   },
   "properties" : [ {
     "advancedOption" : null,

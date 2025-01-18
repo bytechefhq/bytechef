@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.domain;
 import com.bytechef.commons.data.jdbc.wrapper.MapWrapper;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.domain.Property;
-import com.bytechef.platform.component.domain.ValueProperty;
 import com.bytechef.platform.domain.OutputResponse;
 import java.time.Instant;
 import java.util.Map;

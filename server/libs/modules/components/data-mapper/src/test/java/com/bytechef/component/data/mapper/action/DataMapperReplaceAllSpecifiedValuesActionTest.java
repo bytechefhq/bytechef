@@ -24,6 +24,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.constant.InputType;
+import com.bytechef.component.data.mapper.constant.ValueType;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -201,7 +203,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     void testPerformWithStringTypeObjectRegex() {
         Map<String, Object> inputMap = Map.of("key", "input value");
 
-        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
+        when(inputParameters.getRequired(TYPE, ValueType.class)).thenReturn(ValueType.STRING);
 
         setupAndAssertTest(
             inputMap, List.of(new ObjectMapping(" ", "_")),
@@ -214,7 +216,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     void testPerformWithStringTypeArrayRegex() {
         List<Object> list = List.of(Map.of("key", "input value"));
 
-        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
+        when(inputParameters.getRequired(TYPE, ValueType.class)).thenReturn(ValueType.STRING);
 
         setupAndAssertTest(
             list, List.of(new ObjectMapping(" ", "_")),
@@ -306,7 +308,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     private void setupAndAssertTest(List<Object> inputValue, List<ObjectMapping> mappings, Consumer<List<?>> consumer) {
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(mappings);
         when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
-        when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(2);
+        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.ARRAY);
 
         Object result = DataMapperReplaceAllSpecifiedValuesAction.perform(
             inputParameters, connectionParameters, context);
@@ -319,7 +321,7 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
 
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(mappings);
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
-        when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(1);
+        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.OBJECT);
 
         Object result = DataMapperReplaceAllSpecifiedValuesAction.perform(
             inputParameters, connectionParameters, context);

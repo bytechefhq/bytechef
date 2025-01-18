@@ -46,7 +46,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
-import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.mapper.constant.ValueType;
 import com.bytechef.component.data.mapper.model.Mapping;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.data.mapper.util.DataMapperUtils;
@@ -70,122 +70,122 @@ public class DataMapperReplaceValueAction {
                 "specified for the value, it returns the default value, and if there is no default defined, it " +
                 "returns null. You can also change a string value with regex.")
         .properties(
-            integer(TYPE)
+            string(TYPE)
                 .label("Value Type")
                 .description("The value type.")
                 .required(true)
                 .options(
-                    option("Array", 1),
-                    option("Boolean", 2),
-                    option("Date", 3),
-                    option("Date Time", 4),
-                    option("Integer", 5),
-                    option("Number", 7),
-                    option("Object", 8),
-                    option("String", 9),
-                    option("Time", 10))
+                    option("Array", ValueType.ARRAY.name()),
+                    option("Boolean", ValueType.BOOLEAN.name()),
+                    option("Date", ValueType.DATE.name()),
+                    option("Date Time", ValueType.DATE_TIME.name()),
+                    option("Integer", ValueType.INTEGER.name()),
+                    option("Number", ValueType.NUMBER.name()),
+                    option("Object", ValueType.OBJECT.name()),
+                    option("String", ValueType.STRING.name()),
+                    option("Time", ValueType.TIME.name()))
                 .required(true),
             array(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("1"))
+                .displayCondition(getDisplayCondition(ValueType.ARRAY))
                 .required(true),
             bool(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("2"))
+                .displayCondition(getDisplayCondition(ValueType.BOOLEAN))
                 .required(true),
             date(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("3"))
+                .displayCondition(getDisplayCondition(ValueType.DATE))
                 .required(true),
             dateTime(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("4"))
+                .displayCondition(getDisplayCondition(ValueType.DATE_TIME))
                 .required(true),
             integer(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("5"))
+                .displayCondition(getDisplayCondition(ValueType.INTEGER))
                 .required(true),
             number(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("7"))
+                .displayCondition(getDisplayCondition(ValueType.NUMBER))
                 .required(true),
             object(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("8"))
+                .displayCondition(getDisplayCondition(ValueType.OBJECT))
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), nullable(), number(), object(), string(), time())
                 .required(true),
             string(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("9"))
+                .displayCondition(getDisplayCondition(ValueType.STRING))
                 .required(true),
             time(VALUE)
                 .label(VALUE_LABEL)
                 .description(VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("10"))
+                .displayCondition(getDisplayCondition(ValueType.TIME))
                 .required(true),
             array(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("1"))
+                .displayCondition(getDisplayCondition(ValueType.ARRAY))
                 .required(true),
             bool(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("2"))
+                .displayCondition(getDisplayCondition(ValueType.BOOLEAN))
                 .required(true),
             date(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("3"))
+                .displayCondition(getDisplayCondition(ValueType.DATE))
                 .required(true),
             dateTime(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("4"))
+                .displayCondition(getDisplayCondition(ValueType.DATE_TIME))
                 .required(true),
             integer(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("5"))
+                .displayCondition(getDisplayCondition(ValueType.INTEGER))
                 .required(true),
             nullable(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("6"))
+                .displayCondition(getDisplayCondition(ValueType.NULL))
                 .required(true),
             number(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("7"))
+                .displayCondition(getDisplayCondition(ValueType.NUMBER))
                 .required(true),
             object(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("8"))
+                .displayCondition(getDisplayCondition(ValueType.OBJECT))
                 .required(true),
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("9"))
+                .displayCondition(getDisplayCondition(ValueType.STRING))
                 .required(true),
             time(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description(DEFAULT_VALUE_DESCRIPTION)
-                .displayCondition(getDisplayCondition("10"))
+                .displayCondition(getDisplayCondition(ValueType.TIME))
                 .required(true),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("1"))
+                .displayCondition(getDisplayCondition(ValueType.ARRAY))
                 .items(
                     object().properties(
                         array(FROM)
@@ -199,7 +199,7 @@ public class DataMapperReplaceValueAction {
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("2"))
+                .displayCondition(getDisplayCondition(ValueType.BOOLEAN))
                 .items(
                     object().properties(
                         bool(FROM)
@@ -213,7 +213,7 @@ public class DataMapperReplaceValueAction {
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("3"))
+                .displayCondition(getDisplayCondition(ValueType.DATE))
                 .items(
                     object().properties(
                         date(FROM)
@@ -228,7 +228,7 @@ public class DataMapperReplaceValueAction {
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("4"))
+                .displayCondition(getDisplayCondition(ValueType.DATE_TIME))
                 .items(
                     object().properties(
                         dateTime(FROM)
@@ -242,73 +242,78 @@ public class DataMapperReplaceValueAction {
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("5"))
+                .displayCondition(getDisplayCondition(ValueType.INTEGER))
                 .items(
-                    object().properties(
-                        integer(FROM)
-                            .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
-                            .required(true),
-                        integer(TO)
-                            .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
-                            .required(true))),
+                    object()
+                        .properties(
+                            integer(FROM)
+                                .label(LABEL_FROM)
+                                .description(FROM_DESCRIPTION)
+                                .required(true),
+                            integer(TO)
+                                .label(LABEL_TO)
+                                .description(TO_DESCRIPTION)
+                                .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("7"))
+                .displayCondition(getDisplayCondition(ValueType.NUMBER))
                 .items(
-                    object().properties(
-                        number(FROM)
-                            .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
-                            .required(true),
-                        number(TO)
-                            .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
-                            .required(true))),
+                    object()
+                        .properties(
+                            number(FROM)
+                                .label(LABEL_FROM)
+                                .description(FROM_DESCRIPTION)
+                                .required(true),
+                            number(TO)
+                                .label(LABEL_TO)
+                                .description(TO_DESCRIPTION)
+                                .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("8"))
+                .displayCondition(getDisplayCondition(ValueType.OBJECT))
                 .items(
-                    object().properties(
-                        object(FROM)
-                            .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
-                            .required(true),
-                        object(TO)
-                            .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
-                            .required(true))),
+                    object()
+                        .properties(
+                            object(FROM)
+                                .label(LABEL_FROM)
+                                .description(FROM_DESCRIPTION)
+                                .required(true),
+                            object(TO)
+                                .label(LABEL_TO)
+                                .description(TO_DESCRIPTION)
+                                .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("9"))
+                .displayCondition(getDisplayCondition(ValueType.STRING))
                 .items(
-                    object().properties(
-                        string(FROM)
-                            .label(LABEL_FROM)
-                            .description("Part of the string value you want to change, defined by regex.")
-                            .required(true),
-                        string(TO)
-                            .label(LABEL_TO)
-                            .description("The value you want to change the defined part to, defined by regex.")
-                            .required(true))),
+                    object()
+                        .properties(
+                            string(FROM)
+                                .label(LABEL_FROM)
+                                .description("Part of the string value you want to change, defined by regex.")
+                                .required(true),
+                            string(TO)
+                                .label(LABEL_TO)
+                                .description("The value you want to change the defined part to, defined by regex.")
+                                .required(true))),
             array(MAPPINGS)
                 .label(MAPPINGS_LABEL)
                 .description(MAPPINGS_DESCRIPTION)
-                .displayCondition(getDisplayCondition("10"))
+                .displayCondition(getDisplayCondition(ValueType.TIME))
                 .items(
-                    object().properties(
-                        time(FROM)
-                            .label(LABEL_FROM)
-                            .description(FROM_DESCRIPTION)
-                            .required(true),
-                        time(TO)
-                            .label(LABEL_TO)
-                            .description(TO_DESCRIPTION)
-                            .required(true))))
+                    object()
+                        .properties(
+                            time(FROM)
+                                .label(LABEL_FROM)
+                                .description(FROM_DESCRIPTION)
+                                .required(true),
+                            time(TO)
+                                .label(LABEL_TO)
+                                .description(TO_DESCRIPTION)
+                                .required(true))))
         .output()
         .perform(DataMapperReplaceValueAction::perform);
 
@@ -319,13 +324,12 @@ public class DataMapperReplaceValueAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         Class<?> type = DataMapperUtils.getType(inputParameters);
-
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         for (Mapping<Object, Object> mapping : mappings) {
             Object mappingFrom = mapping.getFrom();
 
-            if (ConvertUtils.canConvert(mappingFrom, type)) {
+            if (DataMapperUtils.canConvert(context, mappingFrom, type)) {
                 Object mappingTo = mapping.getTo();
 
                 if (type.equals(String.class)) {
@@ -336,10 +340,10 @@ public class DataMapperReplaceValueAction {
 
                     return matcher.replaceAll(mappingTo.toString());
                 } else {
-                    Object from = ConvertUtils.convertValue(mappingFrom, type);
+                    Object from = DataMapperUtils.convertFrom(context, mappingFrom, type);
 
                     if (from.equals(inputParameters.get(VALUE, type))) {
-                        return ConvertUtils.convertValue(mappingTo, type);
+                        return DataMapperUtils.convertTo(context, mappingTo, type);
                     }
                 }
             }

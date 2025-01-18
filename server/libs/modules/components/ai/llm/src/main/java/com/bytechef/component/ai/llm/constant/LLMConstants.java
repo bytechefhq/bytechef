@@ -30,6 +30,8 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
 
+import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.Role;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property.ControlType;
 import java.util.List;
@@ -104,63 +106,63 @@ public class LLMConstants {
         .description("The language of the input audio.")
         .options(
             List.of(
-                option("Afrikaans", "af"),
-                option("Arabic", "ar"),
-                option("Armenian", "hy"),
-                option("Azerbaijani", "az"),
-                option("Belarusian", "be"),
-                option("Bosnian", "bs"),
-                option("Bulgarian", "bg"),
-                option("Catalan", "ca"),
-                option("Chinese (Simplified)", "zh"),
-                option("Croatian", "hr"),
-                option("Czech", "cs"),
-                option("Danish", "da"),
-                option("Dutch", "nl"),
-                option("Greek", "el"),
-                option("Estonian", "et"),
-                option("English", "en"),
-                option("Finnish", "fi"),
-                option("French", "fr"),
-                option("Galician", "gl"),
-                option("German", "de"),
-                option("Hebrew", "he"),
-                option("Hindi", "hi"),
-                option("Hungarian", "hu"),
-                option("Icelandic", "is"),
-                option("Indonesian", "id"),
-                option("Italian", "it"),
-                option("Japanese", "ja"),
-                option("Kazakh", "kk"),
-                option("Kannada", "kn"),
-                option("Korean", "ko"),
-                option("Lithuanian", "lt"),
-                option("Latvian", "lv"),
-                option("Maori", "ma"),
-                option("Macedonian", "mk"),
-                option("Marathi", "mr"),
-                option("Malay", "ms"),
-                option("Nepali", "ne"),
-                option("Norwegian", "no"),
-                option("Persian", "fa"),
-                option("Polish", "pl"),
-                option("Portuguese", "pt"),
-                option("Romanian", "ro"),
-                option("Russian", "ru"),
-                option("Slovak", "sk"),
-                option("Slovenian", "sl"),
-                option("Serbian", "sr"),
-                option("Spanish", "es"),
-                option("Swedish", "sv"),
-                option("Swahili", "sw"),
-                option("Tamil", "ta"),
-                option("Tagalog", "tl"),
-                option("Thai", "th"),
-                option("Turkish", "tr"),
-                option("Ukrainian", "uk"),
-                option("Urdu", "ur"),
-                option("Vietnamese", "vi"),
-                option("Welsh", "cy")))
+                option(Language.AF.getLabel(), Language.AF.name()),
+                option(Language.AR.getLabel(), Language.AR.name()),
+                option(Language.HY.getLabel(), Language.HY.name()),
+                option(Language.AZ.getLabel(), Language.AZ.name()),
+                option(Language.BE.getLabel(), Language.BE.name()),
+                option(Language.BS.getLabel(), Language.BS.name()),
+                option(Language.BG.getLabel(), Language.BG.name()),
+                option(Language.CA.getLabel(), Language.CA.name()),
+                option(Language.ZH.getLabel(), Language.ZH.name()),
+                option(Language.HR.getLabel(), Language.HR.name()),
+                option(Language.CS.getLabel(), Language.CS.name()),
+                option(Language.DA.getLabel(), Language.DA.name()),
+                option(Language.NL.getLabel(), Language.NL.name()),
+                option(Language.EL.getLabel(), Language.EL.name()),
+                option(Language.ET.getLabel(), Language.ET.name()),
+                option(Language.EN.getLabel(), Language.EN.name()),
+                option(Language.FI.getLabel(), Language.FI.name()),
+                option(Language.FR.getLabel(), Language.FR.name()),
+                option(Language.GL.getLabel(), Language.GL.name()),
+                option(Language.DE.getLabel(), Language.DE.name()),
+                option(Language.HE.getLabel(), Language.HE.name()),
+                option(Language.HI.getLabel(), Language.HI.name()),
+                option(Language.HU.getLabel(), Language.HU.name()),
+                option(Language.IS.getLabel(), Language.IS.name()),
+                option(Language.ID.getLabel(), Language.ID.name()),
+                option(Language.IT.getLabel(), Language.IT.name()),
+                option(Language.JA.getLabel(), Language.JA.name()),
+                option(Language.KK.getLabel(), Language.KK.name()),
+                option(Language.KN.getLabel(), Language.KN.name()),
+                option(Language.KO.getLabel(), Language.KO.name()),
+                option(Language.LT.getLabel(), Language.LT.name()),
+                option(Language.LV.getLabel(), Language.LV.name()),
+                option(Language.MA.getLabel(), Language.MA.name()),
+                option(Language.MK.getLabel(), Language.MK.name()),
+                option(Language.MR.getLabel(), Language.MR.name()),
+                option(Language.MS.getLabel(), Language.MS.name()),
+                option(Language.NE.getLabel(), Language.NE.name()),
+                option(Language.NO.getLabel(), Language.NO.name()),
+                option(Language.FA.getLabel(), Language.FA.name()),
+                option(Language.PL.getLabel(), Language.PL.name()),
+                option(Language.PT.getLabel(), Language.PT.name()),
+                option(Language.RO.getLabel(), Language.RO.name()),
+                option(Language.RU.getLabel(), Language.RU.name()),
+                option(Language.SK.getLabel(), Language.SK.name()),
+                option(Language.SL.getLabel(), Language.SL.name()),
+                option(Language.SR.getLabel(), Language.SR.name()),
+                option(Language.ES.getLabel(), Language.ES.name()),
+                option(Language.SV.getLabel(), Language.SV.name()),
+                option(Language.SW.getLabel(), Language.SW.name()),
+                option(Language.TA.getLabel(), Language.TA.name()),
+                option(Language.TL.getLabel(), Language.TL.name()),
+                option(Language.TH.getLabel(), Language.TH.name()),
+                option(Language.TR.getLabel(), Language.TR.name()),
+                option(Language.UK.getLabel(), Language.UK.name()),
+                option(Language.UR.getLabel(), Language.UR.name()),
+                option(Language.VI.getLabel(), Language.VI.name()),
+                option(Language.CY.getLabel(), Language.CY.name())))
         .required(false);
 
     public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
@@ -186,10 +188,10 @@ public class LLMConstants {
                         .label("Role")
                         .description("The role of the messages author.")
                         .options(
-                            option("System", "system"),
-                            option("User", "user"),
-                            option("Assistant", "assistant"),
-                            option("Tool", "tool"))
+                            option("System", Role.SYSTEM.name()),
+                            option("User", Role.USER.name()),
+                            option("Assistant", Role.ASSISTANT.name()),
+                            option("Tool", Role.TOOL.name()))
                         .required(true),
                     string(CONTENT)
                         .label("Content")
@@ -200,7 +202,7 @@ public class LLMConstants {
                         .label("Attachments")
                         .description(
                             "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.")
-                        .displayCondition("%s == '%s'".formatted("messages[index].role", "user"))
+                        .displayCondition("%s == '%s'".formatted("messages[index].role", Role.USER.name()))
                         .items(fileEntry())
                         .required(false)))
         .required(true);
@@ -231,19 +233,19 @@ public class LLMConstants {
         .label("Response")
         .description("The response from the API.")
         .properties(
-            integer(RESPONSE_FORMAT)
+            string(RESPONSE_FORMAT)
                 .label("Response Format")
                 .description("In which format do you want the response to be in?")
                 .options(
-                    option("Text", 1, "Text response"),
-                    option("JSON", 2, "JSON response with key-value pairs"))
-                .defaultValue(1)
+                    option("Text", ChatModel.ResponseFormat.TEXT.name(), "Text response"),
+                    option("JSON", ChatModel.ResponseFormat.JSON.name(), "JSON response with key-value pairs"))
+                .defaultValue(ChatModel.ResponseFormat.TEXT.name())
                 .required(false),
             string(RESPONSE_SCHEMA)
                 .label("Response Schema")
                 .description("Define the JSON schema for the response.")
                 .controlType(JSON_SCHEMA_BUILDER)
-                .displayCondition("response.responseFormat == 2")
+                .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.JSON.name()))
                 .required(false))
         .required(false);
 

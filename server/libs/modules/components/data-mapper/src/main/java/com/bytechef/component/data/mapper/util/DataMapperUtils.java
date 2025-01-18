@@ -17,8 +17,9 @@
 package com.bytechef.component.data.mapper.util;
 
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TYPE;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
 
+import com.bytechef.component.data.mapper.constant.ValueType;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,21 +44,35 @@ public class DataMapperUtils {
     public static final String TO_DESCRIPTION = "Defines what you want to change the property value to.";
 
     public static Class<?> getType(Parameters inputParameters) {
-        return switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1 -> ArrayList.class;
-            case 2 -> Boolean.class;
-            case 3 -> LocalDate.class;
-            case 4 -> LocalDateTime.class;
-            case 5 -> Integer.class;
-            case 7 -> Number.class;
-            case 8 -> Object.class;
-            case 9 -> String.class;
-            case 10 -> LocalTime.class;
-            default -> nullable().getClass();
+        return switch (inputParameters.getRequired(TYPE, ValueType.class)) {
+            case ARRAY -> ArrayList.class;
+            case BOOLEAN -> Boolean.class;
+            case DATE -> LocalDate.class;
+            case DATE_TIME -> LocalDateTime.class;
+            case INTEGER -> Integer.class;
+            case NUMBER -> Number.class;
+            case OBJECT -> Object.class;
+            case STRING -> String.class;
+            case TIME -> LocalTime.class;
+            default ->
+                throw new IllegalStateException(
+                    "Unexpected value: " + inputParameters.getRequired(TYPE, ValueType.class));
         };
     }
 
-    public static String getDisplayCondition(String number) {
-        return "type == " + number;
+    public static boolean canConvert(ActionContext context, Object mappingFrom, Class<?> type) {
+        return context.convert(convert -> convert.canConvert(mappingFrom, type));
+    }
+
+    public static Object convertTo(ActionContext context, Object mappingTo, Class<?> type) {
+        return context.convert(convert -> convert.value(mappingTo, type));
+    }
+
+    public static Object convertFrom(ActionContext context, Object mappingFrom, Class<?> type) {
+        return context.convert(convert -> convert.value(mappingFrom, type));
+    }
+
+    public static String getDisplayCondition(ValueType valueType) {
+        return "type == '%s'".formatted(valueType);
     }
 }

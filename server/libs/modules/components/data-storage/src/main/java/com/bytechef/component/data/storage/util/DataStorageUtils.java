@@ -20,6 +20,7 @@ import static com.bytechef.component.data.storage.constant.DataStorageConstants.
 import static com.bytechef.component.data.storage.constant.DataStorageConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDsl.nullable;
 
+import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,55 +30,66 @@ import java.util.ArrayList;
 public class DataStorageUtils {
 
     public static Class<?> getType(Parameters inputParameters) {
-        return switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1 -> ArrayList.class;
-            case 2 -> Boolean.class;
-            case 3 -> LocalDate.class;
-            case 4 -> LocalDateTime.class;
-            case 5 -> Integer.class;
-            case 7 -> Number.class;
-            case 8 -> Object.class;
-            case 9 -> String.class;
-            case 10 -> LocalTime.class;
-            default -> nullable().getClass();
+        return switch (inputParameters.getRequired(TYPE, ValueType.class)) {
+            case ARRAY -> ArrayList.class;
+            case BOOLEAN -> Boolean.class;
+            case DATE -> LocalDate.class;
+            case DATE_TIME -> LocalDateTime.class;
+            case INTEGER -> Integer.class;
+            case NUMBER -> Number.class;
+            case OBJECT -> Object.class;
+            case STRING -> String.class;
+            case TIME -> LocalTime.class;
+            default -> null;
         };
     }
 
     public static Object getValue(Parameters inputParameters) {
         Object value = null;
 
-        switch (inputParameters.getRequiredInteger(TYPE)) {
-            case 1:
+        switch (inputParameters.getRequired(TYPE, ValueType.class)) {
+            case ARRAY:
                 value = inputParameters.getRequiredArray(VALUE);
+
                 break;
-            case 2:
+            case BOOLEAN:
                 value = inputParameters.getRequiredBoolean(VALUE);
+
                 break;
-            case 3:
+            case DATE:
                 value = inputParameters.getRequiredLocalDate(VALUE);
+
                 break;
-            case 4:
+            case DATE_TIME:
                 value = inputParameters.getRequiredLocalDateTime(VALUE);
+
                 break;
-            case 5:
+            case INTEGER:
                 value = inputParameters.getRequiredInteger(VALUE);
+
                 break;
-            case 6:
+            case NULL:
                 value = nullable();
+
                 break;
-            case 7:
+            case NUMBER:
                 value = inputParameters.getRequiredDouble(VALUE);
+
                 break;
-            case 8:
+            case OBJECT:
                 value = inputParameters.getRequiredMap(VALUE);
+
                 break;
-            case 9:
+            case STRING:
                 value = inputParameters.getRequiredString(VALUE);
+
                 break;
-            case 10:
+            case TIME:
                 value = inputParameters.getRequiredLocalTime(VALUE);
+
                 break;
             default:
+
                 break;
         }
 

@@ -42,8 +42,8 @@
           "multipleValues" : null,
           "options" : null,
           "properties" : null,
-          "optionsDataSource" : null,
-          "controlType" : "OBJECT_BUILDER"
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
         },
         "sampleOutput" : null
       },
@@ -65,8 +65,8 @@
         "multipleValues" : null,
         "options" : null,
         "properties" : null,
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       },
       "sampleOutput" : null
     },
@@ -92,9 +92,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from XML String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -160,28 +160,29 @@
       "metadata" : { },
       "required" : null,
       "name" : "type",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Object",
-        "value" : 1
+        "value" : "OBJECT"
       }, {
         "description" : null,
         "label" : "Array",
-        "value" : 2
+        "value" : "ARRAY"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The object to convert to XML string.",
-      "displayCondition" : "type == 1",
+      "displayCondition" : "type == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -196,12 +197,12 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The array to convert to XML string.",
-      "displayCondition" : "type == 2",
+      "displayCondition" : "type == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -217,13 +218,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Convert to XML String",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,

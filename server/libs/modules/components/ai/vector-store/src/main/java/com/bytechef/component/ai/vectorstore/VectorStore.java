@@ -19,16 +19,11 @@ package com.bytechef.component.ai.vectorstore;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.DOCUMENT_TYPE;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.JSON_KEYS_TO_USE;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.KEYWORD_METADATA_ENRICHER;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.MD;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.PDF;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SUMMARY_METADATA_ENRICHER;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TIKA;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOKEN_TEXT_SPLITTER;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TXT;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_KEYWORD_ENRICHER;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_SUMMARY_ENRICHER;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.USE_TOKEN_TEXT_SPLITTER;
@@ -61,6 +56,10 @@ import org.springframework.core.io.FileSystemResource;
  */
 public interface VectorStore {
 
+    enum DocumentType {
+        JSON, MD, PDF, TXT, TIKA
+    }
+
     org.springframework.ai.vectorstore.VectorStore createVectorStore(Parameters connectionParameters);
 
     default void loadData(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
@@ -79,7 +78,7 @@ public interface VectorStore {
         File file1 = actionContext.file(file -> file.toTempFile(fileEntry));
         FileSystemResource fileSystemResource = new FileSystemResource(file1);
 
-        String documentType = inputParameters.getRequiredString(DOCUMENT_TYPE);
+        DocumentType documentType = inputParameters.getRequired(DOCUMENT_TYPE, DocumentType.class);
         return switch (documentType) {
             case JSON -> {
                 List<String> keys = inputParameters.getList(JSON_KEYS_TO_USE, String.class);

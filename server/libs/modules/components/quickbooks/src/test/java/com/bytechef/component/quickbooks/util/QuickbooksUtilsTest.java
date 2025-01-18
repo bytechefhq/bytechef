@@ -17,16 +17,9 @@
 package com.bytechef.component.quickbooks.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVOICE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.PAYMENT;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 import static com.bytechef.component.quickbooks.util.QuickbooksUtils.getPropertiesForItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,6 +33,8 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
+import com.bytechef.component.quickbooks.constant.ItemType;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -62,23 +57,23 @@ class QuickbooksUtilsTest {
 
     @Test
     void testGetPropertiesForItemWithInventoryType() {
-        verifyProperties(INVENTORY, true, true, true);
+        verifyProperties(ItemType.INVENTORY, true, true, true);
     }
 
     @Test
     void testGetPropertiesForItemWithServiceType() {
-        verifyProperties(SERVICE, true, false, false);
+        verifyProperties(ItemType.SERVICE, true, false, false);
     }
 
     @Test
     void testGetPropertiesForItemWithOtherType() {
-        verifyProperties("Non-Inventory", false, false, false);
+        verifyProperties(ItemType.NON_INVENTORY, false, false, false);
     }
 
     private void verifyProperties(
-        String type, boolean incomeRequired, boolean assetRequired, boolean inventoryDateRequired) {
+        ItemType type, boolean incomeRequired, boolean assetRequired, boolean inventoryDateRequired) {
 
-        when(mockedParameters.getRequiredString(TYPE)).thenReturn(type);
+        when(mockedParameters.getRequired(TYPE, ItemType.class)).thenReturn(type);
 
         List<? extends Property.ValueProperty<?>> properties =
             getPropertiesForItem(mockedParameters, mockedParameters, Map.of(), mockedActionContext);
@@ -104,65 +99,70 @@ class QuickbooksUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class))).thenReturn(responseBody);
     }
 
-    private void verifyQuery(String expectedEntity) {
+    private void verifyQuery(Entity expectedEntity) {
         assertEquals("query", queryNameArgumentCapture.getValue());
-        assertEquals(URLEncoder.encode("SELECT * FROM " + expectedEntity, StandardCharsets.UTF_8),
+        assertEquals(URLEncoder.encode("SELECT * FROM " + expectedEntity.getName(), StandardCharsets.UTF_8),
             queryValueArgumentCapture.getValue());
     }
 
     @Test
     void testGetOptionsForCustomer() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of("Customer", List.of(Map.of(DISPLAY_NAME, "abc", ID, "123")))));
+        setupHttpMock(
+            Map.of(
+                "QueryResponse", Map.of(Entity.CUSTOMER.getName(), List.of(Map.of(DISPLAY_NAME, "abc", ID, "123")))));
 
-        List<? extends Option<String>> result = QuickbooksUtils.getOptions(CUSTOMER, null)
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.CUSTOMER, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
-        verifyQuery(CUSTOMER);
+        verifyQuery(Entity.CUSTOMER);
     }
 
     @Test
     void testGetOptionsForInvoice() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of(INVOICE, List.of(Map.of("DocNumber", "abc", ID, "123")))));
+        setupHttpMock(
+            Map.of("QueryResponse", Map.of(Entity.INVOICE.getName(), List.of(Map.of("DocNumber", "abc", ID, "123")))));
 
-        List<? extends Option<String>> result = QuickbooksUtils.getOptions(INVOICE, null)
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.INVOICE, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
-        verifyQuery(INVOICE);
+        verifyQuery(Entity.INVOICE);
     }
 
     @Test
     void testGetOptionsForPayment() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of(PAYMENT, List.of(Map.of(ID, "123")))));
+        setupHttpMock(Map.of("QueryResponse", Map.of(Entity.PAYMENT.getName(), List.of(Map.of(ID, "123")))));
 
-        List<? extends Option<String>> result = QuickbooksUtils.getOptions(PAYMENT, null)
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.PAYMENT, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(List.of(option("123", "123")), result);
-        verifyQuery(PAYMENT);
+        verifyQuery(Entity.PAYMENT);
     }
 
     @Test
     void testGetOptionsForItem() throws Exception {
-        setupHttpMock(Map.of("QueryResponse", Map.of(ITEM, List.of(Map.of(NAME, "abc", ID, "123")))));
+        setupHttpMock(Map.of("QueryResponse", Map.of(Entity.ITEM.getName(), List.of(Map.of(NAME, "abc", ID, "123")))));
 
-        List<? extends Option<String>> result = QuickbooksUtils.getOptions(ITEM, null)
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.ITEM, null)
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
-        verifyQuery(ITEM);
+        verifyQuery(Entity.ITEM);
     }
 
     @Test
     void testGetOptionsForIncomeAccount() throws Exception {
         setupHttpMock(
-            Map.of("QueryResponse", Map.of(ACCOUNT, List.of(Map.of(NAME, "abc", ID, "123", "AccountType", "Income")))));
+            Map.of(
+                "QueryResponse",
+                Map.of(Entity.ACCOUNT.getName(), List.of(Map.of(NAME, "abc", ID, "123", "AccountType", "Income")))));
 
-        List<? extends Option<String>> result = QuickbooksUtils.getOptions(ACCOUNT, "Income")
+        List<? extends Option<String>> result = QuickbooksUtils.getOptions(Entity.ACCOUNT, "Income")
             .apply(mockedParameters, mockedParameters, null, "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
-        verifyQuery(ACCOUNT);
+        verifyQuery(Entity.ACCOUNT);
     }
 }

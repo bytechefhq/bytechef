@@ -31,6 +31,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 
 /**
@@ -45,7 +46,7 @@ public class QuickbooksGetInvoiceAction {
             string(INVOICE)
                 .label("Invoice")
                 .description("Invoice to get.")
-                .options(QuickbooksUtils.getOptions(INVOICE, null))
+                .options(QuickbooksUtils.getOptions(Entity.INVOICE, null))
                 .required(true))
         .output(
             outputSchema(

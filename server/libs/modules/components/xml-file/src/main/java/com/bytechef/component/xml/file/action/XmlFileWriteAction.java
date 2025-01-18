@@ -19,7 +19,6 @@ package com.bytechef.component.xml.file.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -44,25 +43,30 @@ import java.nio.charset.StandardCharsets;
  */
 public class XmlFileWriteAction {
 
+    private enum ValueType {
+
+        OBJECT, ARRAY;
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to a XML file.")
         .properties(
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(
-                    option("Object", 1),
-                    option("Array", 2)),
+                    option("Object", ValueType.OBJECT.name()),
+                    option("Array", ValueType.ARRAY.name())),
             object(SOURCE)
                 .label("Source")
                 .description("The object to write to the file.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT.name()))
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("The aray to write to the file.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY.name()))
                 .required(true),
             string(FILENAME)
                 .label("Filename")

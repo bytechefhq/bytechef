@@ -29,13 +29,14 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE_OPTIONS;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE_TYPE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.object.helper.constant.ValueType;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,60 +57,60 @@ public class ObjectHelperAddValueByKeyAction {
                 .label("Key")
                 .description("Key of the value to be added or updated.")
                 .required(true),
-            integer(VALUE_TYPE)
-                .label("Value Type")
+            string(TYPE)
+                .label("Type")
                 .options(TYPE_OPTIONS)
                 .description("Type of value to be added or updated.")
                 .required(true),
             array(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             bool(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
                 .required(true),
             date(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 3")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE))
                 .required(true),
             dateTime(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 4")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME))
                 .required(true),
             integer(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 5")
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
                 .required(true),
             nullable(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 6")
+                .displayCondition("type == '%s'".formatted(ValueType.NULL))
                 .required(true),
             number(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 7")
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
                 .required(true),
             object(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 8")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             string(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 9")
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(VALUE)
                 .label("Value")
                 .description("Value to be added or updated.")
-                .displayCondition("valueType == 10")
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
         .output()
         .perform(ObjectHelperAddValueByKeyAction::perform);

@@ -18,7 +18,6 @@ package com.bytechef.component.xml.helper.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -35,25 +34,30 @@ import com.bytechef.component.definition.Parameters;
  */
 public class XmlHelperStringifyAction {
 
+    private enum ValueType {
+
+        OBJECT, ARRAY;
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("stringify")
         .title("Convert to XML String")
         .description("Writes the object/array to a XML string.")
         .properties(
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(
-                    option("Object", 1),
-                    option("Array", 2)),
+                    option("Object", ValueType.OBJECT.name()),
+                    option("Array", ValueType.ARRAY.name())),
             object(SOURCE)
                 .label("Source")
                 .description("The object to convert to XML string.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT.name()))
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("The array to convert to XML string.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY.name()))
                 .required(true))
         .output(outputSchema(string()))
         .perform(XmlHelperStringifyAction::perform);

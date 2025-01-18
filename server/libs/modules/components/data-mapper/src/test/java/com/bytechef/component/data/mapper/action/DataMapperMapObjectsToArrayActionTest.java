@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.constant.InputType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
@@ -163,7 +164,8 @@ class DataMapperMapObjectsToArrayActionTest {
         map.put("key", input);
 
         if (isArray) {
-            setupAndAssertTest(List.of(map),
+            setupAndAssertTest(
+                List.of(map),
                 (List<?> result) -> {
                     assertEquals(
                         "key", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
@@ -173,7 +175,8 @@ class DataMapperMapObjectsToArrayActionTest {
                         "'fieldValue' value in result with should match the expected key input value.");
                 });
         } else {
-            setupAndAssertTest(map,
+            setupAndAssertTest(
+                map,
                 (List<?> result) -> {
                     assertEquals(
                         "key", ((Map<?, ?>) result.getFirst()).get("fieldKey"),
@@ -233,7 +236,7 @@ class DataMapperMapObjectsToArrayActionTest {
         when(inputParameters.getRequiredString(FIELD_KEY)).thenReturn("fieldKey");
         when(inputParameters.getRequiredString(VALUE_KEY)).thenReturn("fieldValue");
         when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
-        when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(2);
+        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.ARRAY);
 
         List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(
             inputParameters, connectionParameters, context);
@@ -245,7 +248,7 @@ class DataMapperMapObjectsToArrayActionTest {
         when(inputParameters.getRequiredString(FIELD_KEY)).thenReturn("fieldKey");
         when(inputParameters.getRequiredString(VALUE_KEY)).thenReturn("fieldValue");
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
-        when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(1);
+        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.OBJECT);
 
         List<Map<String, Object>> result = DataMapperMapObjectsToArrayAction.perform(
             inputParameters, connectionParameters, context);

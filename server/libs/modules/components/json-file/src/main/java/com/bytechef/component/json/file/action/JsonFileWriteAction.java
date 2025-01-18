@@ -19,7 +19,6 @@ package com.bytechef.component.json.file.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -33,7 +32,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.json.file.constant.JsonFileConstants;
+import com.bytechef.component.json.file.constant.FileType;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -48,6 +47,11 @@ import java.util.Map;
  */
 public class JsonFileWriteAction {
 
+    private enum ValueType {
+
+        OBJECT, ARRAY;
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("write")
         .title("Write to File")
         .description("Writes the data to a JSON file.")
@@ -56,25 +60,25 @@ public class JsonFileWriteAction {
                 .label("File Type")
                 .description("The file type to choose.")
                 .options(
-                    option("JSON", JsonFileConstants.FileType.JSON.name()),
-                    option("JSON Line", JsonFileConstants.FileType.JSONL.name()))
-                .defaultValue(JsonFileConstants.FileType.JSON.name())
+                    option("JSON", FileType.JSON.name()),
+                    option("JSON Line", FileType.JSONL.name()))
+                .defaultValue(FileType.JSON.name())
                 .required(true),
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(
-                    option("Object", 1),
-                    option("Array", 2)),
+                    option("Object", ValueType.OBJECT.name()),
+                    option("Array", ValueType.ARRAY.name())),
             object(SOURCE)
                 .label("Source")
                 .description("The object to write to the file.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("The array to write to the file.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             string(FILENAME)
                 .label("Filename")
@@ -86,9 +90,9 @@ public class JsonFileWriteAction {
         .output(outputSchema(fileEntry()))
         .perform(JsonFileWriteAction::perform);
 
-    private static String getDefaultFileName(JsonFileConstants.FileType fileType, String defaultFilename) {
+    private static String getDefaultFileName(FileType fileType, String defaultFilename) {
         return defaultFilename == null
-            ? "file." + (fileType == JsonFileConstants.FileType.JSON ? "json" : "jsonl")
+            ? "file." + (fileType == FileType.JSON ? "json" : "jsonl")
             : defaultFilename;
     }
 
@@ -96,12 +100,12 @@ public class JsonFileWriteAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        JsonFileConstants.FileType fileType = JsonFileReadAction.getFileType(inputParameters);
+        FileType fileType = JsonFileReadAction.getFileType(inputParameters);
         Object source = inputParameters.getRequired(SOURCE);
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-        if (fileType == JsonFileConstants.FileType.JSON) {
+        if (fileType == FileType.JSON) {
             try (PrintWriter printWriter = new PrintWriter(byteArrayOutputStream, false, StandardCharsets.UTF_8)) {
                 printWriter.println((String) context.json(json -> json.write(source)));
             }

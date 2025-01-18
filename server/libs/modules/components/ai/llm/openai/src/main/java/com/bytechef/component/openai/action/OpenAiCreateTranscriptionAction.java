@@ -31,6 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
+import com.bytechef.component.ai.llm.constant.Language;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -95,15 +96,19 @@ public class OpenAiCreateTranscriptionAction {
         .perform(OpenAiCreateTranscriptionAction::perform);
 
     private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION =
-        (inputParameters, connectionParameters) -> new OpenAiAudioTranscriptionModel(
-            new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
-            OpenAiAudioTranscriptionOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .prompt(inputParameters.getString(PROMPT))
-                .language(inputParameters.getString(LANGUAGE))
-                .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
-                .temperature(inputParameters.getFloat(TEMPERATURE))
-                .build());
+        (inputParameters, connectionParameters) -> {
+            Language language = inputParameters.get(LANGUAGE, Language.class);
+
+            return new OpenAiAudioTranscriptionModel(
+                new OpenAiAudioApi(connectionParameters.getString(TOKEN)),
+                OpenAiAudioTranscriptionOptions.builder()
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .prompt(inputParameters.getString(PROMPT))
+                    .language(language.getCode())
+                    .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
+                    .temperature(inputParameters.getFloat(TEMPERATURE))
+                    .build());
+        };
 
     private OpenAiCreateTranscriptionAction() {
     }

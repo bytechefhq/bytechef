@@ -19,7 +19,6 @@ package com.bytechef.component.resend.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -55,6 +54,11 @@ import java.util.List;
  */
 public final class ResendSendEmailAction {
 
+    private enum ContentType {
+
+        HTML, TEXT
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendEmail")
         .title("Send Email")
         .description("Send an email")
@@ -89,23 +93,23 @@ public final class ResendSendEmailAction {
                 .description("Reply-to email addresses.")
                 .items(EMAIL_PROPERTY)
                 .required(false),
-            integer(CONTENT_TYPE)
+            string(CONTENT_TYPE)
                 .label("Content Type")
                 .options(
-                    option("HTML", 1),
-                    option("Plain text", 2))
-                .defaultValue(1)
+                    option("HTML", ContentType.HTML.name()),
+                    option("Plain text", ContentType.TEXT.name()))
+                .defaultValue(ContentType.HTML.name())
                 .required(true),
             string(HTML)
                 .label("HTML")
                 .description("The HTML version of the message.")
-                .displayCondition("%s == %s".formatted(CONTENT_TYPE, 1))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.HTML))
                 .controlType(Property.ControlType.RICH_TEXT)
                 .required(false),
             string(TEXT)
                 .label("Text")
                 .description("The plain text version of the message.")
-                .displayCondition("%s == %s".formatted(CONTENT_TYPE, 2))
+                .displayCondition("%s == '%s'".formatted(CONTENT_TYPE, ContentType.TEXT))
                 .controlType(ControlType.TEXT_AREA)
                 .required(false),
             object(HEADERS)

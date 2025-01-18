@@ -16,6 +16,10 @@
 
 package com.bytechef.component.ai.llm.azure.openai.action;
 
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.B64_JSON;
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.URL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.NATURAL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.VIVID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
@@ -35,10 +39,11 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ImageModel;
+import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
+import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -103,17 +108,19 @@ public class AzureOpenAiCreateImageAction {
                 .label("Response Format")
                 .description("The format in which the generated images are returned.")
                 .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("URL")
+                    option("URL", URL.name()),
+                    option("B64_JSON", B64_JSON.name()))
+                .defaultValue(URL.name())
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
                 .description(
                     "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
-                    option("vivid", "vivid"),
-                    option("natural", "natural"))
+                    option("vivid", VIVID.name()),
+                    option("natural", NATURAL.name()))
+                .defaultValue(NATURAL.name())
+                .displayCondition("model == 'dall-e-3'")
                 .advancedOption(true),
             USER_PROPERTY)
         .output(
@@ -139,23 +146,23 @@ public class AzureOpenAiCreateImageAction {
     }
 
     private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
-        OpenAIClient openAIClient = new OpenAIClientBuilder()
-            .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-            .endpoint(connectionParameters.getString(ENDPOINT))
-            .buildClient();
-
+        ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
         Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+        Style style = inputParameters.get(STYLE, Style.class, NATURAL);
 
         return new AzureOpenAiImageModel(
-            openAIClient,
+            new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT))
+                .buildClient(),
             AzureOpenAiImageOptions.builder()
+                .height(size[1])
                 .model(inputParameters.getRequiredString(MODEL))
                 .N(inputParameters.getInteger(N))
-                .height(size[1])
-                .width(size[0])
-                .style(inputParameters.getString(STYLE))
+                .responseFormat(responseFormat.getValue())
+                .style(style.getValue())
                 .user(inputParameters.getString(USER))
-                .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .width(size[0])
                 .build());
     };
 }

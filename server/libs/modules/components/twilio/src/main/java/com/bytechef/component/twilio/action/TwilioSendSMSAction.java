@@ -75,6 +75,16 @@ import java.util.Map;
  */
 public class TwilioSendSMSAction {
 
+    private enum Content {
+
+        BODY, MEDIA_URL
+    }
+
+    private enum Source {
+
+        FROM, MESSAGING_SERVICE_SID
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendSMS")
         .title("Send SMS")
         .description("Send a new SMS message")
@@ -91,11 +101,11 @@ public class TwilioSendSMSAction {
                         "whatsapp:+15552229999.")
                 .controlType(ControlType.PHONE)
                 .required(true),
-            integer(SOURCE)
+            string(SOURCE)
                 .label("Source")
                 .options(
-                    option("From", 1),
-                    option("Messaging Service SID", 2))
+                    option("From", Source.FROM.name()),
+                    option("Messaging Service SID", Source.MESSAGING_SERVICE_SID.name()))
                 .required(true),
             string(FROM)
                 .label("From")
@@ -106,7 +116,7 @@ public class TwilioSendSMSAction {
                         "Message. If you are using messaging_service_sid, this parameter can be empty (Twilio " +
                         "assigns a from value from the Messaging Service's Sender Pool) or you can provide a " +
                         "specific sender from your Sender Pool.")
-                .displayCondition("%s == %s".formatted(SOURCE, 1))
+                .displayCondition("%s == '%s'".formatted(SOURCE, Source.FROM))
                 .controlType(ControlType.PHONE)
                 .required(true),
             string(MESSAGING_SERVICE_SID)
@@ -116,13 +126,13 @@ public class TwilioSendSMSAction {
                         "provided and the from parameter is omitted, Twilio selects the optimal sender from the " +
                         "Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a " +
                         "specific Sender from the Sender Pool.")
-                .displayCondition("%s == %s".formatted(SOURCE, 2))
+                .displayCondition("%s == '%s'".formatted(SOURCE, Source.MESSAGING_SERVICE_SID))
                 .required(true),
-            integer(CONTENT)
+            string(CONTENT)
                 .label("Content")
                 .options(
-                    option("Body", 1),
-                    option("Media URL", 2))
+                    option("Body", Content.BODY.name()),
+                    option("Media URL", Content.MEDIA_URL.name()))
                 .required(false)
                 .advancedOption(true),
             string(BODY)
@@ -133,7 +143,7 @@ public class TwilioSendSMSAction {
                         "segmented and charged accordingly. For long body text, consider using the send_as_mms " +
                         "parameter.")
                 .maxLength(1600)
-                .displayCondition("%s == %s".formatted(CONTENT, 1))
+                .displayCondition("%s == '%s'".formatted(CONTENT, Content.BODY))
                 .required(true),
             array(MEDIA_URL)
                 .label("Media URL")
@@ -301,7 +311,7 @@ public class TwilioSendSMSAction {
                         "Template is not used. Find the SID in the Console on the Content Editor page. For Content " +
                         "API users, the SID is found in Twilio's response when creating the Template or by fetching " +
                         "your Templates.")
-                .displayCondition("%s == %s".formatted(CONTENT, 2))
+                .displayCondition("%s == '%s'".formatted(CONTENT, Content.MEDIA_URL))
                 .required(false)
                 .advancedOption(true))
         .output(

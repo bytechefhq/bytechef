@@ -3368,28 +3368,29 @@
         "metadata" : { },
         "required" : false,
         "name" : "contentType",
-        "type" : "INTEGER",
-        "defaultValue" : 1,
+        "type" : "STRING",
+        "defaultValue" : "TEXT",
         "exampleValue" : null,
         "label" : "Content Type",
         "placeholder" : null,
-        "maxValue" : null,
-        "minValue" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
         "options" : [ {
           "description" : null,
           "label" : "Text",
-          "value" : 1
+          "value" : "TEXT"
         }, {
           "description" : null,
           "label" : "HTML",
-          "value" : 2
+          "value" : "HTML"
         } ],
-        "controlType" : "SELECT",
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The content of the item.",
-        "displayCondition" : "body.contentType == 2",
+        "displayCondition" : "body.contentType == 'HTML'",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -3409,7 +3410,7 @@
       }, {
         "advancedOption" : null,
         "description" : "The content of the item.",
-        "displayCondition" : "body.contentType == 1",
+        "displayCondition" : "body.contentType == 'TEXT'",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -3435,7 +3436,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3951,5 +3951,6 @@
     "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
+  "dataStream" : null,
   "unifiedApi" : null
 }

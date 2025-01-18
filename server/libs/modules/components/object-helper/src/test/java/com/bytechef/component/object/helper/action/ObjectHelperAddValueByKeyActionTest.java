@@ -18,8 +18,8 @@ package com.bytechef.component.object.helper.action;
 
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.KEY;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.SOURCE;
+import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.TYPE;
 import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE;
-import static com.bytechef.component.object.helper.constant.ObjectHelperConstants.VALUE_TYPE;
 import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
@@ -46,7 +46,7 @@ class ObjectHelperAddValueByKeyActionTest {
         Object expectedObject = gson.fromJson(expectedJson, Object.class);
 
         Parameters inputParameters = MockParametersFactory.create(
-            Map.of(SOURCE, sourceObject, KEY, key, VALUE_TYPE, 0, VALUE, valueObject));
+            Map.of(SOURCE, sourceObject, KEY, key, TYPE, 0, VALUE, valueObject));
 
         Object resultObject = ObjectHelperAddValueByKeyAction.perform(inputParameters, mockedParameters, mockedContext);
 

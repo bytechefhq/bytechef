@@ -50,6 +50,7 @@ import static org.springframework.ai.azure.openai.AzureOpenAiResponseFormat.TEXT
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -93,7 +94,9 @@ public class AzureOpenAiChatAction {
             .endpoint(connectionParameters.getString(ENDPOINT));
 
         AzureOpenAiResponseFormat format =
-            inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1) == 1 ? TEXT : JSON;
+            inputParameters.getFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
+                    ? TEXT : JSON;
 
         return new AzureOpenAiChatModel(
             openAIClientBuilder,

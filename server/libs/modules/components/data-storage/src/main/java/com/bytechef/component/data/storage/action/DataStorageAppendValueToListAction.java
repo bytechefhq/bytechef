@@ -35,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
+import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
@@ -65,59 +66,59 @@ public class DataStorageAppendValueToListAction {
                     "The identifier of a list must be unique within the chosen scope, or a new value will " +
                         "overwrite the existing one.")
                 .required(true),
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(TYPE_OPTIONS),
             array(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             bool(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
                 .required(true),
             date(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 3")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE))
                 .required(true),
             dateTime(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 4")
+                .displayCondition("type == '%S'".formatted(ValueType.DATE_TIME))
                 .required(true),
             integer(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 5")
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
                 .required(true),
             nullable(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 6")
+                .displayCondition("type == '%s'".formatted(ValueType.NULL))
                 .required(true),
             number(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 7")
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
                 .required(true),
             object(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 8")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             string(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 9")
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(VALUE)
                 .label("Value")
                 .description("The value to set under given key.")
-                .displayCondition("type == 10")
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true),
             bool(APPEND_LIST_AS_SINGLE_ITEM)
                 .label("Append a List as a Single Item")

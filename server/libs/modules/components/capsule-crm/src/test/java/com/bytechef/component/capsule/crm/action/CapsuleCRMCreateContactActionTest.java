@@ -33,6 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.capsule.crm.constant.ContactType;
 import com.bytechef.component.definition.Context.Http;
 import java.util.HashMap;
 import java.util.List;
@@ -61,8 +62,8 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
             .thenReturn((String) propertyStubsMap.get(FIRST_NAME));
         when(mockedParameters.getString(LAST_NAME))
             .thenReturn((String) propertyStubsMap.get(LAST_NAME));
-        when(mockedParameters.getRequiredString(TYPE))
-            .thenReturn((String) propertyStubsMap.get(TYPE));
+        when(mockedParameters.getRequired(TYPE, ContactType.class))
+            .thenReturn(ContactType.PERSON);
         when(mockedParameters.getString(ABOUT))
             .thenReturn((String) propertyStubsMap.get(ABOUT));
         when((List<Map<String, String>>) mockedParameters.getList(EMAIL_ADDRESSES))
@@ -92,6 +93,7 @@ class CapsuleCRMCreateContactActionTest extends AbstractCapsuleCRMActionTest {
         propertyStubsMap.put(EMAIL_ADDRESSES, emails);
         propertyStubsMap.put(ADDRESSES, addresses);
         propertyStubsMap.put(PHONE_NUMBERS, phoneNumbers);
+        propertyStubsMap.put(TYPE, ContactType.PERSON.getValue());
 
         return propertyStubsMap;
     }

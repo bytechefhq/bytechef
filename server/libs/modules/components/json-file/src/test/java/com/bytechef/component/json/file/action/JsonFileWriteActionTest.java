@@ -24,7 +24,7 @@ import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.JsonFileComponentHandlerTest;
-import com.bytechef.component.json.file.constant.JsonFileConstants;
+import com.bytechef.component.json.file.constant.FileType;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class JsonFileWriteActionTest {
 
         Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
-        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONObject(Files.contentOf(file, StandardCharsets.UTF_8)).toMap());
@@ -88,7 +88,7 @@ public class JsonFileWriteActionTest {
 
         Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
-        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -119,7 +119,7 @@ public class JsonFileWriteActionTest {
         Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn("test.json");
         Mockito.when(parameters.getString(
-            Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+            Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(new JSONArray(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -144,7 +144,7 @@ public class JsonFileWriteActionTest {
         Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn(null);
         Mockito.when(parameters.getString(
-            Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+            Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSONL");
         Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());
@@ -180,7 +180,7 @@ public class JsonFileWriteActionTest {
         Mockito.when(parameters.getString(Mockito.eq(FILENAME)))
             .thenReturn("test.jsonl");
         Mockito.when(parameters.getString(
-            Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+            Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSONL");
         Mockito.when(parameters.getRequired(Mockito.eq(SOURCE)))
             .thenReturn(linesOf(Files.contentOf(file, StandardCharsets.UTF_8)).toList());

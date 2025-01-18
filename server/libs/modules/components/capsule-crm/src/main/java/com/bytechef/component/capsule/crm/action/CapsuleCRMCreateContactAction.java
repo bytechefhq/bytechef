@@ -25,17 +25,18 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.FI
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.LAST_NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NAME;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NUMBER;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PERSON;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.PHONE_NUMBERS;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STREET;
-import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.STRING_DISPLAY_CONDITION;
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.TYPE;
+import static com.bytechef.component.capsule.crm.constant.ContactType.ORGANIZATION;
+import static com.bytechef.component.capsule.crm.constant.ContactType.PERSON;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.capsule.crm.constant.ContactType;
 import com.bytechef.component.capsule.crm.util.CapsuleCRMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -58,23 +59,23 @@ public class CapsuleCRMCreateContactAction {
                 .label("Type")
                 .description("Represents if this party is a person or an organisation.")
                 .options(
-                    option("Person", PERSON),
-                    option("Organization", "organization"))
+                    option("Person", PERSON.getValue()),
+                    option("Organization", ORGANIZATION.name()))
                 .required(true),
             string(FIRST_NAME)
                 .label("First Name")
                 .description("The first name of the person.")
-                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
+                .displayCondition("%s == '%s'".formatted(TYPE, PERSON))
                 .required(true),
             string(LAST_NAME)
                 .label("Last Name")
                 .description("The last name of the person.")
-                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, PERSON))
+                .displayCondition("%s == '%s'".formatted(TYPE, PERSON))
                 .required(true),
             string(NAME)
                 .label("Name")
                 .description("The name of the organisation.")
-                .displayCondition(STRING_DISPLAY_CONDITION.formatted(TYPE, "organization"))
+                .displayCondition("%s == '%s'".formatted(TYPE, "organization"))
                 .required(true),
             string(ABOUT)
                 .label("About")
@@ -169,12 +170,14 @@ public class CapsuleCRMCreateContactAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
+        ContactType contactType = inputParameters.getRequired(TYPE, ContactType.class);
+
         return actionContext.http(POST_PARTIES_CONTEXT_FUNCTION)
             .body(
                 Http.Body.of(
                     "party",
                     new Object[] {
-                        TYPE, inputParameters.getRequiredString(TYPE),
+                        TYPE, contactType.getValue(),
                         FIRST_NAME, inputParameters.getString(FIRST_NAME),
                         LAST_NAME, inputParameters.getString(LAST_NAME),
                         NAME, inputParameters.getString(NAME),

@@ -35,10 +35,8 @@ public class CapsuleCRMConstants {
     public static final String LAST_NAME = "lastName";
     public static final String NAME = "name";
     public static final String NUMBER = "number";
-    public static final String PERSON = "person";
     public static final String PHONE_NUMBERS = "phoneNumbers";
     public static final String STREET = "street";
-    public static final String STRING_DISPLAY_CONDITION = "%s == '%s'";
     public static final String TYPE = "type";
 
     private CapsuleCRMConstants() {

@@ -49,8 +49,10 @@ public class LLMUtils {
 
     public static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
         return switch (message.role()) {
-            case "system" -> new SystemMessage(message.content());
-            case "user" -> {
+            case ASSISTANT -> new AssistantMessage(message.content());
+            case SYSTEM -> new SystemMessage(message.content());
+            case TOOL -> new ToolResponseMessage(new ArrayList<>());
+            case USER -> {
                 List<FileEntry> attachments = message.attachments();
                 StringBuilder content = new StringBuilder(message.content());
 
@@ -79,9 +81,6 @@ public class LLMUtils {
                     yield new UserMessage(content.toString(), media);
                 }
             }
-            case "assistant" -> new AssistantMessage(message.content());
-            case "tool" -> new ToolResponseMessage(new ArrayList<>());
-            default -> null;
         };
     }
 

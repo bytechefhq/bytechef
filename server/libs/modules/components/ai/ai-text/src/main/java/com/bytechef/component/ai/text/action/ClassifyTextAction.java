@@ -16,8 +16,11 @@
 
 package com.bytechef.component.ai.text.action;
 
+import static com.bytechef.component.ai.llm.ChatModel.Role.SYSTEM;
+import static com.bytechef.component.ai.llm.ChatModel.Role.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.CATEGORIES;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.EXAMPLES;
@@ -103,7 +106,9 @@ public class ClassifyTextAction implements AiTextAction {
 
         modelInputParametersMap.put(
             "messages",
-            List.of(Map.of("content", systemPrompt, "role", "system"), Map.of("content", userBuilder, "role", "user")));
+            List.of(
+                Map.of("content", systemPrompt, ROLE, SYSTEM.name()),
+                Map.of("content", userBuilder, ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);

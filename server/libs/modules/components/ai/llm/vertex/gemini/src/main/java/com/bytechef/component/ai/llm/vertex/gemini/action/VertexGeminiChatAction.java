@@ -40,6 +40,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.ai.llm.vertex.gemini.constant.VertexGeminiConstants;
 import com.bytechef.component.definition.ActionContext;
@@ -82,8 +83,9 @@ public class VertexGeminiChatAction {
         .perform(VertexGeminiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters) -> {
-        String type = inputParameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1) == 1
-            ? "text/plain" : "application/json";
+        String type = inputParameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT) == ResponseFormat.TEXT
+                ? "text/plain" : "application/json";
 
         return new VertexAiGeminiChatModel(
             new VertexAI(connectionParameters.getString(PROJECT_ID), connectionParameters.getString(LOCATION)),

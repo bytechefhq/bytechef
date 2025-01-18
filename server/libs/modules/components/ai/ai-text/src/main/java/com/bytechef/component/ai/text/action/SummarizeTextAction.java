@@ -16,18 +16,25 @@
 
 package com.bytechef.component.ai.text.action;
 
+import static com.bytechef.component.ai.llm.ChatModel.Role.SYSTEM;
+import static com.bytechef.component.ai.llm.ChatModel.Role.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.text.action.SummarizeTextAction.SummarizeFormat.BRIEF_TITLE;
+import static com.bytechef.component.ai.text.action.SummarizeTextAction.SummarizeFormat.BULLETED_LIST;
+import static com.bytechef.component.ai.text.action.SummarizeTextAction.SummarizeFormat.CONCISE_SENTENCE;
+import static com.bytechef.component.ai.text.action.SummarizeTextAction.SummarizeFormat.CUSTOM_PROMPT;
+import static com.bytechef.component.ai.text.action.SummarizeTextAction.SummarizeFormat.STRUCTURED_SUMMARY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.FORMAT;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROMPT;
+import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -47,13 +54,21 @@ public class SummarizeTextAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
 
-    public SummarizeTextAction(ApplicationProperties.Ai.Component component) {
+    public enum SummarizeFormat {
+        STRUCTURED_SUMMARY,
+        BRIEF_TITLE,
+        CONCISE_SENTENCE,
+        BULLETED_LIST,
+        CUSTOM_PROMPT;
+    }
+
+    public SummarizeTextAction(ApplicationProperties.Ai.Provider provider) {
         this.actionDefinition = new AiTextActionDefinition(
             action(AiTextConstants.SUMMARIZE_TEXT)
                 .title("Summarize Text")
                 .description("AI reads, analyzes and summarizes your text into a shorter format.")
                 .properties(
-                    MODEL_PROVIDER_PROPERTY,
+                    PROVIDER_PROPERTY.apply(provider),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     MODEL_URL_PROPERTY,
@@ -62,43 +77,43 @@ public class SummarizeTextAction implements AiTextAction {
                         .description("The text that is to be summarized.")
                         .minLength(100)
                         .required(true),
-                    integer(FORMAT)
+                    string(FORMAT)
                         .label("Format")
                         .description("In what format do you wish the text summarized?")
                         .options(
-                            option("A structured summary with sections", 0),
-                            option("A brief title summarizing the content in 4-7 words", 1),
-                            option("A single, concise sentence", 2),
-                            option("A bulleted list recap", 3),
-                            option("Custom Prompt", 4))
+                            option("A structured summary with sections", STRUCTURED_SUMMARY.name()),
+                            option("A brief title summarizing the content in 4-7 words", BRIEF_TITLE.name()),
+                            option("A single, concise sentence", CONCISE_SENTENCE.name()),
+                            option("A bulleted list recap", BULLETED_LIST.name()),
+                            option("Custom Prompt", CUSTOM_PROMPT.name()))
                         .required(true),
                     string(PROMPT)
                         .label("Custom Prompt")
                         .description("Write your prompt for summarizing text.")
-                        .displayCondition("format == 4")
+                        .displayCondition("format == '%s'".formatted(CUSTOM_PROMPT))
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component, this);
+            provider, this);
     }
 
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        String prompt = switch (inputParameters.getRequiredInteger(FORMAT)) {
-            case 0 -> "You will receive a text. Make a structured summary of that text with sections.";
-            case 1 -> "You will receive a text. Make a brief title summarizing the content in 4-7 words.";
-            case 2 -> "You will receive a text. Summarize it in a single, concise sentence.";
-            case 3 -> "You will receive a text. Create a bullet list recap.";
-            case 4 -> "You will receive a text." + inputParameters.getString("prompt");
-            default -> throw new IllegalArgumentException("Invalid format");
+        String prompt = switch (inputParameters.getRequired(FORMAT, SummarizeFormat.class)) {
+            case STRUCTURED_SUMMARY -> "You will receive a text. Make a structured summary of that text with sections.";
+            case BRIEF_TITLE -> "You will receive a text. Make a brief title summarizing the content in 4-7 words.";
+            case CONCISE_SENTENCE -> "You will receive a text. Summarize it in a single, concise sentence.";
+            case BULLETED_LIST -> "You will receive a text. Create a bullet list recap.";
+            case CUSTOM_PROMPT -> "You will receive a text." + inputParameters.getString("prompt");
         };
 
-        modelInputParametersMap.put("messages",
+        modelInputParametersMap.put(
+            "messages",
             List.of(
-                Map.of("content", prompt, "role", "system"),
-                Map.of("content", inputParameters.getString(TEXT), "role", "user")));
+                Map.of("content", prompt, ROLE, SYSTEM.name()),
+                Map.of("content", inputParameters.getString(TEXT), ROLE, USER.name())));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);

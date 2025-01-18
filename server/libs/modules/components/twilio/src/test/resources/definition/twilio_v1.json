@@ -63,6 +63,8 @@
       "title" : "Basic Auth",
       "type" : "BASIC_AUTH",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -72,9 +74,7 @@
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -1403,28 +1403,29 @@
       "metadata" : { },
       "required" : true,
       "name" : "source",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Source",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "From",
-        "value" : 1
+        "value" : "FROM"
       }, {
         "description" : null,
         "label" : "Messaging Service SID",
-        "value" : 2
+        "value" : "MESSAGING_SERVICE_SID"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool.",
-      "displayCondition" : "source == 1",
+      "displayCondition" : "source == 'FROM'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1444,7 +1445,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The SID of the Messaging Service you want to associate with the Message. When this parameter is provided and the from parameter is omitted, Twilio selects the optimal sender from the Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a specific Sender from the Sender Pool.",
-      "displayCondition" : "source == 2",
+      "displayCondition" : "source == 'MESSAGING_SERVICE_SID'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1470,28 +1471,29 @@
       "metadata" : { },
       "required" : false,
       "name" : "content",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Content",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Body",
-        "value" : 1
+        "value" : "BODY"
       }, {
         "description" : null,
         "label" : "Media URL",
-        "value" : 2
+        "value" : "MEDIA_URL"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter.",
-      "displayCondition" : "content == 1",
+      "displayCondition" : "content == 'BODY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -2001,7 +2003,7 @@
     }, {
       "advancedOption" : true,
       "description" : "For Content Editor/API only: The SID of the Content Template to be used with the Message, e.g., HXXXXXXXXXXXXXXXXXXXXXXXXXXXXX. If this parameter is not provided, a Content Template is not used. Find the SID in the Console on the Content Editor page. For Content API users, the SID is found in Twilio's response when creating the Template or by fetching your Templates.",
-      "displayCondition" : "content == 2",
+      "displayCondition" : "content == 'MEDIA_URL'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -2020,9 +2022,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send SMS",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : null,
   "dataStream" : null,

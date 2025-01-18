@@ -43,9 +43,9 @@ public class ChatModelActionTest extends AbstractActionTest {
     @Test
     public void testGetResponse() {
         when(mockedParameters.getList(eq(MESSAGES), any(TypeReference.class)))
-            .thenReturn(List.of(new ChatModel.Message("QUESTION", null, "user")));
-        when(mockedParameters.getFromPath(any(), eq(Integer.class), eq(1)))
-            .thenReturn(1);
+            .thenReturn(List.of(new ChatModel.Message("QUESTION", null, ChatModel.Role.USER)));
+        when(mockedParameters.getFromPath(any(), eq(ChatModel.ResponseFormat.class), eq(ChatModel.ResponseFormat.TEXT)))
+            .thenReturn(ChatModel.ResponseFormat.TEXT);
 
         ChatModel mockedChat = spy(new MockChatModel());
         org.springframework.ai.chat.model.ChatModel mockedChatModelModel = mock(

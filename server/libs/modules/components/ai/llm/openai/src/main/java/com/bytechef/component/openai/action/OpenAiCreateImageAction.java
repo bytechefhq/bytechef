@@ -16,6 +16,12 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.ai.llm.ImageModel.Quality.HD;
+import static com.bytechef.component.ai.llm.ImageModel.Quality.STANDARD;
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.B64_JSON;
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.URL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.NATURAL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.VIVID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
@@ -36,6 +42,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.openai.constant.OpenAiConstants.QUALITY;
 
 import com.bytechef.component.ai.llm.ImageModel;
+import com.bytechef.component.ai.llm.ImageModel.Quality;
+import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
+import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -101,24 +110,27 @@ public class OpenAiCreateImageAction {
                 .label("Response format")
                 .description("The format in which the generated images are returned.")
                 .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("URL")
+                    option("URL", URL.name()),
+                    option("B64_JSON", B64_JSON.name()))
+                .defaultValue(URL.getValue())
                 .advancedOption(true),
             string(QUALITY)
                 .label("Quality")
                 .description("The quality of the image that will be generated.")
                 .options(
-                    option("standard", "standard"),
-                    option("hd", "hd"))
+                    option("Standard", STANDARD.name()),
+                    option("HD", HD.name()))
+                .defaultValue(STANDARD.name())
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
                 .description(
                     "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
-                    option("vivid", "vivid"),
-                    option("natural", "natural"))
+                    option("vivid", VIVID.name()),
+                    option("natural", NATURAL.name()))
+                .defaultValue(NATURAL.name())
+                .displayCondition("model == 'dall-e-3'")
                 .advancedOption(true),
             USER_PROPERTY)
         .output(
@@ -137,19 +149,22 @@ public class OpenAiCreateImageAction {
         .perform(OpenAiCreateImageAction::perform);
 
     private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
+        ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
         Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+        Style style = inputParameters.get(STYLE, Style.class, NATURAL);
+        Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
 
         return new OpenAiImageModel(
             new OpenAiImageApi(connectionParameters.getString(TOKEN)),
             OpenAiImageOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withN(inputParameters.getInteger(N))
-                .withHeight(size[1])
-                .withWidth(size[0])
-                .withStyle(inputParameters.getString(STYLE))
-                .withUser(inputParameters.getString(USER))
-                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
-                .withQuality(inputParameters.getString(QUALITY))
+                .height(size[1])
+                .model(inputParameters.getRequiredString(MODEL))
+                .N(inputParameters.getInteger(N))
+                .responseFormat(responseFormat.getValue())
+                .quality(quality.getValue())
+                .style(style.getValue())
+                .user(inputParameters.getString(USER))
+                .width(size[0])
                 .build(),
             new RetryTemplate());
     };

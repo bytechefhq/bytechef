@@ -34,18 +34,18 @@ public class ObjectHelperConstants {
     public static final String SOURCE = "source";
     public static final String SOURCE_TYPE = "sourceType";
     public static final String TARGET = "target";
-    public static final List<Option<Long>> TYPE_OPTIONS = List.of(
-        option("Array", 1),
-        option("Boolean", 2),
-        option("Date", 3),
-        option("Date Time", 4),
-        option("Integer", 5),
-        option("Nullable", 6),
-        option("Number", 7),
-        option("Object", 8),
-        option("String", 9),
-        option("Time", 10));
+    public static final String TYPE = "type";
     public static final String VALUE = "value";
-    public static final String VALUE_TYPE = "valueType";
 
+    public static final List<Option<String>> TYPE_OPTIONS = List.of(
+        option("Array", ValueType.ARRAY.name()),
+        option("Boolean", ValueType.BOOLEAN.name()),
+        option("Date", ValueType.DATE.name()),
+        option("Date Time", ValueType.DATE_TIME.name()),
+        option("Integer", ValueType.INTEGER.name()),
+        option("Nullable", ValueType.NULL.name()),
+        option("Number", ValueType.NUMBER.name()),
+        option("Object", ValueType.OBJECT.name()),
+        option("String", ValueType.STRING.name()),
+        option("Time", ValueType.TIME.name()));
 }

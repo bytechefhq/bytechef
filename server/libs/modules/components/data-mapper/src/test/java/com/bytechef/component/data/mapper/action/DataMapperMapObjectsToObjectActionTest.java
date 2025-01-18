@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.data.mapper.constant.InputType;
 import com.bytechef.component.data.mapper.model.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
@@ -465,8 +466,9 @@ class DataMapperMapObjectsToObjectActionTest {
                 List.of(inputValue), mappings, (Consumer<List<Map<String, Object>>>) consumer, includeUnmapped,
                 includeNulls, includeEmptyStrings);
         } else {
-            setupAndAssertTest(inputValue, mappings, (Consumer<Map<String, Object>>) consumer, includeUnmapped,
-                includeNulls, includeEmptyStrings);
+            setupAndAssertTest(
+                inputValue, mappings, (Consumer<Map<String, Object>>) consumer, includeUnmapped, includeNulls,
+                includeEmptyStrings);
         }
     }
 
@@ -498,7 +500,7 @@ class DataMapperMapObjectsToObjectActionTest {
 
         when(inputParameters.getList(MAPPINGS, RequiredStringMapping.class, List.of())).thenReturn(mappings);
         when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
-        when(inputParameters.getInteger(INPUT_TYPE)).thenReturn(1);
+        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.OBJECT);
 
         Map<String, Object> result = (Map<String, Object>) DataMapperMapObjectsToObjectAction.perform(
             inputParameters, connectionParameters, context);

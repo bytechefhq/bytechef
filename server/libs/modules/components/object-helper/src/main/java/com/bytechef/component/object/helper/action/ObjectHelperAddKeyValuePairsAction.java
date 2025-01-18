@@ -35,6 +35,7 @@ import static com.bytechef.component.object.helper.constant.ObjectHelperConstant
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.object.helper.constant.ValueType;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -56,17 +57,17 @@ public class ObjectHelperAddKeyValuePairsAction {
                 "treated as Key-value pairs. If the value is array of objects, key-value pairs will be added to " +
                 "every object in the array.")
         .properties(
-            integer(SOURCE_TYPE)
+            string(SOURCE_TYPE)
                 .label("Type of Initial Object")
                 .options(
-                    option("Array", 1),
-                    option("Object", 2))
+                    option("Array", ValueType.ARRAY.name()),
+                    option("Object", ValueType.OBJECT.name()))
                 .description("Type of initial object to be added or updated.")
                 .required(true),
             array(SOURCE)
                 .label("Source")
                 .description("Source object to be added or updated")
-                .displayCondition("sourceType == 1")
+                .displayCondition("sourceType == '%s'".formatted(ValueType.ARRAY.name()))
                 .items(
                     object()
                         .additionalProperties(
@@ -76,7 +77,7 @@ public class ObjectHelperAddKeyValuePairsAction {
             object(SOURCE)
                 .label("Source")
                 .description("Source object to be added or updated")
-                .displayCondition("sourceType == 2")
+                .displayCondition("sourceType == '%s'".formatted(ValueType.OBJECT.name()))
                 .additionalProperties(
                     array(), bool(), date(), dateTime(), integer(), number(), nullable(), object(), string(), time())
                 .required(true),
@@ -94,10 +95,10 @@ public class ObjectHelperAddKeyValuePairsAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Integer sourceType = inputParameters.getRequiredInteger(SOURCE_TYPE);
+        ValueType sourceType = inputParameters.getRequired(SOURCE_TYPE, ValueType.class);
         Map<String, Object> keyValuePairs = inputParameters.getRequiredMap(VALUE, Object.class);
 
-        if (sourceType.equals(1)) {
+        if (sourceType == ValueType.ARRAY) {
             List<Map<String, Object>> mapList = new ArrayList<>();
             List<Object> modifiedArray = inputParameters.getRequiredList(SOURCE, Object.class);
             for (Object sourceObject : modifiedArray) {

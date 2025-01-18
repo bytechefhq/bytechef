@@ -19,19 +19,15 @@ package com.bytechef.component.quickbooks.util;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
+import static com.bytechef.component.quickbooks.constant.Entity.ACCOUNT;
+import static com.bytechef.component.quickbooks.constant.ItemType.INVENTORY;
+import static com.bytechef.component.quickbooks.constant.ItemType.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.CUSTOMER;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.DISPLAY_NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ID;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVOICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.PAYMENT;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 
 import com.bytechef.component.definition.ActionContext;
@@ -43,6 +39,8 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
+import com.bytechef.component.quickbooks.constant.ItemType;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -61,30 +59,30 @@ public class QuickbooksUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         ActionContext actionContext) {
 
-        String type = inputParameters.getRequiredString(TYPE);
+        ItemType type = inputParameters.getRequired(TYPE, ItemType.class);
 
         ModifiableStringProperty incomeAccount = string(INCOME_ACCOUNT_REF)
             .label("Income Account")
             .options(getOptions(ACCOUNT, "Income"))
-            .required(type.equals(INVENTORY) || type.equals(SERVICE));
+            .required(type == INVENTORY || type == SERVICE);
 
         ModifiableStringProperty assetAccount = string(ASSET_ACCOUNT_REF)
             .label("Asset Account")
             .options(getOptions(ACCOUNT, "Asset"))
-            .required(type.equals(INVENTORY));
+            .required(type == INVENTORY);
 
         ModifiableDateProperty inventoryStartDate = date(INV_START_DATE)
             .label("Inventory Start Date")
             .description("Date of opening balance for the inventory transaction.")
-            .required(type.equals(INVENTORY));
+            .required(type == INVENTORY);
 
         return List.of(incomeAccount, assetAccount, inventoryStartDate);
     }
 
-    public static ActionOptionsFunction<String> getOptions(String entity, String accountType) {
+    public static ActionOptionsFunction<String> getOptions(Entity entity, String accountType) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, actionContext) -> {
 
-            String encodeQuery = URLEncoder.encode("SELECT * FROM " + entity, StandardCharsets.UTF_8);
+            String encodeQuery = URLEncoder.encode("SELECT * FROM " + entity.getName(), StandardCharsets.UTF_8);
 
             Map<String, Object> body = actionContext
                 .http(http -> http.get("/query"))
@@ -95,7 +93,9 @@ public class QuickbooksUtils {
 
             List<Option<String>> options = new ArrayList<>();
 
-            if (body.get("QueryResponse") instanceof Map<?, ?> map && map.get(entity) instanceof List<?> list) {
+            if (body.get("QueryResponse") instanceof Map<?, ?> map &&
+                map.get(entity.getName()) instanceof List<?> list) {
+
                 for (Object o : list) {
                     if (o instanceof Map<?, ?> entityMap) {
                         String entityAccountType = (String) entityMap.get("AccountType");
@@ -112,13 +112,12 @@ public class QuickbooksUtils {
         };
     }
 
-    private static String getDisplayValue(String entity, Map<?, ?> entityMap) {
+    private static String getDisplayValue(Entity entity, Map<?, ?> entityMap) {
         return switch (entity) {
             case ACCOUNT, ITEM -> (String) entityMap.get(NAME);
             case CUSTOMER -> (String) entityMap.get(DISPLAY_NAME);
             case INVOICE -> (String) entityMap.get("DocNumber");
             case PAYMENT -> (String) entityMap.get(ID);
-            default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
 }

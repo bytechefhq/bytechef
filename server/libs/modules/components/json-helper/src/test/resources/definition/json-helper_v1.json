@@ -74,28 +74,29 @@
       "metadata" : { },
       "required" : null,
       "name" : "type",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Object",
-        "value" : 1
+        "value" : "OBJECT"
       }, {
         "description" : null,
         "label" : "Array",
-        "value" : 2
+        "value" : "ARRAY"
       } ],
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
-      "displayCondition" : "type == 1",
+      "displayCondition" : "type == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -110,12 +111,12 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The data to convert to JSON string.",
-      "displayCondition" : "type == 2",
+      "displayCondition" : "type == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -131,8 +132,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Convert to JSON String",
     "perform" : { },

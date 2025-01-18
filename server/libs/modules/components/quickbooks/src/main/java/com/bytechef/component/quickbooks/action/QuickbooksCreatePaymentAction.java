@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class QuickbooksCreatePaymentAction {
         .properties(
             string(CUSTOMER)
                 .label("Customer")
-                .options(QuickbooksUtils.getOptions(CUSTOMER, null))
+                .options(QuickbooksUtils.getOptions(Entity.CUSTOMER, null))
                 .required(true),
             number(TOTAL_AMT)
                 .label("Total Amount")

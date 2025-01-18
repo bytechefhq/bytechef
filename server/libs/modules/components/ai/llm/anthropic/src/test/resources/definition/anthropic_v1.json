@@ -43,18 +43,18 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "tokenUrl" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -72,8 +72,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -179,19 +179,19 @@
           "options" : [ {
             "description" : null,
             "label" : "System",
-            "value" : "system"
+            "value" : "SYSTEM"
           }, {
             "description" : null,
             "label" : "User",
-            "value" : "user"
+            "value" : "USER"
           }, {
             "description" : null,
             "label" : "Assistant",
-            "value" : "assistant"
+            "value" : "ASSISTANT"
           }, {
             "description" : null,
             "label" : "Tool",
-            "value" : "tool"
+            "value" : "TOOL"
           } ],
           "optionsDataSource" : null
         }, {
@@ -217,7 +217,7 @@
         }, {
           "advancedOption" : null,
           "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
-          "displayCondition" : "messages[index].role == 'user'",
+          "displayCondition" : "messages[index].role == 'USER'",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
@@ -329,18 +329,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -358,8 +358,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -386,28 +386,29 @@
         "metadata" : { },
         "required" : false,
         "name" : "responseFormat",
-        "type" : "INTEGER",
-        "defaultValue" : 1,
+        "type" : "STRING",
+        "defaultValue" : "TEXT",
         "exampleValue" : null,
         "label" : "Response Format",
         "placeholder" : null,
-        "maxValue" : null,
-        "minValue" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
         "options" : [ {
           "description" : "Text response",
           "label" : "Text",
-          "value" : 1
+          "value" : "TEXT"
         }, {
           "description" : "JSON response with key-value pairs",
           "label" : "JSON",
-          "value" : 2
+          "value" : "JSON"
         } ],
-        "controlType" : "SELECT",
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Define the JSON schema for the response.",
-        "displayCondition" : "response.responseFormat == 2",
+        "displayCondition" : "response.responseFormat == 'JSON'",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -425,8 +426,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -447,8 +448,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -469,8 +470,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Specify the number of token choices the generative uses to generate the next token.",
@@ -488,8 +489,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -529,13 +530,13 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "triggers" : null,
   "dataStream" : null,
