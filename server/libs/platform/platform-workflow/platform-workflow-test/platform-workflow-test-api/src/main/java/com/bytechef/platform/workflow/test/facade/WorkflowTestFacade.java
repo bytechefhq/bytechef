@@ -17,6 +17,8 @@
 package com.bytechef.platform.workflow.test.facade;
 
 import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
+import org.springframework.lang.NonNull;
+
 import java.util.Map;
 
 /**
@@ -24,5 +26,5 @@ import java.util.Map;
  */
 public interface WorkflowTestFacade {
 
-    WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs);
+    WorkflowTestExecutionDTO testWorkflow(@NonNull String workflowId, @NonNull Map<String, Object> inputs);
 }
