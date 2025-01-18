@@ -743,6 +743,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         if (type == null) {
             dynamicPropertyTypesMap.remove(path);
+
+            if (path.contains("[")) {
+                List<Integer> pathIndexes = extractIndexes(path);
+                String pathPrefix = path.substring(0, path.lastIndexOf("["));
+
+                for (String key : new HashSet<>(dynamicPropertyTypesMap.keySet())) {
+                    List<Integer> keyIndexes = extractIndexes(key);
+
+                    if (key.startsWith(pathPrefix) && pathIndexes.getLast() < keyIndexes.getLast()) {
+                        dynamicPropertyTypesMap.put(
+                            pathPrefix + "[" + (keyIndexes.getLast() - 1) +
+                                path.substring(path.lastIndexOf("[") + 2, path.lastIndexOf("]") + 1),
+                            dynamicPropertyTypesMap.remove(key));
+                    }
+                }
+            }
         } else {
             dynamicPropertyTypesMap.put(path, type);
         }
