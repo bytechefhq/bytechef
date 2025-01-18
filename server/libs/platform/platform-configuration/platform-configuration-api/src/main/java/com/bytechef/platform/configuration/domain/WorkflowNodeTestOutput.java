@@ -137,8 +137,8 @@ public class WorkflowNodeTestOutput {
         return new OutputResponse(getOutputSchema(), getSampleOutput());
     }
 
-    public ValueProperty<?> getOutputSchema() {
-        return MapUtils.get(outputSchema.getMap(), "outputSchema", ValueProperty.class);
+    public Property getOutputSchema() {
+        return MapUtils.get(outputSchema.getMap(), "outputSchema", Property.class);
     }
 
     public Object getSampleOutput() {
