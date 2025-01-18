@@ -1,4 +1,4 @@
-import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
 
@@ -13,7 +13,7 @@ export function CopilotRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {addMessage, conversationId, messages} = useCopilotStore();
+    const {addMessage, context, conversationId, messages} = useCopilotStore();
 
     const onNew = async (message: AppendMessage) => {
         if (message.content[0]?.type !== 'text') {
@@ -27,6 +27,7 @@ export function CopilotRuntimeProvider({
 
         const result = await fetch('/api/platform/internal/ai/chat', {
             body: JSON.stringify({
+                context,
                 message: input,
             }),
             headers: {

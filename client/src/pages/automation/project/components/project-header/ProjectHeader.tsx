@@ -1,6 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ProjectHeaderCopilotButton from '@/pages/automation/project/components/project-header/ProjectHeaderCopilotButton';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
@@ -18,6 +17,8 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
 import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
@@ -262,7 +263,7 @@ const ProjectHeader = ({
 
                     <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
 
-                    <ProjectHeaderCopilotButton />
+                    <CopilotButton source={Source.WORKFLOW_EDITOR} />
                 </div>
 
                 {project && (

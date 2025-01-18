@@ -5,8 +5,14 @@ import {ThreadMessageLike} from '@assistant-ui/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
+export enum Source {
+    WORKFLOW_EDITOR,
+    WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU,
+    CODE_EDITOR,
+}
+
 export type ContextType = {
-    source: string;
+    source: Source;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     parameters: Record<string, any>;
     workflowId: string;
@@ -17,7 +23,7 @@ interface CopilotStateI {
     generateConversationId: () => void;
 
     context: ContextType | undefined;
-    setContext: (context: ContextType) => void;
+    setContext: (context: ContextType | undefined) => void;
 
     copilotPanelOpen: boolean;
     setCopilotPanelOpen: (showCopilot: boolean) => void;
