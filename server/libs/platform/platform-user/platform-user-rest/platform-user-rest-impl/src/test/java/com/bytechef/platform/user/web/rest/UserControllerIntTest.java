@@ -34,6 +34,7 @@ import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.mapper.UserMapper;
 import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.tenant.cache.TenantCacheKeyGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -62,6 +63,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
 @WithMockUser(authorities = AuthorityConstants.ADMIN)
+@UserIntTestConfigurationSharedMocks
 class UserControllerIntTest {
 
     private static final String DEFAULT_LOGIN = "johndoe";

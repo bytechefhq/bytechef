@@ -23,8 +23,8 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
@@ -69,7 +69,7 @@ public class WorkflowApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ProjectInstanceFacade projectInstanceFacade;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
     private ProjectFacade projectFacade;

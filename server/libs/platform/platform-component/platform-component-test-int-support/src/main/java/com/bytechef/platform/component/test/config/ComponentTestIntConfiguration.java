@@ -42,7 +42,7 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -58,6 +58,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -68,7 +69,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -82,16 +82,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Configuration
 public class ComponentTestIntConfiguration {
 
-    @MockitoBean(name = "connectionService")
-    private ConnectionService connectionService;
-
-    @MockitoBean(name = "dataStorageService")
-    private DataStorage dataStorage;
-
     private final JsonComponentModule jsonComponentModule;
-
-    @MockitoBean
-    private MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI")
     public ComponentTestIntConfiguration(JsonComponentModule jsonComponentModule) {
@@ -129,6 +120,16 @@ public class ComponentTestIntConfiguration {
             MapUtils.concat(taskHandlerMap, taskHandlerFactory.getTaskHandlerMap()), workflowService);
     }
 
+    @Bean(name = "connectionService")
+    ConnectionService connectionService() {
+        return Mockito.mock(ConnectionService.class);
+    }
+
+    @Bean(name = "dataStorageService")
+    DataStorage dataStorage() {
+        return Mockito.mock(DataStorage.class);
+    }
+
     @Bean
     ContextService contextService() {
         return new ContextServiceImpl(new InMemoryContextRepository());
@@ -150,8 +151,13 @@ public class ComponentTestIntConfiguration {
     }
 
     @Bean
-    InstanceAccessorRegistry instanceAccessorRegistry() {
-        return new InstanceAccessorRegistry(List.of());
+    MessageBroker messageBroker() {
+        return Mockito.mock(MessageBroker.class);
+    }
+
+    @Bean
+    PrincipalAccessorRegistry principalAccessorRegistry() {
+        return new PrincipalAccessorRegistry(List.of());
     }
 
     @Bean

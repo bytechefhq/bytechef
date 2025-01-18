@@ -43,22 +43,22 @@ public interface ProjectWorkflowRepository extends ListCrudRepository<ProjectWor
 
     @Query("""
         SELECT project_workflow.* FROM project_workflow
-        JOIN project_instance ON project_instance.project_id = project_workflow.project_id
-        AND project_instance.project_version = project_workflow.project_version
+        JOIN project_deployment ON project_deployment.project_id = project_workflow.project_id
+        AND project_deployment.project_version = project_workflow.project_version
         WHERE project_workflow.workflow_id = :workflowId
-        AND project_instance.id = :projectInstanceId
+        AND project_deployment.id = :projectDeploymentId
         """)
-    Optional<ProjectWorkflow> findByProjectInstanceIdAndWorkflowId(
-        @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId);
+    Optional<ProjectWorkflow> findByProjectDeploymentIdAndWorkflowId(
+        @Param("projectDeploymentId") long projectDeploymentId, @Param("workflowId") String workflowId);
 
     @Query("""
         SELECT project_workflow.* FROM project_workflow
-        JOIN project_instance ON project_instance.project_id = project_workflow.project_id
-        AND project_instance.project_version = project_workflow.project_version
+        JOIN project_deployment ON project_deployment.project_id = project_workflow.project_id
+        AND project_deployment.project_version = project_workflow.project_version
         WHERE project_workflow.workflow_reference_code = :workflowReferenceCode
-        AND project_instance.id = :projectInstanceId
+        AND project_deployment.id = :projectDeploymentId
         """)
-    Optional<ProjectWorkflow> findByProjectInstanceIdAndWorkflowReferenceCode(
-        @Param("projectInstanceId") long projectInstanceId,
+    Optional<ProjectWorkflow> findByProjectDeploymentIdAndWorkflowReferenceCode(
+        @Param("projectDeploymentId") long projectDeploymentId,
         @Param("workflowReferenceCode") String workflowReferenceCode);
 }

@@ -59,7 +59,7 @@ public class TriggerWorkerConfiguration {
         ApplicationEventPublisher eventPublisher, TriggerFileStorage triggerFileStorage,
         TriggerWorkerExecutor triggerWorkerExecutor, TriggerHandlerResolver triggerHandlerResolver) {
 
-        return new TriggerWorker(eventPublisher, triggerFileStorage, triggerWorkerExecutor,
-            triggerHandlerResolver);
+        return new TriggerWorker(
+            eventPublisher, triggerFileStorage, triggerWorkerExecutor, triggerHandlerResolver);
     }
 }

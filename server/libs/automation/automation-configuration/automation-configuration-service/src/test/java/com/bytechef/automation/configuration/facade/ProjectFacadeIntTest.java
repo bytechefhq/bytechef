@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_CATEGORY;
-import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
-import static com.bytechef.automation.configuration.ProjectInstanceFacadeHelper.PREFIX_PROJECT_NAME;
+import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_CATEGORY;
+import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_DESCRIPTION;
+import static com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper.PREFIX_PROJECT_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -26,8 +26,9 @@ import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
-import com.bytechef.automation.configuration.ProjectInstanceFacadeHelper;
+import com.bytechef.automation.configuration.ProjectDeploymentFacadeHelper;
 import com.bytechef.automation.configuration.config.ProjectIntTestConfiguration;
+import com.bytechef.automation.configuration.config.ProjectIntTestConfigurationSharedMocks;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.domain.Workspace;
@@ -72,6 +73,7 @@ import org.springframework.context.annotation.Import;
         "bytechef.workflow.repository.jdbc.enabled=true"
     })
 @Import(PostgreSQLContainerConfiguration.class)
+@ProjectIntTestConfigurationSharedMocks
 public class ProjectFacadeIntTest {
 
     @Autowired
@@ -84,7 +86,7 @@ public class ProjectFacadeIntTest {
     private ProjectRepository projectRepository;
 
     @Autowired
-    private ProjectInstanceFacade projectInstanceFacade;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @Autowired
     private ProjectWorkflowRepository projectWorkflowRepository;
@@ -104,7 +106,7 @@ public class ProjectFacadeIntTest {
     private WorkspaceRepository workspaceRepository;
 
     @Autowired
-    private ProjectInstanceFacadeHelper projectFacadeInstanceHelper;
+    private ProjectDeploymentFacadeHelper projectFacadeInstanceHelper;
 
     @Autowired
     private ProjectWorkflowServiceImpl projectWorkflowServiceImpl;
@@ -134,7 +136,7 @@ public class ProjectFacadeIntTest {
         ProjectWorkflowDTO workflowDTO = projectFacadeInstanceHelper.addTestWorkflow(projectDTO);
 
         ProjectWorkflow projectWorkflow =
-            projectWorkflowServiceImpl.getProjectInstanceProjectWorkflow(workflowDTO.getProjectWorkflowId());
+            projectWorkflowServiceImpl.getProjectDeploymentProjectWorkflow(workflowDTO.getProjectWorkflowId());
 
         Optional<Workflow> workflowOptional = workflowRepository.findById(projectWorkflow.getWorkflowId());
 

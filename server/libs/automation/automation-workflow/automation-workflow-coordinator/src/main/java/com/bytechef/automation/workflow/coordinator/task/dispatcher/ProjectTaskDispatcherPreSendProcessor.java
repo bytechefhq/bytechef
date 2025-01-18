@@ -20,13 +20,13 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProce
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.apache.commons.lang3.Validate;
@@ -40,39 +40,40 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobService principalJobService;
 
     @SuppressFBWarnings("EI")
     public ProjectTaskDispatcherPreSendProcessor(
-        JobService jobService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
-        InstanceJobService instanceJobService) {
+        JobService jobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        PrincipalJobService principalJobService) {
 
-        super(projectInstanceWorkflowService);
+        super(projectDeploymentWorkflowService);
 
         this.jobService = jobService;
-        this.instanceJobService = instanceJobService;
+        this.principalJobService = principalJobService;
     }
 
     @Override
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long projectInstanceId = instanceJobService.getJobInstanceId(
+        Long projectDeploymentId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION);
 
-        taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, projectInstanceId);
+        taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            projectInstanceId, job.getWorkflowId(), taskExecution.getName());
+            projectDeploymentId, job.getWorkflowId(), taskExecution.getName());
 
         if (!connectionIdMap.isEmpty()) {
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-            projectInstanceId, job.getWorkflowId());
+        ProjectDeploymentWorkflow projectDeploymentWorkflow =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                projectDeploymentId, job.getWorkflowId());
 
-        taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, projectInstanceWorkflow.getId());
+        taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID, projectDeploymentWorkflow.getId());
 
         taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
@@ -84,10 +85,10 @@ public class ProjectTaskDispatcherPreSendProcessor extends AbstractDispatcherPre
     public boolean canProcess(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long projectInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
+        Long projectDeploymentId = OptionalUtils.orElse(
+            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.AUTOMATION),
             null);
 
-        return projectInstanceId != null;
+        return projectDeploymentId != null;
     }
 }

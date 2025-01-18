@@ -34,8 +34,8 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
@@ -78,7 +78,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 public abstract class AbstractWebhookTriggerController {
 
     private final FilesFileStorage filesFileStorage;
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
     private final String publicUrld;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowExecutor workflowExecutor;
@@ -87,12 +87,12 @@ public abstract class AbstractWebhookTriggerController {
     private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     protected AbstractWebhookTriggerController(
-        FilesFileStorage filesFileStorage, InstanceAccessorRegistry instanceAccessorRegistry, String publicUrld,
+        FilesFileStorage filesFileStorage, PrincipalAccessorRegistry principalAccessorRegistry, String publicUrld,
         TriggerDefinitionService triggerDefinitionService, WorkflowExecutor workflowExecutor,
         WorkflowService workflowService) {
 
         this.filesFileStorage = filesFileStorage;
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.principalAccessorRegistry = principalAccessorRegistry;
         this.publicUrld = publicUrld;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowExecutor = workflowExecutor;
@@ -170,9 +170,10 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return !instanceAccessor.isWorkflowEnabled(
+        return !principalAccessor.isWorkflowEnabled(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
@@ -320,9 +321,10 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getWorkflowId(
+        return principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 

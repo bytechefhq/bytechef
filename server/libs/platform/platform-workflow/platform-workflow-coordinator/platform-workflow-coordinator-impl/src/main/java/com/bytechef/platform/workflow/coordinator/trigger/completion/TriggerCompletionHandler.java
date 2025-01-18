@@ -18,14 +18,14 @@ package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,20 +44,20 @@ public class TriggerCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionHandler.class);
 
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
-    private final InstanceJobFacade instanceJobFacade;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final PrincipalJobFacade principalJobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
     private final TriggerStateService triggerStateService;
 
     @SuppressFBWarnings("EI")
     public TriggerCompletionHandler(
-        InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade,
+        PrincipalAccessorRegistry principalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService) {
 
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
-        this.instanceJobFacade = instanceJobFacade;
+        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.principalJobFacade = principalJobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
         this.triggerStateService = triggerStateService;
@@ -125,20 +125,22 @@ public class TriggerCompletionHandler {
     }
 
     private long createJob(String workflowId, Map<String, ?> inpputMap, long instanceId, ModeType type) {
-        return instanceJobFacade.createJob(new JobParametersDTO(workflowId, inpputMap), instanceId, type);
+        return principalJobFacade.createJob(new JobParametersDTO(workflowId, inpputMap), instanceId, type);
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getInputMap(
+        return principalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getWorkflowId(
+        return principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

@@ -25,7 +25,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
@@ -61,6 +61,7 @@ import org.springframework.context.annotation.Import;
         "spring.application.name=server-app"
     })
 @Import(PostgreSQLContainerConfiguration.class)
+@ConnectionIntTestConfigurationSharedMocks
 public class ConnectionFacadeIntTest {
 
     @Autowired
@@ -279,8 +280,8 @@ public class ConnectionFacadeIntTest {
     public static class ConnectionFacadeIntTestConfiguration {
 
         @Bean
-        InstanceAccessor instanceAccessor() {
-            return new InstanceAccessor() {
+        PrincipalAccessor instanceAccessor() {
+            return new PrincipalAccessor() {
 
                 @Override
                 public boolean isConnectionUsed(long connectionId) {
@@ -288,12 +289,12 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode) {
+                public boolean isWorkflowEnabled(long principalId, String workflowReferenceCode) {
                     return false;
                 }
 
                 @Override
-                public Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode) {
+                public Map<String, ?> getInputMap(long principalId, String workflowReferenceCode) {
                     return Map.of();
                 }
 
@@ -303,7 +304,7 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public String getWorkflowId(long instanceId, String workflowReferenceCode) {
+                public String getWorkflowId(long principalId, String workflowReferenceCode) {
                     return "";
                 }
             };

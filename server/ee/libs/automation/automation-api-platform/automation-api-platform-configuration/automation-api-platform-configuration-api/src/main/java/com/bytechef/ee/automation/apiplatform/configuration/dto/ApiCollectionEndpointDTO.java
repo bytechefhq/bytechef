@@ -16,7 +16,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.dto;
 
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import java.time.Instant;
@@ -24,19 +24,19 @@ import java.time.Instant;
 public record ApiCollectionEndpointDTO(
     long apiCollectionId,
     String createdBy, Instant createdDate, boolean enabled, HttpMethod httpMethod, Long id, String lastModifiedBy,
-    Instant lastModifiedDate, String name, String path, long projectInstanceWorkflowId, int version,
+    Instant lastModifiedDate, String name, String path, long projectDeploymentWorkflowId, int version,
     String workflowReferenceCode) {
 
     public ApiCollectionEndpointDTO(
-        ApiCollectionEndpoint apiCollectionEndpoint, ProjectInstanceWorkflow projectInstanceWorkflow) {
+        ApiCollectionEndpoint apiCollectionEndpoint, ProjectDeploymentWorkflow projectDeploymentWorkflow) {
 
         this(
             apiCollectionEndpoint.getApiCollectionId(), apiCollectionEndpoint.getCreatedBy(),
-            apiCollectionEndpoint.getCreatedDate(), projectInstanceWorkflow.isEnabled(),
+            apiCollectionEndpoint.getCreatedDate(), projectDeploymentWorkflow.isEnabled(),
             apiCollectionEndpoint.getHttpMethod(), apiCollectionEndpoint.getId(),
             apiCollectionEndpoint.getLastModifiedBy(), apiCollectionEndpoint.getLastModifiedDate(),
             apiCollectionEndpoint.getName(), apiCollectionEndpoint.getPath(),
-            apiCollectionEndpoint.getProjectInstanceWorkflowId(), apiCollectionEndpoint.getVersion(),
+            apiCollectionEndpoint.getProjectDeploymentWorkflowId(), apiCollectionEndpoint.getVersion(),
             apiCollectionEndpoint.getWorkflowReferenceCode());
     }
 

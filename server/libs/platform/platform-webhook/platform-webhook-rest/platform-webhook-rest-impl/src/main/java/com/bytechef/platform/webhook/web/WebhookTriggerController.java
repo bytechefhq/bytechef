@@ -23,7 +23,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.web.rest.AbstractWebhookTriggerController;
@@ -55,11 +55,11 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
     @SuppressFBWarnings("EI")
     public WebhookTriggerController(
         ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
-        InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
+        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
         WorkflowExecutor workflowExecutor, WorkflowService workflowService) {
 
         super(
-            filesFileStorage, instanceAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
+            filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
             workflowExecutor, workflowService);
 
         this.workflowExecutor = workflowExecutor;

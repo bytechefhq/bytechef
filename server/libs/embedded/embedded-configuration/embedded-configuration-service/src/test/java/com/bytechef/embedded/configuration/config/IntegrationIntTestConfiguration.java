@@ -16,26 +16,9 @@
 
 package com.bytechef.embedded.configuration.config;
 
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
-import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +32,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -65,57 +47,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class IntegrationIntTestConfiguration {
-
-    @MockitoBean
-    private ComponentDefinitionService componentDefinitionService;
-
-    @MockitoBean
-    private ConnectionDefinitionService connectionDefinitionService;
-
-    @MockitoBean
-    private ConnectionService connectionService;
-
-    @MockitoBean
-    private ConnectedUserService connectedUserService;
-
-    @MockitoBean
-    private InstanceJobFacade instanceJobFacade;
-
-    @MockitoBean
-    private InstanceJobService instanceJobService;
-
-    @MockitoBean
-    private JobFacade jobFacade;
-
-    @MockitoBean
-    private JobService jobService;
-
-    @MockitoBean
-    private OAuth2Service oAuth2Service;
-
-    @MockitoBean
-    private TriggerDefinitionService triggerDefinitionService;
-
-    @MockitoBean
-    private TriggerExecutionService triggerExecutionService;
-
-    @MockitoBean
-    private TriggerLifecycleFacade triggerLifecycleFacade;
-
-    @MockitoBean
-    private WorkflowConnectionFacade workflowConnectionFacade;
-
-    @MockitoBean
-    private WorkflowFacade workflowFacade;
-
-    @MockitoBean
-    private WorkflowNodeParameterFacade workflowNodeParameterFacade;
-
-    @MockitoBean
-    private WorkflowNodeTestOutputService workflowNodeTestOutputService;
-
-    @MockitoBean
-    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
     EncryptionKey encryptionKey() {

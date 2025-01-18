@@ -68,7 +68,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             "componentTriggerHandlerMapFactory",
             BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerFactory.class)
                 .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("instanceAccessorRegistry")
+                .addConstructorArgReference("principalAccessorRegistry")
                 .addConstructorArgReference("triggerDefinitionFacade")
                 .getBeanDefinition());
     }

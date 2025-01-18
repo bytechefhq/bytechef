@@ -37,6 +37,7 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.config.ComponentRegistryConfiguration;
+import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
 import com.bytechef.platform.component.config.JacksonConfiguration;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.definition.FileEntryImpl;
@@ -71,6 +72,7 @@ import wiremock.com.fasterxml.jackson.databind.node.JsonNodeFactory;
 @Import({
     JacksonConfiguration.class, PostgreSQLContainerConfiguration.class
 })
+@ComponentRegistryConfigurationSharedMocks
 @WireMockTest(httpPort = 9999)
 public class OpenApiComponentTaskHandlerIntTest {
 

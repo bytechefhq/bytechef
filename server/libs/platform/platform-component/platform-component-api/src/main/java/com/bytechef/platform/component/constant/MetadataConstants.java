@@ -23,8 +23,8 @@ public class MetadataConstants {
 
     public static final String CONNECTION_IDS = "connectionIds";
     public static final String EDITOR_ENVIRONMENT = "editorEnvironment";
-    public static final String INSTANCE_ID = "instanceId";
-    public static final String INSTANCE_WORKFLOW_ID = "instanceWorkflowId";
+    public static final String JOB_PRINCIPAL_ID = "jobPrincipalId";
+    public static final String JOB_PRINCIPAL_WORKFLOW_ID = "jobPrincipalWorkflowId";
     public static final String TYPE = "type";
     public static final String WORKFLOW_ID = "workflowId";
 }

@@ -16,11 +16,8 @@
 
 package com.bytechef.embedded.configuration.web.rest.config;
 
-import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -39,10 +36,4 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 @Configuration
 public class IntegrationConfigurationRestTestConfiguration {
-
-    @MockitoBean
-    private IntegrationInstanceFacade integrationInstanceFacade;
-
-    @MockitoBean
-    private IntegrationInstanceService integrationInstanceService;
 }

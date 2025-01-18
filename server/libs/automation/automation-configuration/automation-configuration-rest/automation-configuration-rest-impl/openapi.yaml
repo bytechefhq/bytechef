@@ -8,10 +8,10 @@ servers:
 tags:
   - name: "category"
     description: "The Automation Category API"
-  - name: "project-instance-tag"
-    description: "The Automation Project Instance Tag Internal API"
-  - name: "project-instance"
-    description: "The Automation Project Instance Internal API"
+  - name: "project-deployment-tag"
+    description: "The Automation Project Deployment Tag Internal API"
+  - name: "project-deployment"
+    description: "The Automation Project Deployment Internal API"
   - name: "project-tag"
     description: "The Automation Project Tag Internal API"
   - name: "project"
@@ -21,37 +21,37 @@ tags:
   - name: "workspace"
     description: "The Automation Workspace Internal API"
 paths:
-  /project-instances:
+  /project-deployments:
     post:
-      description: "Create a new project instance."
-      summary: "Create a new project instance"
+      description: "Create a new project deployment."
+      summary: "Create a new project deployment"
       tags:
-      - "project-instance"
-      operationId: "createProjectInstance"
+      - "project-deployment"
+      operationId: "createProjectDeployment"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectInstance"
+              $ref: "#/components/schemas/ProjectDeployment"
         required: true
       responses:
         "200":
-          description: "The project instance id."
+          description: "The project deployment id."
           content:
             application/json:
               schema:
                 type: integer
                 format: int64
-  /project-instances/tags:
+  /project-deployments/tags:
     get:
-      description: "Get project instance tags."
-      summary: "Get project instance tags"
+      description: "Get project deployment tags."
+      summary: "Get project deployment tags"
       tags:
-      - "project-instance-tag"
-      operationId: "getProjectInstanceTags"
+      - "project-deployment-tag"
+      operationId: "getProjectDeploymentTags"
       responses:
         "200":
-          description: "The list of project instance tags."
+          description: "The list of project deployment tags."
           content:
             application/json:
               schema:
@@ -59,16 +59,16 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Tag"
-  /project-instances/{id}:
+  /project-deployments/{id}:
     delete:
-      description: "Delete a project instance."
-      summary: "Delete a project instance"
+      description: "Delete a project deployment."
+      summary: "Delete a project deployment"
       tags:
-      - "project-instance"
-      operationId: "deleteProjectInstance"
+      - "project-deployment"
+      operationId: "deleteProjectDeployment"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -78,14 +78,14 @@ paths:
         "204":
           description: "Successful operation."
     get:
-      description: "Get a project instance by id."
-      summary: "Get a project instance by id"
+      description: "Get a project deployment by id."
+      summary: "Get a project deployment by id"
       tags:
-      - "project-instance"
-      operationId: "getProjectInstance"
+      - "project-deployment"
+      operationId: "getProjectDeployment"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -93,20 +93,20 @@ paths:
           format: "int64"
       responses:
         "200":
-          description: "The project instance object."
+          description: "The project deployment object."
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ProjectInstance"
+                $ref: "#/components/schemas/ProjectDeployment"
     put:
-      description: "Update an existing project instance."
-      summary: "Update an existing project instance"
+      description: "Update an existing project deployment."
+      summary: "Update an existing project deployment"
       tags:
-      - "project-instance"
-      operationId: "updateProjectInstance"
+      - "project-deployment"
+      operationId: "updateProjectDeployment"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -116,28 +116,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectInstance"
+              $ref: "#/components/schemas/ProjectDeployment"
         required: true
       responses:
         "204":
           description: "Successful operation."
-  /project-instances/{id}/enable/{enable}:
+  /project-deployments/{id}/enable/{enable}:
     patch:
-      description: "Enable/disable a project instance."
-      summary: "Enable/disable a project instance"
+      description: "Enable/disable a project deployment."
+      summary: "Enable/disable a project deployment"
       tags:
-      - "project-instance"
-      operationId: "enableProjectInstance"
+      - "project-deployment"
+      operationId: "enableProjectDeployment"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
           type: "integer"
           format: "int64"
       - name: "enable"
-        description: "Enable/disable the project instance."
+        description: "Enable/disable the project deployment."
         in: "path"
         required: true
         schema:
@@ -145,16 +145,16 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /project-instances/{id}/tags:
+  /project-deployments/{id}/tags:
     put:
-      description: "Updates tags of an existing project instance."
-      summary: "Updates tags of an existing project instance"
+      description: "Updates tags of an existing project deployment."
+      summary: "Updates tags of an existing project deployment"
       tags:
-      - "project-instance-tag"
-      operationId: "updateProjectInstanceTags"
+      - "project-deployment-tag"
+      operationId: "updateProjectDeploymentTags"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -169,16 +169,16 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /project-instances/{id}/workflows/{workflowId}/enable/{enable}:
+  /project-deployments/{id}/workflows/{workflowId}/enable/{enable}:
     patch:
-      description: "Enable/disable a workflow of a project instance."
-      summary: "Enable/disable a workflow of a project instance"
+      description: "Enable/disable a workflow of a project deployment."
+      summary: "Enable/disable a workflow of a project deployment"
       tags:
-      - "project-instance"
-      operationId: "enableProjectInstanceWorkflow"
+      - "project-deployment"
+      operationId: "enableProjectDeploymentWorkflow"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -191,7 +191,7 @@ paths:
         schema:
           type: "string"
       - name: "enable"
-        description: "Enable/disable the workflow of a project instance."
+        description: "Enable/disable the workflow of a project deployment."
         in: "path"
         required: true
         schema:
@@ -199,23 +199,23 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /project-instances/{id}/project-instance-workflows/{projectInstanceWorkflowId}:
+  /project-deployments/{id}/project-deployment-workflows/{projectDeploymentWorkflowId}:
     put:
-      description: "Update an existing project instance workflow."
-      summary: "Update an existing project instance workflow"
+      description: "Update an existing project deployment workflow."
+      summary: "Update an existing project deployment workflow"
       tags:
-        - "project-instance"
-      operationId: "updateProjectInstanceWorkflow"
+        - "project-deployment"
+      operationId: "updateProjectDeploymentWorkflow"
       parameters:
         - name: "id"
-          description: "The id of a project instance."
+          description: "The id of a project deployment."
           in: "path"
           required: true
           schema:
             type: "integer"
             format: "int64"
-        - name: "projectInstanceWorkflowId"
-          description: "The id of a project instance workflow."
+        - name: "projectDeploymentWorkflowId"
+          description: "The id of a project deployment workflow."
           in: "path"
           required: true
           schema:
@@ -225,21 +225,21 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ProjectInstanceWorkflow"
+              $ref: "#/components/schemas/ProjectDeploymentWorkflow"
         required: true
       responses:
         "204":
           description: "Successful operation."
-  /project-instances/{id}/workflows/{workflowId}/jobs:
+  /project-deployments/{id}/workflows/{workflowId}/jobs:
     post:
       description: "Create a request for running a new job."
       summary: "Create a request for running a new job"
       tags:
-      - "project-instance"
-      operationId: "createProjectInstanceWorkflowJob"
+      - "project-deployment"
+      operationId: "createProjectDeploymentWorkflowJob"
       parameters:
       - name: "id"
-        description: "The id of a project instance."
+        description: "The id of a project deployment."
         in: "path"
         required: true
         schema:
@@ -699,13 +699,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workflow"
-  /workspaces/{id}/project-instances:
+  /workspaces/{id}/project-deployments:
     get:
-      description: "Get project instances."
-      summary: "Get project instances"
+      description: "Get project deployments."
+      summary: "Get project deployments"
       tags:
-        - "project-instance"
-      operationId: "getWorkspaceProjectInstances"
+        - "project-deployment"
+      operationId: "getWorkspaceProjectDeployments"
       parameters:
         - name: "id"
           description: "The id of a workspace."
@@ -721,14 +721,14 @@ paths:
           schema:
             $ref: "#/components/schemas/Environment"
         - name: "projectId"
-          description: "The project ids used for filtering project instances."
+          description: "The project ids used for filtering project deployments."
           in: "query"
           required: false
           schema:
             type: "integer"
             format: "int64"
         - name: "tagId"
-          description: "The tag id of used for filtering project instances."
+          description: "The tag id of used for filtering project deployments."
           in: "query"
           required: false
           schema:
@@ -743,13 +743,13 @@ paths:
             default: true
       responses:
         "200":
-          description: "The list of project instances."
+          description: "The list of project deployments."
           content:
             application/json:
               schema:
                 type: "array"
                 items:
-                  $ref: "#/components/schemas/ProjectInstance"
+                  $ref: "#/components/schemas/ProjectDeployment"
   /workspaces/{id}/projects:
     get:
       description: "Get projects by workspace id."
@@ -772,8 +772,8 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "projectInstances"
-          description: "Use for filtering projects for which project instances exist."
+        - name: "projectDeployments"
+          description: "Use for filtering projects for which project deployments exist."
           in: "query"
           required: false
           schema:
@@ -886,11 +886,11 @@ components:
           description: "The last version of a project."
           type: "integer"
           readOnly: true
-    ProjectInstance:
+    ProjectDeployment:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
       allOf:
-        - $ref: "#/components/schemas/ProjectInstanceBasic"
+        - $ref: "#/components/schemas/ProjectDeploymentBasic"
         - type: "object"
           required:
             - "name"
@@ -900,17 +900,17 @@ components:
               allOf:
                 - $ref: "#/components/schemas/ProjectBasic"
               readOnly: true
-            projectInstanceWorkflows:
+            projectDeploymentWorkflows:
               type: "array"
               items:
-                $ref: "#/components/schemas/ProjectInstanceWorkflow"
+                $ref: "#/components/schemas/ProjectDeploymentWorkflow"
             tags:
               type: "array"
               items:
                 $ref: "#/components/schemas/Tag"
             __version:
               type: "integer"
-    ProjectInstanceBasic:
+    ProjectDeploymentBasic:
       description: "Contains configurations and connections required for the execution\
         \ of project workflows."
       type: "object"
@@ -927,15 +927,15 @@ components:
           format: "date-time"
           readOnly: true
         description:
-          description: "The description of a project instance."
+          description: "The description of a project deployment."
           type: "string"
         enabled:
-          description: "If a project instance is enabled or not."
+          description: "If a project deployment is enabled or not."
           type: "boolean"
         environment:
           $ref: '#/components/schemas/Environment'
         id:
-          description: "The id of a project instance."
+          description: "The id of a project deployment."
           type: "integer"
           format: "int64"
           readOnly: true
@@ -954,7 +954,7 @@ components:
           format: "date-time"
           readOnly: true
         name:
-          description: "The name of a project instance."
+          description: "The name of a project deployment."
           type: "string"
         projectId:
           description: "The id of a project."
@@ -963,7 +963,7 @@ components:
         projectVersion:
           description: "The version of a project."
           type: "integer"
-    ProjectInstanceWorkflow:
+    ProjectDeploymentWorkflow:
       description: "Contains configuration and connections required for the execution\
         \ of a particular project workflow."
       type: "object"
@@ -980,25 +980,25 @@ components:
           format: "date-time"
           readOnly: true
         inputs:
-          description: "The input parameters of an project instance used as workflow\
+          description: "The input parameters of an project deployment used as workflow\
             \ input values."
           type: "object"
           additionalProperties: true
         connections:
-          description: "The connections used by a project instance."
+          description: "The connections used by a project deployment."
           type: "array"
           items:
-            $ref: "#/components/schemas/ProjectInstanceWorkflowConnection"
+            $ref: "#/components/schemas/ProjectDeploymentWorkflowConnection"
         enabled:
-          description: "If a workflow is enabled or not in the project instance workflow."
+          description: "If a workflow is enabled or not in the project deployment workflow."
           type: "boolean"
         id:
-          description: "The id of a project instance workflow."
+          description: "The id of a project deployment workflow."
           type: "integer"
           format: "int64"
           readOnly: true
         lastExecutionDate:
-          description: "The last execution date of a project instance."
+          description: "The last execution date of a project deployment."
           type: "string"
           format: "date-time"
         lastModifiedBy:
@@ -1010,8 +1010,8 @@ components:
           type: "string"
           format: "date-time"
           readOnly: true
-        projectInstanceId:
-          description: "The id of a project instance."
+        projectDeploymentId:
+          description: "The id of a project deployment."
           type: "integer"
           format: "int64"
         staticWebhookUrl:
@@ -1026,7 +1026,7 @@ components:
           readOnly: true
         __version:
           type: "integer"
-    ProjectInstanceWorkflowConnection:
+    ProjectDeploymentWorkflowConnection:
       description: "The connection used in a particular action task or trigger."
       type: "object"
       required:

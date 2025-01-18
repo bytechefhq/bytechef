@@ -46,7 +46,7 @@ import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -65,7 +65,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade {
 
     private final ConnectedUserService connectedUserService;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobService principalJobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
@@ -80,7 +80,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     @SuppressFBWarnings("EI")
     public IntegrationInstanceFacadeImpl(
-        ConnectedUserService connectedUserService, InstanceJobService instanceJobService,
+        ConnectedUserService connectedUserService, PrincipalJobService principalJobService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         ApplicationProperties applicationProperties,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -91,7 +91,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         WorkflowService workflowService) {
 
         this.connectedUserService = connectedUserService;
-        this.instanceJobService = instanceJobService;
+        this.principalJobService = principalJobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
@@ -331,7 +331,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
 
     private Instant getIntegrationInstanceLastExecutionDate(long integrationInstanceId) {
         return OptionalUtils.mapOrElse(
-            instanceJobService.fetchLastJobId(integrationInstanceId, ModeType.EMBEDDED), this::getJobEndDate, null);
+            principalJobService.fetchLastJobId(integrationInstanceId, ModeType.EMBEDDED), this::getJobEndDate, null);
     }
 
     private Instant getJobEndDate(Long jobId) {

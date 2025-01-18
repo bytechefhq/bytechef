@@ -38,17 +38,18 @@ public class RemoteProjectWorkflowServiceClient implements ProjectWorkflowServic
     }
 
     @Override
-    public ProjectWorkflow getProjectInstanceProjectWorkflow(long id) {
+    public ProjectWorkflow getProjectDeploymentProjectWorkflow(long id) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ProjectWorkflow getProjectInstanceProjectWorkflow(long projectInstanceId, String workflowId) {
+    public ProjectWorkflow getProjectDeploymentProjectWorkflow(long projectDeploymentId, String workflowId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public String getProjectInstanceProjectWorkflowWorkflowId(long projectInstanceId, String workflowReferenceCode) {
+    public String
+        getProjectDeploymentProjectWorkflowWorkflowId(long projectDeploymentId, String workflowReferenceCode) {
         throw new UnsupportedOperationException();
     }
 

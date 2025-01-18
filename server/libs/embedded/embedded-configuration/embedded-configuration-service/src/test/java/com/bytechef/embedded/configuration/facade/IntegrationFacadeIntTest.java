@@ -26,6 +26,7 @@ import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.embedded.configuration.config.IntegrationIntTestConfiguration;
+import com.bytechef.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
@@ -62,6 +63,7 @@ import org.springframework.context.annotation.Import;
     classes = IntegrationIntTestConfiguration.class,
     properties = "bytechef.workflow.repository.jdbc.enabled=true")
 @Import(PostgreSQLContainerConfiguration.class)
+@IntegrationIntTestConfigurationSharedMocks
 public class IntegrationFacadeIntTest {
 
     @Autowired

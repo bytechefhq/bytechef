@@ -8,10 +8,10 @@
 package com.bytechef.ee.automation.apiplatform.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
-import com.bytechef.automation.configuration.service.ProjectInstanceService;
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
@@ -40,8 +40,8 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
-    private final ProjectInstanceService projectInstanceService;
-    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TagService tagService;
@@ -49,13 +49,14 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     @SuppressFBWarnings("EI")
     public ApiCollectionFacadeImpl(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService, TagService tagService) {
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
-        this.projectInstanceService = projectInstanceService;
-        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.tagService = tagService;
@@ -65,17 +66,17 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     public ApiCollectionDTO createApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO) {
         ApiCollection apiCollection = apiCollectionDTO.toApiCollection();
 
-        ProjectInstance projectInstance = new ProjectInstance();
+        ProjectDeployment projectDeployment = new ProjectDeployment();
 
-        projectInstance.setDescription(apiCollection.getDescription());
-        projectInstance.setEnvironment(Environment.TEST);
-        projectInstance.setName(apiCollection.getName());
-        projectInstance.setProjectId(apiCollectionDTO.projectId());
-        projectInstance.setProjectVersion(apiCollectionDTO.projectVersion());
+        projectDeployment.setDescription(apiCollection.getDescription());
+        projectDeployment.setEnvironment(Environment.TEST);
+        projectDeployment.setName(apiCollection.getName());
+        projectDeployment.setProjectId(apiCollectionDTO.projectId());
+        projectDeployment.setProjectVersion(apiCollectionDTO.projectVersion());
 
-        projectInstance = projectInstanceService.create(projectInstance);
+        projectDeployment = projectDeploymentService.create(projectDeployment);
 
-        apiCollection.setProjectInstanceId(projectInstance.getId());
+        apiCollection.setProjectDeploymentId(projectDeployment.getId());
 
         return toApiCollectionDTO(apiCollectionService.create(apiCollection));
     }
@@ -89,19 +90,19 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         ApiCollection apiCollection = apiCollectionService.getApiCollection(
             apiCollectionEndpoint.getApiCollectionId());
 
-        ProjectInstanceWorkflow projectInstanceWorkflow = new ProjectInstanceWorkflow();
+        ProjectDeploymentWorkflow projectDeploymentWorkflow = new ProjectDeploymentWorkflow();
 
-        projectInstanceWorkflow.setProjectInstanceId(apiCollection.getProjectInstanceId());
-        projectInstanceWorkflow.setWorkflowId(
-            projectWorkflowService.getProjectInstanceProjectWorkflowWorkflowId(
-                apiCollection.getProjectInstanceId(), apiCollectionEndpoint.getWorkflowReferenceCode()));
+        projectDeploymentWorkflow.setProjectDeploymentId(apiCollection.getProjectDeploymentId());
+        projectDeploymentWorkflow.setWorkflowId(
+            projectWorkflowService.getProjectDeploymentProjectWorkflowWorkflowId(
+                apiCollection.getProjectDeploymentId(), apiCollectionEndpoint.getWorkflowReferenceCode()));
 
-        projectInstanceWorkflow = projectInstanceWorkflowService.create(projectInstanceWorkflow);
+        projectDeploymentWorkflow = projectDeploymentWorkflowService.create(projectDeploymentWorkflow);
 
-        apiCollectionEndpoint.setProjectInstanceWorkflowId(projectInstanceWorkflow.getId());
+        apiCollectionEndpoint.setProjectDeploymentWorkflowId(projectDeploymentWorkflow.getId());
 
         return new ApiCollectionEndpointDTO(
-            apiCollectionEndpointService.create(apiCollectionEndpoint), projectInstanceWorkflow);
+            apiCollectionEndpointService.create(apiCollectionEndpoint), projectDeploymentWorkflow);
     }
 
     @Override
@@ -150,26 +151,26 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         apiCollectionEndpoint = apiCollectionEndpointService.update(apiCollectionEndpoint);
 
         return new ApiCollectionEndpointDTO(
-            apiCollectionEndpoint, projectInstanceWorkflowService.getProjectInstanceWorkflow(
-                apiCollectionEndpoint.getProjectInstanceWorkflowId()));
+            apiCollectionEndpoint, projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                apiCollectionEndpoint.getProjectDeploymentWorkflowId()));
     }
 
     private ApiCollectionDTO toApiCollectionDTO(ApiCollection apiCollection) {
-        Project project = projectService.getProjectInstanceProject(apiCollection.getProjectInstanceId());
+        Project project = projectService.getProjectDeploymentProject(apiCollection.getProjectDeploymentId());
 
-        ProjectInstance projectInstance = projectInstanceService.getProjectInstance(
-            apiCollection.getProjectInstanceId());
+        ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+            apiCollection.getProjectDeploymentId());
 
         List<ApiCollectionEndpointDTO> apiCollectionEndpointDTOs = apiCollectionEndpointService.getApiEndpoints(
             apiCollection.getId())
             .stream()
             .map(apiCollectionEndpoint -> new ApiCollectionEndpointDTO(
-                apiCollectionEndpoint, projectInstanceWorkflowService.getProjectInstanceWorkflow(
-                    apiCollectionEndpoint.getProjectInstanceWorkflowId())))
+                apiCollectionEndpoint, projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                    apiCollectionEndpoint.getProjectDeploymentWorkflowId())))
             .toList();
 
         return new ApiCollectionDTO(
-            apiCollection, apiCollectionEndpointDTOs, project, projectInstance,
+            apiCollection, apiCollectionEndpointDTOs, project, projectDeployment,
             tagService.getTags(apiCollection.getTagIds()));
     }
 }

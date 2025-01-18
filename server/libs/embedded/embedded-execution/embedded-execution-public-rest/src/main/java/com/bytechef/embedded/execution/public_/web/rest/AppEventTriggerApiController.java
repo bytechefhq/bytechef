@@ -38,7 +38,7 @@ import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiv
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
@@ -82,7 +82,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     public AppEventTriggerApiController(
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
         FilesFileStorage filesFileStorage, HttpServletRequest httpServletRequest,
-        InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
+        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
         WorkflowExecutor workflowExecutor, HttpServletResponse httpServletResponse,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
@@ -90,7 +90,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
 
         super(
-            filesFileStorage, instanceAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
+            filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
             workflowExecutor, workflowService);
 
         this.connectedUserService = connectedUserService;

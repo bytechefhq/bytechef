@@ -23,8 +23,8 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
@@ -60,7 +60,7 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private final ConnectionDefinitionFacade connectionDefinitionFacade;
     private final ConnectionDefinitionService connectionDefinitionService;
     private final ConnectionService connectionService;
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
@@ -68,14 +68,14 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     @SuppressFBWarnings("EI2")
     public ConnectionFacadeImpl(
         ConnectionDefinitionFacade connectionDefinitionFacade, ConnectionDefinitionService connectionDefinitionService,
-        ConnectionService connectionService, InstanceAccessorRegistry instanceAccessorRegistry,
+        ConnectionService connectionService, PrincipalAccessorRegistry principalAccessorRegistry,
         OAuth2Service oAuth2Service, TagService tagService,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionDefinitionFacade = connectionDefinitionFacade;
         this.connectionDefinitionService = connectionDefinitionService;
         this.connectionService = connectionService;
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.principalAccessorRegistry = principalAccessorRegistry;
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
@@ -209,9 +209,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean isConnectionUsed(long connectionId, ModeType type) {
         boolean connectionUsed;
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(type);
+        PrincipalAccessor principalAccessor = principalAccessorRegistry.getPrincipalAccessor(type);
 
-        connectionUsed = instanceAccessor.isConnectionUsed(connectionId);
+        connectionUsed = principalAccessor.isConnectionUsed(connectionId);
 
         if (!connectionUsed) {
             connectionUsed = workflowTestConfigurationService.isConnectionUsed(connectionId);

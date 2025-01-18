@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="202401114213050" author="Ivica Cardic">
+        <renameColumn tableName="api_collection" oldColumnName="project_instance_id" newColumnName="project_deployment_id" />
+        <renameColumn tableName="api_collection_endpoint" oldColumnName="project_instance_workflow_id" newColumnName="project_deployment_workflow_id" />
+
+        <dropForeignKeyConstraint baseTableName="api_collection" constraintName="fk_api_collection_project" />
+        <dropForeignKeyConstraint baseTableName="api_collection_endpoint" constraintName="fk_api_collection_endpoint_project_instance_workflow" />
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection"
+            baseColumnNames="project_deployment_id"
+            constraintName="fk_api_collection_project"
+            referencedTableName="project_deployment"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="api_collection_endpoint"
+            baseColumnNames="project_deployment_workflow_id"
+            constraintName="fk_api_collection_endpoint_project_deployment_workflow"
+            referencedTableName="project_deployment_workflow"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

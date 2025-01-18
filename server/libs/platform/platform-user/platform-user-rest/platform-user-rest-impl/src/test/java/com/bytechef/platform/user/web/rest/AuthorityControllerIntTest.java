@@ -30,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,7 @@ import org.springframework.transaction.annotation.Transactional;
 @WithMockUser(authorities = {
     "ROLE_ADMIN"
 })
+@UserIntTestConfigurationSharedMocks
 class AuthorityControllerIntTest {
 
     private static final String ENTITY_API_URL = "/api/platform/internal/authorities";

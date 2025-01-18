@@ -1345,7 +1345,7 @@ components:
           description: "If a workflow is enabled or not in the integration instance workflow."
           type: "boolean"
         id:
-          description: "The id of a project instance workflow."
+          description: "The id of a project deployment workflow."
           type: "integer"
           format: "int64"
           readOnly: true

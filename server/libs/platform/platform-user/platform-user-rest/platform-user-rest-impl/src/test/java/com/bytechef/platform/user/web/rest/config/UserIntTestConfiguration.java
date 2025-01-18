@@ -30,10 +30,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -49,15 +45,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 })
 @Configuration
 public class UserIntTestConfiguration {
-
-    @MockitoBean
-    private AuthenticationFailureHandler authenticationFailureHandler;
-
-    @MockitoBean
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
-
-    @MockitoBean
-    private RememberMeServices rememberMeServices;
 
     @Bean
     JavaMailSender javaMailSender() {

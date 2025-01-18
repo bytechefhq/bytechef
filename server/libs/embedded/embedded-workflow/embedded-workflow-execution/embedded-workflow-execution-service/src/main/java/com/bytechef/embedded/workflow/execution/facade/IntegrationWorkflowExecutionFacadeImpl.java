@@ -50,7 +50,7 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -73,7 +73,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobService principalJobService;
     private final IntegrationFacade integrationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
@@ -91,7 +91,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
     @SuppressFBWarnings("EI")
     public IntegrationWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        InstanceJobService instanceJobService, IntegrationFacade integrationFacade,
+        PrincipalJobService principalJobService, IntegrationFacade integrationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
@@ -103,7 +103,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
-        this.instanceJobService = instanceJobService;
+        this.principalJobService = principalJobService;
         this.integrationFacade = integrationFacade;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
@@ -126,7 +126,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
         JobDTO jobDTO = new JobDTO(
             job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
-        long integrationInstanceId = instanceJobService.getJobInstanceId(
+        long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), ""), ModeType.EMBEDDED);
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
@@ -184,7 +184,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
             if (integrationInstanceConfigurationIds.isEmpty()) {
                 return Page.empty();
             } else {
-                Page<Job> jobsPage = instanceJobService
+                Page<Job> jobsPage = principalJobService
                     .getJobIds(
                         jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, ModeType.EMBEDDED,
                         workflowIds, pageNumber)
@@ -203,7 +203,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
                 return jobsPage.map(job -> {
                     IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
-                        instanceJobService.getJobInstanceId(Validate.notNull(job.getId(), ""), ModeType.EMBEDDED));
+                        principalJobService.getJobPrincipalId(Validate.notNull(job.getId(), ""), ModeType.EMBEDDED));
 
                     return new WorkflowExecution(
                         Validate.notNull(job.getId(), "id"),

@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.workflow.coordinator;
 
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflowConnection;
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import java.util.List;
 import java.util.Map;
@@ -27,21 +27,21 @@ import java.util.Map;
  */
 public abstract class AbstractDispatcherPreSendProcessor {
 
-    protected final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    protected final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
-    protected AbstractDispatcherPreSendProcessor(ProjectInstanceWorkflowService projectInstanceWorkflowService) {
-        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+    protected AbstractDispatcherPreSendProcessor(ProjectDeploymentWorkflowService projectDeploymentWorkflowService) {
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     protected Map<String, Long> getConnectionIdMap(
-        Long projectInstanceId, String workflowId, String workflowNodeName) {
+        Long projectDeploymentId, String workflowId, String workflowNodeName) {
 
-        List<ProjectInstanceWorkflowConnection> projectInstanceWorkflowConnections =
-            projectInstanceWorkflowService.getProjectInstanceWorkflowConnections(
-                projectInstanceId, workflowId, workflowNodeName);
+        List<ProjectDeploymentWorkflowConnection> projectDeploymentWorkflowConnections =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflowConnections(
+                projectDeploymentId, workflowId, workflowNodeName);
 
         return MapUtils.toMap(
-            projectInstanceWorkflowConnections, ProjectInstanceWorkflowConnection::getKey,
-            ProjectInstanceWorkflowConnection::getConnectionId);
+            projectDeploymentWorkflowConnections, ProjectDeploymentWorkflowConnection::getKey,
+            ProjectDeploymentWorkflowConnection::getConnectionId);
     }
 }

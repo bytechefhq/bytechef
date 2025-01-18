@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20240604153081-1" author="Ivica Cardic" contextFilter="mono">
+        <dropForeignKeyConstraint baseTableName="project_instance_workflow_connection" constraintName="project_instance_workflow_connection_connection" />
+    </changeSet>
+
+    <changeSet id="20240604153081" author="Ivica Cardic">
+        <dropForeignKeyConstraint baseTableName="project_instance" constraintName="fk_project_instance_project" />
+        <dropForeignKeyConstraint baseTableName="project_instance_tag" constraintName="fk_project_instance_tag_project_instance" />
+        <dropForeignKeyConstraint baseTableName="project_instance_tag" constraintName="fk_project_instance_tag_tag" />
+        <dropForeignKeyConstraint baseTableName="project_instance_workflow" constraintName="fk_project_instance_workflow_project_instance" />
+        <dropForeignKeyConstraint baseTableName="project_instance_workflow_connection" constraintName="fk_project_instance_workflow_connection_piw" />
+
+        <dropPrimaryKey tableName="project_instance_tag"/>
+        <dropPrimaryKey tableName="project_instance_workflow_connection"/>
+
+        <renameColumn tableName="project_instance_tag" oldColumnName="project_instance_id" newColumnName="project_deployment_id" />
+        <renameColumn tableName="project_instance_workflow" oldColumnName="project_instance_id" newColumnName="project_deployment_id" />
+        <renameColumn tableName="project_instance_workflow_connection" oldColumnName="project_instance_workflow_id" newColumnName="project_deployment_workflow_id" />
+
+        <renameTable oldTableName="project_instance" newTableName="project_deployment" />
+        <renameTable oldTableName="project_instance_tag" newTableName="project_deployment_tag" />
+        <renameTable oldTableName="project_instance_workflow" newTableName="project_deployment_workflow" />
+        <renameTable oldTableName="project_instance_workflow_connection" newTableName="project_deployment_workflow_connection" />
+
+        <addPrimaryKey tableName="project_deployment_tag" columnNames="project_deployment_id,tag_id"/>
+        <addPrimaryKey tableName="project_deployment_workflow_connection" columnNames="project_deployment_workflow_id,workflow_node_name,key"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_deployment"
+            baseColumnNames="project_id"
+            constraintName="fk_project_deployment_project"
+            referencedTableName="project"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_deployment_tag"
+            baseColumnNames="project_deployment_id"
+            constraintName="fk_project_deployment_tag_project_deployment"
+            referencedTableName="project_deployment"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_deployment_tag"
+            baseColumnNames="tag_id"
+            constraintName="fk_project_deployment_tag_tag"
+            referencedTableName="tag"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_deployment_workflow"
+            baseColumnNames="project_deployment_id"
+            constraintName="fk_project_deployment_workflow_project_deployment"
+            referencedTableName="project_deployment"
+            referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint
+            baseTableName="project_deployment_workflow_connection"
+            baseColumnNames="project_deployment_workflow_id"
+            constraintName="fk_project_deployment_workflow_connection_piw"
+            referencedTableName="project_deployment_workflow"
+            referencedColumnNames="id"/>
+
+    </changeSet>
+
+    <changeSet id="20240604153081-2" author="Ivica Cardic" contextFilter="mono">
+        <addForeignKeyConstraint
+            baseTableName="project_deployment_workflow_connection"
+            baseColumnNames="connection_id"
+            constraintName="fk_project_deployment_workflow_connection_connection"
+            referencedTableName="connection"
+            referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

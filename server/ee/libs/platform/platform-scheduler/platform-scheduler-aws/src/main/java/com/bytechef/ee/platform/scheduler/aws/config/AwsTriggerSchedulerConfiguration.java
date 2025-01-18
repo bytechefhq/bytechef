@@ -15,7 +15,7 @@ import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class AwsTriggerSchedulerConfiguration {
     @Bean
     DynamicWebhookTriggerRefreshListener dynamicWebhookListener(
         AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider,
-        InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
+        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         SchedulerClient schedulerClient = SchedulerClient.builder()
@@ -74,7 +74,7 @@ public class AwsTriggerSchedulerConfiguration {
             .build();
 
         return new DynamicWebhookTriggerRefreshListener(
-            instanceAccessorRegistry, schedulerClient, triggerDefinitionFacade, triggerStateService, workflowService);
+            principalAccessorRegistry, schedulerClient, triggerDefinitionFacade, triggerStateService, workflowService);
     }
 
     @Bean

@@ -32,6 +32,7 @@ import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.bytechef.tenant.TenantContext;
@@ -74,6 +75,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
         "bytechef.tenant.mode=multi", "bytechef.edition=ee", "spring.main.allow-bean-definition-overriding=true"
     })
 @AutoConfigureMockMvc
+@UserIntTestConfigurationSharedMocks
 class MultiTenantAccountControllerIntTest {
 
     @MockitoBean

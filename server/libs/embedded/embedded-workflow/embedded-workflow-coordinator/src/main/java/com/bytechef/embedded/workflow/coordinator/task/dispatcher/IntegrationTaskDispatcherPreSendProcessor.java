@@ -35,7 +35,7 @@ import com.bytechef.embedded.workflow.coordinator.AbstractDispatcherPreSendProce
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
     implements TaskDispatcherPreSendProcessor {
 
     private final JobService jobService;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobService principalJobService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
     private final IntegrationService integrationService;
@@ -60,13 +60,13 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
     public IntegrationTaskDispatcherPreSendProcessor(
         JobService jobService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
-        InstanceJobService instanceJobService, IntegrationInstanceService integrationInstanceService,
+        PrincipalJobService principalJobService, IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService) {
 
         super(integrationInstanceConfigurationWorkflowService);
 
         this.jobService = jobService;
-        this.instanceJobService = instanceJobService;
+        this.principalJobService = principalJobService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.integrationService = integrationService;
@@ -76,10 +76,10 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
     public TaskExecution process(TaskExecution taskExecution) {
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
-        Long integrationInstanceId = instanceJobService.getJobInstanceId(
+        Long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED);
 
-        taskExecution.putMetadata(MetadataConstants.INSTANCE_ID, integrationInstanceId);
+        taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, integrationInstanceId);
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(
             integrationInstanceId, job.getWorkflowId(), taskExecution.getName());
@@ -122,7 +122,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
             .findFirst()
             .orElseThrow(() -> new RuntimeException("IntegrationInstanceWorkflow not found"));
 
-        taskExecution.putMetadata(MetadataConstants.INSTANCE_WORKFLOW_ID, integrationInstanceWorkflow.getId());
+        taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_WORKFLOW_ID, integrationInstanceWorkflow.getId());
 
         taskExecution.putMetadata(MetadataConstants.TYPE, ModeType.EMBEDDED);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
@@ -135,7 +135,7 @@ public class IntegrationTaskDispatcherPreSendProcessor extends AbstractDispatche
         Job job = jobService.getJob(Validate.notNull(taskExecution.getJobId(), "jobId"));
 
         Long integrationInstanceId = OptionalUtils.orElse(
-            instanceJobService.fetchJobInstanceId(Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED), null);
+            principalJobService.fetchJobPrincipalId(Validate.notNull(job.getId(), "id"), ModeType.EMBEDDED), null);
 
         return integrationInstanceId != null;
     }

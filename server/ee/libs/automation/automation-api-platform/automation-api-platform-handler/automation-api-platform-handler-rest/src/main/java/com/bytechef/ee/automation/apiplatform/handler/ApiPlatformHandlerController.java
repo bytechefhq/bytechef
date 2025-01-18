@@ -18,7 +18,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -68,11 +68,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     public ApiPlatformHandlerController(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
         ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
-        InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
+        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
         WorkflowService workflowService, WorkflowExecutor workflowExecutor) {
 
         super(
-            filesFileStorage, instanceAccessorRegistry, applicationProperties.getPublicUrl(),
+            filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(),
             triggerDefinitionService, workflowExecutor, workflowService);
 
         this.apiCollectionService = apiCollectionService;
@@ -147,7 +147,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 webhookRequest.body(), webhookRequest.method());
 
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
-                ModeType.AUTOMATION, apiCollection.getProjectInstanceId(),
+                ModeType.AUTOMATION, apiCollection.getProjectDeploymentId(),
                 apiCollectionEndpoint.getWorkflowReferenceCode(), "trigger_1");
 
             return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);

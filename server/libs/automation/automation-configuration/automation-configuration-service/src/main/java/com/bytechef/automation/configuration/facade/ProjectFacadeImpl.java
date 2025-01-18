@@ -21,14 +21,14 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
-import com.bytechef.automation.configuration.service.ProjectInstanceService;
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -63,9 +63,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
-    private final ProjectInstanceFacade projectInstanceFacade;
-    private final ProjectInstanceService projectInstanceService;
-    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectDeploymentFacade projectDeploymentFacade;
+    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final TagService tagService;
     private final WorkflowFacade workflowFacade;
     private final WorkflowService workflowService;
@@ -75,18 +75,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
         CategoryService categoryService, ProjectWorkflowService projectWorkflowService,
-        ProjectInstanceService projectInstanceService, ProjectService projectService,
-        ProjectInstanceFacade projectInstanceFacade, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectDeploymentFacade projectDeploymentFacade,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
         this.projectWorkflowService = projectWorkflowService;
-        this.projectInstanceService = projectInstanceService;
+        this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
-        this.projectInstanceFacade = projectInstanceFacade;
-        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+        this.projectDeploymentFacade = projectDeploymentFacade;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.tagService = tagService;
         this.workflowFacade = workflowFacade;
         this.workflowService = workflowService;
@@ -131,10 +132,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public void deleteProject(long id) {
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(id);
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(id);
 
-        for (ProjectInstance projectInstance : projectInstances) {
-            projectInstanceFacade.deleteProjectInstance(projectInstance.getId());
+        for (ProjectDeployment projectDeployment : projectDeployments) {
+            projectDeploymentFacade.deleteProjectDeployment(projectDeployment.getId());
         }
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(id);
@@ -159,23 +160,24 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void deleteWorkflow(@NonNull String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
-        List<ProjectInstance> projectInstances = projectInstanceService.getProjectInstances(project.getId());
+        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(project.getId());
 
-        for (ProjectInstance projectInstance : projectInstances) {
-            List<ProjectInstanceWorkflow> projectInstanceWorkflows = projectInstanceWorkflowService
-                .getProjectInstanceWorkflows(Validate.notNull(projectInstance.getId(), "id"));
+        for (ProjectDeployment projectDeployment : projectDeployments) {
+            List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
+                .getProjectDeploymentWorkflows(Validate.notNull(projectDeployment.getId(), "id"));
 
             if (CollectionUtils.anyMatch(
-                projectInstanceWorkflows,
-                projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
+                projectDeploymentWorkflows,
+                projectDeploymentWorkflow -> Objects.equals(projectDeploymentWorkflow.getWorkflowId(), workflowId))) {
 
-                projectInstanceWorkflows.stream()
+                projectDeploymentWorkflows.stream()
                     .filter(
-                        projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))
+                        projectDeploymentWorkflow -> Objects.equals(
+                            projectDeploymentWorkflow.getWorkflowId(), workflowId))
                     .findFirst()
                     .ifPresent(
-                        projectInstanceWorkflow -> projectInstanceWorkflowService.delete(
-                            projectInstanceWorkflow.getId()));
+                        projectDeploymentWorkflow -> projectDeploymentWorkflowService.delete(
+                            projectDeploymentWorkflow.getId()));
             }
         }
 
@@ -257,7 +259,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public ProjectWorkflowDTO getProjectWorkflow(long projectWorkflowId) {
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectInstanceProjectWorkflow(projectWorkflowId);
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectDeploymentProjectWorkflow(projectWorkflowId);
 
         return new ProjectWorkflowDTO(workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow);
     }
@@ -312,17 +314,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status) {
-        return getProjects(null, categoryId, projectInstances, tagId, status, true);
+    public List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status) {
+        return getProjects(null, categoryId, projectDeployments, tagId, status, true);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status,
+        long workspaceId, Long categoryId, boolean projectDeployments, Long tagId, Status status,
         boolean includeAllFields) {
 
-        return getProjects(workspaceId, categoryId, projectInstances, tagId, status, includeAllFields);
+        return getProjects(workspaceId, categoryId, projectDeployments, tagId, status, includeAllFields);
     }
 
     @Override
@@ -416,13 +418,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<ProjectDTO> getProjects(
-        Long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status,
+        Long workspaceId, Long categoryId, boolean projectDeployments, Long tagId, Status status,
         boolean includeAllFields) {
 
         List<Long> projectIds = List.of();
 
-        if (projectInstances) {
-            projectIds = projectInstanceService.getProjectIds();
+        if (projectDeployments) {
+            projectIds = projectDeploymentService.getProjectIds();
         }
 
         List<Project> projects = projectService.getProjects(workspaceId, categoryId, projectIds, tagId, status);

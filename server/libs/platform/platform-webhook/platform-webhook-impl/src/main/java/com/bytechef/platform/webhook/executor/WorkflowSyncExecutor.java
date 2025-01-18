@@ -27,8 +27,8 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowSyncExecutor {
 
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
@@ -59,13 +59,13 @@ public class WorkflowSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public WorkflowSyncExecutor(
-        InstanceAccessorRegistry instanceAccessorRegistry,
+        PrincipalAccessorRegistry principalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
         TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.principalAccessorRegistry = principalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
@@ -157,9 +157,10 @@ public class WorkflowSyncExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getInputMap(
+        return principalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
@@ -183,9 +184,10 @@ public class WorkflowSyncExecutor {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getWorkflowId(
+        return principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 

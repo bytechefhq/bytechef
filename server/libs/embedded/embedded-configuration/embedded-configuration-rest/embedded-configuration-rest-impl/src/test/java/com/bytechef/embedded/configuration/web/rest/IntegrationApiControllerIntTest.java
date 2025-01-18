@@ -28,6 +28,8 @@ import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
 import com.bytechef.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
@@ -68,6 +70,12 @@ public class IntegrationApiControllerIntTest {
 
     @MockitoBean
     private IntegrationFacade integrationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceFacade integrationInstanceFacade;
+
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
 
     @Autowired
     private IntegrationMapper.IntegrationDTOToIntegrationModelMapper integrationMapper;

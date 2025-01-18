@@ -24,12 +24,12 @@ import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,21 +43,21 @@ import org.springframework.context.ApplicationEventPublisher;
 public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
-    private final InstanceJobFacade instanceJobFacade;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final PrincipalJobFacade principalJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
     private final WorkflowSyncExecutor workflowSyncExecutor;
     private final TaskFileStorage taskFileStorage;
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutorImpl(
-        ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
-        InstanceJobFacade instanceJobFacade, JobSyncExecutor jobSyncExecutor,
+        ApplicationEventPublisher eventPublisher, PrincipalAccessorRegistry principalAccessorRegistry,
+        PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
         WorkflowSyncExecutor workflowSyncExecutor,
         TaskFileStorage taskFileStorage) {
 
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
-        this.instanceJobFacade = instanceJobFacade;
+        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.principalJobFacade = principalJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
         this.workflowSyncExecutor = workflowSyncExecutor;
@@ -85,7 +85,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
             for (Object triggerOutputValue : triggerOutputValues) {
                 Job job = jobSyncExecutor.execute(
                     createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutputValue),
-                    jobParameters -> instanceJobFacade.createSyncJob(
+                    jobParameters -> principalJobFacade.createSyncJob(
                         jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
                 outputsList.add(taskFileStorage.readJobOutputs(job.getOutputs()));
@@ -95,7 +95,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
         } else {
             Job job = jobSyncExecutor.execute(
                 createJobParameters(workflowExecutionId, workflowId, inputMap, triggerOutput.value()),
-                jobParameters -> instanceJobFacade.createSyncJob(
+                jobParameters -> principalJobFacade.createSyncJob(
                     jobParameters, workflowExecutionId.getInstanceId(), workflowExecutionId.getType()));
 
             outputs = job.getOutputs() == null ? null : taskFileStorage.readJobOutputs(job.getOutputs());
@@ -136,16 +136,18 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getInputMap(
+        return principalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getWorkflowId(
+        return principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

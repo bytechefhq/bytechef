@@ -24,7 +24,8 @@ import org.springframework.stereotype.Component;
 public class RemoteIntegrationInstanceConfigurationServiceClient implements IntegrationInstanceConfigurationService {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String PROJECT_INSTANCE_SERVICE = "/remote/integration-instance-configuration-service";
+    private static final String INTEGRATION_INSTANCE_CONFIGURATION_SERVICE =
+        "/remote/integration-instance-configuration-service";
 
     private final LoadBalancedRestClient loadBalancedRestClient;
 
@@ -58,7 +59,7 @@ public class RemoteIntegrationInstanceConfigurationServiceClient implements Inte
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
-                .path(PROJECT_INSTANCE_SERVICE + "/get-integration-instance-configuration/{id}")
+                .path(INTEGRATION_INSTANCE_CONFIGURATION_SERVICE + "/get-integration-instance-configuration/{id}")
                 .build(id),
             IntegrationInstanceConfiguration.class);
     }

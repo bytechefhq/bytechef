@@ -38,7 +38,7 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
         Validate.notNull(apiCollection.getCollectionVersion(), "'collectionVersion' must not be null");
         Validate.isTrue(apiCollection.getId() == null, "'id' must be null");
         Validate.notNull(apiCollection.getName(), "'name' must not be null");
-        Validate.notNull(apiCollection.getProjectInstanceId(), "'projectInstanceId' must not be null");
+        Validate.notNull(apiCollection.getProjectDeploymentId(), "'projectDeploymentId' must not be null");
 
         return apiCollectionRepository.save(apiCollection);
     }

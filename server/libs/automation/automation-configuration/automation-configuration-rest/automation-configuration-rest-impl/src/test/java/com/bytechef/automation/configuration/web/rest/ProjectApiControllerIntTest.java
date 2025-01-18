@@ -27,8 +27,8 @@ import com.bytechef.atlas.configuration.domain.Workflow.Format;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDTO;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.web.rest.config.ProjectConfigurationRestTestConfiguration;
 import com.bytechef.automation.configuration.web.rest.mapper.ProjectMapper;
 import com.bytechef.automation.configuration.web.rest.model.ProjectModel;
@@ -71,7 +71,7 @@ public class ProjectApiControllerIntTest {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private ProjectInstanceFacade projectInstanceFacade;
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
     @MockitoBean
     private ProjectFacade projectFacade;

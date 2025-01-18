@@ -40,6 +40,7 @@ import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -72,6 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
+@UserIntTestConfigurationSharedMocks
 class AccountControllerIntTest {
 
     static final String TEST_USER_LOGIN = "test";

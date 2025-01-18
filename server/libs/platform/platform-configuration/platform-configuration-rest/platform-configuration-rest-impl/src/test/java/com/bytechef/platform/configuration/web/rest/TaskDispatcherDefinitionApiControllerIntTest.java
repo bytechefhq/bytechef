@@ -16,13 +16,8 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfiguration;
+import com.bytechef.platform.configuration.web.rest.config.WorkflowConfigurationRestTestConfigurationSharedMocks;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import java.util.List;
@@ -35,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -46,28 +40,11 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @Disabled
 @ContextConfiguration(classes = WorkflowConfigurationRestTestConfiguration.class)
 @WebMvcTest(TaskDispatcherDefinitionApiController.class)
+@WorkflowConfigurationRestTestConfigurationSharedMocks
 public class TaskDispatcherDefinitionApiControllerIntTest {
 
-    @MockitoBean
-    private ActionDefinitionFacade actionDefinitionFacade;
-
-    @MockitoBean
-    private ActionDefinitionService actionDefinitionService;
-
-    @MockitoBean
-    private ComponentDefinitionService componentDefinitionService;
-
-    @MockitoBean
-    private ConnectionDefinitionService connectionDefinitionService;
-
-    @MockitoBean
+    @Autowired
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
-
-    @MockitoBean
-    TriggerDefinitionFacade triggerDefinitionFacade;
-
-    @MockitoBean
-    private TriggerDefinitionService triggerDefinitionService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,8 +53,7 @@ public class TaskDispatcherDefinitionApiControllerIntTest {
 
     @BeforeEach
     public void setup() {
-        this.webTestClient = MockMvcWebTestClient
-            .bindTo(mockMvc)
+        this.webTestClient = MockMvcWebTestClient.bindTo(mockMvc)
             .build();
     }
 

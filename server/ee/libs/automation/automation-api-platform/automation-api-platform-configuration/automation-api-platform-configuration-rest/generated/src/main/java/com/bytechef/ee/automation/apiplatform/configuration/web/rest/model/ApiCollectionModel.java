@@ -1,25 +1,20 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
-import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
+
+import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -60,7 +55,7 @@ public class ApiCollectionModel {
 
   private Long projectInstanceId;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
+  private ProjectDeploymentBasicModel projectInstance;
 
   private Integer projectVersion;
 
@@ -95,7 +90,7 @@ public class ApiCollectionModel {
    * The version of an API collection.
    * @return collectionVersion
    */
-  
+
   @Schema(name = "collectionVersion", description = "The version of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("collectionVersion")
   public Integer getCollectionVersion() {
@@ -115,7 +110,7 @@ public class ApiCollectionModel {
    * The created by.
    * @return createdBy
    */
-  
+
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -135,7 +130,7 @@ public class ApiCollectionModel {
    * The created date.
    * @return createdDate
    */
-  @Valid 
+  @Valid
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -155,7 +150,7 @@ public class ApiCollectionModel {
    * The description of an API collection.
    * @return description
    */
-  
+
   @Schema(name = "description", description = "The description of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -175,7 +170,7 @@ public class ApiCollectionModel {
    * If an API collection is enabled or not.
    * @return enabled
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "enabled", description = "If an API collection is enabled or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -203,7 +198,7 @@ public class ApiCollectionModel {
    * Get endpoints
    * @return endpoints
    */
-  @Valid 
+  @Valid
   @Schema(name = "endpoints", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endpoints")
   public List<@Valid ApiCollectionEndpointModel> getEndpoints() {
@@ -223,7 +218,7 @@ public class ApiCollectionModel {
    * The id of an API collection.
    * @return id
    */
-  
+
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -243,7 +238,7 @@ public class ApiCollectionModel {
    * The name of an API collection.
    * @return name
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "name", description = "The name of an API collection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -263,7 +258,7 @@ public class ApiCollectionModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-  
+
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -283,7 +278,7 @@ public class ApiCollectionModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid 
+  @Valid
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -303,7 +298,7 @@ public class ApiCollectionModel {
    * The id of a project the API collection is connected to.
    * @return projectId
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "projectId", description = "The id of a project the API collection is connected to.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("projectId")
   public Long getProjectId() {
@@ -323,7 +318,7 @@ public class ApiCollectionModel {
    * Get project
    * @return project
    */
-  @Valid 
+  @Valid
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
   public com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
@@ -343,7 +338,7 @@ public class ApiCollectionModel {
    * The id of an project instance the API collection is connected to.
    * @return projectInstanceId
    */
-  
+
   @Schema(name = "projectInstanceId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project instance the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstanceId")
   public Long getProjectInstanceId() {
@@ -354,7 +349,7 @@ public class ApiCollectionModel {
     this.projectInstanceId = projectInstanceId;
   }
 
-  public ApiCollectionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+  public ApiCollectionModel projectInstance(ProjectDeploymentBasicModel projectInstance) {
     this.projectInstance = projectInstance;
     return this;
   }
@@ -363,14 +358,14 @@ public class ApiCollectionModel {
    * Get projectInstance
    * @return projectInstance
    */
-  @Valid 
+  @Valid
   @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("projectInstance")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
+  public ProjectDeploymentBasicModel getProjectInstance() {
     return projectInstance;
   }
 
-  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
+  public void setProjectInstance(ProjectDeploymentBasicModel projectInstance) {
     this.projectInstance = projectInstance;
   }
 
@@ -383,7 +378,7 @@ public class ApiCollectionModel {
    * The version of a project the API collection is connected to.
    * @return projectVersion
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "projectVersion", description = "The version of a project the API collection is connected to.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("projectVersion")
   public Integer getProjectVersion() {
@@ -411,7 +406,7 @@ public class ApiCollectionModel {
    * Get tags
    * @return tags
    */
-  @Valid 
+  @Valid
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {
@@ -431,7 +426,7 @@ public class ApiCollectionModel {
    * The workspace id.
    * @return workspaceId
    */
-  @NotNull 
+  @NotNull
   @Schema(name = "workspaceId", description = "The workspace id.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workspaceId")
   public Long getWorkspaceId() {
@@ -451,7 +446,7 @@ public class ApiCollectionModel {
    * Get version
    * @return version
    */
-  
+
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {

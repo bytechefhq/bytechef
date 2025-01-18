@@ -61,8 +61,8 @@ import com.bytechef.platform.exception.ConfigurationException;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -90,8 +90,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final ConnectionDefinitionService connectionDefinitionService;
-    private final InstanceJobFacade instanceJobFacade;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobFacade principalJobFacade;
+    private final PrincipalJobService principalJobService;
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -111,8 +111,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     public IntegrationInstanceConfigurationFacadeImpl(
         CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
-        ConnectionDefinitionService connectionDefinitionService, InstanceJobFacade instanceJobFacade,
-        InstanceJobService instanceJobService, JobFacade jobFacade,
+        ConnectionDefinitionService connectionDefinitionService, PrincipalJobFacade principalJobFacade,
+        PrincipalJobService principalJobService, JobFacade jobFacade,
         JobService jobService, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
@@ -126,8 +126,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.connectionDefinitionService = connectionDefinitionService;
-        this.instanceJobFacade = instanceJobFacade;
-        this.instanceJobService = instanceJobService;
+        this.principalJobFacade = principalJobFacade;
+        this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -211,7 +211,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
 
-        return instanceJobFacade.createJob(
+        return principalJobFacade.createJob(
             new JobParametersDTO(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id,
             ModeType.EMBEDDED);
     }
@@ -228,12 +228,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(id);
 
-        List<Long> jobIds = instanceJobService.getJobIds(id, ModeType.EMBEDDED);
+        List<Long> jobIds = principalJobService.getJobIds(id, ModeType.EMBEDDED);
 
         for (long jobId : jobIds) {
             triggerExecutionService.deleteJobTriggerExecution(jobId);
 
-            instanceJobService.deleteInstanceJobs(jobId, ModeType.EMBEDDED);
+            principalJobService.deletePrincipalJobs(jobId, ModeType.EMBEDDED);
 
             jobFacade.deleteJob(jobId);
         }
@@ -826,11 +826,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow) {
 
         if (integrationInstanceConfigurationWorkflow.isEnabled()) {
-            List<IntegrationInstanceConfigurationWorkflowConnection> projectInstanceWorkflowConnections =
+            List<IntegrationInstanceConfigurationWorkflowConnection> integrationInstanceConfigurationWorkflowConnections =
                 integrationInstanceConfigurationWorkflow.getConnections();
             Workflow workflow = workflowService.getWorkflow(integrationInstanceConfigurationWorkflow.getWorkflowId());
 
-            validateIntegrationInstanceConfigurationWorkflowConnections(projectInstanceWorkflowConnections, workflow);
+            validateIntegrationInstanceConfigurationWorkflowConnections(
+                integrationInstanceConfigurationWorkflowConnections, workflow);
             validateIntegrationInstanceConfigurationWorkflowInputs(integrationInstanceConfigurationWorkflow.getInputs(),
                 workflow);
         }

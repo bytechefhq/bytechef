@@ -33,10 +33,10 @@ public interface ProjectRepository
 
     @Query("""
             SELECT project.* FROM project
-            JOIN project_instance ON project.id = project_instance.project_id
-            WHERE project_instance.id = :projectInstanceId
+            JOIN project_deployment ON project.id = project_deployment.project_id
+            WHERE project_deployment.id = :projectDeploymentId
         """)
-    Project findByProjectInstanceId(@Param("projectInstanceId") long projectInstanceId);
+    Project findByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
 
     Optional<Project> findByNameIgnoreCase(String name);
 

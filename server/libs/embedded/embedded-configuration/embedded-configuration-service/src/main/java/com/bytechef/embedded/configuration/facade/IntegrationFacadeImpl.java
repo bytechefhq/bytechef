@@ -172,21 +172,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(integration.getId());
 
         for (IntegrationInstanceConfiguration integrationInstanceConfiguration : integrationInstanceConfigurations) {
-            List<IntegrationInstanceConfigurationWorkflow> projectInstanceWorkflows =
+            List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
                 integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
                     Validate.notNull(integrationInstanceConfiguration.getId(), "id"));
 
             if (CollectionUtils.anyMatch(
-                projectInstanceWorkflows,
-                projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))) {
+                integrationInstanceConfigurationWorkflows,
+                integrationInstanceConfigurationWorkflow -> Objects.equals(
+                    integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowId))) {
 
-                projectInstanceWorkflows.stream()
+                integrationInstanceConfigurationWorkflows.stream()
                     .filter(
-                        projectInstanceWorkflow -> Objects.equals(projectInstanceWorkflow.getWorkflowId(), workflowId))
+                        integrationInstanceConfigurationWorkflow -> Objects.equals(
+                            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowId))
                     .findFirst()
                     .ifPresent(
-                        projectInstanceWorkflow -> integrationInstanceConfigurationWorkflowService.delete(
-                            projectInstanceWorkflow.getId()));
+                        integrationInstanceConfigurationWorkflow -> integrationInstanceConfigurationWorkflowService
+                            .delete(integrationInstanceConfigurationWorkflow.getId()));
             }
         }
 
