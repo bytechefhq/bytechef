@@ -57,6 +57,7 @@ export interface GetWorkspaceProjectsRequest {
     projectInstances?: boolean;
     tagId?: number;
     status?: ProjectStatus;
+    includeAllFields?: boolean;
 }
 
 export interface PublishProjectOperationRequest {
@@ -283,6 +284,10 @@ export class ProjectApi extends runtime.BaseAPI {
 
         if (requestParameters['status'] != null) {
             queryParameters['status'] = requestParameters['status'];
+        }
+
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

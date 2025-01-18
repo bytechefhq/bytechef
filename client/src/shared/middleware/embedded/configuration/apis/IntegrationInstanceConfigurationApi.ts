@@ -63,6 +63,7 @@ export interface GetIntegrationInstanceConfigurationsRequest {
     environment?: Environment;
     integrationId?: number;
     tagId?: number;
+    includeAllFields?: boolean;
 }
 
 export interface UpdateIntegrationInstanceConfigurationRequest {
@@ -340,6 +341,10 @@ export class IntegrationInstanceConfigurationApi extends runtime.BaseAPI {
 
         if (requestParameters['tagId'] != null) {
             queryParameters['tagId'] = requestParameters['tagId'];
+        }
+
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

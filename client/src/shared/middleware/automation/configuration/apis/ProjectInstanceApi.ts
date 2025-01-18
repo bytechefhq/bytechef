@@ -64,6 +64,7 @@ export interface GetWorkspaceProjectInstancesRequest {
     environment?: Environment;
     projectId?: number;
     tagId?: number;
+    includeAllFields?: boolean;
 }
 
 export interface UpdateProjectInstanceRequest {
@@ -348,6 +349,10 @@ export class ProjectInstanceApi extends runtime.BaseAPI {
 
         if (requestParameters['tagId'] != null) {
             queryParameters['tagId'] = requestParameters['tagId'];
+        }
+
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

@@ -29,6 +29,7 @@ export interface DeleteWorkflowRequest {
 export interface GetIntegrationVersionWorkflowsRequest {
     id: number;
     integrationVersion: number;
+    includeAllFields?: boolean;
 }
 
 export interface GetIntegrationWorkflowRequest {
@@ -107,6 +108,10 @@ export class WorkflowApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 
