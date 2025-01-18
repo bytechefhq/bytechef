@@ -1,20 +1,25 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
-
-import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -23,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.480310+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.845117+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ApiCollectionModel {
 
   private Integer collectionVersion;
@@ -53,9 +58,9 @@ public class ApiCollectionModel {
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private Long projectInstanceId;
+  private Long projectDeploymentId;
 
-  private ProjectDeploymentBasicModel projectInstance;
+  private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private Integer projectVersion;
 
@@ -90,7 +95,7 @@ public class ApiCollectionModel {
    * The version of an API collection.
    * @return collectionVersion
    */
-
+  
   @Schema(name = "collectionVersion", description = "The version of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("collectionVersion")
   public Integer getCollectionVersion() {
@@ -110,7 +115,7 @@ public class ApiCollectionModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -130,7 +135,7 @@ public class ApiCollectionModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -150,7 +155,7 @@ public class ApiCollectionModel {
    * The description of an API collection.
    * @return description
    */
-
+  
   @Schema(name = "description", description = "The description of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -170,7 +175,7 @@ public class ApiCollectionModel {
    * If an API collection is enabled or not.
    * @return enabled
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "enabled", description = "If an API collection is enabled or not.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -198,7 +203,7 @@ public class ApiCollectionModel {
    * Get endpoints
    * @return endpoints
    */
-  @Valid
+  @Valid 
   @Schema(name = "endpoints", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("endpoints")
   public List<@Valid ApiCollectionEndpointModel> getEndpoints() {
@@ -218,7 +223,7 @@ public class ApiCollectionModel {
    * The id of an API collection.
    * @return id
    */
-
+  
   @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an API collection.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -238,7 +243,7 @@ public class ApiCollectionModel {
    * The name of an API collection.
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The name of an API collection.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -258,7 +263,7 @@ public class ApiCollectionModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -278,7 +283,7 @@ public class ApiCollectionModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -298,7 +303,7 @@ public class ApiCollectionModel {
    * The id of a project the API collection is connected to.
    * @return projectId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "projectId", description = "The id of a project the API collection is connected to.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("projectId")
   public Long getProjectId() {
@@ -318,7 +323,7 @@ public class ApiCollectionModel {
    * Get project
    * @return project
    */
-  @Valid
+  @Valid 
   @Schema(name = "project", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("project")
   public com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel getProject() {
@@ -329,44 +334,44 @@ public class ApiCollectionModel {
     this.project = project;
   }
 
-  public ApiCollectionModel projectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public ApiCollectionModel projectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
     return this;
   }
 
   /**
-   * The id of an project instance the API collection is connected to.
-   * @return projectInstanceId
+   * The id of an project deployment the API collection is connected to.
+   * @return projectDeploymentId
    */
-
-  @Schema(name = "projectInstanceId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project instance the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstanceId")
-  public Long getProjectInstanceId() {
-    return projectInstanceId;
+  
+  @Schema(name = "projectDeploymentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project deployment the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeploymentId")
+  public Long getProjectDeploymentId() {
+    return projectDeploymentId;
   }
 
-  public void setProjectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public void setProjectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
   }
 
-  public ApiCollectionModel projectInstance(ProjectDeploymentBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public ApiCollectionModel projectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
     return this;
   }
 
   /**
-   * Get projectInstance
-   * @return projectInstance
+   * Get projectDeployment
+   * @return projectDeployment
    */
-  @Valid
-  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstance")
-  public ProjectDeploymentBasicModel getProjectInstance() {
-    return projectInstance;
+  @Valid 
+  @Schema(name = "projectDeployment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeployment")
+  public com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel getProjectDeployment() {
+    return projectDeployment;
   }
 
-  public void setProjectInstance(ProjectDeploymentBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public void setProjectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
   }
 
   public ApiCollectionModel projectVersion(Integer projectVersion) {
@@ -378,7 +383,7 @@ public class ApiCollectionModel {
    * The version of a project the API collection is connected to.
    * @return projectVersion
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "projectVersion", description = "The version of a project the API collection is connected to.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("projectVersion")
   public Integer getProjectVersion() {
@@ -406,7 +411,7 @@ public class ApiCollectionModel {
    * Get tags
    * @return tags
    */
-  @Valid
+  @Valid 
   @Schema(name = "tags", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("tags")
   public List<@Valid TagModel> getTags() {
@@ -426,7 +431,7 @@ public class ApiCollectionModel {
    * The workspace id.
    * @return workspaceId
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "workspaceId", description = "The workspace id.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workspaceId")
   public Long getWorkspaceId() {
@@ -446,7 +451,7 @@ public class ApiCollectionModel {
    * Get version
    * @return version
    */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {
@@ -478,8 +483,8 @@ public class ApiCollectionModel {
         Objects.equals(this.lastModifiedDate, apiCollection.lastModifiedDate) &&
         Objects.equals(this.projectId, apiCollection.projectId) &&
         Objects.equals(this.project, apiCollection.project) &&
-        Objects.equals(this.projectInstanceId, apiCollection.projectInstanceId) &&
-        Objects.equals(this.projectInstance, apiCollection.projectInstance) &&
+        Objects.equals(this.projectDeploymentId, apiCollection.projectDeploymentId) &&
+        Objects.equals(this.projectDeployment, apiCollection.projectDeployment) &&
         Objects.equals(this.projectVersion, apiCollection.projectVersion) &&
         Objects.equals(this.tags, apiCollection.tags) &&
         Objects.equals(this.workspaceId, apiCollection.workspaceId) &&
@@ -488,7 +493,7 @@ public class ApiCollectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectInstanceId, projectInstance, projectVersion, tags, workspaceId, version);
+    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
   }
 
   @Override
@@ -507,8 +512,8 @@ public class ApiCollectionModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
-    sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
-    sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
+    sb.append("    projectDeploymentId: ").append(toIndentedString(projectDeploymentId)).append("\n");
+    sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");

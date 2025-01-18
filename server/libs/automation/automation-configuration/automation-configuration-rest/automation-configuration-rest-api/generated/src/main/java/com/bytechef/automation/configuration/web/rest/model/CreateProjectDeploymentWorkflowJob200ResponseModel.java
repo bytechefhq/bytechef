@@ -16,16 +16,16 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateProjectInstanceWorkflowJob200ResponseModel
+ * CreateProjectDeploymentWorkflowJob200ResponseModel
  */
 
-@JsonTypeName("createProjectInstanceWorkflowJob_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class CreateProjectInstanceWorkflowJob200ResponseModel {
+@JsonTypeName("createProjectDeploymentWorkflowJob_200_response")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class CreateProjectDeploymentWorkflowJob200ResponseModel {
 
   private Long jobId;
 
-  public CreateProjectInstanceWorkflowJob200ResponseModel jobId(Long jobId) {
+  public CreateProjectDeploymentWorkflowJob200ResponseModel jobId(Long jobId) {
     this.jobId = jobId;
     return this;
   }
@@ -53,8 +53,8 @@ public class CreateProjectInstanceWorkflowJob200ResponseModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateProjectInstanceWorkflowJob200ResponseModel createProjectInstanceWorkflowJob200Response = (CreateProjectInstanceWorkflowJob200ResponseModel) o;
-    return Objects.equals(this.jobId, createProjectInstanceWorkflowJob200Response.jobId);
+    CreateProjectDeploymentWorkflowJob200ResponseModel createProjectDeploymentWorkflowJob200Response = (CreateProjectDeploymentWorkflowJob200ResponseModel) o;
+    return Objects.equals(this.jobId, createProjectDeploymentWorkflowJob200Response.jobId);
   }
 
   @Override
@@ -65,7 +65,7 @@ public class CreateProjectInstanceWorkflowJob200ResponseModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateProjectInstanceWorkflowJob200ResponseModel {\n");
+    sb.append("class CreateProjectDeploymentWorkflowJob200ResponseModel {\n");
     sb.append("    jobId: ").append(toIndentedString(jobId)).append("\n");
     sb.append("}");
     return sb.toString();

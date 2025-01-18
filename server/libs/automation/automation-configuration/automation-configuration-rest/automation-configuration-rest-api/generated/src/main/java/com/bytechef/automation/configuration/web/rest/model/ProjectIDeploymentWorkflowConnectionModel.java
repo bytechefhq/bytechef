@@ -1,28 +1,22 @@
-package com.bytechef.embedded.configuration.web.rest.model;
+package com.bytechef.automation.configuration.web.rest.model;
 
-import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import org.openapitools.jackson.nullable.JsonNullable;
-import java.time.OffsetDateTime;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
-import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * The connection used in a particular task or trigger.
+ * The connection used in a particular action task or trigger.
  */
 
-@Schema(name = "IntegrationInstanceConfigurationWorkflowConnection", description = "The connection used in a particular task or trigger.")
-@JsonTypeName("IntegrationInstanceConfigurationWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:39.150515+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class IntegrationInstanceConfigurationWorkflowConnectionModel {
+@Schema(name = "ProjectDeploymentWorkflowConnection", description = "The connection used in a particular action task or trigger.")
+@JsonTypeName("ProjectDeploymentWorkflowConnection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ProjectIDeploymentWorkflowConnectionModel {
 
   private Long connectionId;
 
@@ -30,7 +24,20 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
 
   private String workflowNodeName;
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel connectionId(Long connectionId) {
+  public ProjectIDeploymentWorkflowConnectionModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public ProjectIDeploymentWorkflowConnectionModel(Long connectionId, String key, String workflowNodeName) {
+    this.connectionId = connectionId;
+    this.key = key;
+    this.workflowNodeName = workflowNodeName;
+  }
+
+  public ProjectIDeploymentWorkflowConnectionModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -39,8 +46,8 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
    * The connection id
    * @return connectionId
    */
-  
-  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull
+  @Schema(name = "connectionId", description = "The connection id", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("connectionId")
   public Long getConnectionId() {
     return connectionId;
@@ -50,7 +57,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     this.connectionId = connectionId;
   }
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel key(String key) {
+  public ProjectIDeploymentWorkflowConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -59,8 +66,8 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
    * The connection key under which a connection is defined in a workflow definition.
    * @return key
    */
-  
-  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull
+  @Schema(name = "key", description = "The connection key under which a connection is defined in a workflow definition.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("key")
   public String getKey() {
     return key;
@@ -70,7 +77,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     this.key = key;
   }
 
-  public IntegrationInstanceConfigurationWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+  public ProjectIDeploymentWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -79,8 +86,8 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
    * The action/trigger name to which a connection belongs.
    * @return workflowNodeName
    */
-  
-  @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @NotNull
+  @Schema(name = "workflowNodeName", description = "The action/trigger name to which a connection belongs.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("workflowNodeName")
   public String getWorkflowNodeName() {
     return workflowNodeName;
@@ -98,10 +105,10 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    IntegrationInstanceConfigurationWorkflowConnectionModel integrationInstanceConfigurationWorkflowConnection = (IntegrationInstanceConfigurationWorkflowConnectionModel) o;
-    return Objects.equals(this.connectionId, integrationInstanceConfigurationWorkflowConnection.connectionId) &&
-        Objects.equals(this.key, integrationInstanceConfigurationWorkflowConnection.key) &&
-        Objects.equals(this.workflowNodeName, integrationInstanceConfigurationWorkflowConnection.workflowNodeName);
+    ProjectIDeploymentWorkflowConnectionModel projectDeploymentWorkflowConnection = (ProjectIDeploymentWorkflowConnectionModel) o;
+    return Objects.equals(this.connectionId, projectDeploymentWorkflowConnection.connectionId) &&
+        Objects.equals(this.key, projectDeploymentWorkflowConnection.key) &&
+        Objects.equals(this.workflowNodeName, projectDeploymentWorkflowConnection.workflowNodeName);
   }
 
   @Override
@@ -112,7 +119,7 @@ public class IntegrationInstanceConfigurationWorkflowConnectionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class IntegrationInstanceConfigurationWorkflowConnectionModel {\n");
+    sb.append("class ProjectDeploymentWorkflowConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");

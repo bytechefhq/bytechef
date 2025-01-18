@@ -32,39 +32,39 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
-@Tag(name = "project-instance-tag", description = "The Automation Project Instance Tag Internal API")
-public interface ProjectInstanceTagApi {
+@Tag(name = "project-deployment-tag", description = "The Automation Project Deployment Tag Internal API")
+public interface ProjectDeploymentTagApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
     /**
-     * GET /project-instances/tags : Get project instance tags
-     * Get project instance tags.
+     * GET /project-deployments/tags : Get project deployment tags
+     * Get project deployment tags.
      *
-     * @return The list of project instance tags. (status code 200)
+     * @return The list of project deployment tags. (status code 200)
      */
     @Operation(
-        operationId = "getProjectInstanceTags",
-        summary = "Get project instance tags",
-        description = "Get project instance tags.",
-        tags = { "project-instance-tag" },
+        operationId = "getProjectDeploymentTags",
+        summary = "Get project deployment tags",
+        description = "Get project deployment tags.",
+        tags = { "project-deployment-tag" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of project instance tags.", content = {
+            @ApiResponse(responseCode = "200", description = "The list of project deployment tags.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = TagModel.class)))
             })
         }
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/project-instances/tags",
+        value = "/project-deployments/tags",
         produces = { "application/json" }
     )
     
-    default ResponseEntity<List<TagModel>> getProjectInstanceTags(
+    default ResponseEntity<List<TagModel>> getProjectDeploymentTags(
         
     ) {
         getRequest().ifPresent(request -> {
@@ -82,30 +82,30 @@ public interface ProjectInstanceTagApi {
 
 
     /**
-     * PUT /project-instances/{id}/tags : Updates tags of an existing project instance
-     * Updates tags of an existing project instance.
+     * PUT /project-deployments/{id}/tags : Updates tags of an existing project deployment
+     * Updates tags of an existing project deployment.
      *
-     * @param id The id of a project instance. (required)
+     * @param id The id of a project deployment. (required)
      * @param comBytechefPlatformTagWebRestModelUpdateTagsRequestModel  (required)
      * @return Successful operation. (status code 204)
      */
     @Operation(
-        operationId = "updateProjectInstanceTags",
-        summary = "Updates tags of an existing project instance",
-        description = "Updates tags of an existing project instance.",
-        tags = { "project-instance-tag" },
+        operationId = "updateProjectDeploymentTags",
+        summary = "Updates tags of an existing project deployment",
+        description = "Updates tags of an existing project deployment.",
+        tags = { "project-deployment-tag" },
         responses = {
             @ApiResponse(responseCode = "204", description = "Successful operation.")
         }
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/project-instances/{id}/tags",
+        value = "/project-deployments/{id}/tags",
         consumes = { "application/json" }
     )
     
-    default ResponseEntity<Void> updateProjectInstanceTags(
-        @Parameter(name = "id", description = "The id of a project instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+    default ResponseEntity<Void> updateProjectDeploymentTags(
+        @Parameter(name = "id", description = "The id of a project deployment.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel comBytechefPlatformTagWebRestModelUpdateTagsRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

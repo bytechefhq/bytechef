@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:56.706207+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:37.375296+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "app-event-trigger", description = "The Embedded App Event Trigger Public API")
 public interface AppEventTriggerApi {

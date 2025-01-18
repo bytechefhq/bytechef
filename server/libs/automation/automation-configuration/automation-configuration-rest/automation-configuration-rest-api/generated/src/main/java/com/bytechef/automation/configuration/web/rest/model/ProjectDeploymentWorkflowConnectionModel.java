@@ -19,10 +19,10 @@ import jakarta.annotation.Generated;
  * The connection used in a particular action task or trigger.
  */
 
-@Schema(name = "ProjectInstanceWorkflowConnection", description = "The connection used in a particular action task or trigger.")
-@JsonTypeName("ProjectInstanceWorkflowConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class ProjectInstanceWorkflowConnectionModel {
+@Schema(name = "ProjectDeploymentWorkflowConnection", description = "The connection used in a particular action task or trigger.")
+@JsonTypeName("ProjectDeploymentWorkflowConnection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ProjectDeploymentWorkflowConnectionModel {
 
   private Long connectionId;
 
@@ -30,20 +30,20 @@ public class ProjectInstanceWorkflowConnectionModel {
 
   private String workflowNodeName;
 
-  public ProjectInstanceWorkflowConnectionModel() {
+  public ProjectDeploymentWorkflowConnectionModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ProjectInstanceWorkflowConnectionModel(Long connectionId, String key, String workflowNodeName) {
+  public ProjectDeploymentWorkflowConnectionModel(Long connectionId, String key, String workflowNodeName) {
     this.connectionId = connectionId;
     this.key = key;
     this.workflowNodeName = workflowNodeName;
   }
 
-  public ProjectInstanceWorkflowConnectionModel connectionId(Long connectionId) {
+  public ProjectDeploymentWorkflowConnectionModel connectionId(Long connectionId) {
     this.connectionId = connectionId;
     return this;
   }
@@ -63,7 +63,7 @@ public class ProjectInstanceWorkflowConnectionModel {
     this.connectionId = connectionId;
   }
 
-  public ProjectInstanceWorkflowConnectionModel key(String key) {
+  public ProjectDeploymentWorkflowConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -83,7 +83,7 @@ public class ProjectInstanceWorkflowConnectionModel {
     this.key = key;
   }
 
-  public ProjectInstanceWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+  public ProjectDeploymentWorkflowConnectionModel workflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -111,10 +111,10 @@ public class ProjectInstanceWorkflowConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectInstanceWorkflowConnectionModel projectInstanceWorkflowConnection = (ProjectInstanceWorkflowConnectionModel) o;
-    return Objects.equals(this.connectionId, projectInstanceWorkflowConnection.connectionId) &&
-        Objects.equals(this.key, projectInstanceWorkflowConnection.key) &&
-        Objects.equals(this.workflowNodeName, projectInstanceWorkflowConnection.workflowNodeName);
+    ProjectDeploymentWorkflowConnectionModel projectDeploymentWorkflowConnection = (ProjectDeploymentWorkflowConnectionModel) o;
+    return Objects.equals(this.connectionId, projectDeploymentWorkflowConnection.connectionId) &&
+        Objects.equals(this.key, projectDeploymentWorkflowConnection.key) &&
+        Objects.equals(this.workflowNodeName, projectDeploymentWorkflowConnection.workflowNodeName);
   }
 
   @Override
@@ -125,7 +125,7 @@ public class ProjectInstanceWorkflowConnectionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectInstanceWorkflowConnectionModel {\n");
+    sb.append("class ProjectDeploymentWorkflowConnectionModel {\n");
     sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");
     sb.append("    workflowNodeName: ").append(toIndentedString(workflowNodeName)).append("\n");

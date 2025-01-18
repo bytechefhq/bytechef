@@ -3,7 +3,7 @@ package com.bytechef.automation.configuration.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
-import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowModel;
 import com.bytechef.platform.tag.web.rest.model.TagModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -28,10 +28,10 @@ import jakarta.annotation.Generated;
  * Contains configurations and connections required for the execution of project workflows.
  */
 
-@Schema(name = "ProjectInstance", description = "Contains configurations and connections required for the execution of project workflows.")
-@JsonTypeName("ProjectInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class ProjectInstanceModel {
+@Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
+@JsonTypeName("ProjectDeployment")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ProjectDeploymentModel {
 
   private String createdBy;
 
@@ -63,25 +63,25 @@ public class ProjectInstanceModel {
   private Object project;
 
   @Valid
-  private List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows = new ArrayList<>();
+  private List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows = new ArrayList<>();
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
   private Integer version;
 
-  public ProjectInstanceModel() {
+  public ProjectDeploymentModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ProjectInstanceModel(String name) {
+  public ProjectDeploymentModel(String name) {
     this.name = name;
   }
 
-  public ProjectInstanceModel createdBy(String createdBy) {
+  public ProjectDeploymentModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -101,7 +101,7 @@ public class ProjectInstanceModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectInstanceModel createdDate(OffsetDateTime createdDate) {
+  public ProjectDeploymentModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -121,17 +121,17 @@ public class ProjectInstanceModel {
     this.createdDate = createdDate;
   }
 
-  public ProjectInstanceModel description(String description) {
+  public ProjectDeploymentModel description(String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * The description of a project instance.
+   * The description of a project deployment.
    * @return description
    */
   
-  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -141,17 +141,17 @@ public class ProjectInstanceModel {
     this.description = description;
   }
 
-  public ProjectInstanceModel enabled(Boolean enabled) {
+  public ProjectDeploymentModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
 
   /**
-   * If a project instance is enabled or not.
+   * If a project deployment is enabled or not.
    * @return enabled
    */
   
-  @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "enabled", description = "If a project deployment is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
     return enabled;
@@ -161,7 +161,7 @@ public class ProjectInstanceModel {
     this.enabled = enabled;
   }
 
-  public ProjectInstanceModel environment(EnvironmentModel environment) {
+  public ProjectDeploymentModel environment(EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -181,17 +181,17 @@ public class ProjectInstanceModel {
     this.environment = environment;
   }
 
-  public ProjectInstanceModel id(Long id) {
+  public ProjectDeploymentModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of a project instance.
+   * The id of a project deployment.
    * @return id
    */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -201,7 +201,7 @@ public class ProjectInstanceModel {
     this.id = id;
   }
 
-  public ProjectInstanceModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ProjectDeploymentModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -221,7 +221,7 @@ public class ProjectInstanceModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectInstanceModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectDeploymentModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -241,7 +241,7 @@ public class ProjectInstanceModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectInstanceModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ProjectDeploymentModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -261,17 +261,17 @@ public class ProjectInstanceModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectInstanceModel name(String name) {
+  public ProjectDeploymentModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The name of a project instance.
+   * The name of a project deployment.
    * @return name
    */
   @NotNull 
-  @Schema(name = "name", description = "The name of a project instance.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of a project deployment.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -281,7 +281,7 @@ public class ProjectInstanceModel {
     this.name = name;
   }
 
-  public ProjectInstanceModel projectId(Long projectId) {
+  public ProjectDeploymentModel projectId(Long projectId) {
     this.projectId = projectId;
     return this;
   }
@@ -301,7 +301,7 @@ public class ProjectInstanceModel {
     this.projectId = projectId;
   }
 
-  public ProjectInstanceModel projectVersion(Integer projectVersion) {
+  public ProjectDeploymentModel projectVersion(Integer projectVersion) {
     this.projectVersion = projectVersion;
     return this;
   }
@@ -321,7 +321,7 @@ public class ProjectInstanceModel {
     this.projectVersion = projectVersion;
   }
 
-  public ProjectInstanceModel project(Object project) {
+  public ProjectDeploymentModel project(Object project) {
     this.project = project;
     return this;
   }
@@ -341,40 +341,40 @@ public class ProjectInstanceModel {
     this.project = project;
   }
 
-  public ProjectInstanceModel projectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
-    this.projectInstanceWorkflows = projectInstanceWorkflows;
+  public ProjectDeploymentModel projectDeploymentWorkflows(List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows) {
+    this.projectDeploymentWorkflows = projectDeploymentWorkflows;
     return this;
   }
 
-  public ProjectInstanceModel addProjectInstanceWorkflowsItem(ProjectInstanceWorkflowModel projectInstanceWorkflowsItem) {
-    if (this.projectInstanceWorkflows == null) {
-      this.projectInstanceWorkflows = new ArrayList<>();
+  public ProjectDeploymentModel addProjectDeploymentWorkflowsItem(ProjectDeploymentWorkflowModel projectDeploymentWorkflowsItem) {
+    if (this.projectDeploymentWorkflows == null) {
+      this.projectDeploymentWorkflows = new ArrayList<>();
     }
-    this.projectInstanceWorkflows.add(projectInstanceWorkflowsItem);
+    this.projectDeploymentWorkflows.add(projectDeploymentWorkflowsItem);
     return this;
   }
 
   /**
-   * Get projectInstanceWorkflows
-   * @return projectInstanceWorkflows
+   * Get projectDeploymentWorkflows
+   * @return projectDeploymentWorkflows
    */
   @Valid 
-  @Schema(name = "projectInstanceWorkflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstanceWorkflows")
-  public List<@Valid ProjectInstanceWorkflowModel> getProjectInstanceWorkflows() {
-    return projectInstanceWorkflows;
+  @Schema(name = "projectDeploymentWorkflows", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeploymentWorkflows")
+  public List<@Valid ProjectDeploymentWorkflowModel> getProjectDeploymentWorkflows() {
+    return projectDeploymentWorkflows;
   }
 
-  public void setProjectInstanceWorkflows(List<@Valid ProjectInstanceWorkflowModel> projectInstanceWorkflows) {
-    this.projectInstanceWorkflows = projectInstanceWorkflows;
+  public void setProjectDeploymentWorkflows(List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows) {
+    this.projectDeploymentWorkflows = projectDeploymentWorkflows;
   }
 
-  public ProjectInstanceModel tags(List<@Valid TagModel> tags) {
+  public ProjectDeploymentModel tags(List<@Valid TagModel> tags) {
     this.tags = tags;
     return this;
   }
 
-  public ProjectInstanceModel addTagsItem(TagModel tagsItem) {
+  public ProjectDeploymentModel addTagsItem(TagModel tagsItem) {
     if (this.tags == null) {
       this.tags = new ArrayList<>();
     }
@@ -397,7 +397,7 @@ public class ProjectInstanceModel {
     this.tags = tags;
   }
 
-  public ProjectInstanceModel version(Integer version) {
+  public ProjectDeploymentModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -425,34 +425,34 @@ public class ProjectInstanceModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectInstanceModel projectInstance = (ProjectInstanceModel) o;
-    return Objects.equals(this.createdBy, projectInstance.createdBy) &&
-        Objects.equals(this.createdDate, projectInstance.createdDate) &&
-        Objects.equals(this.description, projectInstance.description) &&
-        Objects.equals(this.enabled, projectInstance.enabled) &&
-        Objects.equals(this.environment, projectInstance.environment) &&
-        Objects.equals(this.id, projectInstance.id) &&
-        Objects.equals(this.lastExecutionDate, projectInstance.lastExecutionDate) &&
-        Objects.equals(this.lastModifiedBy, projectInstance.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, projectInstance.lastModifiedDate) &&
-        Objects.equals(this.name, projectInstance.name) &&
-        Objects.equals(this.projectId, projectInstance.projectId) &&
-        Objects.equals(this.projectVersion, projectInstance.projectVersion) &&
-        Objects.equals(this.project, projectInstance.project) &&
-        Objects.equals(this.projectInstanceWorkflows, projectInstance.projectInstanceWorkflows) &&
-        Objects.equals(this.tags, projectInstance.tags) &&
-        Objects.equals(this.version, projectInstance.version);
+    ProjectDeploymentModel projectDeployment = (ProjectDeploymentModel) o;
+    return Objects.equals(this.createdBy, projectDeployment.createdBy) &&
+        Objects.equals(this.createdDate, projectDeployment.createdDate) &&
+        Objects.equals(this.description, projectDeployment.description) &&
+        Objects.equals(this.enabled, projectDeployment.enabled) &&
+        Objects.equals(this.environment, projectDeployment.environment) &&
+        Objects.equals(this.id, projectDeployment.id) &&
+        Objects.equals(this.lastExecutionDate, projectDeployment.lastExecutionDate) &&
+        Objects.equals(this.lastModifiedBy, projectDeployment.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectDeployment.lastModifiedDate) &&
+        Objects.equals(this.name, projectDeployment.name) &&
+        Objects.equals(this.projectId, projectDeployment.projectId) &&
+        Objects.equals(this.projectVersion, projectDeployment.projectVersion) &&
+        Objects.equals(this.project, projectDeployment.project) &&
+        Objects.equals(this.projectDeploymentWorkflows, projectDeployment.projectDeploymentWorkflows) &&
+        Objects.equals(this.tags, projectDeployment.tags) &&
+        Objects.equals(this.version, projectDeployment.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectInstanceWorkflows, tags, version);
+    return Objects.hash(createdBy, createdDate, description, enabled, environment, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, name, projectId, projectVersion, project, projectDeploymentWorkflows, tags, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectInstanceModel {\n");
+    sb.append("class ProjectDeploymentModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
@@ -466,7 +466,7 @@ public class ProjectInstanceModel {
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
-    sb.append("    projectInstanceWorkflows: ").append(toIndentedString(projectInstanceWorkflows)).append("\n");
+    sb.append("    projectDeploymentWorkflows: ").append(toIndentedString(projectDeploymentWorkflows)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
     sb.append("}");

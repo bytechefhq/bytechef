@@ -2,7 +2,7 @@ package com.bytechef.automation.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceWorkflowConnectionModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,10 +27,10 @@ import jakarta.annotation.Generated;
  * Contains configuration and connections required for the execution of a particular project workflow.
  */
 
-@Schema(name = "ProjectInstanceWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
-@JsonTypeName("ProjectInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class ProjectInstanceWorkflowModel {
+@Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
+@JsonTypeName("ProjectDeploymentWorkflow")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ProjectDeploymentWorkflowModel {
 
   private String createdBy;
 
@@ -41,7 +41,7 @@ public class ProjectInstanceWorkflowModel {
   private Map<String, Object> inputs = new HashMap<>();
 
   @Valid
-  private List<@Valid ProjectInstanceWorkflowConnectionModel> connections = new ArrayList<>();
+  private List<@Valid ProjectDeploymentWorkflowConnectionModel> connections = new ArrayList<>();
 
   private Boolean enabled;
 
@@ -55,7 +55,7 @@ public class ProjectInstanceWorkflowModel {
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private OffsetDateTime lastModifiedDate;
 
-  private Long projectInstanceId;
+  private Long projectDeploymentId;
 
   private String staticWebhookUrl;
 
@@ -65,7 +65,7 @@ public class ProjectInstanceWorkflowModel {
 
   private Integer version;
 
-  public ProjectInstanceWorkflowModel createdBy(String createdBy) {
+  public ProjectDeploymentWorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -85,7 +85,7 @@ public class ProjectInstanceWorkflowModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectInstanceWorkflowModel createdDate(OffsetDateTime createdDate) {
+  public ProjectDeploymentWorkflowModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -105,12 +105,12 @@ public class ProjectInstanceWorkflowModel {
     this.createdDate = createdDate;
   }
 
-  public ProjectInstanceWorkflowModel inputs(Map<String, Object> inputs) {
+  public ProjectDeploymentWorkflowModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public ProjectInstanceWorkflowModel putInputsItem(String key, Object inputsItem) {
+  public ProjectDeploymentWorkflowModel putInputsItem(String key, Object inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -119,11 +119,11 @@ public class ProjectInstanceWorkflowModel {
   }
 
   /**
-   * The input parameters of an project instance used as workflow input values.
+   * The input parameters of an project deployment used as workflow input values.
    * @return inputs
    */
   
-  @Schema(name = "inputs", description = "The input parameters of an project instance used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "inputs", description = "The input parameters of an project deployment used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
   public Map<String, Object> getInputs() {
     return inputs;
@@ -133,12 +133,12 @@ public class ProjectInstanceWorkflowModel {
     this.inputs = inputs;
   }
 
-  public ProjectInstanceWorkflowModel connections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
+  public ProjectDeploymentWorkflowModel connections(List<@Valid ProjectDeploymentWorkflowConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public ProjectInstanceWorkflowModel addConnectionsItem(ProjectInstanceWorkflowConnectionModel connectionsItem) {
+  public ProjectDeploymentWorkflowModel addConnectionsItem(ProjectDeploymentWorkflowConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -147,31 +147,31 @@ public class ProjectInstanceWorkflowModel {
   }
 
   /**
-   * The connections used by a project instance.
+   * The connections used by a project deployment.
    * @return connections
    */
   @Valid 
-  @Schema(name = "connections", description = "The connections used by a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "connections", description = "The connections used by a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid ProjectInstanceWorkflowConnectionModel> getConnections() {
+  public List<@Valid ProjectDeploymentWorkflowConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid ProjectInstanceWorkflowConnectionModel> connections) {
+  public void setConnections(List<@Valid ProjectDeploymentWorkflowConnectionModel> connections) {
     this.connections = connections;
   }
 
-  public ProjectInstanceWorkflowModel enabled(Boolean enabled) {
+  public ProjectDeploymentWorkflowModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
 
   /**
-   * If a workflow is enabled or not in the project instance workflow.
+   * If a workflow is enabled or not in the project deployment workflow.
    * @return enabled
    */
   
-  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "enabled", description = "If a workflow is enabled or not in the project deployment workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
     return enabled;
@@ -181,17 +181,17 @@ public class ProjectInstanceWorkflowModel {
     this.enabled = enabled;
   }
 
-  public ProjectInstanceWorkflowModel id(Long id) {
+  public ProjectDeploymentWorkflowModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of a project instance workflow.
+   * The id of a project deployment workflow.
    * @return id
    */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -201,17 +201,17 @@ public class ProjectInstanceWorkflowModel {
     this.id = id;
   }
 
-  public ProjectInstanceWorkflowModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ProjectDeploymentWorkflowModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
 
   /**
-   * The last execution date of a project instance.
+   * The last execution date of a project deployment.
    * @return lastExecutionDate
    */
   @Valid 
-  @Schema(name = "lastExecutionDate", description = "The last execution date of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "lastExecutionDate", description = "The last execution date of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastExecutionDate")
   public OffsetDateTime getLastExecutionDate() {
     return lastExecutionDate;
@@ -221,7 +221,7 @@ public class ProjectInstanceWorkflowModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectInstanceWorkflowModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectDeploymentWorkflowModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -241,7 +241,7 @@ public class ProjectInstanceWorkflowModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectInstanceWorkflowModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ProjectDeploymentWorkflowModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -261,27 +261,27 @@ public class ProjectInstanceWorkflowModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectInstanceWorkflowModel projectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public ProjectDeploymentWorkflowModel projectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
     return this;
   }
 
   /**
-   * The id of a project instance.
-   * @return projectInstanceId
+   * The id of a project deployment.
+   * @return projectDeploymentId
    */
   
-  @Schema(name = "projectInstanceId", description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstanceId")
-  public Long getProjectInstanceId() {
-    return projectInstanceId;
+  @Schema(name = "projectDeploymentId", description = "The id of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeploymentId")
+  public Long getProjectDeploymentId() {
+    return projectDeploymentId;
   }
 
-  public void setProjectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public void setProjectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
   }
 
-  public ProjectInstanceWorkflowModel staticWebhookUrl(String staticWebhookUrl) {
+  public ProjectDeploymentWorkflowModel staticWebhookUrl(String staticWebhookUrl) {
     this.staticWebhookUrl = staticWebhookUrl;
     return this;
   }
@@ -301,7 +301,7 @@ public class ProjectInstanceWorkflowModel {
     this.staticWebhookUrl = staticWebhookUrl;
   }
 
-  public ProjectInstanceWorkflowModel workflowId(String workflowId) {
+  public ProjectDeploymentWorkflowModel workflowId(String workflowId) {
     this.workflowId = workflowId;
     return this;
   }
@@ -321,7 +321,7 @@ public class ProjectInstanceWorkflowModel {
     this.workflowId = workflowId;
   }
 
-  public ProjectInstanceWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
+  public ProjectDeploymentWorkflowModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;
     return this;
   }
@@ -341,7 +341,7 @@ public class ProjectInstanceWorkflowModel {
     this.workflowReferenceCode = workflowReferenceCode;
   }
 
-  public ProjectInstanceWorkflowModel version(Integer version) {
+  public ProjectDeploymentWorkflowModel version(Integer version) {
     this.version = version;
     return this;
   }
@@ -369,32 +369,32 @@ public class ProjectInstanceWorkflowModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectInstanceWorkflowModel projectInstanceWorkflow = (ProjectInstanceWorkflowModel) o;
-    return Objects.equals(this.createdBy, projectInstanceWorkflow.createdBy) &&
-        Objects.equals(this.createdDate, projectInstanceWorkflow.createdDate) &&
-        Objects.equals(this.inputs, projectInstanceWorkflow.inputs) &&
-        Objects.equals(this.connections, projectInstanceWorkflow.connections) &&
-        Objects.equals(this.enabled, projectInstanceWorkflow.enabled) &&
-        Objects.equals(this.id, projectInstanceWorkflow.id) &&
-        Objects.equals(this.lastExecutionDate, projectInstanceWorkflow.lastExecutionDate) &&
-        Objects.equals(this.lastModifiedBy, projectInstanceWorkflow.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, projectInstanceWorkflow.lastModifiedDate) &&
-        Objects.equals(this.projectInstanceId, projectInstanceWorkflow.projectInstanceId) &&
-        Objects.equals(this.staticWebhookUrl, projectInstanceWorkflow.staticWebhookUrl) &&
-        Objects.equals(this.workflowId, projectInstanceWorkflow.workflowId) &&
-        Objects.equals(this.workflowReferenceCode, projectInstanceWorkflow.workflowReferenceCode) &&
-        Objects.equals(this.version, projectInstanceWorkflow.version);
+    ProjectDeploymentWorkflowModel projectDeploymentWorkflow = (ProjectDeploymentWorkflowModel) o;
+    return Objects.equals(this.createdBy, projectDeploymentWorkflow.createdBy) &&
+        Objects.equals(this.createdDate, projectDeploymentWorkflow.createdDate) &&
+        Objects.equals(this.inputs, projectDeploymentWorkflow.inputs) &&
+        Objects.equals(this.connections, projectDeploymentWorkflow.connections) &&
+        Objects.equals(this.enabled, projectDeploymentWorkflow.enabled) &&
+        Objects.equals(this.id, projectDeploymentWorkflow.id) &&
+        Objects.equals(this.lastExecutionDate, projectDeploymentWorkflow.lastExecutionDate) &&
+        Objects.equals(this.lastModifiedBy, projectDeploymentWorkflow.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectDeploymentWorkflow.lastModifiedDate) &&
+        Objects.equals(this.projectDeploymentId, projectDeploymentWorkflow.projectDeploymentId) &&
+        Objects.equals(this.staticWebhookUrl, projectDeploymentWorkflow.staticWebhookUrl) &&
+        Objects.equals(this.workflowId, projectDeploymentWorkflow.workflowId) &&
+        Objects.equals(this.workflowReferenceCode, projectDeploymentWorkflow.workflowReferenceCode) &&
+        Objects.equals(this.version, projectDeploymentWorkflow.version);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectInstanceId, staticWebhookUrl, workflowId, workflowReferenceCode, version);
+    return Objects.hash(createdBy, createdDate, inputs, connections, enabled, id, lastExecutionDate, lastModifiedBy, lastModifiedDate, projectDeploymentId, staticWebhookUrl, workflowId, workflowReferenceCode, version);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectInstanceWorkflowModel {\n");
+    sb.append("class ProjectDeploymentWorkflowModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
@@ -404,7 +404,7 @@ public class ProjectInstanceWorkflowModel {
     sb.append("    lastExecutionDate: ").append(toIndentedString(lastExecutionDate)).append("\n");
     sb.append("    lastModifiedBy: ").append(toIndentedString(lastModifiedBy)).append("\n");
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
-    sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
+    sb.append("    projectDeploymentId: ").append(toIndentedString(projectDeploymentId)).append("\n");
     sb.append("    staticWebhookUrl: ").append(toIndentedString(staticWebhookUrl)).append("\n");
     sb.append("    workflowId: ").append(toIndentedString(workflowId)).append("\n");
     sb.append("    workflowReferenceCode: ").append(toIndentedString(workflowReferenceCode)).append("\n");

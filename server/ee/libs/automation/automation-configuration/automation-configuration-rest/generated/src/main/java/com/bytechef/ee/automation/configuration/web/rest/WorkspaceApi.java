@@ -5,12 +5,15 @@
  */
 package com.bytechef.ee.automation.configuration.web.rest;
 
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -19,14 +22,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.Valid;
-
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:57.322087+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:38.341505+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "workspace", description = "The Automation Workspace Internal API")
 public interface WorkspaceApi {
@@ -59,7 +64,7 @@ public interface WorkspaceApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel> createWorkspace(
         @Parameter(name = "com.bytechef.automation.configuration.web.rest.model.WorkspaceModel", description = "", required = true) @Valid @RequestBody com.bytechef.automation.configuration.web.rest.model.WorkspaceModel comBytechefAutomationConfigurationWebRestModelWorkspaceModel
     ) {
@@ -97,7 +102,7 @@ public interface WorkspaceApi {
         method = RequestMethod.DELETE,
         value = "/workspaces/{id}"
     )
-
+    
     default ResponseEntity<Void> deleteWorkspace(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -129,7 +134,7 @@ public interface WorkspaceApi {
         value = "/users/{id}/workspaces",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel>> getUserWorkspaces(
         @Parameter(name = "id", description = "The id of a user.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -170,7 +175,7 @@ public interface WorkspaceApi {
         value = "/workspaces/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel> getWorkspace(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -210,9 +215,9 @@ public interface WorkspaceApi {
         value = "/workspaces",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel>> getWorkspaces(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -253,7 +258,7 @@ public interface WorkspaceApi {
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<com.bytechef.automation.configuration.web.rest.model.WorkspaceModel> updateWorkspace(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "com.bytechef.automation.configuration.web.rest.model.WorkspaceModel", description = "", required = true) @Valid @RequestBody com.bytechef.automation.configuration.web.rest.model.WorkspaceModel comBytechefAutomationConfigurationWebRestModelWorkspaceModel

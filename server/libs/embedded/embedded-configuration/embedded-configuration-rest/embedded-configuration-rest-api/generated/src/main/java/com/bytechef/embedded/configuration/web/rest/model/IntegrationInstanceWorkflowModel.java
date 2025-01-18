@@ -25,7 +25,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T06:16:00.287813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:39.150515+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class IntegrationInstanceWorkflowModel {
 
   private String createdBy;
@@ -156,11 +156,11 @@ public class IntegrationInstanceWorkflowModel {
   }
 
   /**
-   * The id of a project instance workflow.
+   * The id of a project deployment workflow.
    * @return id
    */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;

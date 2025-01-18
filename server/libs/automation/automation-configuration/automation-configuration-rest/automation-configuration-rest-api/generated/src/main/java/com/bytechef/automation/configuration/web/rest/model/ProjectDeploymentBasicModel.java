@@ -23,10 +23,10 @@ import jakarta.annotation.Generated;
  * Contains configurations and connections required for the execution of project workflows.
  */
 
-@Schema(name = "ProjectInstanceBasic", description = "Contains configurations and connections required for the execution of project workflows.")
-@JsonTypeName("ProjectInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public class ProjectInstanceBasicModel {
+@Schema(name = "ProjectDeploymentBasic", description = "Contains configurations and connections required for the execution of project workflows.")
+@JsonTypeName("ProjectDeploymentBasic")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.432803+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ProjectDeploymentBasicModel {
 
   private String createdBy;
 
@@ -55,18 +55,18 @@ public class ProjectInstanceBasicModel {
 
   private Integer projectVersion;
 
-  public ProjectInstanceBasicModel() {
+  public ProjectDeploymentBasicModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public ProjectInstanceBasicModel(String name) {
+  public ProjectDeploymentBasicModel(String name) {
     this.name = name;
   }
 
-  public ProjectInstanceBasicModel createdBy(String createdBy) {
+  public ProjectDeploymentBasicModel createdBy(String createdBy) {
     this.createdBy = createdBy;
     return this;
   }
@@ -86,7 +86,7 @@ public class ProjectInstanceBasicModel {
     this.createdBy = createdBy;
   }
 
-  public ProjectInstanceBasicModel createdDate(OffsetDateTime createdDate) {
+  public ProjectDeploymentBasicModel createdDate(OffsetDateTime createdDate) {
     this.createdDate = createdDate;
     return this;
   }
@@ -106,17 +106,17 @@ public class ProjectInstanceBasicModel {
     this.createdDate = createdDate;
   }
 
-  public ProjectInstanceBasicModel description(String description) {
+  public ProjectDeploymentBasicModel description(String description) {
     this.description = description;
     return this;
   }
 
   /**
-   * The description of a project instance.
+   * The description of a project deployment.
    * @return description
    */
   
-  @Schema(name = "description", description = "The description of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "description", description = "The description of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
     return description;
@@ -126,17 +126,17 @@ public class ProjectInstanceBasicModel {
     this.description = description;
   }
 
-  public ProjectInstanceBasicModel enabled(Boolean enabled) {
+  public ProjectDeploymentBasicModel enabled(Boolean enabled) {
     this.enabled = enabled;
     return this;
   }
 
   /**
-   * If a project instance is enabled or not.
+   * If a project deployment is enabled or not.
    * @return enabled
    */
   
-  @Schema(name = "enabled", description = "If a project instance is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "enabled", description = "If a project deployment is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
     return enabled;
@@ -146,7 +146,7 @@ public class ProjectInstanceBasicModel {
     this.enabled = enabled;
   }
 
-  public ProjectInstanceBasicModel environment(EnvironmentModel environment) {
+  public ProjectDeploymentBasicModel environment(EnvironmentModel environment) {
     this.environment = environment;
     return this;
   }
@@ -166,17 +166,17 @@ public class ProjectInstanceBasicModel {
     this.environment = environment;
   }
 
-  public ProjectInstanceBasicModel id(Long id) {
+  public ProjectDeploymentBasicModel id(Long id) {
     this.id = id;
     return this;
   }
 
   /**
-   * The id of a project instance.
+   * The id of a project deployment.
    * @return id
    */
   
-  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project instance.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "id", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of a project deployment.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
     return id;
@@ -186,7 +186,7 @@ public class ProjectInstanceBasicModel {
     this.id = id;
   }
 
-  public ProjectInstanceBasicModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
+  public ProjectDeploymentBasicModel lastExecutionDate(OffsetDateTime lastExecutionDate) {
     this.lastExecutionDate = lastExecutionDate;
     return this;
   }
@@ -206,7 +206,7 @@ public class ProjectInstanceBasicModel {
     this.lastExecutionDate = lastExecutionDate;
   }
 
-  public ProjectInstanceBasicModel lastModifiedBy(String lastModifiedBy) {
+  public ProjectDeploymentBasicModel lastModifiedBy(String lastModifiedBy) {
     this.lastModifiedBy = lastModifiedBy;
     return this;
   }
@@ -226,7 +226,7 @@ public class ProjectInstanceBasicModel {
     this.lastModifiedBy = lastModifiedBy;
   }
 
-  public ProjectInstanceBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
+  public ProjectDeploymentBasicModel lastModifiedDate(OffsetDateTime lastModifiedDate) {
     this.lastModifiedDate = lastModifiedDate;
     return this;
   }
@@ -246,17 +246,17 @@ public class ProjectInstanceBasicModel {
     this.lastModifiedDate = lastModifiedDate;
   }
 
-  public ProjectInstanceBasicModel name(String name) {
+  public ProjectDeploymentBasicModel name(String name) {
     this.name = name;
     return this;
   }
 
   /**
-   * The name of a project instance.
+   * The name of a project deployment.
    * @return name
    */
   @NotNull 
-  @Schema(name = "name", description = "The name of a project instance.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of a project deployment.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -266,7 +266,7 @@ public class ProjectInstanceBasicModel {
     this.name = name;
   }
 
-  public ProjectInstanceBasicModel projectId(Long projectId) {
+  public ProjectDeploymentBasicModel projectId(Long projectId) {
     this.projectId = projectId;
     return this;
   }
@@ -286,7 +286,7 @@ public class ProjectInstanceBasicModel {
     this.projectId = projectId;
   }
 
-  public ProjectInstanceBasicModel projectVersion(Integer projectVersion) {
+  public ProjectDeploymentBasicModel projectVersion(Integer projectVersion) {
     this.projectVersion = projectVersion;
     return this;
   }
@@ -314,19 +314,19 @@ public class ProjectInstanceBasicModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    ProjectInstanceBasicModel projectInstanceBasic = (ProjectInstanceBasicModel) o;
-    return Objects.equals(this.createdBy, projectInstanceBasic.createdBy) &&
-        Objects.equals(this.createdDate, projectInstanceBasic.createdDate) &&
-        Objects.equals(this.description, projectInstanceBasic.description) &&
-        Objects.equals(this.enabled, projectInstanceBasic.enabled) &&
-        Objects.equals(this.environment, projectInstanceBasic.environment) &&
-        Objects.equals(this.id, projectInstanceBasic.id) &&
-        Objects.equals(this.lastExecutionDate, projectInstanceBasic.lastExecutionDate) &&
-        Objects.equals(this.lastModifiedBy, projectInstanceBasic.lastModifiedBy) &&
-        Objects.equals(this.lastModifiedDate, projectInstanceBasic.lastModifiedDate) &&
-        Objects.equals(this.name, projectInstanceBasic.name) &&
-        Objects.equals(this.projectId, projectInstanceBasic.projectId) &&
-        Objects.equals(this.projectVersion, projectInstanceBasic.projectVersion);
+    ProjectDeploymentBasicModel projectDeploymentBasic = (ProjectDeploymentBasicModel) o;
+    return Objects.equals(this.createdBy, projectDeploymentBasic.createdBy) &&
+        Objects.equals(this.createdDate, projectDeploymentBasic.createdDate) &&
+        Objects.equals(this.description, projectDeploymentBasic.description) &&
+        Objects.equals(this.enabled, projectDeploymentBasic.enabled) &&
+        Objects.equals(this.environment, projectDeploymentBasic.environment) &&
+        Objects.equals(this.id, projectDeploymentBasic.id) &&
+        Objects.equals(this.lastExecutionDate, projectDeploymentBasic.lastExecutionDate) &&
+        Objects.equals(this.lastModifiedBy, projectDeploymentBasic.lastModifiedBy) &&
+        Objects.equals(this.lastModifiedDate, projectDeploymentBasic.lastModifiedDate) &&
+        Objects.equals(this.name, projectDeploymentBasic.name) &&
+        Objects.equals(this.projectId, projectDeploymentBasic.projectId) &&
+        Objects.equals(this.projectVersion, projectDeploymentBasic.projectVersion);
   }
 
   @Override
@@ -337,7 +337,7 @@ public class ProjectInstanceBasicModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class ProjectInstanceBasicModel {\n");
+    sb.append("class ProjectDeploymentBasicModel {\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
