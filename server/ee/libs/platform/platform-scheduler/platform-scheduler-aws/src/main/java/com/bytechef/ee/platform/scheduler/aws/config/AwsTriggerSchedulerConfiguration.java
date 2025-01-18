@@ -13,6 +13,7 @@ import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
 import com.bytechef.ee.platform.scheduler.aws.listener.DynamicWebhookTriggerRefreshListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -33,6 +34,7 @@ import software.amazon.awssdk.services.scheduler.SchedulerClient;
  */
 @Configuration
 @ConditionalOnProperty(prefix = "bytechef", name = "coordinator.trigger.scheduler.provider", havingValue = "aws")
+@ConditionalOnEEVersion
 public class AwsTriggerSchedulerConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AwsTriggerSchedulerConfiguration.class);

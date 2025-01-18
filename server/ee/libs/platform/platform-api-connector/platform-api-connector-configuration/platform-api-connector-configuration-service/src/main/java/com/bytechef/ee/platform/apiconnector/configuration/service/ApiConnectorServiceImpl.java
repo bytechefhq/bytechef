@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.apiconnector.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.repository.ApiConnectorRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ApiConnectorServiceImpl implements ApiConnectorService {
 
     private final ApiConnectorRepository apiConnectorRepository;

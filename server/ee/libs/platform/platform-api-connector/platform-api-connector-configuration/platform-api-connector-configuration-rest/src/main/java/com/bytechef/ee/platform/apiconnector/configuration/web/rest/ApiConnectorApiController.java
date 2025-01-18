@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.facade.ApiConnectorFa
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.ee.platform.apiconnector.configuration.web.rest.model.ApiConnectorModel;
 import com.bytechef.ee.platform.apiconnector.configuration.web.rest.model.ImportOpenApiSpecificationRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class ApiConnectorApiController implements ApiConnectorApi {
 
     private final ApiConnectorFacade apiConnectorFacade;

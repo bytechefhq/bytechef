@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.codeworkflow.configuration.repository;
 
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Repository;
  * @author Ivica Cardic
  */
 @Repository
+@ConditionalOnEEVersion
 public interface CodeWorkflowContainerRepository extends ListCrudRepository<CodeWorkflowContainer, Long> {
 
     Optional<CodeWorkflowContainer> findByCodeWorkflowContainerReference(String codeWorkflowContainerReference);

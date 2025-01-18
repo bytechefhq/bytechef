@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomCompo
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorage;
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
 import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CustomComponentDynamicComponentHandlerFactory implements DynamicComponentHandlerFactory {
 
     private final CustomComponentFileStorage customComponentFileStorage;

@@ -14,6 +14,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.ee.component.codeworkflow.action.CodeWorkflowPerformAction;
 import com.bytechef.ee.component.codeworkflow.task.CodeWorkflowTaskExecutor;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component(CODE_WORKFLOW + "_v1_ComponentHandler")
+@ConditionalOnEEVersion
 public class CodeWorkflowComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;

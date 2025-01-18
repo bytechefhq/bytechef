@@ -12,6 +12,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
 import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComponentService;
 import com.bytechef.ee.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("com.bytechef.platform.custom.component.configuration.web.rest.CustomComponentApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class CustomComponentApiController implements CustomComponentApi {
 
     private final CustomComponentFacade customComponentFacade;

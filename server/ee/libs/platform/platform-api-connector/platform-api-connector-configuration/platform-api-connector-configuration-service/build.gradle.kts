@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":cli:commands:component:init:openapi"))
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-api"))
 
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-api"))

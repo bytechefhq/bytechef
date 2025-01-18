@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.codeworkflow.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.repository.CodeWorkflowContainerRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.apache.commons.lang3.Validate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class CodeWorkflowContainerServiceImpl implements CodeWorkflowContainerService {
 
     private final CodeWorkflowContainerRepository codeWorkflowContainerRepository;

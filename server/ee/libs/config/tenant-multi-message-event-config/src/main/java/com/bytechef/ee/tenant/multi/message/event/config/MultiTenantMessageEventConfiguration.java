@@ -9,7 +9,7 @@ package com.bytechef.ee.tenant.multi.message.event.config;
 
 import com.bytechef.message.event.MessageEventPostReceiveProcessor;
 import com.bytechef.message.event.MessageEventPreSendProcessor;
-import com.bytechef.platform.annotation.ConditionalOnEeVersion;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEeVersion
+@ConditionalOnEEVersion
 @ConditionalOnMultiTenant
 public class MultiTenantMessageEventConfiguration {
 

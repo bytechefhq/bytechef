@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.audit.repository;
 import com.bytechef.commons.util.LocalDateTimeUtils;
 import com.bytechef.ee.platform.audit.AuditEventConverter;
 import com.bytechef.ee.platform.audit.domain.PersistentAuditEvent;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.actuate.audit.AuditEvent;
 import org.springframework.boot.actuate.audit.AuditEventRepository;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Ivica Cardic
  */
 @Repository
-@ConditionalOnProperty(prefix = "bytechef", name = "edition", havingValue = "ee")
+@ConditionalOnEEVersion
 public class CustomAuditEventRepository implements AuditEventRepository {
 
     private static final String AUTHORIZATION_FAILURE = "AUTHORIZATION_FAILURE";

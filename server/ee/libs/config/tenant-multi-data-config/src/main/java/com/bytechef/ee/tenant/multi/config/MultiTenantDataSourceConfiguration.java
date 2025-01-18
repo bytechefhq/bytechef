@@ -9,7 +9,7 @@ package com.bytechef.ee.tenant.multi.config;
 
 import com.bytechef.ee.tenant.multi.liquibase.MultiTenantLiquibaseChangelogLoader;
 import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
-import com.bytechef.platform.annotation.ConditionalOnEeVersion;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.service.TenantService;
 import com.zaxxer.hikari.HikariDataSource;
@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnEeVersion
+@ConditionalOnEEVersion
 @ConditionalOnMultiTenant
 public class MultiTenantDataSourceConfiguration {
 

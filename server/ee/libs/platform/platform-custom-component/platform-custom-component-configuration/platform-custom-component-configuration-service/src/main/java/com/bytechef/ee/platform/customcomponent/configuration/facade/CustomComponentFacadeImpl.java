@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.customcomponent.configuration.service.CustomComp
 import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFileStorage;
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class CustomComponentFacadeImpl implements CustomComponentFacade {
 
     private final CustomComponentService customComponentService;

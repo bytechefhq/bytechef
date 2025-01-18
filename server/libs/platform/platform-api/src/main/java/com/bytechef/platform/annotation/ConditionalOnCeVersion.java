@@ -32,5 +32,5 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
     ElementType.TYPE, ElementType.METHOD
 })
 @ConditionalOnProperty(prefix = "bytechef", name = "edition", havingValue = "ce", matchIfMissing = true)
-public @interface ConditionalOnCeVersion {
+public @interface ConditionalOnCEVersion {
 }

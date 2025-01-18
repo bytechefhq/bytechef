@@ -21,6 +21,7 @@ import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorageImpl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnEEVersion
 public class ApiConnectorFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiConnectorFileStorageConfiguration.class);

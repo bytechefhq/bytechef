@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.customcomponent.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomComponentRepository;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class CustomComponentServiceImpl implements CustomComponentService {
 
     private final CustomComponentRepository customComponentRepository;

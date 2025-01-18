@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.customcomponent.configuration.public_.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent.Language;
 import com.bytechef.ee.platform.customcomponent.configuration.facade.CustomComponentFacade;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.Objects;
@@ -26,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController("com.bytechef.platform.custom.component.configuration.public_.web.rest.CustomComponentApiController")
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/v1")
 @ConditionalOnCoordinator
+@ConditionalOnEEVersion
 public class CustomComponentApiController implements CustomComponentApi {
 
     private final CustomComponentFacade customComponentFacade;

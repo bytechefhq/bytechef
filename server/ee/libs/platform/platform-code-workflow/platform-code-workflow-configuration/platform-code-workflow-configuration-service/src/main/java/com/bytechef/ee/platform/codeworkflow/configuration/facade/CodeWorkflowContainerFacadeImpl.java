@@ -13,6 +13,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowCo
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.workflow.definition.TaskDefinition;
 import com.bytechef.workflow.definition.WorkflowDefinition;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class CodeWorkflowContainerFacadeImpl implements CodeWorkflowContainerFacade {
 
     private final CodeWorkflowContainerService codeWorkflowContainerService;

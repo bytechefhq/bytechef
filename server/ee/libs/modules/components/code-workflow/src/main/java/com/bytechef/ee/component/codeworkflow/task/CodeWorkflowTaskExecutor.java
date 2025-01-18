@@ -11,6 +11,7 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.workflow.ProjectHandler;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CodeWorkflowTaskExecutor {
 
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;

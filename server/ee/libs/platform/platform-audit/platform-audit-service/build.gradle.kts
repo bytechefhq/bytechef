@@ -5,4 +5,5 @@ dependencies {
     implementation("org.springframework.security:spring-security-web")
     implementation(project(":server:libs:core:commons:commons-data"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-api"))
 }

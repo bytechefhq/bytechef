@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Property;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.component.definition.ActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class ComponentDefinitionHelper {
 
     private static final Function<ActionDefinition, ActionDefinition.SingleConnectionPerformFunction> PERFORM_FUNCTION_FUNCTION =
