@@ -45,7 +45,7 @@ import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/wo
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {CableIcon, Code2Icon, PuzzleIcon, SlidersIcon} from 'lucide-react';
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
@@ -73,39 +73,6 @@ const Integration = () => {
 
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
-    const rightSidebarNavigation: {
-        name?: string;
-        icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
-        onClick?: () => void;
-        separator?: boolean;
-    }[] = [
-        {
-            icon: PuzzleIcon,
-            name: 'Components & Flow Controls',
-            onClick: () => {
-                setWorkflowNodeDetailsPanelOpen(false);
-                setWorkflowTestChatPanelOpen(false);
-
-                setRightSidebarOpen(!rightSidebarOpen);
-            },
-        },
-        {
-            icon: SlidersIcon,
-            name: 'Workflow Inputs',
-            onClick: () => setShowWorkflowInputsSheet(true),
-        },
-        {
-            icon: CableIcon,
-            name: 'Workflow Outputs',
-            onClick: () => setShowWorkflowOutputsSheet(true),
-        },
-        {
-            icon: Code2Icon,
-            name: 'Workflow Code Editor',
-            onClick: () => setShowWorkflowCodeEditorSheet(true),
-        },
-    ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true));
-
     const {
         data: componentDefinitions,
         error: componentsError,
@@ -125,41 +92,6 @@ const Integration = () => {
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowTestConfiguration} = useGetWorkflowTestConfigurationQuery({workflowId: workflow?.id!});
-
-    const workflowTestConfigurationInputs =
-        workflowTestConfiguration && workflowTestConfiguration.inputs ? workflowTestConfiguration.inputs : {};
-
-    const workflowTestConfigurationConnections = (
-        workflowTestConfiguration && workflowTestConfiguration.connections ? workflowTestConfiguration.connections : []
-    ).reduce(function (map: {[key: string]: number}, workflowTestConfigurationConnection) {
-        map[
-            workflowTestConfigurationConnection.workflowNodeName +
-                '_' +
-                workflowTestConfigurationConnection.workflowConnectionKey
-        ] = workflowTestConfigurationConnection.connectionId;
-
-        return map;
-    }, {});
-
-    const runDisabled =
-        (workflow?.inputs ?? []).filter((input) => input.required && !workflowTestConfigurationInputs[input.name])
-            .length > 0 ||
-        (workflow?.tasks ?? []).length === 0 ||
-        (workflow?.tasks ?? [])
-            .flatMap((task) => (task.connections ? task.connections : []))
-            .filter(
-                (workflowConnection) =>
-                    workflowConnection.required &&
-                    !workflowTestConfigurationConnections[
-                        workflowConnection.workflowNodeName + '_' + workflowConnection.key
-                    ]
-            ).length > 0;
-
-    const testConfigurationDisabled =
-        (workflow?.inputs ?? []).length === 0 &&
-        [...(workflow?.triggers ?? []), ...(workflow?.tasks ?? [])].flatMap((operation) =>
-            operation.connections ? operation.connections : []
-        ).length === 0;
 
     const queryClient = useQueryClient();
 
@@ -199,6 +131,95 @@ const Integration = () => {
             });
         },
     });
+
+    const rightSidebarNavigation: {
+        name?: string;
+        icon?: React.ForwardRefExoticComponent<Omit<React.SVGProps<SVGSVGElement>, 'ref'>>;
+        onClick?: () => void;
+        separator?: boolean;
+    }[] = useMemo(
+        () =>
+            [
+                {
+                    icon: PuzzleIcon,
+                    name: 'Components & Flow Controls',
+                    onClick: () => {
+                        setWorkflowNodeDetailsPanelOpen(false);
+                        setWorkflowTestChatPanelOpen(false);
+
+                        setRightSidebarOpen(!rightSidebarOpen);
+                    },
+                },
+                {
+                    icon: SlidersIcon,
+                    name: 'Workflow Inputs',
+                    onClick: () => setShowWorkflowInputsSheet(true),
+                },
+                {
+                    icon: CableIcon,
+                    name: 'Workflow Outputs',
+                    onClick: () => setShowWorkflowOutputsSheet(true),
+                },
+                {
+                    icon: Code2Icon,
+                    name: 'Workflow Code Editor',
+                    onClick: () => setShowWorkflowCodeEditorSheet(true),
+                },
+            ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true)),
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [ff_1840, rightSidebarOpen]
+    );
+
+    const workflowTestConfigurationInputs = useMemo(
+        () => workflowTestConfiguration?.inputs ?? {},
+        [workflowTestConfiguration]
+    );
+
+    const workflowTestConfigurationConnections = useMemo(
+        () =>
+            (workflowTestConfiguration?.connections ?? []).reduce(
+                (map: {[key: string]: number}, workflowTestConfigurationConnection) => {
+                    const {connectionId, workflowConnectionKey, workflowNodeName} = workflowTestConfigurationConnection;
+
+                    map[`${workflowNodeName}_${workflowConnectionKey}`] = connectionId;
+
+                    return map;
+                },
+                {}
+            ),
+        [workflowTestConfiguration]
+    );
+
+    const runDisabled = useMemo(() => {
+        const requiredInputsMissing = (workflow?.inputs ?? []).some(
+            (input) => input.required && !workflowTestConfigurationInputs[input.name]
+        );
+
+        const noTasks = (workflow?.tasks ?? []).length === 0;
+
+        const requiredConnectionsMissing = (workflow?.tasks ?? [])
+            .flatMap((task) => task.connections ?? [])
+            .some(
+                (workflowConnection) =>
+                    workflowConnection.required &&
+                    !workflowTestConfigurationConnections[
+                        `${workflowConnection.workflowNodeName}_${workflowConnection.key}`
+                    ]
+            );
+
+        return requiredInputsMissing || noTasks || requiredConnectionsMissing;
+    }, [workflow, workflowTestConfigurationInputs, workflowTestConfigurationConnections]);
+
+    const testConfigurationDisabled = useMemo(() => {
+        const noInputs = (workflow?.inputs ?? []).length === 0;
+
+        const noConnections =
+            [...(workflow?.triggers ?? []), ...(workflow?.tasks ?? [])].flatMap(
+                (operation) => operation.connections ?? []
+            ).length === 0;
+
+        return noInputs && noConnections;
+    }, [workflow]);
 
     useEffect(() => {
         if (componentDefinitions) {
