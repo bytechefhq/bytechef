@@ -97,11 +97,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     implementation(project(":server:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
-    implementation(project(":server:libs:platform:platform-custom-component:platform-custom-component-handler"))
-    implementation(project(":server:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-public-rest"))
-    implementation(project(":server:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest"))
-    implementation(project(":server:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
-    implementation(project(":server:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-file-storage:platform-data-storage-file-storage-service"))
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-service"))
     implementation(project(":server:libs:platform:platform-feature-flags"))
@@ -273,6 +268,11 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-file-storage:platform-api-connector-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-handler"))
     implementation(project(":server:ee:libs:platform:platform-audit:platform-audit-service"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-handler"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-public-rest"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-rest"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-configuration:platform-custom-component-configuration-service"))
+    implementation(project(":server:ee:libs:platform:platform-custom-component:platform-custom-component-file-storage:platform-custom-component-file-storage-impl"))
 
     implementation(project(":server:ee:libs:modules:components:api-platform"))
 
