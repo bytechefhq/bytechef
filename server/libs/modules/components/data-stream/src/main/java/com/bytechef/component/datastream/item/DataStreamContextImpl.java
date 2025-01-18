@@ -38,6 +38,11 @@ public class DataStreamContextImpl implements DataStreamContext {
     }
 
     @Override
+    public <R> R convert(ContextFunction<Convert, R> convertFunction) {
+        return actionContext.convert(convertFunction);
+    }
+
+    @Override
     public <R> R file(ContextFunction<File, R> fileFunction) {
         return actionContext.file(fileFunction);
     }

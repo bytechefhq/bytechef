@@ -36,6 +36,13 @@ import java.util.stream.Stream;
 public interface Context {
 
     /**
+     * @param convertFunction
+     * @param <R>
+     * @return
+     */
+    <R> R convert(ContextFunction<Convert, R> convertFunction);
+
+    /**
      * @param fileFunction
      * @param <R>
      * @return
@@ -99,6 +106,52 @@ public interface Context {
     interface ContextFunction<T, R> {
 
         R apply(T t) throws Exception;
+    }
+
+    /**
+     *
+     */
+    interface Convert {
+
+        /**
+         *
+         * @param fromValue
+         * @param toValueType
+         * @return
+         */
+        boolean canConvert(Object fromValue, Class<?> toValueType);
+
+        /**
+         *
+         * @param fromValue
+         * @param toValueType
+         * @return
+         */
+        <T> T value(Object fromValue, Class<T> toValueType);
+
+        /**
+         *
+         * @param fromValue
+         * @param toValueType
+         * @param includeNulls
+         * @return
+         */
+        <T> T value(Object fromValue, Class<T> toValueType, boolean includeNulls);
+
+        /**
+         *
+         * @param fromValue
+         * @param toValueTypeRef
+         * @return
+         */
+        <T> T value(Object fromValue, TypeReference<T> toValueTypeRef);
+
+        /**
+         *
+         * @param str
+         * @return
+         */
+        Object string(String str);
 
     }
 

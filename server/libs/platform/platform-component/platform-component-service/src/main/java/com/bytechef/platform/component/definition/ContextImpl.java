@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
  */
 class ContextImpl implements Context {
 
+    private final Convert convert;
     private final File file;
     private final Http http;
     private final Json json;
@@ -63,6 +65,7 @@ class ContextImpl implements Context {
         String componentName, int componentVersion, String componentOperationName, FilesFileStorage filesFileStorage,
         ComponentConnection connection, HttpClientExecutor httpClientExecutor) {
 
+        this.convert = new ConvertImpl();
         this.file = new FileImpl(filesFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
@@ -71,6 +74,15 @@ class ContextImpl implements Context {
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
+    }
+
+    @Override
+    public <R> R convert(ContextFunction<Convert, R> convertFunction) {
+        try {
+            return convertFunction.apply(convert);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -295,6 +307,34 @@ class ContextImpl implements Context {
                     throw new RuntimeException("Unable to execute HTTP request", e);
                 }
             }
+        }
+    }
+
+    private record ConvertImpl() implements Convert {
+
+        @Override
+        public boolean canConvert(Object fromValue, Class<?> toValueType) {
+            return ConvertUtils.canConvert(fromValue, toValueType);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, Class<T> toValueType) {
+            return ConvertUtils.convertValue(fromValue, toValueType);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, Class<T> toValueType, boolean includeNulls) {
+            return ConvertUtils.convertValue(fromValue, toValueType, includeNulls);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, TypeReference<T> toValueTypeRef) {
+            return ConvertUtils.convertValue(fromValue, toValueTypeRef.getType());
+        }
+
+        @Override
+        public Object string(String str) {
+            return ConvertUtils.convertString(str);
         }
     }
 
