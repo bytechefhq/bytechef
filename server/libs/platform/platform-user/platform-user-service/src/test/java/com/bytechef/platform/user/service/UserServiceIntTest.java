@@ -37,8 +37,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.auditing.DateTimeProvider;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -64,7 +64,7 @@ class UserServiceIntTest {
     @Autowired
     private UserService userService;
 
-    @MockBean
+    @MockitoBean
     private DateTimeProvider dateTimeProvider;
 
     private User user;

@@ -43,13 +43,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -66,55 +66,55 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Configuration
 public class IntegrationIntTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ConnectionDefinitionService connectionDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ConnectionService connectionService;
 
-    @MockBean
+    @MockitoBean
     private ConnectedUserService connectedUserService;
 
-    @MockBean
+    @MockitoBean
     private InstanceJobFacade instanceJobFacade;
 
-    @MockBean
+    @MockitoBean
     private InstanceJobService instanceJobService;
 
-    @MockBean
+    @MockitoBean
     private JobFacade jobFacade;
 
-    @MockBean
+    @MockitoBean
     private JobService jobService;
 
-    @MockBean
+    @MockitoBean
     private OAuth2Service oAuth2Service;
 
-    @MockBean
+    @MockitoBean
     private TriggerDefinitionService triggerDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private TriggerExecutionService triggerExecutionService;
 
-    @MockBean
+    @MockitoBean
     private TriggerLifecycleFacade triggerLifecycleFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowConnectionFacade workflowConnectionFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowFacade workflowFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowNodeParameterFacade workflowNodeParameterFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowNodeTestOutputService workflowNodeTestOutputService;
 
-    @MockBean
+    @MockitoBean
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean

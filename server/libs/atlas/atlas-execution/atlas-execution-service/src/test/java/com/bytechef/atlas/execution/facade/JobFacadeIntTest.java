@@ -34,13 +34,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * Ivica Cardic
@@ -71,16 +71,16 @@ public class JobFacadeIntTest {
     @Configuration
     public static class WorkflowExecutionIntTestConfiguration {
 
-        @MockBean
+        @MockitoBean
         private ContextService contextService;
 
-        @MockBean
+        @MockitoBean
         private WorkflowService workflowService;
 
-        @MockBean
+        @MockitoBean
         private TaskExecutionService taskExecutionService;
 
-        @MockBean
+        @MockitoBean
         private TaskFileStorage taskFileStorage;
 
         @Bean

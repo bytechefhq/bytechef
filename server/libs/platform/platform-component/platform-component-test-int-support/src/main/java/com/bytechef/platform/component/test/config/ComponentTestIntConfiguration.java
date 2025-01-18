@@ -63,12 +63,12 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jackson.JsonComponentModule;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -82,15 +82,15 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 @Configuration
 public class ComponentTestIntConfiguration {
 
-    @MockBean(name = "connectionService")
+    @MockitoBean(name = "connectionService")
     private ConnectionService connectionService;
 
-    @MockBean(name = "dataStorageService")
+    @MockitoBean(name = "dataStorageService")
     private DataStorage dataStorage;
 
     private final JsonComponentModule jsonComponentModule;
 
-    @MockBean
+    @MockitoBean
     private MessageBroker messageBroker;
 
     @SuppressFBWarnings("EI")

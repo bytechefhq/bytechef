@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.repository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
+import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -36,6 +37,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@ConnectionIntTestConfigurationSharedMocks
 public class ConnectionRepositoryIntTest {
 
     @Autowired

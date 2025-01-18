@@ -31,11 +31,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
@@ -48,16 +48,16 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest(classes = SecurityConfiguration.class)
 public class SpaWebFilterIntTest {
 
-    @MockBean
+    @MockitoBean
     private AuthenticationFailureHandler authenticationFailureHandler;
 
-    @MockBean
+    @MockitoBean
     private AuthenticationSuccessHandler authenticationSuccessHandler;
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private RememberMeServices rememberMeServices;
 
     @Test

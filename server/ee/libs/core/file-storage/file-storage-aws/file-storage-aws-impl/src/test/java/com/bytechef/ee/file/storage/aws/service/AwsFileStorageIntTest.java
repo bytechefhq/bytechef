@@ -14,8 +14,6 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.awspring.cloud.s3.S3ObjectConverter;
-import io.awspring.cloud.s3.S3OutputStreamProvider;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,8 +41,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 /**
  * @version ee
@@ -246,13 +242,6 @@ class AwsFileStorageIntTest {
         @Bean
         ObjectMapper objectMapper() {
             return new ObjectMapper();
-        }
-
-        @Bean
-        S3Template s3Template(
-            S3Client s3Client, S3OutputStreamProvider s3OutputStreamProvider,
-            S3ObjectConverter s3ObjectConverter, S3Presigner s3Presigner) {
-            return new S3Template(s3Client, s3OutputStreamProvider, s3ObjectConverter, s3Presigner);
         }
 
         @Bean

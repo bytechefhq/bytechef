@@ -24,7 +24,6 @@ import com.bytechef.security.config.SecurityConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +33,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -51,13 +51,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
 @Configuration
 public class UserIntTestConfiguration {
 
-    @MockBean
+    @MockitoBean
     private AuthenticationFailureHandler authenticationFailureHandler;
 
-    @MockBean
+    @MockitoBean
     private AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @MockBean
+    @MockitoBean
     private RememberMeServices rememberMeServices;
 
     @Bean

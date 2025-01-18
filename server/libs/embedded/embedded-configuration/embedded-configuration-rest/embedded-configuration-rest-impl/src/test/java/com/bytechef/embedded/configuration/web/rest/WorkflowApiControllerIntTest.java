@@ -38,9 +38,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -67,27 +67,27 @@ public class WorkflowApiControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private AppEventService appEventService;
 
-    @MockBean
+    @MockitoBean
     private IntegrationFacade integrationFacade;
 
-    @MockBean
+    @MockitoBean
     private IntegrationService integrationService;
 
-    @MockBean
+    @MockitoBean
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private WorkflowFacade workflowFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowService workflowService;
 
-    @MockBean
+    @MockitoBean
     private WorkflowConnectionFacade workflowConnectionFacade;
 
     @BeforeEach

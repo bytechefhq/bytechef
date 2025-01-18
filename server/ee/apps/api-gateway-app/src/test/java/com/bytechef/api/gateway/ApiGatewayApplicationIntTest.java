@@ -7,10 +7,8 @@
 
 package com.bytechef.api.gateway;
 
-import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 
 /**
  * @version ee
@@ -18,7 +16,6 @@ import org.springframework.context.annotation.Import;
  * @author Ivica Cardic
  */
 @SpringBootTest
-@Import(RedisContainerConfiguration.class)
 public class ApiGatewayApplicationIntTest {
 
     @Test

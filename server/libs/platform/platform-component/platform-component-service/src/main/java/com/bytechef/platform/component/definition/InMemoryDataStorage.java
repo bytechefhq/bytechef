@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -44,37 +45,48 @@ class InMemoryDataStorage implements DataStorage {
     }
 
     @Override
-    public void delete(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+    public void delete(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         map.remove(key);
     }
 
+    @NonNull
     @Override
     public <T> Optional<T> fetch(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         return Optional.ofNullable((T) map.get(key));
     }
 
+    @NonNull
     @Override
-    public <T> T get(String componentName, DataStorageScope scope, String scopeId, String key, ModeType type) {
+    public <T> T get(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type) {
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 
         return (T) map.get(key);
     }
 
+    @NonNull
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> getAll(String componentName, DataStorageScope scope, String scopeId, ModeType type) {
+    public <T> Map<String, T> getAll(
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId,
+        @NonNull ModeType type) {
         return (Map<String, T>) getValueMap(componentName, scope, scopeId, type);
     }
 
     @Override
     public void put(
-        String componentName, DataStorageScope scope, String scopeId, String key, ModeType type, Object value) {
+        @NonNull String componentName, @NonNull DataStorageScope scope, @NonNull String scopeId, @NonNull String key,
+        @NonNull ModeType type, @NonNull Object value) {
 
         Map<String, Object> map = getValueMap(componentName, scope, scopeId, type);
 

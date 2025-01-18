@@ -32,7 +32,11 @@ public class LiquibaseConfiguration {
         SpringLiquibase liquibase = new SpringLiquibase();
 
         liquibase.setChangeLog("classpath:config/liquibase/master.xml");
-        liquibase.setContexts(liquibaseProperties.getContexts());
+
+        if (liquibaseProperties.getContexts() != null) {
+            liquibase.setContexts(String.join(",", liquibaseProperties.getContexts()));
+        }
+
         liquibase.setDataSource(dataSource);
         liquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         liquibase.setDropFirst(liquibaseProperties.isDropFirst());

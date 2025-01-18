@@ -33,9 +33,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -48,25 +48,25 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @WebMvcTest(ComponentDefinitionApiController.class)
 public class ComponentDefinitionApiControllerIntTest {
 
-    @MockBean
+    @MockitoBean
     private ActionDefinitionFacade actionDefinitionFacade;
 
-    @MockBean
+    @MockitoBean
     private ActionDefinitionService actionDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ConnectionDefinitionService connectionDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
-    @MockBean
+    @MockitoBean
     TriggerDefinitionFacade triggerDefinitionFacade;
 
-    @MockBean
+    @MockitoBean
     private TriggerDefinitionService triggerDefinitionService;
 
     @Autowired

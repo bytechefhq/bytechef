@@ -17,7 +17,6 @@
 package com.bytechef.configuration;
 
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
-import com.bytechef.test.config.testcontainers.RedisContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -27,7 +26,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootTest
 @Import({
-    PostgreSQLContainerConfiguration.class, RedisContainerConfiguration.class
+    PostgreSQLContainerConfiguration.class,
 })
 public class ConfigurationApplicationIntTest {
 

@@ -155,7 +155,7 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
         multiTenantSpringLiquibase.setChangeLog("classpath:config/liquibase/master.xml");
 
         if (contexts == null) {
-            multiTenantSpringLiquibase.setContexts(liquibaseProperties.getContexts());
+            multiTenantSpringLiquibase.setContexts(String.join(",", liquibaseProperties.getContexts()));
         } else {
             multiTenantSpringLiquibase.setContexts(contexts);
         }

@@ -19,6 +19,7 @@ package com.bytechef.platform.component.facade;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.http.client.action.HttpClientGetAction;
 import com.bytechef.platform.component.config.ComponentDefinitionIntTestConfiguration;
+import com.bytechef.platform.component.config.ComponentRegistryConfigurationSharedMocks;
 import com.bytechef.platform.component.config.JacksonConfiguration;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.helper.TokenRefreshHelper;
@@ -45,16 +46,21 @@ import org.springframework.context.annotation.ComponentScan;
         JacksonConfiguration.class, PostgreSQLContainerConfiguration.class,
         ComponentDefinitionIntTestConfiguration.class
     })
+@ComponentRegistryConfigurationSharedMocks
 public class ActionDefinitionFacadeIntTest {
 
     @Autowired
     private ConnectionDefinitionService connectionDefinitionService;
+
     @Autowired
     private ConnectionService connectionService;
+
     @Autowired
     private ActionDefinitionService actionDefinitionService;
+
     @Autowired
     private ContextFactory contextFactory;
+
     @Autowired
     private TokenRefreshHelper tokenRefreshHelper;
 

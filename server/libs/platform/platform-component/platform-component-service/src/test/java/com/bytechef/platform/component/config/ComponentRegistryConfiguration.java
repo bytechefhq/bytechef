@@ -48,12 +48,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ComponentScan(
     basePackages = {
@@ -84,25 +84,25 @@ public class ComponentRegistryConfiguration {
         }
     };
 
-    @MockBean
+    @MockitoBean
     DataStorage dataStorage;
 
-    @MockBean
+    @MockitoBean
     MessageBroker messageBroker;
 
-    @MockBean
+    @MockitoBean
     OAuth2Service oAuth2Service;
 
-    @MockBean
+    @MockitoBean
     TagService tagService;
 
-    @MockBean
+    @MockitoBean
     WorkflowService workflowService;
 
-    @MockBean
+    @MockitoBean
     WorkflowConnectionFacade workflowConnectionFacade;
 
-    @MockBean
+    @MockitoBean
     WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean

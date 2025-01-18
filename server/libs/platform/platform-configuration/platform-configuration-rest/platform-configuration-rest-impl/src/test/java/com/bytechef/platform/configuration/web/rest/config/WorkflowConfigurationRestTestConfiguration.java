@@ -28,9 +28,9 @@ import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Ivica Cardic
@@ -48,33 +48,33 @@ public class WorkflowConfigurationRestTestConfiguration {
         this.objectMapper = objectMapper;
     }
 
-    @MockBean
+    @MockitoBean
     private ActionDefinitionFacade actionDefinitionFacade;
 
-    @MockBean
+    @MockitoBean
     private ActionDefinitionService actionDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ComponentDefinitionService componentDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private ConnectionDefinitionService connectionDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private OAuth2ParametersFacade oAuth2ParametersFacade;
 
-    @MockBean
+    @MockitoBean
     private OAuth2Service oAuth2Service;
 
-    @MockBean
+    @MockitoBean
     private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private TriggerDefinitionFacade triggerDefinitionFacade;
 
-    @MockBean
+    @MockitoBean
     private TriggerDefinitionService triggerDefinitionService;
 
-    @MockBean
+    @MockitoBean
     private WorkflowService workflowService;
 }
