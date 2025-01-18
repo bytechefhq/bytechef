@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.json.file.constant.JsonFileConstants.*;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_ENTRY;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.FILE_TYPE;
 import static com.bytechef.component.json.file.constant.JsonFileConstants.IS_ARRAY;
@@ -33,7 +34,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.json.file.constant.JsonFileConstants;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -57,9 +57,9 @@ public class JsonFileReadAction {
                 .label("File Type")
                 .description("The file type to choose.")
                 .options(
-                    option("JSON", JsonFileConstants.FileType.JSON.name()),
-                    option("JSON Line", JsonFileConstants.FileType.JSONL.name()))
-                .defaultValue(JsonFileConstants.FileType.JSON.name())
+                    option("JSON", FileType.JSON.name()),
+                    option("JSON Line", FileType.JSONL.name()))
+                .defaultValue(FileType.JSON.name())
                 .required(true),
             fileEntry(FILE_ENTRY)
                 .label("File")
@@ -89,17 +89,17 @@ public class JsonFileReadAction {
         .output()
         .perform(JsonFileReadAction::perform);
 
-    protected static JsonFileConstants.FileType getFileType(Parameters inputParameters) {
-        String fileType = inputParameters.getString(FILE_TYPE, JsonFileConstants.FileType.JSON.name());
+    protected static FileType getFileType(Parameters inputParameters) {
+        String fileType = inputParameters.getString(FILE_TYPE, FileType.JSON.name());
 
-        return JsonFileConstants.FileType.valueOf(fileType.toUpperCase());
+        return FileType.valueOf(fileType.toUpperCase());
     }
 
     @SuppressWarnings("unchecked")
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) throws IOException {
 
-        JsonFileConstants.FileType fileType = getFileType(inputParameters);
+        FileType fileType = getFileType(inputParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
         boolean isArray = inputParameters.getBoolean(IS_ARRAY, true);
         Object result;
@@ -109,7 +109,7 @@ public class JsonFileReadAction {
             InputStream inputStream = context.file(file -> file.getStream(fileEntry));
             List<Map<String, ?>> items;
 
-            if (fileType == JsonFileConstants.FileType.JSON) {
+            if (fileType == FileType.JSON) {
                 if (path == null) {
                     try (Stream<Map<String, ?>> stream = context.json(json -> json.stream(inputStream))) {
                         items = stream.toList();
