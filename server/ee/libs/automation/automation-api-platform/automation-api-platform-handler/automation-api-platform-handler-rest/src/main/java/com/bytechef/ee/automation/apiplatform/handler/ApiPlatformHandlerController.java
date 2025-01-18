@@ -9,6 +9,10 @@ package com.bytechef.ee.automation.apiplatform.handler;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
@@ -63,13 +67,17 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
+    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ApiPlatformHandlerController(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
         ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
-        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
-        WorkflowService workflowService, WorkflowExecutor workflowExecutor) {
+        PrincipalAccessorRegistry principalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
+        WorkflowExecutor workflowExecutor) {
 
         super(
             filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(),
@@ -77,39 +85,41 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
         this.apiCollectionService = apiCollectionService;
         this.apiCollectionEndpointService = apiCollectionEndpointService;
+        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
     }
 
     @DeleteMapping(produces = "application/json")
     public ResponseEntity<?> handleDeleteMethod(
-        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
         return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<?> handleGetMethod(
-        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
         return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PatchMapping(produces = "application/json")
     public ResponseEntity<?> handlePatchMethod(
-        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
         return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PostMapping(produces = "application/json")
     public ResponseEntity<?> handlePostMethod(
-        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
         return doHandle(httpServletRequest, httpServletResponse);
     }
 
     @PutMapping(produces = "application/json")
     public ResponseEntity<?> handlePutMethod(
-        final HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
         return doHandle(httpServletRequest, httpServletResponse);
     }
@@ -127,8 +137,25 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
             ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(
                 path, getEnvironment(httpServletRequest));
 
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                    apiCollectionEndpoint.getProjectDeploymentWorkflowId());
+
+            if (!projectDeploymentWorkflow.isEnabled()) {
+                return ResponseEntity.status(404)
+                    .body("API Collection Endpoint is not enabled");
+            }
+
             ApiCollection apiCollection = apiCollectionService.getApiCollection(
                 apiCollectionEndpoint.getApiCollectionId());
+
+            ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
+                apiCollection.getProjectDeploymentId());
+
+            if (!projectDeployment.isEnabled()) {
+                return ResponseEntity.status(404)
+                    .body("API Collection is not enabled");
+            }
 
             variables = PATH_MATCHER
                 .extractUriTemplateVariables(

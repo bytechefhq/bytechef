@@ -55,6 +55,11 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
+    public List<Long> getApiCollectionProjectIds() {
+        return apiCollectionRepository.findAllApiCollectionProjectIds();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public List<ApiCollection> getApiCollections(
         Long workspaceId, Environment environment, Long projectId, Long tagId) {
@@ -71,9 +76,20 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
 
         ApiCollection curApiCollection = getApiCollection(Validate.notNull(apiCollection.getId(), "id"));
 
+        curApiCollection.setCollectionVersion(apiCollection.getCollectionVersion());
         curApiCollection.setDescription(apiCollection.getDescription());
         curApiCollection.setName(apiCollection.getName());
+        curApiCollection.setTagIds(apiCollection.getTagIds());
 
         return apiCollectionRepository.save(curApiCollection);
+    }
+
+    @Override
+    public ApiCollection update(long id, @NonNull List<Long> tagIds) {
+        ApiCollection connection = getApiCollection(id);
+
+        connection.setTagIds(tagIds);
+
+        return apiCollectionRepository.save(connection);
     }
 }

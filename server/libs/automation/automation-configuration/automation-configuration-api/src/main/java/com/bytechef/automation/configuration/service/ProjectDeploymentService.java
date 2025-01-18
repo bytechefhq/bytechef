@@ -33,7 +33,7 @@ public interface ProjectDeploymentService {
 
     ProjectDeployment getProjectDeployment(long id);
 
-    List<Long> getProjectIds();
+    List<Long> getProjectDeploymentProjectIds();
 
     List<ProjectDeployment> getProjectDeployments();
 

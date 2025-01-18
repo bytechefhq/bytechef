@@ -62,6 +62,16 @@ public class ProjectDeploymentWorkflowServiceImpl implements ProjectDeploymentWo
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ProjectDeploymentWorkflow>
+        fetchProjectDeploymentWorkflow(long projectDeploymentId, String workflowId) {
+        Validate.notNull(workflowId, "'workflowId' must not be null");
+
+        return projectDeploymentWorkflowRepository.findByProjectDeploymentIdAndWorkflowId(
+            projectDeploymentId, workflowId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Optional<ProjectDeploymentWorkflowConnection> fetchProjectDeploymentWorkflowConnection(
         long projectDeploymentOd, String workflowId, String workflowNodeName, String workflowConnectionKey) {
 

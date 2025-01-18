@@ -31,6 +31,8 @@ public interface ProjectDeploymentRepository
     extends ListPagingAndSortingRepository<ProjectDeployment, Long>, CrudRepository<ProjectDeployment, Long>,
     CustomProjectDeploymentRepository {
 
-    @Query("SELECT project_deployment.project_id FROM project_deployment")
-    List<Long> findAllProjectId();
+    @Query("""
+        SELECT project_deployment.project_id FROM project_deployment WHERE project_deployment.id NOT IN
+        (SELECT api_collection.project_deployment_id FROM api_collection)""")
+    List<Long> findAllProjectDeploymentProjectIds();
 }

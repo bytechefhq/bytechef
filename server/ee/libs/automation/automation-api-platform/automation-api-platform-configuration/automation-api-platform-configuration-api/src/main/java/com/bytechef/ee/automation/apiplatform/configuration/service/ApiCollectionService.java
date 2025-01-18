@@ -25,7 +25,11 @@ public interface ApiCollectionService {
 
     ApiCollection getApiCollection(long id);
 
+    List<Long> getApiCollectionProjectIds();
+
     List<ApiCollection> getApiCollections(Long workspaceId, Environment environment, Long projectId, Long tagId);
 
     ApiCollection update(@NonNull ApiCollection apiCollection);
+
+    ApiCollection update(long id, @NonNull List<Long> tagIds);
 }

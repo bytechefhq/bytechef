@@ -50,6 +50,13 @@ public class RemoteProjectDeploymentWorkflowServiceClient implements ProjectDepl
     }
 
     @Override
+    public Optional<ProjectDeploymentWorkflow> fetchProjectDeploymentWorkflow(
+        long projectDeploymentId, String workflowId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean isProjectDeploymentWorkflowEnabled(long projectDeploymentId, String workflowId) {
         throw new UnsupportedOperationException();
     }

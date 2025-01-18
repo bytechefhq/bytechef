@@ -64,8 +64,8 @@ public class ProjectDeploymentServiceImpl implements ProjectDeploymentService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Long> getProjectIds() {
-        return projectDeploymentRepository.findAllProjectId();
+    public List<Long> getProjectDeploymentProjectIds() {
+        return projectDeploymentRepository.findAllProjectDeploymentProjectIds();
     }
 
     @Override

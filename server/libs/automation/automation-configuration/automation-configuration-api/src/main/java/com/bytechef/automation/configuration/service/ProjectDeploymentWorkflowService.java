@@ -20,6 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @author Ivica Cardic
@@ -31,6 +32,9 @@ public interface ProjectDeploymentWorkflowService {
     List<ProjectDeploymentWorkflow> create(List<ProjectDeploymentWorkflow> projectDeploymentWorkflows);
 
     void delete(long id);
+
+    @Transactional(readOnly = true)
+    Optional<ProjectDeploymentWorkflow> fetchProjectDeploymentWorkflow(long projectDeploymentId, String workflowId);
 
     Optional<ProjectDeploymentWorkflowConnection> fetchProjectDeploymentWorkflowConnection(
         long projectDeploymentOd, String workflowId, String workflowNodeName, String workflowConnectionKey);

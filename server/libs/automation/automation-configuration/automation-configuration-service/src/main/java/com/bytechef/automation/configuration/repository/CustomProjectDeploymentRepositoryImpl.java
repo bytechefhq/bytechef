@@ -91,6 +91,14 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "tag_id = ? ";
         }
 
+        if (query.contains("WHERE")) {
+            query += "AND ";
+        } else {
+            query += "WHERE ";
+        }
+
+        query += "project_deployment.id NOT IN (SELECT api_collection.project_deployment_id from api_collection) ";
+
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";
 

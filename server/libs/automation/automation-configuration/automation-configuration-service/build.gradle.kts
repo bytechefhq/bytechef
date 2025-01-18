@@ -13,6 +13,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
+
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jdk8")
     testImplementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-repository:atlas-configuration-repository-jdbc"))
