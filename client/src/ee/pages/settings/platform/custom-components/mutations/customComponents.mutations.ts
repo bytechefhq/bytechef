@@ -1,4 +1,4 @@
-import {CustomComponentApi, EnableCustomComponentRequest} from '@/shared/middleware/platform/custom-component';
+import {CustomComponentApi, EnableCustomComponentRequest} from '@/ee/shared/middleware/platform/custom-component';
 import {useMutation} from '@tanstack/react-query';
 
 interface DeleteCustomComponentMutationProps {

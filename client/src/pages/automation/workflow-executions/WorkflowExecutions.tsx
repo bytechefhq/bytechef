@@ -96,8 +96,8 @@ export const WorkflowExecutions = () => {
         environment:
             filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
-        projectId: filterProjectId,
         includeAllFields: false,
+        projectId: filterProjectId,
     });
 
     const {data: projects} = useGetWorkspaceProjectsQuery({id: currentWorkspaceId!, includeAllFields: false});

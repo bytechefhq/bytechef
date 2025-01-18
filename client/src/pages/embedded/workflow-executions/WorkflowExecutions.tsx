@@ -99,8 +99,8 @@ export const WorkflowExecutions = () => {
     const {data: integrationInstanceConfigurations} = useGetIntegrationInstanceConfigurationsQuery({
         environment:
             filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
-        integrationId: filterIntegrationId,
         includeAllFields: false,
+        integrationId: filterIntegrationId,
     });
 
     const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});

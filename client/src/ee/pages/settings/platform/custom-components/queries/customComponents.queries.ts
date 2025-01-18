@@ -1,4 +1,4 @@
-import {CustomComponent, CustomComponentApi} from '@/shared/middleware/platform/custom-component';
+import {CustomComponent, CustomComponentApi} from '@/ee/shared/middleware/platform/custom-component';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

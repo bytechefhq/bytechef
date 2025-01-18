@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-instances/stores/useWorkflowsEnabledStore';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     Environment,
@@ -52,6 +53,7 @@ const ProjectInstanceDialog = ({
     const [activeStepIndex, setActiveStepIndex] = useState(0);
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
+    const {currentWorkspaceId} = useWorkspaceStore();
     const [resetWorkflowsEnabledStore, setWorkflowEnabled] = useWorkflowsEnabledStore(
         useShallow(({reset, setWorkflowEnabled}) => [reset, setWorkflowEnabled])
     );
@@ -98,7 +100,7 @@ const ProjectInstanceDialog = ({
             queryKey: ProjectInstanceTagKeys.projectInstanceTags,
         });
         queryClient.invalidateQueries({
-            queryKey: ProjectKeys.filteredProjects({}),
+            queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
         });
 
         closeDialog();

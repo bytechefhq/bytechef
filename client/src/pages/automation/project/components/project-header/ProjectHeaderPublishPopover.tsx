@@ -46,7 +46,7 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
             });
 
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId}),
+                queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
             });
 
             toast({
