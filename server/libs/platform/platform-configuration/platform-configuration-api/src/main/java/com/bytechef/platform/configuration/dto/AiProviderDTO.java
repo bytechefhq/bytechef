@@ -14,21 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.text;
+package com.bytechef.platform.configuration.dto;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
- * @author Marko Krišković
+ * @author Ivica Cardic
  */
-class AiTextComponentHandlerTest {
-
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_text_v1.json",
-            new AiTextComponentHandler(new ApplicationProperties(), null).getDefinition());
-    }
+@SuppressFBWarnings("EI")
+public record AiProviderDTO(int id, String name, String icon, String apiKey, boolean enabled) {
 }

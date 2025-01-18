@@ -400,6 +400,7 @@ include("server:ee:libs:platform:platform-component:platform-component-remote-cl
 include("server:ee:libs:platform:platform-component:platform-component-remote-rest")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-client")
 include("server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest")
+include("server:ee:libs:platform:platform-configuration:platform-configuration-rest")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-client")
 include("server:ee:libs:platform:platform-connection:platform-connection-remote-rest")
 include("server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api")

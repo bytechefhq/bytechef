@@ -43,6 +43,7 @@ import com.bytechef.component.ai.text.constant.AiTextConstants;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,13 +63,15 @@ public class SummarizeTextAction implements AiTextAction {
         CUSTOM_PROMPT;
     }
 
-    public SummarizeTextAction(ApplicationProperties.Ai.Provider provider) {
+    public SummarizeTextAction(
+        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+
         this.actionDefinition = new AiTextActionDefinition(
             action(AiTextConstants.SUMMARIZE_TEXT)
                 .title("Summarize Text")
                 .description("AI reads, analyzes and summarizes your text into a shorter format.")
                 .properties(
-                    PROVIDER_PROPERTY.apply(provider),
+                    PROVIDER_PROPERTY.apply(provider, propertyService),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     MODEL_URL_PROPERTY,
@@ -95,7 +98,7 @@ public class SummarizeTextAction implements AiTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            provider, this);
+            provider, this, propertyService);
     }
 
     public Parameters createParameters(Parameters inputParameters) {

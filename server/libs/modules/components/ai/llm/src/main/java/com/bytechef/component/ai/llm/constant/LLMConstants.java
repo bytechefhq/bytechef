@@ -29,11 +29,12 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.ai.llm.ChatModel.Role;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Property.ControlType;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -76,6 +77,8 @@ public class LLMConstants {
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
 
+    public static final List<Provider> PROVIDERS = Arrays.asList(Provider.values());
+
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
         .description(
@@ -105,64 +108,9 @@ public class LLMConstants {
         .label("Language")
         .description("The language of the input audio.")
         .options(
-            List.of(
-                option(Language.AF.getLabel(), Language.AF.name()),
-                option(Language.AR.getLabel(), Language.AR.name()),
-                option(Language.HY.getLabel(), Language.HY.name()),
-                option(Language.AZ.getLabel(), Language.AZ.name()),
-                option(Language.BE.getLabel(), Language.BE.name()),
-                option(Language.BS.getLabel(), Language.BS.name()),
-                option(Language.BG.getLabel(), Language.BG.name()),
-                option(Language.CA.getLabel(), Language.CA.name()),
-                option(Language.ZH.getLabel(), Language.ZH.name()),
-                option(Language.HR.getLabel(), Language.HR.name()),
-                option(Language.CS.getLabel(), Language.CS.name()),
-                option(Language.DA.getLabel(), Language.DA.name()),
-                option(Language.NL.getLabel(), Language.NL.name()),
-                option(Language.EL.getLabel(), Language.EL.name()),
-                option(Language.ET.getLabel(), Language.ET.name()),
-                option(Language.EN.getLabel(), Language.EN.name()),
-                option(Language.FI.getLabel(), Language.FI.name()),
-                option(Language.FR.getLabel(), Language.FR.name()),
-                option(Language.GL.getLabel(), Language.GL.name()),
-                option(Language.DE.getLabel(), Language.DE.name()),
-                option(Language.HE.getLabel(), Language.HE.name()),
-                option(Language.HI.getLabel(), Language.HI.name()),
-                option(Language.HU.getLabel(), Language.HU.name()),
-                option(Language.IS.getLabel(), Language.IS.name()),
-                option(Language.ID.getLabel(), Language.ID.name()),
-                option(Language.IT.getLabel(), Language.IT.name()),
-                option(Language.JA.getLabel(), Language.JA.name()),
-                option(Language.KK.getLabel(), Language.KK.name()),
-                option(Language.KN.getLabel(), Language.KN.name()),
-                option(Language.KO.getLabel(), Language.KO.name()),
-                option(Language.LT.getLabel(), Language.LT.name()),
-                option(Language.LV.getLabel(), Language.LV.name()),
-                option(Language.MA.getLabel(), Language.MA.name()),
-                option(Language.MK.getLabel(), Language.MK.name()),
-                option(Language.MR.getLabel(), Language.MR.name()),
-                option(Language.MS.getLabel(), Language.MS.name()),
-                option(Language.NE.getLabel(), Language.NE.name()),
-                option(Language.NO.getLabel(), Language.NO.name()),
-                option(Language.FA.getLabel(), Language.FA.name()),
-                option(Language.PL.getLabel(), Language.PL.name()),
-                option(Language.PT.getLabel(), Language.PT.name()),
-                option(Language.RO.getLabel(), Language.RO.name()),
-                option(Language.RU.getLabel(), Language.RU.name()),
-                option(Language.SK.getLabel(), Language.SK.name()),
-                option(Language.SL.getLabel(), Language.SL.name()),
-                option(Language.SR.getLabel(), Language.SR.name()),
-                option(Language.ES.getLabel(), Language.ES.name()),
-                option(Language.SV.getLabel(), Language.SV.name()),
-                option(Language.SW.getLabel(), Language.SW.name()),
-                option(Language.TA.getLabel(), Language.TA.name()),
-                option(Language.TL.getLabel(), Language.TL.name()),
-                option(Language.TH.getLabel(), Language.TH.name()),
-                option(Language.TR.getLabel(), Language.TR.name()),
-                option(Language.UK.getLabel(), Language.UK.name()),
-                option(Language.UR.getLabel(), Language.UR.name()),
-                option(Language.VI.getLabel(), Language.VI.name()),
-                option(Language.CY.getLabel(), Language.CY.name())))
+            Arrays.stream(Language.values())
+                .map(language -> option(language.getLabel(), language.name()))
+                .toList())
         .required(false);
 
     public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
@@ -196,7 +144,7 @@ public class LLMConstants {
                     string(CONTENT)
                         .label("Content")
                         .description("The contents of the message.")
-                        .controlType(ControlType.TEXT_AREA)
+                        .controlType(TEXT_AREA)
                         .required(true),
                     array("attachments")
                         .label("Attachments")

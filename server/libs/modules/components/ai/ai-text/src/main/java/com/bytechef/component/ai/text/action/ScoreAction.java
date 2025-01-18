@@ -29,8 +29,8 @@ import static com.bytechef.component.ai.text.constant.AiTextConstants.IS_DECIMAL
 import static com.bytechef.component.ai.text.constant.AiTextConstants.LOWEST_SCORE;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
+import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -41,10 +41,11 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.text.constant.AiTextConstants;
-import com.bytechef.component.ai.text.util.AiTextAnalysisUtil;
+import com.bytechef.component.ai.text.util.AiTextUtils;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,17 +54,19 @@ public class ScoreAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
 
-    public ScoreAction(ApplicationProperties.Ai.Component component) {
-        this.actionDefinition = getActionDefinition(component);
+    public ScoreAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+        this.actionDefinition = getActionDefinition(provider, propertyService);
     }
 
-    private AiTextActionDefinition getActionDefinition(ApplicationProperties.Ai.Component component) {
+    private AiTextActionDefinition getActionDefinition(
+        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+
         return new AiTextActionDefinition(
             action(AiTextConstants.SCORE)
                 .title("Score")
                 .description("Scores the text based on several criteria")
                 .properties(
-                    MODEL_PROVIDER_PROPERTY,
+                    PROVIDER_PROPERTY.apply(provider, propertyService),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     MODEL_URL_PROPERTY,
@@ -98,7 +101,7 @@ public class ScoreAction implements AiTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component, this);
+            provider, this, propertyService);
     }
 
     public Parameters createParameters(Parameters inputParameters) {
@@ -113,8 +116,8 @@ public class ScoreAction implements AiTextAction {
             .append(inputParameters.getString(TEXT))
             .append("\n");
 
-        List<AiTextAnalysisUtil.Criteria> criteria = inputParameters.getList(
-            CRITERIA, AiTextAnalysisUtil.Criteria.class, List.of());
+        List<AiTextUtils.Criteria> criteria = inputParameters.getList(
+            CRITERIA, AiTextUtils.Criteria.class, List.of());
 
         userBuilder.append("Criteria: {")
             .append("\n");

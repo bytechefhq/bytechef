@@ -16,22 +16,18 @@
 
 package com.bytechef.config;
 
-import com.bytechef.platform.properties.service.PropertiesService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author Ivica Cardic
  */
 @ConfigurationProperties(prefix = "bytechef", ignoreUnknownFields = false)
 @SuppressFBWarnings("EI")
-public class ApplicationProperties implements ApplicationContextAware {
+public class ApplicationProperties {
 
     /**
      * Edition.
@@ -66,8 +62,6 @@ public class ApplicationProperties implements ApplicationContextAware {
     private String webhookUrl;
     private Worker worker = new Worker();
     private Workflow workflow = new Workflow();
-
-    private PropertiesService propertiesService;
 
     public Ai getAi() {
         return ai;
@@ -183,11 +177,6 @@ public class ApplicationProperties implements ApplicationContextAware {
 
     public void setCache(Cache cache) {
         this.cache = cache;
-    }
-
-    @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.propertiesService = applicationContext.getBean(PropertiesService.class);
     }
 
     public void setCloud(Cloud cloud) {
@@ -315,23 +304,23 @@ public class ApplicationProperties implements ApplicationContextAware {
      */
     public static class Ai {
 
-        private Component component = new Component();
+        private Provider provider = new Provider();
         private Copilot copilot = new Copilot();
 
         public Copilot getCopilot() {
             return copilot;
         }
 
-        public Component getComponent() {
-            return component;
+        public Provider getProvider() {
+            return provider;
         }
 
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
 
-        public void setComponent(Component component) {
-            this.component = component;
+        public void setProvider(Provider provider) {
+            this.provider = provider;
         }
 
         public static class Copilot {
@@ -417,18 +406,138 @@ public class ApplicationProperties implements ApplicationContextAware {
             }
         }
 
-        public static class Component {
-            private AmazonBedrock amazonBedrock = new AmazonBedrock();
+        public static class Provider {
 
-            public AmazonBedrock getAmazonBedrock() {
-                return amazonBedrock;
+            private AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = new AmazonBedrockAnthropic2();
+            private AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = new AmazonBedrockAnthropic3();
+            private AmazonBedrockCohere amazonBedrockCohere = new AmazonBedrockCohere();
+            private AmazonBedrockJurassic2 amazonBedrockJurassic2 = new AmazonBedrockJurassic2();
+            private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
+            private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
+            private Anthropic anthropic = new Anthropic();
+            private Groq groq = new Groq();
+            private Mistral mistral = new Mistral();
+            private Nvidia nvidia = new Nvidia();
+            private OpenAi openAi = new OpenAi();
+            private VertexGemini vertexGemini = new VertexGemini();
+
+            public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
+                return amazonBedrockAnthropic2;
             }
 
-            public void setAmazonBedrock(AmazonBedrock amazonBedrock) {
-                this.amazonBedrock = amazonBedrock;
+            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
+                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
             }
 
-            public static class AmazonBedrock {
+            public AmazonBedrockAnthropic3 getAmazonBedrockAnthropic3() {
+                return amazonBedrockAnthropic3;
+            }
+
+            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
+                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
+            }
+
+            public AmazonBedrockCohere getAmazonBedrockCohere() {
+                return amazonBedrockCohere;
+            }
+
+            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
+                this.amazonBedrockCohere = amazonBedrockCohere;
+            }
+
+            public AmazonBedrockJurassic2 getAmazonBedrockJurassic2() {
+                return amazonBedrockJurassic2;
+            }
+
+            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
+                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
+            }
+
+            public AmazonBedrockLlama getAmazonBedrockLlama() {
+                return amazonBedrockLlama;
+            }
+
+            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
+                this.amazonBedrockLlama = amazonBedrockLlama;
+            }
+
+            public AmazonBedrockTitan getAmazonBedrockTitan() {
+                return amazonBedrockTitan;
+            }
+
+            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
+                this.amazonBedrockTitan = amazonBedrockTitan;
+            }
+
+            public Anthropic getAnthropic() {
+                return anthropic;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+            public AzureOpenAi getAzureOpenAi() {
+                return azureOpenAi;
+            }
+
+            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                this.azureOpenAi = azureOpenAi;
+            }
+
+            public Groq getGroq() {
+                return groq;
+            }
+
+            public void setGroq(Groq groq) {
+                this.groq = groq;
+            }
+
+            public Nvidia getNvidia() {
+                return nvidia;
+            }
+
+            public void setNvidia(Nvidia nvidia) {
+                this.nvidia = nvidia;
+            }
+
+            private HuggingFace huggingFace = new HuggingFace();
+
+            public HuggingFace getHuggingFace() {
+                return huggingFace;
+            }
+
+            public void setHuggingFace(HuggingFace huggingFace) {
+                this.huggingFace = huggingFace;
+            }
+
+            public Mistral getMistral() {
+                return mistral;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public VertexGemini getVertexGemini() {
+                return vertexGemini;
+            }
+
+            public void setVertexGemini(VertexGemini vertexGemini) {
+                this.vertexGemini = vertexGemini;
+            }
+
+            public static class AmazonBedrockAnthropic2 {
 
                 private String apiKey;
 
@@ -441,14 +550,69 @@ public class ApplicationProperties implements ApplicationContextAware {
                 }
             }
 
-            private Anthropic anthropic = new Anthropic();
+            public static class AmazonBedrockAnthropic3 {
 
-            public Anthropic getAnthropic() {
-                return anthropic;
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
             }
 
-            public void setAnthropic(Anthropic anthropic) {
-                this.anthropic = anthropic;
+            public static class AmazonBedrockCohere {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockJurassic2 {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockLlama {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockTitan {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
             }
 
             public static class Anthropic {
@@ -464,16 +628,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 }
             }
 
-            private AzureOpenAi azureOpenAi = new AzureOpenAi();
-
-            public AzureOpenAi getAzureOpenAi() {
-                return azureOpenAi;
-            }
-
-            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
-                this.azureOpenAi = azureOpenAi;
-            }
-
             public static class AzureOpenAi {
 
                 private String apiKey;
@@ -485,16 +639,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private Groq groq = new Groq();
-
-            public Groq getGroq() {
-                return groq;
-            }
-
-            public void setGroq(Groq groq) {
-                this.groq = groq;
             }
 
             public static class Groq {
@@ -510,16 +654,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 }
             }
 
-            private Nvidia nvidia = new Nvidia();
-
-            public Nvidia getNvidia() {
-                return nvidia;
-            }
-
-            public void setNvidia(Nvidia nvidia) {
-                this.nvidia = nvidia;
-            }
-
             public static class Nvidia {
 
                 private String apiKey;
@@ -531,16 +665,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private HuggingFace huggingFace = new HuggingFace();
-
-            public HuggingFace getHuggingFace() {
-                return huggingFace;
-            }
-
-            public void setHuggingFace(HuggingFace huggingFace) {
-                this.huggingFace = huggingFace;
             }
 
             public static class HuggingFace {
@@ -556,16 +680,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 }
             }
 
-            private Mistral mistral = new Mistral();
-
-            public Mistral getMistral() {
-                return mistral;
-            }
-
-            public void setMistral(Mistral mistral) {
-                this.mistral = mistral;
-            }
-
             public static class Mistral {
 
                 private String apiKey;
@@ -579,16 +693,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 }
             }
 
-            private OpenAi openAi = new OpenAi();
-
-            public OpenAi getOpenAi() {
-                return openAi;
-            }
-
-            public void setOpenAi(OpenAi openAi) {
-                this.openAi = openAi;
-            }
-
             public static class OpenAi {
 
                 private String apiKey;
@@ -600,16 +704,6 @@ public class ApplicationProperties implements ApplicationContextAware {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private VertexGemini vertexGemini = new VertexGemini();
-
-            public VertexGemini getVertexGemini() {
-                return vertexGemini;
-            }
-
-            public void setVertexGemini(VertexGemini vertexGemini) {
-                this.vertexGemini = vertexGemini;
             }
 
             public static class VertexGemini {

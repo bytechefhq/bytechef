@@ -25,9 +25,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PR
 import static com.bytechef.component.ai.text.constant.AiTextConstants.CHUNK_SIZE;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.NUM_RESULTS;
+import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.QUERY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -39,6 +39,7 @@ import com.bytechef.component.ai.text.constant.AiTextConstants;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,14 +51,16 @@ public class SimilaritySearchAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
 
-    public SimilaritySearchAction(ApplicationProperties.Ai.Component component) {
+    public SimilaritySearchAction(
+        ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+
         this.actionDefinition = new AiTextActionDefinition(
             action(AiTextConstants.SIMILARITY_SEARCH)
                 .title("Similarity Search")
                 .description(
                     "Search through a large text and find the parts that are the most relevant. Returns a JSON list.")
                 .properties(
-                    MODEL_PROVIDER_PROPERTY,
+                    PROVIDER_PROPERTY.apply(provider, propertyService),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     MODEL_URL_PROPERTY,
@@ -83,7 +86,7 @@ public class SimilaritySearchAction implements AiTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component, this);
+            provider, this, propertyService);
     }
 
     public Parameters createParameters(Parameters inputParameters) {

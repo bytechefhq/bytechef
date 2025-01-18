@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiComponentDefinition;
+import com.bytechef.platform.configuration.service.PropertyService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,10 +41,10 @@ public class AiTextComponentHandler implements ComponentHandler {
 
     private final AiComponentDefinition componentDefinition;
 
-    public AiTextComponentHandler(ApplicationProperties applicationProperties) {
+    public AiTextComponentHandler(ApplicationProperties applicationProperties, PropertyService propertyService) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        this.componentDefinition = new AiTextComponentDefinitionImpl(ai.getComponent());
+        this.componentDefinition = new AiTextComponentDefinitionImpl(ai.getProvider(), propertyService);
     }
 
     @Override
@@ -54,7 +55,8 @@ public class AiTextComponentHandler implements ComponentHandler {
     private static class AiTextComponentDefinitionImpl
         extends AbstractComponentDefinitionWrapper implements AiComponentDefinition {
 
-        private AiTextComponentDefinitionImpl(ApplicationProperties.Ai.Component component) {
+        private AiTextComponentDefinitionImpl(
+            ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
             super(
                 component(AI_TEXT)
                     .title("AI Text")
@@ -62,11 +64,11 @@ public class AiTextComponentHandler implements ComponentHandler {
                     .icon("path:assets/ai-text.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
-                        new ClassifyTextAction(component).actionDefinition,
-                        new SentimentAction(component).actionDefinition,
-                        new ScoreAction(component).actionDefinition,
-                        new SummarizeTextAction(component).actionDefinition,
-                        new SimilaritySearchAction(component).actionDefinition));
+                        new ClassifyTextAction(provider, propertyService).actionDefinition,
+                        new SentimentAction(provider, propertyService).actionDefinition,
+                        new ScoreAction(provider, propertyService).actionDefinition,
+                        new SummarizeTextAction(provider, propertyService).actionDefinition,
+                        new SimilaritySearchAction(provider, propertyService).actionDefinition));
         }
     }
 }

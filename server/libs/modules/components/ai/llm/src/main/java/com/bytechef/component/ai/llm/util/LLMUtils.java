@@ -16,10 +16,13 @@
 
 package com.bytechef.component.ai.llm.util;
 
+import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.JSON;
+import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Option;
@@ -98,7 +101,7 @@ public class LLMUtils {
 
         BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
 
-        if (inputParameters.getFromPath("response.responseFormat", Integer.class, 1) == 2) {
+        if (inputParameters.getFromPath("response.responseFormat", ResponseFormat.class, TEXT) == JSON) {
             String responseSchema = inputParameters.getRequiredFromPath("response.responseSchema", String.class);
 
             outputSchemaProperty = actionContext.outputSchema(

@@ -17,14 +17,27 @@
 package com.bytechef.component.ai.text.constant;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC2;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC3;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_COHERE;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JURASSIC2;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
+import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
+import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
+import static com.bytechef.component.ai.llm.constant.Provider.MISTRAL;
+import static com.bytechef.component.ai.llm.constant.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.config.ApplicationProperties.Ai;
 
-import com.bytechef.component.ai.text.util.AiTextAnalysisUtil;
-import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.ai.text.util.AiTextUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
+import com.bytechef.platform.configuration.service.PropertyService;
+import java.util.function.BiFunction;
 
 /**
  * @author Marko Krišković
@@ -38,58 +51,50 @@ public class AiTextConstants {
     public static final String CATEGORIES = "categories";
     public static final String CRITERIA = "criteria";
     public static final String EXAMPLES = "examples";
-
     public static final String CRITERION = "criterion";
     public static final String LOWEST_SCORE = "lowestScore";
     public static final String HIGHEST_SCORE = "highestScore";
     public static final String IS_DECIMAL = "isDecimal";
     public static final String NUM_RESULTS = "numResults";
     public static final String CHUNK_SIZE = "chunkSize";
-
-    public static final String MODEL_PROVIDER = "modelProvider";
+    public static final String PROVIDER = "provider";
     public static final String SUMMARIZE_TEXT = "summarizeText";
     public static final String SIMILARITY_SEARCH = "similaritySearch";
     public static final String CLASSIFY_TEXT = "classifyText";
     public static final String SENTIMENT_ANALYSIS = "sentimentAnalysis";
     public static final String SCORE = "score";
 
-    public static final ModifiableIntegerProperty MODEL_PROVIDER_PROPERTY = integer(MODEL_PROVIDER)
-        .label("Model provider")
-        .options(
-            option("Amazon Bedrock: Anthropic 2", 0),
-            option("Amazon Bedrock: Anthropic 3", 1),
-            option("Amazon Bedrock: Cohere", 2),
-            option("Amazon Bedrock: Jurassic 2", 3),
-            option("Amazon Bedrock: Llama", 4),
-            option("Amazon Bedrock: Titan", 5),
-            option("Anthropic", 6),
-            option("Azure Open AI", 7),
-            option("Groq", 8),
-            option("NVIDIA", 9),
-            option("Hugging Face", 10),
-            option("Mistral", 11),
-            option("Open AI", 12),
-            option("Vertex Gemini", 13))
-        .required(true);
+    public static final BiFunction<Ai.Provider, PropertyService, ModifiableStringProperty> PROVIDER_PROPERTY =
+        (aiProvider, propertyService) -> string(PROVIDER)
+            .label("Provider")
+            .options(
+                (ActionOptionsFunction<String>) (
+                    inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiTextUtils
+                        .getProviderOptions(aiProvider, propertyService))
+            .required(true);
 
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
-        .description("ID of the model to use.")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) AiTextAnalysisUtil::getModelOptions)
-        .optionsLookupDependsOn(MODEL_PROVIDER)
-        .displayCondition("modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)")
+        .description("The model name to use.")
+        .options((ActionOptionsFunction<String>) AiTextUtils::getModelOptions)
+        .optionsLookupDependsOn(PROVIDER)
+        .displayCondition(
+            "{'%s','%s','%s','%s','%s','%s','%s','%s','%s','%s'}.contains(provider)".formatted(
+                AMAZON_BEDROCK_ANTHROPIC2, AMAZON_BEDROCK_ANTHROPIC3, AMAZON_BEDROCK_COHERE,
+                AMAZON_BEDROCK_JURASSIC2, AMAZON_BEDROCK_LLAMA, AMAZON_BEDROCK_TITAN, ANTHROPIC,
+                MISTRAL, OPEN_AI, VERTEX_GEMINI))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("modelProvider >= 7 && modelProvider <= 9")
+        .displayCondition("{'%s','%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_URL_PROPERTY = string(MODEL)
         .label("URL")
         .description("Url of the inference endpoint.")
-        .displayCondition("modelProvider == 10")
+        .displayCondition("provider == '%s'".formatted(VERTEX_GEMINI))
         .required(true);
 
     private AiTextConstants() {

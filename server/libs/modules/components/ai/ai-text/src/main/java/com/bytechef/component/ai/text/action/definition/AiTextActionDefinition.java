@@ -16,7 +16,21 @@
 
 package com.bytechef.component.ai.text.action.definition;
 
-import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_PROVIDER;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC2;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_ANTHROPIC3;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_COHERE;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JURASSIC2;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
+import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
+import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
+import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
+import static com.bytechef.component.ai.llm.constant.Provider.HUGGING_FACE;
+import static com.bytechef.component.ai.llm.constant.Provider.MISTRAL;
+import static com.bytechef.component.ai.llm.constant.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
+import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.ChatModel;
@@ -28,6 +42,8 @@ import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockLlamaCha
 import com.bytechef.component.ai.llm.amazon.bedrock.action.AmazonBedrockTitanChatAction;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
+import com.bytechef.component.ai.llm.constant.LLMConstants;
+import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
 import com.bytechef.component.ai.llm.hugging.face.action.HuggingFaceChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
@@ -39,10 +55,27 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.action.OpenAiChatAction;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic2;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockAnthropic3;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockCohere;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockJurassic2;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockLlama;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockTitan;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.AzureOpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.HuggingFace;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Mistral;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Nvidia;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,18 +84,20 @@ import java.util.Optional;
  */
 public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
 
-    private final ApplicationProperties.Ai.Component component;
+    private final ApplicationProperties.Ai.Provider aiProvider;
     private final AiTextAction aiTextAction;
+    private final PropertyService propertyService;
 
     @SuppressFBWarnings("EI")
     public AiTextActionDefinition(
-        ActionDefinition actionDefinition, ApplicationProperties.Ai.Component component,
-        AiTextAction aiTextAction) {
+        ActionDefinition actionDefinition, ApplicationProperties.Ai.Provider aiProvider, AiTextAction aiTextAction,
+        PropertyService propertyService) {
 
         super(actionDefinition);
 
-        this.component = component;
+        this.aiProvider = aiProvider;
         this.aiTextAction = aiTextAction;
+        this.propertyService = propertyService;
     }
 
     @Override
@@ -75,95 +110,198 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
 
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
-        final ApplicationProperties.Ai.Component.AmazonBedrock amazonBedrock = component.getAmazonBedrock();
+        List<String> activeProviderKeys = propertyService.getProperties(
+            LLMConstants.PROVIDERS.stream()
+                .map(Provider::getKey)
+                .toList())
+            .stream()
+            .filter(property -> property.getValue() != null && property.isEnabled())
+            .map(Property::getKey)
+            .toList();
 
-        ChatModel chatModel = switch (inputParameters.getRequiredInteger(MODEL_PROVIDER)) {
-            case 0 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+        ChatModel chatModel = switch (Provider.valueOf(inputParameters.getRequiredString(PROVIDER))) {
+            case AMAZON_BEDROCK_ANTHROPIC2 -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
+
+                    token = amazonBedrockAnthropic2.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockAnthropic2ChatAction.CHAT_MODEL;
             }
-            case 1 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+            case AMAZON_BEDROCK_ANTHROPIC3 -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
+
+                    token = amazonBedrockAnthropic3.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockAnthropic3ChatAction.CHAT_MODEL;
             }
-            case 2 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+            case AMAZON_BEDROCK_COHERE -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
+
+                    token = amazonBedrockCohere.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockCohereChatAction.CHAT_MODEL;
             }
-            case 3 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+            case AMAZON_BEDROCK_JURASSIC2 -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
+
+                    token = amazonBedrockJurassic2.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockJurassic2ChatAction.CHAT_MODEL;
             }
-            case 4 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+            case AMAZON_BEDROCK_LLAMA -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
+
+                    token = amazonBedrockLlama.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockLlamaChatAction.CHAT_MODEL;
             }
-            case 5 -> {
-                modelConnectionParametersMap.put(TOKEN, amazonBedrock.getApiKey());
+            case AMAZON_BEDROCK_TITAN -> {
+                String token = getAiProviderToken(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
+
+                    token = amazonBedrockTitan.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AmazonBedrockTitanChatAction.CHAT_MODEL;
             }
-            case 6 -> {
-                modelConnectionParametersMap.put(TOKEN, component.getAnthropic()
-                    .getApiKey());
+            case ANTHROPIC -> {
+                String token = getAiProviderToken(ANTHROPIC.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    Anthropic anthropic = aiProvider.getAnthropic();
+
+                    token = anthropic.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AnthropicChatAction.CHAT_MODEL;
             }
-            case 7 -> {
-                ApplicationProperties.Ai.Component.AzureOpenAi azureOpenAi = component.getAzureOpenAi();
+            case AZURE_OPEN_AI -> {
+                String token = getAiProviderToken(AZURE_OPEN_AI.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, azureOpenAi.getApiKey());
+                if (token == null) {
+                    AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
+
+                    token = azureOpenAi.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield AzureOpenAiChatAction.CHAT_MODEL;
             }
-            case 8 -> {
-                ApplicationProperties.Ai.Component.Groq groq = component.getGroq();
+            case GROQ -> {
+                String token = getAiProviderToken(GROQ.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, groq.getApiKey());
+                if (token == null) {
+                    Groq groq = aiProvider.getGroq();
+
+                    token = groq.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield GroqChatAction.CHAT_MODEL;
             }
-            case 9 -> {
-                ApplicationProperties.Ai.Component.Nvidia nvidia = component.getNvidia();
+            case HUGGING_FACE -> {
+                String token = getAiProviderToken(HUGGING_FACE.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, nvidia.getApiKey());
+                if (token == null) {
+                    HuggingFace huggingFace = aiProvider.getHuggingFace();
 
-                yield NvidiaChatAction.CHAT_MODEL;
-            }
-            case 10 -> {
-                ApplicationProperties.Ai.Component.HuggingFace huggingFace = component.getHuggingFace();
+                    token = huggingFace.getApiKey();
+                }
 
-                modelConnectionParametersMap.put(TOKEN, huggingFace.getApiKey());
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield HuggingFaceChatAction.CHAT_MODEL;
             }
-            case 11 -> {
-                ApplicationProperties.Ai.Component.Mistral mistral = component.getMistral();
+            case MISTRAL -> {
+                String token = getAiProviderToken(MISTRAL.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, mistral.getApiKey());
+                if (token == null) {
+                    Mistral mistral = aiProvider.getMistral();
+
+                    token = mistral.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield MistralChatAction.CHAT_MODEL;
             }
-            case 12 -> {
-                ApplicationProperties.Ai.Component.OpenAi openAi = component.getOpenAi();
+            case NVIDIA -> {
+                String token = getAiProviderToken(NVIDIA.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, openAi.getApiKey());
+                if (token == null) {
+                    Nvidia nvidia = aiProvider.getNvidia();
+
+                    token = nvidia.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
+
+                yield NvidiaChatAction.CHAT_MODEL;
+            }
+            case OPEN_AI -> {
+                String token = getAiProviderToken(OPEN_AI.getKey(), activeProviderKeys);
+
+                if (token == null) {
+                    OpenAi openAi = aiProvider.getOpenAi();
+
+                    token = openAi.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield OpenAiChatAction.CHAT_MODEL;
             }
-            case 13 -> {
-                ApplicationProperties.Ai.Component.VertexGemini vertexGemini = component.getVertexGemini();
+            case VERTEX_GEMINI -> {
+                String token = getAiProviderToken(VERTEX_GEMINI.getKey(), activeProviderKeys);
 
-                modelConnectionParametersMap.put(TOKEN, vertexGemini.getApiKey());
+                if (token == null) {
+                    VertexGemini vertexGemini = aiProvider.getVertexGemini();
+
+                    token = vertexGemini.getApiKey();
+                }
+
+                modelConnectionParametersMap.put(TOKEN, token);
 
                 yield VertexGeminiChatAction.CHAT_MODEL;
             }
-            default -> throw new IllegalArgumentException("Invalid connection provider");
         };
 
         Parameters modelConnectionParameters = ParametersFactory.createParameters(modelConnectionParametersMap);
@@ -173,5 +311,14 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         Object response = chatModel.getResponse(modelInputParameters, modelConnectionParameters, context);
 
         return response.toString();
+    }
+
+    private String getAiProviderToken(String key, List<String> activeProviderKeys) {
+        return activeProviderKeys.stream()
+            .filter(key::equals)
+            .findFirst()
+            .map(propertyService::getProperty)
+            .map(property -> (String) property.get("apiKey"))
+            .orElse(null);
     }
 }

@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.text;
+package com.bytechef.platform.configuration.repository;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import com.bytechef.platform.configuration.domain.Property;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * @author Marko Krišković
+ * @author Ivica Cardic
  */
-class AiTextComponentHandlerTest {
+@Repository
+public interface PropertyRepository extends CrudRepository<Property, Long> {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_text_v1.json",
-            new AiTextComponentHandler(new ApplicationProperties(), null).getDefinition());
-    }
+    List<Property> findAllByKeyIn(List<String> keys);
+
+    Optional<Property> findByKey(String key);
 }

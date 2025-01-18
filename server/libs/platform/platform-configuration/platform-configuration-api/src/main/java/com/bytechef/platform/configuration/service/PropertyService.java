@@ -14,21 +14,28 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.text;
+package com.bytechef.platform.configuration.service;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import org.junit.jupiter.api.Test;
+import com.bytechef.platform.configuration.domain.Property;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
- * @author Marko Krišković
+ * @author Ivica Cardic
  */
-class AiTextComponentHandlerTest {
+public interface PropertyService {
 
-    @Test
-    void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_text_v1.json",
-            new AiTextComponentHandler(new ApplicationProperties(), null).getDefinition());
-    }
+    void delete(@NonNull String key);
+
+    Optional<Property> fetchProperty(@NonNull String key);
+
+    Property getProperty(@NonNull String key);
+
+    List<Property> getProperties(@NonNull List<String> keys);
+
+    void save(@NonNull String key, @NonNull Map<String, ?> value);
+
+    void update(@NonNull String key, boolean enabled);
 }
