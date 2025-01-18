@@ -41,7 +41,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final Long instanceId;
     private final Long instanceWorkflowId;
     private final Long jobId;
-    private final boolean devEnvironment;
+    private final boolean editorEnvironment;
     private final ModeType type;
     private final String workflowId;
 
@@ -49,7 +49,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     public ActionContextImpl(
         String componentName, int componentVersion, String actionName, ModeType type, Long instanceId,
         Long instanceWorkflowId, String workflowId, Long jobId, ComponentConnection connection,
-        boolean devEnvironment, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
+        boolean editorEnvironment, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, actionName, filesFileStorage, connection, httpClientExecutor);
@@ -57,7 +57,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.actionName = actionName;
         this.data = new DataImpl(
             componentName, componentVersion, actionName, type, instanceId, instanceWorkflowId, jobId, dataStorage);
-        this.devEnvironment = devEnvironment;
+        this.editorEnvironment = editorEnvironment;
         this.event = jobId == null ? progress -> {} : new EventImpl(eventPublisher, jobId);
         this.instanceId = instanceId;
         this.instanceWorkflowId = instanceWorkflowId;
@@ -111,8 +111,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     }
 
     @Override
-    public boolean isDevEnvironment() {
-        return devEnvironment;
+    public boolean isEditorEnvironment() {
+        return editorEnvironment;
     }
 
     private record DataImpl(
