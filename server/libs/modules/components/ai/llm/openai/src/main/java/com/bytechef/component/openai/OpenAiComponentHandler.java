@@ -35,12 +35,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class OpenAiComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("openai")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("openAi")
         .title("OpenAI")
         .description(
             "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
                 "that benefit humanity as a whole.")
-        .icon("path:assets/openai.svg")
+        .icon("path:assets/open-ai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenAiConnection.CONNECTION_DEFINITION)
         .actions(

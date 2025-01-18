@@ -27,6 +27,6 @@ class OpenAiComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/openai_v1.json", new OpenAiComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/open-ai_v1.json", new OpenAiComponentHandler().getDefinition());
     }
 }

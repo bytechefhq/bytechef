@@ -28,6 +28,6 @@ class AzureOpenAiComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/azure-openai_v1.json", new AzureOpenAiComponentHandler().getDefinition());
+            "definition/azure-open-ai_v1.json", new AzureOpenAiComponentHandler().getDefinition());
     }
 }
