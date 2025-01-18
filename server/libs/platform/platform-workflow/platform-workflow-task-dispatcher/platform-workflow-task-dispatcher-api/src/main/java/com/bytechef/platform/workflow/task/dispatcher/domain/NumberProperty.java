@@ -101,13 +101,23 @@ public class NumberProperty extends ValueProperty<Double> {
     @Override
     public String toString() {
         return "NumberProperty{" +
-            "maxValue=" + maxValue +
-            ", minValue=" + minValue +
-            ", numberPrecision=" + numberPrecision +
-            ", options=" + options +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", options=" + options +
+            ", numberPrecision=" + numberPrecision +
+            ", minValue=" + minValue +
+            ", minNumberPrecision=" + minNumberPrecision +
+            ", maxValue=" + maxValue +
+            ", maxNumberPrecision=" + maxNumberPrecision +
+            "} " + super.toString();
     }
 }

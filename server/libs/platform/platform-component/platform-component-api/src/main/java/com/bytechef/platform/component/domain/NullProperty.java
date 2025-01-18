@@ -38,7 +38,17 @@ public class NullProperty extends ValueProperty<Void> {
     @Override
     public String toString() {
         return "NullProperty{" +
-            "controlType=" + controlType +
-            "} ";
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", controlType=" + controlType +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
+            ", exampleValue=" + exampleValue +
+            ", defaultValue=" + defaultValue +
+            "} " + super.toString();
     }
 }

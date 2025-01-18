@@ -43,7 +43,7 @@ import java.util.Objects;
 @SuppressFBWarnings("NM_SAME_SIMPLE_NAME_AS_SUPERCLASS")
 public abstract class Property extends BaseProperty {
 
-    private Type type;
+    protected Type type;
 
     protected Property() {
     }

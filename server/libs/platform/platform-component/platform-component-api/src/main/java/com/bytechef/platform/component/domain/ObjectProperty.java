@@ -99,14 +99,22 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> implements Opt
     @Override
     public String toString() {
         return "ObjectProperty{" +
-            "additionalProperties=" + additionalProperties +
-            ", multipleValues=" + multipleValues +
-            ", options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
-            ", properties=" + properties +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", properties=" + properties +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            ", multipleValues=" + multipleValues +
+            ", additionalProperties=" + additionalProperties +
+            "} " + super.toString();
     }
 }

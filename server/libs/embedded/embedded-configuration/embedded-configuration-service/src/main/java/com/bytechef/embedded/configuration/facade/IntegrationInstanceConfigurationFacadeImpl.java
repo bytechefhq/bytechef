@@ -212,7 +212,8 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
 
         return instanceJobFacade.createJob(
-            new JobParametersDTO(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, ModeType.EMBEDDED);
+            new JobParametersDTO(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id,
+            ModeType.EMBEDDED);
     }
 
     @Override

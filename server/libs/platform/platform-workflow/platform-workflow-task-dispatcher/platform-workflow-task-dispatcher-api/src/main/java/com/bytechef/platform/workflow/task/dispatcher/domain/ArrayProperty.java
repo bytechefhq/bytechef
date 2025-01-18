@@ -100,14 +100,22 @@ public class ArrayProperty extends ValueProperty<List<?>> {
     @Override
     public String toString() {
         return "ArrayProperty{" +
-            "items=" + items +
-            ", multipleValues=" + multipleValues +
-            ", options=" + options +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
+            ", defaultValue=" + defaultValue +
+            ", options=" + options +
+            ", multipleValues=" + multipleValues +
             ", minItems=" + minItems +
             ", maxItems=" + maxItems +
-            "} ";
+            ", items=" + items +
+            "} " + super.toString();
     }
 }

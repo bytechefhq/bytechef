@@ -98,13 +98,22 @@ public class StringProperty extends ValueProperty<String> implements OptionsData
     @Override
     public String toString() {
         return "StringProperty{" +
-            "maxLength=" + maxLength +
-            ", minLength=" + minLength +
-            ", options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            ", minLength=" + minLength +
+            ", maxLength=" + maxLength +
+            ", languageId='" + languageId + '\'' +
+            "} " + super.toString();
     }
 }

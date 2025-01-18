@@ -75,11 +75,19 @@ public class DateProperty extends ValueProperty<LocalDate> implements OptionsDat
     @Override
     public String toString() {
         return "DateProperty{" +
-            "options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            "} " + super.toString();
     }
 }

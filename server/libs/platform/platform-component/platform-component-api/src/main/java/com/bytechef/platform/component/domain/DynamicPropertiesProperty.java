@@ -68,8 +68,16 @@ public class DynamicPropertiesProperty extends Property {
     @Override
     public String toString() {
         return "DynamicPropertiesProperty{" +
-            "header='" + header + '\'' +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", propertiesDataSource=" + propertiesDataSource +
+            ", header='" + header + '\'' +
             "} " + super.toString();
     }
 }

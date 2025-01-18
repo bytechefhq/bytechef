@@ -32,4 +32,18 @@ public class TaskProperty extends Property {
     public Object accept(PropertyVisitor propertyVisitor) {
         return propertyVisitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "TaskProperty{" +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
+            "} " + super.toString();
+    }
 }
