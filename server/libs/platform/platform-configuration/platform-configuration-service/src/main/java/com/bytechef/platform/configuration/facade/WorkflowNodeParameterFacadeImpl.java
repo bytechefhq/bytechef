@@ -50,6 +50,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
@@ -221,17 +222,30 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
         List<List<Integer>> indexesList = findIndexes(displayCondition, parameterMap);
 
-        for (List<Integer> indexes : indexesList) {
-            String updatedDisplayCondition = replaceIndexes(displayCondition, indexes);
-
-            if (displayConditionMap.containsKey(updatedDisplayCondition)) {
-                continue;
-            }
-
-            boolean result = evaluate(updatedDisplayCondition, inputMap, outputs, parameterMap);
+        if (indexesList.isEmpty()) {
+            boolean result = evaluate(displayCondition, inputMap, outputs, parameterMap);
 
             if (result) {
-                displayConditionMap.put(updatedDisplayCondition, propertyName);
+                displayConditionMap.put(displayCondition, propertyName);
+            }
+        } else {
+            for (List<Integer> indexes : indexesList) {
+                String updatedDisplayCondition = displayCondition.contains("[index]")
+                    ? replaceIndexes(displayCondition, indexes) : displayCondition;
+
+                if (displayConditionMap.containsKey(updatedDisplayCondition)) {
+                    continue;
+                }
+
+                boolean result = evaluate(updatedDisplayCondition, inputMap, outputs, parameterMap);
+
+                if (result) {
+                    String indexesString = indexes.stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining("_"));
+
+                    displayConditionMap.put(updatedDisplayCondition, String.join("_", indexesString, propertyName));
+                }
             }
         }
     }
@@ -389,8 +403,12 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
             if (removeParameters) {
                 List<Integer> parameterPathIndexes = extractIndexes(parameterPath);
 
+                String indexesString = parameterPathIndexes.stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining("_"));
+
                 if (hasExpressionVariable(displayCondition, parameterPath, parameterPathIndexes) &&
-                    !displayConditionMap.containsValue(property.getName())) {
+                    !displayConditionMap.containsValue(String.join("_", indexesString, property.getName()))) {
 
                     removeParameter(property.getName(), parameterPathIndexes, parameterMap);
 
@@ -443,9 +461,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private static void checkDynamicPropertyType(String propertyName, Map<String, ?> dynamicPropertyTypesMap) {
-        Set<String> keySet = dynamicPropertyTypesMap.keySet();
-
-        for (String key : keySet) {
+        for (String key : new HashSet<>(dynamicPropertyTypesMap.keySet())) {
             if (key.equals(propertyName) || key.contains("." + propertyName) || key.startsWith(propertyName + ".") ||
                 key.startsWith(propertyName + "[")) {
 
@@ -478,6 +494,10 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static List<List<Integer>> findIndexes(String displayCondition, Map<String, ?> parameterMap) {
         List<List<Integer>> allIndexes = new ArrayList<>();
 
+        if (displayCondition == null || displayCondition.isEmpty()) {
+            return List.of();
+        }
+
         findIndexes(displayCondition, parameterMap, new ArrayList<>(), allIndexes);
 
         return allIndexes;
@@ -486,12 +506,6 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     private static void findIndexes(
         String displayCondition, Object currentParameters, List<Integer> currentIndexes,
         List<List<Integer>> allIndexes) {
-
-        if (displayCondition.isEmpty()) {
-            allIndexes.add(new ArrayList<>(currentIndexes));
-
-            return;
-        }
 
         Matcher matcher = ARRAY_INDEXES_PATTERN.matcher(displayCondition);
 
@@ -620,7 +634,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                     for (Object item : curList) {
                         Map<String, ?> curTask = (Map<String, ?>) item;
 
-                        if (!curTask.containsKey(WorkflowConstants.NAME) &&
+                        if (curTask == null || !curTask.containsKey(WorkflowConstants.NAME) &&
                             !curTask.containsKey(WorkflowConstants.PARAMETERS)) {
 
                             continue;
