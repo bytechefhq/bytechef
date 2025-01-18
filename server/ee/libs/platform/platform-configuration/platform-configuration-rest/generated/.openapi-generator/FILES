@@ -1,0 +1,6 @@
+README.md
+pom.xml
+src/main/java/com/bytechef/ee/platform/configuration/web/rest/AiProviderApi.java
+src/main/java/com/bytechef/ee/platform/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/ee/platform/configuration/web/rest/model/AiProviderModel.java
+src/main/java/com/bytechef/ee/platform/configuration/web/rest/model/UpdateAiProviderRequestModel.java
