@@ -65,10 +65,14 @@ public class OdsFileWriteAction {
                 .advancedOption(true),
             array(ROWS)
                 .label("Rows")
-                .description("The array of objects to write to the file.")
+                .description("The array of rows to write to the file.")
                 .required(true)
-                .items(object().additionalProperties(
-                    bool(), date(), dateTime(), integer(), nullable(), number(), string(), time())),
+                .placeholder("Add Row")
+                .items(
+                    object()
+                        .placeholder("Add Column")
+                        .additionalProperties(
+                            bool(), date(), dateTime(), integer(), nullable(), number(), string(), time())),
             string(FILENAME)
                 .label("Filename")
                 .description(

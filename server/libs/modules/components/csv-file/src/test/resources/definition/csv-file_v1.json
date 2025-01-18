@@ -360,9 +360,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Read from File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -573,7 +573,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Define a sequence of fields that will form a line. The values for these fields will consistently repeat in the same order defined here across all lines.",
+      "description" : "The array of rows to write to the file.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -583,8 +583,8 @@
       "type" : "ARRAY",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Line Structure Definition",
-      "placeholder" : null,
+      "label" : "Rows",
+      "placeholder" : "Add Row",
       "items" : [ {
         "advancedOption" : null,
         "description" : null,
@@ -598,7 +598,7 @@
         "defaultValue" : null,
         "exampleValue" : null,
         "label" : null,
-        "placeholder" : null,
+        "placeholder" : "Add Column",
         "additionalProperties" : [ {
           "advancedOption" : null,
           "description" : null,
@@ -717,11 +717,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to CSV File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -733,5 +732,6 @@
       "dataStreamItemWriter" : { }
     }
   },
+  "triggers" : null,
   "unifiedApi" : null
 }
