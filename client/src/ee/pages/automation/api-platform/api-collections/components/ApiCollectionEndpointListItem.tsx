@@ -24,6 +24,7 @@ import {twMerge} from 'tailwind-merge';
 
 const ApiCollectionEndpointListItem = ({
     apiCollectionEndpoint,
+    collectionVersion,
     projectDeploymentId,
     projectDeploymentWorkflow,
     projectId,
@@ -31,6 +32,7 @@ const ApiCollectionEndpointListItem = ({
     workflows,
 }: {
     apiCollectionEndpoint: ApiCollectionEndpoint;
+    collectionVersion: number;
     projectId: number;
     projectDeploymentId: number;
     projectDeploymentWorkflow: ProjectDeploymentWorkflow;
@@ -105,7 +107,11 @@ const ApiCollectionEndpointListItem = ({
                         {apiCollectionEndpoint.name}
                     </Link>
 
-                    <div className="w-4/12 text-sm font-semibold">{apiCollectionEndpoint.path}</div>
+                    <div className="w-4/12 text-sm font-semibold">
+                        <span>/v{collectionVersion}</span>
+
+                        <span>{apiCollectionEndpoint.path}</span>
+                    </div>
                 </div>
             </div>
 

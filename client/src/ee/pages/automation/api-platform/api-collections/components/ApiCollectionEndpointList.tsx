@@ -11,12 +11,14 @@ import ApiCollectionEndpointListItem from './ApiCollectionEndpointListItem';
 const ApiCollectionEndpointList = ({
     apiCollectionEndpoints,
     apiCollectionId,
+    collectionVersion,
     projectDeploymentId,
     projectId,
     projectVersion,
 }: {
-    apiCollectionId: number;
     apiCollectionEndpoints?: Array<ApiCollectionEndpoint>;
+    apiCollectionId: number;
+    collectionVersion: number;
     projectId: number;
     projectDeploymentId: number;
     projectVersion: number;
@@ -47,6 +49,7 @@ const ApiCollectionEndpointList = ({
                                     workflows && (
                                         <ApiCollectionEndpointListItem
                                             apiCollectionEndpoint={apiCollectionEndpoint}
+                                            collectionVersion={collectionVersion}
                                             projectDeploymentId={projectDeploymentId}
                                             projectDeploymentWorkflow={
                                                 projectDeployment.projectDeploymentWorkflows.find(

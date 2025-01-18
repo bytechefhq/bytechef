@@ -99,7 +99,6 @@ const ApiCollectionEndpointDialog = ({
                 apiCollectionId,
             });
         } else {
-            console.log(apiEndpoint);
             createOpenApiEndpointMutation.mutate({
                 ...apiEndpoint,
                 ...getValues(),

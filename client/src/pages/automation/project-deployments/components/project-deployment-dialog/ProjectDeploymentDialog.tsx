@@ -103,6 +103,12 @@ const ProjectDeploymentDialog = ({
             queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),
         });
 
+        if (projectDeployment?.projectId) {
+            queryClient.invalidateQueries({
+                queryKey: [...ProjectKeys.projects, projectDeployment?.projectId],
+            });
+        }
+
         closeDialog();
         setActiveStepIndex(0);
     };

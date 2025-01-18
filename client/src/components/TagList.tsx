@@ -137,7 +137,7 @@ const TagList = ({getRequest, id, remainingTags, tags, updateTagsMutation}: TagL
                     />
 
                     <Tooltip>
-                        <TooltipTrigger>
+                        <TooltipTrigger asChild>
                             <Button
                                 className="px-2 text-red-500 hover:bg-red-100 hover:text-red-700"
                                 onClick={() => setIsNewTagWindowVisible(false)}

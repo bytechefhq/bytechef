@@ -176,14 +176,7 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                         <ProjectDeploymentListItemDropdownMenu
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
-                            onEnableClick={() =>
-                                enableProjectDeploymentMutation.mutate({
-                                    enable: !projectDeployment.enabled,
-                                    id: projectDeployment.id!,
-                                })
-                            }
                             onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
-                            projectDeploymentEnabled={projectDeployment.enabled!}
                         />
                     </div>
                 </div>

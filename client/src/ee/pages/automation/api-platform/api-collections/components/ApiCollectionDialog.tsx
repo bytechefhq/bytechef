@@ -13,8 +13,10 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useCreateApiCollectionMutation, useUpdateApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
+import ApiCollectionDialogTagsSelect from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialogTagsSelect';
+import {ApiCollectionTagKeys} from '@/ee/queries/apiCollectionTags.queries';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
+import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -32,6 +34,13 @@ const formSchema = z.object({
     }),
     projectId: z.number().min(1),
     projectVersion: z.number().min(1),
+    tags: z.array(
+        z.object({
+            label: z.string(),
+            name: z.string(),
+            value: z.string(),
+        })
+    ),
     workspaceId: z.number(),
 });
 
@@ -53,6 +62,12 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             name: apiCollection?.name || '',
             projectId: apiCollection?.projectId,
             projectVersion: apiCollection?.projectVersion,
+            tags:
+                (apiCollection?.tags?.map((tag) => ({
+                    ...tag,
+                    label: tag.name,
+                    value: tag.name,
+                })) as Tag[]) || [],
             workspaceId: -1,
         } as ApiCollection,
         resolver: zodResolver(formSchema),
@@ -65,6 +80,10 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     const onSuccess = () => {
         queryClient.invalidateQueries({
             queryKey: ApiCollectionKeys.apiCollections,
+        });
+
+        queryClient.invalidateQueries({
+            queryKey: ApiCollectionTagKeys.apiCollectionTags,
         });
 
         closeDialog();
@@ -84,7 +103,6 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     };
 
     function saveOpenApiCollection() {
-        console.log(apiCollection);
         if (apiCollection?.id) {
             updateOpenApiCollectionMutation.mutate({
                 ...apiCollection,
@@ -122,40 +140,42 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                             </DialogDescription>
                         </DialogHeader>
 
-                        <FormField
-                            control={control}
-                            name="projectId"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Project</FormLabel>
+                        {!apiCollection?.id && (
+                            <FormField
+                                control={control}
+                                name="projectId"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Project</FormLabel>
 
-                                    <FormControl>
-                                        <ProjectDeploymentDialogBasicStepProjectsComboBox
-                                            onBlur={field.onBlur}
-                                            onChange={(item) => {
-                                                if (item) {
-                                                    setValue('projectId', item.value);
-                                                    resetField('projectVersion');
+                                        <FormControl>
+                                            <ProjectDeploymentDialogBasicStepProjectsComboBox
+                                                onBlur={field.onBlur}
+                                                onChange={(item) => {
+                                                    if (item) {
+                                                        setValue('projectId', item.value);
+                                                        resetField('projectVersion');
 
-                                                    if (!getValues('name')) {
-                                                        setValue('name', item.name!.toString());
+                                                        if (!getValues('name')) {
+                                                            setValue('name', item.name!.toString());
+                                                        }
+
+                                                        setCurProjectId(item.value);
+                                                        setCurProjectVersion(undefined);
                                                     }
+                                                }}
+                                                value={field.value}
+                                            />
+                                        </FormControl>
 
-                                                    setCurProjectId(item.value);
-                                                    setCurProjectVersion(undefined);
-                                                }
-                                            }}
-                                            value={field.value}
-                                        />
-                                    </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                                shouldUnregister={false}
+                            />
+                        )}
 
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                            shouldUnregister={false}
-                        />
-
-                        {curProjectId && (
+                        {!apiCollection?.id && curProjectId && (
                             <FormField
                                 control={control}
                                 name="projectVersion"
@@ -228,6 +248,34 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                 </FormItem>
                             )}
                             shouldUnregister={false}
+                        />
+
+                        <FormField
+                            control={control}
+                            name="tags"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Tags</FormLabel>
+
+                                    <ApiCollectionDialogTagsSelect
+                                        apiCollection={apiCollection}
+                                        /* eslint-disable @typescript-eslint/no-explicit-any */
+                                        field={field as any}
+                                        onCreateOption={(inputValue: string) => {
+                                            setValue('tags', [
+                                                ...(getValues().tags ?? []),
+                                                {
+                                                    label: inputValue,
+                                                    name: inputValue,
+                                                    value: inputValue,
+                                                },
+                                            ] as never[]);
+                                        }}
+                                    />
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
                         />
 
                         <DialogFooter>

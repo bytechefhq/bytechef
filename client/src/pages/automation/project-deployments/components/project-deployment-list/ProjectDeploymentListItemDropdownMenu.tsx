@@ -11,17 +11,13 @@ import {EllipsisVerticalIcon} from 'lucide-react';
 interface ProjectDeploymentListItemDropdownMenuProps {
     onDeleteClick: () => void;
     onEditClick: () => void;
-    onEnableClick: () => void;
     onUpdateProjectVersionClick: () => void;
-    projectDeploymentEnabled: boolean;
 }
 
 const ProjectDeploymentListItemDropdownMenu = ({
     onDeleteClick,
     onEditClick,
-    onEnableClick,
     onUpdateProjectVersionClick,
-    projectDeploymentEnabled,
 }: ProjectDeploymentListItemDropdownMenuProps) => {
     return (
         <DropdownMenu>
@@ -35,10 +31,6 @@ const ProjectDeploymentListItemDropdownMenu = ({
                 <DropdownMenuItem onClick={onEditClick}>Edit</DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
-
-                <DropdownMenuItem onClick={onEnableClick}>
-                    {projectDeploymentEnabled ? 'Disable' : 'Enable'}
-                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 

@@ -47,8 +47,8 @@ const ApiCollections = () => {
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useGetWorkspaceProjectsQuery({
+        apiCollections: true,
         id: currentWorkspaceId!,
-        projectDeployments: true,
     });
 
     const {
@@ -101,7 +101,7 @@ const ApiCollections = () => {
                 loading={apiCollectionsIsLoading || projectsIsLoading || tagsIsLoading}
             >
                 {apiCollections && apiCollections?.length > 0 ? (
-                    <ApiCollectionList apiCollections={apiCollections} />
+                    <ApiCollectionList apiCollections={apiCollections} tags={tags} />
                 ) : (
                     <EmptyList
                         button={<ApiCollectionDialog triggerNode={<Button>New API Collection</Button>} />}

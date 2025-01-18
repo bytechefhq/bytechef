@@ -1,46 +1,57 @@
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import TagList from '@/components/TagList';
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {CollapsibleTrigger} from '@/components/ui/collapsible';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useUpdateApiCollectionTagsMutation} from '@/ee/mutations/apiCollectionTags.mutations';
 import {useDeleteApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
 import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionDialog';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
+import ApiCollectionListItemDropDownMenu from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionListItemDropDownMenu';
 import {useApiCollectionsEnabledStore} from '@/ee/pages/automation/api-platform/api-collections/stores/useApiCollectionsEnabledStore';
+import {ApiCollectionTagKeys} from '@/ee/queries/apiCollectionTags.queries';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
+import {ApiCollection, Tag} from '@/ee/shared/middleware/automation/api-platform';
+import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
-import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
-import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
+import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
+import {ChevronDownIcon} from '@radix-ui/react-icons';
+import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ApiCollectionListItemProps {
     apiCollection: ApiCollection;
+    tags?: Tag[];
 }
 
-const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
+const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showApiEndpointDialog, setShowApiEndpointDialog] = useState(false);
+    const [showUpdateProjectVersionDialog, setShowUpdateProjectVersionDialog] = useState(false);
 
     const setApiCollectionEnabled = useApiCollectionsEnabledStore(
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const updateTagsMutation: UseMutationResult<void, object, any, unknown> = {} as any;
+    const apiCollectionTagIds = apiCollection.tags?.map((tag) => tag.id);
+
+    const {data: projectDeployment} = useGetProjectDeploymentQuery(apiCollection.projectDeploymentId!);
 
     const queryClient = useQueryClient();
+
+    const updateApiCollectionTagsMutation = useUpdateApiCollectionTagsMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ApiCollectionKeys.apiCollections,
+            });
+            queryClient.invalidateQueries({
+                queryKey: ApiCollectionTagKeys.apiCollectionTags,
+            });
+        },
+    });
 
     const deleteApiCollection = useDeleteApiCollectionMutation({
         onSuccess: () => {
@@ -71,6 +82,14 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                 },
             }
         );
+    };
+
+    const handleOnProjectDeploymentDialogClose = () => {
+        queryClient
+            .invalidateQueries({
+                queryKey: ApiCollectionKeys.apiCollections,
+            })
+            .then(() => setShowUpdateProjectVersionDialog(false));
     };
 
     return (
@@ -111,14 +130,16 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                                         <TagList
                                             getRequest={(id, tags) => ({
                                                 id: id!,
-                                                updateTagsRequestModel: {
+                                                updateTagsRequest: {
                                                     tags: tags || [],
                                                 },
                                             })}
                                             id={apiCollection.id!}
-                                            remainingTags={[]}
-                                            tags={apiCollection.tags}
-                                            updateTagsMutation={updateTagsMutation}
+                                            remainingTags={tags?.filter(
+                                                (tag) => !apiCollectionTagIds?.includes(tag.id)
+                                            )}
+                                            tags={apiCollection.tags ?? []}
+                                            updateTagsMutation={updateApiCollectionTagsMutation}
                                         />
                                     )}
                                 </div>
@@ -127,12 +148,24 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <Badge className="flex space-x-1" variant="secondary">
-                            <span>V{apiCollection.collectionVersion}</span>
-                        </Badge>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge className="flex space-x-1" variant="secondary">
+                                    V{apiCollection.projectVersion}
+                                </Badge>
+                            </TooltipTrigger>
+
+                            <TooltipContent>The project version</TooltipContent>
+                        </Tooltip>
 
                         <div className="flex min-w-28 justify-end">
-                            <Badge variant="secondary">{apiCollection.projectDeployment?.environment}</Badge>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge variant="secondary">{apiCollection.projectDeployment?.environment}</Badge>
+                                </TooltipTrigger>
+
+                                <TooltipContent>The environment</TooltipContent>
+                            </Tooltip>
                         </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">
@@ -160,27 +193,12 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                             </Tooltip>
                         </div>
 
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button size="icon" variant="ghost">
-                                    <DotsVerticalIcon className="size-4 hover:cursor-pointer" />
-                                </Button>
-                            </DropdownMenuTrigger>
-
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => setShowEditDialog(true)}>Edit</DropdownMenuItem>
-
-                                <DropdownMenuItem onClick={() => setShowApiEndpointDialog(true)}>
-                                    New Endpoint
-                                </DropdownMenuItem>
-
-                                <DropdownMenuSeparator />
-
-                                <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
-                                    Delete
-                                </DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                        <ApiCollectionListItemDropDownMenu
+                            onDeleteClick={() => setShowDeleteDialog(true)}
+                            onEditClick={() => setShowEditDialog(true)}
+                            onNewEndpoint={() => setShowApiEndpointDialog(true)}
+                            onUpdateProjectVersionClick={() => setShowUpdateProjectVersionDialog(true)}
+                        />
                     </div>
                 </div>
             </div>
@@ -203,6 +221,14 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                     onClose={() => setShowApiEndpointDialog(false)}
                     projectId={apiCollection.projectId}
                     projectVersion={apiCollection.projectVersion}
+                />
+            )}
+
+            {showUpdateProjectVersionDialog && (
+                <ProjectDeploymentDialog
+                    onClose={handleOnProjectDeploymentDialogClose}
+                    projectDeployment={projectDeployment}
+                    updateProjectVersion={true}
                 />
             )}
         </>
