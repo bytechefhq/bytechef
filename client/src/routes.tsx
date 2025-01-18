@@ -26,6 +26,7 @@ import Integrations from '@/pages/embedded/integrations/Integrations';
 import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pages/embedded/workflow-executions/WorkflowExecutions';
 import Home from '@/pages/home/Home';
 import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup';
+import AiProviders from '@/pages/platform/settings/ai-providers/AiProviders';
 import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
@@ -113,6 +114,16 @@ const platformSettingsRoutes = {
             ),
             path: 'api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <AiProviders />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai-providers',
+        },
     ],
     navItems: [
         {
@@ -129,6 +140,10 @@ const platformSettingsRoutes = {
         {
             href: 'api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'ai-providers',
+            title: 'AI Providers',
         },
     ],
 };

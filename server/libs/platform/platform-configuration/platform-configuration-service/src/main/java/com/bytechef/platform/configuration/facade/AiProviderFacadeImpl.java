@@ -23,6 +23,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.dto.AiProviderDTO;
 import com.bytechef.platform.configuration.service.PropertyService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     private final ComponentDefinitionService componentDefinitionService;
     private final PropertyService propertyService;
 
+    @SuppressFBWarnings("EI")
     public AiProviderFacadeImpl(
         ComponentDefinitionService componentDefinitionService, PropertyService propertyService) {
 
