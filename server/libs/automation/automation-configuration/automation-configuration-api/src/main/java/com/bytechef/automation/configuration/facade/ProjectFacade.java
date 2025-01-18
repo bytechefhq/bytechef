@@ -55,12 +55,13 @@ public interface ProjectFacade {
 
     List<ProjectWorkflowDTO> getProjectWorkflows(long id);
 
-    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion);
+    List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields);
 
     List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status);
 
     List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status);
+        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status,
+        boolean includeAllFields);
 
     void publishProject(long id, String description);
 

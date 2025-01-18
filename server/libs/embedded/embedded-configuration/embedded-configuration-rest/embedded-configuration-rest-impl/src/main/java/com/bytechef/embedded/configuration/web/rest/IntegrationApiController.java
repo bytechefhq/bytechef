@@ -94,13 +94,14 @@ public class IntegrationApiController implements IntegrationApi {
 
     @Override
     public ResponseEntity<List<IntegrationModel>> getIntegrations(
-        Long categoryId, Boolean integrationInstanceConfigurations, Long tagId, IntegrationStatusModel status) {
+        Long categoryId, Boolean integrationInstanceConfigurations, IntegrationStatusModel status, Long tagId,
+        Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             integrationFacade
                 .getIntegrations(
                     categoryId, integrationInstanceConfigurations != null, tagId,
-                    status == null ? null : Status.valueOf(status.name()))
+                    status == null ? null : Status.valueOf(status.name()), includeAllFields)
                 .stream()
                 .map(integration -> conversionService.convert(integration, IntegrationModel.class))
                 .toList());

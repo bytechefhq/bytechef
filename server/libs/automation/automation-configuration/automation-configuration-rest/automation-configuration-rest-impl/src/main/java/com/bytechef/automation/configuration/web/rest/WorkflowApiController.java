@@ -93,10 +93,12 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
     }
 
     @Override
-    public ResponseEntity<List<WorkflowModel>> getProjectVersionWorkflows(Long id, Integer projectVersion) {
+    public ResponseEntity<List<WorkflowModel>> getProjectVersionWorkflows(
+        Long id, Integer projectVersion, Boolean includeAllFields) {
+
         return ResponseEntity.ok(
             CollectionUtils.map(
-                projectFacade.getProjectVersionWorkflows(id, projectVersion),
+                projectFacade.getProjectVersionWorkflows(id, projectVersion, includeAllFields),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 

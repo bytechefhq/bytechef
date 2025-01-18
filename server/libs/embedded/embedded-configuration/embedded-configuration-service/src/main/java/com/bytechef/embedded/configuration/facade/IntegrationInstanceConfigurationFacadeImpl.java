@@ -372,39 +372,43 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     @Override
     @Transactional(readOnly = true)
     public List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
-        Environment environment, Long integrationId, Long tagId) {
+        Environment environment, Long integrationId, Long tagId, boolean includeAllFields) {
 
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(
                 environment, integrationId, tagId);
 
-        List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
-            integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
-                CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfiguration::getId));
-        List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
-        List<Tag> tags = getTags(integrationInstanceConfigurations);
+        if (includeAllFields) {
+            List<IntegrationInstanceConfigurationWorkflow> integrationInstanceConfigurationWorkflows =
+                integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflows(
+                    CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfiguration::getId));
+            List<IntegrationDTO> integrationDTOs = getIntegrations(integrationInstanceConfigurations);
+            List<Tag> tags = getTags(integrationInstanceConfigurations);
 
-        return CollectionUtils.map(
-            integrationInstanceConfigurations,
-            integrationInstanceConfiguration -> {
-                List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
+            return CollectionUtils.map(
+                integrationInstanceConfigurations,
+                integrationInstanceConfiguration -> {
+                    List<String> workflowIds = getWorkflowIds(integrationInstanceConfiguration);
 
-                return toIntegrationInstanceConfigurationDTO(
-                    CollectionUtils.getFirst(
-                        integrationDTOs, integration -> Objects.equals(
-                            integration.id(), integrationInstanceConfiguration.getIntegrationId())),
-                    integrationInstanceConfiguration,
-                    CollectionUtils.filter(
-                        integrationInstanceConfigurationWorkflows,
-                        integrationInstanceConfigurationWorkflow -> Objects.equals(
-                            integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
-                            integrationInstanceConfiguration.getId()) &&
-                            workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
-                    integrationWorkflowService.getIntegrationWorkflows(
-                        integrationInstanceConfiguration.getIntegrationId(),
-                        integrationInstanceConfiguration.getIntegrationVersion()),
-                    filterTags(tags, integrationInstanceConfiguration));
-            });
+                    return toIntegrationInstanceConfigurationDTO(
+                        CollectionUtils.getFirst(
+                            integrationDTOs, integration -> Objects.equals(
+                                integration.id(), integrationInstanceConfiguration.getIntegrationId())),
+                        integrationInstanceConfiguration,
+                        CollectionUtils.filter(
+                            integrationInstanceConfigurationWorkflows,
+                            integrationInstanceConfigurationWorkflow -> Objects.equals(
+                                integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
+                                integrationInstanceConfiguration.getId()) &&
+                                workflowIds.contains(integrationInstanceConfigurationWorkflow.getWorkflowId())),
+                        integrationWorkflowService.getIntegrationWorkflows(
+                            integrationInstanceConfiguration.getIntegrationId(),
+                            integrationInstanceConfiguration.getIntegrationVersion()),
+                        filterTags(tags, integrationInstanceConfiguration));
+                });
+        } else {
+            return CollectionUtils.map(integrationInstanceConfigurations, IntegrationInstanceConfigurationDTO::new);
+        }
     }
 
     @Override

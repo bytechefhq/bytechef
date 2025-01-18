@@ -116,9 +116,8 @@ public class ProjectInstanceFacadeIntTest {
 
         projectInstanceFacade.deleteProjectInstance(projectInstanceToDelete.id());
 
-        List<ProjectInstanceDTO> workspaceProjectInstances = projectInstanceFacade
-            .getWorkspaceProjectInstances(workspace.getId(), Environment.TEST, projectInstanceToDelete.projectId(),
-                null);
+        List<ProjectInstanceDTO> workspaceProjectInstances = projectInstanceFacade.getWorkspaceProjectInstances(
+            workspace.getId(), Environment.TEST, projectInstanceToDelete.projectId(), null, true);
 
         assertThat(workspaceProjectInstances).hasSize(0);
     }

@@ -99,12 +99,13 @@ public class ProjectInstanceApiController implements ProjectInstanceApi {
 
     @Override
     public ResponseEntity<List<ProjectInstanceModel>> getWorkspaceProjectInstances(
-        Long id, EnvironmentModel environment, Long projectId, Long tagId) {
+        Long id, EnvironmentModel environment, Long projectId, Long tagId, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             projectInstanceFacade
                 .getWorkspaceProjectInstances(
-                    id, environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId)
+                    id, environment == null ? null : Environment.valueOf(environment.getValue()), projectId, tagId,
+                    includeAllFields)
                 .stream()
                 .map(projectInstance -> conversionService.convert(projectInstance, ProjectInstanceModel.class))
                 .toList());

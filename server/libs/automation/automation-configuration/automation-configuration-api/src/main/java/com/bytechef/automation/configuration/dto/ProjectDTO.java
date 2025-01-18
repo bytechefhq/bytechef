@@ -43,6 +43,15 @@ public record ProjectDTO(
             project.getProjectVersions(), projectWorkflowIds, tags, project.getVersion(), project.getWorkspaceId());
     }
 
+    public ProjectDTO(Project project) {
+        this(
+            project.getCategoryId() == null ? null : new Category(project.getCategoryId()), project.getCreatedBy(),
+            project.getCreatedDate(), project.getDescription(), project.getId(), project.getName(),
+            project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
+            project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
+            List.of(), project.getVersion(), project.getWorkspaceId());
+    }
+
     public static Builder builder() {
         return new Builder();
     }

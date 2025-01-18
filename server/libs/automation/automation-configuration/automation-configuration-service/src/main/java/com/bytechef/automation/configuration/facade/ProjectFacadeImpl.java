@@ -293,25 +293,36 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion) {
-        return projectWorkflowService.getProjectWorkflows(id, projectVersion)
-            .stream()
-            .map(projectWorkflow -> new ProjectWorkflowDTO(
-                workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
-            .toList();
+    @Transactional(readOnly = true)
+    public List<ProjectWorkflowDTO> getProjectVersionWorkflows(long id, int projectVersion, boolean includeAllFields) {
+        if (includeAllFields) {
+            return projectWorkflowService.getProjectWorkflows(id, projectVersion)
+                .stream()
+                .map(projectWorkflow -> new ProjectWorkflowDTO(
+                    workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                .toList();
+        } else {
+            return projectWorkflowService.getProjectWorkflows(id, projectVersion)
+                .stream()
+                .map(projectWorkflow -> new ProjectWorkflowDTO(
+                    workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
+                .toList();
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getProjects(Long categoryId, boolean projectInstances, Long tagId, Status status) {
-        return getProjects(null, categoryId, projectInstances, tagId, status);
+        return getProjects(null, categoryId, projectInstances, tagId, status, true);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status) {
+        long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status,
+        boolean includeAllFields) {
 
-        return getProjects(workspaceId, categoryId, projectInstances, tagId, status);
+        return getProjects(workspaceId, categoryId, projectInstances, tagId, status, includeAllFields);
     }
 
     @Override
@@ -405,7 +416,8 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<ProjectDTO> getProjects(
-        Long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status) {
+        Long workspaceId, Long categoryId, boolean projectInstances, Long tagId, Status status,
+        boolean includeAllFields) {
 
         List<Long> projectIds = List.of();
 
@@ -415,27 +427,31 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         List<Project> projects = projectService.getProjects(workspaceId, categoryId, projectIds, tagId, status);
 
-        return CollectionUtils.map(
-            projects,
-            project -> new ProjectDTO(
-                CollectionUtils.findFirstFilterOrElse(
-                    categoryService.getCategories(
-                        projects
-                            .stream()
-                            .map(Project::getCategoryId)
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    category -> Objects.equals(project.getCategoryId(), category.getId()),
-                    null),
-                project,
-                projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
-                CollectionUtils.filter(
-                    tagService.getTags(
-                        projects.stream()
-                            .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
-                            .filter(Objects::nonNull)
-                            .toList()),
-                    tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+        if (includeAllFields) {
+            return CollectionUtils.map(
+                projects,
+                project -> new ProjectDTO(
+                    CollectionUtils.findFirstFilterOrElse(
+                        categoryService.getCategories(
+                            projects
+                                .stream()
+                                .map(Project::getCategoryId)
+                                .filter(Objects::nonNull)
+                                .toList()),
+                        category -> Objects.equals(project.getCategoryId(), category.getId()),
+                        null),
+                    project,
+                    projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
+                    CollectionUtils.filter(
+                        tagService.getTags(
+                            projects.stream()
+                                .flatMap(curProject -> CollectionUtils.stream(curProject.getTagIds()))
+                                .filter(Objects::nonNull)
+                                .toList()),
+                        tag -> CollectionUtils.contains(project.getTagIds(), tag.getId()))));
+        } else {
+            return CollectionUtils.map(projects, ProjectDTO::new);
+        }
     }
 
     private ProjectDTO toProjectDTO(Project project) {

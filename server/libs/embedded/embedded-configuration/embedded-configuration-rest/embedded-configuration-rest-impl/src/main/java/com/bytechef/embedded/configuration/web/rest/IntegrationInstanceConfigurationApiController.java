@@ -111,12 +111,13 @@ public class IntegrationInstanceConfigurationApiController implements Integratio
 
     @Override
     public ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
-        EnvironmentModel environment, Long integrationId, Long tagId) {
+        EnvironmentModel environment, Long integrationId, Long tagId, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationFacade
                 .getIntegrationInstanceConfigurations(
-                    environment == null ? null : Environment.valueOf(environment.getValue()), integrationId, tagId)
+                    environment == null ? null : Environment.valueOf(environment.getValue()), integrationId, tagId,
+                    includeAllFields)
                 .stream()
                 .map(this::toIntegrationInstanceConfigurationModel)
                 .toList());

@@ -35,6 +35,15 @@ public record ProjectInstanceDTO(
     Project project, long projectId, int projectVersion, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows,
     List<Tag> tags, int version) {
 
+    public ProjectInstanceDTO(ProjectInstance projectInstance) {
+        this(
+            projectInstance.getCreatedBy(), projectInstance.getCreatedDate(), projectInstance.getDescription(),
+            projectInstance.isEnabled(), projectInstance.getEnvironment(), projectInstance.getId(),
+            projectInstance.getName(), null, projectInstance.getLastModifiedBy(), projectInstance.getLastModifiedDate(),
+            null, projectInstance.getProjectId(), projectInstance.getProjectVersion(), List.of(), List.of(),
+            projectInstance.getVersion());
+    }
+
     public ProjectInstanceDTO(
         ProjectInstance projectInstance, List<ProjectInstanceWorkflowDTO> projectInstanceWorkflows, Project project,
         Instant lastExecutionDate, List<Tag> tags) {

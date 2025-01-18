@@ -43,7 +43,8 @@ public interface IntegrationFacade {
 
     List<Tag> getIntegrationTags();
 
-    List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion);
+    List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
+        long id, int integrationVersion, boolean includeAllFields);
 
     IntegrationWorkflowDTO getIntegrationWorkflow(String workflowId);
 
@@ -54,7 +55,8 @@ public interface IntegrationFacade {
     List<IntegrationWorkflowDTO> getIntegrationWorkflows(long id);
 
     List<IntegrationDTO> getIntegrations(
-        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status);
+        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
+        boolean includeAllFields);
 
     void publishIntegration(long id, String description);
 

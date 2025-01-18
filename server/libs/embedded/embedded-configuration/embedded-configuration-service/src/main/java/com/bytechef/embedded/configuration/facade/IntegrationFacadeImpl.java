@@ -231,14 +231,23 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     }
 
     @Override
-    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(
+        long id, int integrationVersion, boolean includeAllFields) {
+
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(
             id, integrationVersion);
 
-        return CollectionUtils.map(
-            integrationWorkflows,
-            integrationWorkflow -> new IntegrationWorkflowDTO(
-                workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
+        if (includeAllFields) {
+            return CollectionUtils.map(
+                integrationWorkflows,
+                integrationWorkflow -> new IntegrationWorkflowDTO(
+                    workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
+        } else {
+            return CollectionUtils.map(
+                integrationWorkflows,
+                integrationWorkflow -> new IntegrationWorkflowDTO(
+                    workflowService.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow));
+        }
     }
 
     @Override
@@ -290,7 +299,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     @Transactional(readOnly = true)
     public List<IntegrationDTO> getIntegrations(
-        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status) {
+        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
+        boolean includeAllFields) {
 
         List<Long> integrationIds = List.of();
 
@@ -304,26 +314,31 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         List<Integration> integrations = integrationService.getIntegrations(categoryId, integrationIds, tagId, status);
 
-        List<Category> categories = categoryService.getCategories(
-            integrations.stream()
-                .map(Integration::getCategoryId)
-                .filter(Objects::nonNull)
-                .toList());
-        List<Tag> tags = tagService.getTags(
-            integrations.stream()
-                .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))
-                .filter(Objects::nonNull)
-                .toList());
+        if (includeAllFields) {
+            List<Category> categories = categoryService.getCategories(
+                integrations.stream()
+                    .map(Integration::getCategoryId)
+                    .filter(Objects::nonNull)
+                    .toList());
+            List<Tag> tags = tagService.getTags(
+                integrations.stream()
+                    .flatMap(curIntegration -> CollectionUtils.stream(curIntegration.getTagIds()))
+                    .filter(Objects::nonNull)
+                    .toList());
 
-        return CollectionUtils.map(
-            integrations,
-            integration -> new IntegrationDTO(
-                CollectionUtils.findFirstFilterOrElse(
-                    categories, category -> Objects.equals(integration.getCategoryId(), category.getId()), null),
-                componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
-                integration,
-                getIntegrationWorkflowIds(integration),
-                CollectionUtils.filter(tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+            return CollectionUtils.map(
+                integrations,
+                integration -> new IntegrationDTO(
+                    CollectionUtils.findFirstFilterOrElse(
+                        categories, category -> Objects.equals(integration.getCategoryId(), category.getId()), null),
+                    componentDefinitionService.getComponentDefinition(integration.getComponentName(), null),
+                    integration,
+                    getIntegrationWorkflowIds(integration),
+                    CollectionUtils.filter(
+                        tags, tag -> CollectionUtils.contains(integration.getTagIds(), tag.getId()))));
+        } else {
+            return CollectionUtils.map(integrations, IntegrationDTO::new);
+        }
     }
 
     @Override

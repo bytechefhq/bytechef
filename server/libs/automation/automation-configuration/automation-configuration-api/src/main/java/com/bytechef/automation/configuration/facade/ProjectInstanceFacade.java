@@ -41,7 +41,8 @@ public interface ProjectInstanceFacade {
 
     List<Tag> getProjectInstanceTags();
 
-    List<ProjectInstanceDTO> getWorkspaceProjectInstances(long id, Environment environment, Long projectId, Long tagId);
+    List<ProjectInstanceDTO> getWorkspaceProjectInstances(
+        long id, Environment environment, Long projectId, Long tagId, boolean includeAllFields);
 
     void updateProjectInstance(ProjectInstanceDTO projectInstanceDTO);
 

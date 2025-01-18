@@ -197,7 +197,7 @@ public class IntegrationApiControllerIntTest {
     public void testGetIntegrations() {
         IntegrationDTO integrationDTO = getIntegrationDTO();
 
-        when(integrationFacade.getIntegrations(null, false, null, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(null, false, null, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -210,7 +210,7 @@ public class IntegrationApiControllerIntTest {
             .contains(integrationMapper.convert(integrationDTO))
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(1L, false, null, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, false, null, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -222,7 +222,7 @@ public class IntegrationApiControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(null, false, 1L, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(null, false, 1L, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -234,7 +234,7 @@ public class IntegrationApiControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(1L, false, 1L, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, false, 1L, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()

@@ -38,6 +38,17 @@ public record IntegrationDTO(
     Instant lastPublishedDate, Status lastStatus, Integer lastIntegrationVersion, String name, List<Tag> tags,
     String title, int version) {
 
+    public IntegrationDTO(Integration integration) {
+        this(
+            integration.isAllowMultipleInstances(),
+            integration.getCategoryId() == null ? null : new Category(integration.getCategoryId()),
+            integration.getComponentName(), integration.getCreatedBy(), integration.getCreatedDate(),
+            integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(), null,
+            integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
+            integration.getLastStatus(), integration.getLastIntegrationVersion(), integration.getName(), List.of(),
+            null, integration.getVersion());
+    }
+
     public IntegrationDTO(
         Category category, ComponentDefinition componentDefinition, Integration integration,
         List<Long> integrationWorkflowIds, List<Tag> tags) {
