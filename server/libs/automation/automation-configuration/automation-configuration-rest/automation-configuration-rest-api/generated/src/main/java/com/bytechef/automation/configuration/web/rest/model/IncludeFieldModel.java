@@ -17,19 +17,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
- * The status of a project.
+ * Gets or Sets IncludeField
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
-public enum ProjectStatusModel {
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-09T19:56:34.112361+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public enum IncludeFieldModel {
   
-  DRAFT("DRAFT"),
+  ALL("ALL"),
   
-  PUBLISHED("PUBLISHED");
+  BASIC("BASIC");
 
   private String value;
 
-  ProjectStatusModel(String value) {
+  IncludeFieldModel(String value) {
     this.value = value;
   }
 
@@ -44,8 +44,8 @@ public enum ProjectStatusModel {
   }
 
   @JsonCreator
-  public static ProjectStatusModel fromValue(String value) {
-    for (ProjectStatusModel b : ProjectStatusModel.values()) {
+  public static IncludeFieldModel fromValue(String value) {
+    for (IncludeFieldModel b : IncludeFieldModel.values()) {
       if (b.value.equals(value)) {
         return b;
       }

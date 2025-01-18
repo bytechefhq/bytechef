@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T06:16:00.287813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "workflow", description = "The Embedded Workflow Internal API")
 public interface WorkflowApi {
@@ -76,6 +76,7 @@ public interface WorkflowApi {
      *
      * @param id The id of a integration. (required)
      * @param integrationVersion The version of a integration. (required)
+     * @param includeAllFields Use for including all fields or just basic ones. (optional, default to true)
      * @return The array of integration workflows. (status code 200)
      */
     @Operation(
@@ -97,7 +98,8 @@ public interface WorkflowApi {
     
     default ResponseEntity<List<WorkflowModel>> getIntegrationVersionWorkflows(
         @Parameter(name = "id", description = "The id of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "integrationVersion", description = "The version of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("integrationVersion") Integer integrationVersion
+        @Parameter(name = "integrationVersion", description = "The version of a integration.", required = true, in = ParameterIn.PATH) @PathVariable("integrationVersion") Integer integrationVersion,
+        @Parameter(name = "includeAllFields", description = "Use for including all fields or just basic ones.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "includeAllFields", required = false, defaultValue = "true") Boolean includeAllFields
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

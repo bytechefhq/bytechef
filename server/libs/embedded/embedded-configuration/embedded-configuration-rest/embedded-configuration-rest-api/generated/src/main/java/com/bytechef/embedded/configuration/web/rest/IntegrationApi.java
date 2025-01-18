@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T06:16:00.287813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "integration", description = "The Embedded Integration Internal API")
 public interface IntegrationApi {
@@ -230,8 +230,9 @@ public interface IntegrationApi {
      *
      * @param categoryId The category id used for filtering integrations. (optional)
      * @param integrationInstanceConfigurations Use for filtering integrations for which integration instance configurations exist. (optional)
-     * @param tagId The tag id of used for filtering integrations. (optional)
      * @param status Use for filtering integrations by status. (optional)
+     * @param tagId The tag id of used for filtering integrations. (optional)
+     * @param includeAllFields Use for including all fields or just basic ones. (optional, default to true)
      * @return The list of integrations. (status code 200)
      */
     @Operation(
@@ -254,8 +255,9 @@ public interface IntegrationApi {
     default ResponseEntity<List<IntegrationModel>> getIntegrations(
         @Parameter(name = "categoryId", description = "The category id used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "integrationInstanceConfigurations", description = "Use for filtering integrations for which integration instance configurations exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationInstanceConfigurations", required = false) Boolean integrationInstanceConfigurations,
+        @Parameter(name = "status", description = "Use for filtering integrations by status.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) IntegrationStatusModel status,
         @Parameter(name = "tagId", description = "The tag id of used for filtering integrations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,
-        @Parameter(name = "status", description = "Use for filtering integrations by status.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) IntegrationStatusModel status
+        @Parameter(name = "includeAllFields", description = "Use for including all fields or just basic ones.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "includeAllFields", required = false, defaultValue = "true") Boolean includeAllFields
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

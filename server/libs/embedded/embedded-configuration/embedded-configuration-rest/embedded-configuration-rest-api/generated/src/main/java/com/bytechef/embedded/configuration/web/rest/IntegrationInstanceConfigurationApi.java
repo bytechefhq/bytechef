@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.302783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T06:16:00.287813+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "integration-instance-configuration", description = "the integration-instance-configuration API")
 public interface IntegrationInstanceConfigurationApi {
@@ -261,6 +261,7 @@ public interface IntegrationInstanceConfigurationApi {
      * @param environment The environment. (optional)
      * @param integrationId The integration id used for filtering integration instance configurations. (optional)
      * @param tagId The tag id of used for filtering integration instance configurations. (optional)
+     * @param includeAllFields Use for including all fields or just basic ones. (optional, default to true)
      * @return The list of integration instance configurations. (status code 200)
      */
     @Operation(
@@ -283,7 +284,8 @@ public interface IntegrationInstanceConfigurationApi {
     default ResponseEntity<List<IntegrationInstanceConfigurationModel>> getIntegrationInstanceConfigurations(
         @Parameter(name = "environment", description = "The environment.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "environment", required = false) EnvironmentModel environment,
         @Parameter(name = "integrationId", description = "The integration id used for filtering integration instance configurations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "integrationId", required = false) Long integrationId,
-        @Parameter(name = "tagId", description = "The tag id of used for filtering integration instance configurations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId
+        @Parameter(name = "tagId", description = "The tag id of used for filtering integration instance configurations.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,
+        @Parameter(name = "includeAllFields", description = "Use for including all fields or just basic ones.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "includeAllFields", required = false, defaultValue = "true") Boolean includeAllFields
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

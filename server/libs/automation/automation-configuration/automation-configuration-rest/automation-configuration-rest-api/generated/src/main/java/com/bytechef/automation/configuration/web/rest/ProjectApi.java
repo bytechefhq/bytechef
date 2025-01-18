@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:57.435090+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T05:57:54.056231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -238,6 +238,7 @@ public interface ProjectApi {
      * @param projectInstances Use for filtering projects for which project instances exist. (optional)
      * @param tagId The tag id of used for filtering projects. (optional)
      * @param status Use for filtering projects per status. (optional)
+     * @param includeAllFields Use for including all fields or just basic ones. (optional, default to true)
      * @return The list of projects. (status code 200)
      */
     @Operation(
@@ -262,7 +263,8 @@ public interface ProjectApi {
         @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "projectInstances", description = "Use for filtering projects for which project instances exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectInstances", required = false) Boolean projectInstances,
         @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,
-        @Parameter(name = "status", description = "Use for filtering projects per status.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) ProjectStatusModel status
+        @Parameter(name = "status", description = "Use for filtering projects per status.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "status", required = false) ProjectStatusModel status,
+        @Parameter(name = "includeAllFields", description = "Use for including all fields or just basic ones.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "includeAllFields", required = false, defaultValue = "true") Boolean includeAllFields
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
