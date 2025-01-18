@@ -1,5 +1,5 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {ApiConnector} from '@/middleware/platform/api-connector';
+import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 
 import ApiConnectorEndpointList from './ApiConnectorEndpointList';
 import ApiConnectorListItem from './ApiConnectorListItem';

@@ -10,8 +10,8 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
 import {useToast} from '@/hooks/use-toast';
-import {ApiClient} from '@/middleware/automation/api-platform';
 import {useCreateApiClientMutation, useUpdateApiClientMutation} from '@/shared/mutations/platform/apiClients.mutations';
 import {ApiClientKeys} from '@/shared/queries/platform/apiClients.queries';
 import {zodResolver} from '@hookform/resolvers/zod';

@@ -3,7 +3,7 @@ import {
     ApiCollectionApi,
     Environment,
     GetWorkspaceApiCollectionsRequest,
-} from '@/middleware/automation/api-platform';
+} from '@/ee/shared/middleware/automation/api-platform';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

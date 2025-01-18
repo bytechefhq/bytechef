@@ -17,7 +17,7 @@ import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collecti
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {useApiCollectionsEnabledStore} from '@/ee/pages/automation/api-platform/api-collections/stores/useApiCollectionsEnabledStore';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollection} from '@/middleware/automation/api-platform';
+import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
 import {useEnableProjectInstanceMutation} from '@/shared/mutations/automation/projectInstances.mutations';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';

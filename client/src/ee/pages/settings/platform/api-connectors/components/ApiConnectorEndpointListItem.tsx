@@ -2,7 +2,7 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ApiConnectorEndpoint} from '@/middleware/platform/api-connector';
+import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';

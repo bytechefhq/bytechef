@@ -11,7 +11,7 @@ import {
 import {Button} from '@/components/ui/button';
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
-import {ApiClient} from '@/middleware/automation/api-platform';
+import {ApiClient} from '@/ee/shared/middleware/automation/api-platform';
 import {useDeleteApiClientMutation} from '@/shared/mutations/platform/apiClients.mutations';
 import {ApiClientKeys} from '@/shared/queries/platform/apiClients.queries';
 import {useQueryClient} from '@tanstack/react-query';

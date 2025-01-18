@@ -1,4 +1,4 @@
-import {ApiCollectionEndpoint, ApiCollectionEndpointApi} from '@/middleware/automation/api-platform';
+import {ApiCollectionEndpoint, ApiCollectionEndpointApi} from '@/ee/shared/middleware/automation/api-platform';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiCollectionEndpointMutationProps {

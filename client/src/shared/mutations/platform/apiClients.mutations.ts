@@ -1,4 +1,4 @@
-import {ApiClient, ApiClientApi, CreateApiClient200Response} from '@/middleware/automation/api-platform';
+import {ApiClient, ApiClientApi, CreateApiClient200Response} from '@/ee/shared/middleware/automation/api-platform';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiClientMutationProps {

@@ -12,7 +12,7 @@ import {Switch} from '@/components/ui/switch';
 import {useDeleteApiCollectionEndpointMutation} from '@/ee/mutations/apiCollectionEndpoints.mutations';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollectionEndpoint} from '@/middleware/automation/api-platform';
+import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
 import {ProjectInstanceWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';

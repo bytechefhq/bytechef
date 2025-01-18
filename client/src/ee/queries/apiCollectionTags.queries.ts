@@ -1,4 +1,4 @@
-import {ApiCollectionTagApi} from '@/middleware/automation/api-platform';
+import {ApiCollectionTagApi} from '@/ee/shared/middleware/automation/api-platform';
 
 /* eslint-disable sort-keys */
 import {Tag} from '@/shared/middleware/automation/configuration';

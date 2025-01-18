@@ -14,7 +14,7 @@ import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useCreateApiCollectionMutation, useUpdateApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollection} from '@/middleware/automation/api-platform';
+import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectInstanceDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-instances/components/project-instance-dialog/ProjectInstanceDialogBasicStepProjectVersionsSelect';
 import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/project-instances/components/project-instance-dialog/ProjectInstanceDialogBasicStepProjectsComboBox';
 import {zodResolver} from '@hookform/resolvers/zod';

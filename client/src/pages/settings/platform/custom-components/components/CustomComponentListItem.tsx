@@ -3,13 +3,13 @@ import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {CustomComponent} from '@/middleware/platform/custom-component';
 import CustomComponentDeleteAlertDialog from '@/pages/settings/platform/custom-components/components/CustomComponentDeleteAlertDialog';
 import {
     useDeleteCustomComponentMutation,
     useEnableCustomComponentMutation,
 } from '@/pages/settings/platform/custom-components/mutations/customComponents.mutations';
 import {CustomComponentKeys} from '@/pages/settings/platform/custom-components/queries/customComponents.queries';
+import {CustomComponent} from '@/shared/middleware/platform/custom-component';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';

@@ -1,4 +1,4 @@
-import {ApiCollection, ApiCollectionApi} from '@/middleware/automation/api-platform';
+import {ApiCollection, ApiCollectionApi} from '@/ee/shared/middleware/automation/api-platform';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useMutation} from '@tanstack/react-query';
 

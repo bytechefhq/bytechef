@@ -1,4 +1,4 @@
-import {CustomComponent} from '@/middleware/platform/custom-component';
+import {CustomComponent} from '@/shared/middleware/platform/custom-component';
 
 import CustomComponentListItem from './CustomComponentListItem';
 

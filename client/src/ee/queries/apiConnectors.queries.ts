@@ -1,4 +1,4 @@
-import {ApiConnector, ApiConnectorApi} from '@/middleware/platform/api-connector';
+import {ApiConnector, ApiConnectorApi} from '@/ee/shared/middleware/platform/api-connector';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

@@ -6,7 +6,7 @@ import ApiCollectionDialog from '@/ee/pages/automation/api-platform/api-collecti
 import ApiCollectionsFilterTitle from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionsFilterTitle';
 import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {useGetApiCollectionsQuery} from '@/ee/queries/apiCollections.queries';
-import {Environment} from '@/middleware/automation/api-platform';
+import {Environment} from '@/ee/shared/middleware/automation/api-platform';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';

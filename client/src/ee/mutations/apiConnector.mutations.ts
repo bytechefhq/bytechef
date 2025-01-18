@@ -3,7 +3,7 @@ import {
     ApiConnectorApi,
     EnableApiConnectorRequest,
     ImportOpenApiSpecificationRequest,
-} from '@/middleware/platform/api-connector';
+} from '@/ee/shared/middleware/platform/api-connector';
 import {useMutation} from '@tanstack/react-query';
 
 interface CreateApiConnectorMutationProps {

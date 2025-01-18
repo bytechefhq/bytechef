@@ -15,7 +15,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {useCreateApiConnectorMutation, useUpdateApiConnectorMutation} from '@/ee/mutations/apiConnector.mutations';
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
-import {ApiConnector} from '@/middleware/platform/api-connector';
+import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
