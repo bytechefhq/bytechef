@@ -40,15 +40,16 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
 
     const queryClient = useQueryClient();
 
-    const updateProjectInstanceWorkflowMutation = useUpdateIntegrationInstanceConfigurationWorkflowMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
-            });
+    const updateIntegrationInstanceConfigurationWorkflowMutation =
+        useUpdateIntegrationInstanceConfigurationWorkflowMutation({
+            onSuccess: () => {
+                queryClient.invalidateQueries({
+                    queryKey: IntegrationInstanceConfigurationKeys.integrationInstanceConfigurations,
+                });
 
-            closeDialog();
-        },
-    });
+                closeDialog();
+            },
+        });
 
     function closeDialog() {
         setIsOpen(false);
@@ -65,7 +66,9 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
             return;
         }
 
-        updateProjectInstanceWorkflowMutation.mutate(formData.integrationInstanceConfigurationWorkflows![0]);
+        updateIntegrationInstanceConfigurationWorkflowMutation.mutate(
+            formData.integrationInstanceConfigurationWorkflows![0]
+        );
     }
 
     useEffect(() => {

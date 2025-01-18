@@ -100,7 +100,7 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         }
 
         if (instanceIds != null && !instanceIds.isEmpty()) {
-            query += "AND instance_id IN(%s) ".formatted(
+            query += "AND principal_id IN(%s) ".formatted(
                 String.join(",", CollectionUtils.map(instanceIds, String::valueOf)));
         }
 

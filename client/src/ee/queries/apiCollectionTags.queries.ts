@@ -5,7 +5,7 @@ import {Tag} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiCollectionTagKeys = {
-    apiCollectionTags: ['projectInstanceTags'] as const,
+    apiCollectionTags: ['apiCollectionTags'] as const,
 };
 
 export const useGetApiCollectionTagsQuery = () =>

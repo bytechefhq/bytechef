@@ -12,7 +12,7 @@ import AccountProfile from '@/pages/account/settings/AccountProfile';
 import Appearance from '@/pages/account/settings/Appearance';
 import Sessions from '@/pages/account/settings/Sessions';
 import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
-import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
+import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
 import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
@@ -244,10 +244,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <ProjectInstances />
+                                            <ProjectDeployments />
                                         </PrivateRoute>
                                     ),
-                                    path: 'instances',
+                                    path: 'deployments',
                                 },
                                 {
                                     children: [

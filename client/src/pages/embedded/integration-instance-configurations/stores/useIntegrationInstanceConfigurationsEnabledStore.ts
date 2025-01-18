@@ -3,7 +3,7 @@ import {devtools} from 'zustand/middleware';
 
 export interface IntegrationInstanceConfigurationsEnabledStateI {
     integrationInstanceConfigurationMap: Map<number, boolean>;
-    setIntegrationInstanceConfigurationEnabled: (projectInstanceId: number, enabled: boolean) => void;
+    setIntegrationInstanceConfigurationEnabled: (integrationInstanceConfigurationId: number, enabled: boolean) => void;
 }
 
 export const useIntegrationInstanceConfigurationsEnabledStore =

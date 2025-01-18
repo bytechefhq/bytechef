@@ -12,7 +12,7 @@ import {twMerge} from 'tailwind-merge';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const projectInstanceWorkflow = undefined;
+    const projectDeploymentWorkflow = undefined;
 
     return (
         <>
@@ -67,11 +67,11 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 </DropdownMenu>
             </div>
 
-            {showEditWorkflowDialog && projectInstanceWorkflow && (
-                // <ProjectInstanceEditWorkflowDialog
+            {showEditWorkflowDialog && projectDeploymentWorkflow && (
+                // <ProjectDeploymentEditWorkflowDialog
                 //     onClose={() => setShowEditWorkflowDialog(false)}
-                //     projectInstanceEnabled={projectInstanceEnabled}
-                //     projectInstanceWorkflow={projectInstanceWorkflow}
+                //     projectDeploymentEnabled={projectDeploymentEnabled}
+                //     projectDeploymentWorkflow={projectDeploymentWorkflow}
                 //     workflow={workflow}
                 // />
                 <>TODO</>

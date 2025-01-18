@@ -15,8 +15,8 @@ import {Textarea} from '@/components/ui/textarea';
 import {useCreateApiCollectionMutation, useUpdateApiCollectionMutation} from '@/ee/mutations/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
-import ProjectInstanceDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-instances/components/project-instance-dialog/ProjectInstanceDialogBasicStepProjectVersionsSelect';
-import ProjectInstanceDialogBasicStepProjectsComboBox from '@/pages/automation/project-instances/components/project-instance-dialog/ProjectInstanceDialogBasicStepProjectsComboBox';
+import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectVersionsSelect';
+import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useState} from 'react';
@@ -130,7 +130,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                     <FormLabel>Project</FormLabel>
 
                                     <FormControl>
-                                        <ProjectInstanceDialogBasicStepProjectsComboBox
+                                        <ProjectDeploymentDialogBasicStepProjectsComboBox
                                             onBlur={field.onBlur}
                                             onChange={(item) => {
                                                 if (item) {
@@ -164,7 +164,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
                                         <FormLabel>Project Version</FormLabel>
 
                                         <FormControl>
-                                            <ProjectInstanceDialogBasicStepProjectVersionsSelect
+                                            <ProjectDeploymentDialogBasicStepProjectVersionsSelect
                                                 onChange={(value) => {
                                                     field.onChange(value);
                                                     setCurProjectVersion(value);

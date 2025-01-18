@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import {Button} from '@/components/ui/button';
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
-import {useGetProjectInstanceQuery} from '@/shared/queries/automation/projectInstances.queries';
+import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowIcon} from 'lucide-react';
 
@@ -11,19 +11,19 @@ import ApiCollectionEndpointListItem from './ApiCollectionEndpointListItem';
 const ApiCollectionEndpointList = ({
     apiCollectionEndpoints,
     apiCollectionId,
+    projectDeploymentId,
     projectId,
-    projectInstanceId,
     projectVersion,
 }: {
     apiCollectionId: number;
     apiCollectionEndpoints?: Array<ApiCollectionEndpoint>;
     projectId: number;
-    projectInstanceId: number;
+    projectDeploymentId: number;
     projectVersion: number;
 }) => {
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(projectId, projectVersion);
 
-    const {data: projectInstance} = useGetProjectInstanceQuery(projectInstanceId);
+    const {data: projectDeployment} = useGetProjectDeploymentQuery(projectDeploymentId);
 
     return (
         <div className="border-b border-b-border/50 py-3 pl-4">
@@ -42,20 +42,20 @@ const ApiCollectionEndpointList = ({
                                 key={apiCollectionEndpoint.id}
                             >
                                 {apiCollectionEndpoint &&
-                                    projectInstance &&
-                                    projectInstance.projectInstanceWorkflows &&
+                                    projectDeployment &&
+                                    projectDeployment.projectDeploymentWorkflows &&
                                     workflows && (
                                         <ApiCollectionEndpointListItem
                                             apiCollectionEndpoint={apiCollectionEndpoint}
-                                            projectId={projectId}
-                                            projectInstanceId={projectInstanceId}
-                                            projectInstanceWorkflow={
-                                                projectInstance.projectInstanceWorkflows.find(
-                                                    (projectInstanceWorkflow) =>
-                                                        projectInstanceWorkflow.workflowReferenceCode ===
+                                            projectDeploymentId={projectDeploymentId}
+                                            projectDeploymentWorkflow={
+                                                projectDeployment.projectDeploymentWorkflows.find(
+                                                    (projectDeploymentWorkflow) =>
+                                                        projectDeploymentWorkflow.workflowReferenceCode ===
                                                         apiCollectionEndpoint.workflowReferenceCode
                                                 )!
                                             }
+                                            projectId={projectId}
                                             projectVersion={projectVersion}
                                             workflows={workflows}
                                         />

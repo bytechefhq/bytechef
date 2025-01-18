@@ -17,8 +17,8 @@ const ApiCollectionList = ({apiCollections}: {apiCollections: ApiCollection[]}) 
                                 <ApiCollectionEndpointList
                                     apiCollectionEndpoints={apiCollection.endpoints}
                                     apiCollectionId={apiCollection.id!}
+                                    projectDeploymentId={apiCollection.projectDeploymentId!}
                                     projectId={apiCollection.projectId}
-                                    projectInstanceId={apiCollection.projectInstanceId!}
                                     projectVersion={apiCollection.projectVersion}
                                 />
                             </CollapsibleContent>

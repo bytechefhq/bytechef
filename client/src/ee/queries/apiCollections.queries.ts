@@ -9,7 +9,7 @@ import {
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiCollectionKeys = {
-    filteredProjectInstances: (filters: {
+    filteredProjectDeployments: (filters: {
         id?: number;
         environment?: Environment;
         projectId?: number;
@@ -20,6 +20,6 @@ export const ApiCollectionKeys = {
 
 export const useGetApiCollectionsQuery = (request: GetWorkspaceApiCollectionsRequest) =>
     useQuery<ApiCollection[], Error>({
-        queryKey: ApiCollectionKeys.filteredProjectInstances(request),
+        queryKey: ApiCollectionKeys.filteredProjectDeployments(request),
         queryFn: () => new ApiCollectionApi().getWorkspaceApiCollections(request),
     });

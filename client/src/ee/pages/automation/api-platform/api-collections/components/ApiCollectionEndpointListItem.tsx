@@ -13,9 +13,9 @@ import {useDeleteApiCollectionEndpointMutation} from '@/ee/mutations/apiCollecti
 import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-collections/components/ApiCollectionEndpointDialog';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
-import ProjectInstanceEditWorkflowDialog from '@/pages/automation/project-instances/components/ProjectInstanceEditWorkflowDialog';
-import {ProjectInstanceWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
-import {useEnableProjectInstanceWorkflowMutation} from '@/shared/mutations/automation/projectInstanceWorkflows.mutations';
+import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
+import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
@@ -24,16 +24,16 @@ import {twMerge} from 'tailwind-merge';
 
 const ApiCollectionEndpointListItem = ({
     apiCollectionEndpoint,
+    projectDeploymentId,
+    projectDeploymentWorkflow,
     projectId,
-    projectInstanceId,
-    projectInstanceWorkflow,
     projectVersion,
     workflows,
 }: {
     apiCollectionEndpoint: ApiCollectionEndpoint;
     projectId: number;
-    projectInstanceId: number;
-    projectInstanceWorkflow: ProjectInstanceWorkflow;
+    projectDeploymentId: number;
+    projectDeploymentWorkflow: ProjectDeploymentWorkflow;
     projectVersion: number;
     workflows: Workflow[];
 }) => {
@@ -55,7 +55,7 @@ const ApiCollectionEndpointListItem = ({
         },
     });
 
-    const enableProjectInstanceWorkflowMutation = useEnableProjectInstanceWorkflowMutation({
+    const enableProjectDeploymentWorkflowMutation = useEnableProjectDeploymentWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
@@ -64,10 +64,10 @@ const ApiCollectionEndpointListItem = ({
     });
 
     const handleApiCollectionEndpointEnable = () => {
-        enableProjectInstanceWorkflowMutation.mutate(
+        enableProjectDeploymentWorkflowMutation.mutate(
             {
                 enable: !apiCollectionEndpoint.enabled,
-                id: projectInstanceId,
+                id: projectDeploymentId,
                 workflowId: workflow.id!,
             },
             {
@@ -155,10 +155,10 @@ const ApiCollectionEndpointListItem = ({
                 />
             )}
 
-            {showEditWorkflowDialog && projectInstanceWorkflow && (
-                <ProjectInstanceEditWorkflowDialog
+            {showEditWorkflowDialog && projectDeploymentWorkflow && (
+                <ProjectDeploymentEditWorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    projectInstanceWorkflow={projectInstanceWorkflow}
+                    projectDeploymentWorkflow={projectDeploymentWorkflow}
                     workflow={workflow}
                 />
             )}

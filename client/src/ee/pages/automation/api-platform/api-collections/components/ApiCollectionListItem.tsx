@@ -18,7 +18,7 @@ import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-
 import {useApiCollectionsEnabledStore} from '@/ee/pages/automation/api-platform/api-collections/stores/useApiCollectionsEnabledStore';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
-import {useEnableProjectInstanceMutation} from '@/shared/mutations/automation/projectInstances.mutations';
+import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {UseMutationResult, useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';
@@ -50,7 +50,7 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
         },
     });
 
-    const enableProjectInstanceMutation = useEnableProjectInstanceMutation({
+    const enableProjectDeploymentMutation = useEnableProjectDeploymentMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: ApiCollectionKeys.apiCollections,
@@ -59,14 +59,14 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
     });
 
     const handleOnCheckedChange = (value: boolean) => {
-        enableProjectInstanceMutation.mutate(
+        enableProjectDeploymentMutation.mutate(
             {
                 enable: value,
-                id: apiCollection.projectInstanceId!,
+                id: apiCollection.projectDeploymentId!,
             },
             {
                 onSuccess: () => {
-                    setApiCollectionEnabled(apiCollection.projectInstanceId!, !apiCollection.enabled);
+                    setApiCollectionEnabled(apiCollection.projectDeploymentId!, !apiCollection.enabled);
                     apiCollection!.enabled = !apiCollection.enabled;
                 },
             }
@@ -132,7 +132,7 @@ const ApiCollectionListItem = ({apiCollection}: ApiCollectionListItemProps) => {
                         </Badge>
 
                         <div className="flex min-w-28 justify-end">
-                            <Badge variant="secondary">{apiCollection.projectInstance?.environment}</Badge>
+                            <Badge variant="secondary">{apiCollection.projectDeployment?.environment}</Badge>
                         </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">

@@ -13,8 +13,8 @@ export interface AnalyticsI {
     captureIntegrationWorkflowImported(): void;
     captureIntegrationWorkflowTested(): void;
     captureProjectCreated(): void;
-    captureProjectInstanceCreated(): void;
-    captureProjectInstanceEnabled(): void;
+    captureProjectDeploymentCreated(): void;
+    captureProjectDeploymentEnabled(): void;
     captureProjectPublished(): void;
     captureProjectWorkflowCreated(): void;
     captureProjectWorkflowImported(): void;
@@ -61,11 +61,11 @@ export const useAnalytics = (): AnalyticsI => {
         captureProjectCreated: () => {
             posthog.capture('project_created');
         },
-        captureProjectInstanceCreated: () => {
-            posthog.capture('project_instance_created');
+        captureProjectDeploymentCreated: () => {
+            posthog.capture('project_deployment_created');
         },
-        captureProjectInstanceEnabled: () => {
-            posthog.capture('project_instance_enabled');
+        captureProjectDeploymentEnabled: () => {
+            posthog.capture('project_deployment_enabled');
         },
         captureProjectPublished: () => {
             posthog.capture('project_published');

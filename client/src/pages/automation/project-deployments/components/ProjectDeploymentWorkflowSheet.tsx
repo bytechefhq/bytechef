@@ -1,16 +1,13 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
+import useProjectDeploymentWorkflowSheetStore from '@/pages/automation/project-deployments/stores/useProjectDeploymentWorkflowSheetStore';
 import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
-import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
-const IntegrationInstanceConfigurationWorkflowSheet = () => {
-    const {
-        integrationInstanceConfigurationWorkflowSheetOpen,
-        setIntegrationInstanceConfigurationWorkflowSheetOpen,
-        workflowId,
-    } = useIntegrationInstanceConfigurationWorkflowSheetStore();
+const ProjectDeploymentWorkflowSheet = () => {
+    const {projectDeploymentWorkflowSheetOpen, setProjectDeploymentWorkflowSheetOpen, workflowId} =
+        useProjectDeploymentWorkflowSheetStore();
 
     const {data: workflow} = useGetWorkflowQuery(workflowId!, !!workflowId);
 
@@ -26,10 +23,8 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
 
     return (
         <Sheet
-            onOpenChange={() =>
-                setIntegrationInstanceConfigurationWorkflowSheetOpen(!integrationInstanceConfigurationWorkflowSheetOpen)
-            }
-            open={integrationInstanceConfigurationWorkflowSheetOpen}
+            onOpenChange={() => setProjectDeploymentWorkflowSheetOpen(!projectDeploymentWorkflowSheetOpen)}
+            open={projectDeploymentWorkflowSheetOpen}
         >
             <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
                 <div className="size-full bg-muted/50 p-4">
@@ -46,4 +41,4 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
     );
 };
 
-export default IntegrationInstanceConfigurationWorkflowSheet;
+export default ProjectDeploymentWorkflowSheet;

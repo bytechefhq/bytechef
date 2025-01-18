@@ -47,9 +47,9 @@ const automationNavigation: NavigationType[] = [
         name: 'Projects',
     },
     {
-        href: '/automation/instances',
+        href: '/automation/deployments',
         icon: Layers3Icon,
-        name: 'Project Instances',
+        name: 'Project Deployments',
     },
     {
         href: '/automation/api-platform',

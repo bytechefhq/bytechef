@@ -16,9 +16,9 @@ import {
     WorkflowExecutionFromJSON,
 } from '@/shared/middleware/automation/workflow/execution';
 import {
-    useGetProjectInstanceQuery,
-    useGetWorkspaceProjectInstancesQuery,
-} from '@/shared/queries/automation/projectInstances.queries';
+    useGetProjectDeploymentQuery,
+    useGetWorkspaceProjectDeploymentsQuery,
+} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowExecutionsQuery} from '@/shared/queries/automation/workflowExecutions.queries';
@@ -75,8 +75,8 @@ export const WorkflowExecutions = () => {
     const [filterProjectId, setFilterProjectId] = useState<number | undefined>(
         searchParams.get('projectId') ? +searchParams.get('projectId')! : undefined
     );
-    const [filterProjectInstanceId, setFilterProjectInstanceId] = useState<number | undefined>(
-        searchParams.get('projectInstanceId') ? +searchParams.get('projectInstanceId')! : undefined
+    const [filterProjectDeploymentId, setFilterProjectDeploymentId] = useState<number | undefined>(
+        searchParams.get('projectDeploymentId') ? +searchParams.get('projectDeploymentId')! : undefined
     );
     const [filterStatus, setFilterStatus] = useState<GetWorkflowExecutionsPageJobStatusEnum | undefined>(
         searchParams.get('status') ? (searchParams.get('status')! as GetWorkflowExecutionsPageJobStatusEnum) : undefined
@@ -90,9 +90,12 @@ export const WorkflowExecutions = () => {
 
     const navigate = useNavigate();
 
-    const {data: projectInstance} = useGetProjectInstanceQuery(filterProjectInstanceId!, !!filterProjectInstanceId);
+    const {data: projectDeployment} = useGetProjectDeploymentQuery(
+        filterProjectDeploymentId!,
+        !!filterProjectDeploymentId
+    );
 
-    const {data: projectInstances} = useGetWorkspaceProjectInstancesQuery({
+    const {data: projectDeployments} = useGetWorkspaceProjectDeploymentsQuery({
         environment:
             filterEnvironment === 0 ? undefined : filterEnvironment === 1 ? Environment.Test : Environment.Production,
         id: currentWorkspaceId!,
@@ -113,17 +116,17 @@ export const WorkflowExecutions = () => {
         jobStartDate: filterStartDate,
         jobStatus: filterStatus,
         pageNumber: filterPageNumber,
+        projectDeploymentId: filterProjectDeploymentId,
         projectId: filterProjectId,
-        projectInstanceId: filterProjectInstanceId,
         workflowId: filterWorkflowId,
     });
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflows} = useGetProjectVersionWorkflowsQuery(
         filterProjectId!,
-        projectInstance?.projectVersion!,
+        projectDeployment?.projectVersion!,
         false,
-        !!projectInstance
+        !!projectDeployment
     );
 
     const emptyListMessage =
@@ -131,7 +134,7 @@ export const WorkflowExecutions = () => {
         !filterStartDate &&
         !filterEndDate &&
         !filterProjectId &&
-        !filterProjectInstanceId &&
+        !filterProjectDeploymentId &&
         !filterWorkflowId &&
         !filterPageNumber
             ? "You don't have any executed workflows yet."
@@ -147,12 +150,12 @@ export const WorkflowExecutions = () => {
         startDate?: Date,
         endDate?: Date,
         projectId?: number,
-        projectInstanceId?: number,
+        projectDeploymentId?: number,
         workflowId?: string,
         pageNumber?: number
     ) {
         navigate(
-            `/automation/executions?environment=${environment ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectInstanceId=${projectInstanceId ? projectInstanceId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
+            `/automation/executions?environment=${environment ?? ''}&status=${status ? status : ''}&startDate=${startDate ? startDate.getTime() : ''}&endDate=${endDate ? endDate.getTime() : ''}&projectId=${projectId ? projectId : ''}&projectDeploymentId=${projectDeploymentId ? projectDeploymentId : ''}&workflowId=${workflowId ? workflowId : ''}&pageNumber=${pageNumber ? pageNumber : ''}`
         );
     }
 
@@ -165,7 +168,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             date,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
@@ -180,7 +183,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
@@ -195,7 +198,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             pageNumber
         );
@@ -216,20 +219,20 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             projectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
     };
 
-    const handleProjectInstanceChange = (item?: ComboBoxItemType) => {
-        let projectInstanceId;
+    const handleProjectDeploymentChange = (item?: ComboBoxItemType) => {
+        let projectDeploymentId;
 
         if (item) {
-            projectInstanceId = Number(item.value);
+            projectDeploymentId = Number(item.value);
         }
 
-        setFilterProjectInstanceId(projectInstanceId);
+        setFilterProjectDeploymentId(projectDeploymentId);
 
         filter(
             filterEnvironment,
@@ -237,7 +240,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             filterProjectId,
-            projectInstanceId,
+            projectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
@@ -258,7 +261,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
@@ -273,7 +276,7 @@ export const WorkflowExecutions = () => {
             date,
             filterEndDate,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             filterWorkflowId,
             filterPageNumber
         );
@@ -294,7 +297,7 @@ export const WorkflowExecutions = () => {
             filterStartDate,
             filterEndDate,
             filterProjectId,
-            filterProjectInstanceId,
+            filterProjectDeploymentId,
             workflowId,
             filterPageNumber
         );
@@ -385,29 +388,29 @@ export const WorkflowExecutions = () => {
                     </div>
 
                     <div className="flex flex-col space-y-2">
-                        <Label>Instance</Label>
+                        <Label>Deployment</Label>
 
                         <ComboBox
                             items={
-                                projectInstances?.length
-                                    ? projectInstances?.map((projectInstance) => ({
+                                projectDeployments?.length
+                                    ? projectDeployments?.map((projectDeployment) => ({
                                           label: (
                                               <span className="flex items-center">
                                                   <span className="mr-1">
-                                                      {projectInstance.name} V{projectInstance.projectVersion}
+                                                      {projectDeployment.name} V{projectDeployment.projectVersion}
                                                   </span>
 
                                                   <span className="text-xs text-gray-500">
-                                                      {projectInstance?.tags?.map((tag) => tag.name).join(', ')}
+                                                      {projectDeployment?.tags?.map((tag) => tag.name).join(', ')}
                                                   </span>
                                               </span>
                                           ),
-                                          value: projectInstance.id,
+                                          value: projectDeployment.id,
                                       }))
                                     : []
                             }
-                            onChange={handleProjectInstanceChange}
-                            value={filterProjectInstanceId}
+                            onChange={handleProjectDeploymentChange}
+                            value={filterProjectDeploymentId}
                         />
                     </div>
 

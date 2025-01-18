@@ -6,7 +6,7 @@ import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
 const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecution: WorkflowExecution}) => {
-    const {project, projectInstance, workflow} = workflowExecution;
+    const {project, projectDeployment, workflow} = workflowExecution;
 
     const {data: workflowDetails} = useGetWorkflowQuery(workflow!.id!, !!workflow?.id);
 
@@ -31,7 +31,7 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
 
                 <span>/</span>
 
-                <Badge variant="secondary">{projectInstance?.environment}</Badge>
+                <Badge variant="secondary">{projectDeployment?.environment}</Badge>
             </h1>
 
             {componentDefinitions && workflowDetails ? (

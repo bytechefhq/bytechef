@@ -48,7 +48,7 @@ const ApiCollections = () => {
         isLoading: projectsIsLoading,
     } = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
-        projectInstances: true,
+        projectDeployments: true,
     });
 
     const {
