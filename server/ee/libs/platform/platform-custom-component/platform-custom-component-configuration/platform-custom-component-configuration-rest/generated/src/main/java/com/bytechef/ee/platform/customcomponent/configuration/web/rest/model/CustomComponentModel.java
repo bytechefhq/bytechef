@@ -1,5 +1,6 @@
 package com.bytechef.ee.platform.customcomponent.configuration.web.rest.model;
 
+import java.net.URI;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -7,11 +8,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.openapitools.jackson.nullable.JsonNullable;
+import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
+import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
@@ -20,7 +24,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CustomComponent", description = "An custom component.")
 @JsonTypeName("CustomComponent")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.095096+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T17:02:03.292187+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class CustomComponentModel {
 
   private Integer componentVersion;
@@ -43,11 +47,11 @@ public class CustomComponentModel {
    */
   public enum LanguageEnum {
     JAVA("JAVA"),
-
+    
     JAVASCRIPT("JAVASCRIPT"),
-
+    
     PYTHON("PYTHON"),
-
+    
     RUBY("RUBY");
 
     private String value;
@@ -110,7 +114,7 @@ public class CustomComponentModel {
    * The version of a custom component.
    * @return componentVersion
    */
-
+  
   @Schema(name = "componentVersion", description = "The version of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("componentVersion")
   public Integer getComponentVersion() {
@@ -130,7 +134,7 @@ public class CustomComponentModel {
    * The created by.
    * @return createdBy
    */
-
+  
   @Schema(name = "createdBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The created by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdBy")
   public String getCreatedBy() {
@@ -150,7 +154,7 @@ public class CustomComponentModel {
    * The created date.
    * @return createdDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "createdDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The created date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("createdDate")
   public OffsetDateTime getCreatedDate() {
@@ -170,7 +174,7 @@ public class CustomComponentModel {
    * The description of a custom component.
    * @return description
    */
-
+  
   @Schema(name = "description", description = "The description of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("description")
   public String getDescription() {
@@ -190,7 +194,7 @@ public class CustomComponentModel {
    * If a custom component is enabled or not.
    * @return enabled
    */
-
+  
   @Schema(name = "enabled", description = "If a custom component is enabled or not.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("enabled")
   public Boolean getEnabled() {
@@ -210,7 +214,7 @@ public class CustomComponentModel {
    * The icon of a custom component.
    * @return icon
    */
-
+  
   @Schema(name = "icon", description = "The icon of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("icon")
   public String getIcon() {
@@ -230,7 +234,7 @@ public class CustomComponentModel {
    * The id of an custom component.
    * @return id
    */
-
+  
   @Schema(name = "id", description = "The id of an custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("id")
   public Long getId() {
@@ -250,7 +254,7 @@ public class CustomComponentModel {
    * The language in which the component is implemented
    * @return language
    */
-
+  
   @Schema(name = "language", accessMode = Schema.AccessMode.READ_ONLY, description = "The language in which the component is implemented", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("language")
   public LanguageEnum getLanguage() {
@@ -270,7 +274,7 @@ public class CustomComponentModel {
    * The last modified by.
    * @return lastModifiedBy
    */
-
+  
   @Schema(name = "lastModifiedBy", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified by.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedBy")
   public String getLastModifiedBy() {
@@ -290,7 +294,7 @@ public class CustomComponentModel {
    * The last modified date.
    * @return lastModifiedDate
    */
-  @Valid
+  @Valid 
   @Schema(name = "lastModifiedDate", accessMode = Schema.AccessMode.READ_ONLY, description = "The last modified date.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("lastModifiedDate")
   public OffsetDateTime getLastModifiedDate() {
@@ -310,7 +314,7 @@ public class CustomComponentModel {
    * The name of a custom component.
    * @return name
    */
-  @NotNull
+  @NotNull 
   @Schema(name = "name", description = "The name of a custom component.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
@@ -330,7 +334,7 @@ public class CustomComponentModel {
    * The title of a custom component.
    * @return title
    */
-
+  
   @Schema(name = "title", description = "The title of a custom component.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("title")
   public String getTitle() {
@@ -350,7 +354,7 @@ public class CustomComponentModel {
    * Get version
    * @return version
    */
-
+  
   @Schema(name = "__version", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("__version")
   public Integer getVersion() {

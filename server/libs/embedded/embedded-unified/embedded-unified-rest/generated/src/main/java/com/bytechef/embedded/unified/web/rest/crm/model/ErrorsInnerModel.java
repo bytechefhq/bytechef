@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("errors_inner")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-09T18:54:19.403746+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T17:02:02.774797+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ErrorsInnerModel {
 
   private String id;

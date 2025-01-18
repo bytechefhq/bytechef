@@ -6,12 +6,15 @@
 package com.bytechef.ee.platform.customcomponent.configuration.web.rest;
 
 import com.bytechef.ee.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
+import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import org.springframework.http.HttpStatus;
@@ -20,12 +23,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.095096+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T17:02:03.292187+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "custom-component", description = "The Platform Custom Component Internal API")
 public interface CustomComponentApi {
@@ -54,7 +61,7 @@ public interface CustomComponentApi {
         method = RequestMethod.DELETE,
         value = "/custom-components/{id}"
     )
-
+    
     default ResponseEntity<Void> deleteCustomComponent(
         @Parameter(name = "id", description = "The id of an custom component.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -84,7 +91,7 @@ public interface CustomComponentApi {
         method = RequestMethod.PATCH,
         value = "/custom-components/{id}/enable/{enable}"
     )
-
+    
     default ResponseEntity<Void> enableCustomComponent(
         @Parameter(name = "id", description = "The id of the custom component.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "enable", description = "Enable/disable the custom component.", required = true, in = ParameterIn.PATH) @PathVariable("enable") Boolean enable
@@ -117,7 +124,7 @@ public interface CustomComponentApi {
         value = "/custom-components/{id}",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<CustomComponentModel> getCustomComponent(
         @Parameter(name = "id", description = "The id of an custom component.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -157,9 +164,9 @@ public interface CustomComponentApi {
         value = "/custom-components",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<CustomComponentModel>> getCustomComponents(
-
+        
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

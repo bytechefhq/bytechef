@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.071988+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-10T17:02:03.260207+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "custom-component", description = "The Platform Custom Component Public API")
 public interface CustomComponentApi {
@@ -61,7 +61,7 @@ public interface CustomComponentApi {
         value = "/custom-components/deploy",
         consumes = { "multipart/form-data" }
     )
-
+    
     default ResponseEntity<Void> deployCustomComponent(
         @Parameter(name = "componentFile", description = "The file of a custom component.") @RequestPart(value = "componentFile", required = false) MultipartFile componentFile
     ) {
