@@ -1,6 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Badge} from '@/components/ui/badge';
-import ReadOnlyWorkflowEditor from '@/shared/components/ReadOnlyWorkflow';
+import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';

@@ -1,7 +1,7 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
-import ReadOnlyWorkflowEditor from '@/shared/components/ReadOnlyWorkflow';
+import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
 import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 

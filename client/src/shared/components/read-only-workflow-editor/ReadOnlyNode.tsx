@@ -4,7 +4,7 @@ import {Handle, Position} from '@xyflow/react';
 import {memo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import styles from '../styles/WorkflowNode.module.css';
+import styles from '../../styles/WorkflowNode.module.css';
 
 const ReadOnlyNode = ({data}: {data: NodeDataType}) => (
     <div className="relative flex cursor-grab items-center justify-center">

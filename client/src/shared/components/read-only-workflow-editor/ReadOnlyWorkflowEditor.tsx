@@ -4,7 +4,7 @@ import {ComponentIcon} from 'lucide-react';
 import {useMemo} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
-import {ComponentDefinitionBasic, Workflow} from '../middleware/platform/configuration';
+import {ComponentDefinitionBasic, Workflow} from '../../middleware/platform/configuration';
 import ReadOnlyEdge from './ReadOnlyEdge';
 import ReadOnlyNode from './ReadOnlyNode';
 
