@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * @author Ivica Cardic
  */
-public class JobParameters {
+public class JobParametersDTO {
 
     private Map<String, ?> inputs = Collections.emptyMap();
     private String label;
@@ -39,31 +39,31 @@ public class JobParameters {
     private List<Webhook> webhooks = Collections.emptyList();
     private String workflowId;
 
-    private JobParameters() {
+    private JobParametersDTO() {
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(String workflowId) {
+    public JobParametersDTO(String workflowId) {
         this(workflowId, Map.of());
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(String workflowId, Map<String, ?> inputs) {
+    public JobParametersDTO(String workflowId, Map<String, ?> inputs) {
         this(workflowId, inputs, Map.of());
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(String workflowId, Map<String, ?> inputs, Map<String, ?> metadata) {
+    public JobParametersDTO(String workflowId, Map<String, ?> inputs, Map<String, ?> metadata) {
         this(workflowId, null, inputs, null, null, List.of(), metadata);
     }
 
     @SuppressFBWarnings("EI2")
-    public JobParameters(String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs) {
+    public JobParametersDTO(String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs) {
         this(workflowId, parentTaskExecutionId, inputs, null, null, List.of(), Map.of());
     }
 
     @Default
-    public JobParameters(
+    public JobParametersDTO(
         String workflowId, Long parentTaskExecutionId, Map<String, ?> inputs, String label, Integer priority,
         List<Webhook> webhooks, Map<String, ?> metadata) {
 
@@ -120,14 +120,14 @@ public class JobParameters {
             return false;
         }
 
-        JobParameters jobParameters = (JobParameters) o;
+        JobParametersDTO jobParametersDTO = (JobParametersDTO) o;
 
-        return Objects.equals(this.inputs, jobParameters.inputs)
-            && Objects.equals(this.label, jobParameters.label)
-            && Objects.equals(this.parentTaskExecutionId, jobParameters.parentTaskExecutionId)
-            && Objects.equals(this.priority, jobParameters.priority)
-            && Objects.equals(this.webhooks, jobParameters.webhooks)
-            && Objects.equals(this.workflowId, jobParameters.workflowId);
+        return Objects.equals(this.inputs, jobParametersDTO.inputs)
+            && Objects.equals(this.label, jobParametersDTO.label)
+            && Objects.equals(this.parentTaskExecutionId, jobParametersDTO.parentTaskExecutionId)
+            && Objects.equals(this.priority, jobParametersDTO.priority)
+            && Objects.equals(this.webhooks, jobParametersDTO.webhooks)
+            && Objects.equals(this.workflowId, jobParametersDTO.workflowId);
     }
 
     @Override

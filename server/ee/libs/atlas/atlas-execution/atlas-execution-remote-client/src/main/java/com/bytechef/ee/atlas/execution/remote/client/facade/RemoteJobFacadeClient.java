@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.atlas.execution.remote.client.facade;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,13 +29,13 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public long createJob(JobParameters jobParameters) {
+    public long createJob(JobParametersDTO jobParametersDTO) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host("execution-app")
                 .path("/remote/job-facade/create-async-job")
                 .build(),
-            jobParameters, Long.class);
+            jobParametersDTO, Long.class);
     }
 
     @Override

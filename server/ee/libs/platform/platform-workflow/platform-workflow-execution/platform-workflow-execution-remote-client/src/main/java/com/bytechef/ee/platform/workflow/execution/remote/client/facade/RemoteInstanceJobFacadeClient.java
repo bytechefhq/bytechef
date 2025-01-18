@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.workflow.execution.remote.client.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
@@ -34,26 +34,26 @@ public class RemoteInstanceJobFacadeClient implements InstanceJobFacade {
     }
 
     @Override
-    public long createJob(JobParameters jobParameters, long instanceId, ModeType type) {
+    public long createJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(INSTANCE_JOB_FACADE + "/create-job")
                 .build(),
-            new CreateJobRequest(jobParameters, instanceId, type), Long.class);
+            new CreateJobRequest(jobParametersDTO, instanceId, type), Long.class);
     }
 
     @Override
-    public Job createSyncJob(JobParameters jobParameters, long instanceId, ModeType type) {
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(INSTANCE_JOB_FACADE + "/create-sync-job")
                 .build(),
-            new CreateJobRequest(jobParameters, instanceId, type), Job.class);
+            new CreateJobRequest(jobParametersDTO, instanceId, type), Job.class);
     }
 
     @SuppressFBWarnings("EI")
-    public record CreateJobRequest(JobParameters jobParameters, long instanceId, ModeType type) {
+    public record CreateJobRequest(JobParametersDTO jobParameters, long instanceId, ModeType type) {
     }
 }

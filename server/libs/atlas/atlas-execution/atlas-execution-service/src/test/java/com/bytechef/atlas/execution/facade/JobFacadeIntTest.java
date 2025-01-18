@@ -17,7 +17,7 @@
 package com.bytechef.atlas.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -59,7 +59,7 @@ public class JobFacadeIntTest {
     public void testRequiredParameters() {
         Assertions.assertThrows(
             NullPointerException.class,
-            () -> jobFacade.createJob(new JobParameters("aGVsbG8x", Collections.emptyMap())));
+            () -> jobFacade.createJob(new JobParametersDTO("aGVsbG8x", Collections.emptyMap())));
     }
 
     @ComponentScan(

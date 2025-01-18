@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -70,7 +70,7 @@ public class ComponentJobTestExecutor {
             taskExecutionService, MapUtils.concat(this.taskHandlerMap, taskHandlerMap)::get, taskFileStorage,
             workflowService);
 
-        return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
+        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
     }
 
     private static List<TaskDispatcherPreSendProcessor> getTaskDispatcherPreSendProcessors() {

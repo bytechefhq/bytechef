@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.constant.ModeType;
@@ -52,8 +52,8 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     // TODO @Transactional
-    public long createJob(JobParameters jobParameters, long instanceId, ModeType type) {
-        long jobId = jobFacade.createJob(jobParameters);
+    public long createJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type) {
+        long jobId = jobFacade.createJob(jobParametersDTO);
 
         instanceJobService.create(jobId, instanceId, type);
 
@@ -62,8 +62,8 @@ public class InstanceJobFacadeImpl implements InstanceJobFacade {
 
     @Override
     @Transactional
-    public Job createSyncJob(JobParameters jobParameters, long instanceId, ModeType type) {
-        Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
+    public Job createSyncJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type) {
+        Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         instanceJobService.create(Validate.notNull(job.getId(), "id"), instanceId, type);
 

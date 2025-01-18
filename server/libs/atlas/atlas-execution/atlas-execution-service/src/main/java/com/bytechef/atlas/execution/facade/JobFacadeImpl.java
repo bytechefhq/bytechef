@@ -23,7 +23,7 @@ import com.bytechef.atlas.coordinator.event.StartJobEvent;
 import com.bytechef.atlas.coordinator.event.StopJobEvent;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -68,8 +68,8 @@ public class JobFacadeImpl implements JobFacade {
     // the job id is missing.
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public long createJob(JobParameters jobParameters) {
-        Job job = jobService.create(jobParameters, workflowService.getWorkflow(jobParameters.getWorkflowId()));
+    public long createJob(JobParametersDTO jobParametersDTO) {
+        Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         long jobId = Validate.notNull(job.getId(), "id");
 

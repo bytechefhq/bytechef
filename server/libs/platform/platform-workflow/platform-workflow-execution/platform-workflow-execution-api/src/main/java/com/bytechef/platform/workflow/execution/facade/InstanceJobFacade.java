@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.platform.constant.ModeType;
 
 /**
@@ -25,7 +25,7 @@ import com.bytechef.platform.constant.ModeType;
  */
 public interface InstanceJobFacade {
 
-    long createJob(JobParameters jobParameters, long instanceId, ModeType type);
+    long createJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type);
 
-    Job createSyncJob(JobParameters jobParameters, long instanceId, ModeType type);
+    Job createSyncJob(JobParametersDTO jobParametersDTO, long instanceId, ModeType type);
 }

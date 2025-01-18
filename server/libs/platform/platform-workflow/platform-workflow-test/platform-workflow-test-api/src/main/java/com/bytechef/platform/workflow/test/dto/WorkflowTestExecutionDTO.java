@@ -25,5 +25,5 @@ import org.springframework.lang.NonNull;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowTestExecution(@NonNull JobDTO job, TriggerExecutionDTO triggerExecution) {
+public record WorkflowTestExecutionDTO(@NonNull JobDTO job, TriggerExecutionDTO triggerExecution) {
 }

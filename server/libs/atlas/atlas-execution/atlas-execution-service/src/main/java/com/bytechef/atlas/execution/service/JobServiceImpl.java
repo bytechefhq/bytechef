@@ -18,7 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,16 +48,16 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
-    public Job create(@NonNull JobParameters jobParameters, Workflow workflow) {
-        Validate.notNull(jobParameters, "'jobParameters' must not be null");
+    public Job create(@NonNull JobParametersDTO jobParametersDTO, Workflow workflow) {
+        Validate.notNull(jobParametersDTO, "'jobParameters' must not be null");
 
-        String workflowId = jobParameters.getWorkflowId();
+        String workflowId = jobParametersDTO.getWorkflowId();
 
         Validate.notNull(workflow, String.format("Unknown workflow: %s", workflowId));
 
-        validate(jobParameters, workflow);
+        validate(jobParametersDTO, workflow);
 
-        Job job = getJob(jobParameters, workflow);
+        Job job = getJob(jobParametersDTO, workflow);
 
         job = jobRepository.save(job);
 
@@ -161,25 +161,25 @@ public class JobServiceImpl implements JobService {
         return job.getStatus() == Job.Status.STOPPED || job.getStatus() == Job.Status.FAILED;
     }
 
-    private static Job getJob(JobParameters jobParameters, Workflow workflow) {
+    private static Job getJob(JobParametersDTO jobParametersDTO, Workflow workflow) {
         Job job = new Job();
 
-        job.setInputs(jobParameters.getInputs());
-        job.setLabel(jobParameters.getLabel() == null ? workflow.getLabel() : jobParameters.getLabel());
-        job.setMetadata(jobParameters.getMetadata());
-        job.setParentTaskExecutionId(jobParameters.getParentTaskExecutionId());
-        job.setPriority(jobParameters.getPriority());
+        job.setInputs(jobParametersDTO.getInputs());
+        job.setLabel(jobParametersDTO.getLabel() == null ? workflow.getLabel() : jobParametersDTO.getLabel());
+        job.setMetadata(jobParametersDTO.getMetadata());
+        job.setParentTaskExecutionId(jobParametersDTO.getParentTaskExecutionId());
+        job.setPriority(jobParametersDTO.getPriority());
         job.setStatus(Job.Status.CREATED);
-        job.setWebhooks(jobParameters.getWebhooks());
+        job.setWebhooks(jobParametersDTO.getWebhooks());
         job.setWorkflowId(workflow.getId());
 
         return job;
     }
 
-    private static void validate(JobParameters jobParameters, Workflow workflow) {
+    private static void validate(JobParametersDTO jobParametersDTO, Workflow workflow) {
         // validate inputs
 
-        Map<String, Object> inputs = jobParameters.getInputs();
+        Map<String, Object> inputs = jobParametersDTO.getInputs();
 
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
@@ -189,7 +189,7 @@ public class JobServiceImpl implements JobService {
 
         // validate webhooks
 
-        for (Job.Webhook webhook : jobParameters.getWebhooks()) {
+        for (Job.Webhook webhook : jobParametersDTO.getWebhooks()) {
             Validate.notNull(webhook.type(), "must define 'type' on webhook");
             Validate.notNull(webhook.url(), "must define 'url' on webhook");
         }

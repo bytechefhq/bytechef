@@ -18,7 +18,7 @@ package com.bytechef.platform.workflow.test.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -35,7 +35,7 @@ import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.domain.TriggerExecution.Status;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import com.bytechef.platform.workflow.test.dto.WorkflowTestExecution;
+import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.executor.JobTestExecutor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
@@ -75,7 +75,7 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
     }
 
     @SuppressWarnings("unchecked")
-    public WorkflowTestExecution testWorkflow(String workflowId, Map<String, Object> inputs) {
+    public WorkflowTestExecutionDTO testWorkflow(String workflowId, Map<String, Object> inputs) {
         Optional<WorkflowTestConfiguration> workflowTestConfigurationOptional =
             workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId);
 
@@ -145,9 +145,9 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
             }
         }
 
-        return new WorkflowTestExecution(
+        return new WorkflowTestExecutionDTO(
             jobTestExecutor.execute(
-                new JobParameters(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap))),
+                new JobParametersDTO(workflowId, inputs, Map.of(MetadataConstants.CONNECTION_IDS, connectionIdsMap))),
             triggerExecutionDTO);
     }
 }

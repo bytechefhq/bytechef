@@ -17,7 +17,7 @@
 package com.bytechef.platform.webhook.executor;
 
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.HttpStatus;
@@ -125,11 +125,11 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     }
 
     @SuppressWarnings("unchecked")
-    private static JobParameters createJobParameters(
+    private static JobParametersDTO createJobParameters(
         WorkflowExecutionId workflowExecutionId, String workflowId, Map<String, ?> inputMap,
         Object triggerOutputValue) {
 
-        return new JobParameters(
+        return new JobParametersDTO(
             workflowId,
             MapUtils.concat(
                 (Map<String, Object>) inputMap, Map.of(workflowExecutionId.getTriggerName(), triggerOutputValue)));

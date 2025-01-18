@@ -19,7 +19,7 @@ package com.bytechef.embedded.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.CollectionUtils;
@@ -212,7 +212,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(id, workflowId);
 
         return instanceJobFacade.createJob(
-            new JobParameters(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, ModeType.EMBEDDED);
+            new JobParametersDTO(workflowId, integrationInstanceConfigurationWorkflow.getInputs()), id, ModeType.EMBEDDED);
     }
 
     @Override
