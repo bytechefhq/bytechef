@@ -19,8 +19,8 @@ package com.bytechef.embedded.workflow.execution.web.rest.mapper.config;
 import com.bytechef.embedded.configuration.web.rest.adapter.IntegrationConfigurationConversionServiceAdapter;
 import com.bytechef.embedded.workflow.execution.web.rest.adapter.IntegrationWorkflowExecutionConversionServiceAdapter;
 import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
 import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 

@@ -9,7 +9,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.con
 
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.adapter.ApiPlatformConversionServiceAdapter;
 import com.bytechef.platform.tag.web.rest.mapper.config.TagMapperSpringConfig;
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 

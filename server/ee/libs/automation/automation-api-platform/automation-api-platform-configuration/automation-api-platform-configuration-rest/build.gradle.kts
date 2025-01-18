@@ -65,8 +65,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")

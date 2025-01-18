@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.web.rest.mapper.config;
 
 import com.bytechef.platform.user.web.rest.adapter.UserConversionServiceAdapter;
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 

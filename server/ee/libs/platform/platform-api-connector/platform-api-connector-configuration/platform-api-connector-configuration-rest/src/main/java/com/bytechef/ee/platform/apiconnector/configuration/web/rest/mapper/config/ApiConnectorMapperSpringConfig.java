@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.apiconnector.configuration.web.rest.mapper.config;
 
 import com.bytechef.ee.platform.apiconnector.configuration.web.rest.adapter.ApiConnectorConversionServiceAdapter;
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 

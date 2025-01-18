@@ -16,18 +16,22 @@
 
 package com.bytechef.config;
 
+import com.bytechef.platform.properties.service.PropertiesService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.BeansException;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 /**
  * @author Ivica Cardic
  */
 @ConfigurationProperties(prefix = "bytechef", ignoreUnknownFields = false)
 @SuppressFBWarnings("EI")
-public class ApplicationProperties {
+public class ApplicationProperties implements ApplicationContextAware {
 
     /**
      * Edition.
@@ -62,6 +66,8 @@ public class ApplicationProperties {
     private String webhookUrl;
     private Worker worker = new Worker();
     private Workflow workflow = new Workflow();
+
+    private PropertiesService propertiesService;
 
     public Ai getAi() {
         return ai;
@@ -177,6 +183,11 @@ public class ApplicationProperties {
 
     public void setCache(Cache cache) {
         this.cache = cache;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.propertiesService = applicationContext.getBean(PropertiesService.class);
     }
 
     public void setCloud(Cloud cloud) {

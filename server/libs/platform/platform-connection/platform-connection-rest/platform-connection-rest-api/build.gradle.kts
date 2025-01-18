@@ -61,5 +61,5 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
+    implementation(project(":server:libs:core:rest:rest-api"))
 }

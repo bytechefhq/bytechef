@@ -16,8 +16,8 @@
 
 package com.bytechef.embedded.unified.web.rest.mapper.config;
 
-import com.bytechef.platform.web.rest.mapper.DateTimeMapper;
-import com.bytechef.platform.web.rest.mapper.JsonNullableMapper;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
+import com.bytechef.web.rest.mapper.JsonNullableMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
