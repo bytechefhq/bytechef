@@ -17,7 +17,9 @@
 package com.bytechef.platform.ai.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.ai.service.ChatService;
+import com.bytechef.platform.ai.facade.ChatFacade;
+import com.bytechef.platform.ai.facade.dto.ContextDTO;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -36,19 +38,21 @@ import reactor.core.publisher.Flux;
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class AiCopilotApiController {
 
-    private final ChatService chatService;
+    private final ChatFacade chatFacade;
 
-    public AiCopilotApiController(ChatService chatService) {
-        this.chatService = chatService;
+    public AiCopilotApiController(ChatFacade chatFacade) {
+        this.chatFacade = chatFacade;
     }
 
     @PostMapping("/ai/chat")
     public Flux<Map<String, ?>> chat(
         @RequestBody Request request, @RequestHeader("X-Copilot-Conversation-Id") String conversationId) {
 
-        return chatService.chat(request.message, conversationId);
+        return chatFacade.chat(request.message, request.context, conversationId);
     }
 
-    public record Request(String message) {
+    @SuppressFBWarnings("EI")
+    public record Request(String message, ContextDTO context) {
     }
+
 }

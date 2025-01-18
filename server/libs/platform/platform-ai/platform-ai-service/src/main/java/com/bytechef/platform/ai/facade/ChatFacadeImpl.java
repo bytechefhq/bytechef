@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.ai.service;
+package com.bytechef.platform.ai.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.platform.ai.facade.dto.ContextDTO;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor;
@@ -30,19 +34,28 @@ import reactor.core.publisher.Flux;
  */
 @Service
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
-public class ChatServiceImpl implements ChatService {
+public class ChatFacadeImpl implements ChatFacade {
 
     private final ChatClient chatClient;
+    private final WorkflowService workflowService;
 
-    public ChatServiceImpl(ChatClient.Builder chatClientBuilder) {
+    @SuppressFBWarnings("EI")
+    public ChatFacadeImpl(ChatClient.Builder chatClientBuilder, WorkflowService workflowService) {
         this.chatClient = chatClientBuilder
             // TODO add multiuser, multitenant history
             .defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
             .build();
+
+        this.workflowService = workflowService;
     }
 
     @Override
-    public Flux<Map<String, ?>> chat(String message, String conversationId) {
+    public Flux<Map<String, ?>> chat(String message, ContextDTO contextDTO, String conversationId) {
+        Workflow workflow = workflowService.getWorkflow(contextDTO.workflowId());
+
+        // TODO
+        System.out.println(workflow.getId());
+
         return chatClient.prompt()
             .user(message)
             .advisors(advisor -> advisor
