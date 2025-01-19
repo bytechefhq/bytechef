@@ -52,6 +52,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 /**
  * @author Marko Kriskovic
@@ -95,99 +96,7 @@ public class AiTextUtils {
             .toList();
 
         return LLMConstants.PROVIDERS.stream()
-            .filter(provider -> switch (provider) {
-                case AMAZON_BEDROCK_ANTHROPIC2 -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
-
-                    yield amazonBedrockAnthropic2.getApiKey() != null;
-                }
-                case AMAZON_BEDROCK_ANTHROPIC3 -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
-
-                    yield amazonBedrockAnthropic3.getApiKey() != null;
-                }
-                case AMAZON_BEDROCK_COHERE -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
-
-                    yield amazonBedrockCohere.getApiKey() != null;
-                }
-                case AMAZON_BEDROCK_JURASSIC2 -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
-
-                    yield amazonBedrockJurassic2.getApiKey() != null;
-                }
-                case AMAZON_BEDROCK_LLAMA -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
-
-                    yield amazonBedrockLlama.getApiKey() != null;
-                }
-                case AMAZON_BEDROCK_TITAN -> {
-                    if (checkAiProvider(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
-
-                    yield amazonBedrockTitan.getApiKey() != null;
-                }
-                case ANTHROPIC -> {
-                    if (checkAiProvider(ANTHROPIC.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    Anthropic anthropic = aiProvider.getAnthropic();
-
-                    yield anthropic.getApiKey() != null;
-                }
-                case MISTRAL -> {
-                    if (checkAiProvider(MISTRAL.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    Ai.Provider.Mistral mistral = aiProvider.getMistral();
-
-                    yield mistral.getApiKey() != null;
-                }
-                case OPEN_AI -> {
-                    if (checkAiProvider(OPEN_AI.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
-
-                    yield openAi.getApiKey() != null;
-                }
-                case VERTEX_GEMINI -> {
-                    if (checkAiProvider(VERTEX_GEMINI.getKey(), activeProviderKeys)) {
-                        yield true;
-                    }
-
-                    VertexGemini vertexGemini = aiProvider.getVertexGemini();
-
-                    yield vertexGemini.getApiKey() != null;
-                }
-                default -> false;
-            })
+            .filter(filter(aiProvider, activeProviderKeys))
             .map(provider -> option(provider.getLabel(), String.valueOf(provider)))
             .toList();
     }
@@ -195,6 +104,102 @@ public class AiTextUtils {
     private static boolean checkAiProvider(String key, List<String> activeProviderKeys) {
         return activeProviderKeys.stream()
             .anyMatch(key::equals);
+    }
+
+    private static Predicate<Provider> filter(Ai.Provider aiProvider, List<String> activeProviderKeys) {
+        return provider -> switch (provider) {
+            case AMAZON_BEDROCK_ANTHROPIC2 -> {
+                if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
+
+                yield amazonBedrockAnthropic2.getApiKey() != null;
+            }
+            case AMAZON_BEDROCK_ANTHROPIC3 -> {
+                if (checkAiProvider(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
+
+                yield amazonBedrockAnthropic3.getApiKey() != null;
+            }
+            case AMAZON_BEDROCK_COHERE -> {
+                if (checkAiProvider(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
+
+                yield amazonBedrockCohere.getApiKey() != null;
+            }
+            case AMAZON_BEDROCK_JURASSIC2 -> {
+                if (checkAiProvider(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
+
+                yield amazonBedrockJurassic2.getApiKey() != null;
+            }
+            case AMAZON_BEDROCK_LLAMA -> {
+                if (checkAiProvider(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
+
+                yield amazonBedrockLlama.getApiKey() != null;
+            }
+            case AMAZON_BEDROCK_TITAN -> {
+                if (checkAiProvider(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
+
+                yield amazonBedrockTitan.getApiKey() != null;
+            }
+            case ANTHROPIC -> {
+                if (checkAiProvider(ANTHROPIC.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Anthropic anthropic = aiProvider.getAnthropic();
+
+                yield anthropic.getApiKey() != null;
+            }
+            case MISTRAL -> {
+                if (checkAiProvider(MISTRAL.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.Mistral mistral = aiProvider.getMistral();
+
+                yield mistral.getApiKey() != null;
+            }
+            case OPEN_AI -> {
+                if (checkAiProvider(OPEN_AI.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
+
+                yield openAi.getApiKey() != null;
+            }
+            case VERTEX_GEMINI -> {
+                if (checkAiProvider(VERTEX_GEMINI.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                VertexGemini vertexGemini = aiProvider.getVertexGemini();
+
+                yield vertexGemini.getApiKey() != null;
+            }
+            default -> false;
+        };
     }
 
     public record Criteria(String criterion, double lowestScore, double highestScore, boolean isDecimal) {
