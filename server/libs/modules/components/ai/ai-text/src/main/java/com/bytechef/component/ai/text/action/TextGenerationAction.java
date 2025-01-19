@@ -21,9 +21,9 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROMPT;
+import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
@@ -32,6 +32,7 @@ import com.bytechef.component.ai.text.constant.AiTextConstants;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,13 +44,13 @@ public class TextGenerationAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
 
-    public TextGenerationAction(ApplicationProperties.Ai.Component component) {
+    public TextGenerationAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
         this.actionDefinition = new AiTextActionDefinition(
             action(AiTextConstants.TEXT_GENERATION)
                 .title("Text Generation")
                 .description("AI generates text based on the given prompt.")
                 .properties(
-                    MODEL_PROVIDER_PROPERTY,
+                    PROVIDER_PROPERTY.apply(provider, propertyService),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     MODEL_URL_PROPERTY,
@@ -60,15 +61,14 @@ public class TextGenerationAction implements AiTextAction {
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
                 .output(),
-            component, this);
+            provider, this, propertyService);
     }
 
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        modelInputParametersMap.put("messages",
-            List.of(
-                Map.of("content", inputParameters.getString(PROMPT), "role", "user")));
+        modelInputParametersMap.put(
+            "messages", List.of(Map.of("content", inputParameters.getString(PROMPT), "role", "user")));
         modelInputParametersMap.put("model", inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);

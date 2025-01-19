@@ -69,8 +69,8 @@ public class AiTextComponentHandler implements ComponentHandler {
                         new SentimentAction(provider, propertyService).actionDefinition,
                         new ScoreAction(provider, propertyService).actionDefinition,
                         new SummarizeTextAction(provider, propertyService).actionDefinition,
-                        new SimilaritySearchAction(provider, propertyService).actionDefinition)),
-                        new TextGenerationAction(component, propertyService).actionDefinition));
+                        new SimilaritySearchAction(provider, propertyService).actionDefinition,
+                        new TextGenerationAction(provider, propertyService).actionDefinition));
         }
     }
 }
