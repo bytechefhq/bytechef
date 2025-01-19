@@ -18,19 +18,34 @@ package com.bytechef.component.ai.image.action;
 
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_OPTIONS_PROPERTY;
-import static com.bytechef.component.ai.image.constant.AiImageConstants.MODEL_PROVIDER_PROPERTY;
 import static com.bytechef.component.ai.image.constant.AiImageConstants.PROMPT;
+import static com.bytechef.component.ai.image.constant.AiImageConstants.PROVIDER_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.CONTENT;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.SIZE;
+import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
+import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.HEIGHT;
+import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.WIDTH;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.image.action.definition.AiImageActionDefinition;
 import com.bytechef.component.ai.image.constant.AiImageConstants;
+import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.openai.constant.Size;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,13 +57,13 @@ public class GenerateImageAction implements AiImageAction {
 
     public final AiImageActionDefinition actionDefinition;
 
-    public GenerateImageAction(ApplicationProperties.Ai.Component component) {
+    public GenerateImageAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
         this.actionDefinition = new AiImageActionDefinition(
             action(AiImageConstants.GENERATE_IMAGE)
                 .title("Generate Image")
                 .description("AI generate an image that you prompt.")
                 .properties(
-                    MODEL_PROVIDER_PROPERTY,
+                    PROVIDER_PROPERTY.apply(provider, propertyService),
                     MODEL_OPTIONS_PROPERTY,
                     MODEL_NO_OPTIONS_PROPERTY,
                     string(PROMPT)
@@ -56,21 +71,62 @@ public class GenerateImageAction implements AiImageAction {
                         .description("Write your prompt for generating an image.")
                         .required(true),
                     IMAGE_N_PROPERTY,
+                    string(SIZE)
+                        .label("Size")
+                        .description("The size of the generated images.")
+                        .options(
+                            option("Dall-e-2 256x256", Size.DALL_E_2_256x256.name()),
+                            option("Dall-e-2 512x512", Size.DALL_E_2_512x512.name()),
+                            option("1024x1024", Size._1024x1024.name()),
+                            option("Dall-e-3 1792x1024", Size.DALL_E_3_1792x1024.name()),
+                            option("Dall-e-3 1024x1792", Size.DALL_E_3_1024x1792.name()))
+                        .displayCondition("{'%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
+                        .required(true),
+                    integer(HEIGHT)
+                        .label("Height")
+                        .description(
+                            "Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                        .defaultValue(512)
+                        .displayCondition("provider == '%s'".formatted(STABILITY))
+                        .required(true),
+                    integer(WIDTH)
+                        .label("Width")
+                        .description(
+                            "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                        .defaultValue(512)
+                        .displayCondition("provider == '%s'".formatted(STABILITY))
+                        .required(true),
                     IMAGE_RESPONSE_PROPERTY)
-                .output(),
-            component, this);
+                .output(
+                    outputSchema(
+                        object()
+                            .properties(
+                                string("url"),
+                                string("b64Json")))),
+            provider, this, propertyService);
     }
 
     public Parameters createParameters(Parameters inputParameters) {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
-        modelInputParametersMap.put("imageMessages",
-            List.of(
-                Map.of("content", inputParameters.getString(PROMPT))));
-        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
-        modelInputParametersMap.put("size", new Integer[] {
-            1024, 1024
-        });
+        Provider provider = Provider.valueOf(inputParameters.getString(AiImageConstants.PROVIDER));
+        Integer[] sizeDimensions;
+
+        if (provider == STABILITY) {
+            sizeDimensions = new Integer[] {
+                inputParameters.getRequiredInteger(WIDTH), inputParameters.getRequiredInteger(HEIGHT)
+            };
+        } else {
+            Size size = inputParameters.getRequired(SIZE, Size.class);
+
+            sizeDimensions = new Integer[] {
+                size.getDimensions()[0], size.getDimensions()[1]
+            };
+        }
+
+        modelInputParametersMap.put(IMAGE_MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT))));
+        modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
+        modelInputParametersMap.put(SIZE, sizeDimensions);
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }

@@ -18,7 +18,6 @@ package com.bytechef.component.openai.action;
 
 import static com.bytechef.component.ai.llm.ImageModel.Quality.HD;
 import static com.bytechef.component.ai.llm.ImageModel.Quality.STANDARD;
-import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.B64_JSON;
 import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.URL;
 import static com.bytechef.component.ai.llm.ImageModel.Style.NATURAL;
 import static com.bytechef.component.ai.llm.ImageModel.Style.VIVID;
@@ -35,8 +34,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -47,12 +44,11 @@ import com.bytechef.component.ai.llm.ImageModel;
 import com.bytechef.component.ai.llm.ImageModel.Quality;
 import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
-import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import com.bytechef.component.openai.constant.OpenAiConstants;
+import com.bytechef.component.openai.constant.Size;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -74,25 +70,15 @@ public class OpenAiCreateImageAction {
                 .options(OpenAiConstants.IMAGE_MODELS)
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
-            object(SIZE)
+            string(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options(
-                    option("Dall-e-2 256x256", new Integer[] {
-                        256, 256
-                    }),
-                    option("Dall-e-2 512x512", new Integer[] {
-                        512, 512
-                    }),
-                    option("1024x1024", new Integer[] {
-                        1024, 1024
-                    }),
-                    option("Dall-e-3 1792x1024", new Integer[] {
-                        1792, 1024
-                    }),
-                    option("Dall-e-3 1024x1792", new Integer[] {
-                        1024, 1792
-                    }))
+                    option("Dall-e-2 256x256", Size.DALL_E_2_256x256.name()),
+                    option("Dall-e-2 512x512", Size.DALL_E_2_512x512.name()),
+                    option("1024x1024", Size._1024x1024.name()),
+                    option("Dall-e-3 1792x1024", Size.DALL_E_3_1792x1024.name()),
+                    option("Dall-e-3 1024x1792", Size.DALL_E_3_1024x1792.name()))
                 .required(true),
             IMAGE_N_PROPERTY,
             IMAGE_RESPONSE_PROPERTY,
@@ -119,34 +105,27 @@ public class OpenAiCreateImageAction {
             outputSchema(
                 object()
                     .properties(
-                        integer("created"),
-                        array("data")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("url")
-                                            .controlType(Property.ControlType.URL),
-                                        string("b64Json"),
-                                        string("revisedPrompt"))))))
+                        string("url"),
+                        string("b64Json"))))
         .perform(OpenAiCreateImageAction::perform);
 
     public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
         ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
-        Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+        Size size = inputParameters.getRequired(SIZE, Size.class);
         Style style = inputParameters.get(STYLE, Style.class, NATURAL);
         Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
 
         return new OpenAiImageModel(
             new OpenAiImageApi(connectionParameters.getString(TOKEN)),
             OpenAiImageOptions.builder()
-                .height(size[1])
+                .height(size.getDimensions()[1])
                 .model(inputParameters.getRequiredString(MODEL))
                 .N(inputParameters.getInteger(N))
                 .responseFormat(responseFormat.getValue())
                 .quality(quality.getValue())
                 .style(style.getValue())
                 .user(inputParameters.getString(USER))
-                .width(size[0])
+                .width(size.getDimensions()[0])
                 .build(),
             new RetryTemplate());
     };

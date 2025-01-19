@@ -29,6 +29,6 @@ class AiImageComponentHandlerTest {
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/ai_image_v1.json",
-            new AiImageComponentHandler(new ApplicationProperties()).getDefinition());
+            new AiImageComponentHandler(new ApplicationProperties(), null).getDefinition());
     }
 }

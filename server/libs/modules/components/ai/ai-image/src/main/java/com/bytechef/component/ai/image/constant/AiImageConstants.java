@@ -17,45 +17,49 @@
 package com.bytechef.component.ai.image.constant;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.STABILITY;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
-import com.bytechef.component.ai.image.util.AiImageAnalysisUtil;
-import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
+import com.bytechef.component.ai.image.util.AiImageUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.config.ApplicationProperties.Ai;
+import com.bytechef.platform.configuration.service.PropertyService;
+import java.util.function.BiFunction;
 
 /**
  * @author Marko Krišković
  */
 public class AiImageConstants {
 
-    public static final String PROMPT = "prompt";
-
-    public static final String MODEL_PROVIDER = "modelProvider";
     public static final String GENERATE_IMAGE = "generateImage";
+    public static final String PROMPT = "prompt";
+    public static final String PROVIDER = "provider";
 
-    public static final ModifiableIntegerProperty MODEL_PROVIDER_PROPERTY = integer(MODEL_PROVIDER)
-        .label("Model provider")
-        .options(
-            option("Azure Open AI", 0),
-            option("Open AI", 1),
-            option("Stability", 2))
-        .required(true);
+    public static final BiFunction<Ai.Provider, PropertyService, ModifiableStringProperty> PROVIDER_PROPERTY =
+        (aiProvider, propertyService) -> string(PROVIDER)
+            .label("Provider")
+            .options(
+                (OptionsDataSource.ActionOptionsFunction<String>) (
+                    inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> AiImageUtils
+                        .getProviderOptions(aiProvider, propertyService))
+
+            .required(true);
 
     public static final ModifiableStringProperty MODEL_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .options((OptionsDataSource.ActionOptionsFunction<String>) AiImageAnalysisUtil::getModelOptions)
-        .optionsLookupDependsOn(MODEL_PROVIDER)
-        .displayCondition("modelProvider >= 0 && modelProvider <= 1")
+        .options((OptionsDataSource.ActionOptionsFunction<String>) AiImageUtils::getModelOptions)
+        .optionsLookupDependsOn(PROVIDER)
+        .displayCondition("{'%s','%s'}.contains(provider)".formatted(AZURE_OPEN_AI, OPEN_AI))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("modelProvider == 2")
+        .displayCondition("provider == '%s'".formatted(STABILITY))
         .required(true);
 
     private AiImageConstants() {

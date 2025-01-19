@@ -26,6 +26,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.AiComponentDefinition;
+import com.bytechef.platform.configuration.service.PropertyService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,10 +37,10 @@ public class AiImageComponentHandler implements ComponentHandler {
 
     private final AiComponentDefinition componentDefinition;
 
-    public AiImageComponentHandler(ApplicationProperties applicationProperties) {
+    public AiImageComponentHandler(ApplicationProperties applicationProperties, PropertyService propertyService) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        this.componentDefinition = new AiImageComponentDefinitionImpl(ai.getComponent());
+        this.componentDefinition = new AiImageComponentDefinitionImpl(ai.getProvider(), propertyService);
     }
 
     @Override
@@ -50,7 +51,9 @@ public class AiImageComponentHandler implements ComponentHandler {
     private static class AiImageComponentDefinitionImpl
         extends AbstractComponentDefinitionWrapper implements AiComponentDefinition {
 
-        private AiImageComponentDefinitionImpl(ApplicationProperties.Ai.Component component) {
+        private AiImageComponentDefinitionImpl(
+            ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+
             super(
                 component(AI_IMAGE)
                     .title("AI Image")
@@ -58,7 +61,7 @@ public class AiImageComponentHandler implements ComponentHandler {
                     .icon("path:assets/ai-image.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
-                        new GenerateImageAction(component).actionDefinition));
+                        new GenerateImageAction(provider, propertyService).actionDefinition));
         }
     }
 }

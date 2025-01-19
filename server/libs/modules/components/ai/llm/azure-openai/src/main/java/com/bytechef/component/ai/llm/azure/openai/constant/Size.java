@@ -16,22 +16,37 @@
 
 package com.bytechef.component.ai.llm.azure.openai.constant;
 
-import com.bytechef.component.ai.llm.util.LLMUtils;
-import com.bytechef.component.definition.Option;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import org.springframework.ai.azure.openai.AzureOpenAiImageOptions;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-public class AzureOpenAiConstants {
+/**
+ * @author Ivica Cardic
+ */
+public enum Size {
 
-    public static final List<Option<String>> IMAGE_MODELS = LLMUtils.getEnumOptions(
-        Arrays.stream(AzureOpenAiImageOptions.ImageModel.values())
-            .collect(
-                Collectors.toMap(
-                    AzureOpenAiImageOptions.ImageModel::getValue,
-                    AzureOpenAiImageOptions.ImageModel::getValue)));
+    DALL_E_2_256x256(new Integer[] {
+        256, 256
+    }),
+    DALL_E_2_512x512(new Integer[] {
+        512, 512
+    }),
+    _1024x1024(new Integer[] {
+        1024, 1024
+    }),
+    DALL_E_3_1792x1024(new Integer[] {
+        1792, 1024
+    }),
+    DALL_E_3_1024x1792(new Integer[] {
+        1024, 1792
+    });
 
-    private AzureOpenAiConstants() {
+    private final Integer[] dimensions;
+
+    Size(Integer[] dimensions) {
+        this.dimensions = dimensions;
+    }
+
+    @SuppressFBWarnings("EI")
+    public Integer[] getDimensions() {
+        return dimensions;
     }
 }

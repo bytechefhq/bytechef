@@ -91,9 +91,7 @@ public interface ImageModel {
     }
 
     private List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
-
-        List<ImageMessage> imageMessages =
-            inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});
+        List<ImageMessage> imageMessages = inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});
 
         return imageMessages.stream()
             .map(messageRecord -> new org.springframework.ai.image.ImageMessage(

@@ -6,13 +6,82 @@
   "customAction" : null,
   "customActionHelp" : null,
   "description" : "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",
-  "icon" : "path:assets/openai.svg",
+  "icon" : "path:assets/open-ai.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "azureOpenai",
+  "name" : "azureOpenAi",
   "resources" : null,
   "version" : 1,
   "title" : "Azure OpenAI",
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "endpoint",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Endpoint",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "token",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Token",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null,
+      "apply" : null,
+      "clientId" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "tokenUrl" : null,
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -98,19 +167,19 @@
           "options" : [ {
             "description" : null,
             "label" : "System",
-            "value" : "system"
+            "value" : "SYSTEM"
           }, {
             "description" : null,
             "label" : "User",
-            "value" : "user"
+            "value" : "USER"
           }, {
             "description" : null,
             "label" : "Assistant",
-            "value" : "assistant"
+            "value" : "ASSISTANT"
           }, {
             "description" : null,
             "label" : "Tool",
-            "value" : "tool"
+            "value" : "TOOL"
           } ],
           "optionsDataSource" : null
         }, {
@@ -136,7 +205,7 @@
         }, {
           "advancedOption" : null,
           "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
-          "displayCondition" : "messages[index].role == 'user'",
+          "displayCondition" : "messages[index].role == 'USER'",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
@@ -248,18 +317,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "ARRAY_BUILDER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -286,28 +355,29 @@
         "metadata" : { },
         "required" : false,
         "name" : "responseFormat",
-        "type" : "INTEGER",
-        "defaultValue" : 1,
+        "type" : "STRING",
+        "defaultValue" : "TEXT",
         "exampleValue" : null,
         "label" : "Response Format",
         "placeholder" : null,
-        "maxValue" : null,
-        "minValue" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
         "options" : [ {
           "description" : "Text response",
           "label" : "Text",
-          "value" : 1
+          "value" : "TEXT"
         }, {
           "description" : "JSON response with key-value pairs",
           "label" : "JSON",
-          "value" : 2
+          "value" : "JSON"
         } ],
-        "controlType" : "SELECT",
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Define the JSON schema for the response.",
-        "displayCondition" : "response.responseFormat == 2",
+        "displayCondition" : "response.responseFormat == 'JSON'",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -325,8 +395,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -344,8 +414,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "How many chat completion choices to generate for each input message.",
@@ -363,8 +433,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -385,8 +455,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
@@ -407,8 +477,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
@@ -429,8 +499,8 @@
       "minValue" : -2.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Modify the likelihood of specified tokens appearing in the completion.",
@@ -465,14 +535,14 @@
         "minValue" : null,
         "numberPrecision" : null,
         "options" : null,
-        "controlType" : "NUMBER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "NUMBER"
       } ],
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -493,8 +563,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -534,8 +604,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.",
@@ -596,16 +666,17 @@
             "hidden" : null,
             "metadata" : { },
             "required" : null,
-            "name" : "created",
-            "type" : "INTEGER",
+            "name" : "url",
+            "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
             "label" : null,
             "placeholder" : null,
-            "maxValue" : null,
-            "minValue" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
             "options" : null,
-            "controlType" : "INTEGER",
             "optionsDataSource" : null
           }, {
             "advancedOption" : null,
@@ -615,102 +686,21 @@
             "hidden" : null,
             "metadata" : { },
             "required" : null,
-            "name" : "data",
-            "type" : "ARRAY",
+            "name" : "b64Json",
+            "type" : "STRING",
             "defaultValue" : null,
             "exampleValue" : null,
             "label" : null,
             "placeholder" : null,
-            "items" : [ {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : null,
-              "type" : "OBJECT",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "additionalProperties" : null,
-              "multipleValues" : null,
-              "options" : null,
-              "properties" : [ {
-                "advancedOption" : null,
-                "description" : null,
-                "displayCondition" : null,
-                "expressionEnabled" : null,
-                "hidden" : null,
-                "metadata" : { },
-                "required" : null,
-                "name" : "url",
-                "type" : "STRING",
-                "defaultValue" : null,
-                "exampleValue" : null,
-                "label" : null,
-                "placeholder" : null,
-                "controlType" : "URL",
-                "languageId" : null,
-                "maxLength" : null,
-                "minLength" : null,
-                "options" : null,
-                "optionsDataSource" : null
-              }, {
-                "advancedOption" : null,
-                "description" : null,
-                "displayCondition" : null,
-                "expressionEnabled" : null,
-                "hidden" : null,
-                "metadata" : { },
-                "required" : null,
-                "name" : "b64Json",
-                "type" : "STRING",
-                "defaultValue" : null,
-                "exampleValue" : null,
-                "label" : null,
-                "placeholder" : null,
-                "controlType" : "TEXT",
-                "languageId" : null,
-                "maxLength" : null,
-                "minLength" : null,
-                "options" : null,
-                "optionsDataSource" : null
-              }, {
-                "advancedOption" : null,
-                "description" : null,
-                "displayCondition" : null,
-                "expressionEnabled" : null,
-                "hidden" : null,
-                "metadata" : { },
-                "required" : null,
-                "name" : "revisedPrompt",
-                "type" : "STRING",
-                "defaultValue" : null,
-                "exampleValue" : null,
-                "label" : null,
-                "placeholder" : null,
-                "controlType" : "TEXT",
-                "languageId" : null,
-                "maxLength" : null,
-                "minLength" : null,
-                "options" : null,
-                "optionsDataSource" : null
-              } ],
-              "controlType" : "OBJECT_BUILDER",
-              "optionsDataSource" : null
-            } ],
-            "maxItems" : null,
-            "minItems" : null,
-            "multipleValues" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
             "options" : null,
-            "controlType" : "ARRAY_BUILDER",
             "optionsDataSource" : null
           } ],
-          "controlType" : "OBJECT_BUILDER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
         },
         "sampleOutput" : null
       },
@@ -739,16 +729,17 @@
           "hidden" : null,
           "metadata" : { },
           "required" : null,
-          "name" : "created",
-          "type" : "INTEGER",
+          "name" : "url",
+          "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "maxValue" : null,
-          "minValue" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
           "options" : null,
-          "controlType" : "INTEGER",
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
@@ -758,102 +749,21 @@
           "hidden" : null,
           "metadata" : { },
           "required" : null,
-          "name" : "data",
-          "type" : "ARRAY",
+          "name" : "b64Json",
+          "type" : "STRING",
           "defaultValue" : null,
           "exampleValue" : null,
           "label" : null,
           "placeholder" : null,
-          "items" : [ {
-            "advancedOption" : null,
-            "description" : null,
-            "displayCondition" : null,
-            "expressionEnabled" : null,
-            "hidden" : null,
-            "metadata" : { },
-            "required" : null,
-            "name" : null,
-            "type" : "OBJECT",
-            "defaultValue" : null,
-            "exampleValue" : null,
-            "label" : null,
-            "placeholder" : null,
-            "additionalProperties" : null,
-            "multipleValues" : null,
-            "options" : null,
-            "properties" : [ {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "url",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "URL",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "b64Json",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            }, {
-              "advancedOption" : null,
-              "description" : null,
-              "displayCondition" : null,
-              "expressionEnabled" : null,
-              "hidden" : null,
-              "metadata" : { },
-              "required" : null,
-              "name" : "revisedPrompt",
-              "type" : "STRING",
-              "defaultValue" : null,
-              "exampleValue" : null,
-              "label" : null,
-              "placeholder" : null,
-              "controlType" : "TEXT",
-              "languageId" : null,
-              "maxLength" : null,
-              "minLength" : null,
-              "options" : null,
-              "optionsDataSource" : null
-            } ],
-            "controlType" : "OBJECT_BUILDER",
-            "optionsDataSource" : null
-          } ],
-          "maxItems" : null,
-          "minItems" : null,
-          "multipleValues" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
           "options" : null,
-          "controlType" : "ARRAY_BUILDER",
           "optionsDataSource" : null
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       },
       "sampleOutput" : null
     },
@@ -956,18 +866,18 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "The size of the generated images.",
@@ -977,36 +887,36 @@
       "metadata" : { },
       "required" : true,
       "name" : "size",
-      "type" : "OBJECT",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Size",
       "placeholder" : null,
-      "additionalProperties" : null,
-      "multipleValues" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Dall-e-2 256x256",
-        "value" : [ 256, 256 ]
+        "value" : "DALL_E_2_256x256"
       }, {
         "description" : null,
         "label" : "Dall-e-2 512x512",
-        "value" : [ 512, 512 ]
+        "value" : "DALL_E_2_512x512"
       }, {
         "description" : null,
         "label" : "1024x1024",
-        "value" : [ 1024, 1024 ]
+        "value" : "_1024x1024"
       }, {
         "description" : null,
         "label" : "Dall-e-3 1792x1024",
-        "value" : [ 1792, 1024 ]
+        "value" : "DALL_E_3_1792x1024"
       }, {
         "description" : null,
         "label" : "Dall-e-3 1024x1792",
-        "value" : [ 1024, 1792 ]
+        "value" : "DALL_E_3_1024x1792"
       } ],
-      "properties" : null,
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
@@ -1025,8 +935,8 @@
       "maxValue" : 10,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The format in which the generated images are returned.",
@@ -1039,7 +949,7 @@
       "type" : "STRING",
       "defaultValue" : "URL",
       "exampleValue" : null,
-      "label" : "Response Format",
+      "label" : "Response format",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1048,24 +958,24 @@
       "options" : [ {
         "description" : null,
         "label" : "URL",
-        "value" : "url"
+        "value" : "URL"
       }, {
         "description" : null,
         "label" : "B64_JSON",
-        "value" : "b64_json"
+        "value" : "B64_JSON"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.",
-      "displayCondition" : null,
+      "displayCondition" : "model == 'dall-e-3'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : null,
       "name" : "style",
       "type" : "STRING",
-      "defaultValue" : null,
+      "defaultValue" : "NATURAL",
       "exampleValue" : null,
       "label" : "Style",
       "placeholder" : null,
@@ -1076,11 +986,11 @@
       "options" : [ {
         "description" : null,
         "label" : "vivid",
-        "value" : "vivid"
+        "value" : "VIVID"
       }, {
         "description" : null,
         "label" : "natural",
-        "value" : "natural"
+        "value" : "NATURAL"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1262,231 +1172,231 @@
       "options" : [ {
         "description" : null,
         "label" : "Afrikaans",
-        "value" : "af"
+        "value" : "AF"
       }, {
         "description" : null,
         "label" : "Arabic",
-        "value" : "ar"
+        "value" : "AR"
       }, {
         "description" : null,
         "label" : "Armenian",
-        "value" : "hy"
+        "value" : "HY"
       }, {
         "description" : null,
         "label" : "Azerbaijani",
-        "value" : "az"
+        "value" : "AZ"
       }, {
         "description" : null,
         "label" : "Belarusian",
-        "value" : "be"
+        "value" : "BE"
       }, {
         "description" : null,
         "label" : "Bosnian",
-        "value" : "bs"
+        "value" : "BS"
       }, {
         "description" : null,
         "label" : "Bulgarian",
-        "value" : "bg"
+        "value" : "BG"
       }, {
         "description" : null,
         "label" : "Catalan",
-        "value" : "ca"
+        "value" : "CA"
       }, {
         "description" : null,
-        "label" : "Chinese (Simplified)",
-        "value" : "zh"
+        "label" : "Chinese",
+        "value" : "ZH"
       }, {
         "description" : null,
         "label" : "Croatian",
-        "value" : "hr"
+        "value" : "HR"
       }, {
         "description" : null,
         "label" : "Czech",
-        "value" : "cs"
+        "value" : "CS"
       }, {
         "description" : null,
         "label" : "Danish",
-        "value" : "da"
+        "value" : "DA"
       }, {
         "description" : null,
         "label" : "Dutch",
-        "value" : "nl"
+        "value" : "NL"
       }, {
         "description" : null,
         "label" : "Greek",
-        "value" : "el"
+        "value" : "EL"
       }, {
         "description" : null,
         "label" : "Estonian",
-        "value" : "et"
+        "value" : "ET"
       }, {
         "description" : null,
         "label" : "English",
-        "value" : "en"
+        "value" : "EN"
       }, {
         "description" : null,
         "label" : "Finnish",
-        "value" : "fi"
+        "value" : "FI"
       }, {
         "description" : null,
         "label" : "French",
-        "value" : "fr"
+        "value" : "FR"
       }, {
         "description" : null,
         "label" : "Galician",
-        "value" : "gl"
+        "value" : "GL"
       }, {
         "description" : null,
         "label" : "German",
-        "value" : "de"
+        "value" : "DE"
       }, {
         "description" : null,
         "label" : "Hebrew",
-        "value" : "he"
+        "value" : "HE"
       }, {
         "description" : null,
         "label" : "Hindi",
-        "value" : "hi"
+        "value" : "HI"
       }, {
         "description" : null,
         "label" : "Hungarian",
-        "value" : "hu"
+        "value" : "HU"
       }, {
         "description" : null,
         "label" : "Icelandic",
-        "value" : "is"
+        "value" : "IS"
       }, {
         "description" : null,
         "label" : "Indonesian",
-        "value" : "id"
+        "value" : "ID"
       }, {
         "description" : null,
         "label" : "Italian",
-        "value" : "it"
+        "value" : "IT"
       }, {
         "description" : null,
         "label" : "Japanese",
-        "value" : "ja"
+        "value" : "JA"
       }, {
         "description" : null,
         "label" : "Kazakh",
-        "value" : "kk"
+        "value" : "KK"
       }, {
         "description" : null,
         "label" : "Kannada",
-        "value" : "kn"
+        "value" : "KN"
       }, {
         "description" : null,
         "label" : "Korean",
-        "value" : "ko"
+        "value" : "KO"
       }, {
         "description" : null,
         "label" : "Lithuanian",
-        "value" : "lt"
+        "value" : "LT"
       }, {
         "description" : null,
         "label" : "Latvian",
-        "value" : "lv"
-      }, {
-        "description" : null,
-        "label" : "Maori",
-        "value" : "ma"
-      }, {
-        "description" : null,
-        "label" : "Macedonian",
-        "value" : "mk"
+        "value" : "LV"
       }, {
         "description" : null,
         "label" : "Marathi",
-        "value" : "mr"
+        "value" : "MA"
+      }, {
+        "description" : null,
+        "label" : "Macedonian",
+        "value" : "MK"
+      }, {
+        "description" : null,
+        "label" : "Marathi",
+        "value" : "MR"
       }, {
         "description" : null,
         "label" : "Malay",
-        "value" : "ms"
+        "value" : "MS"
       }, {
         "description" : null,
         "label" : "Nepali",
-        "value" : "ne"
+        "value" : "NE"
       }, {
         "description" : null,
         "label" : "Norwegian",
-        "value" : "no"
+        "value" : "NO"
       }, {
         "description" : null,
         "label" : "Persian",
-        "value" : "fa"
+        "value" : "FA"
       }, {
         "description" : null,
         "label" : "Polish",
-        "value" : "pl"
+        "value" : "PL"
       }, {
         "description" : null,
         "label" : "Portuguese",
-        "value" : "pt"
+        "value" : "PT"
       }, {
         "description" : null,
         "label" : "Romanian",
-        "value" : "ro"
+        "value" : "RO"
       }, {
         "description" : null,
         "label" : "Russian",
-        "value" : "ru"
+        "value" : "RU"
       }, {
         "description" : null,
         "label" : "Slovak",
-        "value" : "sk"
+        "value" : "SK"
       }, {
         "description" : null,
         "label" : "Slovenian",
-        "value" : "sl"
+        "value" : "SL"
       }, {
         "description" : null,
         "label" : "Serbian",
-        "value" : "sr"
+        "value" : "SR"
       }, {
         "description" : null,
         "label" : "Spanish",
-        "value" : "es"
+        "value" : "ES"
       }, {
         "description" : null,
         "label" : "Swedish",
-        "value" : "sv"
+        "value" : "SV"
       }, {
         "description" : null,
         "label" : "Swahili",
-        "value" : "sw"
+        "value" : "SW"
       }, {
         "description" : null,
         "label" : "Tamil",
-        "value" : "ta"
+        "value" : "TA"
       }, {
         "description" : null,
         "label" : "Tagalog",
-        "value" : "tl"
+        "value" : "TL"
       }, {
         "description" : null,
         "label" : "Thai",
-        "value" : "th"
+        "value" : "TH"
       }, {
         "description" : null,
         "label" : "Turkish",
-        "value" : "tr"
+        "value" : "TR"
       }, {
         "description" : null,
         "label" : "Ukrainian",
-        "value" : "uk"
+        "value" : "UK"
       }, {
         "description" : null,
         "label" : "Urdu",
-        "value" : "ur"
+        "value" : "UR"
       }, {
         "description" : null,
         "label" : "Vietnamese",
-        "value" : "vi"
+        "value" : "VI"
       }, {
         "description" : null,
         "label" : "Welsh",
-        "value" : "cy"
+        "value" : "CY"
       } ],
       "optionsDataSource" : null
     }, {
@@ -1569,84 +1479,15 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Create Transcriptions",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "endpoint",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Endpoint",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "token",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Token",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "refreshToken" : null,
-      "tokenUrl" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  }
+  "dataStream" : null,
+  "unifiedApi" : null
 }

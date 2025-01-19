@@ -21,11 +21,11 @@ import static com.bytechef.platform.component.definition.AiComponentDefinition.A
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.text.action.ClassifyTextAction;
+import com.bytechef.component.ai.text.action.GenerateTextAction;
 import com.bytechef.component.ai.text.action.ScoreAction;
 import com.bytechef.component.ai.text.action.SentimentAction;
 import com.bytechef.component.ai.text.action.SimilaritySearchAction;
 import com.bytechef.component.ai.text.action.SummarizeTextAction;
-import com.bytechef.component.ai.text.action.TextGenerationAction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.config.ApplicationProperties;
@@ -70,7 +70,7 @@ public class AiTextComponentHandler implements ComponentHandler {
                         new ScoreAction(provider, propertyService).actionDefinition,
                         new SummarizeTextAction(provider, propertyService).actionDefinition,
                         new SimilaritySearchAction(provider, propertyService).actionDefinition,
-                        new TextGenerationAction(provider, propertyService).actionDefinition));
+                        new GenerateTextAction(provider, propertyService).actionDefinition));
         }
     }
 }

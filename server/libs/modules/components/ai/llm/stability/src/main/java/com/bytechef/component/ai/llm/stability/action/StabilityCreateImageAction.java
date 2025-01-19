@@ -33,7 +33,6 @@ import static com.bytechef.component.ai.llm.stability.constant.StabilityConstant
 import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.WIDTH;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
@@ -46,7 +45,6 @@ import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
@@ -127,15 +125,8 @@ public class StabilityCreateImageAction {
             outputSchema(
                 object()
                     .properties(
-                        integer("created"),
-                        array("data")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("url")
-                                            .controlType(Property.ControlType.URL),
-                                        string("b64Json"),
-                                        string("revisedPrompt"))))))
+                        string("url"),
+                        string("b64Json"))))
         .perform(StabilityCreateImageAction::perform);
 
     private StabilityCreateImageAction() {

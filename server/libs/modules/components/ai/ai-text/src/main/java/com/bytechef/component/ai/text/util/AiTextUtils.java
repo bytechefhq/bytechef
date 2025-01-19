@@ -23,7 +23,11 @@ import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_JUR
 import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_LLAMA;
 import static com.bytechef.component.ai.llm.constant.Provider.AMAZON_BEDROCK_TITAN;
 import static com.bytechef.component.ai.llm.constant.Provider.ANTHROPIC;
+import static com.bytechef.component.ai.llm.constant.Provider.AZURE_OPEN_AI;
+import static com.bytechef.component.ai.llm.constant.Provider.GROQ;
+import static com.bytechef.component.ai.llm.constant.Provider.HUGGING_FACE;
 import static com.bytechef.component.ai.llm.constant.Provider.MISTRAL;
+import static com.bytechef.component.ai.llm.constant.Provider.NVIDIA;
 import static com.bytechef.component.ai.llm.constant.Provider.OPEN_AI;
 import static com.bytechef.component.ai.llm.constant.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER;
@@ -31,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.ai.llm.amazon.bedrock.constant.AmazonBedrockConstants;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
+import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.constant.LLMConstants;
 import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
@@ -76,8 +81,9 @@ public class AiTextUtils {
             case AMAZON_BEDROCK_LLAMA -> AmazonBedrockConstants.LLAMA_MODELS;
             case AMAZON_BEDROCK_TITAN -> AmazonBedrockConstants.TITAN_MODELS;
             case ANTHROPIC -> AnthropicConstants.MODELS;
+            case AZURE_OPEN_AI -> AzureOpenAiConstants.IMAGE_MODELS;
             case MISTRAL -> MistralConstants.MODELS;
-            case OPEN_AI -> OpenAiConstants.MODELS;
+            case OPEN_AI -> OpenAiConstants.TEXT_MODELS;
             case VERTEX_GEMINI -> VertexGeminiConstants.MODELS;
             default -> throw new IllegalStateException("Unexpected value: " + provider);
         };
@@ -171,6 +177,33 @@ public class AiTextUtils {
 
                 yield anthropic.getApiKey() != null;
             }
+            case AZURE_OPEN_AI -> {
+                if (checkAiProvider(AZURE_OPEN_AI.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
+
+                yield azureOpenAi.getApiKey() != null;
+            }
+            case HUGGING_FACE -> {
+                if (checkAiProvider(HUGGING_FACE.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.HuggingFace huggingFace = aiProvider.getHuggingFace();
+
+                yield huggingFace.getApiKey() != null;
+            }
+            case GROQ -> {
+                if (checkAiProvider(GROQ.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.Groq groq = aiProvider.getGroq();
+
+                yield groq.getApiKey() != null;
+            }
             case MISTRAL -> {
                 if (checkAiProvider(MISTRAL.getKey(), activeProviderKeys)) {
                     yield true;
@@ -179,6 +212,15 @@ public class AiTextUtils {
                 Ai.Provider.Mistral mistral = aiProvider.getMistral();
 
                 yield mistral.getApiKey() != null;
+            }
+            case NVIDIA -> {
+                if (checkAiProvider(NVIDIA.getKey(), activeProviderKeys)) {
+                    yield true;
+                }
+
+                Ai.Provider.Nvidia nvidia = aiProvider.getNvidia();
+
+                yield nvidia.getApiKey() != null;
             }
             case OPEN_AI -> {
                 if (checkAiProvider(OPEN_AI.getKey(), activeProviderKeys)) {

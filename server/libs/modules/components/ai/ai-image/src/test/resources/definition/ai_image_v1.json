@@ -14,33 +14,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Stability",
-        "value" : 2
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 0 && modelProvider <= 1",
+      "displayCondition" : "{'AZURE_OPEN_AI','OPEN_AI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -57,13 +49,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider == 2",
+      "displayCondition" : "provider == 'STABILITY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -117,8 +109,86 @@
       "maxValue" : 10,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
+    }, {
+      "advancedOption" : null,
+      "description" : "The size of the generated images.",
+      "displayCondition" : "{'AZURE_OPEN_AI','OPEN_AI'}.contains(provider)",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "size",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Size",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : [ {
+        "description" : null,
+        "label" : "Dall-e-2 256x256",
+        "value" : "DALL_E_2_256x256"
+      }, {
+        "description" : null,
+        "label" : "Dall-e-2 512x512",
+        "value" : "DALL_E_2_512x512"
+      }, {
+        "description" : null,
+        "label" : "1024x1024",
+        "value" : "_1024x1024"
+      }, {
+        "description" : null,
+        "label" : "Dall-e-3 1792x1024",
+        "value" : "DALL_E_3_1792x1024"
+      }, {
+        "description" : null,
+        "label" : "Dall-e-3 1024x1792",
+        "value" : "DALL_E_3_1024x1792"
+      } ],
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.",
+      "displayCondition" : "provider == 'STABILITY'",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "height",
+      "type" : "INTEGER",
+      "defaultValue" : 512,
+      "exampleValue" : null,
+      "label" : "Height",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
+    }, {
+      "advancedOption" : null,
+      "description" : "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.",
+      "displayCondition" : "provider == 'STABILITY'",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "width",
+      "type" : "INTEGER",
+      "defaultValue" : 512,
+      "exampleValue" : null,
+      "label" : "Width",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The format in which the generated images are returned.",
@@ -131,7 +201,7 @@
       "type" : "STRING",
       "defaultValue" : "URL",
       "exampleValue" : null,
-      "label" : "Response Format",
+      "label" : "Response format",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -140,23 +210,146 @@
       "options" : [ {
         "description" : null,
         "label" : "URL",
-        "value" : "url"
+        "value" : "URL"
       }, {
         "description" : null,
         "label" : "B64_JSON",
-        "value" : "b64_json"
+        "value" : "B64_JSON"
       } ],
       "optionsDataSource" : null
     } ],
     "title" : "Generate Image",
     "perform" : { },
-    "processErrorResponse" : null,
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "url",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "b64Json",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          } ],
+          "optionsDataSource" : null,
+          "controlType" : "OBJECT_BUILDER"
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "url",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "b64Json",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        } ],
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
+      },
       "sampleOutput" : null
     },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "categories" : [ {
@@ -170,7 +363,7 @@
   "icon" : "path:assets/ai-image.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "aiImageAnalysis",
+  "name" : "aiImage",
   "resources" : null,
   "title" : "AI Image",
   "triggers" : null,

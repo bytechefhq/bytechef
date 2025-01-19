@@ -37,6 +37,7 @@ public enum Provider {
     MISTRAL(11, "mistral", "ai.provider.mistral", "Mistral"),
     NVIDIA(12, "nvidia", "ai.provider.nvidia", "NVIDIA"),
     OPEN_AI(13, "openAi", "ai.provider.openAi", "Open AI"),
+    STABILITY(15, "stability", "ai.provider.stability", "Stability"),
     VERTEX_GEMINI(14, "vertexGemini", "ai.provider.vertexGemini", "Vertex Gemini");
 
     private final int id;

@@ -119,11 +119,10 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             .map(Property::getKey)
             .toList();
 
-        ChatModel chatModel = getChatModel(inputParameters, activeProviderKeys, modelConnectionParametersMap);
-
+        Parameters modelInputParameters = aiTextAction.createParameters(inputParameters);
         Parameters modelConnectionParameters = ParametersFactory.createParameters(modelConnectionParametersMap);
 
-        Parameters modelInputParameters = aiTextAction.createParameters(inputParameters);
+        ChatModel chatModel = getChatModel(inputParameters, activeProviderKeys, modelConnectionParametersMap);
 
         Object response = chatModel.getResponse(modelInputParameters, modelConnectionParameters, context);
 
@@ -163,6 +162,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             case NVIDIA -> getNvidiaChatModel(activeProviderKeys, modelConnectionParametersMap);
             case OPEN_AI -> getOpenAiChatModel(activeProviderKeys, modelConnectionParametersMap);
             case VERTEX_GEMINI -> getVertexGeminiChatModel(activeProviderKeys, modelConnectionParametersMap);
+            default -> throw new IllegalArgumentException("Invalid provider");
         };
     }
 

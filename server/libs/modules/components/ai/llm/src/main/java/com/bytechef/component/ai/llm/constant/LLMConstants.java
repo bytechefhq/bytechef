@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.constant;
 
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
@@ -234,14 +235,15 @@ public class LLMConstants {
         .required(false)
         .advancedOption(true);
 
-    public static final ModifiableStringProperty IMAGE_RESPONSE_PROPERTY = string(RESPONSE_FORMAT)
-        .label("Response Format")
-        .description("The format in which the generated images are returned.")
-        .options(
-            option("URL", "url"),
-            option("B64_JSON", "b64_json"))
-        .defaultValue("URL")
-        .advancedOption(true);
+    public static final ModifiableStringProperty IMAGE_RESPONSE_PROPERTY =
+        string(RESPONSE_FORMAT)
+            .label("Response format")
+            .description("The format in which the generated images are returned.")
+            .options(
+                option("URL", ResponseFormat.URL.name()),
+                option("B64_JSON", ResponseFormat.B64_JSON.name()))
+            .defaultValue(ResponseFormat.URL.name())
+            .advancedOption(true);
 
     public static final ModifiableIntegerProperty IMAGE_N_PROPERTY = integer(N)
         .label("Number of Responses")
