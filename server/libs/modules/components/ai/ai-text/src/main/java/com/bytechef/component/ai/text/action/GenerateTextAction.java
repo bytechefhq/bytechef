@@ -16,15 +16,21 @@
 
 package com.bytechef.component.ai.text.action;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.CONTENT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ROLE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_NO_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_OPTIONS_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.MODEL_URL_PROPERTY;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROMPT;
 import static com.bytechef.component.ai.text.constant.AiTextConstants.PROVIDER_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.text.action.definition.AiTextActionDefinition;
@@ -40,11 +46,11 @@ import java.util.Map;
 /**
  * @author Marko Kriskovic
  */
-public class TextGenerationAction implements AiTextAction {
+public class GenerateTextAction implements AiTextAction {
 
     public final AiTextActionDefinition actionDefinition;
 
-    public TextGenerationAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
+    public GenerateTextAction(ApplicationProperties.Ai.Provider provider, PropertyService propertyService) {
         this.actionDefinition = new AiTextActionDefinition(
             action(AiTextConstants.TEXT_GENERATION)
                 .title("Text Generation")
@@ -60,7 +66,7 @@ public class TextGenerationAction implements AiTextAction {
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
-                .output(),
+                .output(outputSchema(string()), sampleOutput("Generated text.")),
             provider, this, propertyService);
     }
 
@@ -68,8 +74,8 @@ public class TextGenerationAction implements AiTextAction {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
         modelInputParametersMap.put(
-            "messages", List.of(Map.of("content", inputParameters.getString(PROMPT), "role", "user")));
-        modelInputParametersMap.put("model", inputParameters.getString(MODEL));
+            MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT), ROLE, USER)));
+        modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }
