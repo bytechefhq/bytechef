@@ -37,6 +37,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.image.action.definition.AiImageActionDefinition;
 import com.bytechef.component.ai.image.constant.AiImageConstants;
@@ -69,6 +70,7 @@ public class GenerateImageAction implements AiImageAction {
                     string(PROMPT)
                         .label("Prompt")
                         .description("Write your prompt for generating an image.")
+                        .controlType(TEXT_AREA)
                         .required(true),
                     IMAGE_N_PROPERTY,
                     string(SIZE)

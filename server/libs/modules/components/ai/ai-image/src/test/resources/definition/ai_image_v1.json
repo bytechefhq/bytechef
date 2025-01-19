@@ -86,7 +86,7 @@
       "exampleValue" : null,
       "label" : "Prompt",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "TEXT_AREA",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
