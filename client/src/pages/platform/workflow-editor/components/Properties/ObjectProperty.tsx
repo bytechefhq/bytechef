@@ -110,8 +110,12 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         [onDeleteClick, path]
     );
 
-    const objectParameterKeys = useMemo(() => {
-        return properties?.length ? properties?.map((property) => property.name) : Object.keys(parameterObject);
+    const objectParameterKeys: string[] = useMemo(() => {
+        return properties?.length
+            ? properties?.map((property) => property.name!)
+            : parameterObject
+              ? Object.keys(parameterObject)
+              : [];
     }, [properties, parameterObject]);
 
     // render individual object items with data gathered from parameters
