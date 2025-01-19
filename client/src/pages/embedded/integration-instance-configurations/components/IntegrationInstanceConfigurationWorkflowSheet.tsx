@@ -1,7 +1,7 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetContent} from '@/components/ui/sheet';
 import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
-import ReadOnlyWorkflowEditor from '@/shared/components/ReadOnlyWorkflow';
+import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
 import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
@@ -31,7 +31,7 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
             }
             open={integrationInstanceConfigurationWorkflowSheetOpen}
         >
-            <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-instance-workflow-sheet-width">
+            <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
                 <div className="size-full bg-muted/50 p-4">
                     <h1 className="text-lg font-semibold">{workflow?.label}</h1>
 

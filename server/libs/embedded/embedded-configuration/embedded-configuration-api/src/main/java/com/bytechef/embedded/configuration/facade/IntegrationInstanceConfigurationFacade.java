@@ -51,7 +51,7 @@ public interface IntegrationInstanceConfigurationFacade {
     List<Tag> getIntegrationInstanceConfigurationTags();
 
     List<IntegrationInstanceConfigurationDTO> getIntegrationInstanceConfigurations(
-        Environment environment, Long integrationId, Long tagId);
+        Environment environment, Long integrationId, Long tagId, boolean includeAllFields);
 
     void updateIntegrationInstanceConfiguration(
         IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO);

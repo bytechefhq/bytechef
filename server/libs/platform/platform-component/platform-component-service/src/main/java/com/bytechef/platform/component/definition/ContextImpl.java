@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MimeTypeUtils;
 import com.bytechef.commons.util.XmlUtils;
@@ -50,10 +51,11 @@ import org.slf4j.LoggerFactory;
  */
 class ContextImpl implements Context {
 
+    private final Convert convert;
     private final File file;
     private final Http http;
     private final Json json;
-    private final Logger logger;
+    private final Log log;
     private final MimeType mimeType;
     private final OutputSchema outputSchema;
     private final Xml xml;
@@ -63,14 +65,24 @@ class ContextImpl implements Context {
         String componentName, int componentVersion, String componentOperationName, FilesFileStorage filesFileStorage,
         ComponentConnection connection, HttpClientExecutor httpClientExecutor) {
 
+        this.convert = new ConvertImpl();
         this.file = new FileImpl(filesFileStorage);
         this.http = new HttpImpl(
             componentName, componentVersion, componentOperationName, connection, this, httpClientExecutor);
         this.json = new JsonImpl();
-        this.logger = new LoggerImpl(componentName, componentOperationName);
+        this.log = new LogImpl(componentName, componentOperationName);
         this.mimeType = new MimeTypeImpl();
         this.outputSchema = new OutputSchemaImpl();
         this.xml = new XmlImpl();
+    }
+
+    @Override
+    public <R> R convert(ContextFunction<Convert, R> convertFunction) {
+        try {
+            return convertFunction.apply(convert);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     @Override
@@ -101,9 +113,9 @@ class ContextImpl implements Context {
     }
 
     @Override
-    public void logger(ContextConsumer<Logger> loggerConsumer) {
+    public void log(ContextConsumer<Log> logConsumer) {
         try {
-            loggerConsumer.accept(logger);
+            logConsumer.accept(log);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }
@@ -295,6 +307,34 @@ class ContextImpl implements Context {
                     throw new RuntimeException("Unable to execute HTTP request", e);
                 }
             }
+        }
+    }
+
+    private record ConvertImpl() implements Convert {
+
+        @Override
+        public boolean canConvert(Object fromValue, Class<?> toValueType) {
+            return ConvertUtils.canConvert(fromValue, toValueType);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, Class<T> toValueType) {
+            return ConvertUtils.convertValue(fromValue, toValueType);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, Class<T> toValueType, boolean includeNulls) {
+            return ConvertUtils.convertValue(fromValue, toValueType, includeNulls);
+        }
+
+        @Override
+        public <T> T value(Object fromValue, TypeReference<T> toValueTypeRef) {
+            return ConvertUtils.convertValue(fromValue, toValueTypeRef.getType());
+        }
+
+        @Override
+        public Object string(String str) {
+            return ConvertUtils.convertString(str);
         }
     }
 
@@ -509,11 +549,11 @@ class ContextImpl implements Context {
         }
     }
 
-    private static class LoggerImpl implements Logger {
+    private static class LogImpl implements Log {
 
         private final org.slf4j.Logger logger;
 
-        public LoggerImpl(String componentName, String componentOperationName) {
+        public LogImpl(String componentName, String componentOperationName) {
             logger = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
         }

@@ -173,7 +173,7 @@ const WorkflowDialog = ({
                                 <FormLabel>Description</FormLabel>
 
                                 <FormControl>
-                                    <Textarea placeholder="Cute description of your project instance" {...field} />
+                                    <Textarea placeholder="Cute description of your project deployment" {...field} />
                                 </FormControl>
 
                                 <FormMessage />

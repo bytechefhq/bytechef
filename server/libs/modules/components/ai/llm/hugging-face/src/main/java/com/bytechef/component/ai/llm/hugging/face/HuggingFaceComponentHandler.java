@@ -32,7 +32,7 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class HuggingFaceComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("hugging-face")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("huggingFace")
         .title("Hugging Face")
         .description(
             "Hugging Face is on a journey to advance and democratize artificial intelligence through open source " +

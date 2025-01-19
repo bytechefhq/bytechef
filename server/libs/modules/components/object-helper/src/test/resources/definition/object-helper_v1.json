@@ -75,61 +75,62 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "valueType",
-      "type" : "INTEGER",
+      "name" : "type",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Value Type",
+      "label" : "Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Array",
-        "value" : 1
+        "value" : "ARRAY"
       }, {
         "description" : null,
         "label" : "Boolean",
-        "value" : 2
+        "value" : "BOOLEAN"
       }, {
         "description" : null,
         "label" : "Date",
-        "value" : 3
+        "value" : "DATE"
       }, {
         "description" : null,
         "label" : "Date Time",
-        "value" : 4
+        "value" : "DATE_TIME"
       }, {
         "description" : null,
         "label" : "Integer",
-        "value" : 5
+        "value" : "INTEGER"
       }, {
         "description" : null,
         "label" : "Nullable",
-        "value" : 6
+        "value" : "NULL"
       }, {
         "description" : null,
         "label" : "Number",
-        "value" : 7
+        "value" : "NUMBER"
       }, {
         "description" : null,
         "label" : "Object",
-        "value" : 8
+        "value" : "OBJECT"
       }, {
         "description" : null,
         "label" : "String",
-        "value" : 9
+        "value" : "STRING"
       }, {
         "description" : null,
         "label" : "Time",
-        "value" : 10
+        "value" : "TIME"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 1",
+      "displayCondition" : "type == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -150,7 +151,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 2",
+      "displayCondition" : "type == 'BOOLEAN'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -174,7 +175,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 3",
+      "displayCondition" : "type == 'DATE'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -191,7 +192,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 4",
+      "displayCondition" : "type == 'DATE_TIME'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -208,7 +209,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 5",
+      "displayCondition" : "type == 'INTEGER'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -227,7 +228,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 6",
+      "displayCondition" : "type == 'NULL'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -242,7 +243,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 7",
+      "displayCondition" : "type == 'NUMBER'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -264,7 +265,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 8",
+      "displayCondition" : "type == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -284,7 +285,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 9",
+      "displayCondition" : "type == 'STRING'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -304,7 +305,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value to be added or updated.",
-      "displayCondition" : "valueType == 10",
+      "displayCondition" : "type == 'TIME'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -345,28 +346,29 @@
       "metadata" : { },
       "required" : true,
       "name" : "sourceType",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Type of Initial Object",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Array",
-        "value" : 1
+        "value" : "ARRAY"
       }, {
         "description" : null,
         "label" : "Object",
-        "value" : 2
+        "value" : "OBJECT"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Source object to be added or updated",
-      "displayCondition" : "sourceType == 1",
+      "displayCondition" : "sourceType == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -599,7 +601,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Source object to be added or updated",
-      "displayCondition" : "sourceType == 2",
+      "displayCondition" : "sourceType == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },

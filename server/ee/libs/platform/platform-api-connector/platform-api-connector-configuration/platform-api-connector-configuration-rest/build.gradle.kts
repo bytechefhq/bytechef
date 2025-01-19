@@ -28,7 +28,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/middleware/platform/api-connector")
+    outputDir.set("$rootDir/client/src/ee/shared/middleware/platform/api-connector")
 }
 
 tasks.register("generateOpenAPI") {
@@ -53,7 +53,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
+    implementation(project(":server:libs:core:rest:rest-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+
     implementation(project(":server:ee:libs:platform:platform-api-connector:platform-api-connector-configuration:platform-api-connector-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")

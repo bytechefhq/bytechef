@@ -14,6 +14,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnectorEn
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
 import com.bytechef.ee.platform.apiconnector.configuration.generator.OpenApiGenerator;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.parser.OpenAPIParser;
@@ -40,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
     private final ApiConnectorFileStorage apiConnectorFileStorage;

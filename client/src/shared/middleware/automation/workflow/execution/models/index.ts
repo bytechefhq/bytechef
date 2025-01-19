@@ -7,7 +7,7 @@ export * from './Job';
 export * from './JobBasic';
 export * from './Page';
 export * from './ProjectBasic';
-export * from './ProjectInstanceBasic';
+export * from './ProjectDeploymentBasic';
 export * from './ProjectStatus';
 export * from './TaskExecution';
 export * from './TriggerExecution';

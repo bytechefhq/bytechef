@@ -132,7 +132,7 @@ module.exports = {
             maxHeight: {
                 'connection-dialog-height': '600px',
                 'integration-instance-configuration-dialog-height': '600px',
-                'project-instance-dialog-height': '600px',
+                'project-deployment-dialog-height': '600px',
                 'select-content-available-height': 'var(--radix-select-content-available-height)',
                 'select-content-available-height-1/2': 'calc(var(--radix-select-content-available-height) / 2)',
                 'workflow-execution-content-height': '80vh',
@@ -149,7 +149,7 @@ module.exports = {
                 'workflow-integration-portal-configuration-workflow-sheet-width': '460px',
                 'workflow-node-details-panel-width': '460px',
                 'workflow-outputs-sheet-width': '700px',
-                'workflow-read-only-project-instance-workflow-sheet-width': '780px',
+                'workflow-read-only-project-deployment-workflow-sheet-width': '780px',
                 'workflow-sidebar-project-version-history-sheet-width': '500px',
                 'workflow-test-configuration-dialog-width': '600px',
             },

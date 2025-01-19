@@ -125,16 +125,16 @@
       "acquire" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
       "refresh" : null,
       "refreshUrl" : null,
       "scopes" : null,
-      "tokenUrl" : null
+      "tokenUrl" : null,
+      "authorizationUrl" : null,
+      "clientSecret" : null,
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -209,29 +209,29 @@
       "options" : [ {
         "description" : null,
         "label" : "JSON document",
-        "value" : "json"
+        "value" : "JSON"
       }, {
         "description" : null,
         "label" : "Markdown document",
-        "value" : "md"
+        "value" : "MD"
       }, {
         "description" : null,
         "label" : "PDF document",
-        "value" : "pdf"
+        "value" : "PDF"
       }, {
         "description" : null,
         "label" : "text document",
-        "value" : "txt"
+        "value" : "TXT"
       }, {
         "description" : null,
         "label" : "Tika (DOCX, PPTX, HTML...)",
-        "value" : "tika"
+        "value" : "TIKA"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Json keys on which extraction of content is based. If no keys are specified, it uses the entire JSON object as content.",
-      "displayCondition" : "documentType == 'json'",
+      "displayCondition" : "documentType == 'JSON'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -267,8 +267,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : null,
@@ -423,8 +423,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum size of each text chunk in characters.",
@@ -442,8 +442,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The minimum length of a chunk to be included.",
@@ -461,8 +461,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "The maximum number of chunks to generate from a text.",
@@ -480,8 +480,8 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Whether to keep separators (like newlines) in the chunks.",
@@ -507,8 +507,8 @@
         } ],
         "controlType" : "SELECT"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Whether to use the keyword metadata enricher.",
@@ -567,11 +567,11 @@
         "maxValue" : null,
         "minValue" : null,
         "options" : null,
-        "optionsDataSource" : null,
-        "controlType" : "INTEGER"
+        "controlType" : "INTEGER",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Whether to use the summary enricher.",
@@ -664,11 +664,11 @@
           "label" : "Next",
           "value" : "NEXT"
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "MULTI_SELECT"
+        "controlType" : "MULTI_SELECT",
+        "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Load Data",
     "processErrorResponse" : null,

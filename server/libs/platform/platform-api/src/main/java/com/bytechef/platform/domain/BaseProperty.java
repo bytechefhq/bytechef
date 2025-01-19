@@ -93,17 +93,4 @@ public abstract class BaseProperty {
     public String getName() {
         return name;
     }
-
-    @Override
-    public String toString() {
-        return "Property" +
-            "advancedOption=" + advancedOption +
-            ", description='" + description + '\'' +
-            ", displayCondition='" + displayCondition + '\'' +
-            ", expressionEnabled=" + expressionEnabled +
-            ", hidden=" + hidden +
-            ", required=" + required +
-            ", name='" + name + '\'' +
-            '}';
-    }
 }

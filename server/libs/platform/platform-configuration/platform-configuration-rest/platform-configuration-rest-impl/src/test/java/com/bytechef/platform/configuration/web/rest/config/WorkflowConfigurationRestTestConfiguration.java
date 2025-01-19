@@ -16,19 +16,8 @@
 
 package com.bytechef.platform.configuration.web.rest.config;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.platform.component.facade.ActionDefinitionFacade;
-import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.component.service.ActionDefinitionService;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -47,34 +36,4 @@ public class WorkflowConfigurationRestTestConfiguration {
     public WorkflowConfigurationRestTestConfiguration(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
-
-    @MockBean
-    private ActionDefinitionFacade actionDefinitionFacade;
-
-    @MockBean
-    private ActionDefinitionService actionDefinitionService;
-
-    @MockBean
-    private ComponentDefinitionService componentDefinitionService;
-
-    @MockBean
-    private ConnectionDefinitionService connectionDefinitionService;
-
-    @MockBean
-    private OAuth2ParametersFacade oAuth2ParametersFacade;
-
-    @MockBean
-    private OAuth2Service oAuth2Service;
-
-    @MockBean
-    private TaskDispatcherDefinitionService taskDispatcherDefinitionService;
-
-    @MockBean
-    private TriggerDefinitionFacade triggerDefinitionFacade;
-
-    @MockBean
-    private TriggerDefinitionService triggerDefinitionService;
-
-    @MockBean
-    private WorkflowService workflowService;
 }

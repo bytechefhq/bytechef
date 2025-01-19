@@ -184,8 +184,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The page number to get.",
@@ -203,13 +203,13 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     } ],
     "title" : "Read from File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -427,28 +427,29 @@
       "metadata" : { },
       "required" : null,
       "name" : "type",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Object",
-        "value" : 1
+        "value" : "OBJECT"
       }, {
         "description" : null,
         "label" : "Array",
-        "value" : 2
+        "value" : "ARRAY"
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "SELECT"
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The object to write to the file.",
-      "displayCondition" : "type == 1",
+      "displayCondition" : "type == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -463,12 +464,12 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The aray to write to the file.",
-      "displayCondition" : "type == 2",
+      "displayCondition" : "type == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -484,8 +485,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Filename to set for binary data. By default, \"file.xml\" will be used.",
@@ -508,11 +509,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Write to File",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

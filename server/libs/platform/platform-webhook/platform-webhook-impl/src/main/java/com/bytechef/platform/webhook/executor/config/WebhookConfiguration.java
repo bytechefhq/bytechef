@@ -33,12 +33,12 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;
 import com.bytechef.platform.webhook.executor.WorkflowSyncExecutor;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
+import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import com.bytechef.task.dispatcher.branch.BranchTaskDispatcher;
 import com.bytechef.task.dispatcher.branch.completion.BranchTaskCompletionHandler;
 import com.bytechef.task.dispatcher.condition.ConditionTaskDispatcher;
@@ -68,7 +68,8 @@ public class WebhookConfiguration {
     @Bean
     WorkflowExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
-        InstanceAccessorRegistry instanceAccessorRegistry, InstanceJobFacade instanceJobFacade, JobService jobService,
+        PrincipalAccessorRegistry principalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowSyncExecutor triggerSyncExecutor,
         TaskFileStorage taskFileStorage, WorkflowService workflowService) {
@@ -76,8 +77,8 @@ public class WebhookConfiguration {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         return new WorkflowExecutorImpl(
-            eventPublisher, instanceAccessorRegistry,
-            instanceJobFacade,
+            eventPublisher, principalAccessorRegistry,
+            principalJobFacade,
             new JobSyncExecutor(
                 contextService, jobService, syncMessageBroker,
                 getTaskCompletionHandlerFactories(

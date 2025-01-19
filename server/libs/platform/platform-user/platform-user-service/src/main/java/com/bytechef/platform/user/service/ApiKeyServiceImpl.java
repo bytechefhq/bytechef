@@ -17,9 +17,9 @@
 package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.platform.tenant.domain.TenantKey;
 import com.bytechef.platform.user.domain.ApiKey;
 import com.bytechef.platform.user.repository.ApiKeyRepository;
+import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;

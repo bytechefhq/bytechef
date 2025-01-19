@@ -18,6 +18,8 @@ package com.bytechef.component.ai.llm.stability.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
@@ -31,11 +33,9 @@ import static com.bytechef.component.ai.llm.stability.constant.StabilityConstant
 import static com.bytechef.component.ai.llm.stability.constant.StabilityConstants.WIDTH;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.springframework.ai.stabilityai.api.StabilityAiApi.DEFAULT_IMAGE_MODEL;
@@ -45,7 +45,6 @@ import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.springframework.ai.stabilityai.StabilityAiImageModel;
@@ -81,21 +80,8 @@ public class StabilityCreateImageAction {
                     "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
                 .defaultValue(512)
                 .required(true),
-            integer(N)
-                .label("Number of responses")
-                .description("The number of images to be generated. Must be between 1 and 10.")
-                .defaultValue(1)
-                .minValue(1)
-                .maxValue(10)
-                .advancedOption(true),
-            string(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("The format in which the generated images are returned.")
-                .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("url")
-                .advancedOption(true),
+            IMAGE_N_PROPERTY,
+            IMAGE_RESPONSE_PROPERTY,
             string(STYLE)
                 .label("Style")
                 .description(
@@ -139,15 +125,8 @@ public class StabilityCreateImageAction {
             outputSchema(
                 object()
                     .properties(
-                        integer("created"),
-                        array("data")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("url")
-                                            .controlType(Property.ControlType.URL),
-                                        string("b64Json"),
-                                        string("revisedPrompt"))))))
+                        string("url"),
+                        string("b64Json"))))
         .perform(StabilityCreateImageAction::perform);
 
     private StabilityCreateImageAction() {
@@ -157,7 +136,7 @@ public class StabilityCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
         new StabilityAiApi(connectionParameters.getString(TOKEN)),
         StabilityAiImageOptions.builder()
             .cfgScale(inputParameters.getFloat(CFG_SCALE))

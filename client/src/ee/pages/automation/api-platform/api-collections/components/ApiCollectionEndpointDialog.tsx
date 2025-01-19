@@ -17,7 +17,7 @@ import {
     useUpdateApiCollectionEndpointMutation,
 } from '@/ee/mutations/apiCollectionEndpoints.mutations';
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
-import {ApiCollectionEndpoint, HttpMethod} from '@/middleware/automation/api-platform';
+import {ApiCollectionEndpoint, HttpMethod} from '@/ee/shared/middleware/automation/api-platform';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';

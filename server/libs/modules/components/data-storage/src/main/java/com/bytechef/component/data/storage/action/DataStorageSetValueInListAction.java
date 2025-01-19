@@ -35,6 +35,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.time;
 
+import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
@@ -71,59 +72,59 @@ public class DataStorageSetValueInListAction {
                 .label("Index")
                 .description("The index in a list to set a value under. The previous value will be overridden.")
                 .required(true),
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(TYPE_OPTIONS),
             array(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             bool(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
                 .required(true),
             date(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 3")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE))
                 .required(true),
             dateTime(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 4")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME))
                 .required(true),
             integer(VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
-                .displayCondition("type == 5")
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
                 .required(true),
             nullable(VALUE)
                 .label("Value")
                 .description("The value to set under the specified key.")
-                .displayCondition("type == 6")
+                .displayCondition("type == '%s'".formatted(ValueType.NULL))
                 .required(true),
             number(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 7")
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
                 .required(true),
             object(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 8")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             string(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 9")
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(VALUE)
                 .label("Value")
                 .description("The value to set under the specified list's key.")
-                .displayCondition("type == 10")
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
         .perform(DataStorageSetValueInListAction::perform);
 
@@ -147,10 +148,8 @@ public class DataStorageSetValueInListAction {
     private static List<Object> getValues(Parameters inputParameters, ActionContext context) {
         List<Object> list;
 
-        Optional<Object> optionalList = context.data(
-            data -> data.fetch(
-                Scope.valueOf(inputParameters.getRequiredString(SCOPE)),
-                inputParameters.getRequiredString(KEY)));
+        Optional<Object> optionalList = context.data(data -> data.fetch(
+            Scope.valueOf(inputParameters.getRequiredString(SCOPE)), inputParameters.getRequiredString(KEY)));
 
         if (optionalList.isPresent() && optionalList.get() instanceof List<?> curList) {
             list = (List<Object>) curList;

@@ -25,14 +25,16 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.IN
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.MAPPINGS;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.REQUIRED_FIELD;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.TO;
+import static com.bytechef.component.data.mapper.constant.InputType.ARRAY;
+import static com.bytechef.component.data.mapper.constant.InputType.OBJECT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.data.mapper.constant.InputType;
 import com.bytechef.component.data.mapper.model.Pair;
 import com.bytechef.component.data.mapper.model.RequiredStringMapping;
 import com.bytechef.component.definition.ActionContext;
@@ -60,22 +62,22 @@ public class DataMapperMapObjectsToObjectAction {
         .title("Map Objects to Object")
         .description("Creates a new object with the chosen input properties. You can also rename the property keys.")
         .properties(
-            integer(INPUT_TYPE)
+            string(INPUT_TYPE)
                 .label("Input Type")
                 .description("The input type.")
                 .options(
-                    option("Object", 1),
-                    option("Array", 2))
+                    option("Object", OBJECT.name()),
+                    option("Array", ARRAY.name()))
                 .required(true),
             object(INPUT)
                 .label("Input")
                 .description("An object containing one or more properties.")
-                .displayCondition("inputType == 1")
+                .displayCondition("inputType == '%s'".formatted(OBJECT.name()))
                 .required(true),
             array(INPUT)
                 .label("Input")
                 .description("An array containing one or more objects.")
-                .displayCondition("inputType == 2")
+                .displayCondition("inputType == '%s'".formatted(ARRAY.name()))
                 .items(object())
                 .required(true),
             array(MAPPINGS)
@@ -120,7 +122,6 @@ public class DataMapperMapObjectsToObjectAction {
     private DataMapperMapObjectsToObjectAction() {
     }
 
-    @SuppressWarnings("unchecked")
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
@@ -132,9 +133,9 @@ public class DataMapperMapObjectsToObjectAction {
                 Collectors.toMap(
                     RequiredStringMapping::getFrom, value -> Pair.create(value.getTo(), value.isRequiredField())));
 
-        Integer inputType = inputParameters.getInteger(INPUT_TYPE);
+        InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
 
-        if (inputType != null && inputType.equals(1)) {
+        if (inputType == OBJECT) {
             DocumentContext input = JsonPath.parse(inputParameters.getMap(INPUT, Object.class, Map.of()));
 
             return fillOutput(inputParameters, input, mappingMap, context);
@@ -157,28 +158,29 @@ public class DataMapperMapObjectsToObjectAction {
         Parameters inputParameters, DocumentContext input, Map<String, Pair<String, Boolean>> mappingMap,
         ActionContext context) {
         Map<String, Object> output = new LinkedHashMap<>();
+
         if (inputParameters.getBoolean(INCLUDE_UNMAPPED) != null && inputParameters.getBoolean(INCLUDE_UNMAPPED)) {
             output = input.read("$");
         }
 
         for (Map.Entry<String, Pair<String, Boolean>> pair : mappingMap.entrySet()) {
             Object value = null;
+
             try {
                 value = input.read(pair.getKey());
 
                 if (isAllowedToMap(inputParameters, value)) {
-                    if (pair.getValue()
-                        .getRight() != null && pair.getValue()
-                            .getRight()) {
+                    Pair<String, Boolean> value1 = pair.getValue();
+
+                    if (value1.getRight() != null && value1.getRight()) {
                         Objects.requireNonNull(value, "Required field " + pair.getKey() + " cannot be null.");
                         Validate.notBlank(value.toString(), "Required field " + pair.getKey() + " cannot be empty.");
                     }
 
-                    output.put(pair.getValue()
-                        .getLeft(), value);
+                    output.put(value1.getLeft(), value);
                 }
             } catch (PathNotFoundException exception) {
-                context.logger(logger -> logger.info(exception.getMessage()));
+                context.log(log -> log.info(exception.getMessage()));
             }
         }
 

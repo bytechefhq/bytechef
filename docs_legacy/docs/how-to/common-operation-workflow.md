@@ -91,7 +91,7 @@ This is valid array example:
 ````
 Assuming practitioner understands `logger/v1/info` task setup and outcome we consider content of get-content.yaml is ready for execution.
 ## 3.2 Run Workflow
-Take hello-world.yaml and paste it to [BYTE_CHEF_WORKFLOW_DEPLOY_FOLDER]. From browser position to `http://localhost:9555/api/automation/project-instances/2/workflows/669d6b7c-4d48-4184-8279-9e6923b36bae/jobs` and provide this payload:
+Take hello-world.yaml and paste it to [BYTE_CHEF_WORKFLOW_DEPLOY_FOLDER]. From browser position to `http://localhost:9555/api/automation/project-deployments/2/workflows/669d6b7c-4d48-4184-8279-9e6923b36bae/jobs` and provide this payload:
 
 ````
 {

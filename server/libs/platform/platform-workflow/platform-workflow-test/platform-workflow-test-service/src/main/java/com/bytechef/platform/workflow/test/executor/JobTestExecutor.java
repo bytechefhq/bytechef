@@ -20,7 +20,7 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -67,8 +67,8 @@ public class JobTestExecutor {
         this.taskFileStorage = taskFileStorage;
     }
 
-    public JobDTO execute(JobParameters jobParameters) {
-        Job job = jobSyncExecutor.execute(jobParameters);
+    public JobDTO execute(JobParametersDTO jobParametersDTO) {
+        Job job = jobSyncExecutor.execute(jobParametersDTO);
 
         return new JobDTO(
             job, getOutputs(job),

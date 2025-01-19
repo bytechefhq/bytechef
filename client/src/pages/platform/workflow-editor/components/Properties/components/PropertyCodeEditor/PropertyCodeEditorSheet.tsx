@@ -2,13 +2,12 @@ import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanel';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ScriptTestExecution, Workflow, WorkflowNodeScriptApi} from '@/shared/middleware/platform/configuration';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import Editor from '@monaco-editor/react';
-import {PlayIcon, RefreshCwIcon, SparklesIcon, SquareIcon} from 'lucide-react';
+import {PlayIcon, RefreshCwIcon, SquareIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
@@ -37,10 +36,7 @@ const PropertyCodeEditorSheet = ({
     const [scriptIsRunning, setScriptIsRunning] = useState(false);
     const [scriptTestExecution, setScriptTestExecution] = useState<ScriptTestExecution | undefined>();
 
-    const {ai} = useApplicationInfoStore();
-    const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
-
-    const ff_1570 = useFeatureFlagsStore()('ff-1570');
+    const {copilotPanelOpen} = useCopilotStore();
 
     const currentWorkflowTask = workflow.tasks?.find((task) => task.name === workflowNodeName);
 
@@ -117,23 +113,7 @@ const PropertyCodeEditorSheet = ({
                                         </Button>
                                     )}
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            {ai.copilot.enabled && ff_1570 && (
-                                                <Button
-                                                    onClick={() =>
-                                                        !copilotPanelOpen && setCopilotPanelOpen(!copilotPanelOpen)
-                                                    }
-                                                    size="icon"
-                                                    variant="ghost"
-                                                >
-                                                    <SparklesIcon className="h-5" />
-                                                </Button>
-                                            )}
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Open Copilot panel</TooltipContent>
-                                    </Tooltip>
+                                    <CopilotButton source={Source.CODE_EDITOR} />
                                 </div>
                             </div>
                         </div>

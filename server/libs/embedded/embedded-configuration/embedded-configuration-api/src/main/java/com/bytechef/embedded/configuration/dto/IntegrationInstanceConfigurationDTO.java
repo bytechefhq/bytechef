@@ -37,6 +37,19 @@ public record IntegrationInstanceConfigurationDTO(
     List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflows, List<Tag> tags,
     int version) {
 
+    public IntegrationInstanceConfigurationDTO(IntegrationInstanceConfiguration integrationInstanceConfiguration) {
+        this(
+            Map.of(), Map.of(), integrationInstanceConfiguration.getConnectionParameters(),
+            integrationInstanceConfiguration.getCreatedBy(), integrationInstanceConfiguration.getCreatedDate(),
+            integrationInstanceConfiguration.getDescription(), integrationInstanceConfiguration.isEnabled(),
+            integrationInstanceConfiguration.getEnvironment(), integrationInstanceConfiguration.getId(),
+            integrationInstanceConfiguration.getLastModifiedBy(),
+            integrationInstanceConfiguration.getLastModifiedDate(),
+            null, integrationInstanceConfiguration.getIntegrationId(),
+            integrationInstanceConfiguration.getIntegrationVersion(), integrationInstanceConfiguration.getName(),
+            List.of(), List.of(), integrationInstanceConfiguration.getVersion());
+    }
+
     public IntegrationInstanceConfigurationDTO(
         Map<String, ?> connectionAuthorizationParameters, Map<String, ?> connectionConnectionParameters,
         IntegrationInstanceConfiguration integrationInstanceConfiguration,

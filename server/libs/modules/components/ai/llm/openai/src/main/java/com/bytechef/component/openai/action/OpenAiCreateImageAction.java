@@ -16,8 +16,15 @@
 
 package com.bytechef.component.openai.action;
 
+import static com.bytechef.component.ai.llm.ImageModel.Quality.HD;
+import static com.bytechef.component.ai.llm.ImageModel.Quality.STANDARD;
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat.URL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.NATURAL;
+import static com.bytechef.component.ai.llm.ImageModel.Style.VIVID;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CREATE_IMAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
@@ -27,8 +34,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -36,13 +41,14 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.openai.constant.OpenAiConstants.QUALITY;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.util.LLMUtils;
+import com.bytechef.component.ai.llm.ImageModel.Quality;
+import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
+import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import com.bytechef.component.openai.constant.OpenAiConstants;
+import com.bytechef.component.openai.constant.Size;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 import org.springframework.ai.openai.api.OpenAiImageApi;
@@ -61,95 +67,65 @@ public class OpenAiCreateImageAction {
             string(MODEL)
                 .label("Model")
                 .description("The model to use for image generation.")
-                .options(
-                    LLMUtils.getEnumOptions(
-                        Arrays.stream(OpenAiImageApi.ImageModel.values())
-                            .collect(
-                                Collectors.toMap(
-                                    OpenAiImageApi.ImageModel::getValue, OpenAiImageApi.ImageModel::getValue))))
+                .options(OpenAiConstants.IMAGE_MODELS)
                 .required(true),
             IMAGE_MESSAGE_PROPERTY,
-            object(SIZE)
+            string(SIZE)
                 .label("Size")
                 .description("The size of the generated images.")
                 .options(
-                    option("Dall-e-2 256x256", new Integer[] {
-                        256, 256
-                    }),
-                    option("Dall-e-2 512x512", new Integer[] {
-                        512, 512
-                    }),
-                    option("1024x1024", new Integer[] {
-                        1024, 1024
-                    }),
-                    option("Dall-e-3 1792x1024", new Integer[] {
-                        1792, 1024
-                    }),
-                    option("Dall-e-3 1024x1792", new Integer[] {
-                        1024, 1792
-                    }))
+                    option("Dall-e-2 256x256", Size.DALL_E_2_256x256.name()),
+                    option("Dall-e-2 512x512", Size.DALL_E_2_512x512.name()),
+                    option("1024x1024", Size._1024x1024.name()),
+                    option("Dall-e-3 1792x1024", Size.DALL_E_3_1792x1024.name()),
+                    option("Dall-e-3 1024x1792", Size.DALL_E_3_1024x1792.name()))
                 .required(true),
-            integer(N)
-                .label("Number of responses")
-                .description(
-                    "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.")
-                .defaultValue(1)
-                .minValue(1)
-                .maxValue(10)
-                .advancedOption(true),
-            string(RESPONSE_FORMAT)
-                .label("Response format")
-                .description("The format in which the generated images are returned.")
-                .options(
-                    option("URL", "url"),
-                    option("B64_JSON", "b64_json"))
-                .defaultValue("URL")
-                .advancedOption(true),
+            IMAGE_N_PROPERTY,
+            IMAGE_RESPONSE_PROPERTY,
             string(QUALITY)
                 .label("Quality")
                 .description("The quality of the image that will be generated.")
                 .options(
-                    option("standard", "standard"),
-                    option("hd", "hd"))
+                    option("Standard", STANDARD.name()),
+                    option("HD", HD.name()))
+                .defaultValue(STANDARD.name())
                 .advancedOption(true),
             string(STYLE)
                 .label("Style")
                 .description(
                     "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
-                    option("vivid", "vivid"),
-                    option("natural", "natural"))
+                    option("vivid", VIVID.name()),
+                    option("natural", NATURAL.name()))
+                .defaultValue(NATURAL.name())
+                .displayCondition("model == 'dall-e-3'")
                 .advancedOption(true),
             USER_PROPERTY)
         .output(
             outputSchema(
                 object()
                     .properties(
-                        integer("created"),
-                        array("data")
-                            .items(
-                                object()
-                                    .properties(
-                                        string("url")
-                                            .controlType(Property.ControlType.URL),
-                                        string("b64Json"),
-                                        string("revisedPrompt"))))))
+                        string("url"),
+                        string("b64Json"))))
         .perform(OpenAiCreateImageAction::perform);
 
-    private static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
-        Integer[] size = inputParameters.getArray(SIZE, Integer.class);
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
+        ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
+        Size size = inputParameters.getRequired(SIZE, Size.class);
+        Style style = inputParameters.get(STYLE, Style.class, NATURAL);
+        Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
 
         return new OpenAiImageModel(
             new OpenAiImageApi(connectionParameters.getString(TOKEN)),
             OpenAiImageOptions.builder()
-                .withModel(inputParameters.getRequiredString(MODEL))
-                .withN(inputParameters.getInteger(N))
-                .withHeight(size[1])
-                .withWidth(size[0])
-                .withStyle(inputParameters.getString(STYLE))
-                .withUser(inputParameters.getString(USER))
-                .withResponseFormat(inputParameters.getString(RESPONSE_FORMAT))
-                .withQuality(inputParameters.getString(QUALITY))
+                .height(size.getDimensions()[1])
+                .model(inputParameters.getRequiredString(MODEL))
+                .N(inputParameters.getInteger(N))
+                .responseFormat(responseFormat.getValue())
+                .quality(quality.getValue())
+                .style(style.getValue())
+                .user(inputParameters.getString(USER))
+                .width(size.getDimensions()[0])
                 .build(),
             new RetryTemplate());
     };

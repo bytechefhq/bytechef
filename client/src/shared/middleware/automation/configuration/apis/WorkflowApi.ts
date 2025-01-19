@@ -39,6 +39,7 @@ export interface DuplicateWorkflowRequest {
 export interface GetProjectVersionWorkflowsRequest {
     id: number;
     projectVersion: number;
+    includeAllFields?: boolean;
 }
 
 export interface GetProjectWorkflowRequest {
@@ -212,6 +213,10 @@ export class WorkflowApi extends runtime.BaseAPI {
         }
 
         const queryParameters: any = {};
+
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
+        }
 
         const headerParameters: runtime.HTTPHeaders = {};
 

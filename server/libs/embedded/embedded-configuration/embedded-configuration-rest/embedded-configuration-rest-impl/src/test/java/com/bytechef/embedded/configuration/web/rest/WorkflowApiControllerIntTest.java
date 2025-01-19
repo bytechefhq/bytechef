@@ -25,7 +25,9 @@ import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
 import com.bytechef.embedded.configuration.facade.IntegrationInstanceConfigurationFacade;
+import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.embedded.configuration.service.AppEventService;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
@@ -38,9 +40,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -67,27 +69,33 @@ public class WorkflowApiControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private AppEventService appEventService;
 
-    @MockBean
+    @MockitoBean
     private IntegrationFacade integrationFacade;
 
-    @MockBean
+    @MockitoBean
+    private IntegrationInstanceFacade integrationInstanceFacade;
+
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
+
+    @MockitoBean
     private IntegrationService integrationService;
 
-    @MockBean
+    @MockitoBean
     private IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
 
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private WorkflowFacade workflowFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowService workflowService;
 
-    @MockBean
+    @MockitoBean
     private WorkflowConnectionFacade workflowConnectionFacade;
 
     @BeforeEach

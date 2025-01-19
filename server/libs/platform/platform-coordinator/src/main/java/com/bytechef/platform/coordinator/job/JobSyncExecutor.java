@@ -37,7 +37,7 @@ import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.service.ContextService;
@@ -59,8 +59,8 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.coordinator.job.exception.TaskExecutionErrorType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.exception.ExecutionException;
-import com.bytechef.platform.tenant.TenantContext;
 import com.bytechef.platform.webhook.executor.constant.WebhookConstants;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -184,20 +184,20 @@ public class JobSyncExecutor {
             e -> taskCoordinator.onStartJobEvent((StartJobEvent) e));
     }
 
-    public Job execute(JobParameters jobParameters) {
-        Job job = jobService.getJob(jobFacade.createJob(jobParameters));
+    public Job execute(JobParametersDTO jobParametersDTO) {
+        Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
 
         checkForError(job);
 
         return checkForWebhookResponse(job);
     }
 
-    public Job execute(JobParameters jobParameters, JobFactoryFunction jobFactoryFunction) {
+    public Job execute(JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction) {
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
             taskFileStorage, workflowService);
 
-        Job job = jobService.getJob(jobFacade.createJob(jobParameters));
+        Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
 
         checkForError(job);
 
@@ -224,7 +224,7 @@ public class JobSyncExecutor {
     @FunctionalInterface
     public interface JobFactoryFunction {
 
-        Job apply(JobParameters jobParameters);
+        Job apply(JobParametersDTO jobParametersDTO);
     }
 
     private void checkForError(Job job) {
@@ -284,8 +284,8 @@ public class JobSyncExecutor {
         }
 
         @Override
-        public Job create(JobParameters jobParameters, Workflow workflow) {
-            return jobFactoryFunction.apply(jobParameters);
+        public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
+            return jobFactoryFunction.apply(jobParametersDTO);
         }
 
         @Override

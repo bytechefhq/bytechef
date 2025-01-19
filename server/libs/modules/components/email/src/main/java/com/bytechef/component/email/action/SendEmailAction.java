@@ -185,7 +185,7 @@ public class SendEmailAction {
 
         Transport.send(message);
 
-        context.logger(logger -> logger.debug(
+        context.log(log -> log.debug(
             "Message sent: from:{}, to:{}, subject:{}",
             message.getFrom(), message.getRecipients(RecipientType.TO), message.getSubject()));
 

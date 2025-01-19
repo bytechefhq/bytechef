@@ -23,8 +23,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -45,7 +45,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class DynamicWebhookTriggerRefreshJob implements Job {
 
-    private InstanceAccessorRegistry instanceAccessorRegistry;
+    private PrincipalAccessorRegistry principalAccessorRegistry;
     private TriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private TriggerStateService triggerStateService;
     private WorkflowService workflowService;
@@ -79,8 +79,8 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
 
     @Autowired
     @SuppressFBWarnings("EI")
-    public void setInstanceAccessorRegistry(InstanceAccessorRegistry instanceAccessorRegistry) {
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+    public void setPrincipalAccessorRegistry(PrincipalAccessorRegistry principalAccessorRegistry) {
+        this.principalAccessorRegistry = principalAccessorRegistry;
     }
 
     @Autowired
@@ -102,9 +102,10 @@ public class DynamicWebhookTriggerRefreshJob implements Job {
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        String workflowId = instanceAccessor.getWorkflowId(
+        String workflowId = principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);

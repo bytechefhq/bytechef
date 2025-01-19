@@ -28,6 +28,8 @@ import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.facade.IntegrationFacade;
+import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
+import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
 import com.bytechef.embedded.configuration.web.rest.mapper.IntegrationMapper;
 import com.bytechef.embedded.configuration.web.rest.model.IntegrationModel;
@@ -48,9 +50,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -63,11 +65,17 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 @WebMvcTest(value = IntegrationApiController.class)
 public class IntegrationApiControllerIntTest {
 
-    @MockBean
+    @MockitoBean
     private CategoryService categoryService;
 
-    @MockBean
+    @MockitoBean
     private IntegrationFacade integrationFacade;
+
+    @MockitoBean
+    private IntegrationInstanceFacade integrationInstanceFacade;
+
+    @MockitoBean
+    private IntegrationInstanceService integrationInstanceService;
 
     @Autowired
     private IntegrationMapper.IntegrationDTOToIntegrationModelMapper integrationMapper;
@@ -197,7 +205,7 @@ public class IntegrationApiControllerIntTest {
     public void testGetIntegrations() {
         IntegrationDTO integrationDTO = getIntegrationDTO();
 
-        when(integrationFacade.getIntegrations(null, false, null, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(null, false, null, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -210,7 +218,7 @@ public class IntegrationApiControllerIntTest {
             .contains(integrationMapper.convert(integrationDTO))
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(1L, false, null, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, false, null, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -222,7 +230,7 @@ public class IntegrationApiControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(null, false, 1L, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(null, false, 1L, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()
@@ -234,7 +242,7 @@ public class IntegrationApiControllerIntTest {
             .expectBodyList(IntegrationModel.class)
             .hasSize(1);
 
-        when(integrationFacade.getIntegrations(1L, false, 1L, null)).thenReturn(List.of(integrationDTO));
+        when(integrationFacade.getIntegrations(1L, false, 1L, null, true)).thenReturn(List.of(integrationDTO));
 
         this.webTestClient
             .get()

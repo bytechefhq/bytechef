@@ -7,7 +7,6 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.loki.logback.appender)
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.cloud:spring-cloud-starter-config")
     implementation("org.springframework.cloud:spring-cloud-starter-loadbalancer")
@@ -40,16 +39,18 @@ dependencies {
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:platform:platform-data-storage:platform-data-storage-jdbc:platform-data-storage-jdbc-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-remote-client"))
-    implementation(project(":server:ee:libs:platform:platform-scheduler:platform-scheduler-aws"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest"))
 
     implementation(project(":server:libs:modules:components:accelo"))
     implementation(project(":server:libs:modules:components:active-campaign"))
     implementation(project(":server:libs:modules:components:affinity"))
     implementation(project(":server:libs:modules:components:ai:ai-agent"))
+    implementation(project(":server:libs:modules:components:ai:ai-image"))
     implementation(project(":server:libs:modules:components:ai:ai-text"))
     implementation(project(":server:libs:modules:components:ai:llm:amazon-bedrock"))
     implementation(project(":server:libs:modules:components:ai:llm:anthropic"))

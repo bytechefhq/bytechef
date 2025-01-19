@@ -35,9 +35,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-api"))
 
     testImplementation("org.springframework:spring-webflux")

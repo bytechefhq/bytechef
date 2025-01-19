@@ -155,7 +155,7 @@ public class TriggerDefinitionFacadeImpl implements TriggerDefinitionFacade {
         @NonNull String componentName, int componentVersion, @NonNull String triggerName,
         ModeType type, Long instanceId, String workflowReferenceCode,
         @NonNull Map<String, ?> inputParameters, Object triggerState, WebhookRequest webhookRequest,
-        Long connectionId, boolean devEnvironment) {
+        Long connectionId, boolean editorEnvironment) {
 
         ComponentConnection componentConnection = getComponentConnection(connectionId);
 

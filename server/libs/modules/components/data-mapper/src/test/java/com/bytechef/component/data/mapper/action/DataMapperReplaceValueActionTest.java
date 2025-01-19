@@ -27,18 +27,21 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.commons.util.ConvertUtils;
+import com.bytechef.component.data.mapper.constant.ValueType;
 import com.bytechef.component.data.mapper.model.ObjectMapping;
+import com.bytechef.component.data.mapper.util.DataMapperUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Marko Kriskovic
@@ -57,84 +60,83 @@ class DataMapperReplaceValueActionTest {
     }
 
     @Test
+    void testPerformWithArrayType() {
+        setupAndAssertTestForType(List.of("item1"), List.of("item2"), "defaultValue", ValueType.ARRAY);
+    }
+
+    @Test
     void testPerformWithBooleanType() {
-        setupAndAssertTestForType(true, false);
+        setupAndAssertTestForType(true, false, "defaultValue", ValueType.BOOLEAN);
     }
 
     @Test
     void testPerformWithDateType() {
         LocalDate now = LocalDate.now();
 
-        setupAndAssertTestForType(LocalDate.now(), now.plusDays(1));
+        setupAndAssertTestForType(LocalDate.now(), now.plusDays(1), "defaultValue", ValueType.DATE);
     }
 
     @Test
     void testPerformWithDateTimeType() {
         LocalDateTime now = LocalDateTime.now();
 
-        setupAndAssertTestForType(now, now.plusDays(1));
+        setupAndAssertTestForType(now, now.plusDays(1), "defaultValue", ValueType.DATE_TIME);
     }
 
     @Test
     void testPerformWithIntegerType() {
-        setupAndAssertTestForType(1, 2);
+        setupAndAssertTestForType(1, 2, "defaultValue", ValueType.INTEGER);
     }
 
     @Test
     void testPerformWithNumberType() {
-        setupAndAssertTestForType(1.5, 2.5);
+        setupAndAssertTestForType(1.5, 2.5, "defaultValue", ValueType.NUMBER);
     }
 
     @Test
     void testPerformWithObjectType() {
-        setupAndAssertTestForType(new Object(), new Object());
-    }
-
-    @Test
-    void testPerformWithListType() {
-        setupAndAssertTestForType(List.of("item1"), List.of("item2"));
+        setupAndAssertTestForType(Map.of(), Map.of(), "defaultValue", ValueType.OBJECT);
     }
 
     @Test
     void testPerformWithTimeType() {
         LocalTime now = LocalTime.now();
 
-        setupAndAssertTestForType(now, now.plusHours(1));
+        setupAndAssertTestForType(now, now.plusHours(1), "defaultValue", ValueType.TIME);
     }
 
     @Test
     void testPerformWithStringType() {
-        setupAndAssertTestForType("inputString", "outputString");
+        setupAndAssertTestForType("inputString", "outputString", "defaultValue", ValueType.STRING);
     }
 
     @Test
     void testPerformWithStringTypeRegex() {
         String inputValue = "input value";
 
-        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
         when(inputParameters.getString(VALUE)).thenReturn(inputValue);
 
         setupAndAssertTest(
-            inputValue, " ", "_", result -> assertEquals("input_value", result,
-                "The ' ' should be replaced by '_'"));
+            inputValue, " ", "_", "defaultValue", ValueType.STRING, result -> assertEquals(
+                "input_value", result, "The ' ' should be replaced by '_'"));
     }
 
     @Test
     void testPerformWithStringTypeRegexNotExists() {
         String inputValue = "input value";
 
-        when(inputParameters.getRequiredInteger(TYPE)).thenReturn(9);
         when(inputParameters.getString(VALUE)).thenReturn(inputValue);
 
         setupAndAssertTest(
-            inputValue, "m", "_", result -> assertEquals("input value", result,
-                "Result should match the expected output value for type: " + result.getClass()));
+            inputValue, "m", "_", "defaultValue", ValueType.STRING, result -> assertEquals(
+                "input value", result, "Result should match the expected output value for type: " + result.getClass()));
     }
 
     @Test
     void testPerformEmptyMapping() {
         // Setup
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(List.of());
+        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class))).thenReturn(ValueType.INTEGER);
         when(inputParameters.get(eq(VALUE), any())).thenReturn(1);
         when((String) inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn("defaultValue");
 
@@ -147,39 +149,46 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformDefaultValue() {
-        setupAndAssertTest(3, 1, 2, result -> assertEquals("defaultValue", result, "Result should be default value."));
+        setupAndAssertTest(
+            3, 1, 2, "defaultValue", ValueType.INTEGER,
+            result -> assertEquals("defaultValue", result, "Result should be default value."));
     }
 
     @Test
     void testPerformWithNotConvertibleType() {
         setupAndAssertTest(
-            "1", 1, 2,
+            "1", 1, 2, "defaultValue", ValueType.INTEGER,
             result -> assertEquals(
                 "defaultValue", result, "Result should be default value due to not convertible type"));
     }
 
-    private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping) {
+    private <T> void setupAndAssertTestForType(T inputMapping, T outputMapping, T defaultValue, ValueType type) {
         setupAndAssertTest(
-            inputMapping, inputMapping, outputMapping, result -> assertEquals(
+            inputMapping, inputMapping, outputMapping, defaultValue, type, result -> assertEquals(
                 outputMapping, result, "Result should match the expected output value for type: " + result.getClass()));
     }
 
     private <T, V> void setupAndAssertTest(
-        V inputValue, T inputMapping, T outputMapping, Consumer<Object> consumer) {
+        V inputValue, T inputMapping, T outputMapping, T defaultValue, ValueType type, Consumer<Object> consumer) {
 
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
             .thenReturn(List.of(new ObjectMapping(inputMapping, outputMapping)));
         when(inputParameters.get(eq(VALUE), any())).thenReturn(inputValue);
-        when((String) inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn("defaultValue");
+        when(inputParameters.getString(eq(VALUE))).thenReturn(inputValue.toString());
+        when(inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn(defaultValue);
+        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class))).thenReturn(type);
 
-        try (MockedStatic<ConvertUtils> convertUtilsMockedStatic = mockStatic(ConvertUtils.class)) {
-            convertUtilsMockedStatic.when(() -> ConvertUtils.canConvert(eq(inputMapping), any()))
+        try (MockedStatic<DataMapperUtils> dataMapperUtilsMockedStatic = mockStatic(
+            DataMapperUtils.class, Mockito.CALLS_REAL_METHODS)) {
+
+            dataMapperUtilsMockedStatic
+                .when(() -> DataMapperUtils.canConvert(any(), any(), any()))
                 .thenReturn(true);
-            convertUtilsMockedStatic.when(
-                () -> ConvertUtils.convertValue(eq(inputMapping), any(Class.class)))
+            dataMapperUtilsMockedStatic
+                .when(() -> DataMapperUtils.convertFrom(any(), any(), any()))
                 .thenReturn(inputMapping);
-            convertUtilsMockedStatic.when(
-                () -> ConvertUtils.convertValue(eq(outputMapping), any(Class.class)))
+            dataMapperUtilsMockedStatic
+                .when(() -> DataMapperUtils.convertTo(any(), any(), any()))
                 .thenReturn(outputMapping);
 
             Object result = DataMapperReplaceValueAction.perform(inputParameters, connectionParameters, context);

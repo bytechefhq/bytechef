@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.workflow.test.web.rest.mapper;
 
-import com.bytechef.platform.workflow.test.dto.WorkflowTestExecution;
+import com.bytechef.platform.workflow.test.dto.WorkflowTestExecutionDTO;
 import com.bytechef.platform.workflow.test.web.rest.mapper.config.WorkflowTestMapperSpringConfig;
 import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestExecutionModel;
 import org.mapstruct.Mapper;
@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowTestMapperSpringConfig.class)
-public interface WorkflowTestExecutionMapper extends Converter<WorkflowTestExecution, WorkflowTestExecutionModel> {
+public interface WorkflowTestExecutionMapper extends Converter<WorkflowTestExecutionDTO, WorkflowTestExecutionModel> {
 
     @Override
-    WorkflowTestExecutionModel convert(WorkflowTestExecution workflowTestExecution);
+    WorkflowTestExecutionModel convert(WorkflowTestExecutionDTO workflowTestExecution);
 }

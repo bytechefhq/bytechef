@@ -44,7 +44,7 @@ export interface IntegrationInstanceWorkflow {
      */
     enabled: boolean;
     /**
-     * The id of a project instance workflow.
+     * The id of a project deployment workflow.
      * @type {number}
      * @memberof IntegrationInstanceWorkflow
      */

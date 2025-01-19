@@ -50,7 +50,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 //    generatorName.set("typescript-fetch")
 //    inputSpec.set("$projectDir/openapi.yaml")
 //    modelNameSuffix.set("Model")
-//    outputDir.set("$rootDir/client/src/middleware/embedded/unified")
+//    outputDir.set("$rootDir/client/src/shared/middleware/embedded/unified")
 //}
 
 tasks.register("generateOpenAPI") {
@@ -75,8 +75,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:embedded:embedded-unified:embedded-unified-api"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-web:platform-security-web-api"))
 
     testImplementation("org.springframework:spring-webflux")

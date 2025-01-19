@@ -67,7 +67,7 @@ public class OpenAiChatAction {
                 .label("Model")
                 .description("ID of the model to use.")
                 .required(true)
-                .options(OpenAiConstants.MODELS),
+                .options(OpenAiConstants.TEXT_MODELS),
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             MAX_TOKENS_PROPERTY,

@@ -8,9 +8,9 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel;
-import com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel;
+import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.ApiPlatformMapperSpringConfig;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
@@ -37,12 +37,12 @@ public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiColl
     ApiCollectionDTO invertConvert(ApiCollectionModel apiCollectionModel);
 
     @Mapping(target = "lastExecutionDate", ignore = true)
-    ProjectInstanceBasicModel mapToProjectInstanceModel(ProjectInstance projectInstance);
+    ProjectDeploymentBasicModel mapToProjectDeploymentModel(ProjectDeployment projectDeployment);
 
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "tagIds", ignore = true)
-    ProjectInstance mapToProjectInstance(ProjectInstanceBasicModel projectInstanceBasicModel);
+    ProjectDeployment mapToProjectDeployment(ProjectDeploymentBasicModel projectDeploymentBasicModel);
 
     @Mapping(target = "workspaceId", ignore = true)
     @Mapping(target = "version", ignore = true)

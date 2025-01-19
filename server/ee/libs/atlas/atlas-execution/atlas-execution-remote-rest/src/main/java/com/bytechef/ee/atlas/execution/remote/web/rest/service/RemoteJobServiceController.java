@@ -9,7 +9,7 @@ package com.bytechef.ee.atlas.execution.remote.web.rest.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.OptionalUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -124,6 +124,6 @@ public class RemoteJobServiceController {
     }
 
     @SuppressFBWarnings("EI")
-    public record JobCreateRequest(JobParameters jobParameters, Workflow workflow) {
+    public record JobCreateRequest(JobParametersDTO jobParameters, Workflow workflow) {
     }
 }

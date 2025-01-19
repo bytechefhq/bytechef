@@ -19,6 +19,7 @@ package com.bytechef.embedded.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.embedded.configuration.config.IntegrationIntTestConfiguration;
+import com.bytechef.embedded.configuration.config.IntegrationIntTestConfigurationSharedMocks;
 import com.bytechef.embedded.configuration.domain.Integration;
 import com.bytechef.embedded.configuration.repository.IntegrationRepository;
 import com.bytechef.embedded.configuration.repository.IntegrationWorkflowRepository;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootTest(classes = IntegrationIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@IntegrationIntTestConfigurationSharedMocks
 public class IntegrationWorkflowServiceIntTest {
 
     @Autowired

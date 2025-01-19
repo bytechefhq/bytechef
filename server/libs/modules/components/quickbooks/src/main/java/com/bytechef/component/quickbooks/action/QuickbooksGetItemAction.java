@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 
 /**
@@ -42,7 +43,7 @@ public class QuickbooksGetItemAction {
             string(ITEM)
                 .label("Item")
                 .description("Item to get.")
-                .options(QuickbooksUtils.getOptions(ITEM, null))
+                .options(QuickbooksUtils.getOptions(Entity.ITEM, null))
                 .required(true))
         .output(outputSchema(ITEM_OUTPUT_PROPERTY))
         .perform(QuickbooksGetItemAction::perform);

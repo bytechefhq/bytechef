@@ -16,14 +16,14 @@
 
 package com.bytechef.atlas.execution.facade;
 
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 
 /**
  * @author Ivica Cardic
  */
 public interface JobFacade {
 
-    long createJob(JobParameters jobParameters);
+    long createJob(JobParametersDTO jobParametersDTO);
 
     void deleteJob(long id);
 

@@ -6,7 +6,7 @@ import {devtools} from 'zustand/middleware';
 
 export interface FeatureFlagsI {
     featureFlags: Record<string, boolean>;
-    set: (featureFlag: string, value: boolean) => void;
+    setFeatureFlag: (featureFlag: string, value: boolean) => void;
 }
 
 const featureFlagsStore = createStore<FeatureFlagsI>()(
@@ -14,7 +14,7 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
         (set) => {
             return {
                 featureFlags: {},
-                set: (featureFlag: string, value: boolean) => {
+                setFeatureFlag: (featureFlag: string, value: boolean) => {
                     set((state) => {
                         return {
                             ...state,
@@ -36,7 +36,7 @@ const featureFlagsStore = createStore<FeatureFlagsI>()(
 export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
     const loadingRef = useRef(false);
 
-    const {featureFlags, set} = useStore(featureFlagsStore, (state) => state);
+    const {featureFlags, setFeatureFlag} = useStore(featureFlagsStore, (state) => state);
 
     const {featureFlags: localFeatureFlags} = useApplicationInfoStore();
 
@@ -61,9 +61,9 @@ export const useFeatureFlagsStore = (): ((featureFlag: string) => boolean) => {
 
         posthog.onFeatureFlags(function () {
             if (posthog.isFeatureEnabled(featureFlag)) {
-                set(featureFlag, true);
+                setFeatureFlag(featureFlag, true);
             } else {
-                set(featureFlag, false);
+                setFeatureFlag(featureFlag, false);
             }
 
             loadingRef.current = false;

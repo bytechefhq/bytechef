@@ -136,7 +136,7 @@ public class CsvFileReadAction {
                 while (iterator.hasNext()) {
                     Map<String, String> row = (Map<String, String>) iterator.nextValue();
 
-                    context.logger(logger -> logger.trace("row: {}", row));
+                    context.log(log -> log.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = CsvFileReadUtils.getHeaderRow(
@@ -155,7 +155,7 @@ public class CsvFileReadAction {
                 while (iterator.hasNext()) {
                     List<String> row = (List<String>) iterator.nextValue();
 
-                    context.logger(logger -> logger.trace("row: {}", row));
+                    context.log(log -> log.trace("row: {}", row));
 
                     if (count >= configuration.rangeStartRow() && count < configuration.rangeEndRow()) {
                         Map<String, Object> map = CsvFileReadUtils.getColumnRow(

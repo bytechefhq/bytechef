@@ -86,12 +86,20 @@ public class StringProperty extends ValueProperty<String> {
     @Override
     public String toString() {
         return "StringProperty{" +
-            "maxLength=" + maxLength +
-            ", minLength=" + minLength +
-            ", options=" + options +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", options=" + options +
+            ", minLength=" + minLength +
+            ", maxLength=" + maxLength +
+            "} " + super.toString();
     }
 }

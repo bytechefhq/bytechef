@@ -30,6 +30,51 @@ import org.springframework.ai.image.ImageResponse;
  */
 public interface ImageModel {
 
+    enum ResponseFormat {
+
+        URL("url"), B64_JSON("b64_json");
+
+        private final String value;
+
+        ResponseFormat(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    enum Style {
+
+        VIVID("vivid"), NATURAL("natural");
+
+        private final String value;
+
+        Style(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    enum Quality {
+        STANDARD("standard"),
+        HD("hd");
+
+        private final String value;
+
+        Quality(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
     org.springframework.ai.image.ImageModel createImageModel(
         Parameters inputParameters, Parameters connectionParameters);
 
@@ -46,9 +91,7 @@ public interface ImageModel {
     }
 
     private List<org.springframework.ai.image.ImageMessage> getMessages(Parameters inputParameters) {
-
-        List<ImageMessage> imageMessages =
-            inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});
+        List<ImageMessage> imageMessages = inputParameters.getList(IMAGE_MESSAGES, new TypeReference<>() {});
 
         return imageMessages.stream()
             .map(messageRecord -> new org.springframework.ai.image.ImageMessage(

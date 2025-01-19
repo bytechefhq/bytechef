@@ -14,77 +14,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 2",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 3",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Cohere",
-        "value" : 2
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Jurassic 2",
-        "value" : 3
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Llama",
-        "value" : 4
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Titan",
-        "value" : 5
-      }, {
-        "description" : null,
-        "label" : "Anthropic",
-        "value" : 6
-      }, {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 7
-      }, {
-        "description" : null,
-        "label" : "Groq",
-        "value" : 8
-      }, {
-        "description" : null,
-        "label" : "NVIDIA",
-        "value" : 9
-      }, {
-        "description" : null,
-        "label" : "Hugging Face",
-        "value" : 10
-      }, {
-        "description" : null,
-        "label" : "Mistral",
-        "value" : 11
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 12
-      }, {
-        "description" : null,
-        "label" : "Vertex Gemini",
-        "value" : 13
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
-      "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -101,13 +49,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -127,7 +75,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Url of the inference endpoint.",
-      "displayCondition" : "modelProvider == 10",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -203,8 +151,8 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "You can classify a few samples, to guide your model on how to classify the real data.",
@@ -243,8 +191,8 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -262,8 +210,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -284,8 +232,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Classify Text",
     "perform" : { },
@@ -312,77 +260,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 2",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 3",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Cohere",
-        "value" : 2
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Jurassic 2",
-        "value" : 3
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Llama",
-        "value" : 4
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Titan",
-        "value" : 5
-      }, {
-        "description" : null,
-        "label" : "Anthropic",
-        "value" : 6
-      }, {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 7
-      }, {
-        "description" : null,
-        "label" : "Groq",
-        "value" : 8
-      }, {
-        "description" : null,
-        "label" : "NVIDIA",
-        "value" : 9
-      }, {
-        "description" : null,
-        "label" : "Hugging Face",
-        "value" : 10
-      }, {
-        "description" : null,
-        "label" : "Mistral",
-        "value" : 11
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 12
-      }, {
-        "description" : null,
-        "label" : "Vertex Gemini",
-        "value" : 13
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
-      "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -399,13 +295,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -425,7 +321,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Url of the inference endpoint.",
-      "displayCondition" : "modelProvider == 10",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -479,8 +375,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -501,8 +397,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Sentiment Analysis",
     "perform" : { },
@@ -529,77 +425,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 2",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 3",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Cohere",
-        "value" : 2
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Jurassic 2",
-        "value" : 3
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Llama",
-        "value" : 4
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Titan",
-        "value" : 5
-      }, {
-        "description" : null,
-        "label" : "Anthropic",
-        "value" : 6
-      }, {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 7
-      }, {
-        "description" : null,
-        "label" : "Groq",
-        "value" : 8
-      }, {
-        "description" : null,
-        "label" : "NVIDIA",
-        "value" : 9
-      }, {
-        "description" : null,
-        "label" : "Hugging Face",
-        "value" : 10
-      }, {
-        "description" : null,
-        "label" : "Mistral",
-        "value" : 11
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 12
-      }, {
-        "description" : null,
-        "label" : "Vertex Gemini",
-        "value" : 13
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
-      "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -616,13 +460,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -642,7 +486,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Url of the inference endpoint.",
-      "displayCondition" : "modelProvider == 10",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -750,8 +594,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "The highest possible score the text can achieve in this category.",
@@ -772,8 +616,8 @@
           "minValue" : null,
           "numberPrecision" : null,
           "options" : null,
-          "controlType" : "NUMBER",
-          "optionsDataSource" : null
+          "optionsDataSource" : null,
+          "controlType" : "NUMBER"
         }, {
           "advancedOption" : null,
           "description" : "Whether the score should use decimal numbers or not.",
@@ -799,15 +643,15 @@
           } ],
           "controlType" : "SELECT"
         } ],
-        "controlType" : "OBJECT_BUILDER",
-        "optionsDataSource" : null
+        "optionsDataSource" : null,
+        "controlType" : "OBJECT_BUILDER"
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -825,8 +669,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -847,8 +691,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Score",
     "perform" : { },
@@ -875,77 +719,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 2",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 3",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Cohere",
-        "value" : 2
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Jurassic 2",
-        "value" : 3
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Llama",
-        "value" : 4
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Titan",
-        "value" : 5
-      }, {
-        "description" : null,
-        "label" : "Anthropic",
-        "value" : 6
-      }, {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 7
-      }, {
-        "description" : null,
-        "label" : "Groq",
-        "value" : 8
-      }, {
-        "description" : null,
-        "label" : "NVIDIA",
-        "value" : 9
-      }, {
-        "description" : null,
-        "label" : "Hugging Face",
-        "value" : 10
-      }, {
-        "description" : null,
-        "label" : "Mistral",
-        "value" : 11
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 12
-      }, {
-        "description" : null,
-        "label" : "Vertex Gemini",
-        "value" : 13
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
-      "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -962,13 +754,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -988,7 +780,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Url of the inference endpoint.",
-      "displayCondition" : "modelProvider == 10",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1034,40 +826,41 @@
       "metadata" : { },
       "required" : true,
       "name" : "format",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Format",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "A structured summary with sections",
-        "value" : 0
+        "value" : "STRUCTURED_SUMMARY"
       }, {
         "description" : null,
         "label" : "A brief title summarizing the content in 4-7 words",
-        "value" : 1
+        "value" : "BRIEF_TITLE"
       }, {
         "description" : null,
         "label" : "A single, concise sentence",
-        "value" : 2
+        "value" : "CONCISE_SENTENCE"
       }, {
         "description" : null,
         "label" : "A bulleted list recap",
-        "value" : 3
+        "value" : "BULLETED_LIST"
       }, {
         "description" : null,
         "label" : "Custom Prompt",
-        "value" : 4
+        "value" : "CUSTOM_PROMPT"
       } ],
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Write your prompt for summarizing text.",
-      "displayCondition" : "format == 4",
+      "displayCondition" : "format == 'CUSTOM_PROMPT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1101,8 +894,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -1123,8 +916,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Summarize Text",
     "perform" : { },
@@ -1151,77 +944,25 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "modelProvider",
-      "type" : "INTEGER",
+      "name" : "provider",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Model provider",
+      "label" : "Provider",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
-      "options" : [ {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 2",
-        "value" : 0
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Anthropic 3",
-        "value" : 1
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Cohere",
-        "value" : 2
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Jurassic 2",
-        "value" : 3
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Llama",
-        "value" : 4
-      }, {
-        "description" : null,
-        "label" : "Amazon Bedrock: Titan",
-        "value" : 5
-      }, {
-        "description" : null,
-        "label" : "Anthropic",
-        "value" : 6
-      }, {
-        "description" : null,
-        "label" : "Azure Open AI",
-        "value" : 7
-      }, {
-        "description" : null,
-        "label" : "Groq",
-        "value" : 8
-      }, {
-        "description" : null,
-        "label" : "NVIDIA",
-        "value" : 9
-      }, {
-        "description" : null,
-        "label" : "Hugging Face",
-        "value" : 10
-      }, {
-        "description" : null,
-        "label" : "Mistral",
-        "value" : 11
-      }, {
-        "description" : null,
-        "label" : "Open AI",
-        "value" : 12
-      }, {
-        "description" : null,
-        "label" : "Vertex Gemini",
-        "value" : 13
-      } ],
       "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
-      "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider <= 6 || (modelProvider >= 11 && modelProvider <= 13)",
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1238,13 +979,13 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : {
-        "optionsLookupDependsOn" : [ "modelProvider" ],
+        "optionsLookupDependsOn" : [ "provider" ],
         "options" : { }
       }
     }, {
       "advancedOption" : null,
       "description" : "ID of the model to use.",
-      "displayCondition" : "modelProvider >= 7 && modelProvider <= 9",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1264,7 +1005,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Url of the inference endpoint.",
-      "displayCondition" : "modelProvider == 10",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1338,8 +1079,8 @@
       "maxValue" : null,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Number of words around each relevant part of the result.",
@@ -1357,8 +1098,8 @@
       "maxValue" : null,
       "minValue" : 1,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -1376,8 +1117,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -1398,8 +1139,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     } ],
     "title" : "Similarity Search",
     "perform" : { },
@@ -1408,6 +1149,214 @@
       "outputResponse" : null,
       "outputSchema" : null,
       "sampleOutput" : null
+    },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "AI generates text based on the given prompt.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "textGeneration",
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : null,
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "provider",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Provider",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "The model name to use.",
+      "displayCondition" : "{'AMAZON_BEDROCK_ANTHROPIC2','AMAZON_BEDROCK_ANTHROPIC3','AMAZON_BEDROCK_COHERE','AMAZON_BEDROCK_JURASSIC2','AMAZON_BEDROCK_LLAMA','AMAZON_BEDROCK_TITAN','ANTHROPIC','MISTRAL','OPEN_AI','VERTEX_GEMINI'}.contains(provider)",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "provider" ],
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "ID of the model to use.",
+      "displayCondition" : "{'AZURE_OPEN_AI','GROQ','NVIDIA'}.contains(provider)",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Model",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Url of the inference endpoint.",
+      "displayCondition" : "provider == 'VERTEX_GEMINI'",
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "model",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "URL",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Write your prompt for generating text.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "prompt",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Prompt",
+      "placeholder" : null,
+      "controlType" : "TEXT_AREA",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : true,
+      "description" : "The maximum number of tokens to generate in the chat completion.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "maxTokens",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Max Tokens",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
+    }, {
+      "advancedOption" : true,
+      "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : null,
+      "name" : "temperature",
+      "type" : "NUMBER",
+      "defaultValue" : 1.0,
+      "exampleValue" : null,
+      "label" : "Temperature",
+      "placeholder" : null,
+      "maxNumberPrecision" : null,
+      "maxValue" : 2.0,
+      "minNumberPrecision" : null,
+      "minValue" : 0.0,
+      "numberPrecision" : null,
+      "options" : null,
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
+    } ],
+    "title" : "Text Generation",
+    "perform" : { },
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : "Generated text."
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      },
+      "sampleOutput" : "Generated text."
     },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
@@ -1423,7 +1372,7 @@
   "icon" : "path:assets/ai-text.svg",
   "tags" : null,
   "metadata" : null,
-  "name" : "aiTextAnalysis",
+  "name" : "aiText",
   "resources" : null,
   "title" : "AI Text",
   "triggers" : null,

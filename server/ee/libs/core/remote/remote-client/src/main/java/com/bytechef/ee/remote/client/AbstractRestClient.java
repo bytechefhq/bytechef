@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.remote.client;
 
-import com.bytechef.platform.tenant.TenantContext;
-import com.bytechef.platform.tenant.constant.TenantConstants;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.constant.TenantConstants;
 import java.net.URI;
 import java.util.function.Function;
 import org.springframework.core.ParameterizedTypeReference;

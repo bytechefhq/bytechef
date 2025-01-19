@@ -40,7 +40,7 @@ public class LoggerDebugAction {
 
         Object text = inputParameters.getRequired(TEXT);
 
-        context.logger(logger -> logger.debug(text.toString()));
+        context.log(logger -> logger.debug(text.toString()));
 
         return null;
     }

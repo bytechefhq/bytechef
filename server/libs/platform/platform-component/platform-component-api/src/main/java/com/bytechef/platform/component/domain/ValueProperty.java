@@ -68,15 +68,4 @@ public abstract class ValueProperty<V> extends Property {
     public String getPlaceholder() {
         return placeholder;
     }
-
-    @Override
-    public String toString() {
-        return "ValueProperty{" +
-            "controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
-            ", exampleValue=" + exampleValue +
-            ", label='" + label + '\'' +
-            ", placeholder='" + placeholder + '\'' +
-            "} " + super.toString();
-    }
 }

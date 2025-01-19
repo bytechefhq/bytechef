@@ -24,7 +24,7 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.util.BeanUtils;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @SuppressFBWarnings("EI")
 public record ComponentTriggerHandlerFactory(
     List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
-    InstanceAccessorRegistry instanceAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade)
+    PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade)
     implements TriggerHandlerFactory {
 
     @Override

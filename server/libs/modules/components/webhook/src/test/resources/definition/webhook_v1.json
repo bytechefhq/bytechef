@@ -36,35 +36,36 @@
       "metadata" : { },
       "required" : null,
       "name" : "responseType",
-      "type" : "INTEGER",
-      "defaultValue" : 1,
+      "type" : "STRING",
+      "defaultValue" : "JSON",
       "exampleValue" : null,
       "label" : "Response Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "JSON",
-        "value" : 1
+        "value" : "JSON"
       }, {
         "description" : null,
         "label" : "Raw",
-        "value" : 2
+        "value" : "RAW"
       }, {
         "description" : null,
         "label" : "Binary",
-        "value" : 3
+        "value" : "BINARY"
       }, {
         "description" : null,
         "label" : "Redirect",
-        "value" : 4
+        "value" : "REDIRECT"
       }, {
         "description" : null,
         "label" : "No Data",
-        "value" : 5
+        "value" : "NO_DATA"
       } ],
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
@@ -109,7 +110,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The body of the response.",
-      "displayCondition" : "responseType == 1",
+      "displayCondition" : "responseType == 'JSON'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -129,7 +130,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The body of the response.",
-      "displayCondition" : "responseType == 2",
+      "displayCondition" : "responseType == 'RAW'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -149,7 +150,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The redirect URL.",
-      "displayCondition" : "responseType == 4",
+      "displayCondition" : "responseType == 'REDIRECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -169,7 +170,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The body of the response.",
-      "displayCondition" : "responseType == 3",
+      "displayCondition" : "responseType == 'BINARY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -265,7 +266,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The status code of the response.",
-      "displayCondition" : "responseType != 4",
+      "displayCondition" : "responseType != 'NO_DATA'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -299,15 +300,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "parameters" : { },
-          "headers" : { }
+          "headers" : { },
+          "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "parameters" : { },
-        "headers" : { }
+        "headers" : { },
+        "parameters" : { }
       }
     },
     "properties" : null,
@@ -339,15 +340,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "parameters" : { },
-          "headers" : { }
+          "headers" : { },
+          "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "parameters" : { },
-        "headers" : { }
+        "headers" : { },
+        "parameters" : { }
       }
     },
     "properties" : [ {
@@ -399,15 +400,15 @@
         "outputSchema" : null,
         "sampleOutput" : {
           "method" : "POST",
-          "parameters" : { },
-          "headers" : { }
+          "headers" : { },
+          "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
         "method" : "POST",
-        "parameters" : { },
-        "headers" : { }
+        "headers" : { },
+        "parameters" : { }
       }
     },
     "properties" : [ {

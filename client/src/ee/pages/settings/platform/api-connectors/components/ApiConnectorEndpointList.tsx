@@ -1,4 +1,4 @@
-import {ApiConnectorEndpoint} from '@/middleware/platform/api-connector';
+import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
 
 import ApiConnectorEndpointListItem from './ApiConnectorEndpointListItem';
 

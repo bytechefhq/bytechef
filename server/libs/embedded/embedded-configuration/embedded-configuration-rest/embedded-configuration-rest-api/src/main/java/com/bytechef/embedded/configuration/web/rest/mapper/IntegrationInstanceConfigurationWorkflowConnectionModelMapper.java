@@ -32,5 +32,5 @@ public interface IntegrationInstanceConfigurationWorkflowConnectionModelMapper
 
     @Override
     IntegrationInstanceConfigurationWorkflowConnection convert(
-        IntegrationInstanceConfigurationWorkflowConnectionModel projectInstanceWorkflowConnectionModel);
+        IntegrationInstanceConfigurationWorkflowConnectionModel integrationInstanceConfigurationWorkflowConnectionModel);
 }

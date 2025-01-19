@@ -94,13 +94,21 @@ public class ObjectProperty extends ValueProperty<Map<String, ?>> {
     @Override
     public String toString() {
         return "ObjectProperty{" +
-            "additionalProperties=" + additionalProperties +
-            ", multipleValues=" + multipleValues +
-            ", options=" + options +
-            ", properties=" + properties +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", required=" + required +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", properties=" + properties +
+            ", options=" + options +
+            ", multipleValues=" + multipleValues +
+            ", additionalProperties=" + additionalProperties +
+            "} " + super.toString();
     }
 }

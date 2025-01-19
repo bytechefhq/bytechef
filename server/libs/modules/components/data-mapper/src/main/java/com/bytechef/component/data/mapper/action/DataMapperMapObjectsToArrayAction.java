@@ -20,13 +20,15 @@ import static com.bytechef.component.data.mapper.constant.DataMapperConstants.FI
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.INPUT_TYPE;
 import static com.bytechef.component.data.mapper.constant.DataMapperConstants.VALUE_KEY;
+import static com.bytechef.component.data.mapper.constant.InputType.ARRAY;
+import static com.bytechef.component.data.mapper.constant.InputType.OBJECT;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.data.mapper.constant.InputType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -45,22 +47,22 @@ public class DataMapperMapObjectsToArrayAction {
         .title("Map Objects to Array")
         .description("Transform an object or array of objects into an array of key-value pairs.")
         .properties(
-            integer(INPUT_TYPE)
+            string(INPUT_TYPE)
                 .label("Input Type")
                 .description("Type of the input. Cam be an object or an array of objects.")
                 .options(
-                    option("Object", 1),
-                    option("Array", 2))
+                    option("Object", OBJECT.name()),
+                    option("Array", ARRAY.name()))
                 .required(true),
             object(INPUT)
                 .label("Input")
                 .description("An input object containing one or more properties.")
-                .displayCondition("inputType == 1")
+                .displayCondition("inputType == '%s'".formatted(OBJECT.name()))
                 .required(true),
             array(INPUT)
                 .label("Input")
                 .description("An input array containing one or more objects.")
-                .displayCondition("inputType == 2")
+                .displayCondition("inputType == '%s'".formatted(ARRAY.name()))
                 .items(object())
                 .required(true),
             string(FIELD_KEY)
@@ -84,9 +86,9 @@ public class DataMapperMapObjectsToArrayAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         List<Map<String, Object>> output = new ArrayList<>();
-        Integer inoutType = inputParameters.getInteger(INPUT_TYPE);
+        InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
 
-        if (inoutType != null && inoutType.equals(1)) {
+        if (inputType == OBJECT) {
             Map<String, Object> input = inputParameters.getMap(INPUT, Object.class, new HashMap<>());
 
             fillOutput(inputParameters, input, output);

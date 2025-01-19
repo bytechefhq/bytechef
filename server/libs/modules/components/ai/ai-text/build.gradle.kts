@@ -15,7 +15,6 @@ dependencies {
     implementation(project(":server:libs:modules:components:ai:llm:mistral"))
     implementation(project(":server:libs:modules:components:ai:llm:nvidia"))
     implementation(project(":server:libs:modules:components:ai:llm:openai"))
-    implementation(project(":server:libs:modules:components:ai:llm:stability"))
     implementation(project(":server:libs:modules:components:ai:llm:vertex:gemini"))
     implementation(project(":server:libs:modules:components:ai:llm:watsonx"))
 }

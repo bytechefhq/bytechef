@@ -35,14 +35,14 @@ public interface IntegrationInstanceConfigurationWorkflowConnectionRepository
     @Query("""
             SELECT integration_instance_configuration_workflow_connection.* FROM integration_instance_configuration_workflow_connection
             JOIN integration_instance_configuration_workflow ON integration_instance_configuration_workflow_connection.integration_instance_configuration_workflow_id = integration_instance_configuration_workflow.id
-            WHERE integration_instance_configuration_workflow.integration_instance_configuration_id = :projectInstanceId
+            WHERE integration_instance_configuration_workflow.integration_instance_configuration_id = :integrationInstanceConfigurationId
             AND integration_instance_configuration_workflow.workflow_id = :workflowId
             AND integration_instance_configuration_workflow_connection.workflow_noden_name = :workflowNodeName
         """)
     List<IntegrationInstanceConfigurationWorkflowConnection>
         findAllByIntegrationInstanceIdAndWorkflowIdAndOperationName(
-            @Param("projectInstanceId") long projectInstanceId, @Param("workflowId") String workflowId,
-            @Param("workflowNodeName") String workflowNodeName);
+            @Param("integrationInstanceConfigurationId") long integrationInstanceConfigurationId,
+            @Param("workflowId") String workflowId, @Param("workflowNodeName") String workflowNodeName);
 
     @Query("""
             SELECT integration_instance_configuration_workflow_connection.* FROM integration_instance_configuration_workflow_connection

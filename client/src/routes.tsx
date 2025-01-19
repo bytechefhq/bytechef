@@ -2,6 +2,7 @@ import App from '@/App';
 import ApiClients from '@/ee/pages/automation/api-platform/api-clients/ApiClients';
 import ApiCollections from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
 import ApiConnectors from '@/ee/pages/settings/platform/api-connectors/ApiConnectors';
+import CustomComponents from '@/ee/pages/settings/platform/custom-components/CustomComponents';
 import Login from '@/pages/account/public/Login';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
 import PasswordResetInit from '@/pages/account/public/PasswordResetInit';
@@ -11,7 +12,7 @@ import AccountProfile from '@/pages/account/settings/AccountProfile';
 import Appearance from '@/pages/account/settings/Appearance';
 import Sessions from '@/pages/account/settings/Sessions';
 import {Connections as AutomationConnections} from '@/pages/automation/connections/Connections';
-import ProjectInstances from '@/pages/automation/project-instances/ProjectInstances';
+import ProjectDeployments from '@/pages/automation/project-deployments/ProjectDeployments';
 import Project from '@/pages/automation/project/Project';
 import Projects from '@/pages/automation/projects/Projects';
 import WorkflowChat from '@/pages/automation/workflow-chat/WorkflowChat';
@@ -25,10 +26,10 @@ import Integrations from '@/pages/embedded/integrations/Integrations';
 import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pages/embedded/workflow-executions/WorkflowExecutions';
 import Home from '@/pages/home/Home';
 import OAuthPopup from '@/pages/platform/connection/components/oauth2/OAuthPopup';
+import AiProviders from '@/pages/platform/settings/ai-providers/AiProviders';
 import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
-import CustomComponents from '@/pages/settings/platform/custom-components/CustomComponents';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
 import {AUTHORITIES} from '@/shared/constants';
 import EEVersion from '@/shared/edition/EEVersion';
@@ -88,7 +89,9 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                    <CustomComponents />
+                    <EEVersion>
+                        <CustomComponents />
+                    </EEVersion>
                 </PrivateRoute>
             ),
             path: 'custom-components',
@@ -111,6 +114,16 @@ const platformSettingsRoutes = {
             ),
             path: 'api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <AiProviders />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai-providers',
+        },
     ],
     navItems: [
         {
@@ -127,6 +140,10 @@ const platformSettingsRoutes = {
         {
             href: 'api-keys',
             title: 'API Keys',
+        },
+        {
+            href: 'ai-providers',
+            title: 'AI Providers',
         },
     ],
 };
@@ -227,10 +244,10 @@ export const getRouter = (queryClient: QueryClient) =>
                                 {
                                     element: (
                                         <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <ProjectInstances />
+                                            <ProjectDeployments />
                                         </PrivateRoute>
                                     ),
-                                    path: 'instances',
+                                    path: 'deployments',
                                 },
                                 {
                                     children: [

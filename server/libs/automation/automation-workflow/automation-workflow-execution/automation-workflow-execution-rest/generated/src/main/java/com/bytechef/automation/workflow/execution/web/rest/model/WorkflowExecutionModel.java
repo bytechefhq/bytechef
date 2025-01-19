@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a project workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:20:58.081632+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.740861+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class WorkflowExecutionModel {
 
   private Long id;
@@ -30,7 +30,7 @@ public class WorkflowExecutionModel {
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
+  private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
@@ -96,24 +96,24 @@ public class WorkflowExecutionModel {
     this.project = project;
   }
 
-  public WorkflowExecutionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public WorkflowExecutionModel projectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
     return this;
   }
 
   /**
-   * Get projectInstance
-   * @return projectInstance
+   * Get projectDeployment
+   * @return projectDeployment
    */
   @Valid 
-  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstance")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
-    return projectInstance;
+  @Schema(name = "projectDeployment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeployment")
+  public com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel getProjectDeployment() {
+    return projectDeployment;
   }
 
-  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public void setProjectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
   }
 
   public WorkflowExecutionModel triggerExecution(com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution) {
@@ -168,14 +168,14 @@ public class WorkflowExecutionModel {
     return Objects.equals(this.id, workflowExecution.id) &&
         Objects.equals(this.job, workflowExecution.job) &&
         Objects.equals(this.project, workflowExecution.project) &&
-        Objects.equals(this.projectInstance, workflowExecution.projectInstance) &&
+        Objects.equals(this.projectDeployment, workflowExecution.projectDeployment) &&
         Objects.equals(this.triggerExecution, workflowExecution.triggerExecution) &&
         Objects.equals(this.workflow, workflowExecution.workflow);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, job, project, projectInstance, triggerExecution, workflow);
+    return Objects.hash(id, job, project, projectDeployment, triggerExecution, workflow);
   }
 
   @Override
@@ -185,7 +185,7 @@ public class WorkflowExecutionModel {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    job: ").append(toIndentedString(job)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
-    sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
+    sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    triggerExecution: ").append(toIndentedString(triggerExecution)).append("\n");
     sb.append("    workflow: ").append(toIndentedString(workflow)).append("\n");
     sb.append("}");

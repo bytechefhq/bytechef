@@ -29,6 +29,6 @@ class AiTextComponentHandlerTest {
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
             "definition/ai_text_v1.json",
-            new AiTextComponentHandler(new ApplicationProperties()).getDefinition());
+            new AiTextComponentHandler(new ApplicationProperties(), null).getDefinition());
     }
 }

@@ -21,7 +21,7 @@ import static com.bytechef.component.datastream.constant.DataStreamConstants.SOU
 import com.bytechef.component.definition.DataStreamItemReader;
 import com.bytechef.platform.component.definition.ContextFactory;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.tenant.util.TenantUtils;
+import com.bytechef.tenant.util.TenantUtils;
 import java.util.Map;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.item.ExecutionContext;

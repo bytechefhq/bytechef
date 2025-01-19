@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.domain;
 
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import java.time.Instant;
 import java.util.Objects;
 import org.springframework.data.annotation.CreatedBy;
@@ -63,8 +63,8 @@ public class ApiCollectionEndpoint {
     @Column
     private String path;
 
-    @Column("project_instance_workflow_id")
-    private AggregateReference<ProjectInstanceWorkflow, Long> projectInstanceWorkflowId;
+    @Column("project_deployment_workflow_id")
+    private AggregateReference<ProjectDeploymentWorkflow, Long> projectDeploymentWorkflowId;
 
     @Column("workflow_reference_code")
     private String workflowReferenceCode;
@@ -126,8 +126,8 @@ public class ApiCollectionEndpoint {
         return path;
     }
 
-    public Long getProjectInstanceWorkflowId() {
-        return projectInstanceWorkflowId.getId();
+    public Long getProjectDeploymentWorkflowId() {
+        return projectDeploymentWorkflowId.getId();
     }
 
     public int getVersion() {
@@ -158,12 +158,8 @@ public class ApiCollectionEndpoint {
         this.path = path;
     }
 
-//    public void setProjectInstanceWorkflow(ProjectInstanceWorkflow projectInstanceWorkflow) {
-//        this.projectInstanceWorkflowId = AggregateReference.to(projectInstanceWorkflow.getId());
-//    }
-
-    public void setProjectInstanceWorkflowId(Long projectInstanceWorkflowId) {
-        this.projectInstanceWorkflowId = AggregateReference.to(projectInstanceWorkflowId);
+    public void setProjectDeploymentWorkflowId(Long projectDeploymentWorkflowId) {
+        this.projectDeploymentWorkflowId = AggregateReference.to(projectDeploymentWorkflowId);
     }
 
     public void setVersion(int version) {
@@ -182,6 +178,7 @@ public class ApiCollectionEndpoint {
             ", path='" + path + '\'' +
             ", httpMethod='" + httpMethod + '\'' +
             ", workflowReferenceCode='" + workflowReferenceCode + '\'' +
+            ", projectDeploymentWorkflowId=" + projectDeploymentWorkflowId +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +

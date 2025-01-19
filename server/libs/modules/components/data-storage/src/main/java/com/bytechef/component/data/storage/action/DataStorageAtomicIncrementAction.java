@@ -83,7 +83,7 @@ public class DataStorageAtomicIncrementAction {
                 }
             }
         } catch (InterruptedException e) {
-            context.logger(logger -> logger.error(e.getMessage(), e));
+            context.log(log -> log.error(e.getMessage(), e));
         } finally {
             LOCK.unlock();
         }

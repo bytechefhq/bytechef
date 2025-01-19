@@ -61,7 +61,8 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
     }
 
     @Override
-    public List<IntegrationWorkflowDTO> getIntegrationVersionWorkflows(long id, int integrationVersion) {
+    public List<IntegrationWorkflowDTO>
+        getIntegrationVersionWorkflows(long id, int integrationVersion, boolean includeAllFields) {
         throw new UnsupportedOperationException();
     }
 
@@ -87,7 +88,8 @@ public class RemoteIntegrationFacadeClient implements IntegrationFacade {
 
     @Override
     public List<IntegrationDTO> getIntegrations(
-        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status) {
+        Long categoryId, boolean integrationInstanceConfigurations, Long tagId, Status status,
+        boolean includeAllFields) {
 
         throw new UnsupportedOperationException();
     }

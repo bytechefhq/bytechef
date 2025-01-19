@@ -1,5 +1,5 @@
 import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
-import {ApiCollection} from '@/middleware/automation/api-platform';
+import {ApiCollection} from '@/ee/shared/middleware/automation/api-platform';
 
 import ApiCollectionEndpointList from './ApiCollectionEndpointList';
 import ApiCollectionListItem from './ApiCollectionListItem';
@@ -17,8 +17,8 @@ const ApiCollectionList = ({apiCollections}: {apiCollections: ApiCollection[]}) 
                                 <ApiCollectionEndpointList
                                     apiCollectionEndpoints={apiCollection.endpoints}
                                     apiCollectionId={apiCollection.id!}
+                                    projectDeploymentId={apiCollection.projectDeploymentId!}
                                     projectId={apiCollection.projectId}
-                                    projectInstanceId={apiCollection.projectInstanceId!}
                                     projectVersion={apiCollection.projectVersion}
                                 />
                             </CollapsibleContent>

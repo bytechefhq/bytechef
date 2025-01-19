@@ -1,4 +1,4 @@
-import {ApiClient, ApiClientApi} from '@/middleware/automation/api-platform';
+import {ApiClient, ApiClientApi} from '@/ee/shared/middleware/automation/api-platform';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';

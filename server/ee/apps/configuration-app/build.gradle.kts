@@ -7,7 +7,6 @@ springBoot {
 
 dependencies {
     implementation("org.apache.commons:commons-lang3")
-    implementation(libs.loki.logback.appender)
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -38,6 +37,7 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-filesystem"))
     implementation(project(":server:libs:core:encryption:encryption-impl"))
     implementation(project(":server:libs:core:encryption:encryption-property"))
+    implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))
@@ -47,7 +47,6 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-impl"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-test:platform-workflow-test-rest"))
@@ -65,7 +64,9 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-rest"))
+    implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-connection:platform-connection-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-registry:platform-workflow-task-dispatcher-registry-remote-client"))

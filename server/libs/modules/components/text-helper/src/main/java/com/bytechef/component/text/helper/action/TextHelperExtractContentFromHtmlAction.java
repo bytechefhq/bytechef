@@ -20,7 +20,6 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.text.helper.constant.TextHelperConstants.ATTRIBUTE;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.CONTENT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.QUERY_SELECTOR;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.RETURN_ARRAY;
@@ -29,7 +28,8 @@ import static com.bytechef.component.text.helper.constant.TextHelperConstants.RE
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.Property.ControlType;
+import com.bytechef.component.text.helper.constant.TextHelperConstants;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jsoup.Jsoup;
@@ -42,6 +42,11 @@ import org.jsoup.select.Elements;
  */
 public class TextHelperExtractContentFromHtmlAction {
 
+    private enum ReturnValue {
+
+        ATTRIBUTE, HTML, TEXT;
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("extractContentFromHtml")
         .title("Extract Content from HTML")
         .description("Extract content from the HTML content.")
@@ -49,7 +54,7 @@ public class TextHelperExtractContentFromHtmlAction {
             string(CONTENT)
                 .label("HTML Content")
                 .description("HTML content to extract content from.")
-                .controlType(Property.ControlType.TEXT_AREA)
+                .controlType(ControlType.TEXT_AREA)
                 .required(true),
             string(QUERY_SELECTOR)
                 .label("CSS Selector")
@@ -59,16 +64,18 @@ public class TextHelperExtractContentFromHtmlAction {
                 .label("Return Value")
                 .description("The data to return.")
                 .options(
-                    option("Attribute", "attribute", "Get the attribute value like 'class' from an element."),
-                    option("HTML", "html", "Get the HTML content that the element contains."),
-                    option("Text", "text", "Get the text content of the element."))
+                    option(
+                        "Attribute", ReturnValue.ATTRIBUTE.name(),
+                        "Get the attribute value like 'class' from an element."),
+                    option("HTML", ReturnValue.HTML.name(), "Get the HTML content that the element contains."),
+                    option("Text", ReturnValue.TEXT.name(), "Get the text content of the element."))
                 .required(true)
                 .defaultValue("html"),
-            string(ATTRIBUTE)
+            string(TextHelperConstants.ATTRIBUTE)
                 .label("Attribute")
                 .description("The name of the attribute to return the value of")
                 .required(true)
-                .displayCondition("%s == 'attribute'".formatted(RETURN_VALUE)),
+                .displayCondition("%s == '%s'".formatted(RETURN_VALUE, ReturnValue.ATTRIBUTE.name())),
             bool(RETURN_ARRAY)
                 .label("Return Array")
                 .description(
@@ -98,13 +105,12 @@ public class TextHelperExtractContentFromHtmlAction {
     }
 
     private static String getValue(Element element, Parameters inputParameters) {
-        String returnValue = inputParameters.getRequiredString(RETURN_VALUE);
+        ReturnValue returnValue = inputParameters.getRequired(RETURN_VALUE, ReturnValue.class);
 
         return switch (returnValue) {
-            case "attribute" -> element.attr(inputParameters.getRequiredString(ATTRIBUTE));
-            case "html" -> element.html();
-            case "text" -> element.text();
-            default -> throw new IllegalArgumentException("Unknown return value: %s".formatted(returnValue));
+            case ATTRIBUTE -> element.attr(inputParameters.getRequiredString(TextHelperConstants.ATTRIBUTE));
+            case HTML -> element.html();
+            case TEXT -> element.text();
         };
     }
 }

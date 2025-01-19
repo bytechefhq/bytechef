@@ -40,6 +40,7 @@ import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,10 +59,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @SpringBootTest(classes = UserIntTestConfiguration.class, properties = "bytechef.tenant.mode=single")
 @AutoConfigureMockMvc
+@UserIntTestConfigurationSharedMocks
 class AccountControllerIntTest {
 
     static final String TEST_USER_LOGIN = "test";
@@ -79,7 +81,7 @@ class AccountControllerIntTest {
     @Autowired
     private AuthorityRepository authorityRepository;
 
-    @MockBean
+    @MockitoBean
     private MailService mailService;
 
     @Autowired

@@ -36,5 +36,5 @@ public interface ActionContextAware extends ActionContext {
 
     String getWorkflowId();
 
-    boolean isDevEnvironment();
+    boolean isEditorEnvironment();
 }

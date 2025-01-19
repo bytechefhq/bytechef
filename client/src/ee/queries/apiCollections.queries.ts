@@ -3,13 +3,13 @@ import {
     ApiCollectionApi,
     Environment,
     GetWorkspaceApiCollectionsRequest,
-} from '@/middleware/automation/api-platform';
+} from '@/ee/shared/middleware/automation/api-platform';
 
 /* eslint-disable sort-keys */
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiCollectionKeys = {
-    filteredProjectInstances: (filters: {
+    filteredProjectDeployments: (filters: {
         id?: number;
         environment?: Environment;
         projectId?: number;
@@ -20,6 +20,6 @@ export const ApiCollectionKeys = {
 
 export const useGetApiCollectionsQuery = (request: GetWorkspaceApiCollectionsRequest) =>
     useQuery<ApiCollection[], Error>({
-        queryKey: ApiCollectionKeys.filteredProjectInstances(request),
+        queryKey: ApiCollectionKeys.filteredProjectDeployments(request),
         queryFn: () => new ApiCollectionApi().getWorkspaceApiCollections(request),
     });

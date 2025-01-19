@@ -32,7 +32,7 @@ import org.apache.commons.lang3.Validate;
 class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerContextAware {
 
     private final Data data;
-    private final boolean devEnvironment;
+    private final boolean editorEnvironment;
     private final Long instanceId;
     private final String triggerName;
     private final ModeType type;
@@ -41,14 +41,15 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     @SuppressFBWarnings("EI")
     public TriggerContextImpl(
         String componentName, int componentVersion, String triggerName, ModeType type, Long instanceId,
-        String workflowReferenceCode, ComponentConnection connection, boolean devEnvironment, DataStorage dataStorage,
+        String workflowReferenceCode, ComponentConnection connection, boolean editorEnvironment,
+        DataStorage dataStorage,
         FilesFileStorage filesFileStorage, HttpClientExecutor httpClientExecutor) {
 
         super(componentName, componentVersion, triggerName, filesFileStorage, connection, httpClientExecutor);
 
         this.data = new DataImpl(
             componentName, componentVersion, triggerName, type, workflowReferenceCode, dataStorage);
-        this.devEnvironment = devEnvironment;
+        this.editorEnvironment = editorEnvironment;
         this.instanceId = instanceId;
         this.triggerName = triggerName;
         this.type = type;
@@ -85,8 +86,8 @@ class TriggerContextImpl extends ContextImpl implements TriggerContext, TriggerC
     }
 
     @Override
-    public boolean isDevEnvironment() {
-        return devEnvironment;
+    public boolean isEditorEnvironment() {
+        return editorEnvironment;
     }
 
     private record DataImpl(

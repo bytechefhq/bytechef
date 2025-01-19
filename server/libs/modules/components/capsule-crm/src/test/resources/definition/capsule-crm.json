@@ -43,8 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
@@ -100,13 +100,13 @@
       }, {
         "description" : null,
         "label" : "Organization",
-        "value" : "organization"
+        "value" : "ORGANIZATION"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The first name of the person.",
-      "displayCondition" : "type == 'person'",
+      "displayCondition" : "type == 'PERSON'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -126,7 +126,7 @@
     }, {
       "advancedOption" : null,
       "description" : "The last name of the person.",
-      "displayCondition" : "type == 'person'",
+      "displayCondition" : "type == 'PERSON'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -1013,7 +1013,7 @@
     "workflowNodeDescription" : null,
     "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

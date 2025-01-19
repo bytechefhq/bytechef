@@ -18,7 +18,7 @@ package com.bytechef.atlas.execution.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -28,7 +28,7 @@ import org.springframework.data.domain.Page;
  */
 public interface JobService {
 
-    Job create(JobParameters jobParameters, Workflow workflow);
+    Job create(JobParametersDTO jobParametersDTO, Workflow workflow);
 
     void deleteJob(long id);
 

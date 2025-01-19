@@ -65,8 +65,8 @@ public class ApiCollection {
     @Column
     private String name;
 
-    @Column("project_instance_id")
-    private AggregateReference<Project, Long> projectInstanceId;
+    @Column("project_deployment_id")
+    private AggregateReference<Project, Long> projectDeploymentId;
 
     @Version
     private int version;
@@ -121,8 +121,8 @@ public class ApiCollection {
         return name;
     }
 
-    public Long getProjectInstanceId() {
-        return projectInstanceId == null ? null : projectInstanceId.getId();
+    public Long getProjectDeploymentId() {
+        return projectDeploymentId == null ? null : projectDeploymentId.getId();
     }
 
     public List<Long> getTagIds() {
@@ -152,8 +152,8 @@ public class ApiCollection {
         this.name = name;
     }
 
-    public void setProjectInstanceId(Long projectInstanceId) {
-        this.projectInstanceId = projectInstanceId == null ? null : AggregateReference.to(projectInstanceId);
+    public void setProjectDeploymentId(Long projectDeploymentId) {
+        this.projectDeploymentId = projectDeploymentId == null ? null : AggregateReference.to(projectDeploymentId);
     }
 
     public void setTagIds(List<Long> tagIds) {
@@ -182,7 +182,7 @@ public class ApiCollection {
             "id=" + id +
             ", name='" + name + '\'' +
             ", collectionVersion=" + collectionVersion +
-            ", projectInstanceId=" + projectInstanceId +
+            ", projectDeploymentId=" + projectDeploymentId +
             ", apiCollectionTags=" + apiCollectionTags +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

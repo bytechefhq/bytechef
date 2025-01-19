@@ -31,8 +31,4 @@ public class JsonFileConstants {
     public static final String FILENAME = "filename";
     public static final String TYPE = "type";
 
-    public enum FileType {
-        JSON,
-        JSONL,
-    }
 }

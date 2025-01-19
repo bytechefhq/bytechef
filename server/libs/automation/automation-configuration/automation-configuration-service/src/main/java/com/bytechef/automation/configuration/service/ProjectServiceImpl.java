@@ -75,8 +75,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional(readOnly = true)
-    public Project getProjectInstanceProject(long projectInstanceId) {
-        return projectRepository.findByProjectInstanceId(projectInstanceId);
+    public Project getProjectDeploymentProject(long projectDeploymentId) {
+        return projectRepository.findByProjectDeploymentId(projectDeploymentId);
     }
 
     @Override

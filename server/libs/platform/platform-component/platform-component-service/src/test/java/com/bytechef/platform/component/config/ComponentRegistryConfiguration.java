@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.component.config;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
@@ -30,16 +29,10 @@ import com.bytechef.encryption.Encryption;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.data.storage.DataStorage;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -48,7 +41,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -62,6 +54,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
+@ComponentRegistryConfigurationSharedMocks
 @Configuration
 public class ComponentRegistryConfiguration {
 
@@ -83,27 +76,6 @@ public class ComponentRegistryConfiguration {
                 OpenApiComponentHandlerLoader.PERFORM_FUNCTION_FUNCTION.apply(modifiableActionDefinition));
         }
     };
-
-    @MockBean
-    DataStorage dataStorage;
-
-    @MockBean
-    MessageBroker messageBroker;
-
-    @MockBean
-    OAuth2Service oAuth2Service;
-
-    @MockBean
-    TagService tagService;
-
-    @MockBean
-    WorkflowService workflowService;
-
-    @MockBean
-    WorkflowConnectionFacade workflowConnectionFacade;
-
-    @MockBean
-    WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
     ApplicationProperties applicationProperties() {
@@ -134,8 +106,8 @@ public class ComponentRegistryConfiguration {
     }
 
     @Bean
-    InstanceAccessorRegistry instanceAccessorRegistry() {
-        return new InstanceAccessorRegistry(List.of());
+    PrincipalAccessorRegistry principalAccessorRegistry() {
+        return new PrincipalAccessorRegistry(List.of());
     }
 
     @Bean

@@ -18,7 +18,7 @@ package com.bytechef.automation.workflow.execution.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,6 +29,6 @@ import org.springframework.lang.NonNull;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowExecution(
-    long id, Project project, ProjectInstance projectInstance, @NonNull JobDTO job, @NonNull Workflow workflow,
+    long id, Project project, ProjectDeployment projectDeployment, @NonNull JobDTO job, @NonNull Workflow workflow,
     TriggerExecutionDTO triggerExecution) {
 }

@@ -1,15 +1,15 @@
 /* tslint:disable */
 /* eslint-disable */
 export * from './Category';
-export * from './CreateProjectInstanceWorkflowJob200Response';
+export * from './CreateProjectDeploymentWorkflowJob200Response';
 export * from './DataStreamComponent';
 export * from './Environment';
 export * from './Project';
 export * from './ProjectBasic';
-export * from './ProjectInstance';
-export * from './ProjectInstanceBasic';
-export * from './ProjectInstanceWorkflow';
-export * from './ProjectInstanceWorkflowConnection';
+export * from './ProjectDeployment';
+export * from './ProjectDeploymentBasic';
+export * from './ProjectDeploymentWorkflow';
+export * from './ProjectDeploymentWorkflowConnection';
 export * from './ProjectStatus';
 export * from './ProjectVersion';
 export * from './PublishProjectRequest';

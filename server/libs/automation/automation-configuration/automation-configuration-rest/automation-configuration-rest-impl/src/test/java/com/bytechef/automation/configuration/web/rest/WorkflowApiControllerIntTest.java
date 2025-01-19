@@ -23,8 +23,8 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
+import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.facade.ProjectInstanceFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
@@ -39,9 +39,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
@@ -68,30 +68,30 @@ public class WorkflowApiControllerIntTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private ProjectInstanceFacade projectInstanceFacade;
+    @MockitoBean
+    private ProjectDeploymentFacade projectDeploymentFacade;
 
-    @MockBean
+    @MockitoBean
     private ProjectFacade projectFacade;
 
-    @MockBean
+    @MockitoBean
     private ProjectService projectService;
 
     private WebTestClient webTestClient;
 
-    @MockBean
+    @MockitoBean
     private WorkflowFacade workflowFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkflowService workflowService;
 
-    @MockBean
+    @MockitoBean
     private WorkflowConnectionFacade workflowConnectionFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkspaceFacade workspaceFacade;
 
-    @MockBean
+    @MockitoBean
     private WorkspaceService workspaceService;
 
     @BeforeEach

@@ -34,20 +34,25 @@ public class WebhookResponseToWebhookRequestAction {
 
     private static final String RESPONSE_TYPE = "responseType";
 
+    private enum ResponseType {
+
+        JSON, RAW, BINARY, REDIRECT, NO_DATA
+    }
+
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("responseToWebhookRequest")
         .title("Response to Webhook Request")
         .description("Converts the response to the webhook request.")
         .properties(
-            integer(RESPONSE_TYPE)
+            string(RESPONSE_TYPE)
                 .label("Response Type")
                 .description("The type of the response.")
                 .options(
-                    option("JSON", 1),
-                    option("Raw", 2),
-                    option("Binary", 3),
-                    option("Redirect", 4),
-                    option("No Data", 5))
-                .defaultValue(1),
+                    option("JSON", ResponseType.JSON.name()),
+                    option("Raw", ResponseType.RAW.name()),
+                    option("Binary", ResponseType.BINARY.name()),
+                    option("Redirect", ResponseType.REDIRECT.name()),
+                    option("No Data", ResponseType.NO_DATA.name()))
+                .defaultValue(ResponseType.JSON.name()),
             object(HEADERS)
                 .label("Headers")
                 .description("The headers of the response.")
@@ -56,31 +61,31 @@ public class WebhookResponseToWebhookRequestAction {
             object(BODY)
                 .label("Body")
                 .description("The body of the response.")
-                .displayCondition("responseType == 1")
+                .displayCondition("responseType == '%s'".formatted(ResponseType.JSON.name()))
                 .required(true)
                 .placeholder("Add property"),
             string(BODY)
                 .label("Body")
                 .description("The body of the response.")
-                .displayCondition("responseType == 2")
+                .displayCondition("responseType == '%s'".formatted(ResponseType.RAW.name()))
                 .required(true)
                 .placeholder("Add property"),
             string(BODY)
                 .label("Redirect URL")
                 .description("The redirect URL.")
-                .displayCondition("responseType == 4")
+                .displayCondition("responseType == '%s'".formatted(ResponseType.REDIRECT.name()))
                 .required(true),
             fileEntry(BODY)
                 .label("Body")
                 .description("The body of the response.")
-                .displayCondition("responseType == 3")
+                .displayCondition("responseType == '%s'".formatted(ResponseType.BINARY.name()))
                 .required(true)
                 .placeholder("Add property"),
             integer(STATUS_CODE)
                 .label("Status Code")
                 .description("The status code of the response.")
                 .defaultValue(200)
-                .displayCondition("responseType != 4"))
+                .displayCondition("responseType != '%s'".formatted(ResponseType.NO_DATA.name())))
         .output(WebhookResponseToWebhookRequestAction::output)
         .perform(WebhookResponseToWebhookRequestAction::perform);
 
@@ -97,20 +102,20 @@ public class WebhookResponseToWebhookRequestAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return switch (inputParameters.getInteger(RESPONSE_TYPE)) {
-            case 1 -> WebhookResponse.json(
+        return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
+            case JSON -> WebhookResponse.json(
                 inputParameters.getRequiredMap(BODY, new TypeReference<>() {}),
                 inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),
                 inputParameters.getInteger(STATUS_CODE, 200));
-            case 2 -> WebhookResponse.raw(
+            case RAW -> WebhookResponse.raw(
                 inputParameters.getRequiredString(BODY),
                 inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),
                 inputParameters.getInteger(STATUS_CODE, 200));
-            case 3 -> WebhookResponse.binary(
+            case BINARY -> WebhookResponse.binary(
                 inputParameters.getRequiredFileEntry(BODY),
                 inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),
                 inputParameters.getInteger(STATUS_CODE, 200));
-            case 4 -> WebhookResponse.redirect(inputParameters.getRequiredString(BODY));
+            case REDIRECT -> WebhookResponse.redirect(inputParameters.getRequiredString(BODY));
             default -> WebhookResponse.noData(
                 inputParameters.getMap(HEADERS, new TypeReference<>() {}, Map.of()),
                 inputParameters.getInteger(STATUS_CODE, 200));

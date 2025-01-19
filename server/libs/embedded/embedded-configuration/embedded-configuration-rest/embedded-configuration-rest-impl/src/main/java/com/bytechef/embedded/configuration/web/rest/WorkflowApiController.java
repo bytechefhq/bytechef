@@ -85,11 +85,11 @@ public class WorkflowApiController extends AbstractWorkflowApiController impleme
 
     @Override
     public ResponseEntity<List<WorkflowModel>> getIntegrationVersionWorkflows(
-        Long id, Integer integrationVersion) {
+        Long id, Integer integrationVersion, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             CollectionUtils.map(
-                integrationFacade.getIntegrationVersionWorkflows(id, integrationVersion),
+                integrationFacade.getIntegrationVersionWorkflows(id, integrationVersion, includeAllFields),
                 workflow -> conversionService.convert(workflow, WorkflowModel.class)));
     }
 

@@ -21,7 +21,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
             "Page" to "org.springframework.data.domain.Page",
             "ProjectBasic" to "com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel",
-            "ProjectInstanceBasic" to  "com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel",
+            "ProjectDeploymentBasic" to  "com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel",
             "ProjectStatus" to "com.bytechef.automation.configuration.web.rest.model.ProjectStatusModel",
             "Tag" to "TagModel",
             "UpdateTagsRequest" to "com.bytechef.platform.tag.web.rest.model.UpdateTagsRequestModel",
@@ -39,7 +39,7 @@ sourceSets.main.get().java.srcDir("$projectDir/generated/src/main/java")
 val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
     generatorName.set("typescript-fetch")
     inputSpec.set("$projectDir/openapi.yaml")
-    outputDir.set("$rootDir/client/src/middleware/automation/api-platform")
+    outputDir.set("$rootDir/client/src/ee/shared/middleware/automation/api-platform")
 }
 
 tasks.register("generateOpenAPI") {
@@ -65,8 +65,8 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-rest:automation-configuration-rest-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-rest:platform-tag-rest-api"))
-    implementation(project(":server:libs:platform:platform-rest:platform-rest-api"))
     implementation(project(":server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")

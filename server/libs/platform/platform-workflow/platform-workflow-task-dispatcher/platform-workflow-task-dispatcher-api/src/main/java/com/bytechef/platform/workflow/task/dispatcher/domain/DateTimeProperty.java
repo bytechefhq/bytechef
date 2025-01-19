@@ -71,10 +71,18 @@ public class DateTimeProperty extends ValueProperty<LocalDateTime> {
     @Override
     public String toString() {
         return "DateTimeProperty{" +
-            "options=" + options +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", options=" + options +
+            "} " + super.toString();
     }
 }

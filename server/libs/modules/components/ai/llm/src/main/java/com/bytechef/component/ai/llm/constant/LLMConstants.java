@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm.constant;
 
+import static com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableArrayProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
@@ -29,9 +30,12 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
+import com.bytechef.component.ai.llm.ChatModel;
+import com.bytechef.component.ai.llm.ChatModel.Role;
 import com.bytechef.component.definition.ComponentDsl;
-import com.bytechef.component.definition.Property.ControlType;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -74,6 +78,8 @@ public class LLMConstants {
     public static final String SPEED = "speed";
     public static final String WEIGHT = "weight";
 
+    public static final List<Provider> PROVIDERS = Arrays.asList(Provider.values());
+
     public static final ModifiableNumberProperty FREQUENCY_PENALTY_PROPERTY = number(FREQUENCY_PENALTY)
         .label("Frequency Penalty")
         .description(
@@ -103,64 +109,9 @@ public class LLMConstants {
         .label("Language")
         .description("The language of the input audio.")
         .options(
-            List.of(
-                option("Afrikaans", "af"),
-                option("Arabic", "ar"),
-                option("Armenian", "hy"),
-                option("Azerbaijani", "az"),
-                option("Belarusian", "be"),
-                option("Bosnian", "bs"),
-                option("Bulgarian", "bg"),
-                option("Catalan", "ca"),
-                option("Chinese (Simplified)", "zh"),
-                option("Croatian", "hr"),
-                option("Czech", "cs"),
-                option("Danish", "da"),
-                option("Dutch", "nl"),
-                option("Greek", "el"),
-                option("Estonian", "et"),
-                option("English", "en"),
-                option("Finnish", "fi"),
-                option("French", "fr"),
-                option("Galician", "gl"),
-                option("German", "de"),
-                option("Hebrew", "he"),
-                option("Hindi", "hi"),
-                option("Hungarian", "hu"),
-                option("Icelandic", "is"),
-                option("Indonesian", "id"),
-                option("Italian", "it"),
-                option("Japanese", "ja"),
-                option("Kazakh", "kk"),
-                option("Kannada", "kn"),
-                option("Korean", "ko"),
-                option("Lithuanian", "lt"),
-                option("Latvian", "lv"),
-                option("Maori", "ma"),
-                option("Macedonian", "mk"),
-                option("Marathi", "mr"),
-                option("Malay", "ms"),
-                option("Nepali", "ne"),
-                option("Norwegian", "no"),
-                option("Persian", "fa"),
-                option("Polish", "pl"),
-                option("Portuguese", "pt"),
-                option("Romanian", "ro"),
-                option("Russian", "ru"),
-                option("Slovak", "sk"),
-                option("Slovenian", "sl"),
-                option("Serbian", "sr"),
-                option("Spanish", "es"),
-                option("Swedish", "sv"),
-                option("Swahili", "sw"),
-                option("Tamil", "ta"),
-                option("Tagalog", "tl"),
-                option("Thai", "th"),
-                option("Turkish", "tr"),
-                option("Ukrainian", "uk"),
-                option("Urdu", "ur"),
-                option("Vietnamese", "vi"),
-                option("Welsh", "cy")))
+            Arrays.stream(Language.values())
+                .map(language -> option(language.getLabel(), language.name()))
+                .toList())
         .required(false);
 
     public static final ModifiableObjectProperty LOGIT_BIAS_PROPERTY = object(LOGIT_BIAS)
@@ -186,21 +137,21 @@ public class LLMConstants {
                         .label("Role")
                         .description("The role of the messages author.")
                         .options(
-                            option("System", "system"),
-                            option("User", "user"),
-                            option("Assistant", "assistant"),
-                            option("Tool", "tool"))
+                            option("System", Role.SYSTEM.name()),
+                            option("User", Role.USER.name()),
+                            option("Assistant", Role.ASSISTANT.name()),
+                            option("Tool", Role.TOOL.name()))
                         .required(true),
                     string(CONTENT)
                         .label("Content")
                         .description("The contents of the message.")
-                        .controlType(ControlType.TEXT_AREA)
+                        .controlType(TEXT_AREA)
                         .required(true),
                     array("attachments")
                         .label("Attachments")
                         .description(
                             "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.")
-                        .displayCondition("%s == '%s'".formatted("messages[index].role", "user"))
+                        .displayCondition("%s == '%s'".formatted("messages[index].role", Role.USER.name()))
                         .items(fileEntry())
                         .required(false)))
         .required(true);
@@ -231,19 +182,19 @@ public class LLMConstants {
         .label("Response")
         .description("The response from the API.")
         .properties(
-            integer(RESPONSE_FORMAT)
+            string(RESPONSE_FORMAT)
                 .label("Response Format")
                 .description("In which format do you want the response to be in?")
                 .options(
-                    option("Text", 1, "Text response"),
-                    option("JSON", 2, "JSON response with key-value pairs"))
-                .defaultValue(1)
+                    option("Text", ChatModel.ResponseFormat.TEXT.name(), "Text response"),
+                    option("JSON", ChatModel.ResponseFormat.JSON.name(), "JSON response with key-value pairs"))
+                .defaultValue(ChatModel.ResponseFormat.TEXT.name())
                 .required(false),
             string(RESPONSE_SCHEMA)
                 .label("Response Schema")
                 .description("Define the JSON schema for the response.")
                 .controlType(JSON_SCHEMA_BUILDER)
-                .displayCondition("response.responseFormat == 2")
+                .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.JSON.name()))
                 .required(false))
         .required(false);
 
@@ -282,6 +233,25 @@ public class LLMConstants {
         .description(
             "A unique identifier representing your end-user, which can help admins to monitor and detect abuse.")
         .required(false)
+        .advancedOption(true);
+
+    public static final ModifiableStringProperty IMAGE_RESPONSE_PROPERTY =
+        string(RESPONSE_FORMAT)
+            .label("Response format")
+            .description("The format in which the generated images are returned.")
+            .options(
+                option("URL", ResponseFormat.URL.name()),
+                option("B64_JSON", ResponseFormat.B64_JSON.name()))
+            .defaultValue(ResponseFormat.URL.name())
+            .advancedOption(true);
+
+    public static final ModifiableIntegerProperty IMAGE_N_PROPERTY = integer(N)
+        .label("Number of Responses")
+        .description(
+            "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..")
+        .defaultValue(1)
+        .minValue(1)
+        .maxValue(10)
         .advancedOption(true);
 
     private LLMConstants() {

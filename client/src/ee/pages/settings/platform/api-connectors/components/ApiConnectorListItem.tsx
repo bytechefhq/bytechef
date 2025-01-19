@@ -13,7 +13,7 @@ import {useDeleteApiConnectorMutation, useEnableApiConnectorMutation} from '@/ee
 import ApiConnectorDeleteAlertDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorDeleteAlertDialog';
 import ApiConnectorImportDialog from '@/ee/pages/settings/platform/api-connectors/components/ApiConnectorImportDialog';
 import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
-import {ApiConnector} from '@/middleware/platform/api-connector';
+import {ApiConnector} from '@/ee/shared/middleware/platform/api-connector';
 import {ChevronDownIcon, DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {CalendarIcon} from 'lucide-react';

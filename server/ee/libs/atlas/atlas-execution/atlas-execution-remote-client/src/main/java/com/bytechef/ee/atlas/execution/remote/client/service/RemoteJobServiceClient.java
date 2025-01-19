@@ -9,7 +9,7 @@ package com.bytechef.ee.atlas.execution.remote.client.service;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -36,13 +36,13 @@ public class RemoteJobServiceClient implements JobService {
     }
 
     @Override
-    public Job create(JobParameters jobParameters, Workflow workflow) {
+    public Job create(JobParametersDTO jobParametersDTO, Workflow workflow) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
                 .path(JOB_SERVICE + "/create")
                 .build(),
-            new JobCreateRequest(jobParameters, workflow), Job.class);
+            new JobCreateRequest(jobParametersDTO, workflow), Job.class);
     }
 
     @Override
@@ -136,6 +136,6 @@ public class RemoteJobServiceClient implements JobService {
             job, Job.class);
     }
 
-    private record JobCreateRequest(JobParameters jobParameters, Workflow workflow) {
+    private record JobCreateRequest(JobParametersDTO jobParameters, Workflow workflow) {
     }
 }

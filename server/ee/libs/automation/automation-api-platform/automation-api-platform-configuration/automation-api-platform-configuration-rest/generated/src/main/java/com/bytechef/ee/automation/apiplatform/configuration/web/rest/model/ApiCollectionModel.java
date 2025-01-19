@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-07T09:21:00.480310+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T10:36:09.845117+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ApiCollectionModel {
 
   private Integer collectionVersion;
@@ -58,9 +58,9 @@ public class ApiCollectionModel {
 
   private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private Long projectInstanceId;
+  private Long projectDeploymentId;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance;
+  private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private Integer projectVersion;
 
@@ -334,44 +334,44 @@ public class ApiCollectionModel {
     this.project = project;
   }
 
-  public ApiCollectionModel projectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public ApiCollectionModel projectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
     return this;
   }
 
   /**
-   * The id of an project instance the API collection is connected to.
-   * @return projectInstanceId
+   * The id of an project deployment the API collection is connected to.
+   * @return projectDeploymentId
    */
   
-  @Schema(name = "projectInstanceId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project instance the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstanceId")
-  public Long getProjectInstanceId() {
-    return projectInstanceId;
+  @Schema(name = "projectDeploymentId", accessMode = Schema.AccessMode.READ_ONLY, description = "The id of an project deployment the API collection is connected to.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeploymentId")
+  public Long getProjectDeploymentId() {
+    return projectDeploymentId;
   }
 
-  public void setProjectInstanceId(Long projectInstanceId) {
-    this.projectInstanceId = projectInstanceId;
+  public void setProjectDeploymentId(Long projectDeploymentId) {
+    this.projectDeploymentId = projectDeploymentId;
   }
 
-  public ApiCollectionModel projectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public ApiCollectionModel projectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
     return this;
   }
 
   /**
-   * Get projectInstance
-   * @return projectInstance
+   * Get projectDeployment
+   * @return projectDeployment
    */
   @Valid 
-  @Schema(name = "projectInstance", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("projectInstance")
-  public com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel getProjectInstance() {
-    return projectInstance;
+  @Schema(name = "projectDeployment", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("projectDeployment")
+  public com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel getProjectDeployment() {
+    return projectDeployment;
   }
 
-  public void setProjectInstance(com.bytechef.automation.configuration.web.rest.model.ProjectInstanceBasicModel projectInstance) {
-    this.projectInstance = projectInstance;
+  public void setProjectDeployment(com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment) {
+    this.projectDeployment = projectDeployment;
   }
 
   public ApiCollectionModel projectVersion(Integer projectVersion) {
@@ -483,8 +483,8 @@ public class ApiCollectionModel {
         Objects.equals(this.lastModifiedDate, apiCollection.lastModifiedDate) &&
         Objects.equals(this.projectId, apiCollection.projectId) &&
         Objects.equals(this.project, apiCollection.project) &&
-        Objects.equals(this.projectInstanceId, apiCollection.projectInstanceId) &&
-        Objects.equals(this.projectInstance, apiCollection.projectInstance) &&
+        Objects.equals(this.projectDeploymentId, apiCollection.projectDeploymentId) &&
+        Objects.equals(this.projectDeployment, apiCollection.projectDeployment) &&
         Objects.equals(this.projectVersion, apiCollection.projectVersion) &&
         Objects.equals(this.tags, apiCollection.tags) &&
         Objects.equals(this.workspaceId, apiCollection.workspaceId) &&
@@ -493,7 +493,7 @@ public class ApiCollectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectInstanceId, projectInstance, projectVersion, tags, workspaceId, version);
+    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
   }
 
   @Override
@@ -512,8 +512,8 @@ public class ApiCollectionModel {
     sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    projectId: ").append(toIndentedString(projectId)).append("\n");
     sb.append("    project: ").append(toIndentedString(project)).append("\n");
-    sb.append("    projectInstanceId: ").append(toIndentedString(projectInstanceId)).append("\n");
-    sb.append("    projectInstance: ").append(toIndentedString(projectInstance)).append("\n");
+    sb.append("    projectDeploymentId: ").append(toIndentedString(projectDeploymentId)).append("\n");
+    sb.append("    projectDeployment: ").append(toIndentedString(projectDeployment)).append("\n");
     sb.append("    projectVersion: ").append(toIndentedString(projectVersion)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
     sb.append("    workspaceId: ").append(toIndentedString(workspaceId)).append("\n");

@@ -36,13 +36,12 @@ const WorkflowEditorLayout = ({
     const {componentActions, workflow} = useWorkflowDataStore();
     const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
             id: workflow.id!,
-            workflowNodeName: currentComponent?.workflowNodeName!,
+            workflowNodeName: currentNodeName!,
         },
-        !!currentComponent && !!currentComponent?.workflowNodeName && currentComponent?.componentName !== 'manual'
+        !!currentNodeName && currentNodeName !== 'manual'
     );
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
@@ -95,10 +94,12 @@ const WorkflowEditorLayout = ({
     // update display conditions when currentNode changes
     useEffect(() => {
         if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
-            setCurrentComponent({
-                ...currentComponent,
-                displayConditions: workflowNodeParameterDisplayConditions?.displayConditions!,
-            });
+            if (currentComponent.workflowNodeName === currentNode?.name) {
+                setCurrentComponent({
+                    ...currentComponent,
+                    displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+                });
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);

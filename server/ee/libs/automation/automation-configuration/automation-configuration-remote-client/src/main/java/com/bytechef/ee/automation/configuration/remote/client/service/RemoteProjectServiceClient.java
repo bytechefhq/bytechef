@@ -62,12 +62,12 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
-    public Project getProjectInstanceProject(long projectInstanceId) {
+    public Project getProjectDeploymentProject(long projectDeploymentId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
-                .path(PROJECT_SERVICE + "/get-project-instance-project/{projectInstanceId}")
-                .build(projectInstanceId),
+                .path(PROJECT_SERVICE + "/get-project/deployment-project/{projectDeploymentId}")
+                .build(projectDeploymentId),
             Project.class);
     }
 

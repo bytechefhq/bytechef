@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.object.helper.constant.ValueType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.google.gson.Gson;
 import java.util.Map;
@@ -52,13 +53,13 @@ class ObjectHelperAddKeyValuePairActionTest {
         Object sourceObject = gson.fromJson(sourceJson, Object.class);
         Object valueObject = gson.fromJson(valueJson, Object.class);
         Object expectedObject = gson.fromJson(expectedJson, Object.class);
-        int sourceType = sourceJson.startsWith("[") ? 1 : 2;
+        ValueType sourceType = sourceJson.startsWith("[") ? ValueType.ARRAY : ValueType.OBJECT;
 
         Parameters mockedParameters = MockParametersFactory.create(
-            Map.of(SOURCE, sourceObject, SOURCE_TYPE, sourceType, VALUE, valueObject));
+            Map.of(SOURCE, sourceObject, SOURCE_TYPE, sourceType.name(), VALUE, valueObject));
 
-        Object resultObject =
-            ObjectHelperAddKeyValuePairsAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+        Object resultObject = ObjectHelperAddKeyValuePairsAction.perform(
+            mockedParameters, mockedParameters, mock(ActionContext.class));
 
         Assertions.assertEquals(expectedObject, resultObject);
     }

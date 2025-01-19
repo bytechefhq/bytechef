@@ -27,13 +27,6 @@ import {
     TriggerExecutionToJSON,
     TriggerExecutionToJSONTyped,
 } from './TriggerExecution';
-import type { ProjectInstanceBasic } from './ProjectInstanceBasic';
-import {
-    ProjectInstanceBasicFromJSON,
-    ProjectInstanceBasicFromJSONTyped,
-    ProjectInstanceBasicToJSON,
-    ProjectInstanceBasicToJSONTyped,
-} from './ProjectInstanceBasic';
 import type { Job } from './Job';
 import {
     JobFromJSON,
@@ -41,6 +34,13 @@ import {
     JobToJSON,
     JobToJSONTyped,
 } from './Job';
+import type { ProjectDeploymentBasic } from './ProjectDeploymentBasic';
+import {
+    ProjectDeploymentBasicFromJSON,
+    ProjectDeploymentBasicFromJSONTyped,
+    ProjectDeploymentBasicToJSON,
+    ProjectDeploymentBasicToJSONTyped,
+} from './ProjectDeploymentBasic';
 import type { ProjectBasic } from './ProjectBasic';
 import {
     ProjectBasicFromJSON,
@@ -75,10 +75,10 @@ export interface WorkflowExecution {
     project?: ProjectBasic;
     /**
      * 
-     * @type {ProjectInstanceBasic}
+     * @type {ProjectDeploymentBasic}
      * @memberof WorkflowExecution
      */
-    projectInstance?: ProjectInstanceBasic;
+    projectDeployment?: ProjectDeploymentBasic;
     /**
      * 
      * @type {TriggerExecution}
@@ -113,7 +113,7 @@ export function WorkflowExecutionFromJSONTyped(json: any, ignoreDiscriminator: b
         'id': json['id'] == null ? undefined : json['id'],
         'job': json['job'] == null ? undefined : JobFromJSON(json['job']),
         'project': json['project'] == null ? undefined : ProjectBasicFromJSON(json['project']),
-        'projectInstance': json['projectInstance'] == null ? undefined : ProjectInstanceBasicFromJSON(json['projectInstance']),
+        'projectDeployment': json['projectDeployment'] == null ? undefined : ProjectDeploymentBasicFromJSON(json['projectDeployment']),
         'triggerExecution': json['triggerExecution'] == null ? undefined : TriggerExecutionFromJSON(json['triggerExecution']),
         'workflow': json['workflow'] == null ? undefined : WorkflowBasicFromJSON(json['workflow']),
     };
@@ -132,7 +132,7 @@ export function WorkflowExecutionToJSONTyped(value?: Omit<WorkflowExecution, 'id
         
         'job': JobToJSON(value['job']),
         'project': ProjectBasicToJSON(value['project']),
-        'projectInstance': ProjectInstanceBasicToJSON(value['projectInstance']),
+        'projectDeployment': ProjectDeploymentBasicToJSON(value['projectDeployment']),
         'triggerExecution': TriggerExecutionToJSON(value['triggerExecution']),
         'workflow': WorkflowBasicToJSON(value['workflow']),
     };

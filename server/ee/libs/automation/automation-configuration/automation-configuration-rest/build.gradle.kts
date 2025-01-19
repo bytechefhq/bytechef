@@ -3,7 +3,7 @@ plugins {
 }
 
 val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
-    apiPackage.set("com.bytechef.automation.configuration.web.rest")
+    apiPackage.set("com.bytechef.ee.automation.configuration.web.rest")
     configOptions.set(
         mapOf(
             "interfaceOnly" to "true",
@@ -14,7 +14,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     generatorName.set("spring")
     inputSpec.set( "$projectDir/openapi.yaml")
     modelNameSuffix.set("Model")
-    modelPackage.set("com.bytechef.automation.configuration.web.rest.model")
+    modelPackage.set("com.bytechef.ee.automation.configuration.web.rest.model")
     outputDir.set("$projectDir/generated")
     schemaMappings.set(
         mapOf(

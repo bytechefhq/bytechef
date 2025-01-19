@@ -77,11 +77,19 @@ public class TimeProperty extends ValueProperty<LocalTime> implements OptionsDat
     @Override
     public String toString() {
         return "TimeProperty{" +
-            "options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            "} " + super.toString();
     }
 }

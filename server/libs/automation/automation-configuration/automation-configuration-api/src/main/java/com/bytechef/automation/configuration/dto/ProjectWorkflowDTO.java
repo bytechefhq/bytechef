@@ -18,9 +18,7 @@ package com.bytechef.automation.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -39,10 +37,7 @@ public final class ProjectWorkflowDTO extends WorkflowDTO {
             workflow.getCreatedBy(), workflow.getCreatedDate(), workflow.getDefinition(), workflow.getDescription(),
             workflow.getFormat(), workflow.getId(), workflow.getInputs(), workflow.getLabel(),
             workflow.getLastModifiedBy(), workflow.getLastModifiedDate(), workflow.getOutputs(),
-            workflow.getSourceType(), workflow.getMaxRetries(),
-            CollectionUtils.map(
-                workflow.getTasks(true), workflowTask -> new WorkflowTaskDTO(workflowTask, List.of(), null)),
-            List.of(), workflow.getVersion(), workflow);
+            workflow.getSourceType(), workflow.getMaxRetries(), List.of(), List.of(), workflow.getVersion(), workflow);
 
         this.projectWorkflowId = projectWorkflow.getId();
         this.workflowReferenceCode = projectWorkflow.getWorkflowReferenceCode();

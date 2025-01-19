@@ -21,9 +21,9 @@ package com.bytechef.component.json.helper.constant;
  */
 public class JsonHelperConstants {
 
-    private JsonHelperConstants() {
-    }
-
     public static final String SOURCE = "source";
     public static final String TYPE = "type";
+
+    private JsonHelperConstants() {
+    }
 }

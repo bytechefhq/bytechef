@@ -37,6 +37,7 @@ import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.component.data.storage.constant.DataStorageConstants;
+import com.bytechef.component.data.storage.constant.ValueType;
 import com.bytechef.component.data.storage.util.DataStorageUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Data.Scope;
@@ -62,59 +63,59 @@ public class DataStorageAwaitGetValueAction {
                 .description("The namespace to obtain a value from.")
                 .options(SCOPE_OPTIONS)
                 .required(true),
-            integer(TYPE)
+            string(TYPE)
                 .label("Type")
                 .description("The value type.")
                 .options(DataStorageConstants.TYPE_OPTIONS),
             array(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 1")
+                .displayCondition("type == '%s'".formatted(ValueType.ARRAY))
                 .required(true),
             bool(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 2")
+                .displayCondition("type == '%s'".formatted(ValueType.BOOLEAN))
                 .required(true),
             date(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 3")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE))
                 .required(true),
             dateTime(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 4")
+                .displayCondition("type == '%s'".formatted(ValueType.DATE_TIME))
                 .required(true),
             integer(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 5")
+                .displayCondition("type == '%s'".formatted(ValueType.INTEGER))
                 .required(true),
             nullable(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 6")
+                .displayCondition("type == '%s'".formatted(ValueType.NULL))
                 .required(true),
             number(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 7")
+                .displayCondition("type == '%s'".formatted(ValueType.NUMBER))
                 .required(true),
             object(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 8")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 9")
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == 10")
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true),
             integer(TIMEOUT)
                 .label("Timeout")
@@ -132,6 +133,10 @@ public class DataStorageAwaitGetValueAction {
         throws InterruptedException {
 
         Class<?> type = DataStorageUtils.getType(inputParameters);
+
+        if (type == null) {
+            return null;
+        }
 
         Optional<Object> optional = Optional.empty();
 

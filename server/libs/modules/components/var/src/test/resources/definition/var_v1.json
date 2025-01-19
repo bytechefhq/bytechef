@@ -36,60 +36,61 @@
       "metadata" : { },
       "required" : null,
       "name" : "type",
-      "type" : "INTEGER",
+      "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
       "label" : "Type",
       "placeholder" : null,
-      "maxValue" : null,
-      "minValue" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
       "options" : [ {
         "description" : null,
         "label" : "Array",
-        "value" : 1
+        "value" : "ARRAY"
       }, {
         "description" : null,
         "label" : "Boolean",
-        "value" : 2
+        "value" : "BOOLEAN"
       }, {
         "description" : null,
         "label" : "Date",
-        "value" : 3
+        "value" : "DATE"
       }, {
         "description" : null,
         "label" : "Date Time",
-        "value" : 4
+        "value" : "DATE_TIME"
       }, {
         "description" : null,
         "label" : "Integer",
-        "value" : 5
+        "value" : "INTEGER"
       }, {
         "description" : null,
         "label" : "Nullable",
-        "value" : 6
+        "value" : "NULL"
       }, {
         "description" : null,
         "label" : "Number",
-        "value" : 7
+        "value" : "NUMBER"
       }, {
         "description" : null,
         "label" : "Object",
-        "value" : 8
+        "value" : "OBJECT"
       }, {
         "description" : null,
         "label" : "String",
-        "value" : 9
+        "value" : "STRING"
       }, {
         "description" : null,
         "label" : "Time",
-        "value" : 10
+        "value" : "TIME"
       } ],
-      "controlType" : "SELECT",
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 1",
+      "displayCondition" : "type == 'ARRAY'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -105,12 +106,12 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "controlType" : "ARRAY_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "ARRAY_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 2",
+      "displayCondition" : "type == 'BOOLEAN'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -134,7 +135,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 3",
+      "displayCondition" : "type == 'DATE'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -146,12 +147,12 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 4",
+      "displayCondition" : "type == 'DATE_TIME'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -163,12 +164,12 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "DATE_TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "DATE_TIME"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 5",
+      "displayCondition" : "type == 'INTEGER'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -182,12 +183,12 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 6",
+      "displayCondition" : "type == 'NULL'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -202,7 +203,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 7",
+      "displayCondition" : "type == 'NUMBER'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -219,12 +220,12 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 8",
+      "displayCondition" : "type == 'OBJECT'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -239,12 +240,12 @@
       "multipleValues" : null,
       "options" : null,
       "properties" : null,
-      "controlType" : "OBJECT_BUILDER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "OBJECT_BUILDER"
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 9",
+      "displayCondition" : "type == 'STRING'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -264,7 +265,7 @@
     }, {
       "advancedOption" : null,
       "description" : "Value of any type to set.",
-      "displayCondition" : "type == 10",
+      "displayCondition" : "type == 'TIME'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -276,15 +277,15 @@
       "label" : "Value",
       "placeholder" : null,
       "options" : null,
-      "controlType" : "TIME",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "TIME"
     } ],
     "title" : "Set Value",
     "perform" : { },
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

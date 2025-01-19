@@ -72,10 +72,18 @@ public class FileEntryProperty extends ValueProperty<Map<String, ?>> {
     @Override
     public String toString() {
         return "FileEntryProperty{" +
-            "properties=" + properties +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
+            ", defaultValue=" + defaultValue +
+            ", properties=" + properties +
             "} " + super.toString();
     }
 }

@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="20240604153041" author="Ivica Cardic" contextFilter="mono and !multitenant and dev">
-        <loadData file="config/liquibase/data/workspace_user.csv" separator=";" tableName="workspace_user" usePreparedStatements="true">
+        <loadData file="config/liquibase/data/workspace_user.csv" separator=";" tableName="workspace_user">
             <column name="id" type="numeric"/>
             <column name="workspace_id" type="numeric"/>
             <column name="user_id" type="numeric"/>

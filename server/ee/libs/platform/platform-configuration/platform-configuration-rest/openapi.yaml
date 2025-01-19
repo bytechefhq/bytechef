@@ -1,0 +1,121 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Properties Internal API"
+  version: "1"
+servers:
+  - url: "/api/platform/internal"
+tags:
+  - name: "ai-provider"
+    description: "The Platform Properties AI Provider Internal API"
+paths:
+  /ai-providers:
+    get:
+      description: "Get AI providers."
+      summary: "Get AI providers"
+      tags:
+        - "ai-provider"
+      operationId: "getAiProviders"
+      responses:
+        "200":
+          description: "The list of AI providers."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AiProvider"
+  /ai-providers/{id}:
+    delete:
+      description: "Delete an AI provider."
+      summary: "Delete an AI provider"
+      tags:
+        - "ai-provider"
+      operationId: "deleteAiProvider"
+      parameters:
+        - name: "id"
+          description: "The id of an AI provider."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      responses:
+        "204":
+          description: "Successful operation."
+    patch:
+      description: "Update an existing AI provider."
+      summary: "Update an existing AI provider"
+      tags:
+        - "ai-provider"
+      operationId: "updateAiProvider"
+      parameters:
+        - name: "id"
+          description: "The id of an AI provider."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apiKey:
+                  type: string
+                  description: "The API key of an AI provider."
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /ai-providers/{id}/enable/{enable}:
+    patch:
+      description: "Enable/disable an AI provider."
+      summary: "e"
+      tags:
+        - "ai-provider"
+      operationId: "enableAiProvider"
+      parameters:
+        - name: "id"
+          description: "The id of an AI provider."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+        - name: "enable"
+          description: "The enable status of an AI provider."
+          in: "path"
+          required: true
+          schema:
+            type: "boolean"
+      responses:
+        "204":
+          description: "Successful operation."
+components:
+  schemas:
+    AiProvider:
+      description: "An AI provider."
+      type: "object"
+      required:
+        - name
+        - secretKey
+      properties:
+        id:
+          description: "The id of an AI provider."
+          type: "integer"
+          readOnly: true
+        name:
+          description: "The name of an AI provider."
+          type: "string"
+          readOnly: true
+        icon:
+          description: "The icon of an AI provider."
+          type: "string"
+          readOnly: true
+        apiKey:
+          description: "The API key of an AI provider."
+          type: "string"
+        enabled:
+          description: "The enabled status of an AI provider."
+          type: "boolean"
+

@@ -18,9 +18,9 @@ package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
-import com.bytechef.platform.tenant.domain.TenantKey;
-import com.bytechef.platform.tenant.util.TenantUtils;
 import com.bytechef.platform.user.service.SigningKeyService;
+import com.bytechef.tenant.domain.TenantKey;
+import com.bytechef.tenant.util.TenantUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Header;

@@ -2,7 +2,7 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {ApiConnectorEndpoint} from '@/middleware/platform/api-connector';
+import {ApiConnectorEndpoint} from '@/ee/shared/middleware/platform/api-connector';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {CalendarIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -12,7 +12,7 @@ import {twMerge} from 'tailwind-merge';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpoint: ApiConnectorEndpoint}) => {
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
-    const projectInstanceWorkflow = undefined;
+    const projectDeploymentWorkflow = undefined;
 
     return (
         <>
@@ -67,11 +67,11 @@ const ApiConnectorEndpointListItem = ({apiConnectorEndpoint}: {apiConnectorEndpo
                 </DropdownMenu>
             </div>
 
-            {showEditWorkflowDialog && projectInstanceWorkflow && (
-                // <ProjectInstanceEditWorkflowDialog
+            {showEditWorkflowDialog && projectDeploymentWorkflow && (
+                // <ProjectDeploymentEditWorkflowDialog
                 //     onClose={() => setShowEditWorkflowDialog(false)}
-                //     projectInstanceEnabled={projectInstanceEnabled}
-                //     projectInstanceWorkflow={projectInstanceWorkflow}
+                //     projectDeploymentEnabled={projectDeploymentEnabled}
+                //     projectDeploymentWorkflow={projectDeploymentWorkflow}
                 //     workflow={workflow}
                 // />
                 <>TODO</>

@@ -50,7 +50,7 @@ public class ApplicationProperties {
     private List<String> featureFlags = List.of();
     private FileStorage fileStorage = new FileStorage();
     private HelpHub helpHub = new HelpHub();
-    private Loki loki = new Loki();
+    private Observability observability = new Observability();
     private Mail mail = new Mail();
     private MessageBroker messageBroker = new MessageBroker();
     private Oauth2 oauth2 = new Oauth2();
@@ -60,6 +60,7 @@ public class ApplicationProperties {
     private SignUp signUp = new SignUp();
     private Tenant tenant = new Tenant();
     private String webhookUrl;
+    private Tracing tracing = new Tracing();
     private Worker worker = new Worker();
     private Workflow workflow = new Workflow();
 
@@ -119,8 +120,8 @@ public class ApplicationProperties {
         return helpHub;
     }
 
-    public Loki getLoki() {
-        return loki;
+    public Observability getObservability() {
+        return observability;
     }
 
     public Mail getMail() {
@@ -153,6 +154,10 @@ public class ApplicationProperties {
 
     public Tenant getTenant() {
         return tenant;
+    }
+
+    public Tracing getTracing() {
+        return tracing;
     }
 
     public String getWebhookUrl() {
@@ -223,8 +228,8 @@ public class ApplicationProperties {
         this.helpHub = helpHub;
     }
 
-    public void setLoki(Loki loki) {
-        this.loki = loki;
+    public void setObservability(Observability observability) {
+        this.observability = observability;
     }
 
     public void setMail(Mail mail) {
@@ -259,6 +264,10 @@ public class ApplicationProperties {
         this.tenant = tenant;
     }
 
+    public void setTracing(Tracing tracing) {
+        this.tracing = tracing;
+    }
+
     public void setWebhookUrl(String webhookUrl) {
         this.webhookUrl = webhookUrl;
     }
@@ -271,30 +280,72 @@ public class ApplicationProperties {
         this.workflow = workflow;
     }
 
-    public static class Loki {
-        private Appender appender = new Appender();
+    public static class Observability {
+        private boolean enabled;
+        private Loki loki;
 
-        public Appender getAppender() {
-            return appender;
+        public boolean isEnabled() {
+            return enabled;
         }
 
-        public void setAppender(Appender appender) {
-            this.appender = appender;
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
         }
 
-        public static class Appender {
-            private Level level = Level.OFF;
+        public Loki getLoki() {
+            return loki;
+        }
 
-            public enum Level {
-                DEBUG, ERROR, FATAL, INFO, OFF, TRACE, WARN
+        public void setLoki(Loki loki) {
+            this.loki = loki;
+        }
+
+        public static class Loki {
+            private Appender appender = new Appender();
+
+            public Appender getAppender() {
+                return appender;
             }
 
-            public Level getLevel() {
-                return level;
+            public void setAppender(Appender appender) {
+                this.appender = appender;
             }
 
-            public void setLevel(Level level) {
-                this.level = level;
+            public static class Appender {
+                private Http http;
+                private Level level = Level.OFF;
+
+                public Http getHttp() {
+                    return http;
+                }
+
+                public void setHttp(Http http) {
+                    this.http = http;
+                }
+
+                public enum Level {
+                    OFF, ERROR, WARN, INFO, DEBUG, TRACE, ALL
+                }
+
+                public Level getLevel() {
+                    return level;
+                }
+
+                public void setLevel(Level level) {
+                    this.level = level;
+                }
+
+                public static class Http {
+                    private String url;
+
+                    public String getUrl() {
+                        return url;
+                    }
+
+                    public void setUrl(String url) {
+                        this.url = url;
+                    }
+                }
             }
         }
     }
@@ -304,23 +355,23 @@ public class ApplicationProperties {
      */
     public static class Ai {
 
-        private Component component = new Component();
+        private Provider provider = new Provider();
         private Copilot copilot = new Copilot();
 
         public Copilot getCopilot() {
             return copilot;
         }
 
-        public Component getComponent() {
-            return component;
+        public Provider getProvider() {
+            return provider;
         }
 
         public void setCopilot(Copilot copilot) {
             this.copilot = copilot;
         }
 
-        public void setComponent(Component component) {
-            this.component = component;
+        public void setProvider(Provider provider) {
+            this.provider = provider;
         }
 
         public static class Copilot {
@@ -406,18 +457,147 @@ public class ApplicationProperties {
             }
         }
 
-        public static class Component {
-            private AmazonBedrock amazonBedrock = new AmazonBedrock();
+        public static class Provider {
 
-            public AmazonBedrock getAmazonBedrock() {
-                return amazonBedrock;
+            private AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = new AmazonBedrockAnthropic2();
+            private AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = new AmazonBedrockAnthropic3();
+            private AmazonBedrockCohere amazonBedrockCohere = new AmazonBedrockCohere();
+            private AmazonBedrockJurassic2 amazonBedrockJurassic2 = new AmazonBedrockJurassic2();
+            private AmazonBedrockLlama amazonBedrockLlama = new AmazonBedrockLlama();
+            private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
+            private Anthropic anthropic = new Anthropic();
+            private Groq groq = new Groq();
+            private Mistral mistral = new Mistral();
+            private Nvidia nvidia = new Nvidia();
+            private OpenAi openAi = new OpenAi();
+            private Stability stability = new Stability();
+            private VertexGemini vertexGemini = new VertexGemini();
+
+            public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
+                return amazonBedrockAnthropic2;
             }
 
-            public void setAmazonBedrock(AmazonBedrock amazonBedrock) {
-                this.amazonBedrock = amazonBedrock;
+            public AmazonBedrockAnthropic3 getAmazonBedrockAnthropic3() {
+                return amazonBedrockAnthropic3;
             }
 
-            public static class AmazonBedrock {
+            public AmazonBedrockCohere getAmazonBedrockCohere() {
+                return amazonBedrockCohere;
+            }
+
+            public AmazonBedrockJurassic2 getAmazonBedrockJurassic2() {
+                return amazonBedrockJurassic2;
+            }
+
+            public AmazonBedrockLlama getAmazonBedrockLlama() {
+                return amazonBedrockLlama;
+            }
+
+            public AmazonBedrockTitan getAmazonBedrockTitan() {
+                return amazonBedrockTitan;
+            }
+
+            public Anthropic getAnthropic() {
+                return anthropic;
+            }
+
+            private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+            public AzureOpenAi getAzureOpenAi() {
+                return azureOpenAi;
+            }
+
+            public Groq getGroq() {
+                return groq;
+            }
+
+            public Nvidia getNvidia() {
+                return nvidia;
+            }
+
+            private HuggingFace huggingFace = new HuggingFace();
+
+            public HuggingFace getHuggingFace() {
+                return huggingFace;
+            }
+
+            public Mistral getMistral() {
+                return mistral;
+            }
+
+            public OpenAi getOpenAi() {
+                return openAi;
+            }
+
+            public Stability getStability() {
+                return stability;
+            }
+
+            public VertexGemini getVertexGemini() {
+                return vertexGemini;
+            }
+
+            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
+                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
+            }
+
+            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
+                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
+            }
+
+            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
+                this.amazonBedrockCohere = amazonBedrockCohere;
+            }
+
+            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
+                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
+            }
+
+            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
+                this.amazonBedrockLlama = amazonBedrockLlama;
+            }
+
+            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
+                this.amazonBedrockTitan = amazonBedrockTitan;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                this.azureOpenAi = azureOpenAi;
+            }
+
+            public void setGroq(Groq groq) {
+                this.groq = groq;
+            }
+
+            public void setNvidia(Nvidia nvidia) {
+                this.nvidia = nvidia;
+            }
+
+            public void setHuggingFace(HuggingFace huggingFace) {
+                this.huggingFace = huggingFace;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public void setStability(Stability stability) {
+                this.stability = stability;
+            }
+
+            public void setVertexGemini(VertexGemini vertexGemini) {
+                this.vertexGemini = vertexGemini;
+            }
+
+            public static class AmazonBedrockAnthropic2 {
 
                 private String apiKey;
 
@@ -430,14 +610,69 @@ public class ApplicationProperties {
                 }
             }
 
-            private Anthropic anthropic = new Anthropic();
+            public static class AmazonBedrockAnthropic3 {
 
-            public Anthropic getAnthropic() {
-                return anthropic;
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
             }
 
-            public void setAnthropic(Anthropic anthropic) {
-                this.anthropic = anthropic;
+            public static class AmazonBedrockCohere {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockJurassic2 {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockLlama {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            public static class AmazonBedrockTitan {
+
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
             }
 
             public static class Anthropic {
@@ -453,16 +688,6 @@ public class ApplicationProperties {
                 }
             }
 
-            private AzureOpenAi azureOpenAi = new AzureOpenAi();
-
-            public AzureOpenAi getAzureOpenAi() {
-                return azureOpenAi;
-            }
-
-            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
-                this.azureOpenAi = azureOpenAi;
-            }
-
             public static class AzureOpenAi {
 
                 private String apiKey;
@@ -474,16 +699,6 @@ public class ApplicationProperties {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private Groq groq = new Groq();
-
-            public Groq getGroq() {
-                return groq;
-            }
-
-            public void setGroq(Groq groq) {
-                this.groq = groq;
             }
 
             public static class Groq {
@@ -499,16 +714,6 @@ public class ApplicationProperties {
                 }
             }
 
-            private Nvidia nvidia = new Nvidia();
-
-            public Nvidia getNvidia() {
-                return nvidia;
-            }
-
-            public void setNvidia(Nvidia nvidia) {
-                this.nvidia = nvidia;
-            }
-
             public static class Nvidia {
 
                 private String apiKey;
@@ -520,16 +725,6 @@ public class ApplicationProperties {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private HuggingFace huggingFace = new HuggingFace();
-
-            public HuggingFace getHuggingFace() {
-                return huggingFace;
-            }
-
-            public void setHuggingFace(HuggingFace huggingFace) {
-                this.huggingFace = huggingFace;
             }
 
             public static class HuggingFace {
@@ -545,16 +740,6 @@ public class ApplicationProperties {
                 }
             }
 
-            private Mistral mistral = new Mistral();
-
-            public Mistral getMistral() {
-                return mistral;
-            }
-
-            public void setMistral(Mistral mistral) {
-                this.mistral = mistral;
-            }
-
             public static class Mistral {
 
                 private String apiKey;
@@ -566,16 +751,6 @@ public class ApplicationProperties {
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
                 }
-            }
-
-            private OpenAi openAi = new OpenAi();
-
-            public OpenAi getOpenAi() {
-                return openAi;
-            }
-
-            public void setOpenAi(OpenAi openAi) {
-                this.openAi = openAi;
             }
 
             public static class OpenAi {
@@ -591,14 +766,17 @@ public class ApplicationProperties {
                 }
             }
 
-            private VertexGemini vertexGemini = new VertexGemini();
+            public static class Stability {
 
-            public VertexGemini getVertexGemini() {
-                return vertexGemini;
-            }
+                private String apiKey;
 
-            public void setVertexGemini(VertexGemini vertexGemini) {
-                this.vertexGemini = vertexGemini;
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
             }
 
             public static class VertexGemini {
@@ -1542,6 +1720,32 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+    }
+
+    public static class Tracing {
+
+        private Zipkin zipkin = new Zipkin();
+
+        public Zipkin getZipkin() {
+            return zipkin;
+        }
+
+        public void setZipkin(Zipkin zipkin) {
+            this.zipkin = zipkin;
+        }
+    }
+
+    public static class Zipkin {
+
+        private String endpoint;
+
+        public String getEndpoint() {
+            return endpoint;
+        }
+
+        public void setEndpoint(String endpoint) {
+            this.endpoint = endpoint;
         }
     }
 

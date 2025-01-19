@@ -4,10 +4,11 @@ import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQuery} from '@tanstack/react-query';
 
 export const IntegrationWorkflowKeys = {
-    integrationVersionWorkflows: (id: number, integrationVersion: number) => [
+    integrationVersionWorkflows: (id: number, integrationVersion: number, includeAllFields: boolean) => [
         ...IntegrationKeys.integrations,
         id,
         integrationVersion,
+        includeAllFields,
         'integrationWorkflows',
     ],
     integrationWorkflow: (integrationId: number, integrationWorkflowId: number) => [
@@ -39,9 +40,14 @@ export const useGetIntegrationWorkflowsQuery = (id: number, enabled?: boolean) =
         enabled: enabled === undefined ? true : enabled,
     });
 
-export const useGetIntegrationVersionWorkflowsQuery = (id: number, integrationVersion: number, enabled?: boolean) =>
+export const useGetIntegrationVersionWorkflowsQuery = (
+    id: number,
+    integrationVersion: number,
+    includeAllFields: boolean = true,
+    enabled?: boolean
+) =>
     useQuery<Workflow[], Error>({
-        queryKey: IntegrationWorkflowKeys.integrationVersionWorkflows(id, integrationVersion),
-        queryFn: () => new WorkflowApi().getIntegrationVersionWorkflows({id, integrationVersion}),
+        queryKey: IntegrationWorkflowKeys.integrationVersionWorkflows(id, integrationVersion, includeAllFields),
+        queryFn: () => new WorkflowApi().getIntegrationVersionWorkflows({id, integrationVersion, includeAllFields}),
         enabled: enabled === undefined ? true : enabled,
     });

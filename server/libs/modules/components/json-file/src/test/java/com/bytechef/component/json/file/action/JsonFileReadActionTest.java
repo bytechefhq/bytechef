@@ -28,7 +28,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.json.file.JsonFileComponentHandlerTest;
-import com.bytechef.component.json.file.constant.JsonFileConstants;
+import com.bytechef.component.json.file.constant.FileType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.FileInputStream;
@@ -65,7 +65,7 @@ public class JsonFileReadActionTest {
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(FileEntry.class));
         Mockito.when(parameters.getString(
-            Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+            Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito
             .when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(false)))
@@ -99,7 +99,7 @@ public class JsonFileReadActionTest {
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(FileEntry.class));
         Mockito.when(parameters.getString(
-            Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+            Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
@@ -124,7 +124,7 @@ public class JsonFileReadActionTest {
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSON");
         Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
@@ -154,7 +154,7 @@ public class JsonFileReadActionTest {
 
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSONL");
         Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);
@@ -177,7 +177,7 @@ public class JsonFileReadActionTest {
 
         Mockito.when(parameters.getRequired(Mockito.eq(FILE_ENTRY), Mockito.eq(FileEntry.class)))
             .thenReturn(Mockito.mock(FileEntry.class));
-        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(JsonFileConstants.FileType.JSON.name())))
+        Mockito.when(parameters.getString(Mockito.eq(FILE_TYPE), Mockito.eq(FileType.JSON.name())))
             .thenReturn("JSONL");
         Mockito.when(parameters.getBoolean(Mockito.eq(IS_ARRAY), Mockito.eq(true)))
             .thenReturn(true);

@@ -26,7 +26,7 @@ import com.bytechef.atlas.configuration.repository.resource.ClassPathResourceWor
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.configuration.service.WorkflowServiceImpl;
 import com.bytechef.atlas.execution.domain.Job;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcContextRepository;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcJobRepository;
 import com.bytechef.atlas.execution.repository.jdbc.JdbcTaskExecutionRepository;
@@ -123,7 +123,7 @@ public class TaskCoordinatorIntTest {
             contextService, jobService, List.of(), taskExecutionService, taskHandlerMap::get, TASK_FILE_STORAGE,
             workflowService);
 
-        return jobSyncExecutor.execute(new JobParameters(workflowId, Collections.singletonMap("yourName", "me")));
+        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, Collections.singletonMap("yourName", "me")));
     }
 
     @EnableAutoConfiguration

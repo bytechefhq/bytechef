@@ -58,8 +58,9 @@ export interface GetIntegrationVersionsRequest {
 export interface GetIntegrationsRequest {
     categoryId?: number;
     integrationInstanceConfigurations?: boolean;
-    tagId?: number;
     status?: IntegrationStatus;
+    tagId?: number;
+    includeAllFields?: boolean;
 }
 
 export interface PublishIntegrationOperationRequest {
@@ -287,12 +288,16 @@ export class IntegrationApi extends runtime.BaseAPI {
             queryParameters['integrationInstanceConfigurations'] = requestParameters['integrationInstanceConfigurations'];
         }
 
+        if (requestParameters['status'] != null) {
+            queryParameters['status'] = requestParameters['status'];
+        }
+
         if (requestParameters['tagId'] != null) {
             queryParameters['tagId'] = requestParameters['tagId'];
         }
 
-        if (requestParameters['status'] != null) {
-            queryParameters['status'] = requestParameters['status'];
+        if (requestParameters['includeAllFields'] != null) {
+            queryParameters['includeAllFields'] = requestParameters['includeAllFields'];
         }
 
         const headerParameters: runtime.HTTPHeaders = {};

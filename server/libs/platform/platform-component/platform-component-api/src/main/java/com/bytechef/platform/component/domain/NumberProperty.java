@@ -111,14 +111,24 @@ public class NumberProperty extends ValueProperty<Double> implements OptionsData
     @Override
     public String toString() {
         return "NumberProperty{" +
-            "maxValue=" + maxValue +
-            ", minValue=" + minValue +
-            ", numberPrecision=" + numberPrecision +
-            ", options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            ", numberPrecision=" + numberPrecision +
+            ", minValue=" + minValue +
+            ", minNumberPrecision=" + minNumberPrecision +
+            ", maxValue=" + maxValue +
+            ", maxNumberPrecision=" + maxNumberPrecision +
+            "} " + super.toString();
     }
 }

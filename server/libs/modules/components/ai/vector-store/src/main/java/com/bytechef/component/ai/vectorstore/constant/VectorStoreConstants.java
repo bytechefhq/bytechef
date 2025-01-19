@@ -16,6 +16,11 @@
 
 package com.bytechef.component.ai.vectorstore.constant;
 
+import static com.bytechef.component.ai.vectorstore.VectorStore.DocumentType.JSON;
+import static com.bytechef.component.ai.vectorstore.VectorStore.DocumentType.MD;
+import static com.bytechef.component.ai.vectorstore.VectorStore.DocumentType.PDF;
+import static com.bytechef.component.ai.vectorstore.VectorStore.DocumentType.TIKA;
+import static com.bytechef.component.ai.vectorstore.VectorStore.DocumentType.TXT;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
@@ -41,17 +46,12 @@ public class VectorStoreConstants {
     public static final String DOCUMENT = "document";
     public static final String DOCUMENT_TYPE = "documentType";
     public static final String EMBEDDING_API_KEY = "embeddingApiKey";
-    public static final String JSON = "json";
     public static final String JSON_KEYS_TO_USE = "jsonKeysToUse";
     public static final String KEYWORD_METADATA_ENRICHER = "keywordMetadataEnricher";
     public static final String LOAD_DATA = "loadData";
-    public static final String MD = "md";
-    public static final String PDF = "pdf";
     public static final String QUERY = "query";
     public static final String SUMMARY_METADATA_ENRICHER = "summaryMetadataEnricher";
-    public static final String TIKA = "tika";
     public static final String TOKEN_TEXT_SPLITTER = "tokenTextSplitter";
-    public static final String TXT = "txt";
     public static final String USE_KEYWORD_ENRICHER = "useKeywordEnricher";
     public static final String USE_SUMMARY_ENRICHER = "useSummaryEnricher";
     public static final String USE_TOKEN_TEXT_SPLITTER = "useTokenTextSplitter";
@@ -63,11 +63,11 @@ public class VectorStoreConstants {
         .label("Document Type")
         .description("The type of the document.")
         .options(
-            option("JSON document", JSON),
-            option("Markdown document", MD),
-            option("PDF document", PDF),
-            option("text document", TXT),
-            option("Tika (DOCX, PPTX, HTML...)", TIKA))
+            option("JSON document", JSON.name()),
+            option("Markdown document", MD.name()),
+            option("PDF document", PDF.name()),
+            option("text document", TXT.name()),
+            option("Tika (DOCX, PPTX, HTML...)", TIKA.name()))
         .required(true);
 
     public static final ModifiableStringProperty EMBEDDING_API_KEY_PROPERTY = string(EMBEDDING_API_KEY)
@@ -80,7 +80,7 @@ public class VectorStoreConstants {
         .description(
             "Json keys on which extraction of content is based. If no keys are specified, it uses the entire " +
                 "JSON object as content.")
-        .displayCondition("%s == '%s'".formatted(DOCUMENT_TYPE, JSON))
+        .displayCondition("documentType == '%s'".formatted(JSON))
         .items(string())
         .required(false);
 

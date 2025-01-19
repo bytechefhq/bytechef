@@ -19,24 +19,20 @@ package com.bytechef.platform.connection.facade;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
-import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
+import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
@@ -52,7 +48,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
@@ -66,6 +61,7 @@ import org.springframework.context.annotation.Import;
         "spring.application.name=server-app"
     })
 @Import(PostgreSQLContainerConfiguration.class)
+@ConnectionIntTestConfigurationSharedMocks
 public class ConnectionFacadeIntTest {
 
     @Autowired
@@ -283,27 +279,9 @@ public class ConnectionFacadeIntTest {
     @TestConfiguration
     public static class ConnectionFacadeIntTestConfiguration {
 
-        @MockBean
-        ConnectionDefinitionFacade connectionDefinitionFacade;
-
-        @MockBean
-        ConnectionDefinitionService connectionDefinitionService;
-
-        @MockBean
-        private OAuth2Service oAuth2Service;
-
-        @MockBean
-        WorkflowService workflowService;
-
-        @MockBean
-        WorkflowConnectionFacade workflowConnectionFacade;
-
-        @MockBean
-        WorkflowTestConfigurationService workflowTestConfigurationService;
-
         @Bean
-        InstanceAccessor instanceAccessor() {
-            return new InstanceAccessor() {
+        PrincipalAccessor instanceAccessor() {
+            return new PrincipalAccessor() {
 
                 @Override
                 public boolean isConnectionUsed(long connectionId) {
@@ -311,12 +289,12 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public boolean isWorkflowEnabled(long instanceId, String workflowReferenceCode) {
+                public boolean isWorkflowEnabled(long principalId, String workflowReferenceCode) {
                     return false;
                 }
 
                 @Override
-                public Map<String, ?> getInputMap(long instanceId, String workflowReferenceCode) {
+                public Map<String, ?> getInputMap(long principalId, String workflowReferenceCode) {
                     return Map.of();
                 }
 
@@ -326,7 +304,7 @@ public class ConnectionFacadeIntTest {
                 }
 
                 @Override
-                public String getWorkflowId(long instanceId, String workflowReferenceCode) {
+                public String getWorkflowId(long principalId, String workflowReferenceCode) {
                     return "";
                 }
             };

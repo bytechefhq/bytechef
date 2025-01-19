@@ -351,14 +351,14 @@ paths:
           schema:
             $ref: "#/components/schemas/Environment"
         - name: "projectId"
-          description: "The project ids used for filtering project instances."
+          description: "The project ids used for filtering project deployments."
           in: "query"
           required: false
           schema:
             type: "integer"
             format: "int64"
         - name: "tagId"
-          description: "The tag id of used for filtering project instances."
+          description: "The tag id of used for filtering project deployments."
           in: "query"
           required: false
           schema:
@@ -474,13 +474,13 @@ components:
           format: "int64"
         project:
           $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
-        projectInstanceId:
-          description: "The id of an project instance the API collection is connected to."
+        projectDeploymentId:
+          description: "The id of an project deployment the API collection is connected to."
           type: "integer"
           format: "int64"
           readOnly: true
-        projectInstance:
-          $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
+        projectDeployment:
+          $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
         projectVersion:
           description: "The version of a project the API collection is connected to."
           type: "integer"
@@ -547,8 +547,8 @@ components:
         path:
           description: "The endpoint path."
           type: "string"
-        projectInstanceWorkflowId:
-          description: "The project instance workflow id."
+        projectDeploymentWorkflowId:
+          description: "The project deployment workflow id."
           type: "integer"
           format: "int64"
           readOnly: true

@@ -15,7 +15,7 @@ import {useImportOpenApiSpecificationMutation} from '@/ee/mutations/apiConnector
 import IconField from '@/ee/pages/settings/platform/api-connectors/components/IconField';
 import OpenApiSpecificationField from '@/ee/pages/settings/platform/api-connectors/components/OpenApiSpecificationField';
 import {ApiConnectorKeys} from '@/ee/queries/apiConnectors.queries';
-import {ApiConnector, ImportOpenApiSpecificationRequest} from '@/middleware/platform/api-connector';
+import {ApiConnector, ImportOpenApiSpecificationRequest} from '@/ee/shared/middleware/platform/api-connector';
 import {useQueryClient} from '@tanstack/react-query';
 import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';

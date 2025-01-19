@@ -276,21 +276,21 @@
       "options" : [ {
         "description" : "Get the attribute value like 'class' from an element.",
         "label" : "Attribute",
-        "value" : "attribute"
+        "value" : "ATTRIBUTE"
       }, {
         "description" : "Get the HTML content that the element contains.",
         "label" : "HTML",
-        "value" : "html"
+        "value" : "HTML"
       }, {
         "description" : "Get the text content of the element.",
         "label" : "Text",
-        "value" : "text"
+        "value" : "TEXT"
       } ],
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The name of the attribute to return the value of",
-      "displayCondition" : "returnValue == 'attribute'",
+      "displayCondition" : "returnValue == 'ATTRIBUTE'",
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
@@ -896,7 +896,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

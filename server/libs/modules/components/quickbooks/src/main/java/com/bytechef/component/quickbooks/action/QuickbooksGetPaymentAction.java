@@ -28,6 +28,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 
 /**
@@ -42,7 +43,7 @@ public class QuickbooksGetPaymentAction {
             string(PAYMENT)
                 .label("Payment")
                 .description("Payment to get.")
-                .options(QuickbooksUtils.getOptions(PAYMENT, null))
+                .options(QuickbooksUtils.getOptions(Entity.PAYMENT, null))
                 .required(true))
         .output(outputSchema(PAYMENT_OUTPUT_PROPERTY))
         .perform(QuickbooksGetPaymentAction::perform);

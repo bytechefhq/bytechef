@@ -23,12 +23,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.bytechef.ee.platform.tenant.multi.sql.MultiTenantDataSource;
+import com.bytechef.ee.tenant.multi.sql.MultiTenantDataSource;
 import com.bytechef.platform.security.constant.AuthorityConstants;
-import com.bytechef.platform.tenant.TenantContext;
-import com.bytechef.platform.tenant.constant.TenantConstants;
-import com.bytechef.platform.tenant.service.TenantService;
-import com.bytechef.platform.tenant.util.TenantUtils;
 import com.bytechef.platform.user.constant.UserConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
@@ -36,8 +32,13 @@ import com.bytechef.platform.user.repository.UserRepository;
 import com.bytechef.platform.user.service.MailService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.user.web.rest.config.UserIntTestConfiguration;
+import com.bytechef.platform.user.web.rest.config.UserIntTestConfigurationSharedMocks;
 import com.bytechef.platform.user.web.rest.vm.KeyAndPasswordVM;
 import com.bytechef.platform.user.web.rest.vm.ManagedUserVM;
+import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.constant.TenantConstants;
+import com.bytechef.tenant.service.TenantService;
+import com.bytechef.tenant.util.TenantUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariDataSource;
 import java.time.Instant;
@@ -54,11 +55,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -74,9 +75,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
         "bytechef.tenant.mode=multi", "bytechef.edition=ee", "spring.main.allow-bean-definition-overriding=true"
     })
 @AutoConfigureMockMvc
+@UserIntTestConfigurationSharedMocks
 class MultiTenantAccountControllerIntTest {
 
-    @MockBean
+    @MockitoBean
     private MailService mailService;
 
     @Autowired

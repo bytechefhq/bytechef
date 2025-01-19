@@ -34,12 +34,12 @@ import com.google.auto.service.AutoService;
 @AutoService(ComponentHandler.class)
 public class AzureOpenAiComponentHandler implements ComponentHandler {
 
-    private static final ComponentDefinition COMPONENT_DEFINITION = component("azureOpenai")
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("azureOpenAi")
         .title("Azure OpenAI")
         .description(
             "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in " +
                 "ways that benefit humanity as a whole.")
-        .icon("path:assets/openai.svg")
+        .icon("path:assets/open-ai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(AzureOpenAiConnection.CONNECTION_DEFINITION)
         .actions(

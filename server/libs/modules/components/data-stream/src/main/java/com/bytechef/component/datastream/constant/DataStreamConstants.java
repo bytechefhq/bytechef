@@ -26,7 +26,7 @@ public class DataStreamConstants {
 
     public static final String CONNECTION_PARAMETERS = "connectionParameters";
     public static final String DESTINATION = "destination";
-    public static final String DEV_ENVIRONMENT = "devEnvironment";
+    public static final String EDITOR_ENVIRONMENT = "editorEnvironment";
     public static final String INPUT_PARAMETERS = "inputParameters";
     public static final String INSTANCE_ID = "instanceId";
     public static final String INSTANCE_WORKFLOW_ID = "instanceWorkflowId";

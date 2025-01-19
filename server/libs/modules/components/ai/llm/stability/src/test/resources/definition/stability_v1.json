@@ -53,8 +53,8 @@
       "authorizationUrl" : null,
       "clientSecret" : null,
       "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "authorizationCallback" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -215,6 +215,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -355,8 +356,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -501,7 +501,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : true,
-      "description" : "The number of images to be generated. Must be between 1 and 10.",
+      "description" : "The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -511,7 +511,7 @@
       "type" : "INTEGER",
       "defaultValue" : 1,
       "exampleValue" : null,
-      "label" : "Number of responses",
+      "label" : "Number of Responses",
       "placeholder" : null,
       "maxValue" : 10,
       "minValue" : 1,
@@ -539,11 +539,11 @@
       "options" : [ {
         "description" : null,
         "label" : "URL",
-        "value" : "url"
+        "value" : "URL"
       }, {
         "description" : null,
         "label" : "B64_JSON",
-        "value" : "b64_json"
+        "value" : "B64_JSON"
       } ],
       "optionsDataSource" : null
     }, {

@@ -2,20 +2,18 @@ import {
     UpdateWorkflowNodeParameter200Response,
     UpdateWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
-import {ComponentType} from '@/shared/types';
 import {UseMutationResult} from '@tanstack/react-query';
 
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import {decodePath} from './encodingUtils';
 
 interface SavePropertyProps {
-    currentComponent: ComponentType;
     includeInMetadata?: boolean;
     path: string;
-    setCurrentComponent: (currentComponent: ComponentType | undefined) => void;
     successCallback?: () => void;
     type: string;
     updateWorkflowNodeParameterMutation: UseMutationResult<
-        UpdateWorkflowNodeParameter200Response,
+        UpdateWorkflowNodeParameter200Response & {workflowNodeName?: string},
         Error,
         UpdateWorkflowNodeParameterOperationRequest,
         unknown
@@ -26,17 +24,21 @@ interface SavePropertyProps {
 }
 
 export default function saveProperty({
-    currentComponent,
     includeInMetadata = false,
     path,
-    setCurrentComponent,
     successCallback,
     type,
     updateWorkflowNodeParameterMutation,
     value,
     workflowId,
 }: SavePropertyProps) {
-    const {workflowNodeName} = currentComponent;
+    const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+
+    if (!currentComponent) {
+        console.error('No current component found in the store');
+
+        return;
+    }
 
     const decodedPath = decodePath(path);
 
@@ -48,7 +50,7 @@ export default function saveProperty({
                 path: decodedPath,
                 type,
                 value,
-                workflowNodeName,
+                workflowNodeName: currentComponent.workflowNodeName,
             },
         },
         {
@@ -57,7 +59,7 @@ export default function saveProperty({
                     successCallback();
                 }
 
-                setCurrentComponent({
+                useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
                     ...currentComponent,
                     displayConditions: response.displayConditions,
                     metadata: response.metadata,

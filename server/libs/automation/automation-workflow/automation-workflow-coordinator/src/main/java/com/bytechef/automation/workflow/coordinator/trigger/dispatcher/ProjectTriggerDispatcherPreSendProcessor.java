@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.workflow.coordinator.trigger.dispatcher;
 
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.coordinator.AbstractDispatcherPreSendProcessor;
 import com.bytechef.platform.component.constant.MetadataConstants;
@@ -39,9 +39,10 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
 
     @SuppressFBWarnings("EI")
     public ProjectTriggerDispatcherPreSendProcessor(
-        ProjectInstanceWorkflowService projectInstanceWorkflowService, ProjectWorkflowService projectWorkflowService) {
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
+        ProjectWorkflowService projectWorkflowService) {
 
-        super(projectInstanceWorkflowService);
+        super(projectDeploymentWorkflowService);
 
         this.projectWorkflowService = projectWorkflowService;
     }
@@ -50,7 +51,7 @@ public class ProjectTriggerDispatcherPreSendProcessor extends AbstractDispatcher
     public TriggerExecution process(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        String workflowId = projectWorkflowService.getProjectInstanceProjectWorkflowWorkflowId(
+        String workflowId = projectWorkflowService.getProjectDeploymentProjectWorkflowWorkflowId(
             triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Map<String, Long> connectionIdMap = getConnectionIdMap(

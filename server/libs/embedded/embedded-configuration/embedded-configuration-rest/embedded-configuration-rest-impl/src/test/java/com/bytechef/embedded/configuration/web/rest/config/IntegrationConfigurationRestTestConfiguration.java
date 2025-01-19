@@ -16,9 +16,6 @@
 
 package com.bytechef.embedded.configuration.web.rest.config;
 
-import com.bytechef.embedded.configuration.facade.IntegrationInstanceFacade;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -35,14 +32,8 @@ import org.springframework.context.annotation.Configuration;
     "com.bytechef.platform.configuration.web.rest.mapper",
     "com.bytechef.platform.tag.web.rest.adapter",
     "com.bytechef.platform.tag.web.rest.mapper",
-    "com.bytechef.platform.web.rest.mapper"
+    "com.bytechef.web.rest.mapper"
 })
 @Configuration
 public class IntegrationConfigurationRestTestConfiguration {
-
-    @MockBean
-    private IntegrationInstanceFacade integrationInstanceFacade;
-
-    @MockBean
-    private IntegrationInstanceService integrationInstanceService;
 }

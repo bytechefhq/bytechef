@@ -18,7 +18,7 @@ package com.bytechef.component.datastream.action.definition;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.DESTINATION;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.DEV_ENVIRONMENT;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.EDITOR_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
@@ -34,7 +34,7 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ParameterConnection;
-import com.bytechef.platform.tenant.TenantContext;
+import com.bytechef.tenant.TenantContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,8 +90,8 @@ public class SyncActionDefinition extends AbstractActionDefinitionWrapper {
                     put(SOURCE, new JobParameter<>(extensions.getMap(SOURCE), Map.class));
                     put(TENANT_ID, new JobParameter<>(TenantContext.getCurrentTenantId(), String.class));
                     put(
-                        DEV_ENVIRONMENT,
-                        new JobParameter<>(actionContextAware.isDevEnvironment(), Boolean.class));
+                        EDITOR_ENVIRONMENT,
+                        new JobParameter<>(actionContextAware.isEditorEnvironment(), Boolean.class));
 
                     if (actionContextAware.getType() != null) {
                         put(TYPE, new JobParameter<>(String.valueOf(actionContextAware.getType()), String.class));

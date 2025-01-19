@@ -31,15 +31,15 @@ const columns = [
         cell: (info) => info.getValue()?.name,
         header: 'Project',
     }),
-    columnHelper.accessor('projectInstance', {
+    columnHelper.accessor('projectDeployment', {
         cell: (info) => `${info.getValue()?.name}`,
-        header: 'Instance',
+        header: 'Deployment',
     }),
-    columnHelper.accessor('projectInstance', {
+    columnHelper.accessor('projectDeployment', {
         cell: (info) => `V${info.getValue()?.projectVersion}`,
         header: 'Version',
     }),
-    columnHelper.accessor('projectInstance', {
+    columnHelper.accessor('projectDeployment', {
         cell: (info) => info.getValue()?.environment,
         header: 'Environment',
     }),

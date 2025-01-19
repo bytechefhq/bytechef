@@ -76,6 +76,7 @@ export type ComponentType = {
             dynamicPropertyTypes?: {[key: string]: string};
         };
     };
+    name?: string;
     operationName?: string;
     parameters?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -39,6 +39,14 @@ import org.springframework.ai.chat.messages.SystemMessage;
  */
 public interface ChatModel {
 
+    enum ResponseFormat {
+        TEXT, JSON
+    }
+
+    enum Role {
+        ASSISTANT, SYSTEM, TOOL, USER
+    }
+
     org.springframework.ai.chat.model.ChatModel createChatModel(
         Parameters inputParameters, Parameters connectionParameters);
 
@@ -62,9 +70,10 @@ public interface ChatModel {
 
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
-        List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(messages.stream()
-            .map(message -> createMessage(message, actionContext))
-            .toList());
+        List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(
+            messages.stream()
+                .map(message -> createMessage(message, actionContext))
+                .toList());
 
         String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
 
@@ -79,9 +88,10 @@ public interface ChatModel {
     private Object returnChatEntity(
         Parameters parameters, ChatClient.CallResponseSpec call, ActionContext actionContext) {
 
-        int responseFormat = parameters.getFromPath(RESPONSE + "." + RESPONSE_FORMAT, Integer.class, 1);
+        ResponseFormat responseFormat = parameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
 
-        if (responseFormat == 1) {
+        if (responseFormat == ResponseFormat.TEXT) {
             try {
                 return Objects.requireNonNull(call.chatResponse())
                     .getResult()
@@ -105,6 +115,6 @@ public interface ChatModel {
     }
 
     @SuppressFBWarnings("EI")
-    record Message(String content, List<FileEntry> attachments, String role) {
+    record Message(String content, List<FileEntry> attachments, Role role) {
     }
 }

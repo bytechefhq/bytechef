@@ -32,10 +32,10 @@ import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.springframework.ai.azure.openai.AzureOpenAiAudioTranscriptionOptions.WhisperModel;
 
-import com.azure.ai.openai.OpenAIClient;
 import com.azure.ai.openai.OpenAIClientBuilder;
 import com.azure.core.credential.KeyCredential;
 import com.bytechef.component.ai.llm.AudioTranscriptionModel;
+import com.bytechef.component.ai.llm.constant.Language;
 import com.bytechef.component.ai.llm.util.LLMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -107,17 +107,17 @@ public class AzureOpenAiCreateTranscriptionAction {
     }
 
     private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
-        OpenAIClient openAIClient = new OpenAIClientBuilder()
-            .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
-            .endpoint(connectionParameters.getString(ENDPOINT))
-            .buildClient();
+        Language language = inputParameters.get(LANGUAGE, Language.class);
 
         return new AzureOpenAiAudioTranscriptionModel(
-            openAIClient,
+            new OpenAIClientBuilder()
+                .credential(new KeyCredential(connectionParameters.getString(TOKEN)))
+                .endpoint(connectionParameters.getString(ENDPOINT))
+                .buildClient(),
             AzureOpenAiAudioTranscriptionOptions.builder()
                 .model(inputParameters.getRequiredString(MODEL))
                 .prompt(inputParameters.getString(PROMPT))
-                .language(inputParameters.getString(LANGUAGE))
+                .language(language.getCode())
                 .responseFormat(TranscriptResponseFormat.valueOf(inputParameters.getString(RESPONSE_FORMAT)))
                 .temperature(inputParameters.getFloat(TEMPERATURE))
                 .build());

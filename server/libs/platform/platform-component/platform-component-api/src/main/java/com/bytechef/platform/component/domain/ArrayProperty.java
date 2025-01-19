@@ -103,13 +103,23 @@ public class ArrayProperty extends ValueProperty<List<?>> implements OptionsData
     @Override
     public String toString() {
         return "ArrayProperty{" +
-            "items=" + items +
-            ", multipleValues=" + multipleValues +
-            ", options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
-            ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", controlType=" + controlType +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            ", multipleValues=" + multipleValues +
+            ", minItems=" + minItems +
+            ", maxItems=" + maxItems +
+            ", items=" + items +
+            "} " + super.toString();
     }
 }

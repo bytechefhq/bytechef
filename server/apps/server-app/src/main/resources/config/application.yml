@@ -72,6 +72,13 @@ management:
       export:
         enabled: true
         step: 60
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${bytechef.tracing.zipkin.endpoint}
+      encoding: PROTO3
 
 openapi:
   openAPIDefinition:
@@ -214,9 +221,6 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
-  loki:
-    appender:
-      level: "OFF"
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@bytechef.io
@@ -229,6 +233,13 @@ bytechef:
 #        clientId: 123456789
 #        clientSecret: 123456789
     redirect-uri: ${bytechef.public-url}/callback
+  observability:
+    loki:
+      appender:
+        level: "ALL"
+        http:
+          url: http://localhost:3100/loki/api/v1/push
+    enabled: false
   public-url: http://127.0.0.1:5173
   resources:
     web: file:///opt/bytechef/client/
@@ -240,6 +251,9 @@ bytechef:
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
+  tracing:
+    zipkin:
+      endpoint: http://localhost:4318/v1/traces
   webhook-url: http://127.0.0.1:9555/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"

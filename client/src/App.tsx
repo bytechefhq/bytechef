@@ -1,7 +1,7 @@
 import {Toaster} from '@/components/ui/toaster';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
-import CopilotPanel from '@/pages/platform/copilot/CopilotPanel';
-import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileSidebar} from '@/shared/layout/MobileSidebar';
@@ -47,9 +47,9 @@ const automationNavigation: NavigationType[] = [
         name: 'Projects',
     },
     {
-        href: '/automation/instances',
+        href: '/automation/deployments',
         icon: Layers3Icon,
-        name: 'Project Instances',
+        name: 'Project Deployments',
     },
     {
         href: '/automation/api-platform',
@@ -100,7 +100,7 @@ const platformNavigation = [
 function App() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const {ai, getApplicationInfo} = useApplicationInfoStore();
+    const {ai, getApplicationInfo, loading} = useApplicationInfoStore();
     const {
         account,
         authenticated,
@@ -209,7 +209,7 @@ function App() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authenticated]);
 
-    if (!sessionHasBeenFetched) {
+    if (loading || !sessionHasBeenFetched) {
         return (
             <div className="flex min-h-screen min-w-full items-center justify-center p-5">
                 <div className="flex animate-pulse space-x-2">

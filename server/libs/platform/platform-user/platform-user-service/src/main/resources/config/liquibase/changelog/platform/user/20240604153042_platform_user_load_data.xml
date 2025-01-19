@@ -4,14 +4,14 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
     <changeSet id="20240604153042" author="Ivica Cardic" contextFilter="mono and !multitenant and dev">
-        <loadData file="config/liquibase/data/user.csv" separator=";" tableName="user" usePreparedStatements="true">
+        <loadData file="config/liquibase/data/user.csv" separator=";" tableName="user">
             <column name="id" type="numeric"/>
             <column name="activated" type="boolean"/>
             <column name="created_date" type="date"/>
             <column name="last_modified_date" type="date"/>
         </loadData>
 
-        <loadData file="config/liquibase/data/user_authority.csv" separator=";" tableName="user_authority" usePreparedStatements="true">
+        <loadData file="config/liquibase/data/user_authority.csv" separator=";" tableName="user_authority">
             <column name="user_id" type="numeric"/>
         </loadData>
     </changeSet>

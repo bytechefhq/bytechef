@@ -1,14 +1,11 @@
-import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useCopilotStore} from '@/pages/platform/copilot/stores/useCopilotStore';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import CopilotButton from '@/shared/components/copilot/CopilotButton';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType} from '@/shared/types';
-import {SparklesIcon} from 'lucide-react';
 import {memo, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -45,11 +42,8 @@ const WorkflowNodesPopoverMenuComponentList = memo(
         >([]);
 
         const {componentDefinitions, taskDispatcherDefinitions} = useWorkflowDataStore();
-        const {ai} = useApplicationInfoStore();
-        const {copilotPanelOpen, setCopilotPanelOpen} = useCopilotStore();
 
         const ff_797 = useFeatureFlagsStore()('ff-797');
-        const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
         useEffect(() => {
             if (taskDispatcherDefinitions) {
@@ -102,21 +96,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                         value={filter}
                     />
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            {ai.copilot.enabled && ff_1570 && (
-                                <Button
-                                    onClick={() => !copilotPanelOpen && setCopilotPanelOpen(!copilotPanelOpen)}
-                                    size="icon"
-                                    variant="ghost"
-                                >
-                                    <SparklesIcon className="h-5" />
-                                </Button>
-                            )}
-                        </TooltipTrigger>
-
-                        <TooltipContent>Open Copilot panel</TooltipContent>
-                    </Tooltip>
+                    <CopilotButton source={Source.WORKFLOW_EDITOR_COMPONENTS_POPOVER_MENU} />
                 </header>
 
                 <div className="h-96 rounded-bl-lg pb-3">

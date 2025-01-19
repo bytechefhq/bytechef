@@ -104,7 +104,7 @@
                     "max-w-workflow-integration-portal-configuration-workflow-sheet-width",
                     "max-w-workflow-node-details-panel-width",
                     "max-w-workflow-outputs-sheet-width",
-                    "max-w-workflow-read-only-project-instance-workflow-sheet-width",
+                    "max-w-workflow-read-only-project-deployment-workflow-sheet-width",
                     "max-w-workflow-sidebar-project-version-history-sheet-width",
                     "max-w-workflow-test-configuration-dialog-width",
                     "min-h-output-tab-sample-data-dialog-height",

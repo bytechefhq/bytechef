@@ -54,9 +54,9 @@ class QuickbooksCreatePaymentActionTest extends AbstractQuickbooksActionTest {
 
         assertEquals(mockedObject, result);
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
         Map<String, Object> expectedBody = Map.of(TOTAL_AMT, 123.0, CUSTOMER_REF, Map.of(VALUE, "abc"));
+
+        Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(expectedBody, body.getContent());
     }

@@ -20,7 +20,6 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACC
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
@@ -32,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.ItemType;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDate;
 import java.util.Map;
@@ -45,7 +45,7 @@ class QuickbooksCreateItemActionTest extends AbstractQuickbooksActionTest {
     @Test
     void testPerform() {
         mockedParameters = MockParametersFactory.create(Map.of(
-            NAME, NAME, TYPE, INVENTORY, QTY_ON_HAND, 123, EXPENSE_ACCOUNT_REF, "expense",
+            NAME, NAME, TYPE, ItemType.INVENTORY.name(), QTY_ON_HAND, 123, EXPENSE_ACCOUNT_REF, "expense",
             ACCOUNT, Map.of(
                 INCOME_ACCOUNT_REF, "income", ASSET_ACCOUNT_REF, "asset", INV_START_DATE, LocalDate.of(2020, 1, 1))));
 

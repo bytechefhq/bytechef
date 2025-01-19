@@ -23,16 +23,17 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.quickbooks.constant.ItemType.INVENTORY;
+import static com.bytechef.component.quickbooks.constant.ItemType.NON_INVENTORY;
+import static com.bytechef.component.quickbooks.constant.ItemType.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ACCOUNT;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ASSET_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.EXPENSE_ACCOUNT_REF;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INCOME_ACCOUNT_REF;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INVENTORY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.INV_START_DATE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.ITEM_OUTPUT_PROPERTY;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.QTY_ON_HAND;
-import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SERVICE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TYPE;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.VALUE;
 
@@ -41,6 +42,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.quickbooks.constant.Entity;
 import com.bytechef.component.quickbooks.util.QuickbooksUtils;
 import java.util.Map;
 
@@ -64,17 +66,17 @@ public class QuickbooksCreateItemAction {
                 .label("Type")
                 .description("Type of item.")
                 .options(
-                    option(INVENTORY, INVENTORY),
-                    option(SERVICE, SERVICE),
-                    option("Non-inventory", "NonInventory"))
-                .defaultValue(SERVICE)
+                    option("Inventory", INVENTORY.name()),
+                    option("Service", SERVICE.name()),
+                    option("Non-inventory", NON_INVENTORY.name()))
+                .defaultValue(SERVICE.name())
                 .required(true),
             dynamicProperties(ACCOUNT)
                 .propertiesLookupDependsOn(TYPE)
                 .properties(QuickbooksUtils::getPropertiesForItem),
             string(EXPENSE_ACCOUNT_REF)
                 .label("Expense Account")
-                .options(QuickbooksUtils.getOptions(ACCOUNT, "Expense"))
+                .options(QuickbooksUtils.getOptions(Entity.ACCOUNT, "Expense"))
                 .required(true),
             number(QTY_ON_HAND)
                 .label("Quantity on Hand")

@@ -17,7 +17,7 @@
 package com.bytechef.platform.user.web.rest.exception;
 
 import com.bytechef.platform.user.exception.InvalidEmailException;
-import com.bytechef.platform.web.rest.error.AbstractResponseEntityExceptionHandler;
+import com.bytechef.web.rest.error.AbstractResponseEntityExceptionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;

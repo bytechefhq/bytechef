@@ -90,13 +90,21 @@ public class IntegerProperty extends ValueProperty<Long> implements OptionsDataS
     @Override
     public String toString() {
         return "IntegerProperty{" +
-            "maxValue=" + maxValue +
-            ", minValue=" + minValue +
-            ", options=" + options +
-            ", optionsDataSource=" + optionsDataSource +
+            "name='" + name + '\'' +
+            ", type=" + type +
             ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", optionsDataSource=" + optionsDataSource +
+            ", options=" + options +
+            ", minValue=" + minValue +
+            ", maxValue=" + maxValue +
+            "} " + super.toString();
     }
 }

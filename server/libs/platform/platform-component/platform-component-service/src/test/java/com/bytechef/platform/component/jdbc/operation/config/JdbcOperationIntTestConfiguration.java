@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Import;
  * @author Ivica Cardic
  */
 @ComponentScan({
-    "com.bytechef.platform.component.registry.jdbc"
+    "com.bytechef.platform.component.jdbc"
 })
 @EnableAutoConfiguration
 @Import(LiquibaseConfiguration.class)

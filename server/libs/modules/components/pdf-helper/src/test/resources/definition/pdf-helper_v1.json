@@ -13,6 +13,7 @@
   "resources" : null,
   "version" : 1,
   "title" : "PDF Helper",
+  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -167,12 +168,11 @@
       "controlType" : "FILE_ENTRY"
     } ],
     "title" : "Extract Text",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

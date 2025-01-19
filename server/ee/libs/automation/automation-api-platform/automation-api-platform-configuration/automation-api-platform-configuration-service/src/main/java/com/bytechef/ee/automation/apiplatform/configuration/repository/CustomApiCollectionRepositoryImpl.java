@@ -42,10 +42,10 @@ public class CustomApiCollectionRepositoryImpl implements CustomApiCollectionRep
 
         String query = "SELECT api_collection.* FROM api_collection ";
 
-        query += "JOIN project_instance ON api_collection.project_instance_id = project_instance.id ";
+        query += "JOIN project_deployment ON api_collection.project_deployment_id = project_deployment.id ";
 
         if (workspaceId != null) {
-            query += "JOIN project ON project_instance.project_id = project.id ";
+            query += "JOIN project ON project_deployment.project_id = project.id ";
         }
 
         if (tagId != null) {
@@ -92,8 +92,8 @@ public class CustomApiCollectionRepositoryImpl implements CustomApiCollectionRep
             query += "tag_id = ? ";
         }
 
-        query += "ORDER BY LOWER(api_collection.name) ASC, project_instance.project_version ASC, " +
-            "project_instance.environment ASC";
+        query += "ORDER BY LOWER(api_collection.name) ASC, project_deployment.project_version ASC, " +
+            "project_deployment.environment ASC";
 
         List<ApiCollection> apiCollections = jdbcClient.sql(query)
             .params(arguments)

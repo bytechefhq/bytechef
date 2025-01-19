@@ -24,8 +24,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
@@ -64,7 +64,7 @@ public class TriggerCoordinator {
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
     private final ApplicationEventPublisher eventPublisher;
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionService triggerExecutionService;
@@ -75,7 +75,7 @@ public class TriggerCoordinator {
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
-        ApplicationEventPublisher eventPublisher, InstanceAccessorRegistry instanceAccessorRegistry,
+        ApplicationEventPublisher eventPublisher, PrincipalAccessorRegistry principalAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
@@ -83,7 +83,7 @@ public class TriggerCoordinator {
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
         this.eventPublisher = eventPublisher;
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.principalAccessorRegistry = principalAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionService = triggerExecutionService;
@@ -213,11 +213,12 @@ public class TriggerCoordinator {
     private void dispatch(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
-                instanceAccessor.getInputMap(
+                principalAccessor.getInputMap(
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
@@ -252,9 +253,10 @@ public class TriggerCoordinator {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return instanceAccessor.getWorkflowId(
+        return principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

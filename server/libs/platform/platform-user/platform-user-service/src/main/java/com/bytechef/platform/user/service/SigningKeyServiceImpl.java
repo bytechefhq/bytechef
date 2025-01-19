@@ -18,9 +18,9 @@ package com.bytechef.platform.user.service;
 
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.constant.ModeType;
-import com.bytechef.platform.tenant.domain.TenantKey;
 import com.bytechef.platform.user.domain.SigningKey;
 import com.bytechef.platform.user.repository.SigningKeyRepository;
+import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.security.KeyFactory;
 import java.security.KeyPair;

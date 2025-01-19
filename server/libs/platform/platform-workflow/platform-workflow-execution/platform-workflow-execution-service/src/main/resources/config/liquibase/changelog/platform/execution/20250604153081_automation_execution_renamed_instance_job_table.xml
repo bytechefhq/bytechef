@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250604153081" author="Ivica Cardic">
+        <dropForeignKeyConstraint baseTableName="instance_job" constraintName="fk_instance_job_job" />
+
+        <renameColumn tableName="instance_job" oldColumnName="instance_id" newColumnName="principal_id" />
+
+        <renameTable oldTableName="instance_job" newTableName="principal_job" />
+
+        <addForeignKeyConstraint
+            baseColumnNames="job_id"
+            baseTableName="principal_job"
+            constraintName="fk_principal_job_job"
+            referencedColumnNames="id"
+            referencedTableName="job"/>
+    </changeSet>
+</databaseChangeLog>

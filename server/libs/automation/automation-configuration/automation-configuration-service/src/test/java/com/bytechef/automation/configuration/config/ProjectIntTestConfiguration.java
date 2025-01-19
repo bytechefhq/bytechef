@@ -17,27 +17,13 @@
 package com.bytechef.automation.configuration.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
-import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
-import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
-import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,9 +32,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -68,53 +54,12 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
+@ProjectIntTestConfigurationSharedMocks
 @Configuration
 public class ProjectIntTestConfiguration {
 
-    @MockBean
-    private AuthorityService authorityService;
-
-    @MockBean
-    private ConnectionService connectionService;
-
-    @MockBean
-    private InstanceJobFacade instanceJobFacade;
-
-    @MockBean
-    private InstanceJobService instanceJobService;
-
-    @MockBean
-    private JobFacade jobFacade;
-
-    @MockBean
-    private JobService jobService;
-
-    @MockBean
-    TaskExecutionService taskExecutionService;
-
-    @MockBean
-    private TriggerDefinitionService triggerDefinitionService;
-
-    @MockBean
-    private TriggerExecutionService triggerExecutionService;
-
-    @MockBean
-    private TriggerLifecycleFacade triggerLifecycleFacade;
-
-    @MockBean
-    private UserService userService;
-
-    @MockBean
+    @Autowired
     private WorkflowConnectionFacade workflowConnectionFacade;
-
-    @MockBean
-    private WorkflowNodeParameterFacade workflowNodeParameterFacade;
-
-    @MockBean
-    private WorkflowNodeTestOutputService workflowNodeTestOutputService;
-
-    @MockBean
-    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {

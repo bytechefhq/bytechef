@@ -17,8 +17,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessor;
-import com.bytechef.platform.configuration.instance.accessor.InstanceAccessorRegistry;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
  */
 public class DynamicWebhookTriggerRefreshListener {
 
-    private final InstanceAccessorRegistry instanceAccessorRegistry;
+    private final PrincipalAccessorRegistry principalAccessorRegistry;
     private final TriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
@@ -44,12 +44,12 @@ public class DynamicWebhookTriggerRefreshListener {
 
     @SuppressFBWarnings("EI")
     public DynamicWebhookTriggerRefreshListener(
-        InstanceAccessorRegistry instanceAccessorRegistry, SchedulerClient schedulerClient,
+        PrincipalAccessorRegistry principalAccessorRegistry, SchedulerClient schedulerClient,
         TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
         this.schedulerClient = schedulerClient;
-        this.instanceAccessorRegistry = instanceAccessorRegistry;
+        this.principalAccessorRegistry = principalAccessorRegistry;
         this.remoteTriggerDefinitionFacade = remoteTriggerDefinitionFacade;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
@@ -76,9 +76,10 @@ public class DynamicWebhookTriggerRefreshListener {
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        InstanceAccessor instanceAccessor = instanceAccessorRegistry.getInstanceAccessor(workflowExecutionId.getType());
+        PrincipalAccessor principalAccessor =
+            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        String workflowId = instanceAccessor.getWorkflowId(
+        String workflowId = principalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);

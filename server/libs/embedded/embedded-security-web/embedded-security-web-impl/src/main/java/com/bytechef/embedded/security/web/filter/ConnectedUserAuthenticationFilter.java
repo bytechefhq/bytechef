@@ -18,7 +18,7 @@ package com.bytechef.embedded.security.web.filter;
 
 import com.bytechef.embedded.security.web.authentication.ConnectedUserAuthenticationToken;
 import com.bytechef.platform.security.web.filter.AbstractPublicApiAuthenticationFilter;
-import com.bytechef.platform.tenant.domain.TenantKey;
+import com.bytechef.tenant.domain.TenantKey;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.Validate;

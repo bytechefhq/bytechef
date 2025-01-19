@@ -19,6 +19,7 @@ package com.bytechef.platform.connection.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
+import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.constant.ModeType;
@@ -39,6 +40,7 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootTest(classes = ConnectionIntTestConfiguration.class)
 @Import(PostgreSQLContainerConfiguration.class)
+@ConnectionIntTestConfigurationSharedMocks
 public class ConnectionServiceIntTest {
 
     @Autowired

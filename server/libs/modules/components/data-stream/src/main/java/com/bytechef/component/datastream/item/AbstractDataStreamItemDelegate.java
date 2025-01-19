@@ -17,7 +17,7 @@
 package com.bytechef.component.datastream.item;
 
 import static com.bytechef.component.datastream.constant.DataStreamConstants.CONNECTION_PARAMETERS;
-import static com.bytechef.component.datastream.constant.DataStreamConstants.DEV_ENVIRONMENT;
+import static com.bytechef.component.datastream.constant.DataStreamConstants.EDITOR_ENVIRONMENT;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INPUT_PARAMETERS;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_ID;
 import static com.bytechef.component.datastream.constant.DataStreamConstants.INSTANCE_WORKFLOW_ID;
@@ -45,7 +45,7 @@ import org.springframework.batch.core.annotation.BeforeStep;
  */
 public abstract class AbstractDataStreamItemDelegate {
 
-    protected boolean devEnvironment;
+    protected boolean editorEnvironment;
     protected String componentName;
     protected int componentVersion;
     protected Parameters connectionParameters;
@@ -108,9 +108,9 @@ public abstract class AbstractDataStreamItemDelegate {
         tenantId = (String) Validate.notNull(jobParameter, "tenantId is required")
             .getValue();
 
-        jobParameter = jobParameters.getParameter(DEV_ENVIRONMENT);
+        jobParameter = jobParameters.getParameter(EDITOR_ENVIRONMENT);
 
-        devEnvironment = (boolean) Validate.notNull(jobParameter, "devEnvironment is required")
+        editorEnvironment = (boolean) Validate.notNull(jobParameter, "editorEnvironment is required")
             .getValue();
 
         jobParameter = jobParameters.getParameter(TYPE);
@@ -124,7 +124,7 @@ public abstract class AbstractDataStreamItemDelegate {
         context = new DataStreamContextImpl(
             contextFactory.createActionContext(
                 componentName, componentVersion, STREAM, type, instanceId, instanceWorkflowId,
-                null, jobId, null, devEnvironment));
+                null, jobId, null, editorEnvironment));
 
         doBeforeStep(stepExecution);
     }

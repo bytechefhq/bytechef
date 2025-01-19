@@ -16,26 +16,9 @@
 
 package com.bytechef.embedded.configuration.config;
 
-import com.bytechef.atlas.execution.facade.JobFacade;
-import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
-import com.bytechef.platform.configuration.facade.WorkflowFacade;
-import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
-import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
-import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.service.ConnectionService;
-import com.bytechef.platform.oauth2.service.OAuth2Service;
-import com.bytechef.platform.workflow.execution.facade.InstanceJobFacade;
-import com.bytechef.platform.workflow.execution.facade.TriggerLifecycleFacade;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
-import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,7 +26,6 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -65,57 +47,6 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class IntegrationIntTestConfiguration {
-
-    @MockBean
-    private ComponentDefinitionService componentDefinitionService;
-
-    @MockBean
-    private ConnectionDefinitionService connectionDefinitionService;
-
-    @MockBean
-    private ConnectionService connectionService;
-
-    @MockBean
-    private ConnectedUserService connectedUserService;
-
-    @MockBean
-    private InstanceJobFacade instanceJobFacade;
-
-    @MockBean
-    private InstanceJobService instanceJobService;
-
-    @MockBean
-    private JobFacade jobFacade;
-
-    @MockBean
-    private JobService jobService;
-
-    @MockBean
-    private OAuth2Service oAuth2Service;
-
-    @MockBean
-    private TriggerDefinitionService triggerDefinitionService;
-
-    @MockBean
-    private TriggerExecutionService triggerExecutionService;
-
-    @MockBean
-    private TriggerLifecycleFacade triggerLifecycleFacade;
-
-    @MockBean
-    private WorkflowConnectionFacade workflowConnectionFacade;
-
-    @MockBean
-    private WorkflowFacade workflowFacade;
-
-    @MockBean
-    private WorkflowNodeParameterFacade workflowNodeParameterFacade;
-
-    @MockBean
-    private WorkflowNodeTestOutputService workflowNodeTestOutputService;
-
-    @MockBean
-    private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Bean
     EncryptionKey encryptionKey() {

@@ -56,8 +56,8 @@ paths:
         schema:
           type: "integer"
           format: "int64"
-      - name: "projectInstanceId"
-        description: "The id of a project instance."
+      - name: "projectDeploymentId"
+        description: "The id of a project deployment."
         in: "query"
         required: false
         schema:
@@ -125,8 +125,8 @@ components:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
         project:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
-        projectInstance:
-          $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
+        projectDeployment:
+          $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
         triggerExecution:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
         workflow:
@@ -142,8 +142,8 @@ components:
           readOnly: true
         project:
           $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
-        projectInstance:
-          $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectInstanceBasic"
+        projectDeployment:
+          $ref: "../../../automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectDeploymentBasic"
         job:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/JobBasic"
         workflow:

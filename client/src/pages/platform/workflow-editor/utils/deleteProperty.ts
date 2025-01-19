@@ -2,12 +2,13 @@ import {
     DeleteWorkflowNodeParameter200Response,
     DeleteWorkflowNodeParameterOperationRequest,
 } from '@/shared/middleware/platform/configuration';
+import {UseMutationResult} from '@tanstack/react-query';
+
+import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function deleteProperty(
     workflowId: string,
     path: string,
-    currentComponent: ComponentType,
-    setCurrentComponent: (currentComponent: ComponentType) => void,
     deleteWorkflowNodeParameterMutation: UseMutationResult<
         DeleteWorkflowNodeParameter200Response,
         Error,
@@ -15,25 +16,28 @@ export default function deleteProperty(
         unknown
     >
 ) {
-    const {workflowNodeName} = currentComponent;
+    const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+
+    if (!currentComponent) {
+        console.error('No current component found in the store');
+
+        return;
+    }
 
     deleteWorkflowNodeParameterMutation.mutate(
         {
             deleteWorkflowNodeParameterRequest: {
                 path,
-                workflowNodeName,
+                workflowNodeName: currentComponent?.workflowNodeName,
             },
             id: workflowId,
         },
         {
             onSuccess: (response) =>
-                setCurrentComponent({
+                useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
                     ...currentComponent,
                     parameters: response.parameters,
                 }),
         }
     );
 }
-
-import {ComponentType} from '@/shared/types';
-import {UseMutationResult} from '@tanstack/react-query';

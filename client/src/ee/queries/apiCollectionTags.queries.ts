@@ -1,11 +1,11 @@
-import {ApiCollectionTagApi} from '@/middleware/automation/api-platform';
+import {ApiCollectionTagApi} from '@/ee/shared/middleware/automation/api-platform';
 
 /* eslint-disable sort-keys */
 import {Tag} from '@/shared/middleware/automation/configuration';
 import {useQuery} from '@tanstack/react-query';
 
 export const ApiCollectionTagKeys = {
-    apiCollectionTags: ['projectInstanceTags'] as const,
+    apiCollectionTags: ['apiCollectionTags'] as const,
 };
 
 export const useGetApiCollectionTagsQuery = () =>

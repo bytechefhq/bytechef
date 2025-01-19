@@ -66,10 +66,18 @@ public class BooleanProperty extends ValueProperty<Boolean> {
     @Override
     public String toString() {
         return "BooleanProperty{" +
-            "options=" + options +
-            ", controlType=" + controlType +
-            ", defaultValue=" + defaultValue +
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", required=" + required +
+            ", hidden=" + hidden +
+            ", expressionEnabled=" + expressionEnabled +
+            ", displayCondition='" + displayCondition + '\'' +
+            ", description='" + description + '\'' +
+            ", advancedOption=" + advancedOption +
             ", exampleValue=" + exampleValue +
-            "} ";
+            ", defaultValue=" + defaultValue +
+            ", controlType=" + controlType +
+            ", options=" + options +
+            "} " + super.toString();
     }
 }

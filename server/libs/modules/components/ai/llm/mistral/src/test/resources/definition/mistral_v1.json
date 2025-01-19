@@ -43,6 +43,8 @@
       "title" : "Bearer Token",
       "type" : "BEARER_TOKEN",
       "acquire" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "authorizationCallback" : null,
       "apply" : null,
       "clientId" : null,
       "pkce" : null,
@@ -52,9 +54,7 @@
       "tokenUrl" : null,
       "authorizationUrl" : null,
       "clientSecret" : null,
-      "refreshToken" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null,
-      "authorizationCallback" : null
+      "refreshToken" : null
     } ],
     "properties" : null,
     "version" : 1,
@@ -72,8 +72,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -179,19 +179,19 @@
           "options" : [ {
             "description" : null,
             "label" : "System",
-            "value" : "system"
+            "value" : "SYSTEM"
           }, {
             "description" : null,
             "label" : "User",
-            "value" : "user"
+            "value" : "USER"
           }, {
             "description" : null,
             "label" : "Assistant",
-            "value" : "assistant"
+            "value" : "ASSISTANT"
           }, {
             "description" : null,
             "label" : "Tool",
-            "value" : "tool"
+            "value" : "TOOL"
           } ],
           "optionsDataSource" : null
         }, {
@@ -217,7 +217,7 @@
         }, {
           "advancedOption" : null,
           "description" : "Only text and image files are supported. Also, only certain models supports images. Please check the documentation.",
-          "displayCondition" : "messages[index].role == 'user'",
+          "displayCondition" : "messages[index].role == 'USER'",
           "expressionEnabled" : null,
           "hidden" : null,
           "metadata" : { },
@@ -367,28 +367,29 @@
         "metadata" : { },
         "required" : false,
         "name" : "responseFormat",
-        "type" : "INTEGER",
-        "defaultValue" : 1,
+        "type" : "STRING",
+        "defaultValue" : "TEXT",
         "exampleValue" : null,
         "label" : "Response Format",
         "placeholder" : null,
-        "maxValue" : null,
-        "minValue" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
         "options" : [ {
           "description" : "Text response",
           "label" : "Text",
-          "value" : 1
+          "value" : "TEXT"
         }, {
           "description" : "JSON response with key-value pairs",
           "label" : "JSON",
-          "value" : 2
+          "value" : "JSON"
         } ],
-        "controlType" : "SELECT",
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
         "description" : "Define the JSON schema for the response.",
-        "displayCondition" : "response.responseFormat == 2",
+        "displayCondition" : "response.responseFormat == 'JSON'",
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
@@ -557,11 +558,11 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Ask",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

@@ -30,11 +30,11 @@ public interface ProjectWorkflowService {
 
     void deleteProjectWorkflows(List<Long> ids);
 
-    ProjectWorkflow getProjectInstanceProjectWorkflow(long id);
+    ProjectWorkflow getProjectDeploymentProjectWorkflow(long id);
 
-    ProjectWorkflow getProjectInstanceProjectWorkflow(long projectInstanceId, String workflowId);
+    ProjectWorkflow getProjectDeploymentProjectWorkflow(long projectDeploymentId, String workflowId);
 
-    String getProjectInstanceProjectWorkflowWorkflowId(long projectInstanceId, String workflowReferenceCode);
+    String getProjectDeploymentProjectWorkflowWorkflowId(long projectDeploymentId, String workflowReferenceCode);
 
     List<Long> getProjectWorkflowIds(long projectId, int projectVersion);
 

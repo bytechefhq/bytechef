@@ -25,7 +25,7 @@ import com.bytechef.atlas.configuration.domain.Task;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.MapUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -50,12 +50,12 @@ public class SubflowTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
 
     @Override
     public void dispatch(TaskExecution taskExecution) {
-        JobParameters jobParameters = new JobParameters(
+        JobParametersDTO jobParametersDTO = new JobParametersDTO(
             MapUtils.getRequiredString(taskExecution.getParameters(), WorkflowConstants.WORKFLOW_ID),
             taskExecution.getId(),
             MapUtils.getMap(taskExecution.getParameters(), WorkflowConstants.INPUTS, Collections.emptyMap()));
 
-        jobFacade.createJob(jobParameters);
+        jobFacade.createJob(jobParametersDTO);
     }
 
     @Override

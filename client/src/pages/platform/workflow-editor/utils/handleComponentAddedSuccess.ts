@@ -25,28 +25,19 @@ export default function handleComponentAddedSuccess({
     });
 
     if (currentNode?.trigger && nodeData.trigger) {
-        useWorkflowNodeDetailsPanelStore.setState({
-            ...useWorkflowNodeDetailsPanelStore.getState(),
-            currentNode: {...currentNode, ...nodeData},
-        });
+        useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({...currentNode, ...nodeData});
     }
 
     if (!currentNode?.trigger && !useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
-        useWorkflowNodeDetailsPanelStore.setState({
-            ...useWorkflowNodeDetailsPanelStore.getState(),
-            currentNode: nodeData,
-        });
+        useWorkflowNodeDetailsPanelStore.getState().setCurrentNode(nodeData);
     }
 
-    useWorkflowNodeDetailsPanelStore.setState({
-        ...useWorkflowNodeDetailsPanelStore.getState(),
-        currentComponent: {
+    if (!useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
+        useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
             ...nodeData,
             workflowNodeName: nodeData.workflowNodeName ?? 'trigger_1',
-        },
-    });
+        });
 
-    useWorkflowNodeDetailsPanelStore.setState({
-        workflowNodeDetailsPanelOpen: true,
-    });
+        useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
+    }
 }

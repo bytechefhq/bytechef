@@ -75,8 +75,9 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
                     .host(CONFIGURATION_APP)
                     .path(
                         INTEGRATION_INSTANCE_CONFIGURATION_WORKFLOW_SERVICE +
-                            "/fetch-integration-instance-configuration-workflow-connection/{projectInstanceId}/" +
-                            "{workflowId}/{workflowNodeName}/{workflowConnectionKey}")
+                            "/fetch-integration-instance-configuration-workflow-connection" +
+                            "/{integrationInstanceConfigurationId}/{workflowId}/{workflowNodeName}" +
+                            "/{workflowConnectionKey}")
                     .build(integrationInstanceConfigurationId, workflowId, workflowNodeName, workflowConnectionKey),
                 IntegrationInstanceConfigurationWorkflowConnection.class));
     }

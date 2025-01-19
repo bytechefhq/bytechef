@@ -38,7 +38,7 @@ export interface GetWorkflowExecutionsPageRequest {
     jobStartDate?: Date;
     jobEndDate?: Date;
     projectId?: number;
-    projectInstanceId?: number;
+    projectDeploymentId?: number;
     workflowId?: string;
     pageNumber?: number;
 }
@@ -110,8 +110,8 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
             queryParameters['projectId'] = requestParameters['projectId'];
         }
 
-        if (requestParameters['projectInstanceId'] != null) {
-            queryParameters['projectInstanceId'] = requestParameters['projectInstanceId'];
+        if (requestParameters['projectDeploymentId'] != null) {
+            queryParameters['projectDeploymentId'] = requestParameters['projectDeploymentId'];
         }
 
         if (requestParameters['workflowId'] != null) {

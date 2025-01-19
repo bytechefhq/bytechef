@@ -21,7 +21,7 @@ import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFacto
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
-import com.bytechef.atlas.execution.dto.JobParameters;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.CounterService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -88,7 +88,7 @@ public class TaskDispatcherJobTestExecutor {
                 contextService, counterService, taskExecutionService),
             taskExecutionService, taskHandlerMapSupplier.get()::get, taskFileStorage, workflowService);
 
-        return jobSyncExecutor.execute(new JobParameters(workflowId, inputs));
+        return jobSyncExecutor.execute(new JobParametersDTO(workflowId, inputs));
     }
 
     @FunctionalInterface

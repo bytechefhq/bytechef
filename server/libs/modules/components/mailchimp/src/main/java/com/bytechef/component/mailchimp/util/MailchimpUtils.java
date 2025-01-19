@@ -65,7 +65,7 @@ public class MailchimpUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        context.logger(logger -> logger.debug("Response for url='%s': %s".formatted(url, response)));
+        context.log(log -> log.debug("Response for url='%s': %s".formatted(url, response)));
 
         List<Option<String>> options = new ArrayList<>();
 

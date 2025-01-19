@@ -27,12 +27,12 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.configuration.domain.Project;
-import com.bytechef.automation.configuration.domain.ProjectInstance;
-import com.bytechef.automation.configuration.domain.ProjectInstanceWorkflow;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
+import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
-import com.bytechef.automation.configuration.service.ProjectInstanceService;
-import com.bytechef.automation.configuration.service.ProjectInstanceWorkflowService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
@@ -48,7 +48,7 @@ import com.bytechef.platform.workflow.execution.domain.TriggerExecution;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import com.bytechef.platform.workflow.execution.service.InstanceJobService;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.domain.TaskDispatcherDefinition;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -73,10 +73,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final JobService jobService;
-    private final InstanceJobService instanceJobService;
+    private final PrincipalJobService principalJobService;
     private final ProjectFacade projectFacade;
-    private final ProjectInstanceService projectInstanceService;
-    private final ProjectInstanceWorkflowService projectInstanceWorkflowService;
+    private final ProjectDeploymentService projectDeploymentService;
+    private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
@@ -89,8 +89,9 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     @SuppressFBWarnings("EI")
     public ProjectWorkflowExecutionFacadeImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService,
-        JobService jobService, InstanceJobService instanceJobService, ProjectFacade projectFacade,
-        ProjectInstanceService projectInstanceService, ProjectInstanceWorkflowService projectInstanceWorkflowService,
+        JobService jobService, PrincipalJobService principalJobService, ProjectFacade projectFacade,
+        ProjectDeploymentService projectDeploymentService,
+        ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectService projectService, ProjectWorkflowService projectWorkflowService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage,
@@ -100,10 +101,10 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.jobService = jobService;
-        this.instanceJobService = instanceJobService;
+        this.principalJobService = principalJobService;
         this.projectFacade = projectFacade;
-        this.projectInstanceService = projectInstanceService;
-        this.projectInstanceWorkflowService = projectInstanceWorkflowService;
+        this.projectDeploymentService = projectDeploymentService;
+        this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
@@ -125,15 +126,15 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 ? null
                 : taskFileStorage.readJobOutputs(job.getOutputs()),
             getJobTaskExecutions(id));
-        Optional<Long> projectInstanceIdOptional = instanceJobService.fetchJobInstanceId(
+        Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), ModeType.AUTOMATION);
 
         return new WorkflowExecution(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
-            OptionalUtils.map(projectInstanceIdOptional, projectInstanceService::getProjectInstance),
+            OptionalUtils.map(projectDeploymentIdOptional, projectDeploymentService::getProjectDeployment),
             jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
-                OptionalUtils.orElse(projectInstanceIdOptional, null),
+                OptionalUtils.orElse(projectDeploymentIdOptional, null),
                 OptionalUtils.orElse(
                     triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")), null),
                 job));
@@ -143,7 +144,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     @Transactional(readOnly = true)
     public Page<WorkflowExecution> getWorkflowExecutions(
         Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
-        Long projectInstanceId, String workflowId, int pageNumber) {
+        Long projectDeploymentId, String workflowId, int pageNumber) {
 
         List<String> workflowIds = new ArrayList<>();
 
@@ -161,24 +162,24 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         if (workflowIds.isEmpty()) {
             workflowExecutionPage = Page.empty();
         } else {
-            List<Long> projectInstanceIds = new ArrayList<>();
+            List<Long> projectDeploymentIds = new ArrayList<>();
 
-            if (projectInstanceId != null) {
-                projectInstanceIds.add(projectInstanceId);
+            if (projectDeploymentId != null) {
+                projectDeploymentIds.add(projectDeploymentId);
             } else {
-                projectInstanceIds.addAll(
-                    projectInstanceService.getProjectInstances(null, environment, null, null)
+                projectDeploymentIds.addAll(
+                    projectDeploymentService.getProjectDeployments(null, environment, null, null)
                         .stream()
-                        .map(ProjectInstance::getId)
+                        .map(ProjectDeployment::getId)
                         .toList());
             }
 
-            if (projectInstanceIds.isEmpty()) {
+            if (projectDeploymentIds.isEmpty()) {
                 workflowExecutionPage = Page.empty();
             } else {
-                Page<Job> jobsPage = instanceJobService
+                Page<Job> jobsPage = principalJobService
                     .getJobIds(
-                        jobStatus, jobStartDate, jobEndDate, projectInstanceIds, ModeType.AUTOMATION, workflowIds,
+                        jobStatus, jobStartDate, jobEndDate, projectDeploymentIds, ModeType.AUTOMATION, workflowIds,
                         pageNumber)
                     .map(jobService::getJob);
 
@@ -200,13 +201,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                         project -> CollectionUtils.contains(
                             projectWorkflowService.getWorkflowIds(project.getId()), job.getWorkflowId())),
                     OptionalUtils.map(
-                        instanceJobService.fetchJobInstanceId(job.getId(), ModeType.AUTOMATION),
-                        projectInstanceService::getProjectInstance),
+                        principalJobService.fetchJobPrincipalId(job.getId(), ModeType.AUTOMATION),
+                        projectDeploymentService::getProjectDeployment),
                     new JobDTO(job),
                     CollectionUtils.getFirst(workflows,
                         workflow -> Objects.equals(workflow.getId(), job.getWorkflowId())),
                     getTriggerExecutionDTO(
-                        projectInstanceId,
+                        projectDeploymentId,
                         OptionalUtils.orElse(
                             triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id")),
                             null),
@@ -257,18 +258,19 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
-        Number projectInstanceId, TriggerExecution triggerExecution, Job job) {
+        Number projectDeploymentId, TriggerExecution triggerExecution, Job job) {
 
         TriggerExecutionDTO triggerExecutionDTO = null;
 
-        if (projectInstanceId != null && triggerExecution != null) {
-            ProjectInstanceWorkflow projectInstanceWorkflow = projectInstanceWorkflowService.getProjectInstanceWorkflow(
-                projectInstanceId.longValue(), job.getWorkflowId());
+        if (projectDeploymentId != null && triggerExecution != null) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
+                    projectDeploymentId.longValue(), job.getWorkflowId());
             DefinitionResult definitionResult = getDefinition(triggerExecution.getType());
 
             triggerExecutionDTO = new TriggerExecutionDTO(
                 triggerExecution, definitionResult.title(), definitionResult.icon(),
-                projectInstanceWorkflow.getInputs(),
+                projectDeploymentWorkflow.getInputs(),
                 triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
         }
 
