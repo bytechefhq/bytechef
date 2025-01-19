@@ -11,7 +11,14 @@ const AiProviders = () => {
     return (
         <PageLoader errors={[aiProvidersError]} loading={aiProvidersLoading}>
             <LayoutContainer
-                header={<Header className="w-full px-4 2xl:mx-auto 2xl:w-4/5" position="main" title="AI Providers" />}
+                header={
+                    <Header
+                        className="w-full px-4 2xl:mx-auto 2xl:w-4/5"
+                        description="Enable providers used by Univerzal AI Connectors"
+                        position="main"
+                        title="AI Providers"
+                    />
+                }
                 leftSidebarOpen={false}
             >
                 {aiProviders && <AiProviderList aiProviders={aiProviders} />}
