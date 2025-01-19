@@ -36,12 +36,3 @@ bytechef:
   security:
     remember-me:
       key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-  zipkin:
-    tracing:
-      endpoint: http://localhost:4318/v1/traces
-      encoding: PROTO3

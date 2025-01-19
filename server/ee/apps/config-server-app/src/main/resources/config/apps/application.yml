@@ -72,6 +72,13 @@ management:
       export:
         enabled: true
         step: 60
+  tracing:
+    sampling:
+      probability: 1.0
+  zipkin:
+    tracing:
+      endpoint: ${bytechef.tracing.zipkin.endpoint}
+      encoding: PROTO3
 
 openapi:
   openAPIDefinition:
@@ -162,6 +169,9 @@ bytechef:
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
+  tracing:
+    zipkin:
+      endpoint: http://localhost:4318/v1/traces
   webhook-url: http://127.0.0.1:7888/webhooks/{id}
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"

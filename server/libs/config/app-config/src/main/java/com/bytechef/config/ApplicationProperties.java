@@ -60,6 +60,7 @@ public class ApplicationProperties {
     private SignUp signUp = new SignUp();
     private Tenant tenant = new Tenant();
     private String webhookUrl;
+    private Tracing tracing = new Tracing();
     private Worker worker = new Worker();
     private Workflow workflow = new Workflow();
 
@@ -153,6 +154,10 @@ public class ApplicationProperties {
 
     public Tenant getTenant() {
         return tenant;
+    }
+
+    public Tracing getTracing() {
+        return tracing;
     }
 
     public String getWebhookUrl() {
@@ -257,6 +262,10 @@ public class ApplicationProperties {
 
     public void setTenant(Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    public void setTracing(Tracing tracing) {
+        this.tracing = tracing;
     }
 
     public void setWebhookUrl(String webhookUrl) {
@@ -1711,6 +1720,32 @@ public class ApplicationProperties {
 
         public void setMode(Mode mode) {
             this.mode = mode;
+        }
+    }
+
+    public static class Tracing {
+
+        private Zipkin zipkin = new Zipkin();
+
+        public Zipkin getZipkin() {
+            return zipkin;
+        }
+
+        public void setZipkin(Zipkin zipkin) {
+            this.zipkin = zipkin;
+        }
+    }
+
+    public static class Zipkin {
+
+        private String endpoint;
+
+        public String getEndpoint() {
+            return endpoint;
+        }
+
+        public void setEndpoint(String endpoint) {
+            this.endpoint = endpoint;
         }
     }
 
