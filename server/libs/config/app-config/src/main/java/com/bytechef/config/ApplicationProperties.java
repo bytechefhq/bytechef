@@ -468,56 +468,28 @@ public class ApplicationProperties {
                 return amazonBedrockAnthropic2;
             }
 
-            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
-                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
-            }
-
             public AmazonBedrockAnthropic3 getAmazonBedrockAnthropic3() {
                 return amazonBedrockAnthropic3;
-            }
-
-            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
-                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
             }
 
             public AmazonBedrockCohere getAmazonBedrockCohere() {
                 return amazonBedrockCohere;
             }
 
-            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
-                this.amazonBedrockCohere = amazonBedrockCohere;
-            }
-
             public AmazonBedrockJurassic2 getAmazonBedrockJurassic2() {
                 return amazonBedrockJurassic2;
-            }
-
-            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
-                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
             }
 
             public AmazonBedrockLlama getAmazonBedrockLlama() {
                 return amazonBedrockLlama;
             }
 
-            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
-                this.amazonBedrockLlama = amazonBedrockLlama;
-            }
-
             public AmazonBedrockTitan getAmazonBedrockTitan() {
                 return amazonBedrockTitan;
             }
 
-            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
-                this.amazonBedrockTitan = amazonBedrockTitan;
-            }
-
             public Anthropic getAnthropic() {
                 return anthropic;
-            }
-
-            public void setAnthropic(Anthropic anthropic) {
-                this.anthropic = anthropic;
             }
 
             private AzureOpenAi azureOpenAi = new AzureOpenAi();
@@ -526,24 +498,12 @@ public class ApplicationProperties {
                 return azureOpenAi;
             }
 
-            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
-                this.azureOpenAi = azureOpenAi;
-            }
-
             public Groq getGroq() {
                 return groq;
             }
 
-            public void setGroq(Groq groq) {
-                this.groq = groq;
-            }
-
             public Nvidia getNvidia() {
                 return nvidia;
-            }
-
-            public void setNvidia(Nvidia nvidia) {
-                this.nvidia = nvidia;
             }
 
             private HuggingFace huggingFace = new HuggingFace();
@@ -552,36 +512,76 @@ public class ApplicationProperties {
                 return huggingFace;
             }
 
-            public void setHuggingFace(HuggingFace huggingFace) {
-                this.huggingFace = huggingFace;
-            }
-
             public Mistral getMistral() {
                 return mistral;
-            }
-
-            public void setMistral(Mistral mistral) {
-                this.mistral = mistral;
             }
 
             public OpenAi getOpenAi() {
                 return openAi;
             }
 
-            public void setOpenAi(OpenAi openAi) {
-                this.openAi = openAi;
-            }
-
             public Stability getStability() {
                 return stability;
             }
 
-            public void setStability(Stability stability) {
-                this.stability = stability;
-            }
-
             public VertexGemini getVertexGemini() {
                 return vertexGemini;
+            }
+
+            public void setAmazonBedrockAnthropic2(AmazonBedrockAnthropic2 amazonBedrockAnthropic2) {
+                this.amazonBedrockAnthropic2 = amazonBedrockAnthropic2;
+            }
+
+            public void setAmazonBedrockAnthropic3(AmazonBedrockAnthropic3 amazonBedrockAnthropic3) {
+                this.amazonBedrockAnthropic3 = amazonBedrockAnthropic3;
+            }
+
+            public void setAmazonBedrockCohere(AmazonBedrockCohere amazonBedrockCohere) {
+                this.amazonBedrockCohere = amazonBedrockCohere;
+            }
+
+            public void setAmazonBedrockJurassic2(AmazonBedrockJurassic2 amazonBedrockJurassic2) {
+                this.amazonBedrockJurassic2 = amazonBedrockJurassic2;
+            }
+
+            public void setAmazonBedrockLlama(AmazonBedrockLlama amazonBedrockLlama) {
+                this.amazonBedrockLlama = amazonBedrockLlama;
+            }
+
+            public void setAmazonBedrockTitan(AmazonBedrockTitan amazonBedrockTitan) {
+                this.amazonBedrockTitan = amazonBedrockTitan;
+            }
+
+            public void setAnthropic(Anthropic anthropic) {
+                this.anthropic = anthropic;
+            }
+
+            public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                this.azureOpenAi = azureOpenAi;
+            }
+
+            public void setGroq(Groq groq) {
+                this.groq = groq;
+            }
+
+            public void setNvidia(Nvidia nvidia) {
+                this.nvidia = nvidia;
+            }
+
+            public void setHuggingFace(HuggingFace huggingFace) {
+                this.huggingFace = huggingFace;
+            }
+
+            public void setMistral(Mistral mistral) {
+                this.mistral = mistral;
+            }
+
+            public void setOpenAi(OpenAi openAi) {
+                this.openAi = openAi;
+            }
+
+            public void setStability(Stability stability) {
+                this.stability = stability;
             }
 
             public void setVertexGemini(VertexGemini vertexGemini) {
