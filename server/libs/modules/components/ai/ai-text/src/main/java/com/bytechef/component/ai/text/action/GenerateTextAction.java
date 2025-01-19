@@ -32,6 +32,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.ai.text.action.definition.AiTextActionDefinition;
 import com.bytechef.component.ai.text.constant.AiTextConstants;
@@ -63,6 +64,7 @@ public class GenerateTextAction implements AiTextAction {
                     string(PROMPT)
                         .label("Prompt")
                         .description("Write your prompt for generating text.")
+                        .controlType(TEXT_AREA)
                         .required(true),
                     MAX_TOKENS_PROPERTY,
                     TEMPERATURE_PROPERTY)
