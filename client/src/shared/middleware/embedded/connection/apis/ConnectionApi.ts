@@ -26,7 +26,7 @@ import {
 } from '../models/index';
 
 export interface CreateConnectionRequest {
-    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'connectionVersion'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 export interface DeleteConnectionRequest {
@@ -46,7 +46,7 @@ export interface GetConnectionsRequest {
 
 export interface UpdateConnectionRequest {
     id: number;
-    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'connectionVersion'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
+    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
 /**
