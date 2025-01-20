@@ -19,6 +19,8 @@ package com.bytechef.component.ai.vectorstore.pinecone.constant;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.pinecone.PineconeVectorStore;
@@ -32,18 +34,25 @@ public class PineconeConstants {
     }
 
     public static final String API_KEY = "apiKey";
-    public static final String ENVIRONMENT = "environment";
-    public static final String INDEX_NAME = "indexName";
-    public static final String PROJECT_ID = "projectId";
+    public static final String HOST = "host";
+
     public static final VectorStore VECTOR_STORE = connectionParameters -> {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
 
-        return PineconeVectorStore
-            .builder(
-                openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
-                connectionParameters.getRequiredString(PROJECT_ID), connectionParameters.getRequiredString(ENVIRONMENT),
-                connectionParameters.getRequiredString(INDEX_NAME))
-            .build();
+        String requiredString = connectionParameters.getRequiredString(HOST);
+        Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
+        Matcher matcher = pattern.matcher(requiredString);
+
+        if (matcher.find())
+            return PineconeVectorStore
+                .builder(
+                    openAiEmbeddingModel, connectionParameters.getRequiredString(API_KEY),
+                    matcher.group(2), matcher.group(3),
+                    matcher.group(1))
+                .build();
+        else
+            throw new IllegalArgumentException("Invalid Host url"); // not sure if I should make an AbstractException
+                                                                    // for this
     };
 }

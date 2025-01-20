@@ -48,8 +48,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Data Query",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -542,10 +542,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Load Data",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -593,57 +596,17 @@
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
-        "description" : "Pinecone environment.",
+        "description" : "Url of the host.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
         "required" : true,
-        "name" : "environment",
-        "type" : "STRING",
-        "defaultValue" : "gcp-starter",
-        "exampleValue" : null,
-        "label" : "Environment",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Pinecone project ID.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "projectId",
+        "name" : "host",
         "type" : "STRING",
         "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Project ID",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Pinecone index name.",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "indexName",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Index Name",
+        "exampleValue" : "https://indexname-pr0j1d7.svc.aped-1234-a12b.pinecone.io",
+        "label" : "Host",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
@@ -672,10 +635,7 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+    "baseUri" : null,
+    "test" : null
+  }
 }
