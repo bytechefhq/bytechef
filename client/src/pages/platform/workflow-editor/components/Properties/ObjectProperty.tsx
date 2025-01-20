@@ -187,22 +187,22 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
         if (preexistingProperties.length) {
             setSubProperties(preexistingProperties as Array<PropertyAllType>);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [parameterObject]);
-
-    // set subProperties in cases where the ObjectProperty has predefined properties
-    useEffect(() => {
-        if (properties?.length) {
+        } else if (properties?.length) {
             setSubProperties(properties as Array<PropertyAllType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [properties]);
+    }, [parameterObject, properties]);
 
     // set default values for subProperties when they are created
     useEffect(() => {
-        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
+        if (
+            !subProperties ||
+            !path ||
+            path.includes('.') ||
+            !currentComponent ||
+            !updateWorkflowNodeParameterMutation ||
+            !workflow.id
+        ) {
             return;
         }
 
@@ -215,21 +215,35 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             return;
         }
 
-        const defaultValueObject = subProperties.reduce<Record<string, unknown>>((acc, subProperty) => {
-            if (subProperty.name) {
-                acc[subProperty.name] = subProperty.defaultValue;
-            }
+        const buildObject = (properties: Array<PropertyAllType>) =>
+            properties.reduce<Record<string, unknown>>((acc, subProperty) => {
+                const {defaultValue, name, properties, type} = subProperty;
 
-            return acc;
-        }, {});
+                if (!name) {
+                    return acc;
+                }
 
-        saveProperty({
-            path,
-            type: 'OBJECT',
-            updateWorkflowNodeParameterMutation,
-            value: defaultValueObject,
-            workflowId: workflow.id,
-        });
+                if (type === 'OBJECT' && properties) {
+                    acc[name] = buildObject(properties);
+                } else {
+                    acc[name] = defaultValue;
+                }
+                return acc;
+            }, {});
+
+        const defaultValueObject = buildObject(subProperties);
+
+        const timeoutId = setTimeout(() => {
+            saveProperty({
+                path,
+                type: 'OBJECT',
+                updateWorkflowNodeParameterMutation,
+                value: defaultValueObject,
+                workflowId: workflow.id!,
+            });
+        }, 200);
+
+        return () => clearTimeout(timeoutId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subProperties]);
 
