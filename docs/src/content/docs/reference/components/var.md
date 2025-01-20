@@ -30,7 +30,7 @@ Assign value to a variable that can be used in the following steps.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Value | [] | ARRAY_BUILDER  |  Value of any type to set.  |
 | Value | BOOLEAN | SELECT  |  Value of any type to set.  |
 | Value | DATE | DATE  |  Value of any type to set.  |

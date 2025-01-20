@@ -52,7 +52,7 @@ Create a document on Google Docs.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Title | STRING | TEXT  |  Document title.  |
-| Content | STRING | TEXT  |  Document content.  |
+| Content | STRING | TEXT_AREA  |  Document content.  |
 
 
 
@@ -64,21 +64,21 @@ Edit a template file and replace the values with the ones provided.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Destination File | STRING | TEXT  |  The ID of the file to replace the values.  |
+| Template File ID | STRING | SELECT  |  The ID of the file to replace the values.  |
 | Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value.  |
 | Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL.  |
 
 
 
 
-### Read Document
-Read a document from Google Docs.
+### Get Document
+Retrieve a specified document from your Google Drive.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Document Id | STRING | TEXT  |  The ID of the document to read.  |
+| Document Id | STRING | SELECT  |  The ID of the document to read.  |
 
 
 

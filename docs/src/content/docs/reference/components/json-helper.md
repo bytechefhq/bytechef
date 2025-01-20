@@ -42,7 +42,7 @@ Writes the object/array to a JSON string.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Source | {} | OBJECT_BUILDER  |  The data to convert to JSON string.  |
 | Source | [] | ARRAY_BUILDER  |  The data to convert to JSON string.  |
 

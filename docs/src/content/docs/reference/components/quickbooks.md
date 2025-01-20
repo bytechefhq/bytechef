@@ -67,7 +67,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type)} | OBJECT_BUILDER  |
 
 
 
@@ -100,7 +100,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(Title), STRING\(GivenName), STRING\(MiddleName), STRING\(FamilyName), STRING\(Suffix), STRING\(FullyQualifiedName), STRING\(DisplayName), STRING\(Active)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} | OBJECT_BUILDER  |
 
 
 
@@ -132,7 +132,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type), {STRING\(name)}\(IncomeAccountRef), {STRING\(name)}\(AssetAccountRef), {STRING\(name)}\(ExpenseAccountRef)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} | OBJECT_BUILDER  |
 
 
 
@@ -161,7 +161,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(CustomerRef), STRING\(TotalAmt)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} | OBJECT_BUILDER  |
 
 
 
@@ -189,7 +189,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(Title), STRING\(GivenName), STRING\(MiddleName), STRING\(FamilyName), STRING\(Suffix), STRING\(FullyQualifiedName), STRING\(DisplayName), STRING\(Active)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(title), STRING\(givenName), STRING\(middleName), STRING\(familyName), STRING\(suffix), STRING\(fullyQualifiedName), STRING\(displayName), STRING\(active)} | OBJECT_BUILDER  |
 
 
 
@@ -217,7 +217,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(DocNumber), {STRING\(name)}\(CustomerRef), STRING\(Balance)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(DocNumber), {STRING\(name)}\(customerRef), STRING\(Balance)} | OBJECT_BUILDER  |
 
 
 
@@ -245,7 +245,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), STRING\(Name), STRING\(Active), STRING\(FullyQualifiedName), STRING\(Type), {STRING\(name)}\(IncomeAccountRef), {STRING\(name)}\(AssetAccountRef), {STRING\(name)}\(ExpenseAccountRef)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), STRING\(name), STRING\(active), STRING\(fullyQualifiedName), STRING\(type), {STRING\(name)}\(incomeAccountRef), {STRING\(name)}\(assetAccountRef), {STRING\(name)}\(expenseAccountRef)} | OBJECT_BUILDER  |
 
 
 
@@ -273,7 +273,7 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| {STRING\(domain), STRING\(Id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(CustomerRef), STRING\(TotalAmt)} | OBJECT_BUILDER  |
+| {STRING\(domain), STRING\(id), {STRING\(name)}\(CurrencyRef), {STRING\(name)}\(customerRef), STRING\(totalAmt)} | OBJECT_BUILDER  |
 
 
 

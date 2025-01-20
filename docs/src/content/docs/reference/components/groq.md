@@ -52,7 +52,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | TEXT  |  ID of the model to use.  |
 | Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
+| Response | {STRING\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Max Tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Number of Chat Completion Choices | INTEGER | INTEGER  |  How many chat completion choices to generate for each input message.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |

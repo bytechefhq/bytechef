@@ -54,7 +54,7 @@ Create an image using text-to-image models
 | Messages | [{STRING\(content), NUMBER\(weight)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
 | Height | INTEGER | INTEGER  |  Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.  |
 | Width | INTEGER | INTEGER  |  Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.  |
-| Number of responses | INTEGER | INTEGER  |  The number of images to be generated. Must be between 1 and 10.  |
+| Number of Responses | INTEGER | INTEGER  |  The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported..  |
 | Response format | STRING | SELECT  |  The format in which the generated images are returned.  |
 | Style | STRING | SELECT  |  Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.  |
 | Steps | INTEGER | INTEGER  |  Number of diffusion steps to run. Valid range: 10 to 50.  |
@@ -75,8 +75,8 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| [{STRING\(url), STRING\(b64Json), STRING\(revisedPrompt)}] | ARRAY_BUILDER  |
+| STRING | TEXT  |
+| STRING | TEXT  |
 
 
 

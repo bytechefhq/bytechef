@@ -46,7 +46,7 @@ Writes the data to a XML file.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Source | {} | OBJECT_BUILDER  |  The object to write to the file.  |
 | Source | [] | ARRAY_BUILDER  |  The aray to write to the file.  |
 | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.xml" will be used.  |

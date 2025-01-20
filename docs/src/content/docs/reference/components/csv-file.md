@@ -67,7 +67,7 @@ Writes the data records into a CSV file. Record values are assembled into line a
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Line Structure Definition | [{}] | ARRAY_BUILDER  |  Define a sequence of fields that will form a line. The values for these fields will consistently repeat in the same order defined here across all lines.  |
+| Rows | [{}] | ARRAY_BUILDER  |  The array of rows to write to the file.  |
 | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.csv" will be used.  |
 
 

@@ -53,10 +53,10 @@ Send a new SMS message
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Account SID | STRING | TEXT  |  The SID of the Account creating the Message resource.  |
 | To | STRING | PHONE  |  The recipient's phone number in E.164 format (for SMS/MMS) or channel address, e.g. whatsapp:+15552229999.  |
-| Source | INTEGER | SELECT  |  |
+| Source | STRING | SELECT  |  |
 | From | STRING | PHONE  |  The sender's Twilio phone number (in E.164 format), alphanumeric sender ID, Wireless SIM, short code, or channel address (e.g., whatsapp:+15554449999). The value of the from parameter must be a sender that is hosted within Twilio and belongs to the Account creating the Message. If you are using messaging_service_sid, this parameter can be empty (Twilio assigns a from value from the Messaging Service's Sender Pool) or you can provide a specific sender from your Sender Pool.  |
 | Messaging Service SID | STRING | TEXT  |  The SID of the Messaging Service you want to associate with the Message. When this parameter is provided and the from parameter is omitted, Twilio selects the optimal sender from the Messaging Service's Sender Pool. You may also provide a from parameter if you want to use a specific Sender from the Sender Pool.  |
-| Content | INTEGER | SELECT  |  |
+| Content | STRING | SELECT  |  |
 | Body | STRING | TEXT  |  The text content of the outgoing message. Can be up to 1,600 characters in length. SMS only: If the body contains more than 160 GSM-7 characters (or 70 UCS-2 characters), the message is segmented and charged accordingly. For long body text, consider using the send_as_mms parameter.  |
 | Media URL | [STRING] | ARRAY_BUILDER  |  The URL of media to include in the Message content. jpeg, jpg, gif, and png file types are fully supported by Twilio and content is formatted for delivery on destination devices. The media size limit is 5 MB for supported file types (jpeg, jpg, png, gif) and 500 KB for other types of accepted media. To send more than one image in the message, provide multiple media_url parameters in the POST request. You can include up to ten media_url parameters per message. International and carrier limits apply.  |
 | Status Callback | STRING | URL  |  The URL of the endpoint to which Twilio sends Message status callback requests. URL must contain a valid hostname and underscores are not allowed. If you include this parameter with the messaging_service_sid, Twilio uses this URL instead of the Status Callback URL of the Messaging Service.  |

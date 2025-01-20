@@ -100,7 +100,7 @@ Invites one or more person to an existing event.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Calendar Identifier | STRING | SELECT  |  |
-| Event | STRING | SELECT  |  Event to add attendees to.  |
+| Event ID | STRING | SELECT  |  ID of the event to add attendees to.  |
 | Attendees | [STRING\($email)] | ARRAY_BUILDER  |  The attendees of the event.  |
 
 
@@ -243,7 +243,7 @@ Deletes an event from Google Calendar.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Calendar Identifier | STRING | SELECT  |  |
-| Event | STRING | SELECT  |  Event to delete.  |
+| Event ID | STRING | SELECT  |  ID of the event to delete.  |
 
 
 
@@ -317,7 +317,7 @@ Updates event in Google Calendar.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Calendar Identifier | STRING | SELECT  |  |
-| Event | STRING | SELECT  |  Event to update.  |
+| Event ID | STRING | SELECT  |  ID of the event to update.  |
 | Title | STRING | TEXT  |  New title of the event.  |
 | All Day Event? | BOOLEAN | SELECT  |  |
 | Start Date | DATE | DATE  |  New start date of the event.  |

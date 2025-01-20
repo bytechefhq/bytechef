@@ -56,7 +56,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | TEXT  |  Model is the identifier of the LLM Model to be used.  |
 | Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
+| Response | {STRING\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Decoding Method | STRING | TEXT  |  Decoding is the process that a model uses to choose the tokens in the generated output.  |
 | Repetition Penalty | NUMBER | NUMBER  |  Sets how strongly to penalize repetitions. A higher value (e.g., 1.8) will penalize repetitions more strongly, while a lower value (e.g., 1.1) will be more lenient.  |
 | Min Tokens | INTEGER | INTEGER  |  Sets how many tokens must the LLM generate.  |

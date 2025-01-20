@@ -30,7 +30,7 @@ Transform an object or array of objects into an array of key-value pairs.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input Type | INTEGER | SELECT  |  Type of the input. Cam be an object or an array of objects.  |
+| Input Type | STRING | SELECT  |  Type of the input. Cam be an object or an array of objects.  |
 | Input | {} | OBJECT_BUILDER  |  An input object containing one or more properties.  |
 | Input | [{}] | ARRAY_BUILDER  |  An input array containing one or more objects.  |
 | Field Key | STRING | TEXT  |  Property key of each newly created object in the array. Its property value will be a property key from the input.  |
@@ -46,7 +46,7 @@ Creates a new object with the chosen input properties. You can also rename the p
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input Type | INTEGER | SELECT  |  The input type.  |
+| Input Type | STRING | SELECT  |  The input type.  |
 | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
 | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |
 | Mapping | [{STRING\(from), STRING\(to), BOOLEAN\(requiredField)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from', 'to' and 'requiredField'. For nested keys, it supports dot notation, where the new mapped path can be used for nested mapping.  |
@@ -91,10 +91,10 @@ Goes through all object parameters and replaces all specified input parameter va
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input Type | INTEGER | SELECT  |  The input type.  |
+| Input Type | STRING | SELECT  |  The input type.  |
 | Input | {} | OBJECT_BUILDER  |  An object containing one or more properties.  |
 | Input | [{}] | ARRAY_BUILDER  |  An array containing one or more objects.  |
-| Value Type | INTEGER | SELECT  |  The value type of 'from' and 'to' property values.  |
+| Value Type | STRING | SELECT  |  The value type of 'from' and 'to' property values.  |
 | Mappings | [{[]\(from), []\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
 | Mappings | [{BOOLEAN\(from), BOOLEAN\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
 | Mappings | [{DATE\(from), DATE\(to)}] | ARRAY_BUILDER  |  An array of objects that contains properties 'from' and 'to'.  |
@@ -129,7 +129,7 @@ Replaces a given value with the specified value defined in mappings. In case the
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Value Type | INTEGER | SELECT  |  The value type.  |
+| Value Type | STRING | SELECT  |  The value type.  |
 | Value | [] | ARRAY_BUILDER  |  The value you want to replace.  |
 | Value | BOOLEAN | SELECT  |  The value you want to replace.  |
 | Value | DATE | DATE  |  The value you want to replace.  |
