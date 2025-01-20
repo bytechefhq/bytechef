@@ -107,17 +107,17 @@ public class DataStorageGetValueAction {
             object(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'“.formatted(ValueType.OBJECT))")
+                .displayCondition("type == '%s'".formatted(ValueType.OBJECT))
                 .required(true),
             string(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'“.formatted(ValueType.STRING))")
+                .displayCondition("type == '%s'".formatted(ValueType.STRING))
                 .required(true),
             time(DEFAULT_VALUE)
                 .label(DEFAULT_VALUE_LABEL)
                 .description("The default value to return if no value exists under the given key.")
-                .displayCondition("type == '%s'“.formatted(ValueType.TIME))")
+                .displayCondition("type == '%s'".formatted(ValueType.TIME))
                 .required(true))
         .output()
         .perform(DataStorageGetValueAction::perform);
