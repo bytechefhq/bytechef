@@ -18,9 +18,7 @@ package com.bytechef.component.ai.vectorstore.pinecone.connection;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.ENVIRONMENT;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.INDEX_NAME;
-import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.PROJECT_ID;
+import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeConstants.HOST;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
@@ -42,18 +40,10 @@ public class PineconeConnection {
                         .label("Pinecone API Key")
                         .description("The API key for the Pinecone API.")
                         .required(true),
-                    string(ENVIRONMENT)
-                        .label("Environment")
-                        .description("Pinecone environment.")
-                        .defaultValue("gcp-starter")
-                        .required(true),
-                    string(PROJECT_ID)
-                        .label("Project ID")
-                        .description("Pinecone project ID.")
-                        .required(true),
-                    string(INDEX_NAME)
-                        .label("Index Name")
-                        .description("Pinecone index name.")
+                    string(HOST)
+                        .label("Host")
+                        .description("Url of the host.")
+                        .exampleValue("https://indexname-pr0j1d7.svc.aped-1234-a12b.pinecone.io")
                         .required(true)));
 
     private PineconeConnection() {
