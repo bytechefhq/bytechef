@@ -193,7 +193,7 @@ Send a reply to an email message.
 | To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
 | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
 | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Body | STRING | TEXT  |  Body text of the email  |
+| Body | STRING | TEXT_AREA  |  Body text of the email  |
 | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
 
 
