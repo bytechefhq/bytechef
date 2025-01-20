@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
-import {Bot, Code} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {BotIcon, CodeIcon} from 'lucide-react';
+import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -18,10 +18,10 @@ import {ModeType, useModeTypeStore} from './stores/useModeTypeStore';
 
 interface ModeSelectionDialogProps {
     isDialogOpen: boolean;
-    onDialogClose: () => void;
+    handleDialogClose: () => void;
 }
 
-const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialogClose}: ModeSelectionDialogProps) => {
+const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDialogProps) => {
     const [selectedType, setSelectedType] = useState<ModeType | undefined>(undefined);
 
     const {currentType, setCurrentType} = useModeTypeStore();
@@ -30,16 +30,16 @@ const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialo
 
     const radioValue = (selectedType ?? currentType ?? '').toString();
 
-    const handleChangeModeType = () => {
+    const handleChangeModeType = useCallback(() => {
         if (selectedType !== undefined) {
             setCurrentType(selectedType);
 
-            onDialogClose();
+            handleDialogClose();
         }
-    };
+    }, [selectedType, setCurrentType, handleDialogClose]);
 
     useEffect(() => {
-        if (isDialogOpen === false && currentType !== undefined) {
+        if (!isDialogOpen && currentType !== undefined) {
             setSelectedType(undefined);
         }
     }, [isDialogOpen, currentType]);
@@ -55,7 +55,7 @@ const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialo
     }, [currentType, navigate]);
 
     return (
-        <Dialog onOpenChange={onDialogClose} open={isDialogOpen}>
+        <Dialog onOpenChange={handleDialogClose} open={isDialogOpen}>
             <DialogContent
                 className={twMerge(
                     'flex w-fit flex-col gap-10 p-6',
@@ -80,7 +80,7 @@ const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialo
                         htmlFor="embedded"
                     >
                         <div className="flex items-center gap-6 p-4 pr-2">
-                            <Code size={48} />
+                            <CodeIcon size={48} />
 
                             <div className="flex grow flex-col gap-1">
                                 <p className="text-xl font-bold">Embedded</p>
@@ -106,7 +106,7 @@ const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialo
                         htmlFor="automation"
                     >
                         <div className="flex items-center gap-6 p-4 pr-2">
-                            <Bot size={48} />
+                            <BotIcon size={48} />
 
                             <div className="flex grow flex-col gap-1">
                                 <p className="text-xl font-bold">Automation</p>
@@ -133,7 +133,7 @@ const ModeSelectionDialog = ({isDialogOpen: isDialogOpen, onDialogClose: onDialo
                         <Button
                             aria-label="cancel"
                             className="py-5"
-                            onClick={onDialogClose}
+                            onClick={handleDialogClose}
                             type="button"
                             variant="outline"
                         >

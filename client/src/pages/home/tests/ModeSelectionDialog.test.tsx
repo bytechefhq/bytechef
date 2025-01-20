@@ -49,7 +49,7 @@ const renderModeSelectionDialog = () => {
     render(
         <MemoryRouter>
             <Routes>
-                <Route element={<ModeSelectionDialog isDialogOpen={true} onDialogClose={mockOnClose} />} path="/" />
+                <Route element={<ModeSelectionDialog handleDialogClose={mockOnClose} isDialogOpen={true} />} path="/" />
             </Routes>
         </MemoryRouter>
     );
@@ -65,7 +65,10 @@ it('should not show dialog when isDialogOpen is false', () => {
     render(
         <MemoryRouter>
             <Routes>
-                <Route element={<ModeSelectionDialog isDialogOpen={false} onDialogClose={mockOnClose} />} path="/" />
+                <Route
+                    element={<ModeSelectionDialog handleDialogClose={mockOnClose} isDialogOpen={false} />}
+                    path="/"
+                />
             </Routes>
         </MemoryRouter>
     );
