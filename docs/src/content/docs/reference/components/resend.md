@@ -56,7 +56,7 @@ Send an email
 | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
 | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
 | Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
-| Content Type | INTEGER | SELECT  |  |
+| Content Type | STRING | SELECT  |  |
 | HTML | STRING | RICH_TEXT  |  The HTML version of the message.  |
 | Text | STRING | TEXT_AREA  |  The plain text version of the message.  |
 | Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |

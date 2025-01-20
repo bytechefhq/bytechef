@@ -32,7 +32,7 @@ Add value to the object by key if it exists. Otherwise, update the value
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Source | {} | OBJECT_BUILDER  |  Source object to be added or updated  |
 | Key | STRING | TEXT  |  Key of the value to be added or updated.  |
-| Value Type | INTEGER | SELECT  |  Type of value to be added or updated.  |
+| Type | STRING | SELECT  |  Type of value to be added or updated.  |
 | Value | [] | ARRAY_BUILDER  |  Value to be added or updated.  |
 | Value | BOOLEAN | SELECT  |  Value to be added or updated.  |
 | Value | DATE | DATE  |  Value to be added or updated.  |
@@ -54,7 +54,7 @@ Add values from list to object or array. If the source is object, the items in t
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type of Initial Object | INTEGER | SELECT  |  Type of initial object to be added or updated.  |
+| Type of Initial Object | STRING | SELECT  |  Type of initial object to be added or updated.  |
 | Source | [{}] | ARRAY_BUILDER  |  Source object to be added or updated  |
 | Source | {} | OBJECT_BUILDER  |  Source object to be added or updated  |
 | Key-Value Pairs | {} | OBJECT_BUILDER  |  Key-Value pairs to be added or updated.  |

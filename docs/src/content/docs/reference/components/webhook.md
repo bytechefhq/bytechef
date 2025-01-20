@@ -37,7 +37,7 @@ null
 
 ___Sample Output:___
 
-```{method=POST, parameters={}, headers={}}```
+```{headers={}, method=POST, parameters={}}```
 
 
 null
@@ -61,7 +61,7 @@ Upon receiving a webhook request, it goes through a validation process. Once val
 
 ___Sample Output:___
 
-```{method=POST, parameters={}, headers={}}```
+```{headers={}, method=POST, parameters={}}```
 
 
 null
@@ -86,7 +86,7 @@ You have the flexibility to set up your preferred response. After a webhook requ
 
 ___Sample Output:___
 
-```{method=POST, parameters={}, headers={}}```
+```{headers={}, method=POST, parameters={}}```
 
 
 null
@@ -108,7 +108,7 @@ Converts the response to the webhook request.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Response Type | INTEGER | SELECT  |  The type of the response.  |
+| Response Type | STRING | SELECT  |  The type of the response.  |
 | Headers | {} | OBJECT_BUILDER  |  The headers of the response.  |
 | Body | {} | OBJECT_BUILDER  |  The body of the response.  |
 | Body | STRING | TEXT  |  The body of the response.  |

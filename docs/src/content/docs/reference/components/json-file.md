@@ -48,7 +48,7 @@ Writes the data to a JSON file.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | File Type | STRING | SELECT  |  The file type to choose.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Source | {} | OBJECT_BUILDER  |  The object to write to the file.  |
 | Source | [] | ARRAY_BUILDER  |  The array to write to the file.  |
 | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.json" will be used.  |

@@ -139,6 +139,34 @@ Type: OBJECT
 
 
 
+### Create Status
+Creates new status
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Status | {STRING\(name), STRING\(project_id)} | OBJECT_BUILDER  |  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(message), {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)}\(task_group)} | OBJECT_BUILDER  |
+
+
+
+
+
+
 <hr />
 
 # Additional instructions

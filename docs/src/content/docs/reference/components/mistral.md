@@ -52,7 +52,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Model | STRING | SELECT  |  ID of the model to use.  |
 | Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
+| Response | {STRING\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 | Max Tokens | INTEGER | INTEGER  |  The maximum number of tokens to generate in the chat completion.  |
 | Temperature | NUMBER | NUMBER  |  Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.  |
 | Top P | NUMBER | NUMBER  |  An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.  |

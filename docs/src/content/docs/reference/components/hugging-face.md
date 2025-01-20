@@ -52,7 +52,7 @@ Ask anything you want.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | URL | STRING | TEXT  |  Url of the inference endpoint  |
 | Messages | [{STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)}] | ARRAY_BUILDER  |  A list of messages comprising the conversation so far.  |
-| Response | {INTEGER\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
+| Response | {STRING\(responseFormat), STRING\(responseSchema)} | OBJECT_BUILDER  |  The response from the API.  |
 
 
 

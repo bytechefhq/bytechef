@@ -49,7 +49,7 @@ Writes the data to a XLS/XLSX file.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Sheet Name | STRING | TEXT  |  The name of the sheet to create in the spreadsheet.  |
-| Rows | [{}] | ARRAY_BUILDER  |  The array of objects to write to the file.  |
+| Rows | [{}] | ARRAY_BUILDER  |  The array of rows to write to the file.  |
 | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.xlsx" will be used.  |
 
 

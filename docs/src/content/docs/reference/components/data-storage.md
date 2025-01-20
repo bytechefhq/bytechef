@@ -32,7 +32,7 @@ Append value to the end of a list. If the list does not exist, it will be create
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Scope | STRING | SELECT  |  The namespace for appending a value.  |
 | Key | STRING | TEXT  |  The identifier of a list must be unique within the chosen scope, or a new value will overwrite the existing one.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Value | [] | ARRAY_BUILDER  |  The value to set under given key.  |
 | Value | BOOLEAN | SELECT  |  The value to set under given key.  |
 | Value | DATE | DATE  |  The value to set under given key.  |
@@ -81,7 +81,7 @@ Wait for a value under a specified key, until it's available.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Key | STRING | TEXT  |  The identifier of a value to wait for.  |
 | Scope | STRING | SELECT  |  The namespace to obtain a value from.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Default Value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
 | Default Value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
 | Default Value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
@@ -161,7 +161,7 @@ Retrieve a previously assigned value within the specified scope using its corres
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Key | STRING | TEXT  |  The identifier of a value to get, stored earlier in the selected scope.  |
 | Scope | STRING | SELECT  |  The namespace to get a value from. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Default Value | [] | ARRAY_BUILDER  |  The default value to return if no value exists under the given key.  |
 | Default Value | BOOLEAN | SELECT  |  The default value to return if no value exists under the given key.  |
 | Default Value | DATE | DATE  |  The default value to return if no value exists under the given key.  |
@@ -185,7 +185,7 @@ Set a value under a key, in the specified scope.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Key | STRING | TEXT  |  The identifier of a value. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.  |
 | Scope | STRING | SELECT  |  The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Value | [] | ARRAY_BUILDER  |  The value to set under the specified key.  |
 | Value | BOOLEAN | SELECT  |  The value to set under the specified key.  |
 | Value | DATE | DATE  |  The value to set under the specified key.  |
@@ -210,7 +210,7 @@ Set value under a specified index in a list.
 | Key | STRING | TEXT  |  The identifier of a list. Must be unique across all keys within the chosen scope to prevent overwriting the existing value with a new one. Also, it must be less than 1024 bytes in length.  |
 | Scope | STRING | SELECT  |  The namespace to set a value in. The value should have been previously accessible, either in the present workflow execution, or the workflow itself for all the executions, or the user account for all the workflows the user has.  |
 | Index | INTEGER | INTEGER  |  The index in a list to set a value under. The previous value will be overridden.  |
-| Type | INTEGER | SELECT  |  The value type.  |
+| Type | STRING | SELECT  |  The value type.  |
 | Value | [] | ARRAY_BUILDER  |  The value to set under the specified list's key.  |
 | Value | BOOLEAN | SELECT  |  The value to set under the specified list's key.  |
 | Value | DATE | DATE  |  The value to set under the specified list's key.  |
