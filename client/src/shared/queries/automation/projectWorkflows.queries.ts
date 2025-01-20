@@ -4,7 +4,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectWorkflowKeys = {
-    projectVersionWorkflows: (projectId: number, projectVersion: number, includeAllFields: boolean) => [
+    projectVersionWorkflows: (projectId: number, projectVersion: number, includeAllFields: boolean = true) => [
         ...ProjectKeys.projects,
         projectId,
         projectVersion,
