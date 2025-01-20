@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Webhook",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -288,6 +287,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -299,15 +299,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "method" : "POST",
           "headers" : { },
+          "method" : "POST",
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "method" : "POST",
         "headers" : { },
+        "method" : "POST",
         "parameters" : { }
       }
     },
@@ -316,17 +316,17 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -339,15 +339,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "method" : "POST",
           "headers" : { },
+          "method" : "POST",
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "method" : "POST",
         "headers" : { },
+        "method" : "POST",
         "parameters" : { }
       }
     },
@@ -376,17 +376,17 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
@@ -399,15 +399,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "method" : "POST",
           "headers" : { },
+          "method" : "POST",
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "method" : "POST",
         "headers" : { },
+        "method" : "POST",
         "parameters" : { }
       }
     },
@@ -455,19 +455,19 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : true,
-    "deduplicate" : null,
     "poll" : null,
+    "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "dynamicWebhookRefresh" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

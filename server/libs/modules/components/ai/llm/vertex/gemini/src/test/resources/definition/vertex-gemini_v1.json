@@ -13,191 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Vertex AI Gemini",
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "bearer_token",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : "Google Cloud Platform project ID",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "projectId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Project Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : "Region",
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "location",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Location",
-        "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "Taiwan, asia-east1",
-          "value" : "asia-east1"
-        }, {
-          "description" : null,
-          "label" : "China, asia-east2",
-          "value" : "asia-east2"
-        }, {
-          "description" : null,
-          "label" : "Japan, asia-northeast1",
-          "value" : "asia-northeast1"
-        }, {
-          "description" : null,
-          "label" : "South Korea, asia-northeast3",
-          "value" : "asia-northeast3"
-        }, {
-          "description" : null,
-          "label" : "India, asia-south1",
-          "value" : "asia-south1"
-        }, {
-          "description" : null,
-          "label" : "Singapore, asia-southeast1",
-          "value" : "asia-southeast1"
-        }, {
-          "description" : null,
-          "label" : "Australia, australia-southeast1",
-          "value" : "australia-southeast1"
-        }, {
-          "description" : null,
-          "label" : "Poland, europe-central2",
-          "value" : "europe-central2"
-        }, {
-          "description" : null,
-          "label" : "Finland, europe-north1",
-          "value" : "europe-north1"
-        }, {
-          "description" : null,
-          "label" : "Spain, europe-southwest1",
-          "value" : "europe-southwest1"
-        }, {
-          "description" : null,
-          "label" : "Belgium, europe-west1",
-          "value" : "europe-west1"
-        }, {
-          "description" : null,
-          "label" : "UK, europe-west2",
-          "value" : "europe-west2"
-        }, {
-          "description" : null,
-          "label" : "Germany, europe-west3",
-          "value" : "europe-west3"
-        }, {
-          "description" : null,
-          "label" : "Netherlands, europe-west4",
-          "value" : "europe-west4"
-        }, {
-          "description" : null,
-          "label" : "Switzerland, europe-west6",
-          "value" : "europe-west6"
-        }, {
-          "description" : null,
-          "label" : "Italy, europe-west8",
-          "value" : "europe-west8"
-        }, {
-          "description" : null,
-          "label" : "France, europe-west9",
-          "value" : "europe-west9"
-        }, {
-          "description" : null,
-          "label" : "Qatar, me-central1",
-          "value" : "me-central1"
-        }, {
-          "description" : null,
-          "label" : "Kingdom of Saudi, me-central2",
-          "value" : "me-central2"
-        }, {
-          "description" : null,
-          "label" : "Israel, me-west1",
-          "value" : "me-west1"
-        }, {
-          "description" : null,
-          "label" : "Montreal, northamerica-northeast1",
-          "value" : "northamerica-northeast1"
-        }, {
-          "description" : null,
-          "label" : "Brazil, southamerica-east1",
-          "value" : "southamerica-east1"
-        }, {
-          "description" : null,
-          "label" : "Iowa, us-central1",
-          "value" : "us-central1"
-        }, {
-          "description" : null,
-          "label" : "South Carolina, us-east1",
-          "value" : "us-east1"
-        }, {
-          "description" : null,
-          "label" : "Northern Virginia, us-east4",
-          "value" : "us-east4"
-        }, {
-          "description" : null,
-          "label" : "Columbus, us-east5",
-          "value" : "us-east5"
-        }, {
-          "description" : null,
-          "label" : "Dallas, us-south1",
-          "value" : "us-south1"
-        }, {
-          "description" : null,
-          "label" : "Oregon, us-west1",
-          "value" : "us-west1"
-        }, {
-          "description" : null,
-          "label" : "Nevada, us-west4",
-          "value" : "us-west4"
-        } ],
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : null,
-      "title" : "Bearer Token",
-      "type" : "BEARER_TOKEN",
-      "acquire" : null,
-      "authorizationUrl" : null,
-      "clientSecret" : null,
-      "refreshToken" : null,
-      "apply" : null,
-      "clientId" : null,
-      "pkce" : null,
-      "refresh" : null,
-      "refreshUrl" : null,
-      "scopes" : null,
-      "tokenUrl" : null,
-      "authorizationCallback" : null,
-      "oauth2AuthorizationExtraQueryParameters" : null
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  },
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -449,18 +264,18 @@
           "minItems" : null,
           "multipleValues" : null,
           "options" : null,
-          "optionsDataSource" : null,
-          "controlType" : "ARRAY_BUILDER"
+          "controlType" : "ARRAY_BUILDER",
+          "optionsDataSource" : null
         } ],
-        "optionsDataSource" : null,
-        "controlType" : "OBJECT_BUILDER"
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
       } ],
       "maxItems" : null,
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : null,
       "description" : "The response from the API.",
@@ -527,8 +342,8 @@
         "options" : null,
         "optionsDataSource" : null
       } ],
-      "optionsDataSource" : null,
-      "controlType" : "OBJECT_BUILDER"
+      "controlType" : "OBJECT_BUILDER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The maximum number of tokens to generate in the chat completion.",
@@ -546,8 +361,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "The number of generated response messages to return. This value must be between [1, 8], inclusive. Defaults to 1.",
@@ -565,8 +380,8 @@
       "maxValue" : 8,
       "minValue" : 0,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic.",
@@ -587,8 +402,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.",
@@ -609,8 +424,8 @@
       "minValue" : null,
       "numberPrecision" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "NUMBER"
+      "controlType" : "NUMBER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Specify the number of token choices the generative uses to generate the next token.",
@@ -628,8 +443,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "INTEGER"
+      "controlType" : "INTEGER",
+      "optionsDataSource" : null
     }, {
       "advancedOption" : true,
       "description" : "Up to 4 sequences where the API will stop generating further tokens.",
@@ -669,15 +484,200 @@
       "minItems" : null,
       "multipleValues" : null,
       "options" : null,
-      "optionsDataSource" : null,
-      "controlType" : "ARRAY_BUILDER"
+      "controlType" : "ARRAY_BUILDER",
+      "optionsDataSource" : null
     } ],
     "title" : "Ask Gemini",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "bearer_token",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : "Google Cloud Platform project ID",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "projectId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Project Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : "Region",
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "location",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Location",
+        "placeholder" : null,
+        "controlType" : "SELECT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : [ {
+          "description" : null,
+          "label" : "Taiwan, asia-east1",
+          "value" : "asia-east1"
+        }, {
+          "description" : null,
+          "label" : "China, asia-east2",
+          "value" : "asia-east2"
+        }, {
+          "description" : null,
+          "label" : "Japan, asia-northeast1",
+          "value" : "asia-northeast1"
+        }, {
+          "description" : null,
+          "label" : "South Korea, asia-northeast3",
+          "value" : "asia-northeast3"
+        }, {
+          "description" : null,
+          "label" : "India, asia-south1",
+          "value" : "asia-south1"
+        }, {
+          "description" : null,
+          "label" : "Singapore, asia-southeast1",
+          "value" : "asia-southeast1"
+        }, {
+          "description" : null,
+          "label" : "Australia, australia-southeast1",
+          "value" : "australia-southeast1"
+        }, {
+          "description" : null,
+          "label" : "Poland, europe-central2",
+          "value" : "europe-central2"
+        }, {
+          "description" : null,
+          "label" : "Finland, europe-north1",
+          "value" : "europe-north1"
+        }, {
+          "description" : null,
+          "label" : "Spain, europe-southwest1",
+          "value" : "europe-southwest1"
+        }, {
+          "description" : null,
+          "label" : "Belgium, europe-west1",
+          "value" : "europe-west1"
+        }, {
+          "description" : null,
+          "label" : "UK, europe-west2",
+          "value" : "europe-west2"
+        }, {
+          "description" : null,
+          "label" : "Germany, europe-west3",
+          "value" : "europe-west3"
+        }, {
+          "description" : null,
+          "label" : "Netherlands, europe-west4",
+          "value" : "europe-west4"
+        }, {
+          "description" : null,
+          "label" : "Switzerland, europe-west6",
+          "value" : "europe-west6"
+        }, {
+          "description" : null,
+          "label" : "Italy, europe-west8",
+          "value" : "europe-west8"
+        }, {
+          "description" : null,
+          "label" : "France, europe-west9",
+          "value" : "europe-west9"
+        }, {
+          "description" : null,
+          "label" : "Qatar, me-central1",
+          "value" : "me-central1"
+        }, {
+          "description" : null,
+          "label" : "Kingdom of Saudi, me-central2",
+          "value" : "me-central2"
+        }, {
+          "description" : null,
+          "label" : "Israel, me-west1",
+          "value" : "me-west1"
+        }, {
+          "description" : null,
+          "label" : "Montreal, northamerica-northeast1",
+          "value" : "northamerica-northeast1"
+        }, {
+          "description" : null,
+          "label" : "Brazil, southamerica-east1",
+          "value" : "southamerica-east1"
+        }, {
+          "description" : null,
+          "label" : "Iowa, us-central1",
+          "value" : "us-central1"
+        }, {
+          "description" : null,
+          "label" : "South Carolina, us-east1",
+          "value" : "us-east1"
+        }, {
+          "description" : null,
+          "label" : "Northern Virginia, us-east4",
+          "value" : "us-east4"
+        }, {
+          "description" : null,
+          "label" : "Columbus, us-east5",
+          "value" : "us-east5"
+        }, {
+          "description" : null,
+          "label" : "Dallas, us-south1",
+          "value" : "us-south1"
+        }, {
+          "description" : null,
+          "label" : "Oregon, us-west1",
+          "value" : "us-west1"
+        }, {
+          "description" : null,
+          "label" : "Nevada, us-west4",
+          "value" : "us-west4"
+        } ],
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : null,
+      "title" : "Bearer Token",
+      "type" : "BEARER_TOKEN",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : null,
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : null,
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : null,
+      "scopes" : null,
+      "refreshToken" : null,
+      "tokenUrl" : null
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  }
 }

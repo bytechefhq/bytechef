@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "CSV File",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -733,5 +732,6 @@
     }
   },
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

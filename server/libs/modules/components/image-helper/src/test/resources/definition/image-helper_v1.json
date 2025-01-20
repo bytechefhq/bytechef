@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "Image Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -363,8 +362,8 @@
     } ],
     "title" : "Compress Image",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -768,8 +767,8 @@
     } ],
     "title" : "Crop Image",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -902,8 +901,8 @@
     } ],
     "title" : "Get Image Metadata",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1059,8 +1058,8 @@
     } ],
     "title" : "Image to Base64",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1426,8 +1425,8 @@
     } ],
     "title" : "Resize Image",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1786,9 +1785,10 @@
     } ],
     "title" : "Rotate Image",
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "perform" : { },
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null

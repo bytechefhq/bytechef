@@ -13,7 +13,6 @@
   "resources" : null,
   "version" : 1,
   "title" : "XML Helper",
-  "connection" : null,
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -92,9 +91,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert from XML String",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -222,10 +221,11 @@
       "optionsDataSource" : null
     } ],
     "title" : "Convert to XML String",
+    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "perform" : { }
+    "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
   "unifiedApi" : null
