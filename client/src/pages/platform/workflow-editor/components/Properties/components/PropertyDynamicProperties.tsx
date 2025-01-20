@@ -1,4 +1,4 @@
-import LoadingIcon from '@/components/LoadingIcon';
+import {Skeleton} from '@/components/ui/skeleton';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {Property as PropertyModel} from '@/shared/middleware/platform/configuration';
@@ -52,9 +52,25 @@ const PropertyDynamicProperties = ({
 
     if (isLoading) {
         return (
-            <div className="flex items-center justify-center">
-                <LoadingIcon /> Loading properties...
-            </div>
+            <ul className="flex flex-col gap-4">
+                <li className="flex flex-col space-y-1">
+                    <Skeleton className="h-5 w-1/4" />
+
+                    <Skeleton className="h-9 w-full" />
+                </li>
+
+                <li className="flex flex-col space-y-1">
+                    <Skeleton className="h-5 w-1/4" />
+
+                    <Skeleton className="h-9 w-full" />
+                </li>
+
+                <li className="flex flex-col space-y-1">
+                    <Skeleton className="h-5 w-1/4" />
+
+                    <Skeleton className="h-9 w-full" />
+                </li>
+            </ul>
         );
     }
 
