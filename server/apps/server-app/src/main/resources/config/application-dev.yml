@@ -33,6 +33,8 @@ bytechef:
   mail:
     host: localhost
     port: 1025
+  public-url: http://127.0.0.1:5173
   security:
     remember-me:
       key: e48612ba1fd46fa7089fe9f5085d8d164b53ffb2
+  webhook-url: http://127.0.0.1:9555/webhooks/{id}
