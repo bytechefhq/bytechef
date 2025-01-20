@@ -240,7 +240,7 @@ bytechef:
         http:
           url: http://localhost:3100/loki/api/v1/push
     enabled: false
-  public-url: http://127.0.0.1:5173
+  public-url:
   resources:
     web: file:///opt/bytechef/client/
   security:
@@ -254,7 +254,7 @@ bytechef:
   tracing:
     zipkin:
       endpoint: http://localhost:4318/v1/traces
-  webhook-url: http://127.0.0.1:9555/webhooks/{id}
+  webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
   # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
   # property on any given task.
