@@ -127,7 +127,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -229,7 +228,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -300,9 +300,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Labels",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -336,9 +336,9 @@
       }
     } ],
     "title" : "Delete Mail",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -349,8 +349,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -458,9 +458,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Mail",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -471,8 +471,8 @@
     "outputDefinition" : {
       "output" : { },
       "outputResponse" : null,
-      "sampleOutput" : null,
-      "outputSchema" : null
+      "outputSchema" : null,
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -580,9 +580,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Thread",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -697,7 +697,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -799,7 +798,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -961,7 +961,7 @@
       "exampleValue" : null,
       "label" : "Body",
       "placeholder" : null,
-      "controlType" : "TEXT",
+      "controlType" : "TEXT_AREA",
       "languageId" : null,
       "maxLength" : null,
       "minLength" : null,
@@ -1086,9 +1086,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Reply to Email",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1245,7 +1245,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1389,7 +1388,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1611,9 +1611,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Search Email",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1728,7 +1728,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1830,7 +1829,8 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2155,11 +2155,79 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
-  "dataStream" : null,
+  "connection" : {
+    "authorizations" : [ {
+      "detectOn" : null,
+      "description" : null,
+      "name" : "oauth2_authorization_code",
+      "properties" : [ {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientId",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Id",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      }, {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : true,
+        "name" : "clientSecret",
+        "type" : "STRING",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : "Client Secret",
+        "placeholder" : null,
+        "controlType" : "TEXT",
+        "languageId" : null,
+        "maxLength" : null,
+        "minLength" : null,
+        "options" : null,
+        "optionsDataSource" : null
+      } ],
+      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
+      "title" : "OAuth2 Authorization Code",
+      "type" : "OAUTH2_AUTHORIZATION_CODE",
+      "acquire" : null,
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { },
+      "clientId" : null,
+      "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
+      "refresh" : null,
+      "refreshUrl" : { },
+      "scopes" : { },
+      "refreshToken" : null,
+      "tokenUrl" : { }
+    } ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : null,
+    "test" : null
+  },
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -2656,7 +2724,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3141,7 +3208,8 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -3168,18 +3236,18 @@
     "type" : "STATIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : null
+    "webhookValidateOnEnable" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -3273,7 +3341,6 @@
         },
         "sampleOutput" : null
       },
-      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -3355,94 +3422,27 @@
         "options" : null,
         "controlType" : "ARRAY_BUILDER",
         "optionsDataSource" : null
-      }
+      },
+      "sampleOutput" : null
     },
     "properties" : null,
     "title" : "New Email Polling",
     "type" : "POLLING",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
+    "poll" : { },
     "deduplicate" : null,
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
-    "webhookValidateOnEnable" : null,
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
-    "poll" : { }
+    "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ {
-      "detectOn" : null,
-      "description" : null,
-      "name" : "oauth2_authorization_code",
-      "properties" : [ {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientId",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Id",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "clientSecret",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Client Secret",
-        "placeholder" : null,
-        "controlType" : "TEXT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : null,
-        "optionsDataSource" : null
-      } ],
-      "refreshOn" : [ "^.*(4\\d\\d)(\\s(Unauthorized)?.*)?$" ],
-      "title" : "OAuth2 Authorization Code",
-      "type" : "OAUTH2_AUTHORIZATION_CODE",
-      "acquire" : null,
-      "apply" : null,
-      "pkce" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
-      "clientId" : null,
-      "clientSecret" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "refresh" : null,
-      "refreshUrl" : { },
-      "scopes" : { },
-      "refreshToken" : null,
-      "tokenUrl" : { }
-    } ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : null,
-    "test" : null
-  }
+  "dataStream" : null,
+  "unifiedApi" : null
 }
