@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The environment of a connection.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T07:11:57.463898+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:36.578491+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public enum ConnectionEnvironmentModel {
   
   DEVELOPMENT("DEVELOPMENT"),

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T07:12:01.785306+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:41.002949+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "authority", description = "The Platform User Authority Internal API")
 public interface AuthorityApi {

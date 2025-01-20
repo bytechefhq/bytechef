@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T07:11:58.726098+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-16T13:45:38.829908+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class AiProviderModel {
 
   private Integer id;
