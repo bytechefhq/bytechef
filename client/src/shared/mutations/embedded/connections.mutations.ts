@@ -42,8 +42,12 @@ export const useUpdateConnectionMutation = (mutationProps?: UpdateConnectionMuta
     useMutation<void, Error, Connection>({
         mutationFn: (connection: Connection) => {
             return new ConnectionApi().updateConnection({
-                connection: connection,
                 id: connection.id!,
+                updateConnectionRequest: {
+                    name: connection.name,
+                    tags: connection.tags!,
+                    version: connection.version!,
+                },
             });
         },
         onError: mutationProps?.onError,

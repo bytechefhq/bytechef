@@ -333,13 +333,11 @@ const ConnectionDialog = ({
         if (connection?.id) {
             const {name, tags} = getValues();
 
-            /* eslint-disable @typescript-eslint/no-explicit-any */
-            (connectionMutation as any).mutate({
-                componentName: connection.componentName,
+            connectionMutation.mutate({
                 id: connection?.id,
                 name,
                 tags,
-                version: connection?.version,
+                version: connection.version,
             } as ConnectionI);
         } else {
             return connectionMutation.mutateAsync(getNewConnection(additionalParameters));
