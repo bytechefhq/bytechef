@@ -117,4 +117,15 @@ class NiftyOptionUtilsTest {
         assertEquals("type", queryNameArgumentCaptor.getValue());
         assertEquals("project", queryValueArgumentCaptor.getValue());
     }
+
+    @Test
+    void testGetTaskIdOptions() {
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("tasks", List.of(Map.of(NAME, "abc", ID, "123"))));
+
+        assertEquals(
+            expectedOptions,
+            NiftyOptionUtils.getTaskIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                mockedActionContext));
+    }
 }
