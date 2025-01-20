@@ -24,7 +24,6 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -44,17 +43,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
-    private final ConnectionService connectionService;
     private final ConversionService conversionService;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
-        ConnectionFacade connectionFacade, ConnectionService connectionService, ConversionService conversionService,
+        ConnectionFacade connectionFacade, ConversionService conversionService,
         WorkspaceConnectionFacade workspaceConnectionFacade) {
 
         this.connectionFacade = connectionFacade;
-        this.connectionService = connectionService;
         this.conversionService = conversionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
@@ -99,7 +96,7 @@ public class ConnectionApiController implements ConnectionApi {
         ConnectionDTO connectionDTO = Validate.notNull(
             conversionService.convert(connectionModel.id(id), ConnectionDTO.class), "connectionDTO");
 
-        connectionService.update(connectionDTO.toConnection());
+        connectionFacade.update(connectionDTO);
 
         return ResponseEntity.noContent()
             .build();
