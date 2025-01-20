@@ -12,6 +12,23 @@ components:
       $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
     CredentialStatus:
       $ref: "../../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/credential_status.yaml"
+    UpdateConnectionRequest:
+      description: "Contains all connection parameters that can be updated."
+      type: "object"
+      required:
+        - "name"
+        - "tags"
+      properties:
+        name:
+          description: "The name of a connection."
+          type: "string"
+        tags:
+          type: "array"
+          items:
+            $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/Tag"
+        __version:
+          type: "integer"
+          format: "int32"
     UpdateTagsRequest:
       $ref: "../../../../platform/platform-tag/platform-tag-rest/platform-tag-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
     Tag:

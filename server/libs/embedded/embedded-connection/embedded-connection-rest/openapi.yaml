@@ -129,7 +129,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Connection"
-    put:
+    patch:
       description: "Update an existing connection."
       summary: "Update an existing connection"
       tags:
@@ -147,7 +147,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Connection"
+              $ref: "#/components/schemas/UpdateConnectionRequest"
         required: true
       responses:
         "204":
@@ -184,5 +184,7 @@ components:
       $ref: "../../../platform/platform-connection/platform-connection-rest/openapi/components/schemas/objects/connection_environment.yaml"
     Tag:
       $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/Tag"
+    UpdateConnectionRequest:
+      $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateConnectionRequest"
     UpdateTagsRequest:
       $ref: "../../../platform/platform-connection/platform-connection-rest/platform-connection-rest-api/openapi.yaml#/components/schemas/UpdateTagsRequest"
