@@ -76,7 +76,7 @@ export interface Connection {
      * @type {number}
      * @memberof Connection
      */
-    connectionVersion: number;
+    readonly connectionVersion: number;
     /**
      * The created by.
      * @type {string}
@@ -192,7 +192,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'connectionVersion'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -201,7 +201,6 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         
         'authorizationName': value['authorizationName'],
         'componentName': value['componentName'],
-        'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
         'environment': ConnectionEnvironmentToJSON(value['environment']),
         'name': value['name'],
