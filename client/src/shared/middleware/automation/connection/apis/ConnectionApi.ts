@@ -17,12 +17,15 @@ import * as runtime from '../runtime';
 import type {
   Connection,
   ConnectionEnvironment,
+  UpdateConnectionRequest,
 } from '../models/index';
 import {
     ConnectionFromJSON,
     ConnectionToJSON,
     ConnectionEnvironmentFromJSON,
     ConnectionEnvironmentToJSON,
+    UpdateConnectionRequestFromJSON,
+    UpdateConnectionRequestToJSON,
 } from '../models/index';
 
 export interface CreateConnectionRequest {
@@ -45,9 +48,9 @@ export interface GetWorkspaceConnectionsRequest {
     tagId?: number;
 }
 
-export interface UpdateConnectionRequest {
+export interface UpdateConnectionOperationRequest {
     id: number;
-    connection: Connection;
+    updateConnectionRequest: UpdateConnectionRequest;
 }
 
 /**
@@ -221,7 +224,7 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Update an existing connection.
      * Update an existing connection
      */
-    async updateConnectionRaw(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+    async updateConnectionRaw(requestParameters: UpdateConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
         if (requestParameters['id'] == null) {
             throw new runtime.RequiredError(
                 'id',
@@ -229,10 +232,10 @@ export class ConnectionApi extends runtime.BaseAPI {
             );
         }
 
-        if (requestParameters['connection'] == null) {
+        if (requestParameters['updateConnectionRequest'] == null) {
             throw new runtime.RequiredError(
-                'connection',
-                'Required parameter "connection" was null or undefined when calling updateConnection().'
+                'updateConnectionRequest',
+                'Required parameter "updateConnectionRequest" was null or undefined when calling updateConnection().'
             );
         }
 
@@ -244,10 +247,10 @@ export class ConnectionApi extends runtime.BaseAPI {
 
         const response = await this.request({
             path: `/connections/{id}`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
-            method: 'PUT',
+            method: 'PATCH',
             headers: headerParameters,
             query: queryParameters,
-            body: ConnectionToJSON(requestParameters['connection']),
+            body: UpdateConnectionRequestToJSON(requestParameters['updateConnectionRequest']),
         }, initOverrides);
 
         return new runtime.VoidApiResponse(response);
@@ -257,7 +260,7 @@ export class ConnectionApi extends runtime.BaseAPI {
      * Update an existing connection.
      * Update an existing connection
      */
-    async updateConnection(requestParameters: UpdateConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
+    async updateConnection(requestParameters: UpdateConnectionOperationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<void> {
         await this.updateConnectionRaw(requestParameters, initOverrides);
     }
 
