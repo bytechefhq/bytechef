@@ -39,6 +39,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
@@ -78,6 +79,7 @@ public class GoogleMailReplyToEmailAction {
             string(BODY)
                 .label("Body")
                 .description("Body text of the email")
+                .controlType(ControlType.TEXT_AREA)
                 .required(true),
             array(ATTACHMENTS)
                 .label("Attachments")
