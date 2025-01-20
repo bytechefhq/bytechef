@@ -47,6 +47,11 @@ public class RemoteWorkflowServiceClient implements WorkflowService {
     }
 
     @Override
+    public void delete(@NonNull List<String> ids) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Workflow duplicateWorkflow(@NonNull String id) {
         throw new UnsupportedOperationException();
     }

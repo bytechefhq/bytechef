@@ -22,6 +22,7 @@ import com.bytechef.embedded.configuration.repository.IntegrationWorkflowReposit
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,29 +50,27 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
 
         Validate.notNull(workflowId, "'workflowId' must not be null");
 
-        IntegrationWorkflow integration = new IntegrationWorkflow(
+        IntegrationWorkflow integrationWorkflow = new IntegrationWorkflow(
             integrationId, integrationVersion, workflowId, workflowReferenceCode);
 
-        return integrationWorkflowRepository.save(integration);
+        return integrationWorkflowRepository.save(integrationWorkflow);
     }
 
     @Override
-    public void deleteIntegrationWorkflows(List<Long> ids) {
+    public void delete(long integrationId, int integrationVersion, @NonNull String workflowId) {
+        integrationWorkflowRepository
+            .findByIntegrationIdAndIntegrationVersionAndWorkflowId(integrationId, integrationVersion, workflowId)
+            .ifPresent(IntegrationWorkflow -> integrationWorkflowRepository.deleteById(IntegrationWorkflow.getId()));
+    }
+
+    @Override
+    public void delete(@NonNull List<Long> ids) {
         integrationWorkflowRepository.deleteAllById(ids);
     }
 
     @Override
     public IntegrationWorkflow getIntegrationWorkflow(long id) {
         return OptionalUtils.get(integrationWorkflowRepository.findById(id));
-    }
-
-    @Override
-    public IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
-        long integrationInstanceConfigurationId, String workflowId) {
-
-        return OptionalUtils.get(
-            integrationWorkflowRepository.findByIntegrationInstanceConfigurationIdWorkflowId(
-                integrationInstanceConfigurationId, workflowId));
     }
 
     @Override
@@ -129,13 +128,6 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     @Override
     public IntegrationWorkflow getWorkflowIntegrationWorkflow(String workflowId) {
         return OptionalUtils.get(integrationWorkflowRepository.findByWorkflowId(workflowId));
-    }
-
-    @Override
-    public void removeWorkflow(long integrationId, int integrationVersion, String workflowId) {
-        integrationWorkflowRepository
-            .findByIntegrationIdAndIntegrationVersionAndWorkflowId(integrationId, integrationVersion, workflowId)
-            .ifPresent(IntegrationWorkflow -> integrationWorkflowRepository.deleteById(IntegrationWorkflow.getId()));
     }
 
     @Override

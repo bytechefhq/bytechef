@@ -21,11 +21,16 @@ import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConne
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface WorkflowTestConfigurationService {
+
+    void delete(@NonNull String workflowId);
+
+    void delete(@NonNull List<String> workflowIds);
 
     Optional<WorkflowTestConfiguration> fetchWorkflowTestConfiguration(String workflowId);
 

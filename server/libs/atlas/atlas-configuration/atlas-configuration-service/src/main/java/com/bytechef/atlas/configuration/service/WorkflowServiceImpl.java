@@ -100,6 +100,13 @@ public class WorkflowServiceImpl implements WorkflowService {
     }
 
     @Override
+    public void delete(@NonNull List<String> ids) {
+        for (String id : ids) {
+            delete(id);
+        }
+    }
+
+    @Override
     public Workflow duplicateWorkflow(@NonNull String id) {
         Workflow workflow = getWorkflow(id);
 

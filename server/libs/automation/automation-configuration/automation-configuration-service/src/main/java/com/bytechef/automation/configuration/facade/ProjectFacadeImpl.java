@@ -144,11 +144,17 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(id);
 
-        for (ProjectWorkflow projectWorkflow : projectWorkflows) {
-            workflowService.delete(projectWorkflow.getWorkflowId());
-        }
+        workflowService.delete(
+            projectWorkflows.stream()
+                .map(ProjectWorkflow::getWorkflowId)
+                .toList());
 
-        projectWorkflowService.deleteProjectWorkflows(
+        workflowTestConfigurationService.delete(
+            projectWorkflows.stream()
+                .map(ProjectWorkflow::getWorkflowId)
+                .toList());
+
+        projectWorkflowService.delete(
             projectWorkflows.stream()
                 .map(ProjectWorkflow::getId)
                 .toList());
@@ -185,7 +191,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectWorkflowService.removeWorkflow(project.getId(), project.getLastProjectVersion(), workflowId);
+        projectWorkflowService.delete(project.getId(), project.getLastProjectVersion(), workflowId);
+
+        workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
     }

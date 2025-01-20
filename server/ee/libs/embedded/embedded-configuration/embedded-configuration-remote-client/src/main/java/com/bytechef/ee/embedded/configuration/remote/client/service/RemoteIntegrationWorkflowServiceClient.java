@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.remote.client.service;
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import java.util.List;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,19 +34,12 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public void deleteIntegrationWorkflows(List<Long> ids) {
+    public void delete(@NonNull List<Long> ids) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public IntegrationWorkflow getIntegrationWorkflow(long id) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
-        long integrationInstanceConfigurationId, String workflowId) {
-
         throw new UnsupportedOperationException();
     }
 
@@ -92,7 +86,7 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     }
 
     @Override
-    public void removeWorkflow(long projectId, int projectVersion, String workflowId) {
+    public void delete(long projectId, int projectVersion, @NonNull String workflowId) {
         throw new UnsupportedOperationException();
     }
 

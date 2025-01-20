@@ -18,6 +18,7 @@ package com.bytechef.embedded.configuration.service;
 
 import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -29,15 +30,14 @@ public interface IntegrationWorkflowService {
     IntegrationWorkflow addWorkflow(
         long integrationId, int integrationVersion, String workflowId, String workflowReferenceCode);
 
-    void deleteIntegrationWorkflows(List<Long> ids);
+    void delete(@NonNull List<Long> ids);
+
+    void delete(long integrationId, int integrationVersion, @NonNull String workflowId);
 
     IntegrationWorkflow getIntegrationWorkflow(long id);
 
-    IntegrationWorkflow getIntegrationInstanceConfigurationIntegrationWorkflow(
-        long integrationInstanceConfigurationId, String workflowId);
-
-    String
-        getIntegrationInstanceIntegrationWorkflowWorkflowId(long integrationInstanceId, String workflowReferenceCode);
+    String getIntegrationInstanceIntegrationWorkflowWorkflowId(
+        long integrationInstanceId, String workflowReferenceCode);
 
     List<Long> getIntegrationWorkflowIds(long integrationId, int integrationVersion);
 
@@ -52,8 +52,6 @@ public interface IntegrationWorkflowService {
     List<String> getWorkflowIds(long integrationId, int integrationVersion);
 
     IntegrationWorkflow getWorkflowIntegrationWorkflow(String workflowId);
-
-    void removeWorkflow(long integrationId, int integrationVersion, String workflowId);
 
     IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow);
 

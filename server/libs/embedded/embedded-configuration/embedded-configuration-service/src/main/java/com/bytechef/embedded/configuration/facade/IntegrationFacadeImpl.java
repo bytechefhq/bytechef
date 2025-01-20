@@ -29,7 +29,6 @@ import com.bytechef.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
-import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationServiceImpl;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
@@ -70,7 +69,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
-    private final IntegrationInstanceConfigurationServiceImpl integrationInstanceConfigurationServiceImpl;
 
     @SuppressFBWarnings("EI2")
     public IntegrationFacadeImpl(
@@ -81,8 +79,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
-        WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        IntegrationInstanceConfigurationServiceImpl integrationInstanceConfigurationServiceImpl) {
+        WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
@@ -96,7 +93,6 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
-        this.integrationInstanceConfigurationServiceImpl = integrationInstanceConfigurationServiceImpl;
     }
 
     @Override
@@ -123,10 +119,8 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             integration.setCategory(category);
         }
 
-        List<Tag> tags = integrationDTO.tags();
-
         if (!CollectionUtils.isEmpty(integrationDTO.tags())) {
-            tags = tagService.save(integrationDTO.tags());
+            List<Tag> tags = tagService.save(integrationDTO.tags());
 
             integration.setTags(tags);
         }
@@ -148,11 +142,17 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
         List<IntegrationWorkflow> integrationWorkflows = integrationWorkflowService.getIntegrationWorkflows(id);
 
-        for (IntegrationWorkflow integrationWorkflow : integrationWorkflows) {
-            workflowService.delete(integrationWorkflow.getWorkflowId());
-        }
+        workflowService.delete(
+            integrationWorkflows.stream()
+                .map(IntegrationWorkflow::getWorkflowId)
+                .toList());
 
-        integrationWorkflowService.deleteIntegrationWorkflows(
+        workflowTestConfigurationService.delete(
+            integrationWorkflows.stream()
+                .map(IntegrationWorkflow::getWorkflowId)
+                .toList());
+
+        integrationWorkflowService.delete(
             integrationWorkflows.stream()
                 .map(IntegrationWorkflow::getId)
                 .toList());
@@ -192,8 +192,10 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             }
         }
 
-        integrationWorkflowService.removeWorkflow(
+        integrationWorkflowService.delete(
             integration.getId(), integration.getLastIntegrationVersion(), workflowId);
+
+        workflowTestConfigurationService.delete(workflowId);
 
         workflowService.delete(workflowId);
     }

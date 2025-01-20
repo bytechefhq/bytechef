@@ -31,6 +31,8 @@ public interface WorkflowService {
 
     void delete(@NonNull String id);
 
+    void delete(@NonNull List<String> ids);
+
     Workflow duplicateWorkflow(@NonNull String id);
 
     List<Workflow> getWorkflows();

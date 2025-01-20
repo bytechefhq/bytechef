@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 /**
@@ -34,6 +35,16 @@ public class RemoteWorkflowTestConfigurationServiceClient implements WorkflowTes
     @SuppressFBWarnings("EI")
     public RemoteWorkflowTestConfigurationServiceClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
+    }
+
+    @Override
+    public void delete(@NonNull String workflowId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void delete(@NonNull List<String> workflowIds) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.workflow.configuration.remote.web.rest.service;
 
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class RemoteWorkflowTestConfigurationServiceController {
 
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
+    @SuppressFBWarnings("EI")
     public RemoteWorkflowTestConfigurationServiceController(
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
