@@ -31,7 +31,6 @@ properties:
   connectionVersion:
     description: "The version of a component that uses this connection."
     type: "integer"
-    readOnly: true
   createdBy:
     description: "The created by."
     type: "string"
