@@ -141,10 +141,22 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <Badge variant="secondary">V{projectDeployment.projectVersion}</Badge>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge variant="secondary">V{projectDeployment.projectVersion}</Badge>
+                            </TooltipTrigger>
+
+                            <TooltipContent>The project version</TooltipContent>
+                        </Tooltip>
 
                         <div className="flex min-w-28 justify-end">
-                            <Badge variant="secondary">{projectDeployment.environment}</Badge>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge variant="secondary">{projectDeployment.environment}</Badge>
+                                </TooltipTrigger>
+
+                                <TooltipContent>The environment</TooltipContent>
+                            </Tooltip>
                         </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">

@@ -160,10 +160,26 @@ const IntegrationInstanceConfigurationListItem = ({
                     </div>
 
                     <div className="flex items-center justify-end gap-x-6">
-                        <Badge variant="secondary">V{integrationInstanceConfiguration.integrationVersion}</Badge>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge variant="secondary">
+                                    <Badge variant="secondary">
+                                        V{integrationInstanceConfiguration.integrationVersion}
+                                    </Badge>
+                                </Badge>
+                            </TooltipTrigger>
+
+                            <TooltipContent>The integration version</TooltipContent>
+                        </Tooltip>
 
                         <div className="flex min-w-28 justify-end">
-                            <Badge variant="secondary">{integrationInstanceConfiguration.environment}</Badge>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge variant="secondary">{integrationInstanceConfiguration.environment}</Badge>
+                                </TooltipTrigger>
+
+                                <TooltipContent>The environment</TooltipContent>
+                            </Tooltip>
                         </div>
 
                         <div className="flex min-w-52 flex-col items-end gap-y-4">

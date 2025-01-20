@@ -105,9 +105,15 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     <div className="flex items-center gap-x-2">
                         <div className="flex items-center gap-x-4">
                             {integrationInstance && (
-                                <Badge variant="secondary">
-                                    V{integrationInstance.integrationInstanceConfiguration?.integrationVersion}
-                                </Badge>
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <Badge variant="secondary">
+                                            V{integrationInstance.integrationInstanceConfiguration?.integrationVersion}
+                                        </Badge>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>The integration version</TooltipContent>
+                                </Tooltip>
                             )}
 
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
