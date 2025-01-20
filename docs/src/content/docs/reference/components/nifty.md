@@ -139,6 +139,34 @@ Type: OBJECT
 
 
 
+### Get Task
+Gets task details.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Task ID | STRING | SELECT  |  ID of the task to get details for.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {STRING\(id), STRING\(name), STRING\(project), STRING\(description)} | OBJECT_BUILDER  |
+
+
+
+
+
+
 ### Create Status
 Creates new status
 
@@ -161,6 +189,36 @@ Type: OBJECT
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
 | {STRING\(message), {STRING\(id), STRING\(name), STRING\(color), STRING\(created_by), STRING\(project), INTEGER\(order)}\(task_group)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+### Get Tracked Time Report
+Gets tracked time report information.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Project ID | STRING | SELECT  |  Id of the project to get the report for.  |
+| Start Date | DATE_TIME | DATE_TIME  |  Start date for the report.  |
+| End Date | DATE_TIME | DATE_TIME  |  Start date for the report.  |
+
+
+### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {[{STRING\(id), STRING\(project), STRING\(start), BOOLEAN\(manual), STRING\(user), STRING\(task), STRING\(end), BOOLEAN\(active), STRING\(duration)}]\(items)} | OBJECT_BUILDER  |
 
 
 

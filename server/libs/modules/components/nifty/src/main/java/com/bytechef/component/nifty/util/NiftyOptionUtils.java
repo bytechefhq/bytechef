@@ -102,6 +102,18 @@ public class NiftyOptionUtils {
         return getOptions(body, "items");
     }
 
+    public static List<Option<String>> getTaskIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, ActionContext context) {
+
+        Map<String, Object> body = context.http(http -> http.get("/tasks"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        return getOptions(body, "tasks");
+    }
+
     private static List<Option<String>> getOptions(Map<String, Object> body, String resource) {
         List<Option<String>> options = new ArrayList<>();
 
