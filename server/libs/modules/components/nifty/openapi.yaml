@@ -105,6 +105,38 @@ paths:
                       due_date:
                         type: "string"
                         format: "date-time"
+  /tasks/{taskId}:
+    get:
+      summary: "Get Task"
+      description: "Gets task details."
+      operationId: "getTask"
+      parameters:
+        - name: "taskId"
+          in: "path"
+          description: "ID of the task to get details for."
+          required: true
+          schema:
+            type: "string"
+            title: "Task ID"
+      responses:
+        201:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      id:
+                        type: "string"
+                      name:
+                        type: "string"
+                      project:
+                        type: "string"
+                      description:
+                        type: "string"
   /taskgroups:
     post:
       summary: "Create Status"
@@ -210,7 +242,7 @@ paths:
                             user:
                               type: "string"
                             task:
-                                type: "string"
+                              type: "string"
                             end:
                               type: "string"
                             active:
