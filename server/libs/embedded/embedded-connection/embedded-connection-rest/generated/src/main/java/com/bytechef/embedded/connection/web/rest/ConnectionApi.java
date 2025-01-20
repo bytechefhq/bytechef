@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-17T08:08:37.169939+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T15:00:02.431444+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -192,11 +192,11 @@ public interface ConnectionApi {
 
 
     /**
-     * PUT /connections/{id} : Update an existing connection
+     * PATCH /connections/{id} : Update an existing connection
      * Update an existing connection.
      *
      * @param id The id of a connection. (required)
-     * @param connectionModel  (required)
+     * @param comBytechefPlatformConnectionWebRestModelUpdateConnectionRequestModel  (required)
      * @return Successful operation. (status code 204)
      */
     @Operation(
@@ -209,14 +209,14 @@ public interface ConnectionApi {
         }
     )
     @RequestMapping(
-        method = RequestMethod.PUT,
+        method = RequestMethod.PATCH,
         value = "/connections/{id}",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateConnection(
         @Parameter(name = "id", description = "The id of a connection.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
+        @Parameter(name = "com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel", description = "", required = true) @Valid @RequestBody com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel comBytechefPlatformConnectionWebRestModelUpdateConnectionRequestModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 

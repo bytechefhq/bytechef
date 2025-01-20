@@ -3,3 +3,4 @@ pom.xml
 src/main/java/com/bytechef/platform/connection/web/rest/ApiUtil.java
 src/main/java/com/bytechef/platform/connection/web/rest/model/ConnectionEnvironmentModel.java
 src/main/java/com/bytechef/platform/connection/web/rest/model/CredentialStatusModel.java
+src/main/java/com/bytechef/platform/connection/web/rest/model/UpdateConnectionRequestModel.java
