@@ -156,6 +156,68 @@ paths:
                             type: "string"
                           order:
                             type: "integer"
+  /time:
+    get:
+      summary: "Get Tracked Time Report"
+      description: "Gets tracked time report information."
+      operationId: "getTrackedTimeReport"
+      parameters:
+        - name: "project_id"
+          in: "query"
+          description: "Id of the project to get the report for."
+          required: true
+          schema:
+            title: "Project ID"
+            type: "string"
+        - name: "start_date"
+          in: "query"
+          description: "Start date for the report."
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+        - name: "end_date"
+          in: "query"
+          description: "Start date for the report."
+          required: false
+          schema:
+            type: "string"
+            format: "date-time"
+      responses:
+        200:
+          description: ""
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  body:
+                    type: "object"
+                    properties:
+                      items:
+                        type: "array"
+                        items:
+                          type: "object"
+                          properties:
+                            id:
+                              type: "string"
+                            project:
+                              type: "string"
+                            start:
+                              type: "string"
+                            manual:
+                              type: "boolean"
+                            user:
+                              type: "string"
+                            task:
+                                type: "string"
+                            end:
+                              type: "string"
+                            active:
+                              type: "boolean"
+                            duration:
+                              type: "string"
+
 components:
   securitySchemes:
     oauth2:
