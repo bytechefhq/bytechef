@@ -81,6 +81,9 @@ public class NiftyComponentHandler extends AbstractNiftyComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), "project_id")) {
             ((ModifiableStringProperty) modifiableProperty)
                 .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions);
+        } else if (Objects.equals(modifiableProperty.getName(), "taskId")) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .options((ActionOptionsFunction<String>) NiftyOptionUtils::getTaskIdOptions);
         } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
             Optional<List<? extends Property.ValueProperty<?>>> propertiesOptional =
                 ((ModifiableObjectProperty) modifiableProperty).getProperties();
