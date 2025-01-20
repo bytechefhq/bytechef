@@ -1,6 +1,6 @@
-import {useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 import ModeSelectionDialog from './ModeSelectionDialog';
@@ -14,25 +14,33 @@ const Home = () => {
 
     const ff_520 = useFeatureFlagsStore()('ff-520');
 
+    const memoizedNavigate = useCallback(() => navigate('/automation'), [navigate]);
+
     useEffect(() => {
         if (!ff_520) {
-            navigate('/automation');
+            memoizedNavigate();
 
             return;
+        }
+
+        if (currentType !== undefined) {
+            if (currentType === ModeType.AUTOMATION) {
+                navigate('/automation');
+            } else if (currentType === ModeType.EMBEDDED) {
+                navigate('/embedded');
+            }
         }
 
         if (currentType === undefined) {
             setIsDialogOpen(true);
         }
-    }, [currentType, navigate, ff_520]);
+    }, [ff_520, currentType, memoizedNavigate, navigate]);
 
-    return (
-        <>
-            {ff_520 && isDialogOpen && (
-                <ModeSelectionDialog isDialogOpen={isDialogOpen} onDialogClose={() => setIsDialogOpen(false)} />
-            )}
-        </>
-    );
+    if (!ff_520 || !isDialogOpen) {
+        return <></>;
+    }
+
+    return <ModeSelectionDialog handleDialogClose={() => setIsDialogOpen(false)} isDialogOpen={isDialogOpen} />;
 };
 
 export default Home;
