@@ -5,7 +5,7 @@ import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/pla
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import resolvePath from 'object-resolve-path';
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useMemo, useState} from 'react';
 
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
@@ -19,28 +19,20 @@ interface ArrayPropertyProps {
     property: PropertyAllType;
 }
 
-const initialAvailablePropertyTypes = Object.keys(VALUE_PROPERTY_CONTROL_TYPES).map((type) => ({
-    label: type as string,
-    value: type as string,
-}));
-
 const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayPropertyProps) => {
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
-    const [availablePropertyTypes, setAvailablePropertyTypes] =
-        useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
     const [newPropertyType, setNewPropertyType] = useState<string>();
 
     const {currentComponent} = useWorkflowNodeDetailsPanelStore();
 
-    const {additionalProperties, name} = property;
-
-    let items = property.items;
+    const {additionalProperties, name, placeholder} = property;
+    let {items} = property;
 
     if (!items?.length && parentArrayItems?.[0]?.items?.length) {
         items = parentArrayItems?.[0].items;
     }
 
-    const handleAddItemClick = () => {
+    const handleAddItemClick = useCallback(() => {
         if (!currentComponent || !name) {
             return;
         }
@@ -70,22 +62,24 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         };
 
         setArrayItems([...arrayItems, newItem]);
-    };
+    }, [arrayItems, currentComponent, items, name, newPropertyType, path]);
 
-    const handleDeleteClick = (path: string) => {
-        if (!currentComponent || !path) {
-            return;
-        }
+    const handleDeleteClick = useCallback(
+        (path: string) => {
+            if (!currentComponent || !path) {
+                return;
+            }
 
-        const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
+            const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
-        if (clickedItemParameterValue !== undefined) {
-            onDeleteClick(path);
-        }
-    };
+            if (clickedItemParameterValue !== undefined) {
+                onDeleteClick(path);
+            }
+        },
+        [currentComponent, onDeleteClick]
+    );
 
-    // get available property types from items and additional properties
-    useEffect(() => {
+    const availablePropertyTypes = useMemo(() => {
         let propertyTypes: Array<{label: string; value: string}> = [];
 
         const hasDuplicateTypes = items?.some(
@@ -127,11 +121,8 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
             }
         }
 
-        if (propertyTypes.length) {
-            setAvailablePropertyTypes(propertyTypes);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+        return propertyTypes;
+    }, [items, additionalProperties, currentComponent]);
 
     useEffect(() => {
         if (availablePropertyTypes.length) {
@@ -174,10 +165,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 }
 
                 const subProperties = (matchingItem as ObjectProperty).properties?.map((property) =>
-                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                    Object.keys(parameterItem).includes(name as keyof ArrayPropertyType)
                         ? {
                               ...property,
-                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              defaultValue: parameterItem[name as keyof ArrayPropertyType],
                           }
                         : property
                 );
@@ -196,10 +187,10 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         } else if (items?.length && items[0].type === 'OBJECT' && Array.isArray(parameterValue)) {
             const parameterArrayItems = parameterValue.map((parameterItem: ArrayPropertyType, index: number) => {
                 const subProperties = (items[0] as ObjectProperty).properties?.map((property) =>
-                    Object.keys(parameterItem).includes(property.name as keyof ArrayPropertyType)
+                    Object.keys(parameterItem).includes(name as keyof ArrayPropertyType)
                         ? {
                               ...property,
-                              defaultValue: parameterItem[property.name as keyof ArrayPropertyType],
+                              defaultValue: parameterItem[name as keyof ArrayPropertyType],
                           }
                         : property
                 );
@@ -240,7 +231,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
 
                 let label = `Item ${index}`;
 
-                if (property.name === 'conditions') {
+                if (name === 'conditions') {
                     label = `AND Condition ${index}`;
                 }
 
@@ -343,7 +334,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 <SubPropertyPopover
                     array
                     availablePropertyTypes={availablePropertyTypes}
-                    buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
+                    buttonLabel={placeholder ?? parentArrayItems?.[0]?.placeholder}
                     condition={currentComponent?.componentName === 'condition'}
                     handleClick={handleAddItemClick}
                     key={`${path}_${name}_subPropertyPopoverButton`}
@@ -360,7 +351,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                 >
                     <PlusIcon className="size-4" />
 
-                    {property.placeholder || 'Add array item'}
+                    {placeholder || 'Add array item'}
                 </Button>
             )}
         </Fragment>
