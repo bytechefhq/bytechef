@@ -16,7 +16,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Create a presentation based on a template and replace the values with the ones provided.",
+    "description" : "Creates a new presentation based on an existing one and can replace any placeholder variables found in your template presentation, like [[name]], [[email]], etc.",
     "help" : null,
     "metadata" : null,
     "name" : "createPresentationBasedOnTemplate",
@@ -28,17 +28,17 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The ID of the presentation to replace the values.",
+      "description" : "The ID of the template presentation from which the new presentation will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "templatePresentationId",
+      "name" : "fileId",
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Presentation ID",
+      "label" : "Template Presentation ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -57,7 +57,7 @@
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "newName",
+      "name" : "fileName",
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
@@ -69,6 +69,29 @@
       "minLength" : null,
       "options" : null,
       "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Folder ID where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "folderId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Folder for New Presentation",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
     }, {
       "advancedOption" : null,
       "description" : "Don't include the \"[[]]\", only the key name and its value.",
@@ -111,9 +134,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Presentation Based on Template",
-    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "perform" : { },
-    "workflowNodeDescription" : null
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -184,7 +207,7 @@
     "baseUri" : null,
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }
