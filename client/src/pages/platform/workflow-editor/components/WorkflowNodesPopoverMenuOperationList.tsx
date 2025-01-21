@@ -229,6 +229,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     ),
                     label: clickedOperation.componentLabel,
                     name: workflowNodeName,
+                    operationName: clickedOperation.operationName,
                     type: clickedOperation.type,
                     version,
                     workflowNodeName,
