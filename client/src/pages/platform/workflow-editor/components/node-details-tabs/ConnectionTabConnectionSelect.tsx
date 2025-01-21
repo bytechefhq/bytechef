@@ -56,7 +56,7 @@ const ConnectionTabConnectionSelect = ({
         componentVersion: workflowConnection.componentVersion,
     });
 
-    const {data: connections} = useGetConnectionsQuery!(
+    const {data: componentConnections} = useGetConnectionsQuery!(
         {
             componentName: componentDefinition?.name,
             connectionVersion: componentDefinition?.connection?.version,
@@ -90,6 +90,12 @@ const ConnectionTabConnectionSelect = ({
 
         setConnectionId(connectionId);
 
+        if (currentNode) {
+            setCurrentNode({...currentNode, connectionId});
+        }
+
+        setCurrentConnection(componentConnections?.find((connection) => connection.id === connectionId));
+
         queryClient.removeQueries({
             queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
         });
@@ -98,16 +104,6 @@ const ConnectionTabConnectionSelect = ({
             queryKey: [...WorkflowNodeOptionKeys.workflowNodeOptions, workflowId],
         });
     };
-
-    useEffect(() => {
-        if (currentNode) {
-            setCurrentNode({...currentNode, connectionId});
-        }
-
-        setCurrentConnection(connections?.find((connection) => connection.id === connectionId));
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [connectionId]);
 
     return (
         <div className="flex flex-col gap-6">
@@ -130,7 +126,7 @@ const ConnectionTabConnectionSelect = ({
                     value={connectionId ? connectionId.toString() : undefined}
                 >
                     <div className="flex space-x-2">
-                        {connections && connections.length > 0 && (
+                        {componentConnections && componentConnections.length > 0 && (
                             <SelectTrigger>
                                 <SelectValue placeholder="Choose Connection..." />
                             </SelectTrigger>
@@ -143,11 +139,13 @@ const ConnectionTabConnectionSelect = ({
                                 connectionsQueryKey={ConnectionKeys!.connections}
                                 triggerNode={
                                     <Button
-                                        className={twMerge('mt-auto p-2', !connections?.length && 'w-full')}
+                                        className={twMerge('mt-auto p-2', !componentConnections?.length && 'w-full')}
                                         title="Create a new connection"
                                         variant="outline"
                                     >
-                                        <PlusIcon className="size-5" /> {!connections?.length && 'Create Connection'}
+                                        <PlusIcon className="size-5" />
+
+                                        {!componentConnections?.length && 'Create Connection'}
                                     </Button>
                                 }
                                 useCreateConnectionMutation={useCreateConnectionMutation}
@@ -157,8 +155,8 @@ const ConnectionTabConnectionSelect = ({
                     </div>
 
                     <SelectContent>
-                        {connections &&
-                            connections.map((connection) => (
+                        {componentConnections &&
+                            componentConnections.map((connection) => (
                                 <SelectItem key={connection.id} value={connection.id!.toString()}>
                                     <div className="flex items-center space-x-1">
                                         <span>{connection.name}</span>
