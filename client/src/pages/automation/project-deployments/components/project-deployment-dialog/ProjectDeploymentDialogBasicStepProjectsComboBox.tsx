@@ -25,6 +25,7 @@ const ProjectDeploymentDialogBasicStepProjectsComboBox = ({
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
+        includeAllFields: false,
         status: ProjectStatus.Published,
     });
 

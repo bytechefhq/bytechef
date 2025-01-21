@@ -22,6 +22,7 @@ const ApiClients = () => {
 
     const {data: projects} = useGetWorkspaceProjectsQuery({
         id: currentWorkspaceId!,
+        includeAllFields: false,
         projectDeployments: true,
     });
 

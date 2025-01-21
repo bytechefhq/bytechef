@@ -79,7 +79,7 @@ const ApiPlatformLeftSidebarNav = ({environment, filterData, projects, tags}: Ap
                                         name: item.name,
                                     }}
                                     key={item.id}
-                                    toLink={`?tagId=${item.id}&environment=${environment ?? ''}`}
+                                    toLink={`../api-collections?tagId=${item.id}&environment=${environment ?? ''}`}
                                 />
                             ))
                         ) : (

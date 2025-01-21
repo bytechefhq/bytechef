@@ -50,6 +50,7 @@ const IntegrationInstanceConfigurations = () => {
         error: integrationsError,
         isLoading: integrationsLoading,
     } = useGetIntegrationsQuery({
+        includeAllFields: false,
         integrationInstanceConfigurations: true,
     });
 

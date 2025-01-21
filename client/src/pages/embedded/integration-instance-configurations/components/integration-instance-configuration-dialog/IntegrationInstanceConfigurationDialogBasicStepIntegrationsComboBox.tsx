@@ -35,7 +35,10 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationsComboBox = ({
         connectionDefinitions: true,
     });
 
-    const {data: integrations} = useGetIntegrationsQuery({status: IntegrationStatus.Published});
+    const {data: integrations} = useGetIntegrationsQuery({
+        includeAllFields: false,
+        status: IntegrationStatus.Published,
+    });
 
     return integrations && componentDefinitions ? (
         <ComboBox

@@ -148,7 +148,7 @@ const ConnectedUsers = () => {
         ConnectedUserFromJSON(connectedUser)
     );
 
-    const {data: integrations} = useGetIntegrationsQuery({});
+    const {data: integrations} = useGetIntegrationsQuery({includeAllFields: false});
 
     function filter(
         environment?: number,
