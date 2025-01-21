@@ -19,6 +19,7 @@ package com.bytechef.component.google.slides.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
@@ -33,6 +34,22 @@ import java.util.Map;
 public class GoogleSlidesUtils {
 
     private GoogleSlidesUtils() {
+    }
+
+    public static List<Option<String>> getFolderOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) throws IOException {
+
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        return drive.files()
+            .list()
+            .setQ("mimeType = 'application/vnd.google-apps.folder' and trashed = false")
+            .execute()
+            .getFiles()
+            .stream()
+            .map(folder -> (Option<String>) option(folder.getName(), folder.getId()))
+            .toList();
     }
 
     public static List<Option<String>> getPresentationIdOptions(
