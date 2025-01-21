@@ -23,8 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static com.bytechef.component.google.drive.util.GoogleDriveUtils.getPollOutput;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -42,7 +42,7 @@ public class GoogleDriveNewFileTrigger {
         .description("Triggers when new file is uploaded to Google Drive.")
         .type(TriggerType.POLLING)
         .properties(
-            string(PARENT_FOLDER)
+            string(FOLDER_ID)
                 .label("Parent Folder")
                 .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(true))

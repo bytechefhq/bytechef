@@ -30,13 +30,10 @@ public final class GoogleDriveConstants {
 
     public static final String APPLICATION_VND_GOOGLE_APPS_FOLDER = "application/vnd.google-apps.folder";
     public static final String FILE_ENTRY = "fileEntry";
-    public static final String FILE_ID = "fileId";
-    public static final String FILE_NAME = "fileName";
     public static final String FOLDER_NAME = "folderName";
     public static final String ID = "id";
     public static final String MIME_TYPE = "mimeType";
     public static final String NAME = "name";
-    public static final String PARENT_FOLDER = "parentFolder";
     public static final String TEXT = "text";
 
     public static final ModifiableObjectProperty GOOGLE_FILE_OUTPUT_PROPERTY = object()

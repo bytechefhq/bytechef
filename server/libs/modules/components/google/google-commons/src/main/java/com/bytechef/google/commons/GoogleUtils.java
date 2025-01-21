@@ -17,12 +17,16 @@
 package com.bytechef.google.commons;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -30,6 +34,27 @@ import java.util.List;
  * @author Monika Kušter
  */
 public class GoogleUtils {
+
+    public static File copyFileOnGoogleDrive(Parameters connectionParameters, Parameters inputParameters)
+        throws IOException {
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+        String fileId = inputParameters.getRequiredString(FILE_ID);
+        String folder = inputParameters.getString(FOLDER_ID);
+
+        File originalFile = drive.files()
+            .get(fileId)
+            .execute();
+
+        File newFile = new File()
+            .setName(inputParameters.getRequiredString(FILE_NAME))
+            .setParents(folder == null ? originalFile.getParents() : List.of(folder))
+            .setMimeType(originalFile.getMimeType());
+
+        return drive
+            .files()
+            .copy(fileId, newFile)
+            .execute();
+    }
 
     public static ActionOptionsFunction<String> getFileOptionsByMimeType(String mimeType, boolean isEqualMimetype) {
         return (inputParameters, connectionParameters, arrayIndex, searchText, context) -> getFileOptions(mimeType,

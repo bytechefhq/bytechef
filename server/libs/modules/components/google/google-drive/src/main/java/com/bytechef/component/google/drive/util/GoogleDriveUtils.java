@@ -17,7 +17,7 @@
 package com.bytechef.component.google.drive.util;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
@@ -57,7 +57,7 @@ public class GoogleDriveUtils {
             FileList fileList = drive
                 .files()
                 .list()
-                .setQ(mimeType + " and '" + inputParameters.getRequiredString(PARENT_FOLDER) + "' in parents and " +
+                .setQ(mimeType + " and '" + inputParameters.getRequiredString(FOLDER_ID) + "' in parents and " +
                     "trashed = false and createdTime > '" + startDateString + "'")
                 .setFields("files(id, name, mimeType, webViewLink, kind)")
                 .setOrderBy("createdTime asc")

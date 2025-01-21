@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.google.docs.constant;
+package com.bytechef.google.commons.constant;
 
 /**
  * @author Monika Kušter
  */
-public class GoogleDocsConstants {
+public class GoogleCommonsContants {
 
-    private GoogleDocsConstants() {
-    }
-
-    public static final String APPLICATION_VND_GOOGLE_APPS_DOCUMENT = "application/vnd.google-apps.document";
-    public static final String BODY = "body";
-    public static final String DOCUMENT_ID = "documentId";
-    public static final String IMAGES = "images";
-    public static final String TITLE = "title";
-    public static final String VALUES = "values";
+    public static final String FOLDER_ID = "folderId";
+    public static final String FILE_NAME = "fileName";
+    public static final String FILE_ID = "fileId";
 }

@@ -19,7 +19,7 @@ package com.bytechef.component.google.drive.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
