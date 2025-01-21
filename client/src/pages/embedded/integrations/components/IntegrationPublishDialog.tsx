@@ -65,7 +65,6 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
                                     },
                                 })
                             }
-                            size="sm"
                         >
                             Publish
                         </Button>

@@ -66,7 +66,6 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                                     },
                                 })
                             }
-                            size="sm"
                         >
                             Publish
                         </Button>
