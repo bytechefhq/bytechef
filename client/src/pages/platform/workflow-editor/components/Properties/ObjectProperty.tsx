@@ -187,8 +187,6 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
         if (preexistingProperties.length) {
             setSubProperties(preexistingProperties as Array<PropertyAllType>);
-        } else if (properties?.length) {
-            setSubProperties(properties as Array<PropertyAllType>);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [parameterObject, properties]);
@@ -246,6 +244,14 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         return () => clearTimeout(timeoutId);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [subProperties]);
+
+    // set subProperties in cases where the ObjectProperty has predefined properties
+    useEffect(() => {
+        if (properties?.length) {
+            setSubProperties(properties as Array<PropertyAllType>);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [properties]);
 
     // update parameterObject when workflowDefinition changes
     useEffect(() => {
