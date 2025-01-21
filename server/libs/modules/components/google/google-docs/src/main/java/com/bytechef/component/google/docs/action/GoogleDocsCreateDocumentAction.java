@@ -54,6 +54,7 @@ public class GoogleDocsCreateDocumentAction {
                 .description("Document content.")
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
+        .output()
         .perform(GoogleDocsCreateDocumentAction::perform);
 
     private GoogleDocsCreateDocumentAction() {
@@ -71,8 +72,6 @@ public class GoogleDocsCreateDocumentAction {
                 .setText(inputParameters.getRequiredString(BODY))
                 .setEndOfSegmentLocation(new EndOfSegmentLocation()));
 
-        writeToDocument(docs, newDocument.getDocumentId(), List.of(request));
-
-        return null;
+        return writeToDocument(docs, newDocument.getDocumentId(), List.of(request));
     }
 }
