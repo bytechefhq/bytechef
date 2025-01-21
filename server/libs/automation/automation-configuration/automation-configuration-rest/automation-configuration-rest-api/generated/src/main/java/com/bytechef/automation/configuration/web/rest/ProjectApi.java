@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:08.630376+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "project", description = "The Automation Project Internal API")
 public interface ProjectApi {
@@ -234,7 +234,6 @@ public interface ProjectApi {
      * Get projects by workspace id.
      *
      * @param id The id of a workspace. (required)
-     * @param apiCollections Use for filtering projects for which api collections exist. (optional)
      * @param projectDeployments Use for filtering projects for which project deployments exist. (optional)
      * @param categoryId The category id used for filtering projects. (optional)
      * @param tagId The tag id of used for filtering projects. (optional)
@@ -261,7 +260,6 @@ public interface ProjectApi {
     
     default ResponseEntity<List<ProjectModel>> getWorkspaceProjects(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "apiCollections", description = "Use for filtering projects for which api collections exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "apiCollections", required = false) Boolean apiCollections,
         @Parameter(name = "projectDeployments", description = "Use for filtering projects for which project deployments exist.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "projectDeployments", required = false) Boolean projectDeployments,
         @Parameter(name = "categoryId", description = "The category id used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "categoryId", required = false) Long categoryId,
         @Parameter(name = "tagId", description = "The tag id of used for filtering projects.", in = ParameterIn.QUERY) @Valid @RequestParam(value = "tagId", required = false) Long tagId,

@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.394502+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:33:47.577231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 @Validated
 @Tag(name = "api-collection", description = "The Automation API Platform Collection Internal API")
 public interface ApiCollectionApi {
@@ -154,8 +154,8 @@ public interface ApiCollectionApi {
 
 
     /**
-     * GET /workspaces/{id}/api-collections : Get all workspaceAPI collections
-     * Get all workspaceAPI collections.
+     * GET /workspaces/{id}/api-collections : Get all workspace API collections
+     * Get all workspace API collections.
      *
      * @param id The id of a workspace. (required)
      * @param environment The environment. (optional)
@@ -165,8 +165,8 @@ public interface ApiCollectionApi {
      */
     @Operation(
         operationId = "getWorkspaceApiCollections",
-        summary = "Get all workspaceAPI collections",
-        description = "Get all workspaceAPI collections.",
+        summary = "Get all workspace API collections",
+        description = "Get all workspace API collections.",
         tags = { "api-collection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "A list of API collections.", content = {

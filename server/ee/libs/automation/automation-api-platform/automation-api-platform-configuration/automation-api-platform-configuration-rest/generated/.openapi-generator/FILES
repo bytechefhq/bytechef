@@ -5,6 +5,7 @@ src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiC
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiCollectionEndpointApi.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiCollectionTagApi.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ApiUtil.java
+src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/ProjectApi.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiClientModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionEndpointModel.java
 src/main/java/com/bytechef/ee/automation/apiplatform/configuration/web/rest/model/ApiCollectionModel.java
