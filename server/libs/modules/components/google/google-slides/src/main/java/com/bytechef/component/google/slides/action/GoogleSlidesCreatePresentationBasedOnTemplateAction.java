@@ -19,7 +19,7 @@ package com.bytechef.component.google.slides.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.NEW_NAME;
+import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.NAME;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.TEMPLATE_PRESENTATION_ID;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.VALUES;
 
@@ -44,14 +44,16 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPresentationBasedOnTemplate")
         .title("Create Presentation Based on Template")
-        .description("Create a presentation based on a template and replace the values with the ones provided.")
+        .description(
+            "Creates a new presentation based on an existing one and can replace any placeholder variables found in " +
+                "your template presentation, like [[name]], [[email]], etc.")
         .properties(
             string(TEMPLATE_PRESENTATION_ID)
-                .label("Presentation ID")
-                .description("The ID of the presentation to replace the values.")
+                .label("Template Presentation ID")
+                .description("The ID of the template presentation from which the new presentation will be created.")
                 .options((ActionOptionsFunction<String>) GoogleSlidesUtils::getPresentationIdOptions)
                 .required(true),
-            string(NEW_NAME)
+            string(NAME)
                 .label("New Presentation Name")
                 .description("Name of the new presentation.")
                 .required(true),
@@ -71,7 +73,7 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
 
         File copiedPresentation = copyPresentation(
             connectionParameters, inputParameters.getRequiredString(TEMPLATE_PRESENTATION_ID),
-            inputParameters.getRequiredString(NEW_NAME));
+            inputParameters.getRequiredString(NAME));
 
         List<Map<String, Map<String, Object>>> requests = createReplaceTextRequests(
             inputParameters.getMap(VALUES, String.class, Map.of()));

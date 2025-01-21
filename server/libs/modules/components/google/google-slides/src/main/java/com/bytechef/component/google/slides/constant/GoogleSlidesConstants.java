@@ -24,7 +24,7 @@ public class GoogleSlidesConstants {
     private GoogleSlidesConstants() {
     }
 
-    public static final String NEW_NAME = "newName";
+    public static final String NAME = "name";
     public static final String TEMPLATE_PRESENTATION_ID = "templatePresentationId";
     public static final String VALUES = "values";
 }

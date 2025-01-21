@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.slides.action;
 
-import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.NEW_NAME;
+import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.NAME;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.TEMPLATE_PRESENTATION_ID;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +54,7 @@ class GoogleSlidesCreatePresentationBasedOnTemplateActionTest {
     private final Object mockedObject = mock(Object.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        TEMPLATE_PRESENTATION_ID, "123", NEW_NAME, "newFileName",
+        TEMPLATE_PRESENTATION_ID, "123", NAME, "newFileName",
         VALUES, Map.of("key1", "value1", "key2", "value2")));
     private final ArgumentCaptor<String> presentationIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final File testFile = new File()
