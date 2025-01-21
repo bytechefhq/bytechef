@@ -21,22 +21,19 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.NAME;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
-import java.util.Collections;
 
 /**
  * @author Mayank Madan
@@ -56,7 +53,7 @@ public class GoogleDriveCopyFileAction {
                 .label("New File Name")
                 .description("The name of the new file created as a result of the copy operation.")
                 .required(true),
-            string(PARENT_FOLDER)
+            string(FOLDER_ID)
                 .label("Destination Folder")
                 .required(true)
                 .description("The ID of the folder where the copied file will be stored.")
@@ -77,21 +74,6 @@ public class GoogleDriveCopyFileAction {
     public static File perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
 
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-        String fileId = inputParameters.getRequiredString(FILE_ID);
-
-        File originalFile = drive.files()
-            .get(fileId)
-            .execute();
-
-        File newFile = new File()
-            .setName(inputParameters.getRequiredString(FILE_NAME))
-            .setParents(Collections.singletonList(inputParameters.getRequiredString(PARENT_FOLDER)))
-            .setMimeType(originalFile.getMimeType());
-
-        return drive
-            .files()
-            .copy(fileId, newFile)
-            .execute();
+        return GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
     }
 }

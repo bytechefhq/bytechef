@@ -19,19 +19,17 @@ package com.bytechef.component.google.slides.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.FOLDER_ID;
-import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.NAME;
-import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.TEMPLATE_PRESENTATION_ID;
 import static com.bytechef.component.google.slides.constant.GoogleSlidesConstants.VALUES;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
-import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,12 +46,12 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
             "Creates a new presentation based on an existing one and can replace any placeholder variables found in " +
                 "your template presentation, like [[name]], [[email]], etc.")
         .properties(
-            string(TEMPLATE_PRESENTATION_ID)
+            string(FILE_ID)
                 .label("Template Presentation ID")
                 .description("The ID of the template presentation from which the new presentation will be created.")
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.presentation", true))
                 .required(true),
-            string(NAME)
+            string(FILE_NAME)
                 .label("New Presentation Name")
                 .description("Name of the new presentation.")
                 .required(true),
@@ -78,33 +76,11 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
-        File copiedPresentation = copyPresentation(connectionParameters, inputParameters);
+        File copiedPresentation = GoogleUtils.copyFileOnGoogleDrive(connectionParameters, inputParameters);
         List<Map<String, Map<String, Object>>> requests = createReplaceTextRequests(
             inputParameters.getMap(VALUES, String.class, Map.of()));
 
         return executeBatchUpdate(actionContext, copiedPresentation.getId(), requests);
-    }
-
-    private static File copyPresentation(Parameters connectionParameters, Parameters inputParameters)
-        throws Exception {
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        String templatePresentationId = inputParameters.getRequiredString(TEMPLATE_PRESENTATION_ID);
-        String folder = inputParameters.getString(FOLDER_ID);
-
-        File templatePresentation = drive.files()
-            .get(templatePresentationId)
-            .execute();
-
-        File newPresentation = new File()
-            .setName(inputParameters.getRequiredString(NAME))
-            .setParents(folder == null ? templatePresentation.getParents() : List.of(folder))
-            .setMimeType(templatePresentation.getMimeType());
-
-        return drive.files()
-            .copy(templatePresentationId, newPresentation)
-            .execute();
     }
 
     private static List<Map<String, Map<String, Object>>> createReplaceTextRequests(Map<String, String> values) {

@@ -22,12 +22,12 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -73,7 +73,7 @@ public class GoogleDriveCreateNewTextFileAction {
                     option("XML", "text/xml"))
                 .defaultValue("plain/text")
                 .required(true),
-            string(PARENT_FOLDER)
+            string(FOLDER_ID)
                 .label("Parent Folder")
                 .description(
                     "Folder where the file should be created; if no folder is selected, the file will be created " +
@@ -93,8 +93,8 @@ public class GoogleDriveCreateNewTextFileAction {
 
         File newFile = new File()
             .setName(inputParameters.getRequiredString(FILE_NAME))
-            .setParents(inputParameters.getString(PARENT_FOLDER) == null
-                ? null : List.of(inputParameters.getString(PARENT_FOLDER)));
+            .setParents(inputParameters.getString(FOLDER_ID) == null
+                ? null : List.of(inputParameters.getString(FOLDER_ID)));
 
         String mimeType = inputParameters.getRequiredString(MIME_TYPE);
 

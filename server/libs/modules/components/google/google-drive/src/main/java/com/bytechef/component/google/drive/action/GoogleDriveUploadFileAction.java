@@ -25,7 +25,7 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.GOOGLE_FILE_SAMPLE_OUTPUT;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -54,7 +54,7 @@ public class GoogleDriveUploadFileAction {
                 .label("File")
                 .description("The object property which contains a reference to the file to upload.")
                 .required(true),
-            string(PARENT_FOLDER)
+            string(FOLDER_ID)
                 .label("Parent Folder")
                 .description(
                     "Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to " +
@@ -72,7 +72,7 @@ public class GoogleDriveUploadFileAction {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
         FileEntry fileEntry = inputParameters.getRequiredFileEntry(FILE_ENTRY);
-        String parentFolder = inputParameters.getString(PARENT_FOLDER);
+        String parentFolder = inputParameters.getString(FOLDER_ID);
 
         return drive
             .files()

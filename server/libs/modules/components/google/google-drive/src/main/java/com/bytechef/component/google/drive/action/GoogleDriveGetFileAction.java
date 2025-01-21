@@ -21,10 +21,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
