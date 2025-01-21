@@ -62,7 +62,6 @@ export default function handleConditionChildOperationClick({
         nodeIndex: taskAfterCurrentIndex,
         onSuccess: () =>
             handleComponentAddedSuccess({
-                currentNode,
                 nodeData: newWorkflowNodeData,
                 queryClient,
                 workflow,

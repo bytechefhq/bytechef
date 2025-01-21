@@ -116,7 +116,6 @@ export default async function handleConditionClick({
         nodeIndex: taskIndex,
         onSuccess: () =>
             handleComponentAddedSuccess({
-                currentNode,
                 nodeData: newConditionNodeData,
                 queryClient,
                 workflow,
