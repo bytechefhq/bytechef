@@ -19,6 +19,7 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.constant.Environment;
 import java.util.List;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -39,8 +40,9 @@ public interface ProjectDeploymentService {
 
     List<ProjectDeployment> getProjectDeployments(long projectId);
 
-    List<ProjectDeployment>
-        getProjectDeployments(Long workspaceId, Environment environment, Long projectId, Long tagId);
+    List<ProjectDeployment> getProjectDeployments(
+        Long workspaceId, Environment environment, Long projectId, Long tagId,
+        @NonNull List<Long> excludeProjectDeploymentIds);
 
     ProjectDeployment update(long id, List<Long> tagIds);
 

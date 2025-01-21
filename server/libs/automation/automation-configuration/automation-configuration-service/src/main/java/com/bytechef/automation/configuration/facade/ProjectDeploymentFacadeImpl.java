@@ -565,7 +565,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         Long workspaceId, Environment environment, Long projectId, Long tagId, boolean includeAllFields) {
 
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(
-            workspaceId, environment, projectId, tagId);
+            workspaceId, environment, projectId, tagId, List.of());
 
         if (includeAllFields) {
             List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService

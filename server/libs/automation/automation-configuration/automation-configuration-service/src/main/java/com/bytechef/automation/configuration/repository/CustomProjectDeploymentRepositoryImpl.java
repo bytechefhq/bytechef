@@ -21,6 +21,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.jdbc.core.simple.JdbcClient;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
@@ -36,7 +37,8 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
 
     @Override
     public List<ProjectDeployment> findAllProjectDeployments(
-        Long workspaceId, Integer environment, Long projectId, Long tagId) {
+        Long workspaceId, Integer environment, Long projectId, Long tagId,
+        @NonNull List<Long> excludeProjectDeploymentIds) {
 
         List<Object> arguments = new ArrayList<>();
 
@@ -91,13 +93,27 @@ public class CustomProjectDeploymentRepositoryImpl implements CustomProjectDeplo
             query += "tag_id = ? ";
         }
 
-        if (query.contains("WHERE")) {
-            query += "AND ";
-        } else {
-            query += "WHERE ";
-        }
+        if (!excludeProjectDeploymentIds.isEmpty()) {
+            arguments.addAll(excludeProjectDeploymentIds);
 
-        query += "project_deployment.id NOT IN (SELECT api_collection.project_deployment_id from api_collection) ";
+            if (query.contains("WHERE")) {
+                query += "AND ";
+            } else {
+                query += "WHERE ";
+            }
+
+            StringBuilder idsString = new StringBuilder();
+
+            for (int i = 0; i < excludeProjectDeploymentIds.size(); i++) {
+                idsString.append("?");
+
+                if (i < excludeProjectDeploymentIds.size() - 1) {
+                    idsString.append(",");
+                }
+            }
+
+            query += "project_deployment.id NOT IN (%s) ".formatted(idsString);
+        }
 
         query += "ORDER BY LOWER(project_deployment.name) ASC, project_deployment.project_version ASC, " +
             "project_deployment.environment ASC";

@@ -168,7 +168,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 projectDeploymentIds.add(projectDeploymentId);
             } else {
                 projectDeploymentIds.addAll(
-                    projectDeploymentService.getProjectDeployments(null, environment, null, null)
+                    projectDeploymentService.getProjectDeployments(null, environment, null, null, List.of())
                         .stream()
                         .map(ProjectDeployment::getId)
                         .toList());
