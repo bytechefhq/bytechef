@@ -220,6 +220,8 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 const newWorkflowNodeData = {
                     componentName: clickedOperation.componentName,
+                    connectionId: undefined,
+                    connections: undefined,
                     icon: clickedOperation.icon && (
                         <InlineSVG
                             className="size-9"
