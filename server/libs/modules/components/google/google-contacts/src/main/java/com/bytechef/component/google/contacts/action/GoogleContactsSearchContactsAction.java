@@ -17,75 +17,61 @@
 package com.bytechef.component.google.contacts.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_LIST_OUTPUT_PROPERTY;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.QUERY;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.SearchResponse;
+import com.google.api.services.people.v1.model.SearchResult;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 /**
  * @author Erhan Tunçel
+ * @author Monika Kušter
  */
 public class GoogleContactsSearchContactsAction {
 
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("searchContacts")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("searchContacts")
         .title("Search Contacts")
-        .description("Searches the contacts.")
+        .description("Searches the contacts in Google Contacts account.")
         .properties(
             string(QUERY)
                 .label("Query")
                 .description("The plain-text query.")
                 .required(true))
-        .output(outputSchema(CONTACT_LIST_OUTPUT_PROPERTY))
+        .output(outputSchema(array().items(CONTACT_OUTPUT_PROPERTY)))
         .perform(GoogleContactsSearchContactsAction::perform);
 
     private GoogleContactsSearchContactsAction() {
-
     }
 
     protected static List<Person> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext)
-        throws IOException, InterruptedException {
+        throws IOException {
 
         PeopleService peopleService = GoogleServices.getPeopleService(connectionParameters);
-        String fieldMasks = "names,nicknames,emailAddresses,phoneNumbers,organizations";
 
-        // Warmup cache
-        peopleService
-            .people()
+        SearchResponse searchResponse = peopleService.people()
             .searchContacts()
-            .setQuery("")
-            .setReadMask(fieldMasks)
+            .setQuery(inputParameters.getRequiredString(QUERY))
+            .setReadMask("names,nicknames,emailAddresses,phoneNumbers,organizations")
             .execute();
 
-        // Wait a few seconds
-        Thread.sleep(5);
-
-        SearchResponse searchResponse = peopleService
-            .people()
-            .searchContacts()
-            .setQuery(inputParameters.getString(QUERY))
-            .setReadMask(fieldMasks)
-            .execute();
-
-        List<Person> personList = new ArrayList<>();
-        Optional
-            .ofNullable(searchResponse.getResults())
+        return Optional.ofNullable(searchResponse.getResults())
             .orElse(Collections.emptyList())
-            .forEach(searchResult -> personList.add(searchResult.getPerson()));
-
-        return personList;
+            .stream()
+            .map(SearchResult::getPerson)
+            .toList();
     }
 }
