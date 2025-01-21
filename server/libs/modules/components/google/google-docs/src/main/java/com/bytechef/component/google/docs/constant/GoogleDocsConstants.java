@@ -26,7 +26,9 @@ public class GoogleDocsConstants {
 
     public static final String BODY = "body";
     public static final String DOCUMENT_ID = "documentId";
+    public static final String FOLDER_ID = "folderId";
     public static final String IMAGES = "images";
+    public static final String NAME = "name";
     public static final String TEMPLATE_DOCUMENT_ID = "templateDocumentId";
     public static final String TITLE = "title";
     public static final String VALUES = "values";

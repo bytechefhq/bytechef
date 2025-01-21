@@ -32,7 +32,6 @@ import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
 import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ class GoogleDocsCreateDocumentFromTemplateActionTest extends AbstractGoogleDocsA
 
     @Test
     @SuppressWarnings("unchecked")
-    void perform() throws IOException {
+    void perform() throws Exception {
         when(mockedParameters.getMap(VALUES, String.class, Map.of()))
             .thenReturn(Map.of("textKey1", "textValue1"));
         when(mockedParameters.getMap(IMAGES, String.class, Map.of()))
