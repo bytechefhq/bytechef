@@ -16,42 +16,18 @@
 
 package com.bytechef.component.google.contacts.action;
 
-import static com.bytechef.component.definition.Authorization.ACCESS_TOKEN;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-public abstract class AbstractGoogleContactsActionTest {
+abstract class AbstractGoogleContactsActionTest {
 
-    protected ActionContext mockedContext = mock(ActionContext.class);
-    protected MockedStatic<GoogleServices> mockedGoogleServices;
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
+    protected Parameters mockedParameters;
     protected PeopleService mockedPeopleService = mock(PeopleService.class);
-
-    @BeforeEach
-    public void beforeEach() {
-        mockedGoogleServices = mockStatic(GoogleServices.class);
-
-        when(mockedParameters.getRequiredString(ACCESS_TOKEN))
-            .thenReturn("accessToken");
-
-        mockedGoogleServices.when(() -> GoogleServices.getPeopleService(mockedParameters))
-            .thenReturn(mockedPeopleService);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        mockedGoogleServices.close();
-    }
 }

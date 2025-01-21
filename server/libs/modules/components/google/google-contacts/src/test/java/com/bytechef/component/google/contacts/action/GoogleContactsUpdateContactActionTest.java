@@ -16,20 +16,22 @@
 
 package com.bytechef.component.google.contacts.action;
 
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.RESOURCE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
@@ -38,8 +40,10 @@ import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Martin Tarasovič
@@ -54,6 +58,7 @@ public class GoogleContactsUpdateContactActionTest extends AbstractGoogleContact
     private final Person mockedPerson = mock(Person.class);
     private final ArgumentCaptor<Person> personArgumentCaptor = ArgumentCaptor.forClass(Person.class);
     private final ArgumentCaptor<String> resourceNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> personFieldsArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
@@ -74,88 +79,97 @@ public class GoogleContactsUpdateContactActionTest extends AbstractGoogleContact
             .setPhoneNumbers(List.of(originalPhoneNumber))
             .setOrganizations(List.of(originalOrganization));
 
-        when(mockedParameters.getRequiredString(RESOURCE_NAME))
-            .thenReturn("people/c1234567890123456789");
-        when(mockedParameters.getRequiredString(FIRST_NAME))
-            .thenReturn("First name");
-        when(mockedParameters.getString(MIDDLE_NAME))
-            .thenReturn("Middle name");
-        when(mockedParameters.getRequiredString(LAST_NAME))
-            .thenReturn("Last name");
-        when(mockedParameters.getString(EMAIL))
-            .thenReturn("mail@mail.com");
-        when(mockedParameters.getString(PHONE_NUMBER))
-            .thenReturn("123456");
-        when(mockedParameters.getString(COMPANY))
-            .thenReturn("Company");
-        when(mockedParameters.getString(JOB_TITLE))
-            .thenReturn("Job title");
+        mockedParameters = MockParametersFactory.create(
+            Map.of(
+                RESOURCE_NAME, "people/c1234567890123456789", GIVEN_NAME, "First name", MIDDLE_NAME, "Middle name",
+                FAMILY_NAME, "Last name",
+                EMAIL, "mail@mail.com", PHONE_NUMBER, "123456", NAME, "Company", TITLE, "Job title"));
 
-        when(mockedPeopleService.people())
-            .thenReturn(mockedPeople);
-        when(mockedPeople.get(resourceNameArgumentCaptor.capture()))
-            .thenReturn(mockedGetContact);
-        when(mockedGetContact.setPersonFields(anyString()))
-            .thenReturn(mockedGetContact);
-        when(mockedGetContact.execute())
-            .thenReturn(originalPerson);
-        when(mockedPeople.updateContact(resourceNameArgumentCaptor.capture(), personArgumentCaptor.capture()))
-            .thenReturn(mockedUpdateContact);
-        when(mockedUpdateContact.setUpdatePersonFields(anyString()))
-            .thenReturn(mockedUpdateContact);
-        when(mockedUpdateContact.execute())
-            .thenReturn(mockedPerson);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getPeopleService(mockedParameters))
+                .thenReturn(mockedPeopleService);
 
-        Person result = GoogleContactsUpdateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+            when(mockedPeopleService.people())
+                .thenReturn(mockedPeople);
+            when(mockedPeople.get(resourceNameArgumentCaptor.capture()))
+                .thenReturn(mockedGetContact);
+            when(mockedGetContact.setPersonFields(personFieldsArgumentCaptor.capture()))
+                .thenReturn(mockedGetContact);
+            when(mockedGetContact.execute())
+                .thenReturn(originalPerson);
+            when(mockedPeople.updateContact(resourceNameArgumentCaptor.capture(), personArgumentCaptor.capture()))
+                .thenReturn(mockedUpdateContact);
+            when(mockedUpdateContact.setUpdatePersonFields(personFieldsArgumentCaptor.capture()))
+                .thenReturn(mockedUpdateContact);
+            when(mockedUpdateContact.execute())
+                .thenReturn(mockedPerson);
 
-        assertEquals(mockedPerson, result);
-        assertNotEquals(originalPerson, result);
+            Person result =
+                GoogleContactsUpdateContactAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        Person person = personArgumentCaptor.getValue();
+            assertEquals(mockedPerson, result);
+            assertNotEquals(originalPerson, result);
 
-        assertEquals(originalPerson.getResourceName(), person.getResourceName());
+            List<String> resourceNameArgumentCaptorAllValues = resourceNameArgumentCaptor.getAllValues();
 
-        List<Name> names = person.getNames();
+            assertEquals(2, resourceNameArgumentCaptorAllValues.size());
+            assertEquals("people/c1234567890123456789", resourceNameArgumentCaptorAllValues.getFirst());
+            assertEquals("people/c1234567890123456789", resourceNameArgumentCaptorAllValues.getLast());
 
-        assertEquals(1, names.size());
+            List<String> personFieldsArgumentCaptorAllValues = personFieldsArgumentCaptor.getAllValues();
 
-        Name name = names.getFirst();
+            assertEquals(2, personFieldsArgumentCaptorAllValues.size());
+            assertEquals("names,emailAddresses,phoneNumbers,organizations",
+                personFieldsArgumentCaptorAllValues.getFirst());
+            assertEquals("names,emailAddresses,phoneNumbers,organizations",
+                personFieldsArgumentCaptorAllValues.getLast());
 
-        assertNotEquals(originalName.getGivenName(), name.getGivenName());
-        assertEquals("First name", name.getGivenName());
-        assertNotEquals(originalName.getMiddleName(), name.getMiddleName());
-        assertEquals("Middle name", name.getMiddleName());
-        assertNotEquals(originalName.getFamilyName(), name.getFamilyName());
-        assertEquals("Last name", name.getFamilyName());
+            Person person = personArgumentCaptor.getValue();
 
-        List<EmailAddress> emailAddresses = person.getEmailAddresses();
+            assertEquals(originalPerson.getResourceName(), person.getResourceName());
 
-        assertEquals(1, emailAddresses.size());
+            List<Name> names = person.getNames();
 
-        EmailAddress emailAddress = emailAddresses.getFirst();
+            assertEquals(1, names.size());
 
-        assertNotEquals(originalAddress.getValue(), emailAddress.getValue());
-        assertEquals("mail@mail.com", emailAddress.getValue());
+            Name name = names.getFirst();
 
-        List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
+            assertNotEquals(originalName.getGivenName(), name.getGivenName());
+            assertEquals("First name", name.getGivenName());
+            assertNotEquals(originalName.getMiddleName(), name.getMiddleName());
+            assertEquals("Middle name", name.getMiddleName());
+            assertNotEquals(originalName.getFamilyName(), name.getFamilyName());
+            assertEquals("Last name", name.getFamilyName());
 
-        assertEquals(1, phoneNumbers.size());
+            List<EmailAddress> emailAddresses = person.getEmailAddresses();
 
-        PhoneNumber phoneNumber = phoneNumbers.getFirst();
+            assertEquals(1, emailAddresses.size());
 
-        assertNotEquals(originalPhoneNumber.getValue(), phoneNumber.getValue());
-        assertEquals("123456", phoneNumber.getValue());
+            EmailAddress emailAddress = emailAddresses.getFirst();
 
-        List<Organization> organizations = person.getOrganizations();
+            assertNotEquals(originalAddress.getValue(), emailAddress.getValue());
+            assertEquals("mail@mail.com", emailAddress.getValue());
 
-        assertEquals(1, organizations.size());
+            List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
 
-        Organization organization = organizations.getFirst();
+            assertEquals(1, phoneNumbers.size());
 
-        assertNotEquals(originalOrganization.getName(), organization.getName());
-        assertEquals("Company", organization.getName());
-        assertNotEquals(originalOrganization.getTitle(), organization.getTitle());
-        assertEquals("Job title", organization.getTitle());
+            PhoneNumber phoneNumber = phoneNumbers.getFirst();
+
+            assertNotEquals(originalPhoneNumber.getValue(), phoneNumber.getValue());
+            assertEquals("123456", phoneNumber.getValue());
+
+            List<Organization> organizations = person.getOrganizations();
+
+            assertEquals(1, organizations.size());
+
+            Organization organization = organizations.getFirst();
+
+            assertNotEquals(originalOrganization.getName(), organization.getName());
+            assertEquals("Company", organization.getName());
+            assertNotEquals(originalOrganization.getTitle(), organization.getTitle());
+            assertEquals("Job title", organization.getTitle());
+        }
     }
-
 }

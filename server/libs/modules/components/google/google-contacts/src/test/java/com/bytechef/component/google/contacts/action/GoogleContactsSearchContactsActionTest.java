@@ -20,8 +20,11 @@ import static com.bytechef.component.google.contacts.constant.GoogleContactsCons
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
@@ -30,8 +33,10 @@ import com.google.api.services.people.v1.model.SearchResponse;
 import com.google.api.services.people.v1.model.SearchResult;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Erhan Tunçel
@@ -48,35 +53,41 @@ class GoogleContactsSearchContactsActionTest extends AbstractGoogleContactsActio
 
     @Test
     void testPerform() throws IOException {
+        mockedParameters = MockParametersFactory.create(Map.of(QUERY, "Name"));
+
         Person person = new Person()
             .setNames(List.of(new Name().setGivenName("Name")))
             .setEmailAddresses(List.of(new EmailAddress().setValue("name@localhost.com")));
         SearchResult searchResult = new SearchResult();
         searchResult.setPerson(person);
 
-        when(mockedParameters.getRequiredString(QUERY))
-            .thenReturn("Name");
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getPeopleService(mockedParameters))
+                .thenReturn(mockedPeopleService);
 
-        when(mockedPeopleService.people())
-            .thenReturn(mockedPeople);
-        when(mockedPeople.searchContacts())
-            .thenReturn(mockedSearchContacts);
-        when(mockedSearchContacts.setQuery(queryArgumentCaptor.capture()))
-            .thenReturn(mockedSearchContacts);
-        when(mockedSearchContacts.setReadMask(readMasksArgumentCaptor.capture()))
-            .thenReturn(mockedSearchContacts);
-        when(mockedSearchContacts.execute())
-            .thenReturn(mockedSearchResponse);
-        when(mockedSearchResponse.getResults())
-            .thenReturn(List.of(searchResult));
+            when(mockedPeopleService.people())
+                .thenReturn(mockedPeople);
+            when(mockedPeople.searchContacts())
+                .thenReturn(mockedSearchContacts);
+            when(mockedSearchContacts.setQuery(queryArgumentCaptor.capture()))
+                .thenReturn(mockedSearchContacts);
+            when(mockedSearchContacts.setReadMask(readMasksArgumentCaptor.capture()))
+                .thenReturn(mockedSearchContacts);
+            when(mockedSearchContacts.execute())
+                .thenReturn(mockedSearchResponse);
+            when(mockedSearchResponse.getResults())
+                .thenReturn(List.of(searchResult));
 
-        List<Person> result = GoogleContactsSearchContactsAction
-            .perform(mockedParameters, mockedParameters, mockedContext);
+            List<Person> result = GoogleContactsSearchContactsAction
+                .perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertNotNull(result);
-        assertEquals(List.of(person), result);
+            assertNotNull(result);
+            assertEquals(List.of(person), result);
 
-        assertEquals("Name", queryArgumentCaptor.getValue());
-        assertEquals("names,nicknames,emailAddresses,phoneNumbers,organizations", readMasksArgumentCaptor.getValue());
+            assertEquals("Name", queryArgumentCaptor.getValue());
+            assertEquals("names,nicknames,emailAddresses,phoneNumbers,organizations",
+                readMasksArgumentCaptor.getValue());
+        }
     }
 }

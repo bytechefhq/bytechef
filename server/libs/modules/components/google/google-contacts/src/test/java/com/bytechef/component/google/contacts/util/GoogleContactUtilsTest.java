@@ -16,11 +16,11 @@
 
 package com.bytechef.component.google.contacts.util;
 
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +42,7 @@ class GoogleContactUtilsTest {
     @Test
     void testCreateName() {
         mockedParameters = MockParametersFactory.create(
-            Map.of(FIRST_NAME, "John", MIDDLE_NAME, "A.", LAST_NAME, "Doe"));
+            Map.of(GIVEN_NAME, "John", MIDDLE_NAME, "A.", FAMILY_NAME, "Doe"));
 
         Name name = createName(mockedParameters);
 
@@ -53,7 +53,7 @@ class GoogleContactUtilsTest {
 
     @Test
     void testCreateOrganization() {
-        mockedParameters = MockParametersFactory.create(Map.of(COMPANY, "Tech Corp", JOB_TITLE, "Engineer"));
+        mockedParameters = MockParametersFactory.create(Map.of(NAME, "Tech Corp", TITLE, "Engineer"));
 
         Organization organization = createOrganization(mockedParameters);
 
