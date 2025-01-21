@@ -45,7 +45,7 @@ Version: 1
 
 
 ### Create Contact
-Creates a new contact..
+Creates a new contact.
 
 #### Properties
 
@@ -71,8 +71,8 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING\(firstName), STRING\(middleName), STRING\(lastName)}] | ARRAY_BUILDER  |
-| [{STRING\(company), STRING\(jobTitle)}] | ARRAY_BUILDER  |
+| [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] | ARRAY_BUILDER  |
+| [{STRING\(name), STRING\(title)}] | ARRAY_BUILDER  |
 | [{STRING\(value)}] | ARRAY_BUILDER  |
 | [{STRING\(value)}] | ARRAY_BUILDER  |
 
@@ -137,10 +137,38 @@ Type: OBJECT
 
 |     Type     |     Control Type     |
 |:------------:|:--------------------:|
-| [{STRING\(firstName), STRING\(middleName), STRING\(lastName)}] | ARRAY_BUILDER  |
-| [{STRING\(company), STRING\(jobTitle)}] | ARRAY_BUILDER  |
+| [{STRING\(familyName), STRING\(givenName), STRING\(middleName)}] | ARRAY_BUILDER  |
+| [{STRING\(name), STRING\(title)}] | ARRAY_BUILDER  |
 | [{STRING\(value)}] | ARRAY_BUILDER  |
 | [{STRING\(value)}] | ARRAY_BUILDER  |
+
+
+
+
+
+
+### Search Contacts
+Searches the contacts in Google Contacts account.
+
+#### Properties
+
+|      Name      |     Type     |     Control Type     |     Description     |
+|:--------------:|:------------:|:--------------------:|:-------------------:|
+| Query | STRING | TEXT  |  The plain-text query.  |
+
+
+### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Type     |     Control Type     |
+|:------------:|:--------------------:|
+| {[{STRING\(familyName), STRING\(givenName), STRING\(middleName)}]\(names), [{STRING\(name), STRING\(title)}]\(organizations), [{STRING\(value)}]\(emailAddresses), [{STRING\(value)}]\(phoneNumbers)} | OBJECT_BUILDER  |
 
 
 
