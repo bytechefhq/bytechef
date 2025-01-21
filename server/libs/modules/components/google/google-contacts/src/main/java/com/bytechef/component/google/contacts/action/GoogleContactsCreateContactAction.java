@@ -19,14 +19,14 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
 
@@ -43,15 +43,15 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleContactsCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates a new contact..")
+        .description("Creates a new contact.")
         .properties(
-            string(FIRST_NAME)
+            string(GIVEN_NAME)
                 .label("First Name")
                 .description("The first name of the contact.")
                 .required(true),
@@ -59,15 +59,15 @@ public class GoogleContactsCreateContactAction {
                 .label("Middle Name")
                 .description("The middle name of the contact.")
                 .required(false),
-            string(LAST_NAME)
+            string(FAMILY_NAME)
                 .label("Last Name")
                 .description("The last name of the contact.")
                 .required(true),
-            string(JOB_TITLE)
+            string(TITLE)
                 .label("Job Title")
                 .description("The job title of the contact.")
                 .required(false),
-            string(COMPANY)
+            string(NAME)
                 .label("Company")
                 .description("The company of the contact.")
                 .required(false),
