@@ -19,15 +19,15 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.CONTACT_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.RESOURCE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createName;
 import static com.bytechef.component.google.contacts.util.GoogleContactsUtils.createOrganization;
 
@@ -56,7 +56,7 @@ public class GoogleContactsUpdateContactAction {
                 .label("Resource Name")
                 .description("Resource name of the contact to be updated.")
                 .required(true),
-            string(FIRST_NAME)
+            string(GIVEN_NAME)
                 .label("First Name")
                 .description("New first name of the contact.")
                 .required(true),
@@ -64,15 +64,15 @@ public class GoogleContactsUpdateContactAction {
                 .label("Middle Name")
                 .description("New middle name of the contact.")
                 .required(false),
-            string(LAST_NAME)
+            string(FAMILY_NAME)
                 .label("Last Name")
                 .description("Updated last name of the contact.")
                 .required(true),
-            string(JOB_TITLE)
+            string(TITLE)
                 .label("Job Title")
                 .description("Updated job title of the contact.")
                 .required(false),
-            string(COMPANY)
+            string(NAME)
                 .label("Company")
                 .description("Updated name of the company where the contact is employed.")
                 .required(false),

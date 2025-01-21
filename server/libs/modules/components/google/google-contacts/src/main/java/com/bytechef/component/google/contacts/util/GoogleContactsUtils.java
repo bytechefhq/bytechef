@@ -16,11 +16,11 @@
 
 package com.bytechef.component.google.contacts.util;
 
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 
 import com.bytechef.component.definition.Parameters;
 import com.google.api.services.people.v1.model.Name;
@@ -36,14 +36,14 @@ public class GoogleContactsUtils {
 
     public static Name createName(Parameters inputParameters) {
         return new Name()
-            .setGivenName(inputParameters.getRequiredString(FIRST_NAME))
+            .setGivenName(inputParameters.getRequiredString(GIVEN_NAME))
             .setMiddleName(inputParameters.getString(MIDDLE_NAME))
-            .setFamilyName(inputParameters.getRequiredString(LAST_NAME));
+            .setFamilyName(inputParameters.getRequiredString(FAMILY_NAME));
     }
 
     public static Organization createOrganization(Parameters inputParameters) {
         return new Organization()
-            .setName(inputParameters.getString(COMPANY))
-            .setTitle(inputParameters.getString(JOB_TITLE));
+            .setName(inputParameters.getString(NAME))
+            .setTitle(inputParameters.getString(TITLE));
     }
 }
