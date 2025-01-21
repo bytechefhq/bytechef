@@ -31,28 +31,30 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
     const radioValue = (selectedType ?? currentType ?? '').toString();
 
     const handleChangeModeType = useCallback(() => {
-        if (selectedType !== undefined) {
+        if (selectedType === currentType) {
+            handleDialogClose();
+
+            return;
+        }
+
+        if (selectedType !== undefined && selectedType !== currentType) {
             setCurrentType(selectedType);
+
+            if (selectedType === ModeType.AUTOMATION) {
+                navigate('/automation');
+            } else if (selectedType === ModeType.EMBEDDED) {
+                navigate('/embedded');
+            }
 
             handleDialogClose();
         }
-    }, [selectedType, setCurrentType, handleDialogClose]);
+    }, [currentType, handleDialogClose, navigate, selectedType, setCurrentType]);
 
     useEffect(() => {
         if (!isDialogOpen && currentType !== undefined) {
             setSelectedType(undefined);
         }
     }, [isDialogOpen, currentType]);
-
-    useEffect(() => {
-        if (currentType !== undefined) {
-            if (currentType === ModeType.AUTOMATION) {
-                navigate('/automation');
-            } else if (currentType === ModeType.EMBEDDED) {
-                navigate('/embedded');
-            }
-        }
-    }, [currentType, navigate]);
 
     return (
         <Dialog onOpenChange={handleDialogClose} open={isDialogOpen}>
