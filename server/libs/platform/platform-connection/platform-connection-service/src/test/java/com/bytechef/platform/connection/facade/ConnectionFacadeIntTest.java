@@ -258,16 +258,9 @@ public class ConnectionFacadeIntTest {
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(2);
 
-        connectionDTO = ConnectionDTO.builder()
-            .componentName("componentName")
-            .environment(ConnectionEnvironment.TEST)
-            .id(connectionDTO.id())
-            .name("name")
-            .tags(List.of(tag1))
-            .version(connectionDTO.version())
-            .build();
+        connectionFacade.update(connectionDTO.id(), "name", List.of(tag1), connectionDTO.version());
 
-        connectionFacade.update(connectionDTO);
+        connectionDTO = connectionFacade.getConnection(connectionDTO.id());
 
         Assertions.assertThat(connectionDTO.tags())
             .hasSize(1);

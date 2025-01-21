@@ -82,7 +82,7 @@ public class RemoteConnectionServiceClient implements ConnectionService {
     }
 
     @Override
-    public Connection update(Connection connection) {
+    public Connection update(long id, String name, List<Long> tagIds, int version) {
         throw new UnsupportedOperationException();
     }
 

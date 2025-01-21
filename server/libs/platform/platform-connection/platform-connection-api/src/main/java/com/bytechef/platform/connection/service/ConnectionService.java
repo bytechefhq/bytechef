@@ -43,7 +43,7 @@ public interface ConnectionService {
 
     Connection update(long id, List<Long> tagIds);
 
-    Connection update(Connection connection);
+    Connection update(long id, String name, List<Long> tagIds, int version);
 
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 

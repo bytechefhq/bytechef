@@ -39,7 +39,7 @@ public interface ConnectionFacade {
 
     List<Tag> getConnectionTags(ModeType type);
 
-    void update(ConnectionDTO connectionDTO);
+    void update(long id, List<Tag> tags);
 
-    void update(Long id, List<Tag> tags);
+    void update(long id, String name, List<Tag> tags, int version);
 }

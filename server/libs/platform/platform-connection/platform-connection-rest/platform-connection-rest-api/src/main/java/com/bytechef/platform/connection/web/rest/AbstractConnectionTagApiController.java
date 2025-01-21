@@ -53,12 +53,12 @@ public abstract class AbstractConnectionTagApiController {
     }
 
     protected ResponseEntity<Void> doUpdateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
-        connectionFacade.update(
-            id,
-            updateTagsRequestModel.getTags()
-                .stream()
-                .map(tagModel -> conversionService.convert(tagModel, Tag.class))
-                .toList());
+        List<Tag> tags = updateTagsRequestModel.getTags()
+            .stream()
+            .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+            .toList();
+
+        connectionFacade.update(id, tags);
 
         return ResponseEntity.noContent()
             .build();

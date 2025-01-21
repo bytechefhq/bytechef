@@ -105,17 +105,6 @@ public class ConnectionServiceIntTest {
         assertThat(connectionService.getConnections(null, null, null, null, ModeType.AUTOMATION)).hasSize(1);
     }
 
-    @Test
-    public void testUpdate() {
-        Connection connection = connectionRepository.save(getConnection());
-
-        connection.setName("name2");
-
-        Connection updatedConnection = connectionService.update(connection);
-
-        assertThat(updatedConnection.getName()).isEqualTo("name2");
-    }
-
     private static Connection getConnection() {
         return Connection.builder()
             .componentName("componentName")

@@ -131,15 +131,18 @@ public class ConnectionServiceImpl implements ConnectionService {
     }
 
     @Override
-    public Connection update(Connection connection) {
-        Validate.notBlank(connection.getName(), "'name' must not be empty");
+    public Connection update(long id, String name, List<Long> tagIds, int version) {
+        Connection curConnection = getConnection(id);
 
-        Connection curConnection = OptionalUtils.get(
-            connectionRepository.findById(Validate.notNull(connection.getId(), "id")));
+        if (name != null) {
+            curConnection.setName(name);
+        }
 
-        curConnection.setName(connection.getName());
-        curConnection.setTagIds(connection.getTagIds());
-        curConnection.setVersion(connection.getVersion());
+        if (tagIds != null) {
+            curConnection.setTagIds(tagIds);
+        }
+
+        curConnection.setVersion(version);
 
         return connectionRepository.save(curConnection);
     }

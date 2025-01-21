@@ -179,21 +179,17 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     }
 
     @Override
-    public void update(ConnectionDTO connectionDTO) {
-        List<Tag> tags = checkTags(connectionDTO.tags());
-
-        Connection connection = connectionDTO.toConnection();
-
-        connection.setTags(tags);
-
-        connectionService.update(connection);
-    }
-
-    @Override
-    public void update(Long id, List<Tag> tags) {
+    public void update(long id, List<Tag> tags) {
         tags = checkTags(tags);
 
         connectionService.update(id, CollectionUtils.map(tags, Tag::getId));
+    }
+
+    @Override
+    public void update(long id, String name, List<Tag> tags, int version) {
+        tags = checkTags(tags);
+
+        connectionService.update(id, name, CollectionUtils.map(tags, Tag::getId), version);
     }
 
     private List<Tag> checkTags(List<Tag> tags) {

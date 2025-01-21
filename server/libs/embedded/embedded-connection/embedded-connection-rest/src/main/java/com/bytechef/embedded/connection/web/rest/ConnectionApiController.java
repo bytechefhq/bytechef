@@ -24,7 +24,9 @@ import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.platform.constant.ModeType;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -88,8 +90,14 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateConnection(Long id, ConnectionModel connectionModel) {
-        connectionFacade.update(conversionService.convert(connectionModel.id(id), ConnectionDTO.class));
+    public ResponseEntity<Void> updateConnection(Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
+        List<Tag> list = updateConnectionRequestModel.getTags()
+            .stream()
+            .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+            .toList();
+
+        connectionFacade.update(
+            id, updateConnectionRequestModel.getName(), list, updateConnectionRequestModel.getVersion());
 
         return ResponseEntity.noContent()
             .build();

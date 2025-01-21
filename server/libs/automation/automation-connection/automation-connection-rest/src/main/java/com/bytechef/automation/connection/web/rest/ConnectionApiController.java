@@ -24,8 +24,9 @@ import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.connection.web.rest.model.ConnectionEnvironmentModel;
+import com.bytechef.platform.connection.web.rest.model.UpdateConnectionRequestModel;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -44,17 +45,15 @@ import org.springframework.web.bind.annotation.RestController;
 public class ConnectionApiController implements ConnectionApi {
 
     private final ConnectionFacade connectionFacade;
-    private final ConnectionService connectionService;
     private final ConversionService conversionService;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
-        ConnectionFacade connectionFacade, ConnectionService connectionService, ConversionService conversionService,
+        ConnectionFacade connectionFacade, ConversionService conversionService,
         WorkspaceConnectionFacade workspaceConnectionFacade) {
 
         this.connectionFacade = connectionFacade;
-        this.connectionService = connectionService;
         this.conversionService = conversionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
@@ -95,11 +94,14 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateConnection(Long id, ConnectionModel connectionModel) {
-        ConnectionDTO connectionDTO = Validate.notNull(
-            conversionService.convert(connectionModel.id(id), ConnectionDTO.class), "connectionDTO");
+    public ResponseEntity<Void> updateConnection(Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
+        List<Tag> list = updateConnectionRequestModel.getTags()
+            .stream()
+            .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+            .toList();
 
-        connectionService.update(connectionDTO.toConnection());
+        connectionFacade.update(
+            id, updateConnectionRequestModel.getName(), list, updateConnectionRequestModel.getVersion());
 
         return ResponseEntity.noContent()
             .build();
