@@ -20,7 +20,12 @@
     "help" : null,
     "metadata" : null,
     "name" : "createDocument",
-    "outputDefinition" : null,
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
       "description" : "Document title.",
@@ -64,29 +69,77 @@
     } ],
     "title" : "Create Document",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Edit a template file and replace the values with the ones provided.",
+    "description" : "Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.",
     "help" : null,
     "metadata" : null,
-    "name" : "createDocumentBasedOnTemplate",
-    "outputDefinition" : null,
+    "name" : "createDocumentFromTemplate",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "The ID of the file to replace the values.",
+      "description" : "The ID of the template document from which the new document will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
       "metadata" : { },
       "required" : true,
-      "name" : "destinationFile",
+      "name" : "fileId",
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Template File ID",
+      "label" : "Template Document ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "Name of the new document.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "fileName",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "New Document Name",
+      "placeholder" : null,
+      "controlType" : "TEXT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : null
+    }, {
+      "advancedOption" : null,
+      "description" : "Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : false,
+      "name" : "folderId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Folder for New Document",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -178,10 +231,10 @@
       "controlType" : "OBJECT_BUILDER",
       "optionsDataSource" : null
     } ],
-    "title" : "Edit Template File",
+    "title" : "Create Document From Template",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -221,12 +274,9 @@
     } ],
     "title" : "Get Document",
     "perform" : { },
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -278,12 +328,12 @@
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
       "apply" : null,
-      "pkce" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
@@ -295,5 +345,8 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "triggers" : null,
+  "dataStream" : null,
+  "unifiedApi" : null
 }

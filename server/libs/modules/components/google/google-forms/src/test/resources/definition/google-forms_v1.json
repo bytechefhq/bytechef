@@ -52,8 +52,8 @@
     } ],
     "title" : "Get All Responses",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -93,8 +93,8 @@
     } ],
     "title" : "Get Form",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -157,64 +157,9 @@
     } ],
     "title" : "Get Response",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
-  } ],
-  "dataStream" : null,
-  "triggers" : [ {
-    "batch" : null,
-    "deprecated" : null,
-    "description" : "Triggers when response is submitted to Google Form.",
-    "help" : null,
-    "name" : "newResponse",
-    "outputDefinition" : {
-      "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
-      "sampleOutput" : null
-    },
-    "properties" : [ {
-      "advancedOption" : null,
-      "description" : "Form to watch for new responses.",
-      "displayCondition" : null,
-      "expressionEnabled" : null,
-      "hidden" : null,
-      "metadata" : { },
-      "required" : true,
-      "name" : "formId",
-      "type" : "STRING",
-      "defaultValue" : null,
-      "exampleValue" : null,
-      "label" : "Form",
-      "placeholder" : null,
-      "controlType" : "SELECT",
-      "languageId" : null,
-      "maxLength" : null,
-      "minLength" : null,
-      "options" : null,
-      "optionsDataSource" : {
-        "optionsLookupDependsOn" : null,
-        "options" : { }
-      }
-    } ],
-    "title" : "New Response",
-    "type" : "POLLING",
-    "webhookRawBody" : null,
-    "workflowSyncExecution" : null,
-    "poll" : { },
-    "deduplicate" : null,
-    "webhookDisable" : null,
-    "webhookEnable" : null,
-    "dynamicWebhookRefresh" : null,
-    "webhookRequest" : null,
-    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "listenerDisable" : null,
-    "listenerEnable" : null,
-    "webhookValidate" : null,
-    "webhookValidateOnEnable" : null
+    "processErrorResponse" : null
   } ],
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -266,12 +211,12 @@
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
       "apply" : null,
-      "pkce" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : { },
@@ -283,5 +228,60 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "triggers" : [ {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Triggers when response is submitted to Google Form.",
+    "help" : null,
+    "name" : "newResponse",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "Form to watch for new responses.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "formId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Form",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    } ],
+    "title" : "New Response",
+    "type" : "POLLING",
+    "webhookRawBody" : null,
+    "workflowSyncExecution" : null,
+    "poll" : { },
+    "deduplicate" : null,
+    "webhookDisable" : null,
+    "webhookEnable" : null,
+    "dynamicWebhookRefresh" : null,
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
+    "webhookRequest" : null,
+    "listenerDisable" : null,
+    "listenerEnable" : null,
+    "webhookValidate" : null,
+    "webhookValidateOnEnable" : null
+  } ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }
