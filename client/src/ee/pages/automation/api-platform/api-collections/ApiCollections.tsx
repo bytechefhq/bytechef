@@ -47,7 +47,6 @@ const ApiCollections = () => {
         error: projectsError,
         isLoading: projectsIsLoading,
     } = useGetWorkspaceProjectsQuery({
-        apiCollections: true,
         id: currentWorkspaceId!,
     });
 

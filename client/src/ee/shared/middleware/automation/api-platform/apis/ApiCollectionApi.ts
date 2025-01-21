@@ -162,8 +162,8 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all workspaceAPI collections.
-     * Get all workspaceAPI collections
+     * Get all workspace API collections.
+     * Get all workspace API collections
      */
     async getWorkspaceApiCollectionsRaw(requestParameters: GetWorkspaceApiCollectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<ApiCollection>>> {
         if (requestParameters['id'] == null) {
@@ -200,8 +200,8 @@ export class ApiCollectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get all workspaceAPI collections.
-     * Get all workspaceAPI collections
+     * Get all workspace API collections.
+     * Get all workspace API collections
      */
     async getWorkspaceApiCollections(requestParameters: GetWorkspaceApiCollectionsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<ApiCollection>> {
         const response = await this.getWorkspaceApiCollectionsRaw(requestParameters, initOverrides);
