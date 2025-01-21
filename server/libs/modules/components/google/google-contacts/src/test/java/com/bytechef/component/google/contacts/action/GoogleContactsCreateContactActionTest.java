@@ -16,17 +16,20 @@
 
 package com.bytechef.component.google.contacts.action;
 
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.COMPANY;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.EMAIL;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FIRST_NAME;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.JOB_TITLE;
-import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.LAST_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.FAMILY_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.GIVEN_NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.MIDDLE_NAME;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.PHONE_NUMBER;
+import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.EmailAddress;
 import com.google.api.services.people.v1.model.Name;
@@ -35,11 +38,13 @@ import com.google.api.services.people.v1.model.Person;
 import com.google.api.services.people.v1.model.PhoneNumber;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleContactsCreateContactActionTest extends AbstractGoogleContactsActionTest {
 
@@ -51,67 +56,64 @@ class GoogleContactsCreateContactActionTest extends AbstractGoogleContactsAction
 
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredString(FIRST_NAME))
-            .thenReturn("First name");
-        when(mockedParameters.getString(MIDDLE_NAME))
-            .thenReturn("Middle name");
-        when(mockedParameters.getRequiredString(LAST_NAME))
-            .thenReturn("Last name");
-        when(mockedParameters.getString(EMAIL))
-            .thenReturn("mail@mail.com");
-        when(mockedParameters.getString(PHONE_NUMBER))
-            .thenReturn("123456");
-        when(mockedParameters.getString(COMPANY))
-            .thenReturn("Company");
-        when(mockedParameters.getString(JOB_TITLE))
-            .thenReturn("Job title");
+        mockedParameters = MockParametersFactory.create(
+            Map.of(
+                GIVEN_NAME, "First name", MIDDLE_NAME, "Middle name", FAMILY_NAME, "Last name",
+                EMAIL, "mail@mail.com", PHONE_NUMBER, "123456", NAME, "Company", TITLE, "Job title"));
 
-        when(mockedPeopleService.people())
-            .thenReturn(mockedPeople);
-        when(mockedPeople.createContact(personArgumentCaptor.capture()))
-            .thenReturn(mockedCreateContact);
-        when(mockedCreateContact.execute())
-            .thenReturn(mockedPerson);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getPeopleService(mockedParameters))
+                .thenReturn(mockedPeopleService);
 
-        Person result = GoogleContactsCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
+            when(mockedPeopleService.people())
+                .thenReturn(mockedPeople);
+            when(mockedPeople.createContact(personArgumentCaptor.capture()))
+                .thenReturn(mockedCreateContact);
+            when(mockedCreateContact.execute())
+                .thenReturn(mockedPerson);
 
-        assertEquals(mockedPerson, result);
+            Person result =
+                GoogleContactsCreateContactAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        Person person = personArgumentCaptor.getValue();
+            assertEquals(mockedPerson, result);
 
-        List<Name> names = person.getNames();
+            Person person = personArgumentCaptor.getValue();
 
-        assertEquals(1, names.size());
+            List<Name> names = person.getNames();
 
-        Name name = names.getFirst();
+            assertEquals(1, names.size());
 
-        assertEquals("First name", name.getGivenName());
-        assertEquals("Middle name", name.getMiddleName());
-        assertEquals("Last name", name.getFamilyName());
+            Name name = names.getFirst();
 
-        List<EmailAddress> emailAddresses = person.getEmailAddresses();
+            assertEquals("First name", name.getGivenName());
+            assertEquals("Middle name", name.getMiddleName());
+            assertEquals("Last name", name.getFamilyName());
 
-        assertEquals(1, emailAddresses.size());
+            List<EmailAddress> emailAddresses = person.getEmailAddresses();
 
-        EmailAddress emailAddress = emailAddresses.getFirst();
+            assertEquals(1, emailAddresses.size());
 
-        assertEquals("mail@mail.com", emailAddress.getValue());
+            EmailAddress emailAddress = emailAddresses.getFirst();
 
-        List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
+            assertEquals("mail@mail.com", emailAddress.getValue());
 
-        assertEquals(1, emailAddresses.size());
+            List<PhoneNumber> phoneNumbers = person.getPhoneNumbers();
 
-        PhoneNumber phoneNumber = phoneNumbers.getFirst();
+            assertEquals(1, emailAddresses.size());
 
-        assertEquals("123456", phoneNumber.getValue());
+            PhoneNumber phoneNumber = phoneNumbers.getFirst();
 
-        List<Organization> organizations = person.getOrganizations();
+            assertEquals("123456", phoneNumber.getValue());
 
-        assertEquals(1, organizations.size());
+            List<Organization> organizations = person.getOrganizations();
 
-        Organization organization = organizations.getFirst();
+            assertEquals(1, organizations.size());
 
-        assertEquals("Company", organization.getName());
-        assertEquals("Job title", organization.getTitle());
+            Organization organization = organizations.getFirst();
+
+            assertEquals("Company", organization.getName());
+            assertEquals("Job title", organization.getTitle());
+        }
     }
 }

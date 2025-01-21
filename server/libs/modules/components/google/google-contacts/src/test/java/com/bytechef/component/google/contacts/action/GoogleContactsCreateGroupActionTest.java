@@ -19,17 +19,22 @@ package com.bytechef.component.google.contacts.action;
 import static com.bytechef.component.google.contacts.constant.GoogleContactsConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.people.v1.PeopleService;
 import com.google.api.services.people.v1.model.ContactGroup;
 import com.google.api.services.people.v1.model.CreateContactGroupRequest;
 import java.io.IOException;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleContactsCreateGroupActionTest extends AbstractGoogleContactsActionTest {
 
@@ -42,25 +47,30 @@ class GoogleContactsCreateGroupActionTest extends AbstractGoogleContactsActionTe
 
     @Test
     void testPerform() throws IOException {
-        when(mockedParameters.getRequiredString(NAME))
-            .thenReturn("Name");
+        mockedParameters = MockParametersFactory.create(
+            Map.of(NAME, "Name"));
 
-        when(mockedPeopleService.contactGroups())
-            .thenReturn(mockedContactGroups);
-        when(mockedContactGroups.create(createContactGroupRequestArgumentCaptor.capture()))
-            .thenReturn(mockedCreate);
-        when(mockedCreate.execute())
-            .thenReturn(mockedContactGroup);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getPeopleService(mockedParameters))
+                .thenReturn(mockedPeopleService);
 
-        ContactGroup result =
-            GoogleContactsCreateGroupAction.perform(mockedParameters, mockedParameters, mockedContext);
+            when(mockedPeopleService.contactGroups())
+                .thenReturn(mockedContactGroups);
+            when(mockedContactGroups.create(createContactGroupRequestArgumentCaptor.capture()))
+                .thenReturn(mockedCreate);
+            when(mockedCreate.execute())
+                .thenReturn(mockedContactGroup);
 
-        assertEquals(mockedContactGroup, result);
+            ContactGroup result =
+                GoogleContactsCreateGroupAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        CreateContactGroupRequest createContactGroupRequest = createContactGroupRequestArgumentCaptor.getValue();
+            assertEquals(mockedContactGroup, result);
 
-        assertEquals("Name", createContactGroupRequest.getContactGroup()
-            .getName());
+            CreateContactGroupRequest createContactGroupRequest = createContactGroupRequestArgumentCaptor.getValue();
 
+            assertEquals("Name", createContactGroupRequest.getContactGroup()
+                .getName());
+        }
     }
 }
