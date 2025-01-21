@@ -164,15 +164,17 @@ const WorkflowNodeDetailsPanel = ({
         !!currentNode && !!currentNode.taskDispatcher
     );
 
-    const currentNodeDefinition = useMemo(
-        () =>
-            currentNode?.trigger
-                ? currentTriggerDefinition
-                : currentNode?.taskDispatcher
-                  ? currentTaskDispatcherDefinition
-                  : currentActionDefinition,
-        [currentNode, currentTriggerDefinition, currentTaskDispatcherDefinition, currentActionDefinition]
-    );
+    const currentNodeDefinition = useMemo(() => {
+        if (currentNode?.trigger) {
+            return currentTriggerDefinition;
+        }
+
+        if (currentNode?.taskDispatcher) {
+            return currentTaskDispatcherDefinition;
+        }
+
+        return currentActionDefinition;
+    }, [currentNode, currentTriggerDefinition, currentTaskDispatcherDefinition, currentActionDefinition]);
 
     const currentNodeIndex = useMemo(
         () => currentNode && nodeNames?.indexOf(currentNode?.workflowNodeName),
