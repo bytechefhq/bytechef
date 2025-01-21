@@ -19,7 +19,9 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.FOLDER_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.NAME;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TEMPLATE_DOCUMENT_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
@@ -35,7 +37,8 @@ import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
 import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
-import java.io.IOException;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.model.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -56,6 +59,17 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
                 .description("The ID of the template document from which the new document will be created.")
                 .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
                 .required(true),
+            string(NAME)
+                .label("New Document Name")
+                .description("Name of the new document.")
+                .required(true),
+            string(FOLDER_ID)
+                .label("Folder for New Document")
+                .description(
+                    "Folder ID where the new document will be saved. If not provided, the new document " +
+                        "will be saved in the same folder as the template document.")
+                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getFolderOptions)
+                .required(false),
             object(VALUES)
                 .label("Variables")
                 .description("Don't include the \"[[]]\", only the key name and its value.")
@@ -72,10 +86,40 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
     }
 
     public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws IOException {
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Docs docs = GoogleServices.getDocs(connectionParameters);
+        File copiedPresentation = copyDocument(connectionParameters, inputParameters);
+        List<Request> requests = createRequests(inputParameters);
 
+        writeToDocument(docs, copiedPresentation.getId(), requests);
+
+        return null;
+    }
+
+    private static File copyDocument(Parameters connectionParameters, Parameters inputParameters)
+        throws Exception {
+
+        Drive drive = GoogleServices.getDrive(connectionParameters);
+
+        String templateDocumentId = inputParameters.getRequiredString(TEMPLATE_DOCUMENT_ID);
+        String folderId = inputParameters.getString(FOLDER_ID);
+
+        File templateDocument = drive.files()
+            .get(templateDocumentId)
+            .execute();
+
+        File newPresentation = new File()
+            .setName(inputParameters.getRequiredString(NAME))
+            .setParents(folderId == null ? templateDocument.getParents() : List.of(folderId))
+            .setMimeType(templateDocument.getMimeType());
+
+        return drive.files()
+            .copy(templateDocumentId, newPresentation)
+            .execute();
+    }
+
+    private static List<Request> createRequests(Parameters inputParameters) {
         List<Request> requests = new ArrayList<>();
 
         Map<String, String> values = inputParameters.getMap(VALUES, String.class, Map.of());
@@ -110,10 +154,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
 
             requests.add(request);
         }
-
-        writeToDocument(docs, inputParameters.getRequiredString(TEMPLATE_DOCUMENT_ID), requests);
-
-        return null;
+        return requests;
     }
 
 }
