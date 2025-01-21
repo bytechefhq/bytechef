@@ -90,14 +90,14 @@ public class ProjectApiController implements ProjectApi {
 
     @Override
     public ResponseEntity<List<ProjectModel>> getWorkspaceProjects(
-        Long id, Boolean apiCollections, Boolean projectDeployments, Long categoryId, Long tagId,
+        Long id, Boolean projectDeployments, Long categoryId, Long tagId,
         ProjectStatusModel status, Boolean includeAllFields) {
 
         return ResponseEntity.ok(
             projectFacade
                 .getWorkspaceProjects(
-                    id, apiCollections != null, projectDeployments != null, categoryId, tagId,
-                    status == null ? null : Status.valueOf(status.name()), includeAllFields)
+                    id, projectDeployments != null, categoryId, tagId,
+                    status == null ? null : Status.valueOf(status.name()), List.of(), includeAllFields)
                 .stream()
                 .map(project -> conversionService.convert(project, ProjectModel.class))
                 .toList());

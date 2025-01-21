@@ -14,6 +14,8 @@ tags:
     description: "The Automation API Platform Collection Tag Internal API"
   - name: "api-collection-endpoint"
     description: "The Automation API Platform Collection Endpoint Internal API"
+  - name: "project"
+    description: "The Automation Project Internal API"
 paths:
   /api-clients:
     get:
@@ -331,8 +333,8 @@ paths:
                 $ref: "#/components/schemas/ApiCollectionEndpoint"
   /workspaces/{id}/api-collections:
     get:
-      description: "Get all workspaceAPI collections."
-      summary: "Get all workspaceAPI collections"
+      description: "Get all workspace API collections."
+      summary: "Get all workspace API collections"
       tags:
         - "api-collection"
       operationId: "getWorkspaceApiCollections"
@@ -373,6 +375,30 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/ApiCollection"
+  /workspaces/{id}/api/collections/projects:
+    get:
+      description: "Get workspace API collection projects by workspace id."
+      summary: "Get workspace API collection projects by workspace id"
+      tags:
+        - "project"
+      operationId: "getWorkspaceApiCollectionProjects"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of projects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "../../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/ProjectBasic"
 components:
   schemas:
     ApiClient:

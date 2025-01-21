@@ -60,8 +60,8 @@ public interface ProjectFacade {
     List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status);
 
     List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean apiCollections, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, boolean includeAllFields);
+        long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
+        Status status, List<Long> projectIds, boolean includeAllFields);
 
     void publishProject(long id, String description);
 

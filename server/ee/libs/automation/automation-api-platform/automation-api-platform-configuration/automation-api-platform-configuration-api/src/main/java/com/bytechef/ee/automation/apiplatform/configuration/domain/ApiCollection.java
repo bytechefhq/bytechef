@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.apiplatform.configuration.domain;
 
-import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.tag.domain.Tag;
 import java.time.Instant;
@@ -66,7 +66,7 @@ public class ApiCollection {
     private String name;
 
     @Column("project_deployment_id")
-    private AggregateReference<Project, Long> projectDeploymentId;
+    private AggregateReference<ProjectDeployment, Long> projectDeploymentId;
 
     @Version
     private int version;

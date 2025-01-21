@@ -25,7 +25,7 @@ public interface ApiCollectionService {
 
     ApiCollection getApiCollection(long id);
 
-    List<Long> getApiCollectionProjectIds();
+    List<Long> getApiCollectionProjectIds(long workspaceId);
 
     List<ApiCollection> getApiCollections(Long workspaceId, Environment environment, Long projectId, Long tagId);
 

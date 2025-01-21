@@ -34,7 +34,6 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
@@ -61,7 +60,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
-    private final ApiCollectionService apiCollectionService;
     private final CategoryService categoryService;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
@@ -76,15 +74,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @SuppressFBWarnings("EI2")
     public ProjectFacadeImpl(
-        ApiCollectionService apiCollectionService, CategoryService categoryService,
-        ProjectWorkflowService projectWorkflowService,
+        CategoryService categoryService, ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
         ProjectDeploymentFacade projectDeploymentFacade,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TagService tagService, WorkflowFacade workflowFacade, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
-        this.apiCollectionService = apiCollectionService;
 
         this.categoryService = categoryService;
         this.projectWorkflowService = projectWorkflowService;
@@ -327,17 +323,16 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getProjects(Long categoryId, boolean projectDeployments, Long tagId, Status status) {
-        return getProjects(null, false, projectDeployments, categoryId, tagId, status, true);
+        return getProjects(null, projectDeployments, categoryId, tagId, status, List.of(), true);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<ProjectDTO> getWorkspaceProjects(
-        long workspaceId, boolean apiCollections, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, boolean includeAllFields) {
+        long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
+        Status status, List<Long> projectIds, boolean includeAllFields) {
 
-        return getProjects(
-            workspaceId, apiCollections, projectDeployments, categoryId, tagId, status, includeAllFields);
+        return getProjects(workspaceId, projectDeployments, categoryId, tagId, status, projectIds, includeAllFields);
     }
 
     @Override
@@ -431,14 +426,10 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private List<ProjectDTO> getProjects(
-        Long workspaceId, boolean apiCollections, boolean projectDeployments, Long categoryId, Long tagId,
-        Status status, boolean includeAllFields) {
+        Long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
+        Status status, List<Long> projectIds, boolean includeAllFields) {
 
-        List<Long> projectIds = new ArrayList<>();
-
-        if (apiCollections) {
-            projectIds.addAll(apiCollectionService.getApiCollectionProjectIds());
-        }
+        projectIds = new ArrayList<>(projectIds);
 
         if (projectDeployments) {
             projectIds.addAll(projectDeploymentService.getProjectDeploymentProjectIds());

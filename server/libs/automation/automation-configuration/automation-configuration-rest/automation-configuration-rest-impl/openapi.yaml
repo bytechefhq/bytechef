@@ -765,12 +765,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "apiCollections"
-          description: "Use for filtering projects for which api collections exist."
-          in: "query"
-          required: false
-          schema:
-            type: "boolean"
         - name: "projectDeployments"
           description: "Use for filtering projects for which project deployments exist."
           in: "query"

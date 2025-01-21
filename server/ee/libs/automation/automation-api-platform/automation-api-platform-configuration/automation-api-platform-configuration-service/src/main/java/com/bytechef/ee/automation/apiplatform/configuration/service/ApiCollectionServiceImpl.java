@@ -55,8 +55,8 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
-    public List<Long> getApiCollectionProjectIds() {
-        return apiCollectionRepository.findAllApiCollectionProjectIds();
+    public List<Long> getApiCollectionProjectIds(long workspaceId) {
+        return apiCollectionRepository.findAllApiCollectionProjectIds(workspaceId);
     }
 
     @Override
