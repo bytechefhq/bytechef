@@ -90,7 +90,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     nodeData: newTriggerNodeData,
                     onSuccess: () =>
                         handleComponentAddedSuccess({
-                            currentNode,
                             nodeData: newTriggerNodeData,
                             queryClient,
                             workflow,
@@ -176,7 +175,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     nodeIndex: (previousWorkflowTaskIndex ?? 0) + 1,
                     onSuccess: () =>
                         handleComponentAddedSuccess({
-                            currentNode,
                             nodeData: newWorkflowNodeData,
                             queryClient,
                             workflow,
@@ -257,7 +255,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     nodeIndex: taskNodeIndex,
                     onSuccess: () =>
                         handleComponentAddedSuccess({
-                            currentNode,
                             nodeData: newWorkflowNodeData,
                             queryClient,
                             workflow,
