@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.ID;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
@@ -27,10 +28,9 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class GoogleDriveGetFileAction {
             string(FILE_ID)
                 .label("File")
                 .description("File to be retrieved.")
-                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .output(
             outputSchema(

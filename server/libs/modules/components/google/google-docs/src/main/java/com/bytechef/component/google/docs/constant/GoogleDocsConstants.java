@@ -24,6 +24,7 @@ public class GoogleDocsConstants {
     private GoogleDocsConstants() {
     }
 
+    public static final String APPLICATION_VND_GOOGLE_APPS_DOCUMENT = "application/vnd.google-apps.document";
     public static final String BODY = "body";
     public static final String DOCUMENT_ID = "documentId";
     public static final String FOLDER_ID = "folderId";

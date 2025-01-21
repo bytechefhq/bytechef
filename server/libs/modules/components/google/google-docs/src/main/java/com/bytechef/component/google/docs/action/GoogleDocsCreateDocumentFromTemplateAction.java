@@ -19,6 +19,7 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.FOLDER_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.NAME;
@@ -28,10 +29,9 @@ import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDoc
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.docs.util.GoogleDocsUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
 import com.google.api.services.docs.v1.model.ReplaceImageRequest;
@@ -57,7 +57,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
             string(TEMPLATE_DOCUMENT_ID)
                 .label("Template Document ID")
                 .description("The ID of the template document from which the new document will be created.")
-                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
                 .required(true),
             string(NAME)
                 .label("New Document Name")
@@ -68,7 +68,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
                 .description(
                     "Folder ID where the new document will be saved. If not provided, the new document " +
                         "will be saved in the same folder as the template document.")
-                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getFolderOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false),
             object(VALUES)
                 .label("Variables")

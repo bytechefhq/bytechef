@@ -28,10 +28,9 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
@@ -56,7 +55,7 @@ public class GoogleDriveCreateNewFolderAction {
                 .description(
                     "Folder where the new folder will be created; if no folder is selected, the folder will be " +
                         "created in the root folder.")
-                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFolderOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(false))
         .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))
         .perform(GoogleDriveCreateNewFolderAction::perform);

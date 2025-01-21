@@ -19,6 +19,7 @@ package com.bytechef.component.google.forms.action;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.APPLICATION_VND_GOOGLE_APPS_FORM;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.RESPONSE_ID;
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.createCustomResponse;
@@ -29,6 +30,7 @@ import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.util.Map;
 
 /**
@@ -43,7 +45,7 @@ public class GoogleFormsGetResponseAction {
             string(FORM_ID)
                 .label("Form ID")
                 .description("ID of the form whose response to retrieve.")
-                .options((ActionOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FORM, true))
                 .required(true),
             string(RESPONSE_ID)
                 .label("Response ID")

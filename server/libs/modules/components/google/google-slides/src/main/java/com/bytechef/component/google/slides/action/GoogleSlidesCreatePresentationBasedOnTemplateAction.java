@@ -27,11 +27,10 @@ import static com.bytechef.component.google.slides.constant.GoogleSlidesConstant
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.google.slides.util.GoogleSlidesUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
             string(TEMPLATE_PRESENTATION_ID)
                 .label("Template Presentation ID")
                 .description("The ID of the template presentation from which the new presentation will be created.")
-                .options((ActionOptionsFunction<String>) GoogleSlidesUtils::getPresentationIdOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.presentation", true))
                 .required(true),
             string(NAME)
                 .label("New Presentation Name")
@@ -63,7 +62,7 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
                 .description(
                     "Folder ID where the new presentation will be saved. If not provided, the new presentation " +
                         "will be saved in the same folder as the template presentation.")
-                .options((ActionOptionsFunction<String>) GoogleSlidesUtils::getFolderOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false),
             object(VALUES)
                 .label("Values")

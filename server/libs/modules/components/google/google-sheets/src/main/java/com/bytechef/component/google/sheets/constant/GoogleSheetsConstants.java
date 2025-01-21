@@ -26,12 +26,14 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
+import com.bytechef.google.commons.GoogleUtils;
 
 /**
  * @author Monika Kušter
  */
 public class GoogleSheetsConstants {
 
+    public static final String APPLICATION_VND_GOOGLE_APPS_SPREADSHEET = "application/vnd.google-apps.spreadsheet";
     public static final String COLUMN = "column";
     public static final String HEADERS = "headers";
     public static final String INCLUDE_ITEMS_FROM_ALL_DRIVES = "includeItemsFromAllDrives";
@@ -63,7 +65,7 @@ public class GoogleSheetsConstants {
     public static final ModifiableStringProperty SPREADSHEET_ID_PROPERTY = string(SPREADSHEET_ID)
         .label("Spreadsheet ID")
         .description("The ID of the spreadsheet to apply the updates to.")
-        .options((ActionOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+        .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_SPREADSHEET, true))
         .required(true);
 
     public static final ModifiableIntegerProperty SHEET_ID_PROPERTY = integer(SHEET_ID)
