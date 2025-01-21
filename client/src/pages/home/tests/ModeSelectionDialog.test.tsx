@@ -172,20 +172,26 @@ it('should call setCurrentType with appropriate value when a currentType is chan
     expect(mockSetCurrentType).toHaveBeenCalledWith(ModeType.AUTOMATION);
 });
 
-it('should navigate to correct pages when currentType is changed', () => {
-    mockModeTypeStore({
-        currentType: ModeType.AUTOMATION,
-    });
-
+it('should navigate to embedded page when currentType is changed to embedded', async () => {
     renderModeSelectionDialog();
 
-    expect(mockedUseNavigate).toHaveBeenCalledWith('/automation');
+    await userEvent.click(screen.getByTestId('embedded'));
 
+    await userEvent.click(screen.getByText('Confirm'));
+
+    expect(mockedUseNavigate).toHaveBeenCalledWith('/embedded');
+});
+
+it('should navigate to automation page when currentType is changed to automation', async () => {
     mockModeTypeStore({
         currentType: ModeType.EMBEDDED,
     });
 
     renderModeSelectionDialog();
 
-    expect(mockedUseNavigate).toHaveBeenCalledWith('/embedded');
+    await userEvent.click(screen.getByTestId('automation'));
+
+    await userEvent.click(screen.getByText('Confirm'));
+
+    expect(mockedUseNavigate).toHaveBeenCalledWith('/automation');
 });

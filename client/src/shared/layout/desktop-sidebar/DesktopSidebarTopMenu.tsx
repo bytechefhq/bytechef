@@ -15,7 +15,7 @@ const DesktopSidebarTopMenu = () => {
                 <img alt="ByteChef" className="h-8 w-auto cursor-pointer" src={reactLogo} />
             </button>
 
-            {ff_520 && (
+            {ff_520 && isDialogOpen && (
                 <ModeSelectionDialog handleDialogClose={() => setIsDialogOpen(false)} isDialogOpen={isDialogOpen} />
             )}
         </>
