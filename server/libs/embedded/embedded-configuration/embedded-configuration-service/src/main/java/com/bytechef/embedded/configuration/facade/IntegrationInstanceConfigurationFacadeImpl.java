@@ -200,7 +200,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             integrationInstanceConfiguration);
 
         checkIntegrationInstanceConfigurationWorkflows(
-            integrationInstanceConfiguration, -1, Collections.emptyList(), Collections.emptyList());
+            integrationInstanceConfiguration, -1,
+            CollectionUtils.map(
+                integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows(),
+                IntegrationInstanceConfigurationWorkflowDTO::toIntegrationInstanceConfigurationWorkflow),
+            List.of());
 
         return integrationInstanceConfiguration.getId();
     }
