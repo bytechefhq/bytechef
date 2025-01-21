@@ -19,8 +19,8 @@ package com.bytechef.component.google.docs.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DESTINATION_FILE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TEMPLATE_DOCUMENT_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static com.bytechef.component.google.docs.util.GoogleDocsUtils.writeToDocument;
 
@@ -43,15 +43,17 @@ import java.util.Map;
 /**
  * @author Monika Kušter
  */
-public class GoogleDocsCreateDocumentBasedOnTemplateAction {
+public class GoogleDocsCreateDocumentFromTemplateAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocumentBasedOnTemplate")
-        .title("Edit Template File")
-        .description("Edit a template file and replace the values with the ones provided.")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDocumentFromTemplate")
+        .title("Create Document From Template")
+        .description(
+            "Creates a new document based on an existing one and can replace any placeholder variables found in your " +
+                "template document, like [[name]], [[email]], etc.")
         .properties(
-            string(DESTINATION_FILE)
-                .label("Template File ID")
-                .description("The ID of the file to replace the values.")
+            string(TEMPLATE_DOCUMENT_ID)
+                .label("Template Document ID")
+                .description("The ID of the template document from which the new document will be created.")
                 .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
                 .required(true),
             object(VALUES)
@@ -64,9 +66,9 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
                 .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
                 .additionalProperties(string())
                 .required(false))
-        .perform(GoogleDocsCreateDocumentBasedOnTemplateAction::perform);
+        .perform(GoogleDocsCreateDocumentFromTemplateAction::perform);
 
-    private GoogleDocsCreateDocumentBasedOnTemplateAction() {
+    private GoogleDocsCreateDocumentFromTemplateAction() {
     }
 
     public static Object perform(
@@ -109,7 +111,7 @@ public class GoogleDocsCreateDocumentBasedOnTemplateAction {
             requests.add(request);
         }
 
-        writeToDocument(docs, inputParameters.getRequiredString(DESTINATION_FILE), requests);
+        writeToDocument(docs, inputParameters.getRequiredString(TEMPLATE_DOCUMENT_ID), requests);
 
         return null;
     }

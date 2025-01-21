@@ -23,7 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentAction;
-import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentBasedOnTemplateAction;
+import com.bytechef.component.google.docs.action.GoogleDocsCreateDocumentFromTemplateAction;
 import com.bytechef.component.google.docs.action.GoogleDocsGetDocumentAction;
 import com.google.auto.service.AutoService;
 
@@ -44,7 +44,7 @@ public class GoogleDocsComponentHandler implements ComponentHandler {
         .connection(CONNECTION_DEFINITION)
         .actions(
             GoogleDocsCreateDocumentAction.ACTION_DEFINITION,
-            GoogleDocsCreateDocumentBasedOnTemplateAction.ACTION_DEFINITION,
+            GoogleDocsCreateDocumentFromTemplateAction.ACTION_DEFINITION,
             GoogleDocsGetDocumentAction.ACTION_DEFINITION);
 
     @Override

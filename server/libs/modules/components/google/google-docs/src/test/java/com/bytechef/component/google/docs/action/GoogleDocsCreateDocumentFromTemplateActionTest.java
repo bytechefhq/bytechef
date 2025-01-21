@@ -16,8 +16,8 @@
 
 package com.bytechef.component.google.docs.action;
 
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DESTINATION_FILE;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TEMPLATE_DOCUMENT_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -43,7 +43,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Domiter
  */
-class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDocsActionTest {
+class GoogleDocsCreateDocumentFromTemplateActionTest extends AbstractGoogleDocsActionTest {
 
     private final ArgumentCaptor<String> destinationFileArgumentCaptor = ArgumentCaptor.forClass(String.class);
     @SuppressWarnings("rawtypes")
@@ -56,7 +56,7 @@ class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDo
             .thenReturn(Map.of("textKey1", "textValue1"));
         when(mockedParameters.getMap(IMAGES, String.class, Map.of()))
             .thenReturn(Map.of("imageId1", "url1"));
-        when(mockedParameters.getRequiredString(DESTINATION_FILE))
+        when(mockedParameters.getRequiredString(TEMPLATE_DOCUMENT_ID))
             .thenReturn("destinationFile");
 
         try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
@@ -65,7 +65,7 @@ class GoogleDocsCreateDocumentBasedOnTemplateActionTest extends AbstractGoogleDo
                     requestsArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result = GoogleDocsCreateDocumentBasedOnTemplateAction.perform(mockedParameters, mockedParameters,
+            Object result = GoogleDocsCreateDocumentFromTemplateAction.perform(mockedParameters, mockedParameters,
                 mockedContext);
 
             assertNull(result);
