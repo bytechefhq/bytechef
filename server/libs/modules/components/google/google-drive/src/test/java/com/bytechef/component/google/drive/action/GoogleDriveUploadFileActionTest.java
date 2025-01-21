@@ -17,7 +17,7 @@
 package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ENTRY;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -44,7 +44,7 @@ class GoogleDriveUploadFileActionTest extends AbstractGoogleDriveActionTest {
     void testPerform() throws IOException {
         when(mockedParameters.getRequiredFileEntry(FILE_ENTRY))
             .thenReturn(mockedFileEntry);
-        when(mockedParameters.getString(PARENT_FOLDER))
+        when(mockedParameters.getString(FOLDER_ID))
             .thenReturn("parentFolder");
         when(mockedFileEntry.getName())
             .thenReturn("name");

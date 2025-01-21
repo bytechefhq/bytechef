@@ -16,10 +16,10 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.MIME_TYPE;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.TEXT;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -44,7 +44,7 @@ import org.junit.jupiter.api.Test;
 class GoogleDriveCreateNewTextFileActionTest extends AbstractGoogleDriveActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FILE_NAME, "fileName", PARENT_FOLDER, "parentFolder", TEXT, "text", MIME_TYPE, "mimeType"));
+        Map.of(FILE_NAME, "fileName", FOLDER_ID, "parentFolder", TEXT, "text", MIME_TYPE, "mimeType"));
 
     @Test
     void testPerform() throws IOException {

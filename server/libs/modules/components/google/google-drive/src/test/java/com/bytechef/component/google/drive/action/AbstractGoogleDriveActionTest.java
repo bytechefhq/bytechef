@@ -34,7 +34,7 @@ import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public abstract class AbstractGoogleDriveActionTest {
 
@@ -45,7 +45,6 @@ public abstract class AbstractGoogleDriveActionTest {
     protected MockedStatic<GoogleServices> googleServicesMockedStatic;
     protected ActionContext mockedActionContext = mock(ActionContext.class);
     protected Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
-    protected Drive.Files.Copy mockedCopy = mock(Drive.Files.Copy.class);
     protected Drive mockedDrive = mock(Drive.class);
     protected Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
     protected File mockedGoogleFile = mock(File.class);

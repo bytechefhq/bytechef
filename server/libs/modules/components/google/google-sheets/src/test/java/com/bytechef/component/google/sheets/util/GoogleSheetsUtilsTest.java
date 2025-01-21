@@ -19,7 +19,6 @@ package com.bytechef.component.google.sheets.util;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
@@ -44,9 +43,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.drive.Drive;
-import com.google.api.services.drive.model.File;
-import com.google.api.services.drive.model.FileList;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
@@ -67,20 +63,13 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsUtilsTest {
 
-    private final ArgumentCaptor<Boolean> includeItemsFromAllDrivesArgumentCaptor =
-        ArgumentCaptor.forClass(Boolean.class);
-    private final ArgumentCaptor<Boolean> supportsAllDrivesArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
     private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Sheets.Spreadsheets.Get mockedGet = mock(Sheets.Spreadsheets.Get.class);
-    private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Spreadsheet mockedSpreadsheet = mock(Spreadsheet.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -462,61 +451,6 @@ class GoogleSheetsUtilsTest {
 
             assertEquals("Sheet 2", option.getLabel());
             assertEquals("Sheet 2", option.getValue());
-        }
-    }
-
-    @Test
-    void testGetSpreadsheetIdOptions() throws IOException {
-        File file1 = new File();
-
-        file1.setName("Spreadsheet 1");
-        file1.setId("1234567890");
-
-        File file2 = new File();
-
-        file2.setName("Spreadsheet 2");
-        file2.setId("0987654321");
-
-        List<File> files = Arrays.asList(file1, file2);
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getDrive(mockedParameters))
-                .thenReturn(mockedDrive);
-
-            when(mockedParameters.getBoolean(INCLUDE_ITEMS_FROM_ALL_DRIVES))
-                .thenReturn(true);
-            when(mockedDrive.files())
-                .thenReturn(mockedFiles);
-            when(mockedFiles.list())
-                .thenReturn(mockedList);
-            when(mockedList.setQ(qArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setIncludeItemsFromAllDrives(includeItemsFromAllDrivesArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setSupportsAllDrives(supportsAllDrivesArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.execute())
-                .thenReturn(new FileList().setFiles(files));
-
-            List<Option<String>> spreadsheetIdOptions = GoogleSheetsUtils.getSpreadsheetIdOptions(
-                mockedParameters, mockedParameters, Map.of(), anyString(), mockedContext);
-
-            assertNotNull(spreadsheetIdOptions);
-            assertEquals(2, spreadsheetIdOptions.size());
-
-            Option<String> spreadsheetIdOptionsFirst = spreadsheetIdOptions.getFirst();
-
-            assertEquals("Spreadsheet 1", spreadsheetIdOptionsFirst.getLabel());
-            assertEquals("1234567890", spreadsheetIdOptionsFirst.getValue());
-
-            Option<String> option = spreadsheetIdOptions.get(1);
-
-            assertEquals("Spreadsheet 2", option.getLabel());
-            assertEquals("0987654321", option.getValue());
-            assertEquals("mimeType='application/vnd.google-apps.spreadsheet'", qArgumentCaptor.getValue());
-            assertEquals(true, includeItemsFromAllDrivesArgumentCaptor.getValue());
-            assertEquals(true, supportsAllDrivesArgumentCaptor.getValue());
         }
     }
 
