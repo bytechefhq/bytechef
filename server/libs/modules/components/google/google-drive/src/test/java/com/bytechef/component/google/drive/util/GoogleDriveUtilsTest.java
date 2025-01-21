@@ -16,9 +16,8 @@
 
 package com.bytechef.component.google.drive.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 import static com.bytechef.component.google.drive.util.GoogleDriveUtils.LAST_TIME_CHECKED;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,8 +25,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -53,17 +50,15 @@ import org.mockito.MockedStatic;
  */
 class GoogleDriveUtilsTest {
 
-    private final List<Option<String>> expectedOptions = List.of(option("name", "id"));
     private final List<File> files = new ArrayList<>();
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
-    private final ActionContext mockedContext = mock(ActionContext.class);
     private final Drive mockedDrive = mock(Drive.class);
     private final FileList mockedFileList = mock(FileList.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
     private final Parameters mockedParameters =
         MockParametersFactory
-            .create(Map.of(PARENT_FOLDER, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
+            .create(Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
     private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> fieldsArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
@@ -99,24 +94,7 @@ class GoogleDriveUtilsTest {
     }
 
     @Test
-    void testGetFileOptions() throws IOException {
-        assertEquals(expectedOptions,
-            GoogleDriveUtils.getFileOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-
-        assertEquals("mimeType != 'application/vnd.google-apps.folder' and trashed = false",
-            qArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testGetFolderOptions() throws IOException {
-        assertEquals(expectedOptions,
-            GoogleDriveUtils.getFolderOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
-
-        assertEquals("mimeType = 'application/vnd.google-apps.folder' and trashed = false", qArgumentCaptor.getValue());
-    }
-
-    @Test
-    void testGetPollOutput() throws IOException {
+    void testGetPollOutput() {
         when(mockedList.setFields(fieldsArgumentCaptor.capture()))
             .thenReturn(mockedList);
         when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))

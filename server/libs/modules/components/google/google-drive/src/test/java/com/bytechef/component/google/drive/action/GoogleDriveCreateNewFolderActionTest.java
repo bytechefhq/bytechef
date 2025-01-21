@@ -18,7 +18,7 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(FOLDER_NAME, "folderName", PARENT_FOLDER, "parentFolder"));
+        Map.of(FOLDER_NAME, "folderName", FOLDER_ID, "parentFolder"));
 
     @Test
     void testPerform() throws IOException {

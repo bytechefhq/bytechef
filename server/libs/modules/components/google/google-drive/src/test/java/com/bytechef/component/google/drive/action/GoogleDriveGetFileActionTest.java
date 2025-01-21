@@ -16,7 +16,7 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

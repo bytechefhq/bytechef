@@ -17,7 +17,6 @@
 package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IMAGES;
-import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TEMPLATE_DOCUMENT_ID;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -27,11 +26,13 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.google.docs.util.GoogleDocsUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
 import com.google.api.services.docs.v1.model.ReplaceImageRequest;
 import com.google.api.services.docs.v1.model.Request;
 import com.google.api.services.docs.v1.model.SubstringMatchCriteria;
+import com.google.api.services.drive.model.File;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleDocsCreateDocumentFromTemplateActionTest extends AbstractGoogleDocsActionTest {
 
@@ -55,10 +56,14 @@ class GoogleDocsCreateDocumentFromTemplateActionTest extends AbstractGoogleDocsA
             .thenReturn(Map.of("textKey1", "textValue1"));
         when(mockedParameters.getMap(IMAGES, String.class, Map.of()))
             .thenReturn(Map.of("imageId1", "url1"));
-        when(mockedParameters.getRequiredString(TEMPLATE_DOCUMENT_ID))
-            .thenReturn("destinationFile");
 
-        try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
+        try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class);
+            MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
+
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.copyFileOnGoogleDrive(mockedParameters, mockedParameters))
+                .thenReturn(new File().setId("destinationFile"));
+
             googleDocsUtilsMockedStatic
                 .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), destinationFileArgumentCaptor.capture(),
                     requestsArgumentCaptor.capture()))

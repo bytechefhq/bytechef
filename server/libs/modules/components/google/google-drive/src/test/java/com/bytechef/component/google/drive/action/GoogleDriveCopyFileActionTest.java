@@ -16,51 +16,41 @@
 
 package com.bytechef.component.google.drive.action;
 
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_NAME;
-import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_ID;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FILE_NAME;
+import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mayank Madan
+ * @author Monika Kušter
  */
 class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
-    private final Parameters mockInputParameters = MockParametersFactory.create(
-        Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", PARENT_FOLDER, "newFolderId"));
-    private final File testFile = new File()
-        .setName("newFileName")
-        .setParents(Collections.singletonList("newFolderId"))
-        .setMimeType("application/pdf");
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", FOLDER_ID, "newFolderId"));
+    private final File mockedFile = mock(File.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedFiles.get(fileIdArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.execute())
-            .thenReturn(testFile);
-        when(mockedFiles.copy("originalFileId", testFile))
-            .thenReturn(mockedCopy);
-        when(mockedCopy.execute())
-            .thenReturn(testFile);
+        try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class);) {
+            googleUtilsMockedStatic
+                .when(() -> GoogleUtils.copyFileOnGoogleDrive(mockedParameters, mockedParameters))
+                .thenReturn(mockedFile);
 
-        File copiedFile =
-            GoogleDriveCopyFileAction.perform(mockInputParameters, mockInputParameters, mockedActionContext);
+            File result = GoogleDriveCopyFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        verify(mockedDrive.files()).get("originalFileId");
-        verify(mockedFiles).copy("originalFileId", testFile);
-
-        assertEquals("newFileName", copiedFile.getName());
-        assertEquals(Collections.singletonList("newFolderId"), copiedFile.getParents());
-        assertEquals("application/pdf", copiedFile.getMimeType());
+            assertEquals(mockedFile, result);
+        }
     }
 }
