@@ -80,6 +80,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
                 .description("Key: Image ID (get it manually from the Read File Action), Value: Image URL.")
                 .additionalProperties(string())
                 .required(false))
+        .output()
         .perform(GoogleDocsCreateDocumentFromTemplateAction::perform);
 
     private GoogleDocsCreateDocumentFromTemplateAction() {
@@ -92,9 +93,7 @@ public class GoogleDocsCreateDocumentFromTemplateAction {
         File copiedPresentation = copyDocument(connectionParameters, inputParameters);
         List<Request> requests = createRequests(inputParameters);
 
-        writeToDocument(docs, copiedPresentation.getId(), requests);
-
-        return null;
+        return writeToDocument(docs, copiedPresentation.getId(), requests);
     }
 
     private static File copyDocument(Parameters connectionParameters, Parameters inputParameters)
