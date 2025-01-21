@@ -4,11 +4,11 @@ import {Button} from '@/components/ui/button';
 import ApiPlatformLeftSidebarNav from '@/ee/pages/automation/api-platform/ApiPlatformLeftSidebarNav';
 import ApiClientDialog from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientDialog';
 import ApiClientTable from '@/ee/pages/automation/api-platform/api-clients/components/ApiClientTable';
+import {useGetWorkspaceApiCollectionProjectsQuery} from '@/ee/queries/apiCollectionProjects.queries';
 import {useGetApiCollectionTagsQuery} from '@/ee/queries/apiCollectionTags.queries';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetApiClientsQuery} from '@/shared/queries/platform/apiClients.queries';
 import {KeyIcon} from 'lucide-react';
 import {useState} from 'react';
@@ -20,10 +20,8 @@ const ApiClients = () => {
 
     const {data: apiKeys, error: apiKeysError, isLoading: apiKeysLoading} = useGetApiClientsQuery();
 
-    const {data: projects} = useGetWorkspaceProjectsQuery({
+    const {data: projects} = useGetWorkspaceApiCollectionProjectsQuery({
         id: currentWorkspaceId!,
-        includeAllFields: false,
-        projectDeployments: true,
     });
 
     const {data: tags} = useGetApiCollectionTagsQuery();

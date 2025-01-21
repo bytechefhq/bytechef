@@ -1,6 +1,7 @@
 import {Badge} from '@/components/ui/badge';
 import {Type} from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
-import {Project, Tag} from '@/shared/middleware/automation/configuration';
+import {ProjectBasic} from '@/ee/shared/middleware/automation/api-platform';
+import {Tag} from '@/shared/middleware/automation/configuration';
 import {ReactNode} from 'react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -12,7 +13,7 @@ const ApiCollectionsFilterTitle = ({
 }: {
     environment?: number;
     filterData: {id?: number; type: Type};
-    projects: Project[] | undefined;
+    projects: ProjectBasic[] | undefined;
     tags: Tag[] | undefined;
 }) => {
     const [searchParams] = useSearchParams();

@@ -1,13 +1,14 @@
 import {Type} from '@/ee/pages/automation/api-platform/api-collections/ApiCollections';
+import {ProjectBasic} from '@/ee/shared/middleware/automation/api-platform';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {Project, Tag} from '@/shared/middleware/automation/configuration';
+import {Tag} from '@/shared/middleware/automation/configuration';
 import {TagIcon} from 'lucide-react';
 import {useLocation} from 'react-router-dom';
 
 interface ApiPlatformLeftSidebarNavProps {
     environment?: number;
     filterData?: {id?: number; type: Type};
-    projects: Project[] | undefined;
+    projects: ProjectBasic[] | undefined;
     tags: Tag[] | undefined;
 }
 
