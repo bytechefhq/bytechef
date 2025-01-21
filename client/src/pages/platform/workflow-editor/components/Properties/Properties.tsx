@@ -29,7 +29,7 @@ const Properties = ({
     path,
     properties,
 }: PropertiesProps) => {
-    const {currentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const advancedProperties = properties.filter((property) => {
         const {advancedOption, hidden, name} = property;
@@ -49,14 +49,14 @@ const Properties = ({
         <>
             <ul
                 className={twMerge('space-y-4', customClassName)}
-                key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_properties`}
+                key={`${currentNode?.workflowNodeName}_${currentNode?.operationName}_properties`}
             >
                 {simpleProperties.map((property, index) => (
                     <Property
                         control={control}
                         controlPath={controlPath}
                         formState={formState}
-                        key={`${currentComponent?.workflowNodeName}_${currentComponent?.operationName}_${property.name}_${index}`}
+                        key={`${currentNode?.workflowNodeName}_${currentNode?.operationName}_${property.name}_${index}`}
                         operationName={operationName}
                         path={path}
                         property={property}
@@ -73,13 +73,13 @@ const Properties = ({
                     </CollapsibleTrigger>
 
                     <CollapsibleContent>
-                        <ul className="space-y-4 p-4" key={`${currentComponent?.operationName}_advancedProperties`}>
+                        <ul className="space-y-4 p-4" key={`${currentNode?.operationName}_advancedProperties`}>
                             {advancedProperties.map((property, index) => (
                                 <Property
                                     control={control}
                                     controlPath={controlPath}
                                     formState={formState}
-                                    key={`${property.name}_${currentComponent?.operationName}_${index}`}
+                                    key={`${property.name}_${currentNode?.operationName}_${index}`}
                                     operationName={operationName}
                                     path={path}
                                     property={property}
