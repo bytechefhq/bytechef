@@ -16,7 +16,7 @@ import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOpti
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectionTabConnectionSelect = ({
