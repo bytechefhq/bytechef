@@ -20,15 +20,15 @@ import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.fileEntry;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
@@ -47,7 +47,7 @@ public class GoogleDriveDownloadFileAction {
             string(FILE_ID)
                 .label("File")
                 .description("File to download.")
-                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .output(outputSchema(fileEntry()))
         .perform(GoogleDriveDownloadFileAction::perform);

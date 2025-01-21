@@ -18,14 +18,14 @@ package com.bytechef.component.google.docs.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.APPLICATION_VND_GOOGLE_APPS_DOCUMENT;
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.DOCUMENT_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.docs.util.GoogleDocsUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class GoogleDocsGetDocumentAction {
             string(DOCUMENT_ID)
                 .label("Document Id")
                 .description("The ID of the document to read.")
-                .options((ActionOptionsFunction<String>) GoogleDocsUtils::getDocsIdOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_DOCUMENT, true))
                 .required(true))
         .output()
         .perform(GoogleDocsGetDocumentAction::perform);

@@ -19,15 +19,15 @@ package com.bytechef.component.google.forms.trigger;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
+import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.APPLICATION_VND_GOOGLE_APPS_FORM;
 import static com.bytechef.component.google.forms.constant.GoogleFormsConstants.FORM_ID;
 import static com.bytechef.component.google.forms.util.GoogleFormsUtils.getCustomResponses;
 
-import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
-import com.bytechef.component.google.forms.util.GoogleFormsUtils;
+import com.bytechef.google.commons.GoogleUtils;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +49,7 @@ public class GoogleFormsNewResponseTrigger {
             string(FORM_ID)
                 .label("Form")
                 .description("Form to watch for new responses.")
-                .options((TriggerOptionsFunction<String>) GoogleFormsUtils::getFormIdOptions)
+                .options(GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_FORM, true))
                 .required(true))
         .output()
         .poll(GoogleFormsNewResponseTrigger::poll);

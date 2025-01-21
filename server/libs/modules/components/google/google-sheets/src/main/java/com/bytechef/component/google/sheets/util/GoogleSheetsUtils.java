@@ -23,7 +23,6 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.COLUMN;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
@@ -43,7 +42,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFunction;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
@@ -309,28 +307,6 @@ public class GoogleSheetsUtils {
             String sheetTitle = sheetProperties.getTitle();
 
             options.add(option(sheetTitle, sheetTitle));
-        }
-
-        return options;
-    }
-
-    public static List<Option<String>> getSpreadsheetIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) throws IOException {
-
-        List<File> files = GoogleServices.getDrive(connectionParameters)
-            .files()
-            .list()
-            .setQ("mimeType='application/vnd.google-apps.spreadsheet'")
-            .setIncludeItemsFromAllDrives(inputParameters.getBoolean(INCLUDE_ITEMS_FROM_ALL_DRIVES))
-            .setSupportsAllDrives(true)
-            .execute()
-            .getFiles();
-
-        List<Option<String>> options = new ArrayList<>();
-
-        for (File file : files) {
-            options.add(option(file.getName(), file.getId()));
         }
 
         return options;

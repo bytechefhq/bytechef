@@ -19,6 +19,7 @@ package com.bytechef.component.google.sheets.trigger;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.definition.TriggerContext.Data.Scope.WORKFLOW;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.APPLICATION_VND_GOOGLE_APPS_SPREADSHEET;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
@@ -36,6 +37,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.Channel;
 import com.google.api.services.sheets.v4.Sheets;
@@ -59,7 +61,8 @@ public class GoogleSheetsOnRowAddedTrigger {
             string(SPREADSHEET_ID)
                 .label("Spreadsheet")
                 .description("The spreadsheet to apply the updates to.")
-                .options((TriggerOptionsFunction<String>) GoogleSheetsUtils::getSpreadsheetIdOptions)
+                .options(
+                    GoogleUtils.getFileOptionsByMimeTypeForTriggers(APPLICATION_VND_GOOGLE_APPS_SPREADSHEET, true))
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             string(SHEET_NAME)

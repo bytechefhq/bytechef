@@ -16,12 +16,9 @@
 
 package com.bytechef.component.google.drive.util;
 
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.PARENT_FOLDER;
 
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.google.commons.GoogleServices;
@@ -31,7 +28,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,38 +39,6 @@ public class GoogleDriveUtils {
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
 
     private GoogleDriveUtils() {
-    }
-
-    public static List<Option<String>> getFileOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) throws IOException {
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        return drive.files()
-            .list()
-            .setQ("mimeType != '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "' and trashed = false")
-            .execute()
-            .getFiles()
-            .stream()
-            .map(file -> (Option<String>) option(file.getName(), file.getId()))
-            .toList();
-    }
-
-    public static List<Option<String>> getFolderOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) throws IOException {
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        return drive.files()
-            .list()
-            .setQ("mimeType = '" + APPLICATION_VND_GOOGLE_APPS_FOLDER + "' and trashed = false")
-            .execute()
-            .getFiles()
-            .stream()
-            .map(folder -> (Option<String>) option(folder.getName(), folder.getId()))
-            .toList();
     }
 
     public static PollOutput getPollOutput(

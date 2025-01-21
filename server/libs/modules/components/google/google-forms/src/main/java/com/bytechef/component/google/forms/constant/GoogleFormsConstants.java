@@ -23,6 +23,7 @@ package com.bytechef.component.google.forms.constant;
 public class GoogleFormsConstants {
 
     public static final String ANSWERS = "answers";
+    public static final String APPLICATION_VND_GOOGLE_APPS_FORM = "application/vnd.google-apps.form";
     public static final String FILE_UPLOAD_ANSWERS = "fileUploadAnswers";
     public static final String FORM_ID = "formId";
     public static final String NEXT_PAGE_TOKEN = "nextPageToken";

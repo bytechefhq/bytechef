@@ -30,9 +30,6 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.drive.Drive;
-import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -88,22 +85,6 @@ public class GoogleFormsUtils {
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
-    }
-
-    public static List<Option<String>> getFormIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) throws IOException {
-
-        Drive drive = GoogleServices.getDrive(connectionParameters);
-
-        return drive.files()
-            .list()
-            .setQ("mimeType = 'application/vnd.google-apps.form' and trashed = false")
-            .execute()
-            .getFiles()
-            .stream()
-            .map(file -> (Option<String>) option(file.getName(), file.getId()))
-            .toList();
     }
 
     public static List<Option<String>> getResponseIdOptions(

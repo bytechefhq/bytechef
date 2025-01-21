@@ -18,14 +18,14 @@ package com.bytechef.component.google.drive.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.APPLICATION_VND_GOOGLE_APPS_FOLDER;
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FILE_ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.google.drive.util.GoogleDriveUtils;
 import com.bytechef.google.commons.GoogleServices;
+import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 
@@ -41,7 +41,7 @@ public class GoogleDriveDeleteFileAction {
             string(FILE_ID)
                 .label("File")
                 .description("The id of a file to delete.")
-                .options((ActionOptionsFunction<String>) GoogleDriveUtils::getFileOptions)
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .perform(GoogleDriveDeleteFileAction::perform);
 
