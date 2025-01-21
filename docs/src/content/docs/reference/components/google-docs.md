@@ -57,14 +57,16 @@ Create a document on Google Docs.
 
 
 
-### Edit Template File
-Edit a template file and replace the values with the ones provided.
+### Create Document From Template
+Creates a new document based on an existing one and can replace any placeholder variables found in your template document, like [[name]], [[email]], etc.
 
 #### Properties
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Template File ID | STRING | SELECT  |  The ID of the file to replace the values.  |
+| Template Document ID | STRING | SELECT  |  The ID of the template document from which the new document will be created.  |
+| New Document Name | STRING | TEXT  |  Name of the new document.  |
+| Folder for New Document | STRING | SELECT  |  Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document.  |
 | Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value.  |
 | Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL.  |
 
