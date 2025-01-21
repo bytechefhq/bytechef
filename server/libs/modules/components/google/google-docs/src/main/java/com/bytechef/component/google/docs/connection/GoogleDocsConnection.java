@@ -21,7 +21,7 @@ import com.bytechef.google.commons.GoogleConnection;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleDocsConnection {
 
@@ -30,5 +30,5 @@ public class GoogleDocsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = GoogleConnection.createConnection(
         (connection, context) -> List.of("https://www.googleapis.com/auth/documents",
-            "https://www.googleapis.com/auth/drive.readonly"));
+            "https://www.googleapis.com/auth/drive"));
 }
