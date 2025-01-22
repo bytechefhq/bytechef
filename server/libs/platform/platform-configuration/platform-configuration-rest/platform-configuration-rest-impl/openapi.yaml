@@ -2134,7 +2134,7 @@ components:
           readOnly: true
         __version:
           type: "integer"
-    WorkflowConnection:
+    ComponentConnection:
       type: "object"
       required:
         - "componentName"
@@ -2311,7 +2311,7 @@ components:
         connections:
           type: "array"
           items:
-            $ref: "#/components/schemas/WorkflowConnection"
+            $ref: "#/components/schemas/ComponentConnection"
           readOnly: true
         description:
           description: "The description of the task."
@@ -2376,7 +2376,7 @@ components:
         connections:
           type: "array"
           items:
-            $ref: "#/components/schemas/WorkflowConnection"
+            $ref: "#/components/schemas/ComponentConnection"
           readOnly: true
         description:
           description: "The description of the task."

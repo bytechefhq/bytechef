@@ -9,9 +9,9 @@ package com.bytechef.ee.platform.workflow.configuration.remote.client.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.ee.remote.client.LoadBalancedRestClient;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,25 +23,25 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class RemoteWorkflowConnectionFacadeClient implements WorkflowConnectionFacade {
+public class RemoteComponentConnectionFacadeClient implements ComponentConnectionFacade {
 
     private static final String CONFIGURATION_APP = "configuration-app";
-    private static final String WORKFLOW_CONNECTION_FACADE = "/remote/workflow-connection-facade";
+    private static final String WORKFLOW_CONNECTION_FACADE = "/remote/component-connection-facade";
 
     private final LoadBalancedRestClient loadBalancedRestClient;
 
     @SuppressFBWarnings("EI")
-    public RemoteWorkflowConnectionFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
+    public RemoteComponentConnectionFacadeClient(LoadBalancedRestClient loadBalancedRestClient) {
         this.loadBalancedRestClient = loadBalancedRestClient;
     }
 
     @Override
-    public WorkflowConnection getWorkflowConnection(String workflowId, String workflowNodeName, String key) {
+    public ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask) {
+    public List<ComponentConnection> getComponentConnections(WorkflowTask workflowTask) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)
@@ -52,7 +52,7 @@ public class RemoteWorkflowConnectionFacadeClient implements WorkflowConnectionF
     }
 
     @Override
-    public List<WorkflowConnection> getWorkflowConnections(WorkflowTrigger workflowTrigger) {
+    public List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(CONFIGURATION_APP)

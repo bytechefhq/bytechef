@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.workflow.connection;
 import com.bytechef.platform.component.definition.ScriptComponentDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -32,20 +32,20 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(2)
-public class ScriptWorkflowConnectionFactory
-    implements WorkflowConnectionFactory, WorkflowConnectionFactoryResolver {
+public class ScriptComponentConnectionFactory
+    implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     private final ComponentDefinitionService componentDefinitionService;
 
-    public ScriptWorkflowConnectionFactory(ComponentDefinitionService componentDefinitionService) {
+    public ScriptComponentConnectionFactory(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
     }
 
     @Override
-    public List<WorkflowConnection> create(
+    public List<ComponentConnection> create(
         String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition) {
 
-        return WorkflowConnection.of(
+        return ComponentConnection.of(
             extensions, workflowNodeName,
             (name, version) -> {
                 ComponentDefinition curComponentDefinition = componentDefinitionService.getComponentDefinition(
@@ -56,7 +56,7 @@ public class ScriptWorkflowConnectionFactory
     }
 
     @Override
-    public Optional<WorkflowConnectionFactory> resolve(ComponentDefinition componentDefinition) {
+    public Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition) {
         return Optional.ofNullable(
             StringUtils.startsWith(componentDefinition.getName(), ScriptComponentDefinition.SCRIPT) ? this : null);
     }

@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.configuration.web.rest.mapper;
 
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
@@ -26,8 +26,8 @@ import org.springframework.core.convert.converter.Converter;
  * @author Ivica Cardic
  */
 @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
-public interface WorkflowConnectionMapper extends Converter<WorkflowConnection, WorkflowConnectionModel> {
+public interface ComponentConnectionMapper extends Converter<ComponentConnection, ComponentConnectionModel> {
 
     @Override
-    WorkflowConnectionModel convert(WorkflowConnection workflowConnection);
+    ComponentConnectionModel convert(ComponentConnection componentConnection);
 }

@@ -19,7 +19,7 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -42,17 +42,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigurationFacade {
 
     private final ConnectionService connectionService;
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
     public WorkflowTestConfigurationFacadeImpl(
-        ConnectionService connectionService, WorkflowConnectionFacade workflowConnectionFacade,
+        ConnectionService connectionService, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.connectionService = connectionService;
-        this.workflowConnectionFacade = workflowConnectionFacade;
+        this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
@@ -64,14 +64,14 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
             .ifPresent(workflowTestConfiguration -> {
                 workflowTestConfiguration.setInputs(getInputs(workflow, workflowTestConfiguration));
 
-                List<WorkflowConnection> taskWorkflowConnections = CollectionUtils.flatMap(
-                    workflow.getTasks(true), workflowConnectionFacade::getWorkflowConnections);
-                List<WorkflowConnection> triggerWorkflowConnections = CollectionUtils.flatMap(
-                    WorkflowTrigger.of(workflow), workflowConnectionFacade::getWorkflowConnections);
+                List<ComponentConnection> taskComponentConnections = CollectionUtils.flatMap(
+                    workflow.getTasks(true), componentConnectionFacade::getComponentConnections);
+                List<ComponentConnection> triggerComponentConnections = CollectionUtils.flatMap(
+                    WorkflowTrigger.of(workflow), componentConnectionFacade::getComponentConnections);
 
                 workflowTestConfiguration.setConnections(
                     getWorkflowTestConfigurationConnections(
-                        taskWorkflowConnections, triggerWorkflowConnections, workflowTestConfiguration));
+                        taskComponentConnections, triggerComponentConnections, workflowTestConfiguration));
 
                 workflowTestConfigurationService.saveWorkflowTestConfiguration(workflowTestConfiguration);
             });
@@ -128,23 +128,23 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     private List<WorkflowTestConfigurationConnection> getWorkflowTestConfigurationConnections(
-        List<WorkflowConnection> taskWorkflowConnections, List<WorkflowConnection> triggerWorkflowConnections,
+        List<ComponentConnection> taskComponentConnections, List<ComponentConnection> triggerComponentConnections,
         WorkflowTestConfiguration workflowTestConfiguration) {
 
         List<WorkflowTestConfigurationConnection> workflowTestConfigurationConnections = new ArrayList<>(
             workflowTestConfiguration.getConnections());
 
-        workflowTestConfigurationConnections.removeIf(connection -> anyMatch(taskWorkflowConnections, connection)
-            && anyMatch(triggerWorkflowConnections, connection));
+        workflowTestConfigurationConnections.removeIf(connection -> anyMatch(taskComponentConnections, connection)
+            && anyMatch(triggerComponentConnections, connection));
 
         return workflowTestConfigurationConnections;
     }
 
     private static boolean anyMatch(
-        List<WorkflowConnection> taskWorkflowConnections, WorkflowTestConfigurationConnection connection) {
+        List<ComponentConnection> taskComponentConnections, WorkflowTestConfigurationConnection connection) {
 
         return !CollectionUtils.anyMatch(
-            taskWorkflowConnections,
+            taskComponentConnections,
             workflowConnection -> Objects.equals(
                 workflowConnection.workflowNodeName(), connection.getWorkflowNodeName()));
     }
@@ -165,10 +165,10 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
 
         Connection connection = connectionService.getConnection(connectionId);
 
-        WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
+        ComponentConnection componentConnection = componentConnectionFacade.getComponentConnection(
             workflow.getId(), workflowNodeName, workflowConnectionKey);
 
-        if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {
+        if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
             throw new IllegalArgumentException(
                 "Connection component name does not match workflow test configuration connection component name");
         }

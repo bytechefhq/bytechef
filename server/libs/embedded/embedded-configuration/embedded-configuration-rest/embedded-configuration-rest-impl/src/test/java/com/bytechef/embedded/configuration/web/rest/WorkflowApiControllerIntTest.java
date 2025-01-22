@@ -32,7 +32,7 @@ import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.web.rest.config.IntegrationConfigurationRestTestConfiguration;
 import com.bytechef.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
@@ -96,7 +96,7 @@ public class WorkflowApiControllerIntTest {
     private WorkflowService workflowService;
 
     @MockitoBean
-    private WorkflowConnectionFacade workflowConnectionFacade;
+    private ComponentConnectionFacade componentConnectionFacade;
 
     @BeforeEach
     public void setup() {

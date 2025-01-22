@@ -8,9 +8,9 @@
 package com.bytechef.ee.platform.workflow.configuration.remote.web.rest.facade;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.v3.oas.annotations.Hidden;
 import java.util.List;
@@ -27,14 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Hidden
 @RestController
-@RequestMapping("/remote/workflow-connection-facade")
-public class RemoteWorkflowConnectionFacadeController {
+@RequestMapping("/remote/component-connection-facade")
+public class RemoteComponentConnectionFacadeController {
 
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
 
     @SuppressFBWarnings("EI")
-    public RemoteWorkflowConnectionFacadeController(WorkflowConnectionFacade workflowConnectionFacade) {
-        this.workflowConnectionFacade = workflowConnectionFacade;
+    public RemoteComponentConnectionFacadeController(ComponentConnectionFacade componentConnectionFacade) {
+        this.componentConnectionFacade = componentConnectionFacade;
     }
 
     @RequestMapping(
@@ -43,8 +43,8 @@ public class RemoteWorkflowConnectionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<WorkflowConnection>> getWorkflowConnections(@RequestBody WorkflowTask workflowTask) {
-        return ResponseEntity.ok(workflowConnectionFacade.getWorkflowConnections(workflowTask));
+    public ResponseEntity<List<ComponentConnection>> getWorkflowConnections(@RequestBody WorkflowTask workflowTask) {
+        return ResponseEntity.ok(componentConnectionFacade.getComponentConnections(workflowTask));
     }
 
     @RequestMapping(
@@ -53,9 +53,9 @@ public class RemoteWorkflowConnectionFacadeController {
         produces = {
             "application/json"
         })
-    public ResponseEntity<List<WorkflowConnection>> getWorkflowConnections(
+    public ResponseEntity<List<ComponentConnection>> getWorkflowConnections(
         @RequestBody WorkflowTrigger workflowTrigger) {
 
-        return ResponseEntity.ok(workflowConnectionFacade.getWorkflowConnections(workflowTrigger));
+        return ResponseEntity.ok(componentConnectionFacade.getComponentConnections(workflowTrigger));
     }
 }

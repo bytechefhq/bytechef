@@ -40,9 +40,9 @@ import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
@@ -89,7 +89,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
     private final String webhookUrl;
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -101,7 +101,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         ProjectWorkflowService projectWorkflowService, TagService tagService,
         TriggerDefinitionService triggerDefinitionService, TriggerExecutionService triggerExecutionService,
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
-        WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
+        ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
         this.connectionService = connectionService;
         this.principalJobFacade = principalJobFacade;
@@ -117,7 +117,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         this.triggerExecutionService = triggerExecutionService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
         this.webhookUrl = applicationProperties.getWebhookUrl();
-        this.workflowConnectionFacade = workflowConnectionFacade;
+        this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -469,21 +469,21 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         if (enable) {
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
+            List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
                 WorkflowTrigger.of(workflow)
                     .stream()
                     .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
-                    .filter(WorkflowConnection::required)
+                        componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                    .filter(ComponentConnection::required)
                     .toList(),
                 workflow.getTasks(true)
                     .stream()
                     .flatMap(workflowTask -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
-                    .filter(WorkflowConnection::required)
+                        componentConnectionFacade.getComponentConnections(workflowTask)))
+                    .filter(ComponentConnection::required)
                     .toList());
 
-            if (requiredWorkflowConnections.size() != projectDeploymentWorkflow.getConnectionsCount()) {
+            if (requiredComponentConnections.size() != projectDeploymentWorkflow.getConnectionsCount()) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     ProjectDeploymentErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
@@ -532,8 +532,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     private Long getConnectionId(long projectDeploymentId, String workflowId, WorkflowTrigger workflowTrigger) {
-        return workflowConnectionFacade
-            .getWorkflowConnections(workflowTrigger)
+        return componentConnectionFacade
+            .getComponentConnections(workflowTrigger)
             .stream()
             .findFirst()
             .map(workflowConnection -> getConnectionId(
@@ -693,11 +693,11 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             Connection connection = connectionService.getConnection(
                 projectDeploymentWorkflowConnection.getConnectionId());
 
-            WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
+            ComponentConnection componentConnection = componentConnectionFacade.getComponentConnection(
                 workflow.getId(), projectDeploymentWorkflowConnection.getWorkflowNodeName(),
                 projectDeploymentWorkflowConnection.getKey());
 
-            if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {
+            if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
                 throw new IllegalArgumentException(
                     "Connection component name does not match workflow connection component name");
             }

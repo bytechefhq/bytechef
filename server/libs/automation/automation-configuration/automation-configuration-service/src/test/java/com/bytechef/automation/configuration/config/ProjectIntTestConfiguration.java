@@ -21,7 +21,7 @@ import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
@@ -59,11 +59,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class ProjectIntTestConfiguration {
 
     @Autowired
-    private WorkflowConnectionFacade workflowConnectionFacade;
+    private ComponentConnectionFacade componentConnectionFacade;
 
     @Bean
     WorkflowFacade workflowFacade(WorkflowService workflowService) {
-        return new WorkflowFacadeImpl(workflowConnectionFacade, workflowService);
+        return new WorkflowFacadeImpl(componentConnectionFacade, workflowService);
     }
 
     @Bean

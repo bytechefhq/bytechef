@@ -41,7 +41,7 @@ import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -74,7 +74,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     private final IntegrationWorkflowService integrationWorkflowService;
     private final JobService jobService;
     private final TriggerLifecycleFacade triggerLifecycleFacade;
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
     private final String webhookUrl;
 
@@ -87,7 +87,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService, JobService jobService,
-        TriggerLifecycleFacade triggerLifecycleFacade, WorkflowConnectionFacade workflowConnectionFacade,
+        TriggerLifecycleFacade triggerLifecycleFacade, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService) {
 
         this.connectedUserService = connectedUserService;
@@ -101,7 +101,7 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
         this.integrationWorkflowService = integrationWorkflowService;
         this.jobService = jobService;
         this.triggerLifecycleFacade = triggerLifecycleFacade;
-        this.workflowConnectionFacade = workflowConnectionFacade;
+        this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -308,8 +308,8 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
             return integrationInstance.getConnectionId();
         }
 
-        return workflowConnectionFacade
-            .getWorkflowConnections(workflowTrigger)
+        return componentConnectionFacade
+            .getComponentConnections(workflowTrigger)
             .stream()
             .findFirst()
             .map(workflowConnection -> getConnectionId(

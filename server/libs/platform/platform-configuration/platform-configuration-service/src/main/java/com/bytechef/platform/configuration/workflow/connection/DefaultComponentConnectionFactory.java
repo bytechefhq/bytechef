@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.workflow.connection;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,21 +29,21 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(3)
-public class DefaultWorkflowConnectionFactory
-    implements WorkflowConnectionFactory, WorkflowConnectionFactoryResolver {
+public class DefaultComponentConnectionFactory
+    implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     @Override
-    public List<WorkflowConnection> create(
+    public List<ComponentConnection> create(
         String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition) {
 
         return List.of(
-            WorkflowConnection.of(
+            ComponentConnection.of(
                 workflowNodeName, componentDefinition.getName(), componentDefinition.getVersion(),
                 componentDefinition.isConnectionRequired()));
     }
 
     @Override
-    public Optional<WorkflowConnectionFactory> resolve(ComponentDefinition componentDefinition) {
+    public Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition) {
         return Optional.ofNullable(componentDefinition.getConnection() == null ? null : this);
     }
 }

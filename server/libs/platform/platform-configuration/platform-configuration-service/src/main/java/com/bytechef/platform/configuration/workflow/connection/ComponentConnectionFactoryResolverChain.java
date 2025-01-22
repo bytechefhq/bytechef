@@ -25,22 +25,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Primary
-public class WorkflowConnectionFactoryResolverChain implements WorkflowConnectionFactoryResolver {
+public class ComponentConnectionFactoryResolverChain implements ComponentConnectionFactoryResolver {
 
-    private final List<WorkflowConnectionFactoryResolver> workflowConnectionFactoryResolvers;
+    private final List<ComponentConnectionFactoryResolver> componentConnectionFactoryResolvers;
 
     @SuppressFBWarnings("EI")
-    public WorkflowConnectionFactoryResolverChain(
-        List<WorkflowConnectionFactoryResolver> workflowConnectionFactoryResolvers) {
+    public ComponentConnectionFactoryResolverChain(
+        List<ComponentConnectionFactoryResolver> componentConnectionFactoryResolvers) {
 
-        this.workflowConnectionFactoryResolvers = workflowConnectionFactoryResolvers;
+        this.componentConnectionFactoryResolvers = componentConnectionFactoryResolvers;
     }
 
     @Override
-    public Optional<WorkflowConnectionFactory> resolve(ComponentDefinition componentDefinition) {
-        for (WorkflowConnectionFactoryResolver workflowConnectionFactoryResolver : workflowConnectionFactoryResolvers) {
-            Optional<WorkflowConnectionFactory> workflowConnectionFactoryOptional =
-                workflowConnectionFactoryResolver.resolve(componentDefinition);
+    public Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition) {
+        for (ComponentConnectionFactoryResolver componentConnectionFactoryResolver : componentConnectionFactoryResolvers) {
+            Optional<ComponentConnectionFactory> workflowConnectionFactoryOptional =
+                componentConnectionFactoryResolver.resolve(componentDefinition);
 
             if (workflowConnectionFactoryOptional.isPresent()) {
                 return workflowConnectionFactoryOptional;

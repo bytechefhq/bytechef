@@ -49,9 +49,9 @@ import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.Environment;
@@ -104,7 +104,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     private final OAuth2Service oAuth2Service;
     private final TagService tagService;
     private final TriggerExecutionService triggerExecutionService;
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
@@ -118,7 +118,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         IntegrationInstanceFacade integrationInstanceFacade, IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
         IntegrationWorkflowService integrationWorkflowService, OAuth2Service oAuth2Service, TagService tagService,
-        TriggerExecutionService triggerExecutionService, WorkflowConnectionFacade workflowConnectionFacade,
+        TriggerExecutionService triggerExecutionService, ComponentConnectionFacade componentConnectionFacade,
         WorkflowService workflowService) {
 
         this.categoryService = categoryService;
@@ -140,7 +140,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
         this.oAuth2Service = oAuth2Service;
         this.tagService = tagService;
         this.triggerExecutionService = triggerExecutionService;
-        this.workflowConnectionFacade = workflowConnectionFacade;
+        this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -621,28 +621,28 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 integrationInstanceConfigurationId);
             Workflow workflow = workflowService.getWorkflow(workflowId);
 
-            List<WorkflowConnection> requiredWorkflowConnections = CollectionUtils.concat(
+            List<ComponentConnection> requiredComponentConnections = CollectionUtils.concat(
                 WorkflowTrigger.of(workflow)
                     .stream()
                     .flatMap(workflowTrigger -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTrigger)))
-                    .filter(WorkflowConnection::required)
+                        componentConnectionFacade.getComponentConnections(workflowTrigger)))
+                    .filter(ComponentConnection::required)
                     .toList(),
                 workflow.getTasks(true)
                     .stream()
                     .flatMap(workflowTask -> CollectionUtils.stream(
-                        workflowConnectionFacade.getWorkflowConnections(workflowTask)))
-                    .filter(WorkflowConnection::required)
+                        componentConnectionFacade.getComponentConnections(workflowTask)))
+                    .filter(ComponentConnection::required)
                     .toList());
 
-            requiredWorkflowConnections = requiredWorkflowConnections.stream()
+            requiredComponentConnections = requiredComponentConnections.stream()
                 .filter(workflowConnection -> !Objects.equals(workflowConnection.componentName(),
                     integration.getComponentName()))
                 .toList();
 
             int connectionsCount = integrationInstanceConfigurationWorkflow.getConnectionsCount();
 
-            if (!requiredWorkflowConnections.isEmpty() && requiredWorkflowConnections.size() != connectionsCount) {
+            if (!requiredComponentConnections.isEmpty() && requiredComponentConnections.size() != connectionsCount) {
                 throw new ConfigurationException(
                     "Not all required connections are set for a workflow with id=%s".formatted(workflow.getId()),
                     IntegrationInstanceConfigurationErrorType.REQUIRED_WORKFLOW_CONNECTIONS);
@@ -850,11 +850,11 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             Connection connection = connectionService.getConnection(
                 integrationInstanceConfigurationWorkflowConnection.getConnectionId());
 
-            WorkflowConnection workflowConnection = workflowConnectionFacade.getWorkflowConnection(
+            ComponentConnection componentConnection = componentConnectionFacade.getComponentConnection(
                 workflow.getId(), integrationInstanceConfigurationWorkflowConnection.getWorkflowNodeName(),
                 integrationInstanceConfigurationWorkflowConnection.getKey());
 
-            if (!Objects.equals(connection.getComponentName(), workflowConnection.componentName())) {
+            if (!Objects.equals(connection.getComponentName(), componentConnection.componentName())) {
                 throw new IllegalArgumentException(
                     "Connection component name does not match workflow connection component name");
             }

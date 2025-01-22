@@ -21,9 +21,9 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.workflow.connection.WorkflowConnectionFactoryResolver;
+import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactoryResolver;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -36,32 +36,32 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
-public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
+public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final WorkflowConnectionFactoryResolver workflowConnectionFactoryResolver;
+    private final ComponentConnectionFactoryResolver componentConnectionFactoryResolver;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowConnectionFacadeImpl(
+    public ComponentConnectionFacadeImpl(
         ComponentDefinitionService componentDefinitionService,
-        WorkflowConnectionFactoryResolver workflowConnectionFactoryResolver, WorkflowService workflowService) {
+        ComponentConnectionFactoryResolver componentConnectionFactoryResolver, WorkflowService workflowService) {
 
         this.componentDefinitionService = componentDefinitionService;
-        this.workflowConnectionFactoryResolver = workflowConnectionFactoryResolver;
+        this.componentConnectionFactoryResolver = componentConnectionFactoryResolver;
         this.workflowService = workflowService;
     }
 
     @Override
-    public WorkflowConnection getWorkflowConnection(String workflowId, String workflowNodeName, String key) {
+    public ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         return WorkflowTrigger.fetch(workflow, workflowNodeName)
-            .map(this::getWorkflowConnections)
+            .map(this::getComponentConnections)
             .orElseGet(() -> {
                 WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-                return getWorkflowConnections(workflowTask);
+                return getComponentConnections(workflowTask);
             })
             .stream()
             .filter(workflowConnection -> Objects.equals(workflowConnection.key(), key))
@@ -70,17 +70,17 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
     }
 
     @Override
-    public List<WorkflowConnection> getWorkflowConnections(WorkflowTask workflowTask) {
-        return getWorkflowConnections(workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
+    public List<ComponentConnection> getComponentConnections(WorkflowTask workflowTask) {
+        return getComponentConnections(workflowTask.getName(), workflowTask.getType(), workflowTask.getExtensions());
     }
 
     @Override
-    public List<WorkflowConnection> getWorkflowConnections(WorkflowTrigger workflowTrigger) {
-        return getWorkflowConnections(
+    public List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger) {
+        return getComponentConnections(
             workflowTrigger.getName(), workflowTrigger.getType(), workflowTrigger.getExtensions());
     }
 
-    private List<WorkflowConnection> getWorkflowConnections(
+    private List<ComponentConnection> getComponentConnections(
         String workflowNodeName, String type, Map<String, ?> extensions) {
 
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
@@ -92,7 +92,7 @@ public class WorkflowConnectionFacadeImpl implements WorkflowConnectionFacade {
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             workflowNodeType.componentName(), workflowNodeType.componentVersion());
 
-        return workflowConnectionFactoryResolver.resolve(componentDefinition)
+        return componentConnectionFactoryResolver.resolve(componentDefinition)
             .map(workflowConnectionFactory -> workflowConnectionFactory.create(
                 workflowNodeName, extensions, componentDefinition))
             .orElse(List.of());

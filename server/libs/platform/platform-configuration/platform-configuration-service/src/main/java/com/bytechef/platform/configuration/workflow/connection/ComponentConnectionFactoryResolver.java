@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowConnectionFactoryResolver {
+public interface ComponentConnectionFactoryResolver {
 
-    Optional<WorkflowConnectionFactory> resolve(ComponentDefinition componentDefinition);
+    Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition);
 }

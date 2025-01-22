@@ -37,12 +37,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowFacadeImpl implements WorkflowFacade {
 
-    private final WorkflowConnectionFacade workflowConnectionFacade;
+    private final ComponentConnectionFacade componentConnectionFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
-    public WorkflowFacadeImpl(WorkflowConnectionFacade workflowConnectionFacade, WorkflowService workflowService) {
-        this.workflowConnectionFacade = workflowConnectionFacade;
+    public WorkflowFacadeImpl(ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
+        this.componentConnectionFacade = componentConnectionFacade;
         this.workflowService = workflowService;
     }
 
@@ -65,7 +65,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
             workflowTaskDTOs.add(
                 new WorkflowTaskDTO(
                     workflowTask,
-                    workflowConnectionFacade.getWorkflowConnections(
+                    componentConnectionFacade.getComponentConnections(
                         CollectionUtils.getFirst(
                             allTasks,
                             curWorkflowTask -> Objects.equals(curWorkflowTask.getName(), workflowTask.getName()))),
@@ -79,7 +79,7 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
             workflowTriggerDTOs.add(
                 new WorkflowTriggerDTO(
                     workflowTriggerModel,
-                    workflowConnectionFacade.getWorkflowConnections(
+                    componentConnectionFacade.getComponentConnections(
                         CollectionUtils.getFirst(
                             workflowTriggers,
                             curWorkflowTrigger -> Objects.equals(

@@ -19,8 +19,8 @@ package com.bytechef.platform.configuration.workflow.connection;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.DataStream;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,74 +34,74 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Order(1)
-public class DataStreamWorkflowConnectionFactory
-    implements WorkflowConnectionFactory, WorkflowConnectionFactoryResolver {
+public class DataStreamComponentConnectionFactory
+    implements ComponentConnectionFactory, ComponentConnectionFactoryResolver {
 
     private final ComponentDefinitionService componentDefinitionService;
 
-    public DataStreamWorkflowConnectionFactory(ComponentDefinitionService componentDefinitionService) {
+    public DataStreamComponentConnectionFactory(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
     }
 
     @Override
-    public List<WorkflowConnection> create(
+    public List<ComponentConnection> create(
         String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition) {
 
         return getWorkflowConnections(DataStream.of(extensions), workflowNodeName);
     }
 
     @Override
-    public Optional<WorkflowConnectionFactory> resolve(ComponentDefinition componentDefinition) {
+    public Optional<ComponentConnectionFactory> resolve(ComponentDefinition componentDefinition) {
         return Optional.ofNullable(
             StringUtils.startsWith(componentDefinition.getName(), DataStreamComponentDefinition.DATA_STREAM)
                 ? this
                 : null);
     }
 
-    private List<WorkflowConnection> getWorkflowConnections(DataStream dataStream, String workflowNodeName) {
-        List<WorkflowConnection> workflowConnections = new ArrayList<>();
+    private List<ComponentConnection> getWorkflowConnections(DataStream dataStream, String workflowNodeName) {
+        List<ComponentConnection> componentConnections = new ArrayList<>();
 
         if (dataStream != null) {
             if (dataStream.source() != null) {
-                WorkflowConnection workflowConnection = getWorkflowConnection(
+                ComponentConnection componentConnection = getWorkflowConnection(
                     workflowNodeName,
                     StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.SOURCE.name()),
                     dataStream.source());
 
-                if (workflowConnection != null) {
-                    workflowConnections.add(workflowConnection);
+                if (componentConnection != null) {
+                    componentConnections.add(componentConnection);
                 }
             }
 
             if (dataStream.destination() != null) {
-                WorkflowConnection workflowConnection = getWorkflowConnection(
+                ComponentConnection componentConnection = getWorkflowConnection(
                     workflowNodeName,
                     StringUtils.lowerCase(DataStreamComponentDefinition.ComponentType.DESTINATION.name()),
                     dataStream.destination());
 
-                if (workflowConnection != null) {
-                    workflowConnections.add(workflowConnection);
+                if (componentConnection != null) {
+                    componentConnections.add(componentConnection);
                 }
             }
         }
 
-        return workflowConnections;
+        return componentConnections;
     }
 
-    private WorkflowConnection getWorkflowConnection(
+    private ComponentConnection getWorkflowConnection(
         String workflowNodeName, String workflowConnectionKey, DataStream.DataStreamComponent dataStreamComponent) {
 
-        WorkflowConnection workflowConnection = null;
+        ComponentConnection componentConnection = null;
 
         ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
             dataStreamComponent.componentName(), dataStreamComponent.componentVersion());
 
         if (componentDefinition.getConnection() != null) {
-            workflowConnection =
-                WorkflowConnection.of(workflowNodeName, workflowConnectionKey, componentDefinition.getName(),
+            componentConnection =
+                ComponentConnection.of(workflowNodeName, workflowConnectionKey, componentDefinition.getName(),
                     componentDefinition.getVersion(), componentDefinition.isConnectionRequired());
         }
 
-        return workflowConnection;
+        return componentConnection;
     }
 }

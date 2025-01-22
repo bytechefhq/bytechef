@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.configuration.dto;
 
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -27,10 +27,10 @@ import java.util.Map;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowTriggerDTO(
-    List<WorkflowConnection> connections, String description, Map<String, ?> metadata, String name, String label,
+    List<ComponentConnection> connections, String description, Map<String, ?> metadata, String name, String label,
     Map<String, ?> parameters, String timeout, String type) {
 
-    public WorkflowTriggerDTO(WorkflowTrigger workflowTrigger, List<WorkflowConnection> connections) {
+    public WorkflowTriggerDTO(WorkflowTrigger workflowTrigger, List<ComponentConnection> connections) {
         this(
             connections, workflowTrigger.getDescription(), workflowTrigger.getMetadata(), workflowTrigger.getName(),
             workflowTrigger.getLabel(), workflowTrigger.getParameters(), workflowTrigger.getTimeout(),

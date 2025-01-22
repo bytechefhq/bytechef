@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.json;
 
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -39,8 +39,8 @@ public class WorkflowTaskModelJsonSerializer extends JsonSerializer<WorkflowTask
 
         jsonGenerator.writeArrayFieldStart("connections");
 
-        for (WorkflowConnectionModel workflowConnectionModel : value.getConnections()) {
-            jsonGenerator.writePOJO(workflowConnectionModel);
+        for (ComponentConnectionModel componentConnectionModel : value.getConnections()) {
+            jsonGenerator.writePOJO(componentConnectionModel);
         }
 
         jsonGenerator.writeEndArray();

@@ -28,7 +28,7 @@ import java.util.function.BiFunction;
  *
  * @author Ivica Cardic
  */
-public record WorkflowConnection(
+public record ComponentConnection(
     String componentName, int componentVersion, String workflowNodeName, String key, boolean required) {
 
     public static int count(Map<String, ?> extensions) {
@@ -38,22 +38,22 @@ public record WorkflowConnection(
         return connections.size();
     }
 
-    public static WorkflowConnection of(
+    public static ComponentConnection of(
         String workflowNodeName, String workflowConnectionKey, String componentName, int componentVersion,
         boolean connectionRequired) {
 
-        return new WorkflowConnection(
+        return new ComponentConnection(
             componentName, componentVersion, workflowNodeName, workflowConnectionKey, connectionRequired);
     }
 
-    public static WorkflowConnection of(
+    public static ComponentConnection of(
         String workflowNodeName, String componentName, int componentVersion, boolean connectionRequired) {
 
-        return new WorkflowConnection(
+        return new ComponentConnection(
             componentName, componentVersion, workflowNodeName, componentName, connectionRequired);
     }
 
-    public static List<WorkflowConnection> of(
+    public static List<ComponentConnection> of(
         Map<String, ?> extensions, String workflowNodeName,
         BiFunction<String, Integer, Boolean> connectionRequiredFunction) {
 
@@ -69,7 +69,7 @@ public record WorkflowConnection(
                 String name = MapUtils.getRequiredString(connectionMap, WorkflowExtConstants.COMPONENT_NAME);
                 int version = MapUtils.getRequiredInteger(connectionMap, WorkflowExtConstants.COMPONENT_VERSION);
 
-                return new WorkflowConnection(
+                return new ComponentConnection(
                     name, version, workflowNodeName, entry.getKey(),
                     MapUtils.getBoolean(connectionMap, WorkflowExtConstants.AUTHORIZATION_REQUIRED, false) ||
                         connectionRequiredFunction.apply(name, version));

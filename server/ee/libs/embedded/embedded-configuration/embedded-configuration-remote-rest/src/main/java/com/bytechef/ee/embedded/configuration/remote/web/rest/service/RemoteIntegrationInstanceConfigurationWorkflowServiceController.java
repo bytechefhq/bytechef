@@ -65,35 +65,34 @@ public class RemoteIntegrationInstanceConfigurationWorkflowServiceController {
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/get-integration-instance-configuration-workflow-connection/{integrationInstanceConfigurationId}" +
-            "/{workflowId}/{workflowConnectionOperationName}/{workflowConnectionKey}",
+            "/{workflowId}/{operationName}/{key}",
         produces = {
             "application/json"
         })
     public ResponseEntity<IntegrationInstanceConfigurationWorkflowConnection>
         getIntegrationInstanceConfigurationWorkflowConnection(
             @PathVariable long integrationInstanceConfigurationId, @PathVariable String workflowId,
-            @PathVariable String workflowConnectionOperationName, @PathVariable String workflowConnectionKey) {
+            @PathVariable String operationName, @PathVariable String key) {
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflowConnection(
-                integrationInstanceConfigurationId, workflowId, workflowConnectionOperationName,
-                workflowConnectionKey));
+                integrationInstanceConfigurationId, workflowId, operationName, key));
     }
 
     @RequestMapping(
         method = RequestMethod.GET,
         value = "/get-integration-instance-configuration-workflow-connection/{integrationInstanceConfigurationId}" +
-            "/{workflowId}/{workflowConnectionOperationName}",
+            "/{workflowId}/{operationName}",
         produces = {
             "application/json"
         })
     public ResponseEntity<List<IntegrationInstanceConfigurationWorkflowConnection>>
         getIntegrationInstanceWorkflowConnection(
             @PathVariable long integrationInstanceConfigurationId, @PathVariable String workflowId,
-            @PathVariable String workflowConnectionOperationName) {
+            @PathVariable String operationName) {
 
         return ResponseEntity.ok(
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflowConnections(
-                integrationInstanceConfigurationId, workflowId, workflowConnectionOperationName));
+                integrationInstanceConfigurationId, workflowId, operationName));
     }
 }

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.workflow.connection;
+package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowConnectionFactory {
+public interface ComponentConnectionFacade {
 
-    List<WorkflowConnection> create(
-        String workflowNodeName, Map<String, ?> extensions, ComponentDefinition componentDefinition);
+    ComponentConnection getComponentConnection(String workflowId, String workflowNodeName, String key);
+
+    List<ComponentConnection> getComponentConnections(WorkflowTask workflowTask);
+
+    List<ComponentConnection> getComponentConnections(WorkflowTrigger workflowTrigger);
 }

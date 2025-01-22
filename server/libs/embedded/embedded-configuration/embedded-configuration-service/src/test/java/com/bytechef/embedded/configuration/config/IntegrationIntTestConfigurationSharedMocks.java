@@ -22,7 +22,7 @@ import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.facade.WorkflowConnectionFacade;
+import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeParameterFacade;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
@@ -48,7 +48,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     ComponentDefinitionService.class, ConnectionDefinitionService.class, ConnectionService.class,
     ConnectedUserService.class, PrincipalJobFacade.class, PrincipalJobService.class, JobFacade.class,
     JobService.class, OAuth2Service.class, TriggerDefinitionService.class, TriggerExecutionService.class,
-    TriggerLifecycleFacade.class, WorkflowConnectionFacade.class, WorkflowFacade.class,
+    TriggerLifecycleFacade.class, ComponentConnectionFacade.class, WorkflowFacade.class,
     WorkflowNodeParameterFacade.class, WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {

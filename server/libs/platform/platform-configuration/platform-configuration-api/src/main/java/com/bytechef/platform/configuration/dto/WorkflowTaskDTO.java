@@ -17,9 +17,9 @@
 package com.bytechef.platform.configuration.dto;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.DataStream;
 import com.bytechef.platform.configuration.domain.DataStream.DataStreamComponent;
-import com.bytechef.platform.configuration.domain.WorkflowConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 public final class WorkflowTaskDTO {
 
-    private final List<WorkflowConnection> connections;
+    private final List<ComponentConnection> connections;
     private final String description;
     private final DataStreamComponent destination;
     private final List<WorkflowTask> finalize;
@@ -48,7 +48,7 @@ public final class WorkflowTaskDTO {
     private final String type;
 
     public WorkflowTaskDTO(
-        List<WorkflowConnection> connections, String description, DataStreamComponent destination,
+        List<ComponentConnection> connections, String description, DataStreamComponent destination,
         List<WorkflowTask> finalize, String label, int maxRetries, Map<String, ?> metadata, String name, String node,
         Map<String, ?> parameters, List<WorkflowTask> post, List<WorkflowTask> pre, DataStreamComponent source,
         int taskNumber, String timeout, String type) {
@@ -71,7 +71,7 @@ public final class WorkflowTaskDTO {
         this.type = type;
     }
 
-    public WorkflowTaskDTO(WorkflowTask workflowTask, List<WorkflowConnection> connections, DataStream dataStream) {
+    public WorkflowTaskDTO(WorkflowTask workflowTask, List<ComponentConnection> connections, DataStream dataStream) {
         this(
             connections, workflowTask.getDescription(), dataStream == null ? null : dataStream.destination(),
             workflowTask.getFinalize(), workflowTask.getLabel(), workflowTask.getMaxRetries(),
@@ -80,7 +80,7 @@ public final class WorkflowTaskDTO {
             workflowTask.getTaskNumber(), workflowTask.getTimeout(), workflowTask.getType());
     }
 
-    public List<WorkflowConnection> getConnections() {
+    public List<ComponentConnection> getConnections() {
         return connections;
     }
 
