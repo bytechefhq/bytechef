@@ -12,7 +12,6 @@ import InlineSVG from 'react-inlinesvg';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
@@ -37,7 +36,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
     trigger,
 }: WorkflowNodesPopoverMenuOperationListProps) => {
     const {setLatestComponentDefinition, workflow} = useWorkflowDataStore();
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -189,7 +187,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                     handleConditionChildOperationClick({
                         conditionId,
-                        currentNode,
                         nodes,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
