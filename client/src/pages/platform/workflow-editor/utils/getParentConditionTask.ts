@@ -1,4 +1,4 @@
-import {WorkflowTask} from '@/shared/middleware/automation/configuration';
+import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 export default function getParentConditionTask(
     tasks: Array<WorkflowTask>,

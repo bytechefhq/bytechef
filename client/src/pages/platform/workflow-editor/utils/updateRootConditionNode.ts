@@ -1,4 +1,4 @@
-import {Workflow, WorkflowTask} from '@/shared/middleware/automation/configuration';
+import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
