@@ -32,7 +32,7 @@ const WorkflowEditorLayout = ({
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
 
     const {componentActions, workflow} = useWorkflowDataStore();
-    const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -93,6 +93,13 @@ const WorkflowEditorLayout = ({
 
     // update display conditions when currentNode changes
     useEffect(() => {
+        if (currentNode && workflowNodeParameterDisplayConditions?.displayConditions) {
+            setCurrentNode({
+                ...currentNode,
+                displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+            });
+        }
+
         if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
             if (currentComponent.workflowNodeName === currentNode?.name) {
                 setCurrentComponent({
