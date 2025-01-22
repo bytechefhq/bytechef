@@ -19,10 +19,13 @@ package com.bytechef.component.ai.vectorstore.weaviate.constant;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.exception.ProviderException;
 import io.weaviate.client.Config;
 import io.weaviate.client.WeaviateAuthClient;
 import io.weaviate.client.WeaviateClient;
 import io.weaviate.client.v1.auth.exception.AuthException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vectorstore.weaviate.WeaviateVectorStore;
@@ -36,22 +39,25 @@ public class WeaviateConstants {
     }
 
     public static final String API_KEY = "apiKey";
-    public static final String HOST = "host";
-    public static final String SCHEME = "scheme";
+    public static final String URL = "url";
 
     public static final VectorStore VECTOR_STORE = connectionParameters -> {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
 
-        Config config = new Config(
-            connectionParameters.getRequiredString(SCHEME), connectionParameters.getRequiredString(HOST));
+        Pattern pattern = Pattern.compile("^(http|https)://([^/]+)");
+        Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(URL));
 
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("Invalid URL");
+        }
+
+        Config config = new Config(matcher.group(1), matcher.group(2));
         WeaviateClient weaviateClient;
-
         try {
             weaviateClient = WeaviateAuthClient.apiKey(config, connectionParameters.getRequiredString(API_KEY));
         } catch (AuthException authException) {
-            throw new RuntimeException("Authentication failed", authException);
+            throw new ProviderException("Authentication failed", authException);
         }
 
         return WeaviateVectorStore.builder(weaviateClient, openAiEmbeddingModel)
