@@ -40,9 +40,8 @@ public class PineconeConstants {
         OpenAiEmbeddingModel openAiEmbeddingModel = new OpenAiEmbeddingModel(
             new OpenAiApi(connectionParameters.getRequiredString(EMBEDDING_API_KEY)));
 
-        String requiredString = connectionParameters.getRequiredString(HOST);
         Pattern pattern = Pattern.compile("https:\\/\\/(.*)-(.*)\\.svc\\.(.*)\\.pinecone\\.io");
-        Matcher matcher = pattern.matcher(requiredString);
+        Matcher matcher = pattern.matcher(connectionParameters.getRequiredString(HOST));
 
         if (matcher.find())
             return PineconeVectorStore
@@ -52,7 +51,6 @@ public class PineconeConstants {
                     matcher.group(1))
                 .build();
         else
-            throw new IllegalArgumentException("Invalid Host url"); // not sure if I should make an AbstractException
-                                                                    // for this
+            throw new IllegalArgumentException("Invalid Host url");
     };
 }
