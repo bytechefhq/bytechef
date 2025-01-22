@@ -15,17 +15,17 @@ const RegisterSuccess = () => {
 
     const [searchParams] = useSearchParams();
 
-    useEffect(() => {
-        const key = searchParams.get('key');
-
-        activate(key);
-    }, [activate, searchParams]);
+    const key = searchParams.get('key');
 
     useEffect(() => {
-        if (activationFailure) {
+        if (key) {
+            activate(key);
+        }
+
+        if (key && activationFailure) {
             navigate('/account-error');
         }
-    }, [activationFailure, navigate]);
+    }, [activate, activationFailure, key, navigate]);
 
     return (
         <PublicLayoutContainer>
