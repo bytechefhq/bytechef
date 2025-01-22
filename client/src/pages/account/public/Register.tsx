@@ -10,7 +10,7 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {CheckIcon, Eye, EyeOff, XIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {Link, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
@@ -96,11 +96,14 @@ const Register = () => {
         }
     };
 
-    const handleSubmit = async ({email, password}: z.infer<typeof formSchema>) => {
-        reset();
+    const handleSubmit = useCallback(
+        ({email, password}: z.infer<typeof formSchema>) => {
+            register(email, password);
 
-        return register(email, password);
-    };
+            reset();
+        },
+        [register, reset]
+    );
 
     useEffect(() => {
         if (registerErrorMessage) {
@@ -118,9 +121,13 @@ const Register = () => {
                 navigate('/verify-email', {
                     state: {email: form.getValues().email, password: form.getValues().password},
                 });
+            } else if (!activationRequired) {
+                navigate('/activate');
             }
+
+            reset();
         }
-    }, [activationRequired, captureUserSignedUp, form, getValues, navigate, registerSuccess]);
+    }, [registerSuccess, activationRequired, captureUserSignedUp, form, getValues, navigate, reset]);
 
     return (
         <PublicLayoutContainer>
