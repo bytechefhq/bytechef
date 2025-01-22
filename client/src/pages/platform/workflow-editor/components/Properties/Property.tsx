@@ -467,6 +467,12 @@ const Property = ({
         });
     };
 
+    const memoizedWorkflowTask = useMemo(() => {
+        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
+            (node) => node.name === currentNode?.name
+        );
+    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+
     // set default mentionInput state
     useEffect(() => {
         if (control) {
@@ -635,27 +641,30 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue, mentionInput]);
 
+    // set lookup dependencies
     useEffect(() => {
         if (!currentComponent?.parameters || !optionsDataSource?.optionsLookupDependsOn) {
             return;
         }
 
-        const optionsLookupDependsOnValues = optionsDataSource?.optionsLookupDependsOn.map((optionLookupDependency) =>
-            resolvePath(
-                currentComponent?.parameters,
-                optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
-            )?.toString()
+        const optionsLookupDependsOnValues: string[] = optionsDataSource?.optionsLookupDependsOn.map(
+            (optionLookupDependency) =>
+                resolvePath(
+                    currentComponent?.parameters,
+                    optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
+                )?.toString()
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
     }, [arrayIndex, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
+    // set lookup dependencies
     useEffect(() => {
         if (!currentComponent?.parameters || !propertiesDataSource?.propertiesLookupDependsOn) {
             return;
         }
 
-        const propertiesLookupDependsOnValues = propertiesDataSource?.propertiesLookupDependsOn.map(
+        const propertiesLookupDependsOnValues: string[] = propertiesDataSource?.propertiesLookupDependsOn.map(
             (propertyLookupDependency) =>
                 resolvePath(
                     currentComponent?.parameters,
@@ -686,12 +695,6 @@ const Property = ({
             setShowInputTypeSwitchButton(false);
         }
     }, [controlType, expressionEnabled]);
-
-    const memoizedWorkflowTask = useMemo(() => {
-        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
-        );
-    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
 
     // set propertyParameterValue on workflow definition change
     useEffect(() => {
@@ -1112,13 +1115,10 @@ const Property = ({
                 </>
             )}
 
-            {type === 'DYNAMIC_PROPERTIES' && currentComponent && (
+            {type === 'DYNAMIC_PROPERTIES' && currentNode && (
                 <PropertyDynamicProperties
                     currentOperationName={operationName}
-                    enabled={
-                        !!(currentNode?.connectionId && currentNode?.connections) ||
-                        currentNode?.connections?.length === 0
-                    }
+                    enabled={!!currentNode.connectionId}
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}

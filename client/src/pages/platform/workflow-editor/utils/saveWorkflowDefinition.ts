@@ -46,14 +46,23 @@ export default async function saveWorkflowDefinition({
 }: SaveWorkflowDefinitionProps) {
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
-    if (nodeData.trigger) {
+    const {componentName, connections, description, label, metadata, name, parameters, taskDispatcher, trigger} =
+        nodeData;
+
+    let {operationName, type, version} = nodeData;
+
+    if (trigger) {
+        if (!type) {
+            type = `${componentName}/v${version}/${operationName}`;
+        }
+
         const newTrigger: WorkflowTrigger = {
-            connections: nodeData.connections,
-            description: nodeData.description,
-            label: nodeData.label,
-            name: nodeData.name,
-            parameters: nodeData.parameters,
-            type: nodeData.type ?? `${nodeData.componentName}/v${nodeData.version}/${nodeData.operationName}`,
+            connections,
+            description,
+            label,
+            name,
+            parameters,
+            type,
         };
 
         updateWorkflowMutation.mutate(
@@ -78,10 +87,6 @@ export default async function saveWorkflowDefinition({
 
         return;
     }
-
-    const {componentName, description, label, metadata, name, parameters, taskDispatcher} = nodeData;
-
-    let {operationName, type, version} = nodeData;
 
     if (taskDispatcher && componentName && version) {
         const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
@@ -119,7 +124,7 @@ export default async function saveWorkflowDefinition({
         operationName = newNodeComponentDefinition.actions?.[0].name;
     }
 
-    if (!type && !nodeData.trigger) {
+    if (!type && !trigger) {
         if (taskDispatcher) {
             type = `${componentName}/v${version}`;
         } else {

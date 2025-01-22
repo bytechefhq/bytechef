@@ -215,7 +215,7 @@ const WorkflowNodeDetailsPanel = ({
         [workflow.tasks, currentNode]
     );
 
-    const componentConnections: ComponentConnection[] = useMemo(
+    const currentWorkflowNodeConnections: ComponentConnection[] = useMemo(
         () => currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [],
         [currentWorkflowTask, currentWorkflowTrigger]
     );
@@ -223,7 +223,7 @@ const WorkflowNodeDetailsPanel = ({
     const nodeTabs = useMemo(() => {
         return TABS.filter(({name}) => {
             if (name === 'connection') {
-                return componentConnections.length > 0;
+                return currentWorkflowNodeConnections.length > 0;
             }
 
             if (name === 'dataStreamComponents') {
@@ -243,7 +243,7 @@ const WorkflowNodeDetailsPanel = ({
             return true;
         });
     }, [
-        componentConnections,
+        currentWorkflowNodeConnections,
         currentComponentDefinition,
         hasOutputData,
         currentNode,
@@ -473,7 +473,7 @@ const WorkflowNodeDetailsPanel = ({
 
     // Tab switching logic
     useEffect(() => {
-        if (activeTab === 'connection' && componentConnections.length === 0) {
+        if (activeTab === 'connection' && currentWorkflowNodeConnections.length === 0) {
             setActiveTab('description');
         }
 
@@ -690,11 +690,11 @@ const WorkflowNodeDetailsPanel = ({
                                 {activeTab === 'dataStreamComponents' && <DataStreamComponentsTab />}
 
                                 {activeTab === 'connection' &&
-                                    componentConnections.length > 0 &&
+                                    currentWorkflowNodeConnections.length > 0 &&
                                     currentNode &&
                                     currentComponentDefinition && (
                                         <ConnectionTab
-                                            componentConnections={componentConnections}
+                                            componentConnections={currentWorkflowNodeConnections}
                                             componentDefinition={currentComponentDefinition}
                                             key={`${currentNode?.workflowNodeName}_connection`}
                                             workflowId={workflow.id!}
