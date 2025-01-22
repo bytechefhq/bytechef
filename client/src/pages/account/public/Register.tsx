@@ -61,7 +61,6 @@ const Register = () => {
     const {register, registerErrorMessage, registerSuccess, reset} = useRegisterStore();
 
     const {
-        getApplicationInfo,
         signUp: {activationRequired},
     } = useApplicationInfoStore();
 
@@ -122,10 +121,6 @@ const Register = () => {
             }
         }
     }, [activationRequired, captureUserSignedUp, form, getValues, navigate, registerSuccess]);
-
-    useEffect(() => {
-        getApplicationInfo();
-    }, [getApplicationInfo]);
 
     return (
         <PublicLayoutContainer>
