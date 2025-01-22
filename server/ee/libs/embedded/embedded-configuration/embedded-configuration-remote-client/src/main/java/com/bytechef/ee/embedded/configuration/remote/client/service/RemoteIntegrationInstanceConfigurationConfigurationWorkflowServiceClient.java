@@ -58,12 +58,6 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     }
 
     @Override
-    public void
-        deleteIntegrationInstanceConfigurationWorkflows(long integrationInstanceConfigurationId, List<Long> exclude) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Optional<IntegrationInstanceConfigurationWorkflowConnection>
         fetchIntegrationInstanceConfigurationWorkflowConnection(
             long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,

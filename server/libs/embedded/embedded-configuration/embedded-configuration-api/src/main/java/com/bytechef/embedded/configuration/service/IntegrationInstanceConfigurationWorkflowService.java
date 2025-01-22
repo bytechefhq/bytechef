@@ -34,8 +34,6 @@ public interface IntegrationInstanceConfigurationWorkflowService {
 
     void delete(long id);
 
-    void deleteIntegrationInstanceConfigurationWorkflows(long integrationInstanceConfigurationId, List<Long> exclude);
-
     Optional<IntegrationInstanceConfigurationWorkflowConnection>
         fetchIntegrationInstanceConfigurationWorkflowConnection(
             long integrationInstanceConfigurationId, String workflowId, String workflowNodeName,
