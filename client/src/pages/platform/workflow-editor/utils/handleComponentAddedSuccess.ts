@@ -1,5 +1,5 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {Workflow} from '@/shared/middleware/automation/configuration';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {NodeDataType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';

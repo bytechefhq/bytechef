@@ -2,8 +2,7 @@ import {Button} from '@/components/ui/button';
 import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowInputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetDialog';
 import WorkflowInputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowInputsSheetTable';
-import {Workflow} from '@/shared/middleware/automation/configuration';
-import {WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
+import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowInputsSheetProps {
     onClose: () => void;

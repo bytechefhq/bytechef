@@ -1,4 +1,4 @@
-import {WorkflowTask} from '@/shared/middleware/automation/configuration';
+import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 export default function getAllTaskNames(tasks: Array<WorkflowTask>): Array<string> {
     const extractTaskNames = (taskList: Array<WorkflowTask>): Array<string> => {

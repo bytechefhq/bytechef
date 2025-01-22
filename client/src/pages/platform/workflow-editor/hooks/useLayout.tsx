@@ -1,7 +1,10 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, EDGE_STYLES} from '@/shared/constants';
 import defaultNodes from '@/shared/defaultNodes';
-import {WorkflowTask} from '@/shared/middleware/automation/configuration';
-import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {
+    ComponentDefinitionBasic,
+    TaskDispatcherDefinitionBasic,
+    WorkflowTask,
+} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import Dagre from '@dagrejs/dagre';
