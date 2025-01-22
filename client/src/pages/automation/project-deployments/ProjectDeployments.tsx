@@ -2,8 +2,8 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ProjectDeploymentFilterTitle from '@/pages/automation/project-deployments/components/ProjectDeploymentFilterTitle';
-import ProjectDeploymentWorkflowSheet from '@/pages/automation/project-deployments/components/ProjectDeploymentWorkflowSheet';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ReadOnlyWorkflowEditorSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditorSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -11,6 +11,7 @@ import {Environment, ProjectDeployment} from '@/shared/middleware/automation/con
 import {useGetProjectDeploymentTagsQuery} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {useGetWorkspaceProjectDeploymentsQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {Layers3Icon, TagIcon} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
 
@@ -215,7 +216,7 @@ const ProjectDeployments = () => {
                                 )
                         )}
 
-                        <ProjectDeploymentWorkflowSheet />
+                        <ReadOnlyWorkflowEditorSheet useGetWorkflowQuery={useGetWorkflowQuery} />
                     </div>
                 ) : (
                     <EmptyList

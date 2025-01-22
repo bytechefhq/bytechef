@@ -14,12 +14,12 @@ import ApiCollectionEndpointDialog from '@/ee/pages/automation/api-platform/api-
 import {ApiCollectionKeys} from '@/ee/queries/apiCollections.queries';
 import {ApiCollectionEndpoint} from '@/ee/shared/middleware/automation/api-platform';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
+import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
 import {ProjectDeploymentWorkflow, Workflow} from '@/shared/middleware/automation/configuration';
 import {useEnableProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
-import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 const ApiCollectionEndpointListItem = ({
@@ -42,6 +42,8 @@ const ApiCollectionEndpointListItem = ({
     const [showEditApiCollectionEndpointDialog, setShowEditApiCollectionEndpointDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
+
+    const {setReadOnlyWorkflowEditorSheetOpen, setWorkflowId} = useReadOnlyWorkflowEditorSheetStore();
 
     const workflow = workflows.filter(
         (workflow) => workflow.workflowReferenceCode === apiCollectionEndpoint.workflowReferenceCode
@@ -83,9 +85,14 @@ const ApiCollectionEndpointListItem = ({
         );
     };
 
+    const handleWorkflowClick = () => {
+        setWorkflowId(workflow.id!);
+        setReadOnlyWorkflowEditorSheetOpen(true);
+    };
+
     return (
         <>
-            <div className="flex flex-1 items-center">
+            <div className="flex flex-1 items-center" onClick={handleWorkflowClick}>
                 <Badge
                     className={twMerge(
                         'mr-4 w-20 border-transparent',
@@ -99,13 +106,8 @@ const ApiCollectionEndpointListItem = ({
                     {apiCollectionEndpoint.httpMethod}
                 </Badge>
 
-                <div className="flex flex-1 items-center">
-                    <Link
-                        className="w-4/12 text-sm"
-                        to={`/automation/projects/${1}/project-workflows/${workflow.projectWorkflowId}`}
-                    >
-                        {apiCollectionEndpoint.name}
-                    </Link>
+                <div className="flex flex-1 cursor-pointer items-center">
+                    <div className="w-4/12 text-sm">{apiCollectionEndpoint.name}</div>
 
                     <div className="w-4/12 text-sm font-semibold">
                         <span>/v{collectionVersion}</span>

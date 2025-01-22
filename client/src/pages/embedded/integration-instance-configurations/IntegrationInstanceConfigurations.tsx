@@ -1,10 +1,10 @@
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
-import IntegrationInstanceConfigurationWorkflowSheet from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationWorkflowSheet';
 import IntegrationInstanceConfigurationsFilterTitle from '@/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationsFilterTitle';
 import IntegrationInstanceConfigurationDialog from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import IntegrationInstanceConfigurationList from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-list/IntegrationInstanceConfigurationList';
+import ReadOnlyWorkflowEditorSheet from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditorSheet';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
@@ -12,6 +12,7 @@ import {Environment, IntegrationInstanceConfiguration} from '@/shared/middleware
 import {useGetIntegrationInstanceConfigurationTagsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurationTags.queries';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetIntegrationsQuery} from '@/shared/queries/embedded/integrations.queries';
+import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Settings2Icon, TagIcon} from 'lucide-react';
@@ -294,7 +295,7 @@ const IntegrationInstanceConfigurations = () => {
                                 )
                         )}
 
-                        <IntegrationInstanceConfigurationWorkflowSheet />
+                        <ReadOnlyWorkflowEditorSheet useGetWorkflowQuery={useGetWorkflowQuery} />
                     </div>
                 ) : (
                     <EmptyList

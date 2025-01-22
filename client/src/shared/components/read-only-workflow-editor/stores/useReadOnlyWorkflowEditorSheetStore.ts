@@ -1,9 +1,9 @@
 /* eslint-disable sort-keys */
 import {create} from 'zustand';
 
-interface ProjectDeploymentWorkflowSheetStateI {
-    projectDeploymentWorkflowSheetOpen: boolean;
-    setProjectDeploymentWorkflowSheetOpen: (workflowExecutionSheetOpen: boolean) => void;
+interface ReadOnlyWorkflowEditorSheetStateI {
+    readOnlyWorkflowEditorSheetOpen: boolean;
+    setReadOnlyWorkflowEditorSheetOpen: (workflowExecutionSheetOpen: boolean) => void;
 
     workflowId: string | undefined;
     setWorkflowId: (workflowExecutionId: string | undefined) => void;
@@ -12,7 +12,7 @@ interface ProjectDeploymentWorkflowSheetStateI {
     setWorkflowVersion: (setWorkflowVersion: number | undefined) => void;
 }
 
-export const useProjectDeploymentWorkflowSheetStore = create<ProjectDeploymentWorkflowSheetStateI>()((set) => ({
+export const useReadOnlyWorkflowEditorSheetStore = create<ReadOnlyWorkflowEditorSheetStateI>()((set) => ({
     workflowId: undefined,
     setWorkflowId: (workflowId) =>
         set((state) => ({
@@ -27,12 +27,12 @@ export const useProjectDeploymentWorkflowSheetStore = create<ProjectDeploymentWo
             workflowVersion,
         })),
 
-    projectDeploymentWorkflowSheetOpen: false,
-    setProjectDeploymentWorkflowSheetOpen: (projectDeploymentWorkflowSheetOpen) =>
+    readOnlyWorkflowEditorSheetOpen: false,
+    setReadOnlyWorkflowEditorSheetOpen: (readOnlyWorkflowEditorSheetOpen) =>
         set((state) => ({
             ...state,
-            projectDeploymentWorkflowSheetOpen: projectDeploymentWorkflowSheetOpen,
+            readOnlyWorkflowEditorSheetOpen,
         })),
 }));
 
-export default useProjectDeploymentWorkflowSheetStore;
+export default useReadOnlyWorkflowEditorSheetStore;

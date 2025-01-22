@@ -1,16 +1,18 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Sheet, SheetContent} from '@/components/ui/sheet';
-import useIntegrationInstanceConfigurationWorkflowSheetStore from '@/pages/embedded/integration-instance-configurations/stores/useIntegrationInstanceConfigurationWorkflowSheetStore';
 import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
-import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
+import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
+import {UseQueryResult} from '@tanstack/react-query';
 
-const IntegrationInstanceConfigurationWorkflowSheet = () => {
-    const {
-        integrationInstanceConfigurationWorkflowSheetOpen,
-        setIntegrationInstanceConfigurationWorkflowSheetOpen,
-        workflowId,
-    } = useIntegrationInstanceConfigurationWorkflowSheetStore();
+const ReadOnlyWorkflowEditorSheet = ({
+    useGetWorkflowQuery,
+}: {
+    useGetWorkflowQuery: (id: string, enabled?: boolean) => UseQueryResult<Workflow, Error>;
+}) => {
+    const {readOnlyWorkflowEditorSheetOpen, setReadOnlyWorkflowEditorSheetOpen, workflowId} =
+        useReadOnlyWorkflowEditorSheetStore();
 
     const {data: workflow} = useGetWorkflowQuery(workflowId!, !!workflowId);
 
@@ -26,10 +28,8 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
 
     return (
         <Sheet
-            onOpenChange={() =>
-                setIntegrationInstanceConfigurationWorkflowSheetOpen(!integrationInstanceConfigurationWorkflowSheetOpen)
-            }
-            open={integrationInstanceConfigurationWorkflowSheetOpen}
+            onOpenChange={() => setReadOnlyWorkflowEditorSheetOpen(!readOnlyWorkflowEditorSheetOpen)}
+            open={readOnlyWorkflowEditorSheetOpen}
         >
             <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
                 <div className="size-full bg-muted/50 p-4">
@@ -46,4 +46,4 @@ const IntegrationInstanceConfigurationWorkflowSheet = () => {
     );
 };
 
-export default IntegrationInstanceConfigurationWorkflowSheet;
+export default ReadOnlyWorkflowEditorSheet;

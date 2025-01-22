@@ -194,6 +194,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                         </div>
 
                         <ApiCollectionListItemDropDownMenu
+                            apiCollectionId={apiCollection.id!}
                             onDeleteClick={() => setShowDeleteDialog(true)}
                             onEditClick={() => setShowEditDialog(true)}
                             onNewEndpoint={() => setShowApiEndpointDialog(true)}
