@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * A category of unified API.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:10.068478+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public enum UnifiedApiCategoryModel {
   
   ACCOUNTING("ACCOUNTING"),

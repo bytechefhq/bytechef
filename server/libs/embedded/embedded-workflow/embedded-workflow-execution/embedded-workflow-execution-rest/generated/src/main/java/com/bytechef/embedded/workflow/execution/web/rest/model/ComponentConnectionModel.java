@@ -1,4 +1,4 @@
-package com.bytechef.embedded.configuration.web.rest.model;
+package com.bytechef.embedded.workflow.execution.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -16,12 +16,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * WorkflowConnectionModel
+ * ComponentConnectionModel
  */
 
-@JsonTypeName("workflow_connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2024-08-25T08:26:29.699895+02:00[Europe/Zagreb]", comments = "Generator version: 7.8.0")
-public class WorkflowConnectionModel {
+@JsonTypeName("ComponentConnection")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.580671+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+public class ComponentConnectionModel {
 
   private String componentName;
 
@@ -33,14 +33,14 @@ public class WorkflowConnectionModel {
 
   private String workflowNodeName;
 
-  public WorkflowConnectionModel() {
+  public ComponentConnectionModel() {
     super();
   }
 
   /**
    * Constructor with only required parameters
    */
-  public WorkflowConnectionModel(String componentName, Integer componentVersion, String key, Boolean required, String workflowNodeName) {
+  public ComponentConnectionModel(String componentName, Integer componentVersion, String key, Boolean required, String workflowNodeName) {
     this.componentName = componentName;
     this.componentVersion = componentVersion;
     this.key = key;
@@ -48,7 +48,7 @@ public class WorkflowConnectionModel {
     this.workflowNodeName = workflowNodeName;
   }
 
-  public WorkflowConnectionModel componentName(String componentName) {
+  public ComponentConnectionModel componentName(String componentName) {
     this.componentName = componentName;
     return this;
   }
@@ -68,7 +68,7 @@ public class WorkflowConnectionModel {
     this.componentName = componentName;
   }
 
-  public WorkflowConnectionModel componentVersion(Integer componentVersion) {
+  public ComponentConnectionModel componentVersion(Integer componentVersion) {
     this.componentVersion = componentVersion;
     return this;
   }
@@ -88,7 +88,7 @@ public class WorkflowConnectionModel {
     this.componentVersion = componentVersion;
   }
 
-  public WorkflowConnectionModel key(String key) {
+  public ComponentConnectionModel key(String key) {
     this.key = key;
     return this;
   }
@@ -108,7 +108,7 @@ public class WorkflowConnectionModel {
     this.key = key;
   }
 
-  public WorkflowConnectionModel required(Boolean required) {
+  public ComponentConnectionModel required(Boolean required) {
     this.required = required;
     return this;
   }
@@ -128,7 +128,7 @@ public class WorkflowConnectionModel {
     this.required = required;
   }
 
-  public WorkflowConnectionModel workflowNodeName(String workflowNodeName) {
+  public ComponentConnectionModel workflowNodeName(String workflowNodeName) {
     this.workflowNodeName = workflowNodeName;
     return this;
   }
@@ -156,12 +156,12 @@ public class WorkflowConnectionModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    WorkflowConnectionModel workflowConnection = (WorkflowConnectionModel) o;
-    return Objects.equals(this.componentName, workflowConnection.componentName) &&
-        Objects.equals(this.componentVersion, workflowConnection.componentVersion) &&
-        Objects.equals(this.key, workflowConnection.key) &&
-        Objects.equals(this.required, workflowConnection.required) &&
-        Objects.equals(this.workflowNodeName, workflowConnection.workflowNodeName);
+    ComponentConnectionModel componentConnection = (ComponentConnectionModel) o;
+    return Objects.equals(this.componentName, componentConnection.componentName) &&
+        Objects.equals(this.componentVersion, componentConnection.componentVersion) &&
+        Objects.equals(this.key, componentConnection.key) &&
+        Objects.equals(this.required, componentConnection.required) &&
+        Objects.equals(this.workflowNodeName, componentConnection.workflowNodeName);
   }
 
   @Override
@@ -172,7 +172,7 @@ public class WorkflowConnectionModel {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class WorkflowConnectionModel {\n");
+    sb.append("class ComponentConnectionModel {\n");
     sb.append("    componentName: ").append(toIndentedString(componentName)).append("\n");
     sb.append("    componentVersion: ").append(toIndentedString(componentVersion)).append("\n");
     sb.append("    key: ").append(toIndentedString(key)).append("\n");

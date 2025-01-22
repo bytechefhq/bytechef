@@ -2,8 +2,8 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
 import com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -28,11 +28,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTask", description = "Represents a definition of a workflow task.")
 @JsonTypeName("WorkflowTask")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:10.068478+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class WorkflowTaskModel {
 
   @Valid
-  private List<@Valid WorkflowConnectionModel> connections = new ArrayList<>();
+  private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private String description;
 
@@ -77,12 +77,12 @@ public class WorkflowTaskModel {
     this.type = type;
   }
 
-  public WorkflowTaskModel connections(List<@Valid WorkflowConnectionModel> connections) {
+  public WorkflowTaskModel connections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public WorkflowTaskModel addConnectionsItem(WorkflowConnectionModel connectionsItem) {
+  public WorkflowTaskModel addConnectionsItem(ComponentConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -97,11 +97,11 @@ public class WorkflowTaskModel {
   @Valid 
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid WorkflowConnectionModel> getConnections() {
+  public List<@Valid ComponentConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
+  public void setConnections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
   }
 

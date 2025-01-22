@@ -22,6 +22,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationMo
 src/main/java/com/bytechef/platform/configuration/web/rest/model/AuthorizationTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/BooleanPropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentCategoryModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
@@ -68,7 +69,6 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowN
 src/main/java/com/bytechef/platform/configuration/web/rest/model/UpdateWorkflowNodeParameterRequestModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ValuePropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowBasicModel.java
-src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowFormatModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowInputModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/WorkflowModel.java

@@ -10,6 +10,7 @@ src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationInstanceCo
 src/main/java/com/bytechef/embedded/configuration/web/rest/IntegrationTagApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/WorkflowApi.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/AppEventModel.java
+src/main/java/com/bytechef/embedded/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/CreateIntegrationInstanceConfigurationWorkflowJob200ResponseModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/EnvironmentModel.java
 src/main/java/com/bytechef/embedded/configuration/web/rest/model/IntegrationBasicModel.java

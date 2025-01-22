@@ -2,7 +2,7 @@ package com.bytechef.platform.configuration.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
-import com.bytechef.platform.configuration.web.rest.model.WorkflowConnectionModel;
+import com.bytechef.platform.configuration.web.rest.model.ComponentConnectionModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -27,11 +27,11 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTrigger", description = "Represents a definition of a workflow trigger.")
 @JsonTypeName("WorkflowTrigger")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:10.068478+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class WorkflowTriggerModel {
 
   @Valid
-  private List<@Valid WorkflowConnectionModel> connections = new ArrayList<>();
+  private List<@Valid ComponentConnectionModel> connections = new ArrayList<>();
 
   private String description;
 
@@ -61,12 +61,12 @@ public class WorkflowTriggerModel {
     this.type = type;
   }
 
-  public WorkflowTriggerModel connections(List<@Valid WorkflowConnectionModel> connections) {
+  public WorkflowTriggerModel connections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
     return this;
   }
 
-  public WorkflowTriggerModel addConnectionsItem(WorkflowConnectionModel connectionsItem) {
+  public WorkflowTriggerModel addConnectionsItem(ComponentConnectionModel connectionsItem) {
     if (this.connections == null) {
       this.connections = new ArrayList<>();
     }
@@ -81,11 +81,11 @@ public class WorkflowTriggerModel {
   @Valid 
   @Schema(name = "connections", accessMode = Schema.AccessMode.READ_ONLY, requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("connections")
-  public List<@Valid WorkflowConnectionModel> getConnections() {
+  public List<@Valid ComponentConnectionModel> getConnections() {
     return connections;
   }
 
-  public void setConnections(List<@Valid WorkflowConnectionModel> connections) {
+  public void setConnections(List<@Valid ComponentConnectionModel> connections) {
     this.connections = connections;
   }
 
