@@ -88,6 +88,16 @@ const platformSettingsRoutes = {
     children: [
         {
             element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <AiProviders />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'ai-providers',
+        },
+        {
+            element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
                     <EEVersion>
                         <CustomComponents />
@@ -114,20 +124,14 @@ const platformSettingsRoutes = {
             ),
             path: 'api-keys',
         },
-        {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <AiProviders />
-                    </EEVersion>
-                </PrivateRoute>
-            ),
-            path: 'ai-providers',
-        },
     ],
     navItems: [
         {
             title: 'Organization',
+        },
+        {
+            href: 'ai-providers',
+            title: 'AI Providers',
         },
         {
             href: 'custom-components',
@@ -140,10 +144,6 @@ const platformSettingsRoutes = {
         {
             href: 'api-keys',
             title: 'API Keys',
-        },
-        {
-            href: 'ai-providers',
-            title: 'AI Providers',
         },
     ],
 };
