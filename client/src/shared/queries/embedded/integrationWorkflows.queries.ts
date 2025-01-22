@@ -14,7 +14,7 @@ export const IntegrationWorkflowKeys = {
     integrationWorkflow: (integrationId: number, integrationWorkflowId: number) => [
         ...IntegrationKeys.integrations,
         integrationId,
-        'projectWorkflows',
+        'integrationWorkflows',
         integrationWorkflowId,
     ],
     integrationWorkflows: (id: number) => [...IntegrationKeys.integrations, id, 'integrationWorkflows'],
