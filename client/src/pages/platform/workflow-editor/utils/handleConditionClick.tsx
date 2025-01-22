@@ -14,7 +14,6 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
-    currentNode?: NodeDataType;
     edge?: boolean;
     getNodes: () => Array<Node>;
     queryClient: QueryClient;
@@ -25,7 +24,6 @@ interface HandleConditionClickProps {
 
 export default async function handleConditionClick({
     clickedItem,
-    currentNode,
     edge,
     getNodes,
     queryClient,

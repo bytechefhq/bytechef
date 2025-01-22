@@ -13,7 +13,6 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 
 interface HandleConditionChildOperationClickProps {
     conditionId: string;
-    currentNode?: NodeDataType;
     nodes: Array<Node>;
     operation: ClickedOperationType;
     operationDefinition: ActionDefinition;
@@ -25,7 +24,6 @@ interface HandleConditionChildOperationClickProps {
 
 export default function handleConditionChildOperationClick({
     conditionId,
-    currentNode,
     nodes,
     operation,
     operationDefinition,

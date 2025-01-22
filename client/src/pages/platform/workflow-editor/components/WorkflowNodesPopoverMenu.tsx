@@ -9,7 +9,6 @@ import {twMerge} from 'tailwind-merge';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
-import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import handleConditionClick from '../utils/handleConditionClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
@@ -40,7 +39,6 @@ const WorkflowNodesPopoverMenu = ({
     const [trigger, setTrigger] = useState(false);
 
     const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
-    const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {getNodes} = useReactFlow();
 
@@ -62,7 +60,6 @@ const WorkflowNodesPopoverMenu = ({
             if (clickedItem.name.includes('condition')) {
                 await handleConditionClick({
                     clickedItem,
-                    currentNode,
                     edge,
                     getNodes,
                     queryClient,
