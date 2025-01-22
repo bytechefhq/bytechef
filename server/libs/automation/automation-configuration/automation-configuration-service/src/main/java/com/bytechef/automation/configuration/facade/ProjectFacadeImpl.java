@@ -198,20 +198,22 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 
-        final Project newProject = new Project();
+        Project newProject = new Project();
 
         newProject.setName(generateName(project.getName()));
         newProject.setTagIds(project.getTagIds());
+        newProject.setWorkspaceId(project.getWorkspaceId());
 
         List<String> workflowIds = copyWorkflowIds(
             projectWorkflowService.getWorkflowIds(project.getId(), project.getLastProjectVersion()));
 
+        newProject = projectService.create(newProject);
+
         for (String workflowId : workflowIds) {
-            projectWorkflowService.addWorkflow(
-                newProject.getId(), newProject.getLastProjectVersion(), workflowId);
+            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastProjectVersion(), workflowId);
         }
 
-        return toProjectDTO(projectService.create(newProject));
+        return toProjectDTO(newProject);
     }
 
     @Override
