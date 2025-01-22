@@ -10,6 +10,7 @@ apis/index.ts
 index.ts
 models/AppEvent.ts
 models/Category.ts
+models/ComponentConnection.ts
 models/CreateIntegrationInstanceConfigurationWorkflowJob200Response.ts
 models/DataStreamComponent.ts
 models/Environment.ts
@@ -32,7 +33,6 @@ models/Workflow.ts
 models/Workflow1.ts
 models/WorkflowBasic.ts
 models/WorkflowBasic1.ts
-models/WorkflowConnection.ts
 models/WorkflowFormat.ts
 models/WorkflowInput.ts
 models/WorkflowOutput.ts

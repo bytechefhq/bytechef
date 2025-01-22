@@ -2,6 +2,7 @@ apis/JobApi.ts
 apis/TriggerExecutionApi.ts
 apis/index.ts
 index.ts
+models/ComponentConnection.ts
 models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
@@ -12,7 +13,6 @@ models/TaskExecution.ts
 models/TriggerExecution.ts
 models/Webhook.ts
 models/WebhookRetry.ts
-models/WorkflowConnection.ts
 models/WorkflowTask.ts
 models/WorkflowTrigger.ts
 models/index.ts

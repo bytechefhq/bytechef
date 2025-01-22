@@ -21,6 +21,7 @@ models/Authorization.ts
 models/AuthorizationType.ts
 models/BooleanProperty.ts
 models/ComponentCategory.ts
+models/ComponentConnection.ts
 models/ComponentDefinition.ts
 models/ComponentDefinitionBasic.ts
 models/ConnectionDefinition.ts
@@ -68,7 +69,6 @@ models/UpdateWorkflowNodeParameterRequest.ts
 models/ValueProperty.ts
 models/Workflow.ts
 models/WorkflowBasic.ts
-models/WorkflowConnection.ts
 models/WorkflowFormat.ts
 models/WorkflowInput.ts
 models/WorkflowNodeOutput.ts

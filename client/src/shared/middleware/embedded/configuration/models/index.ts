@@ -2,6 +2,7 @@
 /* eslint-disable */
 export * from './AppEvent';
 export * from './Category';
+export * from './ComponentConnection';
 export * from './CreateIntegrationInstanceConfigurationWorkflowJob200Response';
 export * from './DataStreamComponent';
 export * from './Environment';
@@ -24,7 +25,6 @@ export * from './Workflow';
 export * from './Workflow1';
 export * from './WorkflowBasic';
 export * from './WorkflowBasic1';
-export * from './WorkflowConnection';
 export * from './WorkflowFormat';
 export * from './WorkflowInput';
 export * from './WorkflowOutput';

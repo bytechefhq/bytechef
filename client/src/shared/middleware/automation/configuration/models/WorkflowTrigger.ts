@@ -13,13 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
-import type { WorkflowConnection } from './WorkflowConnection';
+import type { ComponentConnection } from './ComponentConnection';
 import {
-    WorkflowConnectionFromJSON,
-    WorkflowConnectionFromJSONTyped,
-    WorkflowConnectionToJSON,
-    WorkflowConnectionToJSONTyped,
-} from './WorkflowConnection';
+    ComponentConnectionFromJSON,
+    ComponentConnectionFromJSONTyped,
+    ComponentConnectionToJSON,
+    ComponentConnectionToJSONTyped,
+} from './ComponentConnection';
 
 /**
  * Represents a definition of a workflow trigger.
@@ -29,10 +29,10 @@ import {
 export interface WorkflowTrigger {
     /**
      * 
-     * @type {Array<WorkflowConnection>}
+     * @type {Array<ComponentConnection>}
      * @memberof WorkflowTrigger
      */
-    readonly connections?: Array<WorkflowConnection>;
+    readonly connections?: Array<ComponentConnection>;
     /**
      * The description of the task.
      * @type {string}
@@ -96,7 +96,7 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
     }
     return {
         
-        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionFromJSON)),
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'label': json['label'] == null ? undefined : json['label'],
         'metadata': json['metadata'] == null ? undefined : json['metadata'],

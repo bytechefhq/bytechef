@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ComponentConnection } from './ComponentConnection';
+import {
+    ComponentConnectionFromJSON,
+    ComponentConnectionFromJSONTyped,
+    ComponentConnectionToJSON,
+    ComponentConnectionToJSONTyped,
+} from './ComponentConnection';
 import type { DataStreamComponent } from './DataStreamComponent';
 import {
     DataStreamComponentFromJSON,
@@ -20,13 +27,6 @@ import {
     DataStreamComponentToJSON,
     DataStreamComponentToJSONTyped,
 } from './DataStreamComponent';
-import type { WorkflowConnection } from './WorkflowConnection';
-import {
-    WorkflowConnectionFromJSON,
-    WorkflowConnectionFromJSONTyped,
-    WorkflowConnectionToJSON,
-    WorkflowConnectionToJSONTyped,
-} from './WorkflowConnection';
 
 /**
  * Represents a definition of a workflow task.
@@ -36,10 +36,10 @@ import {
 export interface WorkflowTask {
     /**
      * 
-     * @type {Array<WorkflowConnection>}
+     * @type {Array<ComponentConnection>}
      * @memberof WorkflowTask
      */
-    readonly connections?: Array<WorkflowConnection>;
+    readonly connections?: Array<ComponentConnection>;
     /**
      * The description of the task.
      * @type {string}
@@ -139,7 +139,7 @@ export function WorkflowTaskFromJSONTyped(json: any, ignoreDiscriminator: boolea
     }
     return {
         
-        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(WorkflowConnectionFromJSON)),
+        'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'destination': json['destination'] == null ? undefined : DataStreamComponentFromJSON(json['destination']),
         'finalize': json['finalize'] == null ? undefined : ((json['finalize'] as Array<any>).map(WorkflowTaskFromJSON)),

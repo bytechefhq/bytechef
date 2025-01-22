@@ -1,6 +1,7 @@
 apis/WorkflowExecutionApi.ts
 apis/index.ts
 index.ts
+models/ComponentConnection.ts
 models/DataStreamComponent.ts
 models/Environment.ts
 models/ExecutionError.ts
@@ -21,7 +22,6 @@ models/Webhook.ts
 models/WebhookRetry.ts
 models/WorkflowBasic.ts
 models/WorkflowBasic1.ts
-models/WorkflowConnection.ts
 models/WorkflowExecution.ts
 models/WorkflowExecutionBasic.ts
 models/WorkflowTask.ts

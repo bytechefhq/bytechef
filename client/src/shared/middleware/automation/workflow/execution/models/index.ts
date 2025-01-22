@@ -1,5 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
+export * from './ComponentConnection';
 export * from './DataStreamComponent';
 export * from './Environment';
 export * from './ExecutionError';
@@ -15,7 +16,6 @@ export * from './Webhook';
 export * from './WebhookRetry';
 export * from './WorkflowBasic';
 export * from './WorkflowBasic1';
-export * from './WorkflowConnection';
 export * from './WorkflowExecution';
 export * from './WorkflowExecutionBasic';
 export * from './WorkflowTask';

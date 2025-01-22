@@ -1,6 +1,7 @@
 apis/WorkflowTestApi.ts
 apis/index.ts
 index.ts
+models/ComponentConnection.ts
 models/DataStreamComponent.ts
 models/ExecutionError.ts
 models/Job.ts
@@ -9,7 +10,6 @@ models/TestWorkflowRequest.ts
 models/TriggerExecution.ts
 models/Webhook.ts
 models/WebhookRetry.ts
-models/WorkflowConnection.ts
 models/WorkflowTask.ts
 models/WorkflowTestExecution.ts
 models/WorkflowTrigger.ts
