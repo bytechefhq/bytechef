@@ -15,11 +15,11 @@ import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-co
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
+    ComponentConnection,
     Environment,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
-    WorkflowConnection,
 } from '@/shared/middleware/embedded/configuration';
 import {AuthorizationType} from '@/shared/middleware/platform/configuration';
 import {
@@ -281,26 +281,26 @@ const IntegrationInstanceConfigurationDialog = ({
                 let newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
                     [];
 
-                const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+                const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
                     .flatMap((task) => task.connections ?? [])
                     .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
                     .filter((connection) => connection.componentName !== integration?.componentName);
 
-                for (const workflowConnection of workflowConnections) {
+                for (const componentConnection of componentConnections) {
                     const integrationInstanceConfigurationWorkflowConnection =
                         integrationInstanceConfigurationWorkflow?.connections?.find(
                             (integrationInstanceConfigurationWorkflowConnection) =>
                                 integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
-                                    workflowConnection.workflowNodeName &&
-                                integrationInstanceConfigurationWorkflowConnection.key === workflowConnection.key
+                                    componentConnection.workflowNodeName &&
+                                integrationInstanceConfigurationWorkflowConnection.key === componentConnection.key
                         );
 
                     newIntegrationInstanceConfigurationWorkflowConnections = [
                         ...newIntegrationInstanceConfigurationWorkflowConnections,
                         integrationInstanceConfigurationWorkflowConnection ??
                             ({
-                                key: workflowConnection.key,
-                                workflowNodeName: workflowConnection.workflowNodeName,
+                                key: componentConnection.key,
+                                workflowNodeName: componentConnection.workflowNodeName,
                             } as IntegrationInstanceConfigurationWorkflowConnection),
                     ];
                 }

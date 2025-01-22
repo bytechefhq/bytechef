@@ -4,7 +4,7 @@ import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {Workflow} from '@/shared/middleware/automation/configuration';
-import {IntegrationInstanceConfiguration, WorkflowConnection} from '@/shared/middleware/embedded/configuration';
+import {ComponentConnection, IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {useEffect} from 'react';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
@@ -36,7 +36,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+    const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
         .filter((connection) => connection.componentName !== componentName);
@@ -95,8 +95,8 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
                         <Label className="font-semibold">Connections</Label>
 
                         <IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections
+                            componentConnections={componentConnections}
                             control={control}
-                            workflowConnections={workflowConnections}
                             workflowIndex={workflowIndex}
                         />
                     </div>

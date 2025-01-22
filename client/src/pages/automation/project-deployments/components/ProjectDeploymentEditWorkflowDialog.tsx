@@ -3,11 +3,11 @@ import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTi
 import {Form} from '@/components/ui/form';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import {
+    ComponentConnection,
     ProjectDeployment,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
     Workflow,
-    WorkflowConnection,
 } from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
@@ -69,11 +69,11 @@ const ProjectDeploymentEditWorkflowDialog = ({
     useEffect(() => {
         let newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] = [];
 
-        const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+        const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
             .flatMap((task) => task.connections ?? [])
             .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
-        for (const workflowConnection of workflowConnections) {
+        for (const workflowConnection of componentConnections) {
             let projectDeploymentWorkflowConnection = projectDeploymentWorkflow?.connections?.find(
                 (projectDeploymentWorkflowConnection) =>
                     projectDeploymentWorkflowConnection.workflowNodeName === workflowConnection.workflowNodeName &&

@@ -16,8 +16,8 @@ import ConnectionDialog from '@/pages/platform/connection/components/ConnectionD
 import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
 import {
+    ComponentConnection,
     Workflow,
-    WorkflowConnection,
     WorkflowInput,
     WorkflowTestConfiguration,
     WorkflowTestConfigurationConnection,
@@ -40,23 +40,23 @@ interface WorkflowTestConfigurationDialogProps {
 }
 
 const WorkflowTestConfigurationFormField = ({
+    componentConnection,
     connections,
     form,
     index,
+    setComponentConnection,
     setShowNewConnectionDialog,
-    setWorkflowConnection,
-    workflowConnection,
 }: {
     connections: ConnectionI[];
     form: UseFormReturn<WorkflowTestConfiguration>;
     index: number;
-    workflowConnection: WorkflowConnection;
+    componentConnection: ComponentConnection;
     setShowNewConnectionDialog: Dispatch<SetStateAction<boolean>>;
-    setWorkflowConnection: Dispatch<SetStateAction<WorkflowConnection | undefined>>;
+    setComponentConnection: Dispatch<SetStateAction<ComponentConnection | undefined>>;
 }) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     return (
@@ -75,7 +75,7 @@ const WorkflowTestConfigurationFormField = ({
                                 <span className="ml-1">{componentDefinition?.title} Connection</span>
 
                                 <span className="ml-0.5 text-xs text-gray-500">
-                                    {`(${workflowConnection.workflowNodeName})`}
+                                    {`(${componentConnection.workflowNodeName})`}
                                 </span>
                             </FormLabel>
 
@@ -92,7 +92,7 @@ const WorkflowTestConfigurationFormField = ({
                                         <Button
                                             className="mt-auto p-2"
                                             onClick={() => {
-                                                setWorkflowConnection(workflowConnection);
+                                                setComponentConnection(componentConnection);
                                                 setShowNewConnectionDialog(true);
                                             }}
                                             title="Create a new connection"
@@ -109,7 +109,7 @@ const WorkflowTestConfigurationFormField = ({
                                         connections
                                             .filter(
                                                 (connection) =>
-                                                    connection.componentName === workflowConnection.componentName
+                                                    connection.componentName === componentConnection.componentName
                                             )
                                             .map((connection) => (
                                                 <SelectItem key={connection.id} value={connection.id!.toString()}>
@@ -132,7 +132,7 @@ const WorkflowTestConfigurationFormField = ({
                     );
                 }}
                 rules={{
-                    required: workflowConnection.required,
+                    required: componentConnection.required,
                 }}
             />
         </div>
@@ -145,28 +145,28 @@ const WorkflowTestConfigurationDialog = ({
     workflowTestConfiguration,
 }: WorkflowTestConfigurationDialogProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
-    const [workflowConnection, setWorkflowConnection] = useState<WorkflowConnection | undefined>();
+    const [componentConnection, setComponentConnection] = useState<ComponentConnection | undefined>();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery, useGetConnectionsQuery} =
         useConnectionQuery();
 
-    const workflowConnections: WorkflowConnection[] = [
+    const componentConnections: ComponentConnection[] = [
         ...(workflow?.triggers ?? []),
         ...(workflow?.tasks ?? []),
     ].flatMap((operation) => (operation.connections ? operation.connections : []));
 
-    const workflowTestConfigurationConnections = workflowConnections.map((workflowConnection) => {
+    const workflowTestConfigurationConnections = componentConnections.map((componentConnection) => {
         const workflowTestConfigurationConnection = (workflowTestConfiguration?.connections ?? []).find(
             (curWorkflowTestConfigurationConfiguration) =>
-                curWorkflowTestConfigurationConfiguration.workflowNodeName === workflowConnection.workflowNodeName &&
-                curWorkflowTestConfigurationConfiguration.workflowConnectionKey === workflowConnection.key
+                curWorkflowTestConfigurationConfiguration.workflowNodeName === componentConnection.workflowNodeName &&
+                curWorkflowTestConfigurationConfiguration.workflowConnectionKey === componentConnection.key
         );
 
         return (
             workflowTestConfigurationConnection ??
             ({
-                workflowConnectionKey: workflowConnection.key,
-                workflowNodeName: workflowConnection.workflowNodeName,
+                workflowConnectionKey: componentConnection.key,
+                workflowNodeName: componentConnection.workflowNodeName,
             } as WorkflowTestConfigurationConnection)
         );
     });
@@ -187,10 +187,10 @@ const WorkflowTestConfigurationDialog = ({
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: componentDefinition} = useGetComponentDefinitionQuery(
         {
-            componentName: workflowConnection?.componentName!,
-            componentVersion: workflowConnection?.componentVersion!,
+            componentName: componentConnection?.componentName!,
+            componentVersion: componentConnection?.componentVersion!,
         },
-        !!workflowConnection
+        !!componentConnection
     );
 
     const queryClient = useQueryClient();
@@ -266,24 +266,24 @@ const WorkflowTestConfigurationDialog = ({
                                     </div>
                                 )}
 
-                                {workflowConnections && workflowConnections.length > 0 && (
+                                {componentConnections && componentConnections.length > 0 && (
                                     <div className="space-y-2">
                                         <Label className="text-gray-500">Connections</Label>
 
                                         <div className="space-y-4">
-                                            {workflowConnections.map(
+                                            {componentConnections.map(
                                                 (workflowConnection, index) =>
                                                     connections && (
                                                         <WorkflowTestConfigurationFormField
+                                                            componentConnection={workflowConnection}
                                                             connections={connections}
                                                             form={form}
                                                             index={index}
                                                             key={`${workflowConnection.workflowNodeName}_${
                                                                 workflowConnection.key
                                                             }`}
+                                                            setComponentConnection={setComponentConnection}
                                                             setShowNewConnectionDialog={setShowNewConnectionDialog}
-                                                            setWorkflowConnection={setWorkflowConnection}
-                                                            workflowConnection={workflowConnection}
                                                         />
                                                     )
                                             )}

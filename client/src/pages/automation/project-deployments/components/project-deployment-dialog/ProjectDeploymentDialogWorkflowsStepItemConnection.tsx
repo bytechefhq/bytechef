@@ -4,7 +4,7 @@ import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessag
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ProjectDeployment, WorkflowConnection} from '@/shared/middleware/automation/configuration';
+import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
     ConnectionKeys,
@@ -20,15 +20,15 @@ import InlineSVG from 'react-inlinesvg';
 
 export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
     control: Control<ProjectDeployment>;
-    workflowConnection: WorkflowConnection;
-    workflowConnectionIndex: number;
+    componentConnection: ComponentConnection;
+    componentConnectionIndex: number;
     workflowIndex: number;
 }
 
 const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
+    componentConnection,
+    componentConnectionIndex,
     control,
-    workflowConnection,
-    workflowConnectionIndex,
     workflowIndex,
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
@@ -36,13 +36,13 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     const {currentWorkspaceId} = useWorkspaceStore();
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     const {data: connections} = useGetWorkspaceConnectionsQuery(
         {
-            componentName: workflowConnection.componentName,
+            componentName: componentConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
             id: currentWorkspaceId!,
         },
@@ -53,7 +53,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
         <>
             <FormField
                 control={control}
-                name={`projectDeploymentWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
+                name={`projectDeploymentWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
                 render={({field}) => (
                     <FormItem>
                         <FormLabel className="flex items-center">
@@ -64,7 +64,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                             <span className="ml-1">{componentDefinition?.title} Connection</span>
 
                             <span className="ml-0.5 text-xs text-gray-500">
-                                {`(${workflowConnection.workflowNodeName})`}
+                                {`(${componentConnection.workflowNodeName})`}
                             </span>
                         </FormLabel>
 
@@ -108,7 +108,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                         <FormDescription>
                             {`Choose connection for the ${componentDefinition?.title}`}
 
-                            <span className="text-xs text-gray-500">({workflowConnection.key})</span>
+                            <span className="text-xs text-gray-500">({componentConnection.key})</span>
 
                             {` component.`}
                         </FormDescription>
@@ -116,7 +116,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
                         <FormMessage />
                     </FormItem>
                 )}
-                rules={{required: workflowConnection.required}}
+                rules={{required: componentConnection.required}}
             />
             {showNewConnectionDialog && (
                 <Portal.Root>

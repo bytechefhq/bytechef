@@ -3,7 +3,7 @@ import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
-import {WorkflowConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
@@ -12,13 +12,13 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 
 export interface PropertyCodeEditorSheetRightPanelConnectionsSelectProps {
-    workflowConnection: WorkflowConnection;
+    componentConnection: ComponentConnection;
     workflowId: string;
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnection;
 }
 const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
-    workflowConnection,
+    componentConnection,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnection,
@@ -35,8 +35,8 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
     }
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
@@ -72,8 +72,8 @@ const PropertyCodeEditorSheetRightPanelConnectionsSelect = ({
     return (
         <>
             <Select
-                onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
-                required={workflowConnection.required}
+                onValueChange={(value) => handleValueChange(+value, componentConnection.key)}
+                required={componentConnection.required}
                 value={connectionId ? connectionId.toString() : undefined}
             >
                 <div className="flex space-x-2">

@@ -180,8 +180,8 @@ const PropertyCodeEditorSheet = ({
 
                         <div className="flex border-l border-l-border/50">
                             <PropertyCodeEditorSheetRightPanel
+                                componentConnections={currentWorkflowTask?.connections || []}
                                 workflow={workflow}
-                                workflowConnections={currentWorkflowTask?.connections || []}
                                 workflowNodeName={workflowNodeName}
                             />
                         </div>

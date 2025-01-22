@@ -3,7 +3,7 @@ import {Switch} from '@/components/ui/switch';
 import ProjectDeploymentDialogWorkflowsStepItemConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemConnections';
 import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
-import {ProjectDeployment, Workflow, WorkflowConnection} from '@/shared/middleware/automation/configuration';
+import {ComponentConnection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
 import {FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
@@ -32,7 +32,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+    const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
         .flatMap((task) => task.connections ?? [])
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
@@ -84,8 +84,8 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         <Label className="font-semibold">Connections</Label>
 
                         <ProjectDeploymentDialogWorkflowsStepItemConnections
+                            componentConnections={componentConnections}
                             control={control}
-                            workflowConnections={workflowConnections}
                             workflowIndex={workflowIndex}
                         />
                     </div>

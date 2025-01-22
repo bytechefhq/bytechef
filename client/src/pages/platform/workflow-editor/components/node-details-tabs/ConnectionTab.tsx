@@ -2,8 +2,8 @@ import {Button} from '@/components/ui/button';
 import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import ConnectionTabConnectionSelect from '@/pages/platform/workflow-editor/components/node-details-tabs/ConnectionTabConnectionSelect';
 import {
+    ComponentConnection,
     ComponentDefinition,
-    WorkflowConnection,
     WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -14,14 +14,14 @@ import ConnectionDialog from 'pages/platform/connection/components/ConnectionDia
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
 const ConnectionTab = ({
+    componentConnections,
     componentDefinition,
-    workflowConnections,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnections,
 }: {
     componentDefinition: ComponentDefinition;
-    workflowConnections: WorkflowConnection[];
+    componentConnections: ComponentConnection[];
     workflowNodeName: string;
     workflowId: string;
     workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
@@ -32,22 +32,22 @@ const ConnectionTab = ({
 
     return (
         <div className="flex h-full flex-col gap-6 overflow-auto p-4">
-            {workflowConnections?.length ? (
-                workflowConnections.map((workflowConnection) => {
+            {componentConnections?.length ? (
+                componentConnections.map((componentConnection) => {
                     const workflowTestConfigurationConnection =
                         workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0
                             ? workflowTestConfigurationConnections.filter(
                                   (workflowTestConfigurationConnection) =>
                                       workflowTestConfigurationConnection.workflowConnectionKey ===
-                                      workflowConnection.key
+                                      componentConnection.key
                               )[0]
                             : undefined;
 
                     return (
-                        <fieldset className="space-y-2" key={workflowConnection.key}>
+                        <fieldset className="space-y-2" key={componentConnection.key}>
                             <ConnectionTabConnectionSelect
-                                workflowConnection={workflowConnection}
-                                workflowConnectionsCount={workflowConnections.length}
+                                componentConnection={componentConnection}
+                                componentConnectionsCount={componentConnections.length}
                                 workflowId={workflowId}
                                 workflowNodeName={workflowNodeName}
                                 workflowTestConfigurationConnection={workflowTestConfigurationConnection}

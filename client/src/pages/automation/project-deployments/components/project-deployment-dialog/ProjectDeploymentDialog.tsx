@@ -14,11 +14,11 @@ import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/s
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
+    ComponentConnection,
     Environment,
     ProjectDeployment,
     ProjectDeploymentWorkflow,
     ProjectDeploymentWorkflowConnection,
-    WorkflowConnection,
 } from '@/shared/middleware/automation/configuration';
 import {
     useCreateProjectDeploymentMutation,
@@ -221,24 +221,24 @@ const ProjectDeploymentDialog = ({
 
                 let newProjectDeploymentWorkflowConnections: ProjectDeploymentWorkflowConnection[] = [];
 
-                const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+                const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
                     .flatMap((task) => task.connections ?? [])
                     .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []));
 
-                for (const workflowConnection of workflowConnections) {
+                for (const componentConnection of componentConnections) {
                     const projectDeploymentWorkflowConnection = projectDeploymentWorkflow?.connections?.find(
                         (projectDeploymentWorkflowConnection) =>
                             projectDeploymentWorkflowConnection.workflowNodeName ===
-                                workflowConnection.workflowNodeName &&
-                            projectDeploymentWorkflowConnection.key === workflowConnection.key
+                                componentConnection.workflowNodeName &&
+                            projectDeploymentWorkflowConnection.key === componentConnection.key
                     );
 
                     newProjectDeploymentWorkflowConnections = [
                         ...newProjectDeploymentWorkflowConnections,
                         projectDeploymentWorkflowConnection ??
                             ({
-                                key: workflowConnection.key,
-                                workflowNodeName: workflowConnection.workflowNodeName,
+                                key: componentConnection.key,
+                                workflowNodeName: componentConnection.workflowNodeName,
                             } as ProjectDeploymentWorkflowConnection),
                     ];
                 }

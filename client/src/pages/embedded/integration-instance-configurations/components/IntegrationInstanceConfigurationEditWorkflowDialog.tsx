@@ -3,10 +3,10 @@ import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTi
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItem from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItem';
 import {
+    ComponentConnection,
     IntegrationInstanceConfiguration,
     IntegrationInstanceConfigurationWorkflow,
     IntegrationInstanceConfigurationWorkflowConnection,
-    WorkflowConnection,
 } from '@/shared/middleware/embedded/configuration';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {useUpdateIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/mutations/embedded/integrationInstanceConfigurations.mutations';
@@ -75,26 +75,26 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
         let newIntegrationInstanceConfigurationWorkflowConnections: IntegrationInstanceConfigurationWorkflowConnection[] =
             [];
 
-        const workflowConnections: WorkflowConnection[] = (workflow?.tasks ?? [])
+        const componentConnections: ComponentConnection[] = (workflow?.tasks ?? [])
             .flatMap((task) => task.connections ?? [])
             .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
             .filter((connection) => connection.componentName !== componentName);
 
-        for (const workflowConnection of workflowConnections) {
+        for (const componentConnection of componentConnections) {
             let integrationInstanceConfigurationWorkflowConnection =
                 integrationInstanceConfigurationWorkflow?.connections?.find(
                     (integrationInstanceConfigurationWorkflowConnection) =>
                         integrationInstanceConfigurationWorkflowConnection.workflowNodeName ===
-                            workflowConnection.workflowNodeName &&
-                        integrationInstanceConfigurationWorkflowConnection.key === workflowConnection.key
+                            componentConnection.workflowNodeName &&
+                        integrationInstanceConfigurationWorkflowConnection.key === componentConnection.key
                 );
 
             if (!integrationInstanceConfigurationWorkflowConnection) {
                 integrationInstanceConfigurationWorkflowConnection = {
                     /* eslint-disable @typescript-eslint/no-explicit-any */
                     connectionId: undefined as any,
-                    key: workflowConnection.key,
-                    workflowNodeName: workflowConnection.workflowNodeName,
+                    key: componentConnection.key,
+                    workflowNodeName: componentConnection.workflowNodeName,
                 };
             }
 

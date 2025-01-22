@@ -4,7 +4,7 @@ import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessag
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
 import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
-import {WorkflowConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
@@ -20,27 +20,27 @@ import InlineSVG from 'react-inlinesvg';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps {
     control: Control<IntegrationInstanceConfiguration>;
-    workflowConnection: WorkflowConnection;
-    workflowConnectionIndex: number;
+    componentConnection: ComponentConnection;
+    componentConnectionIndex: number;
     workflowIndex: number;
 }
 
 const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
+    componentConnection,
+    componentConnectionIndex,
     control,
-    workflowConnection,
-    workflowConnectionIndex,
     workflowIndex,
 }: IntegrationInstanceConfigurationDialogWorkflowsStepItemConnectionProps) => {
     const [showNewConnectionDialog, setShowNewConnectionDialog] = useState(false);
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     const {data: connections} = useGetConnectionsQuery(
         {
-            componentName: workflowConnection.componentName,
+            componentName: componentConnection.componentName,
             connectionVersion: componentDefinition?.connection?.version,
         },
         !!componentDefinition
@@ -50,7 +50,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
         <>
             <FormField
                 control={control}
-                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.connectionId`}
+                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.connectionId`}
                 render={({field}) => (
                     <FormItem>
                         <FormLabel className="flex items-center">
@@ -61,7 +61,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                             <span className="ml-1">{componentDefinition?.title} Connection</span>
 
                             <span className="ml-0.5 text-xs text-gray-500">
-                                {`(${workflowConnection.workflowNodeName})`}
+                                {`(${componentConnection.workflowNodeName})`}
                             </span>
                         </FormLabel>
 
@@ -108,7 +108,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                         <FormDescription>
                             {`Choose connection for the ${componentDefinition?.title}`}
 
-                            <span className="text-xs text-gray-500">({workflowConnection.key})</span>
+                            <span className="text-xs text-gray-500">({componentConnection.key})</span>
 
                             {` component.`}
                         </FormDescription>
@@ -116,20 +116,20 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection = ({
                         <FormMessage />
                     </FormItem>
                 )}
-                rules={{required: workflowConnection.required}}
+                rules={{required: componentConnection.required}}
             />
 
             <FormField
                 control={control}
-                defaultValue={workflowConnection.key}
-                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.key`}
+                defaultValue={componentConnection.key}
+                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.key`}
                 render={({field}) => <input type="hidden" {...field} />}
             />
 
             <FormField
                 control={control}
-                defaultValue={workflowConnection.workflowNodeName}
-                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${workflowConnectionIndex}.workflowNodeName`}
+                defaultValue={componentConnection.workflowNodeName}
+                name={`integrationInstanceConfigurationWorkflows.${workflowIndex!}.connections.${componentConnectionIndex}.workflowNodeName`}
                 render={({field}) => <input type="hidden" {...field} />}
             />
 

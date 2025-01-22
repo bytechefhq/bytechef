@@ -2,20 +2,20 @@ import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {WorkflowConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 
 export interface PropertyCodeEditorSheetRightPanelConnectionsLabelProps {
     onRemoveClick: () => void;
-    workflowConnection: WorkflowConnection;
+    componentConnection: ComponentConnection;
 }
 const PropertyCodeEditorSheetRightPanelConnectionsLabel = ({
+    componentConnection,
     onRemoveClick,
-    workflowConnection,
 }: PropertyCodeEditorSheetRightPanelConnectionsLabelProps) => {
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     return (
@@ -25,13 +25,13 @@ const PropertyCodeEditorSheetRightPanelConnectionsLabel = ({
                     <Label>
                         <span>{componentDefinition?.title}</span>
 
-                        {workflowConnection.required && <RequiredMark />}
+                        {componentConnection.required && <RequiredMark />}
                     </Label>
                 )}
 
                 <Tooltip>
                     <TooltipTrigger>
-                        <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+                        <Label className="text-sm text-muted-foreground">{componentConnection.key}</Label>
                     </TooltipTrigger>
 
                     <TooltipContent>Workflow Connection Key</TooltipContent>

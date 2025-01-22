@@ -2,6 +2,7 @@ import {UpdateWorkflowRequestI} from '@/shared//mutations/platform/workflows.mut
 import {
     ArrayProperty,
     BooleanProperty,
+    ComponentConnection,
     ComponentDefinition,
     ComponentDefinitionBasic,
     ControlType,
@@ -20,7 +21,6 @@ import {
     TimeProperty,
     TriggerDefinition,
     ValueProperty,
-    WorkflowConnection,
 } from '@/shared/middleware/platform/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ReactNode} from 'react';
@@ -111,7 +111,7 @@ export type NodeDataType = {
         conditionId: string;
         index: number;
     };
-    connections?: Array<WorkflowConnection>;
+    connections?: Array<ComponentConnection>;
     conditionId?: string;
     connectionId?: number;
     description?: string;
@@ -167,7 +167,7 @@ export type WorkflowTaskType = {
             workflowNodeName: string;
         },
     ] & {
-        [key: string]: WorkflowConnectionType;
+        [key: string]: ComponentConnectionType;
     };
     finalize?: Array<WorkflowTaskType>;
     label?: string;
@@ -188,7 +188,7 @@ export type WorkflowTriggerType = {
     type: string;
 };
 
-export type WorkflowConnectionType = {
+export type ComponentConnectionType = {
     componentName: string;
     componentVersion: number;
 };

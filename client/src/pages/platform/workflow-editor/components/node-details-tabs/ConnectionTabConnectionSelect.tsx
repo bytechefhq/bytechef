@@ -7,7 +7,7 @@ import ConnectionDialog from '@/pages/platform/connection/components/ConnectionD
 import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
 import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {WorkflowConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useGetConnectionDefinitionQuery} from '@/shared/queries/platform/connectionDefinitions.queries';
@@ -20,14 +20,14 @@ import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ConnectionTabConnectionSelect = ({
-    workflowConnection,
-    workflowConnectionsCount,
+    componentConnection,
+    componentConnectionsCount,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnection,
 }: {
-    workflowConnection: WorkflowConnection;
-    workflowConnectionsCount: number;
+    componentConnection: ComponentConnection;
+    componentConnectionsCount: number;
     workflowId: string;
     workflowNodeName: string;
     workflowTestConfigurationConnection?: WorkflowTestConfigurationConnection;
@@ -47,13 +47,13 @@ const ConnectionTabConnectionSelect = ({
     }
 
     const {data: componentDefinition} = useGetComponentDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     const {data: connectionDefinition} = useGetConnectionDefinitionQuery({
-        componentName: workflowConnection.componentName,
-        componentVersion: workflowConnection.componentVersion,
+        componentName: componentConnection.componentName,
+        componentVersion: componentConnection.componentVersion,
     });
 
     const {data: componentConnections} = useGetConnectionsQuery!(
@@ -112,17 +112,17 @@ const ConnectionTabConnectionSelect = ({
                     <Label className="mb-2 font-normal">
                         {componentDefinition.title}
 
-                        {workflowConnection.required && <RequiredMark />}
+                        {componentConnection.required && <RequiredMark />}
                     </Label>
                 )}
 
-                {workflowConnectionsCount > 1 && (
-                    <Label className="text-sm text-muted-foreground">{workflowConnection.key}</Label>
+                {componentConnectionsCount > 1 && (
+                    <Label className="text-sm text-muted-foreground">{componentConnection.key}</Label>
                 )}
 
                 <Select
-                    onValueChange={(value) => handleValueChange(+value, workflowConnection.key)}
-                    required={workflowConnection.required}
+                    onValueChange={(value) => handleValueChange(+value, componentConnection.key)}
+                    required={componentConnection.required}
                     value={connectionId ? connectionId.toString() : undefined}
                 >
                     <div className="flex space-x-2">

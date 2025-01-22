@@ -9,7 +9,7 @@ import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
 import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
-import {Workflow, WorkflowConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {Cross2Icon} from '@radix-ui/react-icons';
@@ -20,11 +20,11 @@ import {z} from 'zod';
 const SPACE = 4;
 
 const PropertyCodeEditorSheetRightPanelConnections = ({
+    componentConnections,
     workflow,
-    workflowConnections,
     workflowNodeName,
 }: {
-    workflowConnections: WorkflowConnection[];
+    componentConnections: ComponentConnection[];
     workflow: Workflow;
     workflowNodeName: string;
 }) => {
@@ -134,9 +134,9 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                     <CardTitle>Connections</CardTitle>
                 </CardHeader>
 
-                {workflowConnections?.length ? (
+                {componentConnections?.length ? (
                     <>
-                        {workflowConnections.map((workflowConnection) => {
+                        {componentConnections.map((workflowConnection) => {
                             const workflowTestConfigurationConnection =
                                 workflowTestConfigurationConnections &&
                                 workflowTestConfigurationConnections.length > 0 &&
@@ -151,12 +151,12 @@ const PropertyCodeEditorSheetRightPanelConnections = ({
                             return (
                                 <fieldset className="space-y-2" key={workflowConnection.key}>
                                     <PropertyCodeEditorSheetRightPanelConnectionsLabel
+                                        componentConnection={workflowConnection}
                                         onRemoveClick={() => handleOnRemoveClick(workflowConnection.key)}
-                                        workflowConnection={workflowConnection}
                                     />
 
                                     <PropertyCodeEditorSheetRightPanelConnectionsSelect
-                                        workflowConnection={workflowConnection}
+                                        componentConnection={workflowConnection}
                                         workflowId={workflow.id!}
                                         workflowNodeName={workflowNodeName}
                                         workflowTestConfigurationConnection={workflowTestConfigurationConnection}

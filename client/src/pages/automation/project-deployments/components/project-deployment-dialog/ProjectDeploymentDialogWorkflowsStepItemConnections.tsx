@@ -1,24 +1,24 @@
 import ProjectDeploymentDialogWorkflowsStepItemConnection from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemConnection';
-import {ProjectDeployment, WorkflowConnection} from '@/shared/middleware/automation/configuration';
+import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {Control} from 'react-hook-form';
 
 const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
+    componentConnections,
     control,
-    workflowConnections,
     workflowIndex,
 }: {
     control: Control<ProjectDeployment>;
-    workflowConnections: WorkflowConnection[];
+    componentConnections: ComponentConnection[];
     workflowIndex: number;
 }) => {
-    return workflowConnections.length ? (
+    return componentConnections.length ? (
         <>
-            {workflowConnections.map((workflowConnection, workflowConnectionIndex) => (
+            {componentConnections.map((componentConnection, componentConnectionIndex) => (
                 <ProjectDeploymentDialogWorkflowsStepItemConnection
+                    componentConnection={componentConnection}
+                    componentConnectionIndex={componentConnectionIndex}
                     control={control}
-                    key={workflowConnectionIndex + '_' + workflowConnection.key}
-                    workflowConnection={workflowConnection}
-                    workflowConnectionIndex={workflowConnectionIndex}
+                    key={componentConnectionIndex + '_' + componentConnection.key}
                     workflowIndex={workflowIndex}
                 />
             ))}

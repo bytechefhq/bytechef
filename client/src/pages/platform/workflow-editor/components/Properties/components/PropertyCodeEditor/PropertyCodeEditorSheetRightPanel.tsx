@@ -1,16 +1,16 @@
 import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanelConnections';
 import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanelInputs';
-import {Workflow, WorkflowConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 
 interface PropertyCodeEditorSheetConnectionsSheetRightPanelProps {
-    workflowConnections: WorkflowConnection[];
+    componentConnections: ComponentConnection[];
     workflow: Workflow;
     workflowNodeName: string;
 }
 
 const PropertyCodeEditorSheetRightPanel = ({
+    componentConnections,
     workflow,
-    workflowConnections,
     workflowNodeName,
 }: PropertyCodeEditorSheetConnectionsSheetRightPanelProps) => {
     return (
@@ -23,8 +23,8 @@ const PropertyCodeEditorSheetRightPanel = ({
 
             <div className="flex-1">
                 <PropertyCodeEditorSheetRightPanelConnections
+                    componentConnections={componentConnections}
                     workflow={workflow}
-                    workflowConnections={workflowConnections}
                     workflowNodeName={workflowNodeName}
                 />
             </div>

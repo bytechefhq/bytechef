@@ -1,25 +1,25 @@
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection';
 import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
-import {WorkflowConnection} from '@/shared/middleware/platform/configuration';
+import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {Control} from 'react-hook-form';
 
 const IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections = ({
+    componentConnections,
     control,
-    workflowConnections,
     workflowIndex,
 }: {
     control: Control<IntegrationInstanceConfiguration>;
-    workflowConnections: WorkflowConnection[];
+    componentConnections: ComponentConnection[];
     workflowIndex: number;
 }) => {
-    return workflowConnections.length ? (
+    return componentConnections.length ? (
         <>
-            {workflowConnections.map((workflowConnection, workflowConnectionIndex) => (
+            {componentConnections.map((componentConnection, componentConnectionIndex) => (
                 <IntegrationInstanceConfigurationDialogWorkflowsStepItemConnection
+                    componentConnection={componentConnection}
+                    componentConnectionIndex={componentConnectionIndex}
                     control={control}
-                    key={workflowConnectionIndex + '_' + workflowConnection.key}
-                    workflowConnection={workflowConnection}
-                    workflowConnectionIndex={workflowConnectionIndex}
+                    key={componentConnectionIndex + '_' + componentConnection.key}
                     workflowIndex={workflowIndex}
                 />
             ))}

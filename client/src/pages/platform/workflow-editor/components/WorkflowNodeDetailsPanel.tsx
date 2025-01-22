@@ -8,12 +8,12 @@ import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {
     ActionDefinitionApi,
+    ComponentConnection,
     ComponentDefinition,
     ComponentDefinitionBasic,
     GetComponentActionDefinitionRequest,
     GetComponentTriggerDefinitionRequest,
     TriggerDefinitionApi,
-    WorkflowConnection,
     WorkflowNodeOutput,
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
@@ -215,7 +215,7 @@ const WorkflowNodeDetailsPanel = ({
         [workflow.tasks, currentNode]
     );
 
-    const componentConnections: WorkflowConnection[] = useMemo(
+    const componentConnections: ComponentConnection[] = useMemo(
         () => currentWorkflowTask?.connections || currentWorkflowTrigger?.connections || [],
         [currentWorkflowTask, currentWorkflowTrigger]
     );
@@ -694,9 +694,9 @@ const WorkflowNodeDetailsPanel = ({
                                     currentNode &&
                                     currentComponentDefinition && (
                                         <ConnectionTab
+                                            componentConnections={componentConnections}
                                             componentDefinition={currentComponentDefinition}
                                             key={`${currentNode?.workflowNodeName}_connection`}
-                                            workflowConnections={componentConnections}
                                             workflowId={workflow.id!}
                                             workflowNodeName={currentNode?.workflowNodeName}
                                             workflowTestConfigurationConnections={workflowTestConfigurationConnections}
