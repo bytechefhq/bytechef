@@ -1,5 +1,5 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
-import {WorkflowTask} from '@/shared/middleware/automation/configuration';
+import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 import getParentConditionTask from './getParentConditionTask';
 

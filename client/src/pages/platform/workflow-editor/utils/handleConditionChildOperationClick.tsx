@@ -1,5 +1,4 @@
-import {Workflow} from '@/shared/middleware/automation/configuration';
-import {ActionDefinition} from '@/shared/middleware/platform/configuration';
+import {ActionDefinition, Workflow} from '@/shared/middleware/platform/configuration';
 import {ClickedOperationType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 import {Node} from '@xyflow/react';

@@ -3,11 +3,11 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {WorkflowTask} from '@/shared/middleware/automation/configuration';
 import {
     ComponentDefinition,
     TaskDispatcherDefinition,
     TriggerDefinition,
+    WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
