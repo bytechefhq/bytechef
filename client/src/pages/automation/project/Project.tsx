@@ -128,6 +128,17 @@ const Project = () => {
         workflowKeys: WorkflowKeys,
     });
 
+    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(parseInt(projectId!), parseInt(projectWorkflowId!)),
+            });
+        },
+        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
+        workflowId: workflow.id!,
+        workflowKeys: WorkflowKeys,
+    });
+
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -314,7 +325,7 @@ const Project = () => {
                                 >
                                     <WorkflowMutationProvider
                                         value={{
-                                            updateWorkflowMutation,
+                                            updateWorkflowMutation: updateWorkflowEditorMutation,
                                         }}
                                     >
                                         <WorkflowNodeParameterMutationProvider
@@ -328,7 +339,6 @@ const Project = () => {
                                                     componentDefinitions={componentDefinitions}
                                                     leftSidebarOpen={leftSidebarOpen}
                                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                                    updateWorkflowMutation={updateWorkflowMutation}
                                                 />
 
                                                 {rightSidebarOpen &&
