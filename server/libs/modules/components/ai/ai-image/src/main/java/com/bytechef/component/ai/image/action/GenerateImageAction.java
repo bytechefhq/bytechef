@@ -112,23 +112,16 @@ public class GenerateImageAction implements AiImageAction {
         Map<String, Object> modelInputParametersMap = new HashMap<>();
 
         Provider provider = Provider.valueOf(inputParameters.getString(AiImageConstants.PROVIDER));
-        Integer[] sizeDimensions;
 
         if (provider == STABILITY) {
-            sizeDimensions = new Integer[] {
-                inputParameters.getRequiredInteger(WIDTH), inputParameters.getRequiredInteger(HEIGHT)
-            };
+            modelInputParametersMap.put(HEIGHT, inputParameters.getRequired(HEIGHT, Size.class));
+            modelInputParametersMap.put(WIDTH, inputParameters.getRequired(WIDTH, Size.class));
         } else {
-            Size size = inputParameters.getRequired(SIZE, Size.class);
-
-            sizeDimensions = new Integer[] {
-                size.getDimensions()[0], size.getDimensions()[1]
-            };
+            modelInputParametersMap.put(SIZE, inputParameters.getRequired(SIZE, Size.class));
         }
 
         modelInputParametersMap.put(IMAGE_MESSAGES, List.of(Map.of(CONTENT, inputParameters.getString(PROMPT))));
         modelInputParametersMap.put(MODEL, inputParameters.getString(MODEL));
-        modelInputParametersMap.put(SIZE, sizeDimensions);
 
         return ParametersFactory.createParameters(modelInputParametersMap);
     }
