@@ -12,7 +12,6 @@ const IntegrationsSidebar = ({integrationId}: {integrationId: number}) => {
 
     const {data: integrations} = useGetIntegrationsQuery({
         categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
-        includeAllFields: false,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 

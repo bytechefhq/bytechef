@@ -16,7 +16,6 @@ const ProjectsSidebar = ({projectId}: {projectId: number}) => {
     const {data: projects} = useGetWorkspaceProjectsQuery({
         categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
         id: currentWorkspaceId!,
-        includeAllFields: false,
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
