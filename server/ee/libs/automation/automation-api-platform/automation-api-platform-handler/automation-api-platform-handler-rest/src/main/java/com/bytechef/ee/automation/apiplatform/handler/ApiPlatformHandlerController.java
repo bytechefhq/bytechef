@@ -17,6 +17,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
@@ -61,9 +62,9 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ApiPlatformHandlerController extends AbstractWebhookTriggerController {
 
-    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
-
     protected static final String API_PLATFORM_BASE_PATH = "/api/o";
+
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
 
     private final ApiCollectionService apiCollectionService;
     private final ApiCollectionEndpointService apiCollectionEndpointService;
@@ -93,39 +94,39 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     public ResponseEntity<?> handleDeleteMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.GET, httpServletRequest, httpServletResponse);
     }
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<?> handleGetMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.DELETE, httpServletRequest, httpServletResponse);
     }
 
     @PatchMapping(produces = "application/json")
     public ResponseEntity<?> handlePatchMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.PATCH, httpServletRequest, httpServletResponse);
     }
 
     @PostMapping(produces = "application/json")
     public ResponseEntity<?> handlePostMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.POST, httpServletRequest, httpServletResponse);
     }
 
     @PutMapping(produces = "application/json")
     public ResponseEntity<?> handlePutMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.PUT, httpServletRequest, httpServletResponse);
     }
 
     private ResponseEntity<Object> doHandle(
-        HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+        HttpMethod httpMethod, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
 
         return TenantUtils.callWithTenantId(TenantContext.getCurrentTenantId(), () -> {
             Map<String, List<String>> variables;
@@ -135,7 +136,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
             String path = requestURI.replace(API_PLATFORM_BASE_PATH, "");
 
             ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(
-                path, getEnvironment(httpServletRequest));
+                httpMethod, path, getEnvironment(httpServletRequest));
 
             ProjectDeploymentWorkflow projectDeploymentWorkflow =
                 projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
@@ -181,15 +182,18 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         });
     }
 
-    private ApiCollectionEndpoint getApiCollectionEndpoint(String path, Environment environment) {
+    private ApiCollectionEndpoint getApiCollectionEndpoint(
+        HttpMethod httpMethod, String path, Environment environment) {
+
         for (ApiCollection apiCollection : apiCollectionService.getApiCollections(null, environment, null, null)) {
             List<ApiCollectionEndpoint> apiCollectionEndpoints = apiCollectionEndpointService.getApiEndpoints(
                 apiCollection.getId());
 
             for (ApiCollectionEndpoint apiCollectionEndpoint : apiCollectionEndpoints) {
-                if (PATH_MATCHER.match(
-                    getPathPattern(apiCollection.getCollectionVersion(), apiCollectionEndpoint.getPath()), path)) {
+                String pathPattern = getPathPattern(
+                    apiCollection.getCollectionVersion(), apiCollectionEndpoint.getPath());
 
+                if (PATH_MATCHER.match(pathPattern, path) && apiCollectionEndpoint.getHttpMethod() == httpMethod) {
                     return apiCollectionEndpoint;
                 }
             }

@@ -49,7 +49,8 @@ public class ApiPlatformNewApiRequestTrigger {
 
     public final ModifiableTriggerDefinition triggerDefinition = trigger(NEW_API_REQUEST)
         .title("New API Request")
-        .description(".")
+        .description(
+            "It allows you to customize success and failure responses within the workflow and deliver relevant data payloads for the requester to process.")
         .type(TriggerType.STATIC_WEBHOOK)
         .workflowSyncExecution(true)
         .properties(
@@ -115,7 +116,7 @@ public class ApiPlatformNewApiRequestTrigger {
     protected OutputResponse output(
         Parameters inputParameters, Parameters connectionParameters, TriggerContext context) {
 
-        Map<String, ?> request = inputParameters.getMap("request");
+        Map<String, ?> request = inputParameters.getMap("request", Map.of());
         List<ModifiableValueProperty<?, ?>> properties = new ArrayList<>();
 
         properties.add(string(METHOD));

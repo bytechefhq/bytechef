@@ -30,6 +30,7 @@ import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
+import com.bytechef.ee.component.apiplatform.constant.ResponseType;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.WebhookResponse;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -54,10 +55,10 @@ public class ApiPlatformResponseToApiRequestAction {
                 .label("Response Type")
                 .description("The type of the response.")
                 .options(
-                    option("Success Response", SUCCESS),
-                    option("Internal Error Response", INTERNAL_ERROR),
-                    option("Invalid Input Response", INVALID_INPUT),
-                    option("Forbidden Response", FORBIDDEN))
+                    option("Success Response", ResponseType.SUCCESS.name()),
+                    option("Internal Error Response", ResponseType.INTERNAL_ERROR.name()),
+                    option("Invalid Input Response", ResponseType.INVALID_INPUT.name()),
+                    option("Forbidden Response", ResponseType.FORBIDDEN.name()))
                 .required(true),
             dynamicProperties(RESPONSE)
                 .description("The properties of the response.")
@@ -83,7 +84,7 @@ public class ApiPlatformResponseToApiRequestAction {
     protected Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
         Object response = getResponse(inputParameters);
 
-        return switch (inputParameters.getString(RESPONSE_TYPE)) {
+        return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
             case SUCCESS -> WebhookResponse.json(response);
             case INTERNAL_ERROR -> WebhookResponse.json(response, HttpStatus.BAD_REQUEST);
             case INVALID_INPUT -> WebhookResponse.json(response, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -120,11 +121,11 @@ public class ApiPlatformResponseToApiRequestAction {
 
         Map<String, ?> responseMap = MapUtils.getMap(parameters, RESPONSE, Map.of());
 
-        return switch (inputParameters.getInteger(RESPONSE_TYPE)) {
-            case 1 -> getJsonSchemaProperty(SUCCESS, responseMap, actionContext);
-            case 2 -> getJsonSchemaProperty(INVALID_INPUT, responseMap, actionContext);
-            case 3 -> getJsonSchemaProperty(INTERNAL_ERROR, responseMap, actionContext);
-            case 4 -> getJsonSchemaProperty(FORBIDDEN, responseMap, actionContext);
+        return switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
+            case ResponseType.SUCCESS -> getJsonSchemaProperty(SUCCESS, responseMap, actionContext);
+            case ResponseType.INVALID_INPUT -> getJsonSchemaProperty(INVALID_INPUT, responseMap, actionContext);
+            case ResponseType.INTERNAL_ERROR -> getJsonSchemaProperty(INTERNAL_ERROR, responseMap, actionContext);
+            case ResponseType.FORBIDDEN -> getJsonSchemaProperty(FORBIDDEN, responseMap, actionContext);
             default ->
                 throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
         };
@@ -146,11 +147,11 @@ public class ApiPlatformResponseToApiRequestAction {
     private static Object getResponse(Parameters inputParameters) {
         Map<String, ?> responseMap = MapUtils.getMap(inputParameters, RESPONSE, Map.of());
 
-        String propertyName = switch (inputParameters.getInteger(RESPONSE_TYPE)) {
-            case 1 -> SUCCESS;
-            case 2 -> INVALID_INPUT;
-            case 3 -> INTERNAL_ERROR;
-            case 4 -> FORBIDDEN;
+        String propertyName = switch (inputParameters.get(RESPONSE_TYPE, ResponseType.class)) {
+            case ResponseType.SUCCESS -> SUCCESS;
+            case ResponseType.INVALID_INPUT -> INVALID_INPUT;
+            case ResponseType.INTERNAL_ERROR -> INTERNAL_ERROR;
+            case ResponseType.FORBIDDEN -> FORBIDDEN;
             default ->
                 throw new IllegalStateException("Unexpected value: " + inputParameters.getInteger(RESPONSE_TYPE));
         };
