@@ -10,15 +10,25 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.web.rest.model.EnvironmentModel;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
+import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
 import com.bytechef.platform.constant.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -32,13 +42,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApiCollectionApiController implements ApiCollectionApi {
 
     private final ApiCollectionFacade apiCollectionFacade;
+    private final ApiCollectionService apiCollectionService;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
     public ApiCollectionApiController(
-        ApiCollectionFacade apiCollectionFacade, ConversionService conversionService) {
+        ApiCollectionFacade apiCollectionFacade, ApiCollectionService apiCollectionService,
+        ConversionService conversionService) {
 
         this.apiCollectionFacade = apiCollectionFacade;
+        this.apiCollectionService = apiCollectionService;
         this.conversionService = conversionService;
     }
 
@@ -67,6 +80,18 @@ public class ApiCollectionApiController implements ApiCollectionApi {
             conversionService.convert(apiCollectionFacade.getApiCollection(id), ApiCollectionModel.class));
     }
 
+    @GetMapping("/api-collections/{id}/openapi")
+    @ResponseBody
+    public ResponseEntity<Resource> exportWorkflow(@PathVariable("id") long id) {
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.ok();
+
+        bodyBuilder.contentType(MediaType.APPLICATION_OCTET_STREAM);
+
+        bodyBuilder.header(HttpHeaders.CONTENT_DISPOSITION, "filename=\"" + getFilename(id) + "\"");
+
+        return bodyBuilder.body(new ByteArrayResource("{}".getBytes(StandardCharsets.UTF_8)));
+    }
+
     @Override
     public ResponseEntity<List<ApiCollectionModel>> getWorkspaceApiCollections(
         Long id, EnvironmentModel environment, Long projectId, Long tagId) {
@@ -88,5 +113,17 @@ public class ApiCollectionApiController implements ApiCollectionApi {
                 apiCollectionFacade.updateApiCollection(
                     conversionService.convert(apiCollectionModel.id(id), ApiCollectionDTO.class)),
                 ApiCollectionModel.class));
+    }
+
+    private String getFilename(long id) {
+        ApiCollection apiCollection = apiCollectionService.getApiCollection(id);
+
+        String name = apiCollection.getName();
+
+        name = name.toLowerCase()
+            .replace(" ", "_")
+            .trim();
+
+        return "%s_openapi.json".formatted(name);
     }
 }
