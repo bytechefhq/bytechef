@@ -18,12 +18,10 @@ package com.bytechef.component.ai.vectorstore.weaviate.connection;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.EMBEDDING_API_KEY_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.API_KEY;
-import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.HOST;
-import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.SCHEME;
+import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateConstants.URL;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
 import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
-import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
@@ -38,15 +36,10 @@ public class WeaviateConnection {
             authorization(CUSTOM)
                 .properties(
                     EMBEDDING_API_KEY_PROPERTY,
-                    string(HOST)
-                        .label("Host")
-                        .description("Host oo your Weaviate instance.")
-                        .required(true),
-                    string(SCHEME)
-                        .label("Scheme")
-                        .options(
-                            option("HTTP", "http"),
-                            option("HTTPS", "https"))
+                    string(URL)
+                        .label("Weaviate Url")
+                        .description("The URL of the Weaviate instance.")
+                        .exampleValue("https://jahgfduszftiq.c0.europe-west3.gcp.weaviate.cloud")
                         .required(true),
                     string(API_KEY)
                         .label("Weaviate API Key")
