@@ -115,6 +115,10 @@ export type NodeDataType = {
     conditionId?: string;
     connectionId?: number;
     description?: string;
+    displayConditions?: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        [key: string]: any;
+    };
     icon?: JSX.Element | ReactNode | string;
     label?: string;
     metadata?: {
