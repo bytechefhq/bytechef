@@ -1,3 +1,4 @@
+import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -34,6 +35,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
         }))
     );
     const {copilotPanelOpen} = useCopilotStore();
+    const {dataPillPanelOpen} = useDataPillPanelStore();
     const {rightSidebarOpen} = useRightSidebarStore();
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {workflowTestChatPanelOpen} = useWorkflowTestChatStore();
@@ -171,6 +173,10 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
     if (copilotPanelOpen) {
         canvasWidth -= 450;
+    }
+
+    if (dataPillPanelOpen) {
+        canvasWidth -= 400;
     }
 
     if (leftSidebarOpen) {
