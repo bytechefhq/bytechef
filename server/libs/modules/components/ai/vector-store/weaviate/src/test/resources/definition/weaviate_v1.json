@@ -576,51 +576,23 @@
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
-        "description" : "Host oo your Weaviate instance.",
+        "description" : "The URL of the Weaviate instance.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
         "metadata" : { },
         "required" : true,
-        "name" : "host",
+        "name" : "url",
         "type" : "STRING",
         "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Host",
+        "exampleValue" : "https://jahgfduszftiq.c0.europe-west3.gcp.weaviate.cloud",
+        "label" : "Weaviate Url",
         "placeholder" : null,
         "controlType" : "TEXT",
         "languageId" : null,
         "maxLength" : null,
         "minLength" : null,
         "options" : null,
-        "optionsDataSource" : null
-      }, {
-        "advancedOption" : null,
-        "description" : null,
-        "displayCondition" : null,
-        "expressionEnabled" : null,
-        "hidden" : null,
-        "metadata" : { },
-        "required" : true,
-        "name" : "scheme",
-        "type" : "STRING",
-        "defaultValue" : null,
-        "exampleValue" : null,
-        "label" : "Scheme",
-        "placeholder" : null,
-        "controlType" : "SELECT",
-        "languageId" : null,
-        "maxLength" : null,
-        "minLength" : null,
-        "options" : [ {
-          "description" : null,
-          "label" : "HTTP",
-          "value" : "http"
-        }, {
-          "description" : null,
-          "label" : "HTTPS",
-          "value" : "https"
-        } ],
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
