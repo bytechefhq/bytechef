@@ -98,7 +98,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-impl"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-web:platform-security-web-impl"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:libs:platform:platform-swagger"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     implementation(project(":server:libs:platform:platform-user:platform-user-rest:platform-user-rest-impl"))

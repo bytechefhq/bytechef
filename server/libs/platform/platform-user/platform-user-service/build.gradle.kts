@@ -13,7 +13,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
+    implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-mail")
     testImplementation(project(":server:libs:config:jdbc-config"))

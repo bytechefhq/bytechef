@@ -7,7 +7,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-api"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-web:platform-security-web-api"))
+    implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.5")

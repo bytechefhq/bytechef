@@ -43,7 +43,8 @@ public class AuditingJdbcConfiguration {
 
     @Bean
     AuditorAware<String> springSecurityAuditorAware() {
-        return () -> Optional.of(SecurityUtils.getCurrentUserLogin()
-            .orElse(SYSTEM));
+        return () -> Optional.of(
+            SecurityUtils.getCurrentUserLogin()
+                .orElse(SYSTEM));
     }
 }

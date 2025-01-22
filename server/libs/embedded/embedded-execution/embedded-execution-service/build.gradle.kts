@@ -6,6 +6,6 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:embedded:embedded-execution:embedded-execution-api"))
+    implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
 }

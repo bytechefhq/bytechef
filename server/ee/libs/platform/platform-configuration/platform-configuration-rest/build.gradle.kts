@@ -51,7 +51,7 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-api"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
+    implementation(project(":server:libs:platform:platform-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
