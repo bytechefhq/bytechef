@@ -24,7 +24,7 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.util.BeanUtils;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

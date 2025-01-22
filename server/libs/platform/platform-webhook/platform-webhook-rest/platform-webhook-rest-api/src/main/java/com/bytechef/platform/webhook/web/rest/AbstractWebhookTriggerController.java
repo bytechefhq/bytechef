@@ -34,8 +34,8 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.component.trigger.WebhookRequest.WebhookBodyImpl;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
@@ -170,10 +170,10 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return !principalAccessor.isWorkflowEnabled(
+        return !jobPrincipalAccessor.isWorkflowEnabled(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
@@ -321,10 +321,10 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getWorkflowId(
+        return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 

@@ -33,7 +33,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;

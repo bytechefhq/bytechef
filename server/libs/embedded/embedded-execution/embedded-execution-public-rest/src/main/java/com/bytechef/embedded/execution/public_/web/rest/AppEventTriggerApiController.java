@@ -38,7 +38,7 @@ import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiv
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.definition.WorkflowNodeType;

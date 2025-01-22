@@ -30,7 +30,7 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;

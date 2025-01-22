@@ -18,8 +18,8 @@ package com.bytechef.platform.workflow.coordinator.trigger.completion;
 
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -129,18 +129,18 @@ public class TriggerCompletionHandler {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getInputMap(
+        return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getWorkflowId(
+        return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

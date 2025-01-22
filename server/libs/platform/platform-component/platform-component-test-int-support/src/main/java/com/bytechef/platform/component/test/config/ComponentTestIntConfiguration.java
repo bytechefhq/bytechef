@@ -42,7 +42,7 @@ import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.component.test.ComponentJobTestExecutor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.FilesFileStorage;

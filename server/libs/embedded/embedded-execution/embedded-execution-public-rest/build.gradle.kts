@@ -62,7 +62,6 @@ dependencies {
     implementation(project(":server:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:libs:embedded:embedded-execution:embedded-execution-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))

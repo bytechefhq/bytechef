@@ -15,7 +15,7 @@ import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

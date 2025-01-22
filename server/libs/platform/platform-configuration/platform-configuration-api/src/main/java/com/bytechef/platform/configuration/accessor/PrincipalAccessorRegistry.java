@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.instance.accessor;
+package com.bytechef.platform.configuration.accessor;
 
 import com.bytechef.platform.constant.ModeType;
 import java.util.List;
@@ -30,17 +30,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class PrincipalAccessorRegistry {
 
-    private final Map<ModeType, PrincipalAccessor> principalAccessorMap;
+    private final Map<ModeType, JobPrincipalAccessor> principalAccessorMap;
 
-    public PrincipalAccessorRegistry(List<PrincipalAccessor> principalAccessors) {
-        this.principalAccessorMap = principalAccessors
+    public PrincipalAccessorRegistry(List<JobPrincipalAccessor> jobPrincipalAccessors) {
+        this.principalAccessorMap = jobPrincipalAccessors
             .stream()
             .collect(
-                Collectors.toMap(
-                    PrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
+                Collectors.toMap(JobPrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public PrincipalAccessor getPrincipalAccessor(@NonNull ModeType type) {
+    public JobPrincipalAccessor getPrincipalAccessor(@NonNull ModeType type) {
         return Validate.notNull(principalAccessorMap.get(type), "principalAccessor");
     }
 }

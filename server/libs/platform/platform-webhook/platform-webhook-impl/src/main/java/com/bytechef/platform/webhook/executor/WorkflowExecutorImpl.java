@@ -24,8 +24,8 @@ import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -136,18 +136,18 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
     }
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getInputMap(
+        return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getWorkflowId(
+        return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

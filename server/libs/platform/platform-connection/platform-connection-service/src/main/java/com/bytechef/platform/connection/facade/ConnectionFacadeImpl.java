@@ -23,8 +23,8 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.facade.ConnectionDefinitionFacade;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionEnvironment;
@@ -205,9 +205,9 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
     private boolean isConnectionUsed(long connectionId, ModeType type) {
         boolean connectionUsed;
 
-        PrincipalAccessor principalAccessor = principalAccessorRegistry.getPrincipalAccessor(type);
+        JobPrincipalAccessor jobPrincipalAccessor = principalAccessorRegistry.getPrincipalAccessor(type);
 
-        connectionUsed = principalAccessor.isConnectionUsed(connectionId);
+        connectionUsed = jobPrincipalAccessor.isConnectionUsed(connectionId);
 
         if (!connectionUsed) {
             connectionUsed = workflowTestConfigurationService.isConnectionUsed(connectionId);

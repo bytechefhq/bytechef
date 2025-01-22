@@ -20,7 +20,7 @@ import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfigurati
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -30,14 +30,14 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class IntegrationPrincipalAccessor implements PrincipalAccessor {
+public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationWorkflowService integrationWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public IntegrationPrincipalAccessor(
+    public IntegrationJobPrincipalAccessor(
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationWorkflowService integrationWorkflowService) {

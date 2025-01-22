@@ -24,8 +24,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
 import com.bytechef.platform.workflow.coordinator.event.ErrorEvent;
@@ -213,12 +213,12 @@ public class TriggerCoordinator {
     private void dispatch(TriggerExecution triggerExecution) {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
-                principalAccessor.getInputMap(
+                jobPrincipalAccessor.getInputMap(
                     workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode())));
 
         triggerExecution.setState(OptionalUtils.orElse(triggerStateService.fetchValue(workflowExecutionId), null));
@@ -253,10 +253,10 @@ public class TriggerCoordinator {
     }
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        return principalAccessor.getWorkflowId(
+        return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
     }
 }

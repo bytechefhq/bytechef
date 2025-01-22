@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
-public class IntegrationPrincipalAccessorTest {
+public class IntegrationJobPrincipalAccessorTest {
 
     @Disabled
     @Test

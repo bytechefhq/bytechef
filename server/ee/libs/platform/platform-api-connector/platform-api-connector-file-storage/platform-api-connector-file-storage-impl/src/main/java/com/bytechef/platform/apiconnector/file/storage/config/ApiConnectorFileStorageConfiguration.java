@@ -19,6 +19,7 @@ package com.bytechef.platform.apiconnector.file.storage.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
+import com.bytechef.file.storage.base64.service.Base64FileStorageService;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -55,8 +56,9 @@ public class ApiConnectorFileStorageConfiguration {
 
     @Bean
     ApiConnectorFileStorage apiConnectorFileStorage(ApplicationProperties applicationProperties) {
-        Provider provider = applicationProperties.getFileStorage()
-            .getProvider();
+        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+
+        Provider provider = fileStorage.getProvider();
 
         if (provider == null) {
             provider = Provider.FILESYSTEM;
@@ -74,7 +76,8 @@ public class ApiConnectorFileStorageConfiguration {
     private FileStorageService getFileStorageService(Provider provider) {
         return switch (provider) {
             case Provider.AWS -> awsFileStorageService;
-            default -> new FilesystemFileStorageService(getBasedir());
+            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
+            case Provider.JDBC -> new Base64FileStorageService();
         };
     }
 

@@ -17,8 +17,8 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
@@ -76,10 +76,10 @@ public class DynamicWebhookTriggerRefreshListener {
     }
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        PrincipalAccessor principalAccessor =
+        JobPrincipalAccessor jobPrincipalAccessor =
             principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
 
-        String workflowId = principalAccessor.getWorkflowId(
+        String workflowId = jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
 
         Workflow workflow = workflowService.getWorkflow(workflowId);

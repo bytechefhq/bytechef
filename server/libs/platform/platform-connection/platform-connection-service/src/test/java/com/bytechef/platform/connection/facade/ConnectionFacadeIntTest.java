@@ -25,7 +25,7 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Property;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfiguration;
 import com.bytechef.platform.connection.config.ConnectionIntTestConfigurationSharedMocks;
 import com.bytechef.platform.connection.domain.Connection;
@@ -267,14 +267,14 @@ public class ConnectionFacadeIntTest {
     }
 
     @ComponentScan(basePackages = {
-        "com.bytechef.platform.configuration.instance.accessor", "com.bytechef.platform.tag"
+        "com.bytechef.platform.configuration.accessor", "com.bytechef.platform.tag"
     })
     @TestConfiguration
     public static class ConnectionFacadeIntTestConfiguration {
 
         @Bean
-        PrincipalAccessor instanceAccessor() {
-            return new PrincipalAccessor() {
+        JobPrincipalAccessor jobPrincipalAccessor() {
+            return new JobPrincipalAccessor() {
 
                 @Override
                 public boolean isConnectionUsed(long connectionId) {

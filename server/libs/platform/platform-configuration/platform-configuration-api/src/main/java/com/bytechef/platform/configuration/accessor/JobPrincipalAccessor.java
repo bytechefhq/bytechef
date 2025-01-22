@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.instance.accessor;
+package com.bytechef.platform.configuration.accessor;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import com.bytechef.platform.constant.ModeType;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public class ProjectDeploymentPrincipalAccessorTest {
+public interface JobPrincipalAccessor {
 
-    @Disabled
-    @Test
-    public void createJob() {
-        // TODO
-    }
+    boolean isConnectionUsed(long connectionId);
 
-    @Disabled
-    @Test
-    public void getInputs() {
-        // TODO
-    }
+    boolean isWorkflowEnabled(long principalId, String workflowReferenceCode);
+
+    Map<String, ?> getInputMap(long principalId, String workflowReferenceCode);
+
+    ModeType getType();
+
+    String getWorkflowId(long principalId, String workflowReferenceCode);
 }

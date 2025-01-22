@@ -17,7 +17,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-sync"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
+    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
     implementation(project(":server:libs:platform:platform-coordinator"))
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))

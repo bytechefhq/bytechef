@@ -49,8 +49,9 @@ public class CustomComponentFileStorageConfiguration {
 
     @Bean
     CustomComponentFileStorage customComponentFileStorage(ApplicationProperties applicationProperties) {
-        Provider provider = applicationProperties.getFileStorage()
-            .getProvider();
+        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+
+        Provider provider = fileStorage.getProvider();
 
         if (provider == null) {
             provider = Provider.FILESYSTEM;

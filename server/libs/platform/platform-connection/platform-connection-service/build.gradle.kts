@@ -7,7 +7,6 @@ dependencies {
     implementation(project(":sdks:backend:java:component-api"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-instance-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
 
     testImplementation("com.fasterxml.jackson.core:jackson-databind")

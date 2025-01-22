@@ -20,7 +20,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.platform.configuration.instance.accessor.PrincipalAccessor;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.constant.ModeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
@@ -30,14 +30,14 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class ProjectDeploymentPrincipalAccessor implements PrincipalAccessor {
+public class ProjectDeploymentJobPrincipalAccessor implements JobPrincipalAccessor {
 
     private final ProjectDeploymentService projectDeploymentService;
     private final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public ProjectDeploymentPrincipalAccessor(
+    public ProjectDeploymentJobPrincipalAccessor(
         ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService) {
