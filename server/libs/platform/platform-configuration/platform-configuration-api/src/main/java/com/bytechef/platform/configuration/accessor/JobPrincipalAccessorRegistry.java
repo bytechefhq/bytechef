@@ -28,18 +28,17 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
-public class PrincipalAccessorRegistry {
+public class JobPrincipalAccessorRegistry {
 
-    private final Map<ModeType, JobPrincipalAccessor> principalAccessorMap;
+    private final Map<ModeType, JobPrincipalAccessor> joPrincipalAccessorMap;
 
-    public PrincipalAccessorRegistry(List<JobPrincipalAccessor> jobPrincipalAccessors) {
-        this.principalAccessorMap = jobPrincipalAccessors
-            .stream()
+    public JobPrincipalAccessorRegistry(List<JobPrincipalAccessor> jobPrincipalAccessors) {
+        this.joPrincipalAccessorMap = jobPrincipalAccessors.stream()
             .collect(
                 Collectors.toMap(JobPrincipalAccessor::getType, instanceWorkflowAccessor -> instanceWorkflowAccessor));
     }
 
-    public JobPrincipalAccessor getPrincipalAccessor(@NonNull ModeType type) {
-        return Validate.notNull(principalAccessorMap.get(type), "principalAccessor");
+    public JobPrincipalAccessor getJobPrincipalAccessor(@NonNull ModeType type) {
+        return Validate.notNull(joPrincipalAccessorMap.get(type), "joPrincipalAccessor");
     }
 }

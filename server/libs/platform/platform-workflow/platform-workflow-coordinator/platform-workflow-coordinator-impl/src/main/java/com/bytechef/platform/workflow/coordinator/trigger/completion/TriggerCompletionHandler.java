@@ -19,7 +19,7 @@ package com.bytechef.platform.workflow.coordinator.trigger.completion;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -44,7 +44,7 @@ public class TriggerCompletionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionHandler.class);
 
-    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerFileStorage triggerFileStorage;
@@ -52,11 +52,11 @@ public class TriggerCompletionHandler {
 
     @SuppressFBWarnings("EI")
     public TriggerCompletionHandler(
-        PrincipalAccessorRegistry principalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService) {
 
-        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerFileStorage = triggerFileStorage;
@@ -130,7 +130,7 @@ public class TriggerCompletionHandler {
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
@@ -138,7 +138,7 @@ public class TriggerCompletionHandler {
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());

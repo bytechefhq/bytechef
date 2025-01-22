@@ -33,7 +33,7 @@ import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
 import com.bytechef.message.broker.sync.SyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutor;
 import com.bytechef.platform.webhook.executor.WorkflowExecutorImpl;
@@ -68,7 +68,7 @@ public class WebhookConfiguration {
     @Bean
     WorkflowExecutor webhookExecutor(
         ApplicationEventPublisher eventPublisher, ContextService contextService, CounterService counterService,
-        PrincipalAccessorRegistry principalAccessorRegistry, PrincipalJobFacade principalJobFacade,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, PrincipalJobFacade principalJobFacade,
         JobService jobService,
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors, TaskExecutionService taskExecutionService,
         TaskHandlerRegistry taskHandlerRegistry, WorkflowSyncExecutor triggerSyncExecutor,
@@ -77,7 +77,7 @@ public class WebhookConfiguration {
         SyncMessageBroker syncMessageBroker = new SyncMessageBroker();
 
         return new WorkflowExecutorImpl(
-            eventPublisher, principalAccessorRegistry,
+            eventPublisher, jobPrincipalAccessorRegistry,
             principalJobFacade,
             new JobSyncExecutor(
                 contextService, jobService, syncMessageBroker,

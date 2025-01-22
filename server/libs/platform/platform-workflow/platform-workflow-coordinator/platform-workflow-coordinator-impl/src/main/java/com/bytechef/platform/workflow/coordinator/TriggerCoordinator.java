@@ -24,7 +24,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.workflow.coordinator.event.ApplicationEvent;
@@ -64,7 +64,7 @@ public class TriggerCoordinator {
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
     private final ApplicationEventPublisher eventPublisher;
-    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerCompletionHandler triggerCompletionHandler;
     private final TriggerDispatcher triggerDispatcher;
     private final TriggerExecutionService triggerExecutionService;
@@ -75,7 +75,7 @@ public class TriggerCoordinator {
     @SuppressFBWarnings("EI")
     public TriggerCoordinator(
         List<ApplicationEventListener> applicationEventListeners, List<ErrorEventListener> errorEventListeners,
-        ApplicationEventPublisher eventPublisher, PrincipalAccessorRegistry principalAccessorRegistry,
+        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerCompletionHandler triggerCompletionHandler, TriggerDispatcher triggerDispatcher,
         TriggerExecutionService triggerExecutionService, TriggerFileStorage triggerFileStorage,
         TriggerStateService triggerStateService, WorkflowService workflowService) {
@@ -83,7 +83,7 @@ public class TriggerCoordinator {
         this.applicationEventListeners = applicationEventListeners;
         this.errorEventListeners = errorEventListeners;
         this.eventPublisher = eventPublisher;
-        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerCompletionHandler = triggerCompletionHandler;
         this.triggerDispatcher = triggerDispatcher;
         this.triggerExecutionService = triggerExecutionService;
@@ -214,7 +214,7 @@ public class TriggerCoordinator {
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
 
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         triggerExecution = triggerExecutionService.create(
             triggerExecution.evaluate(
@@ -254,7 +254,7 @@ public class TriggerCoordinator {
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());

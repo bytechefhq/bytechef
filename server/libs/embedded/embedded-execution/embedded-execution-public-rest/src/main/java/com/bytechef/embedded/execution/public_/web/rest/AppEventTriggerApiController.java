@@ -37,7 +37,7 @@ import com.bytechef.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.embedded.execution.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.embedded.execution.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
@@ -82,7 +82,7 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     public AppEventTriggerApiController(
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
         FilesFileStorage filesFileStorage, HttpServletRequest httpServletRequest,
-        PrincipalAccessorRegistry principalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionService triggerDefinitionService,
         WorkflowExecutor workflowExecutor, HttpServletResponse httpServletResponse,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
@@ -90,7 +90,8 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
         IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
 
         super(
-            filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(), triggerDefinitionService,
+            filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
+            triggerDefinitionService,
             workflowExecutor, workflowService);
 
         this.connectedUserService = connectedUserService;

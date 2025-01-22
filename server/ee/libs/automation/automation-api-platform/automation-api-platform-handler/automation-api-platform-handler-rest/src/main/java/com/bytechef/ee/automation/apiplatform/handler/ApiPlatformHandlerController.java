@@ -23,7 +23,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectio
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.constant.Environment;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.file.storage.FilesFileStorage;
@@ -75,13 +75,13 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     public ApiPlatformHandlerController(
         ApiCollectionService apiCollectionService, ApiCollectionEndpointService apiCollectionEndpointService,
         ApplicationProperties applicationProperties, FilesFileStorage filesFileStorage,
-        PrincipalAccessorRegistry principalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService,
         WorkflowExecutor workflowExecutor) {
 
         super(
-            filesFileStorage, principalAccessorRegistry, applicationProperties.getPublicUrl(),
+            filesFileStorage, jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(),
             triggerDefinitionService, workflowExecutor, workflowService);
 
         this.apiCollectionService = apiCollectionService;

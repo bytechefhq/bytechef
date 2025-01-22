@@ -25,7 +25,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookValidateRespon
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.coordinator.job.JobSyncExecutor;
 import com.bytechef.platform.workflow.coordinator.event.TriggerWebhookEvent;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -43,7 +43,7 @@ import org.springframework.context.ApplicationEventPublisher;
 public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private final ApplicationEventPublisher eventPublisher;
-    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
     private final JobSyncExecutor jobSyncExecutor;
     private final WorkflowSyncExecutor workflowSyncExecutor;
@@ -51,12 +51,12 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     @SuppressFBWarnings("EI")
     public WorkflowExecutorImpl(
-        ApplicationEventPublisher eventPublisher, PrincipalAccessorRegistry principalAccessorRegistry,
+        ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         PrincipalJobFacade principalJobFacade, JobSyncExecutor jobSyncExecutor,
         WorkflowSyncExecutor workflowSyncExecutor,
         TaskFileStorage taskFileStorage) {
 
-        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.principalJobFacade = principalJobFacade;
         this.jobSyncExecutor = jobSyncExecutor;
         this.eventPublisher = eventPublisher;
@@ -137,7 +137,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
@@ -145,7 +145,7 @@ public class WorkflowExecutorImpl implements WorkflowExecutor {
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());

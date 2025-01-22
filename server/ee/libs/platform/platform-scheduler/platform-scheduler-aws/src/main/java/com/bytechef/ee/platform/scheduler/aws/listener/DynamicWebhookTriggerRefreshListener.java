@@ -17,7 +17,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.WorkflowExecutionId;
@@ -36,7 +36,7 @@ import software.amazon.awssdk.services.scheduler.model.UpdateScheduleRequest;
  */
 public class DynamicWebhookTriggerRefreshListener {
 
-    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade remoteTriggerDefinitionFacade;
     private final TriggerStateService triggerStateService;
     private final WorkflowService workflowService;
@@ -44,12 +44,12 @@ public class DynamicWebhookTriggerRefreshListener {
 
     @SuppressFBWarnings("EI")
     public DynamicWebhookTriggerRefreshListener(
-        PrincipalAccessorRegistry principalAccessorRegistry, SchedulerClient schedulerClient,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, SchedulerClient schedulerClient,
         TriggerDefinitionFacade remoteTriggerDefinitionFacade, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
         this.schedulerClient = schedulerClient;
-        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.remoteTriggerDefinitionFacade = remoteTriggerDefinitionFacade;
         this.triggerStateService = triggerStateService;
         this.workflowService = workflowService;
@@ -77,7 +77,7 @@ public class DynamicWebhookTriggerRefreshListener {
 
     private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         String workflowId = jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());

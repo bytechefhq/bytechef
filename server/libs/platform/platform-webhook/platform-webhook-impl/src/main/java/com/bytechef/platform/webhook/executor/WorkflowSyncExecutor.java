@@ -27,7 +27,7 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.configuration.accessor.PrincipalAccessorRegistry;
+import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
@@ -49,7 +49,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowSyncExecutor {
 
-    private final PrincipalAccessorRegistry principalAccessorRegistry;
+    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerExecutionService triggerExecutionService;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
@@ -59,13 +59,13 @@ public class WorkflowSyncExecutor {
 
     @SuppressFBWarnings("EI")
     public WorkflowSyncExecutor(
-        PrincipalAccessorRegistry principalAccessorRegistry,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TriggerDefinitionFacade triggerDefinitionFacade, TriggerExecutionService triggerExecutionService,
         List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors,
         TriggerFileStorage triggerFileStorage, TriggerStateService triggerStateService,
         WorkflowService workflowService) {
 
-        this.principalAccessorRegistry = principalAccessorRegistry;
+        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerExecutionService = triggerExecutionService;
         this.triggerDispatcherPreSendProcessors = triggerDispatcherPreSendProcessors;
@@ -158,7 +158,7 @@ public class WorkflowSyncExecutor {
 
     private Map<String, ?> getInputMap(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getInputMap(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
@@ -185,7 +185,7 @@ public class WorkflowSyncExecutor {
 
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
-            principalAccessorRegistry.getPrincipalAccessor(workflowExecutionId.getType());
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getInstanceId(), workflowExecutionId.getWorkflowReferenceCode());
