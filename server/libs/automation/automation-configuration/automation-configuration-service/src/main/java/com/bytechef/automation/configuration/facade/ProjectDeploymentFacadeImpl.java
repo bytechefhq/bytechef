@@ -150,7 +150,8 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         projectDeployment = projectDeploymentService.create(projectDeployment);
 
         checkProjectDeploymentWorkflows(
-            projectDeployment, -1, CollectionUtils.map(
+            projectDeployment, -1,
+            CollectionUtils.map(
                 projectDeploymentDTO.projectDeploymentWorkflows(),
                 ProjectDeploymentWorkflowDTO::toProjectDeploymentWorkflow),
             List.of());
