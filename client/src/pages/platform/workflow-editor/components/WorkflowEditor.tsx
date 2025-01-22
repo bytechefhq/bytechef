@@ -162,6 +162,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
                 if (targetEdge) {
                     handleDropOnWorkflowEdge(targetEdge, droppedNode);
+
                     return;
                 }
             }
