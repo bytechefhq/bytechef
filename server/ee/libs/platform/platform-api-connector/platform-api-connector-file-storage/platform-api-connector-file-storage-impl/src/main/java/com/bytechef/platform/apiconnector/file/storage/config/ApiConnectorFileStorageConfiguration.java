@@ -18,18 +18,13 @@ package com.bytechef.platform.apiconnector.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
-import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorageImpl;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,23 +37,12 @@ public class ApiConnectorFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(ApiConnectorFileStorageConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
-    private final AwsFileStorageService awsFileStorageService;
-
-    @SuppressFBWarnings("EI")
-    public ApiConnectorFileStorageConfiguration(
-        ApplicationProperties applicationProperties,
-        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
-
-        this.applicationProperties = applicationProperties;
-        this.awsFileStorageService = awsFileStorageService;
-    }
-
     @Bean
-    ApiConnectorFileStorage apiConnectorFileStorage(ApplicationProperties applicationProperties) {
-        ApplicationProperties.FileStorage fileStorage = applicationProperties.getFileStorage();
+    ApiConnectorFileStorage apiConnectorFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
 
-        Provider provider = fileStorage.getProvider();
+        Provider provider = applicationProperties.getFileStorage()
+            .getProvider();
 
         if (provider == null) {
             provider = Provider.FILESYSTEM;
@@ -70,20 +54,6 @@ public class ApiConnectorFileStorageConfiguration {
                     StringUtils.lowerCase(provider.name())));
         }
 
-        return new ApiConnectorFileStorageImpl(getFileStorageService(provider));
-    }
-
-    private FileStorageService getFileStorageService(Provider provider) {
-        return switch (provider) {
-            case Provider.AWS -> awsFileStorageService;
-            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case Provider.JDBC -> new Base64FileStorageService();
-        };
-    }
-
-    private String getBasedir() {
-        return applicationProperties.getFileStorage()
-            .getFilesystem()
-            .getBasedir();
+        return new ApiConnectorFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 }

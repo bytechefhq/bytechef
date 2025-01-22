@@ -22,7 +22,6 @@ import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService
 import com.bytechef.file.storage.service.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +29,6 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "file-storage.provider", havingValue = "filesystem")
 public class FilesystemFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(FilesystemFileStorageConfiguration.class);
@@ -46,10 +44,10 @@ public class FilesystemFileStorageConfiguration {
     }
 
     @Bean
-    FileStorageService fileStorageService(ApplicationProperties applicationProperties) {
-        Filesystem filesystem = applicationProperties.getFileStorage()
-            .getFilesystem();
-
-        return new FilesystemFileStorageService(filesystem.getBasedir());
+    FileStorageService filesystemFileStorageService(ApplicationProperties applicationProperties) {
+        return new FilesystemFileStorageService(
+            applicationProperties.getFileStorage()
+                .getFilesystem()
+                .getBasedir());
     }
 }

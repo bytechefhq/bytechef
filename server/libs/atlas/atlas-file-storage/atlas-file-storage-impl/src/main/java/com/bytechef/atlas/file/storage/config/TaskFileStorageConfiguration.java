@@ -20,15 +20,10 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage.Provider;
-import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,18 +35,10 @@ public class TaskFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(TaskFileStorageConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
-    private final AwsFileStorageService awsFileStorageService;
-
-    @SuppressFBWarnings("EI")
-    public TaskFileStorageConfiguration(ApplicationProperties applicationProperties,
-        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
-        this.applicationProperties = applicationProperties;
-        this.awsFileStorageService = awsFileStorageService;
-    }
-
     @Bean
-    TaskFileStorage taskFileStorage(ApplicationProperties applicationProperties) {
+    TaskFileStorage taskFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
         Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
@@ -62,20 +49,6 @@ public class TaskFileStorageConfiguration {
                     StringUtils.lowerCase(provider.name())));
         }
 
-        return new TaskFileStorageImpl(getFileStorageService(provider));
-    }
-
-    private FileStorageService getFileStorageService(Provider provider) {
-        return switch (provider) {
-            case Provider.AWS -> awsFileStorageService;
-            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case Provider.JDBC -> new Base64FileStorageService();
-        };
-    }
-
-    private String getBasedir() {
-        return applicationProperties.getFileStorage()
-            .getFilesystem()
-            .getBasedir();
+        return new TaskFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.file.storage.aws.service;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
@@ -159,6 +160,11 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         byte[] bytes = readFileToBytes(directoryPath, fileEntry);
 
         return new String(bytes, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String getType() {
+        return ApplicationProperties.FileStorage.Provider.AWS.name();
     }
 
     @Override

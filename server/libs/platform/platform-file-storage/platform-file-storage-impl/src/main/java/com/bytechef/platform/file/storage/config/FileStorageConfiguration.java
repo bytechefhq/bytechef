@@ -19,19 +19,14 @@ package com.bytechef.platform.file.storage.config;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage;
 import com.bytechef.config.ApplicationProperties.Workflow.OutputStorage;
-import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.file.storage.FilesFileStorage;
 import com.bytechef.platform.file.storage.FilesFileStorageImpl;
 import com.bytechef.platform.file.storage.TriggerFileStorage;
 import com.bytechef.platform.file.storage.TriggerFileStorageImpl;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -43,20 +38,10 @@ public class FileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(FileStorageConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
-    private final AwsFileStorageService awsFileStorageService;
-
-    @SuppressFBWarnings("EI")
-    public FileStorageConfiguration(
-        ApplicationProperties applicationProperties,
-        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
-
-        this.applicationProperties = applicationProperties;
-        this.awsFileStorageService = awsFileStorageService;
-    }
-
     @Bean
-    FilesFileStorage filesFileStorage(ApplicationProperties applicationProperties) {
+    FilesFileStorage filesFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
         FileStorage.Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
@@ -66,11 +51,13 @@ public class FileStorageConfiguration {
                     StringUtils.lowerCase(provider.name())));
         }
 
-        return new FilesFileStorageImpl(getFilesFileStorageService(provider));
+        return new FilesFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 
     @Bean
-    TriggerFileStorage triggerFileStorage(ApplicationProperties applicationProperties) {
+    TriggerFileStorage triggerFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
+
         OutputStorage.Provider provider = applicationProperties.getWorkflow()
             .getOutputStorage()
             .getProvider();
@@ -81,28 +68,6 @@ public class FileStorageConfiguration {
             logger.info("Files storage provider type enabled: %s".formatted(providerName.toLowerCase()));
         }
 
-        return new TriggerFileStorageImpl(getTriggerFileStorageService(provider));
-    }
-
-    private FileStorageService getFilesFileStorageService(FileStorage.Provider provider) {
-        return switch (provider) {
-            case FileStorage.Provider.AWS -> awsFileStorageService;
-            case FileStorage.Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case FileStorage.Provider.JDBC -> new Base64FileStorageService();
-        };
-    }
-
-    private FileStorageService getTriggerFileStorageService(OutputStorage.Provider provider) {
-        return switch (provider) {
-            case OutputStorage.Provider.AWS -> awsFileStorageService;
-            case OutputStorage.Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case OutputStorage.Provider.JDBC -> new Base64FileStorageService();
-        };
-    }
-
-    private String getBasedir() {
-        return applicationProperties.getFileStorage()
-            .getFilesystem()
-            .getBasedir();
+        return new TriggerFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 }

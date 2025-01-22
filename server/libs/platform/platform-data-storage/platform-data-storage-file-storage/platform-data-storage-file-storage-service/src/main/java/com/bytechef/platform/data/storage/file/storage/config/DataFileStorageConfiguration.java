@@ -17,8 +17,7 @@
 package com.bytechef.platform.data.storage.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.constant.ModeType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStorageProviderAws;
@@ -26,12 +25,10 @@ import com.bytechef.platform.data.storage.annotation.ConditionalOnDataStoragePro
 import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageService;
 import com.bytechef.platform.data.storage.file.storage.service.DataFileStorageServiceImpl;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.NonNull;
@@ -44,40 +41,28 @@ public class DataFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(DataFileStorageConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
-    private final AwsFileStorageService awsFileStorageService;
-
-    @SuppressFBWarnings("EI")
-    public DataFileStorageConfiguration(ApplicationProperties applicationProperties,
-        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
-        this.applicationProperties = applicationProperties;
-        this.awsFileStorageService = awsFileStorageService;
-    }
-
     @Bean
     @ConditionalOnDataStorageProviderAws
-    DataStorage awsFileStorageDataStorageService() {
+    DataStorage awsFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
         if (logger.isInfoEnabled()) {
             logger.info("Data storage provider type enabled: aws");
         }
 
-        return new DataStorageImpl(new DataFileStorageServiceImpl(awsFileStorageService));
+        return new DataStorageImpl(new DataFileStorageServiceImpl(
+            fileStorageServiceRegistry.getFileStorageService(ApplicationProperties.DataStorage.Provider.AWS.name())));
     }
 
     @Bean
     @ConditionalOnDataStorageProviderFilesystem
-    DataStorage filesystemFileStorageDataStorageService() {
+    DataStorage filesystemFileStorageDataStorageService(FileStorageServiceRegistry fileStorageServiceRegistry) {
         if (logger.isInfoEnabled()) {
             logger.info("Data storage provider type enabled: filesystem");
         }
 
-        return new DataStorageImpl(new DataFileStorageServiceImpl(new FilesystemFileStorageService(getBasedir())));
-    }
-
-    private String getBasedir() {
-        return applicationProperties.getFileStorage()
-            .getFilesystem()
-            .getBasedir();
+        return new DataStorageImpl(
+            new DataFileStorageServiceImpl(
+                fileStorageServiceRegistry.getFileStorageService(
+                    ApplicationProperties.DataStorage.Provider.FILESYSTEM.name())));
     }
 
     private record DataStorageImpl(DataFileStorageService dataFileStorageService) implements DataStorage {

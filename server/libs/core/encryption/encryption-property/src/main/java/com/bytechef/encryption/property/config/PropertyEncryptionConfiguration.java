@@ -42,8 +42,8 @@ public class PropertyEncryptionConfiguration {
 
     @Bean
     EncryptionKey encryptionKey(ApplicationProperties applicationProperties) {
-        ApplicationProperties.Encryption encryption = applicationProperties.getEncryption();
-
-        return new PropertyEncryptionKey(encryption.getProperty());
+        return new PropertyEncryptionKey(
+            applicationProperties.getEncryption()
+                .getProperty());
     }
 }

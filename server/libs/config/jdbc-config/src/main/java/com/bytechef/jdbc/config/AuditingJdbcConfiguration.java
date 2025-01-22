@@ -37,7 +37,7 @@ public class AuditingJdbcConfiguration {
     private static final String SYSTEM = "system";
 
     @Bean
-    public DateTimeProvider auditingDateTimeProvider() {
+    DateTimeProvider auditingDateTimeProvider() {
         return CurrentDateTimeProvider.INSTANCE;
     }
 

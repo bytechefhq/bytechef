@@ -37,12 +37,12 @@ public class AwsCloudProviderConfiguration {
     }
 
     @Bean
-    public AwsCredentialsProvider customAwsCredentialsProvider() {
+    AwsCredentialsProvider customAwsCredentialsProvider() {
         return new CustomAWSCredentialsProvider(aws);
     }
 
     @Bean
-    public AwsRegionProvider customRegionProvider() {
+    AwsRegionProvider customRegionProvider() {
         return new CustomAwsRegionProvider(aws);
     }
 }

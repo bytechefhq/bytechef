@@ -47,6 +47,8 @@ public interface FileStorageService {
 
     String readFileToString(@NonNull String directoryPath, @NonNull FileEntry fileEntry) throws FileStorageException;
 
+    String getType();
+
     FileEntry storeFileContent(
         @NonNull String directoryPath, @NonNull String filename, byte[] data) throws FileStorageException;
 

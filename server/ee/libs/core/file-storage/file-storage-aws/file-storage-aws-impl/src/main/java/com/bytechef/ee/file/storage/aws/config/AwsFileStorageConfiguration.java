@@ -28,8 +28,8 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
  * @author Ivica Cardic
  */
 @Configuration
-@ConditionalOnProperty(prefix = "bytechef", name = "file-storage.provider", havingValue = "aws")
-class AwsFileStorageConfiguration {
+@ConditionalOnProperty(prefix = "bytechef", name = "cloud.provider", havingValue = "aws")
+public class AwsFileStorageConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AwsFileStorageConfiguration.class);
 

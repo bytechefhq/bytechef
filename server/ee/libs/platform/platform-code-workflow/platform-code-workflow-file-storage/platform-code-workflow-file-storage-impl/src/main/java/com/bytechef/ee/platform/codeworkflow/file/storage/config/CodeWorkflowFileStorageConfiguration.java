@@ -18,18 +18,13 @@ package com.bytechef.ee.platform.codeworkflow.file.storage.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.FileStorage.Provider;
-import com.bytechef.ee.file.storage.aws.AwsFileStorageService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorageImpl;
-import com.bytechef.file.storage.base64.service.Base64FileStorageService;
-import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
-import com.bytechef.file.storage.service.FileStorageService;
+import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -42,20 +37,9 @@ public class CodeWorkflowFileStorageConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(CodeWorkflowFileStorageConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
-    private final AwsFileStorageService awsFileStorageService;
-
-    @SuppressFBWarnings("EI")
-    public CodeWorkflowFileStorageConfiguration(
-        ApplicationProperties applicationProperties,
-        @Autowired(required = false) AwsFileStorageService awsFileStorageService) {
-
-        this.applicationProperties = applicationProperties;
-        this.awsFileStorageService = awsFileStorageService;
-    }
-
     @Bean
-    CodeWorkflowFileStorage codeWorkflowFileStorage(ApplicationProperties applicationProperties) {
+    CodeWorkflowFileStorage codeWorkflowFileStorage(
+        ApplicationProperties applicationProperties, FileStorageServiceRegistry fileStorageServiceRegistry) {
         Provider provider = applicationProperties.getFileStorage()
             .getProvider();
 
@@ -69,20 +53,6 @@ public class CodeWorkflowFileStorageConfiguration {
                     StringUtils.lowerCase(provider.name())));
         }
 
-        return new CodeWorkflowFileStorageImpl(getFileStorageService(provider));
-    }
-
-    private FileStorageService getFileStorageService(Provider provider) {
-        return switch (provider) {
-            case Provider.AWS -> awsFileStorageService;
-            case Provider.FILESYSTEM -> new FilesystemFileStorageService(getBasedir());
-            case Provider.JDBC -> new Base64FileStorageService();
-        };
-    }
-
-    private String getBasedir() {
-        return applicationProperties.getFileStorage()
-            .getFilesystem()
-            .getBasedir();
+        return new CodeWorkflowFileStorageImpl(fileStorageServiceRegistry.getFileStorageService(provider.name()));
     }
 }

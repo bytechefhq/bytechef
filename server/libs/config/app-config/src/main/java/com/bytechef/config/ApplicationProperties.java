@@ -1334,7 +1334,7 @@ public class ApplicationProperties {
          */
         public static class Filesystem {
 
-            private String basedir;
+            private String basedir = "";
 
             public String getBasedir() {
                 return basedir;

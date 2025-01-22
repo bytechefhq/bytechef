@@ -17,6 +17,7 @@
 package com.bytechef.file.storage.base64.service;
 
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -94,6 +95,11 @@ public class Base64FileStorageService implements FileStorageService {
         String url = fileEntry.getUrl();
 
         return EncodingUtils.base64DecodeToString(url.replace(URL_PREFIX, ""));
+    }
+
+    @Override
+    public String getType() {
+        return ApplicationProperties.FileStorage.Provider.JDBC.name();
     }
 
     @Override

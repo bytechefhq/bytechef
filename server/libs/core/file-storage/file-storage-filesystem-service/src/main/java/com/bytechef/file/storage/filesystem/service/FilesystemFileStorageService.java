@@ -16,6 +16,7 @@
 
 package com.bytechef.file.storage.filesystem.service;
 
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -80,6 +81,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     @Override
     public boolean fileExists(@NonNull String directoryPath, @NonNull String nonRandomFilename)
         throws FileStorageException {
+
         Path path = resolveDirectoryPath(directoryPath);
 
         return path.resolve(nonRandomFilename)
@@ -90,6 +92,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     @Override
     public FileEntry getFileEntry(@NonNull String directoryPath, @NonNull String nonRandomFilename)
         throws FileStorageException {
+
         Path path = resolveDirectoryPath(directoryPath);
 
         FileEntry fileEntry = new FileEntry(nonRandomFilename, URL_PREFIX + path.resolve(nonRandomFilename));
@@ -142,6 +145,7 @@ public class FilesystemFileStorageService implements FileStorageService {
     @Override
     public byte[] readFileToBytes(@NonNull String directoryPath, @NonNull FileEntry fileEntry)
         throws FileStorageException {
+
         Path path = resolveDirectoryPath(directoryPath);
         String url = fileEntry.getUrl();
 
@@ -164,6 +168,11 @@ public class FilesystemFileStorageService implements FileStorageService {
         } catch (IOException ioe) {
             throw new FileStorageException("Failed to open file " + url, ioe);
         }
+    }
+
+    @Override
+    public String getType() {
+        return ApplicationProperties.FileStorage.Provider.FILESYSTEM.name();
     }
 
     @Override
@@ -210,9 +219,9 @@ public class FilesystemFileStorageService implements FileStorageService {
     }
 
     @Override
-    public FileEntry
-        storeFileContent(@NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
-            throws FileStorageException {
+    public FileEntry storeFileContent(
+        @NonNull String directoryPath, @NonNull String filename, @NonNull InputStream inputStream)
+        throws FileStorageException {
 
         return storeFileContent(directoryPath, filename, inputStream, true);
     }

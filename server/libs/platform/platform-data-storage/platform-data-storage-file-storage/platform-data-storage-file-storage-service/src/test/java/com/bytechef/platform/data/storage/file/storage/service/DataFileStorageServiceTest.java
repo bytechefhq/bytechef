@@ -22,6 +22,7 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
@@ -36,8 +37,9 @@ public class DataFileStorageServiceTest {
 
     static {
         try {
-            File baseDir = Files.createTempDirectory("file_data_storage_test")
-                .toFile();
+            Path fileDataStorageTest = Files.createTempDirectory("file_data_storage_test");
+
+            File baseDir = fileDataStorageTest.toFile();
 
             if (!baseDir.exists() && !baseDir.mkdirs()) {
                 throw new RuntimeException("Failed to create base directory");
