@@ -29,8 +29,7 @@ Version: 1
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Open AI API Key | STRING | TEXT  |  The API key for the OpenAI API which is used to generate embeddings.  |
-| Host | STRING | TEXT  |  Host oo your Weaviate instance.  |
-| Scheme | STRING | SELECT  |  |
+| Weaviate Url | STRING | TEXT  |  The URL of the Weaviate instance.  |
 | Weaviate API Key | STRING | TEXT  |  The API key for the Weaviate API.  |
 
 

@@ -30,9 +30,7 @@ Version: 1
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Open AI API Key | STRING | TEXT  |  The API key for the OpenAI API which is used to generate embeddings.  |
 | Pinecone API Key | STRING | TEXT  |  The API key for the Pinecone API.  |
-| Environment | STRING | TEXT  |  Pinecone environment.  |
-| Project ID | STRING | TEXT  |  Pinecone project ID.  |
-| Index Name | STRING | TEXT  |  Pinecone index name.  |
+| Host | STRING | TEXT  |  Url of the host.  |
 
 
 
