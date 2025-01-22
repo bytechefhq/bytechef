@@ -120,6 +120,20 @@ const Integration = () => {
         workflowKeys: WorkflowKeys,
     });
 
+    const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: IntegrationWorkflowKeys.integrationWorkflow(
+                    parseInt(integrationId!),
+                    parseInt(integrationWorkflowId!)
+                ),
+            });
+        },
+        useUpdateWorkflowMutation: useUpdateWorkflowMutation,
+        workflowId: workflow.id!,
+        workflowKeys: WorkflowKeys,
+    });
+
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
@@ -306,7 +320,7 @@ const Integration = () => {
                                 >
                                     <WorkflowMutationProvider
                                         value={{
-                                            updateWorkflowMutation,
+                                            updateWorkflowMutation: updateWorkflowEditorMutation,
                                         }}
                                     >
                                         <WorkflowNodeParameterMutationProvider
@@ -320,7 +334,6 @@ const Integration = () => {
                                                     componentDefinitions={componentDefinitions}
                                                     leftSidebarOpen={leftSidebarOpen}
                                                     taskDispatcherDefinitions={taskDispatcherDefinitions}
-                                                    updateWorkflowMutation={updateWorkflowMutation}
                                                 />
 
                                                 {rightSidebarOpen &&

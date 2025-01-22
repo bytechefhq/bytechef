@@ -7,10 +7,10 @@ import '@xyflow/react/dist/base.css';
 import './WorkflowEditorLayout.css';
 
 import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/workflow-test-chat/WorkflowTestChatPanel';
+import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
-import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useEffect, useState} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -22,19 +22,19 @@ export interface WorkflowEditorLayoutProps {
     componentDefinitions: ComponentDefinitionBasic[];
     leftSidebarOpen: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
-    updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
 const WorkflowEditorLayout = ({
     componentDefinitions,
     leftSidebarOpen,
     taskDispatcherDefinitions,
-    updateWorkflowMutation,
 }: WorkflowEditorLayoutProps) => {
     const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
 
     const {componentActions, workflow} = useWorkflowDataStore();
     const {currentComponent, currentNode, setCurrentComponent} = useWorkflowNodeDetailsPanelStore();
+
+    const {updateWorkflowMutation} = useWorkflowMutation();
 
     const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
         {
