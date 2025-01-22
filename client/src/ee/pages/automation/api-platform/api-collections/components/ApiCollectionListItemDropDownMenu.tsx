@@ -9,6 +9,7 @@ import {
 import {DotsVerticalIcon} from '@radix-ui/react-icons';
 
 interface ApiCollectionListItemDropdownMenuProps {
+    apiCollectionId: number;
     onDeleteClick: () => void;
     onEditClick: () => void;
     onNewEndpoint: () => void;
@@ -16,6 +17,7 @@ interface ApiCollectionListItemDropdownMenuProps {
 }
 
 const ApiCollectionListItemDropDownMenu = ({
+    apiCollectionId,
     onDeleteClick,
     onEditClick,
     onNewEndpoint,
@@ -35,6 +37,14 @@ const ApiCollectionListItemDropDownMenu = ({
                 <DropdownMenuItem onClick={onUpdateProjectVersionClick}>Update Project Version</DropdownMenuItem>
 
                 <DropdownMenuItem onClick={onNewEndpoint}>New Endpoint</DropdownMenuItem>
+
+                <DropdownMenuItem
+                    onClick={() =>
+                        (window.location.href = `/api/automation/api-platform/internal/api-collections/${apiCollectionId}/openapi`)
+                    }
+                >
+                    Downaload OpenAPI Spec
+                </DropdownMenuItem>
 
                 <DropdownMenuSeparator />
 
