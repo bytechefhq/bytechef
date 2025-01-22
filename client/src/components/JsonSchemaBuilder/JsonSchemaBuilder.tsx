@@ -6,13 +6,12 @@ import {SchemaRecordType} from './utils/types';
 import './utils/i18n';
 
 import SchemaCreator from '@/components/JsonSchemaBuilder/components/SchemaCreator';
-import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {isEmpty} from '@/components/JsonSchemaBuilder/utils/helpers';
 
 interface JsonSchemaBuilderProps {
     locale?: string;
     onChange?: (newSchema: SchemaRecordType) => void;
-    schema: SchemaRecordType;
+    schema?: SchemaRecordType;
 }
 
 const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderProps) => {
@@ -21,7 +20,17 @@ const JsonSchemaBuilder = ({locale = 'en', onChange, schema}: JsonSchemaBuilderP
     const {i18n, ready} = useTranslation('null', {useSuspense: false});
 
     useEffect(() => {
-        setCurSchema(!isEmpty(schema) ? {...schema} : {...DEFAULT_SCHEMA});
+        setCurSchema(
+            isEmpty(schema)
+                ? {
+                      $schema: 'https://json-schema.org/draft/2020-12/schema',
+                      properties: {},
+                      required: [],
+                      type: 'object',
+                  }
+                : {...schema}
+        );
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 

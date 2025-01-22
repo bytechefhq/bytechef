@@ -1,4 +1,3 @@
-import {DEFAULT_SCHEMA} from '@/components/JsonSchemaBuilder/utils/constants';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
@@ -1043,7 +1042,7 @@ const Property = ({
                             leadingIcon={typeIcon}
                             name={name!}
                             onChange={(value) => handleJsonSchemaBuilderChange(value)}
-                            schema={inputValue ? JSON.parse(inputValue) : DEFAULT_SCHEMA}
+                            schema={inputValue ? JSON.parse(inputValue) : undefined}
                         />
                     )}
 

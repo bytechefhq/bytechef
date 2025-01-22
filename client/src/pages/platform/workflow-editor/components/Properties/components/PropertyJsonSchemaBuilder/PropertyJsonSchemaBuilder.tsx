@@ -20,7 +20,7 @@ interface PropertyJsonSchemaBuilderProps {
     name: string;
     onChange?: (newSchema: SchemaRecordType) => void;
     required?: boolean;
-    schema: SchemaRecordType;
+    schema?: SchemaRecordType;
 }
 
 const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSchemaBuilderProps>(

@@ -10,7 +10,7 @@ interface PropertyJsonSchemaBuilderSheetProps {
     locale?: string;
     onChange?: (newSchema: SchemaRecordType) => void;
     onClose?: () => void;
-    schema: SchemaRecordType;
+    schema?: SchemaRecordType;
 }
 
 const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: PropertyJsonSchemaBuilderSheetProps) => {

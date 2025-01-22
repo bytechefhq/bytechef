@@ -18,13 +18,6 @@ import {
     StringValidSchemaFieldType,
 } from './types';
 
-export const DEFAULT_SCHEMA = {
-    $schema: 'https://json-schema.org/draft/2020-12/schema',
-    properties: {},
-    required: [],
-    type: 'object',
-};
-
 export const SCHEMA_TYPES: SchemaTypeOptionType[] = [
     {
         label: 'schemaTypes.text',
