@@ -555,6 +555,28 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.workflowNodeName]);
 
+    // Add connections field to the current node
+    useEffect(() => {
+        if (!currentNode || !currentWorkflowNodeConnections.length) {
+            return;
+        }
+
+        setCurrentNode({
+            ...currentNode,
+            connections: currentWorkflowNodeConnections,
+        });
+
+        if (!currentComponent) {
+            return;
+        }
+
+        setCurrentComponent({
+            ...currentComponent,
+            connections: currentWorkflowNodeConnections,
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentWorkflowTask?.name]);
+
     if (!workflowNodeDetailsPanelOpen || !currentNode?.workflowNodeName || !currentTaskData) {
         return <></>;
     }
