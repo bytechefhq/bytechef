@@ -41,6 +41,7 @@ import {Cross2Icon, InfoCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
+import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -519,26 +520,38 @@ const WorkflowNodeDetailsPanel = ({
     }, [currentComponentDefinition]);
 
     useEffect(() => {
-        if (currentNode && workflowTestConfigurationConnections?.[0]?.connectionId) {
-            setCurrentNode({
-                ...currentNode,
-                connectionId: workflowTestConfigurationConnections[0]?.connectionId,
-            });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowTestConfigurationConnections]);
+        if (!currentNode) return;
 
-    // Store new operationName into currentNode
-    useEffect(() => {
-        if (currentNode?.operationName && currentOperationName) {
-            setCurrentNode({
-                ...currentNode,
+        let updatedNode = {...currentNode};
+
+        if (currentNode.operationName && currentOperationName) {
+            updatedNode = {
+                ...updatedNode,
                 operationName: currentOperationName,
                 type: `${currentComponent?.componentName}/v${currentComponentDefinition?.version}/${currentOperationName}`,
-            });
+            };
+        }
+
+        if (currentWorkflowNodeConnections.length && workflowTestConfigurationConnections?.length) {
+            updatedNode = {
+                ...updatedNode,
+                connectionId: workflowTestConfigurationConnections[0]?.connectionId,
+                connections: currentWorkflowNodeConnections,
+            };
+        }
+
+        if (!isEqual(updatedNode, currentNode)) {
+            setCurrentNode(updatedNode);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentOperationName]);
+    }, [
+        currentNode,
+        currentOperationName,
+        currentComponent?.componentName,
+        currentComponentDefinition?.version,
+        currentWorkflowNodeConnections,
+        workflowTestConfigurationConnections,
+    ]);
 
     // Set currentOperationName depending on the currentComponentAction.operationName
     useEffect(() => {
@@ -554,28 +567,6 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.workflowNodeName]);
-
-    // Add connections field to the current node
-    useEffect(() => {
-        if (!currentNode || !currentWorkflowNodeConnections.length) {
-            return;
-        }
-
-        setCurrentNode({
-            ...currentNode,
-            connections: currentWorkflowNodeConnections,
-        });
-
-        if (!currentComponent) {
-            return;
-        }
-
-        setCurrentComponent({
-            ...currentComponent,
-            connections: currentWorkflowNodeConnections,
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentWorkflowTask?.name]);
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.workflowNodeName || !currentTaskData) {
         return <></>;
