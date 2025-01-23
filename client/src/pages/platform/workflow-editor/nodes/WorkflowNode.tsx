@@ -6,7 +6,7 @@ import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/work
 import {NodeDataType} from '@/shared/types';
 import {HoverCard} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
-import {Handle, Position, useReactFlow} from '@xyflow/react';
+import {Handle, Position} from '@xyflow/react';
 import {PencilIcon, TrashIcon} from 'lucide-react';
 import {memo, useState} from 'react';
 import sanitize from 'sanitize-html';
@@ -27,8 +27,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const handleNodeClick = useNodeClickHandler(data, id);
 
-    const {getNode} = useReactFlow();
-
     const isSelected = currentNode?.name === data.name;
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
@@ -48,8 +46,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             handleDeleteTask({
                 currentNode,
                 data,
-                getNode,
-                id,
                 queryClient,
                 updateWorkflowMutation,
                 workflow,

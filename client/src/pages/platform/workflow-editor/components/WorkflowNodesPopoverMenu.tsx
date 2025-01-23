@@ -3,9 +3,9 @@ import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/p
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {useReactFlow} from '@xyflow/react';
 import {PropsWithChildren, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -40,7 +40,11 @@ const WorkflowNodesPopoverMenu = ({
 
     const {componentDefinitions, taskDispatcherDefinitions, workflow} = useWorkflowDataStore();
 
-    const {getNodes} = useReactFlow();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -61,7 +65,7 @@ const WorkflowNodesPopoverMenu = ({
                 await handleConditionClick({
                     clickedItem,
                     edge,
-                    getNodes,
+                    nodes,
                     queryClient,
                     sourceNodeId,
                     updateWorkflowMutation,

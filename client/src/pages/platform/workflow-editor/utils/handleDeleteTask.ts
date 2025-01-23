@@ -4,7 +4,6 @@ import {Workflow, WorkflowTask} from '@/shared/middleware/platform/configuration
 import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutputs.queries';
 import {ConditionTaskDispatcherType, NodeDataType, WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
-import {Node} from '@xyflow/react';
 
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -13,8 +12,6 @@ import getParentConditionTask from './getParentConditionTask';
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
     data: NodeDataType;
-    getNode: (id: string) => Node | undefined;
-    id: string;
     queryClient: QueryClient;
     updateWorkflowMutation: UseMutationResult<void, unknown, {id: string; workflow: Workflow}>;
     workflow: Workflow & WorkflowTaskDataType;
@@ -23,15 +20,11 @@ interface HandleDeleteTaskProps {
 export default function handleDeleteTask({
     currentNode,
     data,
-    getNode,
-    id,
     queryClient,
     updateWorkflowMutation,
     workflow,
 }: HandleDeleteTaskProps) {
-    const node = getNode(id);
-
-    if (!node || !workflow?.definition) {
+    if (!workflow?.definition) {
         return;
     }
 

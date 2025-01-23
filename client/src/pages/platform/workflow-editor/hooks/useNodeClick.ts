@@ -1,8 +1,10 @@
 import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRightSidebarStore';
 import {NodeDataType, TabNameType} from '@/shared/types';
-import {NodeProps, useReactFlow} from '@xyflow/react';
+import {NodeProps} from '@xyflow/react';
 import {useCallback} from 'react';
+import {useShallow} from 'zustand/react/shallow';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 
 export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], activeTab?: TabNameType) {
@@ -10,10 +12,14 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
         useWorkflowNodeDetailsPanelStore();
     const {setRightSidebarOpen} = useRightSidebarStore();
 
-    const {getNode} = useReactFlow();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     return useCallback(() => {
-        const clickedNode = getNode(id);
+        const clickedNode = nodes.find((node) => node.id === id);
 
         if (!clickedNode) {
             return;
@@ -31,14 +37,14 @@ export default function useNodeClick(data: NodeDataType, id: NodeProps['id'], ac
             });
         }
     }, [
-        getNode,
-        id,
+        nodes,
         setRightSidebarOpen,
-        setWorkflowNodeDetailsPanelOpen,
+        setActiveTab,
+        activeTab,
         setCurrentNode,
         data,
-        activeTab,
-        setActiveTab,
+        setWorkflowNodeDetailsPanelOpen,
+        id,
         setCurrentComponent,
     ]);
 }

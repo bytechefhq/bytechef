@@ -15,7 +15,7 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
     edge?: boolean;
-    getNodes: () => Array<Node>;
+    nodes: Array<Node>;
     queryClient: QueryClient;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -25,7 +25,7 @@ interface HandleConditionClickProps {
 export default async function handleConditionClick({
     clickedItem,
     edge,
-    getNodes,
+    nodes,
     queryClient,
     sourceNodeId,
     updateWorkflowMutation,
@@ -46,8 +46,6 @@ export default async function handleConditionClick({
     if (!clickedTaskDispatcherDefinition) {
         return;
     }
-
-    const nodes = getNodes();
 
     const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 

@@ -4,9 +4,9 @@ import getFilteredProperties from '@/pages/platform/workflow-editor/utils/getFil
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {NodeDataType, PropertyAllType} from '@/shared/types';
 import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
-import {useReactFlow} from '@xyflow/react';
 import {ChevronDownIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
+import {useShallow} from 'zustand/react/shallow';
 
 import useNodeClickHandler from '../hooks/useNodeClick';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
@@ -24,7 +24,11 @@ const DataPillPanelBodyPropertiesItem = ({
 }) => {
     const {componentActions} = useWorkflowDataStore();
 
-    const {getNodes} = useReactFlow();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const {componentDefinition, workflowNodeName} = componentOperation;
 
@@ -42,8 +46,6 @@ const DataPillPanelBodyPropertiesItem = ({
     const {icon, title} = componentDefinition;
 
     const currentComponentAction = componentActions.find((action) => action.workflowNodeName === workflowNodeName);
-
-    const nodes = getNodes();
 
     const redirectTargetNode = nodes.find((workflowNode) => workflowNode.id === workflowNodeName);
 
