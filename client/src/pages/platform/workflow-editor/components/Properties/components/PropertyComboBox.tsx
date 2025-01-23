@@ -122,7 +122,7 @@ const PropertyComboBox = ({
 
     const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
 
-    const missingConnection = !options.length && currentNode?.connections?.length && !currentNode.connectionId;
+    const missingConnection = currentNode?.connections?.length && !currentNode.connectionId;
 
     const noOptionsAvailable = !lookupDependsOnValues && !options.length && !missingConnection;
 

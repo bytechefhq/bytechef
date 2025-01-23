@@ -64,6 +64,8 @@ export type TaskDispatcherType = {
 
 export type ComponentType = {
     componentName: string;
+    connections?: Array<ComponentConnection>;
+    connectionId?: number;
     description?: string;
     displayConditions?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

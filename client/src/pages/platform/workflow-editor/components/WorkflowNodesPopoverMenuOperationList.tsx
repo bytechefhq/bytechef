@@ -139,7 +139,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     metadata: undefined,
                     name: workflowNodeName,
                     operationName: clickedOperation.operationName,
-                    parameters: undefined,
+                    parameters: {},
                     type: clickedOperation.type,
                     version,
                     workflowNodeName,
@@ -214,9 +214,10 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 const workflowNodeName = getFormattedName(clickedOperation.componentName!, getNodes());
 
                 const newWorkflowNodeData = {
+                    ...componentDefinition,
                     componentName: clickedOperation.componentName,
+                    connection: componentDefinition.connection,
                     connectionId: undefined,
-                    connections: undefined,
                     icon: clickedOperation.icon && (
                         <InlineSVG
                             className="size-9"
@@ -227,6 +228,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     label: clickedOperation.componentLabel,
                     name: workflowNodeName,
                     operationName: clickedOperation.operationName,
+                    parameters: {},
                     type: clickedOperation.type,
                     version,
                     workflowNodeName,
