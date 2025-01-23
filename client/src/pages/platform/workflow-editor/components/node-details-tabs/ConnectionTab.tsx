@@ -13,19 +13,21 @@ import ConnectionDialog from 'pages/platform/connection/components/ConnectionDia
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 
+type ConnectionTabPropsType = {
+    componentConnections: Array<ComponentConnection>;
+    componentDefinition: ComponentDefinition;
+    workflowNodeName: string;
+    workflowId: string;
+    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
+};
+
 const ConnectionTab = ({
     componentConnections,
     componentDefinition,
     workflowId,
     workflowNodeName,
     workflowTestConfigurationConnections,
-}: {
-    componentDefinition: ComponentDefinition;
-    componentConnections: ComponentConnection[];
-    workflowNodeName: string;
-    workflowId: string;
-    workflowTestConfigurationConnections?: Array<WorkflowTestConfigurationConnection>;
-}) => {
+}: ConnectionTabPropsType) => {
     const {setShowConnectionNote, showConnectionNote} = useConnectionNoteStore();
 
     const {ConnectionKeys, useCreateConnectionMutation, useGetConnectionTagsQuery} = useConnectionQuery();
@@ -34,20 +36,16 @@ const ConnectionTab = ({
         <div className="flex h-full flex-col gap-6 overflow-auto p-4">
             {componentConnections?.length ? (
                 componentConnections.map((componentConnection) => {
-                    const workflowTestConfigurationConnection =
-                        workflowTestConfigurationConnections && workflowTestConfigurationConnections.length > 0
-                            ? workflowTestConfigurationConnections.filter(
-                                  (workflowTestConfigurationConnection) =>
-                                      workflowTestConfigurationConnection.workflowConnectionKey ===
-                                      componentConnection.key
-                              )[0]
-                            : undefined;
+                    const workflowTestConfigurationConnection = workflowTestConfigurationConnections?.find(
+                        (testConfigConnection) => testConfigConnection.workflowConnectionKey === componentConnection.key
+                    );
 
                     return (
                         <fieldset className="space-y-2" key={componentConnection.key}>
                             <ConnectionTabConnectionSelect
                                 componentConnection={componentConnection}
                                 componentConnectionsCount={componentConnections.length}
+                                componentDefinition={componentDefinition}
                                 workflowId={workflowId}
                                 workflowNodeName={workflowNodeName}
                                 workflowTestConfigurationConnection={workflowTestConfigurationConnection}
