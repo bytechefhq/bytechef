@@ -15,7 +15,8 @@ export default function handleComponentAddedSuccess({
     queryClient,
     workflow,
 }: HandleComponentAddedSuccessProps) {
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode, setWorkflowNodeDetailsPanelOpen} =
+        useWorkflowNodeDetailsPanelStore.getState();
 
     queryClient.invalidateQueries({
         queryKey: WorkflowNodeOutputKeys.filteredPreviousWorkflowNodeOutputs({
@@ -24,25 +25,14 @@ export default function handleComponentAddedSuccess({
         }),
     });
 
-    if (currentNode?.trigger && nodeData.trigger) {
-        useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({...currentNode, ...nodeData});
-        useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({...currentComponent, ...nodeData});
-    } else if (!currentNode?.trigger) {
-        if (!useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentNode({
-                ...nodeData,
-                workflowNodeName: nodeData.workflowNodeName ?? 'trigger_1',
-            });
-
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
-                ...nodeData,
-                workflowNodeName: nodeData.workflowNodeName ?? 'trigger_1',
-            });
-
-            useWorkflowNodeDetailsPanelStore.getState().setWorkflowNodeDetailsPanelOpen(true);
-        } else {
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentNode(nodeData);
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent(nodeData);
+    if (useWorkflowNodeDetailsPanelStore.getState().workflowNodeDetailsPanelOpen) {
+        if (currentNode?.trigger && nodeData.trigger) {
+            setCurrentNode({...currentNode, ...nodeData});
+            setCurrentComponent({...currentComponent, ...nodeData});
         }
+    } else {
+        setCurrentNode(nodeData);
+        setCurrentComponent(nodeData);
+        setWorkflowNodeDetailsPanelOpen(true);
     }
 }
