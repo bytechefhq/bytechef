@@ -37,7 +37,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const {workflow} = useWorkflowDataStore();
     const {updateWorkflowNodeParameterMutation} = useWorkflowNodeParameterMutation();
 
-    const {additionalProperties, label, name, properties} = property;
+    const {additionalProperties, label, name, placeholder, properties} = property;
 
     const isContainerObject = name === '__item';
 
@@ -301,6 +301,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             {!!availablePropertyTypes?.length && (
                 <SubPropertyPopover
                     availablePropertyTypes={availablePropertyTypes}
+                    buttonLabel={placeholder}
                     handleClick={handleAddItemClick}
                     newPropertyName={newPropertyName}
                     newPropertyType={newPropertyType}
