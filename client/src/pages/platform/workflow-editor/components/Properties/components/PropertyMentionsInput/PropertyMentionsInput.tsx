@@ -59,10 +59,9 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         const [initialized, setInitialized] = useState(false);
         const [isFocused, setIsFocused] = useState(false);
 
-        const {componentDefinitions, dataPills} = useWorkflowDataStore();
+        const {componentDefinitions, dataPills, workflow} = useWorkflowDataStore();
         const {focusedInput, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
         const {setDataPillPanelOpen} = useDataPillPanelStore();
-        const {workflow} = useWorkflowDataStore();
 
         const onFocus = (editor: Editor) => {
             setFocusedInput(editor);

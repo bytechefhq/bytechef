@@ -44,6 +44,7 @@ import {useCallback, useEffect, useMemo, useState} from 'react';
 import isEqual from 'react-fast-compare';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -101,7 +102,13 @@ const WorkflowNodeDetailsPanel = ({
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore();
 
-    const {componentActions, nodes, setDataPills, workflow} = useWorkflowDataStore();
+    const {componentActions, setDataPills, workflow} = useWorkflowDataStore();
+
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const queryClient = useQueryClient();
 

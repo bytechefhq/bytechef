@@ -8,7 +8,7 @@ import {
 import {NodeDataType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import Dagre from '@dagrejs/dagre';
-import {Edge, Node, useReactFlow} from '@xyflow/react';
+import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import InlineSVG from 'react-inlinesvg';
@@ -136,18 +136,23 @@ export default function useLayout({
     canvasWidth: number;
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }) {
-    const {setEdges, setNodes} = useWorkflowDataStore(
+    const {
+        setEdges,
+        setNodes,
+        workflow: {tasks, triggers},
+    } = useWorkflowDataStore(
         useShallow((state) => ({
             setEdges: state.setEdges,
             setNodes: state.setNodes,
+            workflow: state.workflow,
         }))
     );
 
-    const {getNodes} = useReactFlow();
-
-    const {
-        workflow: {tasks, triggers},
-    } = useWorkflowDataStore();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const triggerComponentName = triggers?.[0]?.type.split('/')[0];
 
@@ -495,21 +500,21 @@ export default function useLayout({
 
         dagreGraph.setGraph({rankdir: DIRECTION});
 
-        let nodes: Node[] = getNodes();
+        let layoutNodes: Node[] = nodes;
         let edges: Edge[] = taskEdges;
 
         if (triggerAndTaskNodes.length) {
-            nodes = taskNodes?.length ? [...triggerAndTaskNodes] : [triggerNode, finalPlaceholderNode];
+            layoutNodes = taskNodes?.length ? [...triggerAndTaskNodes] : [triggerNode, finalPlaceholderNode];
         }
 
-        nodes.forEach((node, index) => {
+        layoutNodes.forEach((node, index) => {
             let height = NODE_HEIGHT;
 
             if (node.id.includes('placeholder')) {
                 height = PLACEHOLDER_NODE_HEIGHT * 2;
 
                 if (node.id.includes('placeholder-0')) {
-                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
 
                     if (hasOtherConditionCaseNodes.length) {
                         height = 0;
@@ -527,10 +532,10 @@ export default function useLayout({
                 height = NODE_HEIGHT * 1.2;
             }
 
-            if (index === nodes.length - 1) {
+            if (index === layoutNodes.length - 1) {
                 height = 20;
 
-                const penultimateNode = nodes[nodes.length - 2];
+                const penultimateNode = layoutNodes[layoutNodes.length - 2];
 
                 if (penultimateNode.id.includes('bottom-placeholder')) {
                     height = 90;
@@ -546,11 +551,11 @@ export default function useLayout({
 
         Dagre.layout(dagreGraph);
 
-        nodes = nodes.map((node) => {
+        layoutNodes = layoutNodes.map((node) => {
             let positionY = dagreGraph.node(node.id).y;
 
             if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
-                const hasOtherConditionCaseNodes = filterConditionCaseNodes(nodes, node);
+                const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
 
                 if (hasOtherConditionCaseNodes.length) {
                     positionY += 35;
@@ -562,7 +567,7 @@ export default function useLayout({
             return {
                 ...node,
                 position: {
-                    x: dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2),
+                    x: dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(layoutNodes[0].id).x - 72 / 2),
                     y: positionY,
                 },
             };
@@ -583,7 +588,7 @@ export default function useLayout({
             {edges: [], map: new Map<string, boolean>()}
         ).edges;
 
-        setNodes(nodes);
+        setNodes(layoutNodes);
         setEdges(edges);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps

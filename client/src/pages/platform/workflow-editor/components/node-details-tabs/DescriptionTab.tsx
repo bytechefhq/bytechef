@@ -13,6 +13,7 @@ import {NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
 import {useDebouncedCallback} from 'use-debounce';
+import {useShallow} from 'zustand/react/shallow';
 
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import updateRootConditionNode from '../../utils/updateRootConditionNode';
@@ -24,7 +25,13 @@ const DescriptionTab = ({
     nodeDefinition: ComponentDefinition | TaskDispatcherDefinition | TriggerDefinition;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }) => {
-    const {nodes, workflow} = useWorkflowDataStore();
+    const {workflow} = useWorkflowDataStore();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
+
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
     const queryClient = useQueryClient();

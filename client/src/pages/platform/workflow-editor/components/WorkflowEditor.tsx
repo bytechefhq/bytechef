@@ -40,7 +40,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
     const {workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore();
     const {workflowTestChatPanelOpen} = useWorkflowTestChatStore();
 
-    const {getEdge, getNode, setViewport} = useReactFlow();
+    const {setViewport} = useReactFlow();
 
     const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop();
 
@@ -117,7 +117,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
                     return;
                 }
 
-                const targetNode = getNode(targetNodeId);
+                const targetNode = nodes.find((node) => node.id === targetNodeId);
 
                 if (targetNode) {
                     handleDropOnTriggerNode(droppedNode);
@@ -139,7 +139,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
 
                 const targetNodeId = targetNodeElement.dataset.id!;
 
-                const targetNode = getNode(targetNodeId);
+                const targetNode = nodes.find((node) => node.id === targetNodeId);
 
                 if (targetNode && targetNode.type === 'placeholder') {
                     if (targetNode?.position.x === 0 && targetNode?.position.y === 0) {
@@ -158,7 +158,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
                     return;
                 }
 
-                const targetEdge = getEdge(targetEdgeElement.id);
+                const targetEdge = edges.find((edge) => edge.id === targetEdgeElement.id);
 
                 if (targetEdge) {
                     handleDropOnWorkflowEdge(targetEdge, droppedNode);

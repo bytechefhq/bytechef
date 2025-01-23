@@ -15,9 +15,10 @@ import {TriggerDefinitionKeys} from '@/shared/queries/platform/triggerDefinition
 import {ClickedDefinitionType, PropertyAllType} from '@/shared/types';
 import {getRandomId} from '@/shared/util/random-utils';
 import {useQueryClient} from '@tanstack/react-query';
-import {Edge, Node, useReactFlow} from '@xyflow/react';
+import {Edge, Node} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
+import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
@@ -29,17 +30,18 @@ export default function useHandleDrop(): [
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType) => void,
 ] {
-    const {workflow} = useWorkflowDataStore();
+    const {edges, nodes, setEdges, workflow} = useWorkflowDataStore(
+        useShallow((state) => ({
+            edges: state.edges,
+            nodes: state.nodes,
+            setEdges: state.setEdges,
+            workflow: state.workflow,
+        }))
+    );
 
     const {captureComponentUsed} = useAnalytics();
 
-    const {setEdges} = useWorkflowDataStore();
-
-    const {getEdges, getNodes} = useReactFlow();
-
     const newNodeId = getRandomId();
-    const nodes = getNodes();
-    const edges = getEdges();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
 
@@ -153,9 +155,9 @@ export default function useHandleDrop(): [
         let taskNodeIndex: number | undefined = undefined;
 
         if (targetNode.id.includes('bottom-placeholder')) {
-            const targetNodeIndex = getNodes().findIndex((node) => node.id === targetNode.id);
+            const targetNodeIndex = nodes.findIndex((node) => node.id === targetNode.id);
 
-            const nextNode = getNodes()[targetNodeIndex + 1];
+            const nextNode = nodes[targetNodeIndex + 1];
 
             taskNodeIndex = workflow.tasks?.findIndex((task) => task.name === nextNode.id);
         }

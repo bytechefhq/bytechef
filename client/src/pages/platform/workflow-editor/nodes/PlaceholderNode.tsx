@@ -1,17 +1,21 @@
 import {NodeDataType} from '@/shared/types';
-import {Handle, Position, useReactFlow} from '@xyflow/react';
+import {Handle, Position} from '@xyflow/react';
 import {memo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+import {useShallow} from 'zustand/react/shallow';
 
 import WorkflowNodesPopoverMenu from '../components/WorkflowNodesPopoverMenu';
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
 
-    const {getNodes} = useReactFlow();
-
-    const nodes = getNodes();
+    const {nodes} = useWorkflowDataStore(
+        useShallow((state) => ({
+            nodes: state.nodes,
+        }))
+    );
 
     const nodeIndex = nodes.findIndex((node) => node.id === id);
 
