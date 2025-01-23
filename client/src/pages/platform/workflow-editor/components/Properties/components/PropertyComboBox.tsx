@@ -7,7 +7,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useGetWorkflowNodeOptionsQuery} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {CaretSortIcon, CheckIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
-import {FocusEventHandler, ReactNode, useState} from 'react';
+import {FocusEventHandler, ReactNode, useEffect, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -62,37 +62,42 @@ const PropertyComboBox = ({
     name,
     onBlur,
     onValueChange,
-    options,
-    path,
+    options: initialOptions,
+    path: initialPath,
     placeholder = 'Select...',
     required,
     showInputTypeSwitchButton,
-    value,
+    value: initialValue,
     workflowId,
     workflowNodeName,
 }: PropertyComboBoxProps) => {
     const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(initialValue ?? defaultValue);
 
     const {currentNode} = useWorkflowNodeDetailsPanelStore();
 
-    if (path) {
-        path = path.replace('parameters.', '').replace('parameters', '');
+    const path = useMemo(() => {
+        let updatedPath = initialPath;
+        if (updatedPath) {
+            updatedPath = updatedPath.replace('parameters.', '').replace('parameters', '');
 
-        if (path.endsWith(`_${arrayIndex}`)) {
-            path = path.substring(0, path.lastIndexOf('.')) + `[${arrayIndex}]`;
+            if (updatedPath.endsWith(`_${arrayIndex}`)) {
+                updatedPath = updatedPath.substring(0, updatedPath.lastIndexOf('.')) + `[${arrayIndex}]`;
+            }
+        } else {
+            updatedPath = name;
         }
-    } else {
-        path = name;
-    }
 
-    const connectionRequirementMet = currentNode?.connections?.length ? !!currentNode.connectionId : true;
+        return updatedPath;
+    }, [initialPath, name, arrayIndex]);
 
-    const {
-        data: optionsData,
-        isLoading,
-        isRefetching,
-    } = useGetWorkflowNodeOptionsQuery(
-        {
+    const connectionRequirementMet = useMemo(
+        () => (currentNode?.connections?.length ? !!currentNode.connectionId : true),
+        [currentNode]
+    );
+
+    const queryOptions = useMemo(
+        () => ({
             loadDependencyValueKey: (lookupDependsOnValues ?? []).join(''),
             request: {
                 id: workflowId,
@@ -100,37 +105,64 @@ const PropertyComboBox = ({
                 propertyName: path!,
                 workflowNodeName,
             },
-        },
-        !!currentNode &&
+        }),
+        [lookupDependsOnValues, workflowId, lookupDependsOnPaths, path, workflowNodeName]
+    );
+
+    const queryEnabled = useMemo(
+        () =>
+            !!currentNode &&
             (lookupDependsOnValues
                 ? lookupDependsOnValues.every((loadDependencyValue) => !!loadDependencyValue)
                 : false) &&
-            !!connectionRequirementMet
+            !!connectionRequirementMet,
+        [currentNode, lookupDependsOnValues, connectionRequirementMet]
     );
 
-    if (optionsData) {
-        options = optionsData.map((option) => ({
-            description: option.description,
-            label: option.label ?? option.value,
-            value: option.value.toString(),
-        }));
-    }
+    const {data: optionsData, isLoading, isRefetching} = useGetWorkflowNodeOptionsQuery(queryOptions, queryEnabled);
 
-    if (defaultValue && !value) {
-        value = defaultValue;
-    }
+    const options = useMemo(() => {
+        if (optionsData) {
+            return optionsData.map((option) => ({
+                description: option.description,
+                label: option.label ?? option.value,
+                value: option.value.toString(),
+            }));
+        }
 
-    const currentOption = (options as Array<ComboBoxItemType>)?.find((option) => option.value === value);
+        return initialOptions;
+    }, [optionsData, initialOptions]);
 
-    const missingConnection = currentNode?.connections?.length && !currentNode.connectionId;
+    const currentOption = useMemo(
+        () => (options as Array<ComboBoxItemType>)?.find((option) => option.value === value),
+        [options, value]
+    );
 
-    const noOptionsAvailable = !lookupDependsOnValues && !options.length && !missingConnection;
+    const missingConnection = useMemo(
+        () => currentNode?.connections?.length && !currentNode.connectionId,
+        [currentNode]
+    );
 
-    if (lookupDependsOnValues?.length && !options.length) {
-        placeholder = `${lookupDependsOnPaths} is not defined`;
-    } else if (missingConnection) {
-        placeholder = 'Connection missing...';
-    }
+    const noOptionsAvailable = useMemo(
+        () => !lookupDependsOnValues && !options.length && !missingConnection,
+        [lookupDependsOnValues, options, missingConnection]
+    );
+
+    const memoizedPlaceholder = useMemo(() => {
+        if (lookupDependsOnValues?.length && !options.length) {
+            return `${lookupDependsOnPaths} is not defined`;
+        } else if (missingConnection) {
+            return 'Connection missing...';
+        }
+
+        return placeholder;
+    }, [lookupDependsOnValues?.length, options.length, missingConnection, placeholder, lookupDependsOnPaths]);
+
+    useEffect(() => {
+        if (initialValue !== undefined) {
+            setValue(initialValue);
+        }
+    }, [initialValue]);
 
     return (
         <fieldset className="w-full space-y-1">
@@ -228,7 +260,7 @@ const PropertyComboBox = ({
                                                     'text-destructive'
                                             )}
                                         >
-                                            {placeholder}
+                                            {memoizedPlaceholder}
                                         </span>
                                     )
                                 )}
@@ -270,6 +302,8 @@ const PropertyComboBox = ({
                                         key={option.value}
                                         onSelect={() => {
                                             setOpen(false);
+
+                                            setValue(option.value);
 
                                             if (onValueChange) {
                                                 onValueChange(option.value);
