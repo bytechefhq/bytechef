@@ -508,6 +508,7 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [controlType, properties?.length, propertyParameterValue]);
 
+    // set error state
     useEffect(() => {
         if (formState && name && path) {
             setHasError(
@@ -751,6 +752,7 @@ const Property = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [propertyParameterValue]);
 
+    // set display condition fetching state
     useEffect(() => {
         if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
             setIsFetchingCurrentDisplayCondition(true);
@@ -1118,7 +1120,10 @@ const Property = ({
             {type === 'DYNAMIC_PROPERTIES' && currentNode && (
                 <PropertyDynamicProperties
                     currentOperationName={operationName}
-                    enabled={!!currentNode.connectionId}
+                    enabled={
+                        !!(currentNode?.connectionId && currentNode?.connections) ||
+                        currentNode?.connections?.length === 0
+                    }
                     lookupDependsOnValues={lookupDependsOnValues}
                     name={name}
                     parameterValue={propertyParameterValue}
