@@ -5,7 +5,7 @@ import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/pla
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import resolvePath from 'object-resolve-path';
-import {Fragment, useEffect, useState} from 'react';
+import {Fragment, useCallback, useEffect, useState} from 'react';
 
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
@@ -40,7 +40,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         items = parentArrayItems?.[0].items;
     }
 
-    const handleAddItemClick = () => {
+    const handleAddItemClick = useCallback(() => {
         if (!currentComponent || !name) {
             return;
         }
@@ -70,19 +70,22 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         };
 
         setArrayItems([...arrayItems, newItem]);
-    };
+    }, [arrayItems, currentComponent, items, name, newPropertyType, path]);
 
-    const handleDeleteClick = (path: string) => {
-        if (!currentComponent || !path) {
-            return;
-        }
+    const handleDeleteClick = useCallback(
+        (path: string) => {
+            if (!currentComponent || !path) {
+                return;
+            }
 
-        const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
+            const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, path);
 
-        if (clickedItemParameterValue !== undefined) {
-            onDeleteClick(path);
-        }
-    };
+            if (clickedItemParameterValue !== undefined) {
+                onDeleteClick(path);
+            }
+        },
+        [currentComponent, onDeleteClick]
+    );
 
     // get available property types from items and additional properties
     useEffect(() => {
@@ -133,6 +136,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // update newPropertyType when availablePropertyTypes change
     useEffect(() => {
         if (availablePropertyTypes.length) {
             setNewPropertyType(availablePropertyTypes[0].value);
@@ -151,7 +155,6 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         }
 
         const encodedParameters = encodeParameters(currentComponent.parameters);
-
         const encodedPath = encodePath(path);
 
         const parameterValue = resolvePath(encodedParameters, encodedPath);
