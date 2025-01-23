@@ -873,7 +873,7 @@ const Property = ({
                         </div>
                     )}
 
-                    {(controlType === 'ARRAY_BUILDER' || controlType === 'MULTI_SELECT') && path && (
+                    {controlType === 'ARRAY_BUILDER' && path && (
                         <ArrayProperty
                             onDeleteClick={handleDeleteCustomPropertyClick}
                             parentArrayItems={parentArrayItems}
