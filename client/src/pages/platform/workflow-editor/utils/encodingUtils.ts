@@ -1,4 +1,9 @@
-import {PATH_DASH_REPLACEMENT, PATH_DIGIT_PREFIX, PATH_SPACE_REPLACEMENT} from '@/shared/constants';
+import {
+    PATH_DASH_REPLACEMENT,
+    PATH_DIGIT_PREFIX,
+    PATH_HASH_REPLACEMENT,
+    PATH_SPACE_REPLACEMENT,
+} from '@/shared/constants';
 import isObject from 'isobject';
 
 function encodeParametersGeneric(
@@ -46,6 +51,8 @@ export function encodeParameters(parameters: {[key: string]: unknown}): {[key: s
 
     encodedParameters = encodeParametersGeneric(encodedParameters, /-/g, PATH_DASH_REPLACEMENT);
 
+    encodedParameters = encodeParametersGeneric(encodedParameters, /#/g, PATH_HASH_REPLACEMENT);
+
     return encodedParameters;
 }
 
@@ -64,6 +71,10 @@ export function decodePath(path: string): string {
         decodedPath = decodedPath.replace(new RegExp(PATH_DASH_REPLACEMENT, 'g'), '-');
     }
 
+    if (decodedPath.includes(PATH_HASH_REPLACEMENT)) {
+        decodedPath = decodedPath.replace(new RegExp(PATH_HASH_REPLACEMENT, 'g'), '#');
+    }
+
     return decodedPath;
 }
 
@@ -73,6 +84,8 @@ export function encodePath(path: string): string {
     encodedPath = encodePathGeneric(encodedPath, /^\d/, PATH_DIGIT_PREFIX);
 
     encodedPath = encodePathGeneric(encodedPath, /-/g, PATH_DASH_REPLACEMENT);
+
+    encodedPath = encodePathGeneric(encodedPath, /#/g, PATH_HASH_REPLACEMENT);
 
     return encodedPath;
 }
