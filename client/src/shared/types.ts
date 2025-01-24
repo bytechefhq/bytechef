@@ -5,6 +5,7 @@ import {
     ComponentConnection,
     ComponentDefinition,
     ComponentDefinitionBasic,
+    ConnectionDefinitionBasic,
     ControlType,
     DateProperty,
     DateTimeProperty,
@@ -113,7 +114,7 @@ export type NodeDataType = {
         conditionId: string;
         index: number;
     };
-    connection?: ComponentConnection;
+    connection?: ConnectionDefinitionBasic;
     connections?: Array<ComponentConnection>;
     conditionId?: string;
     connectionId?: number;
