@@ -113,6 +113,7 @@ export type NodeDataType = {
         conditionId: string;
         index: number;
     };
+    connection?: ComponentConnection;
     connections?: Array<ComponentConnection>;
     conditionId?: string;
     connectionId?: number;

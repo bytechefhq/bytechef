@@ -526,6 +526,7 @@ const WorkflowNodeDetailsPanel = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentComponentDefinition]);
 
+    // Update currentNode with connection data, operationName and type
     useEffect(() => {
         if (!currentNode) return;
 
