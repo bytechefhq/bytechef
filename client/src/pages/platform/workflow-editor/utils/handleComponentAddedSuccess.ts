@@ -31,8 +31,8 @@ export default function handleComponentAddedSuccess({
             setCurrentComponent({...currentComponent, ...nodeData});
         }
     } else {
-        setCurrentNode(nodeData);
-        setCurrentComponent(nodeData);
+        setCurrentNode({...nodeData, description: ''});
+        setCurrentComponent({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);
     }
 }
