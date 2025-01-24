@@ -39,7 +39,7 @@ public class GoogleDriveNewFolderTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newFolder")
         .title("New Folder")
-        .description("Triggers when new file is uploaded to Google Drive.")
+        .description("Triggers when new folder is uploaded to Google Drive.")
         .type(TriggerType.POLLING)
         .properties(
             string(FOLDER_ID)
