@@ -91,10 +91,13 @@ const PropertyComboBox = ({
         return updatedPath;
     }, [initialPath, name, arrayIndex]);
 
-    const connectionRequirementMet = useMemo(
-        () => (currentNode?.connections?.length ? !!currentNode.connectionId : true),
-        [currentNode]
-    );
+    const connectionRequirementMet = useMemo(() => {
+        if (currentNode?.connections?.length || currentNode?.connection) {
+            return !!currentNode.connectionId;
+        }
+
+        return true;
+    }, [currentNode?.connections?.length, currentNode?.connection, currentNode?.connectionId]);
 
     const queryOptions = useMemo(
         () => ({
@@ -143,26 +146,47 @@ const PropertyComboBox = ({
         [currentNode]
     );
 
-    const noOptionsAvailable = useMemo(
-        () => !lookupDependsOnValues && !options.length && !missingConnection,
-        [lookupDependsOnValues, options, missingConnection]
-    );
+    const noOptionsAvailable = useMemo(() => {
+        const hasValidLookupValues = lookupDependsOnValues?.every((value) => value !== undefined);
+
+        return (!lookupDependsOnValues || !hasValidLookupValues) && !options.length;
+    }, [lookupDependsOnValues, options]);
 
     const memoizedPlaceholder = useMemo(() => {
-        if (lookupDependsOnValues?.length && !options.length) {
+        if ((lookupDependsOnValues?.length || lookupDependsOnPaths?.length) && !options.length) {
             return `${lookupDependsOnPaths} is not defined`;
-        } else if (missingConnection) {
+        }
+
+        if (missingConnection || !connectionRequirementMet) {
             return 'Connection missing...';
         }
 
+        if (noOptionsAvailable) {
+            return 'No options available';
+        }
+
         return placeholder;
-    }, [lookupDependsOnValues?.length, options.length, missingConnection, placeholder, lookupDependsOnPaths]);
+    }, [
+        lookupDependsOnValues?.length,
+        lookupDependsOnPaths,
+        options.length,
+        missingConnection,
+        connectionRequirementMet,
+        noOptionsAvailable,
+        placeholder,
+    ]);
 
     useEffect(() => {
         if (initialValue !== undefined) {
             setValue(initialValue);
         }
     }, [initialValue]);
+
+    const placeholderClassName = twMerge(
+        leadingIcon && 'ml-9',
+        ((lookupDependsOnValues?.length && !options.length) || missingConnection || !connectionRequirementMet) &&
+            'text-destructive'
+    );
 
     return (
         <fieldset className="w-full space-y-1">
@@ -207,7 +231,9 @@ const PropertyComboBox = ({
                             'relative w-full justify-between whitespace-normal font-normal',
                             showInputTypeSwitchButton && 'mt-0'
                         )}
-                        disabled={isRefetching || noOptionsAvailable || !!missingConnection}
+                        disabled={
+                            isRefetching || noOptionsAvailable || !!missingConnection || !connectionRequirementMet
+                        }
                         name={name}
                         role="combobox"
                         variant="outline"
@@ -230,10 +256,6 @@ const PropertyComboBox = ({
                             </span>
                         )}
 
-                        {noOptionsAvailable && (
-                            <span className="w-full p-2 text-sm text-muted-foreground">No options available</span>
-                        )}
-
                         {((lookupDependsOnValues && !isLoading) || !lookupDependsOnValues) && (
                             <>
                                 {currentOption ? (
@@ -250,19 +272,7 @@ const PropertyComboBox = ({
                                         {currentOption?.label}
                                     </span>
                                 ) : (
-                                    !isRefetching &&
-                                    !noOptionsAvailable && (
-                                        <span
-                                            className={twMerge(
-                                                leadingIcon && 'ml-9',
-                                                ((lookupDependsOnValues?.length && !options.length) ||
-                                                    missingConnection) &&
-                                                    'text-destructive'
-                                            )}
-                                        >
-                                            {memoizedPlaceholder}
-                                        </span>
-                                    )
+                                    !isRefetching && <span className={placeholderClassName}>{memoizedPlaceholder}</span>
                                 )}
                             </>
                         )}
