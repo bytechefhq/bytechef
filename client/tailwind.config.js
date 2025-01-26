@@ -52,6 +52,9 @@ module.exports = {
                     5: 'hsl(var(--chart-5))',
                 },
                 content: {
+                    brand: {
+                        'primary-pressed': 'hsl(var(--content-brand-primary-pressed))',
+                    },
                     neutral: {
                         primary: 'hsl(var(--content-neutral-primary))',
                         secondary: 'hsl(var(--content-neutral-secondary))',
@@ -89,10 +92,12 @@ module.exports = {
                 stroke: {
                     brand: {
                         primary: 'hsl(var(--stroke-brand-primary))',
+                        'primary-pressed': 'hsl(var(--stroke-brand-primary-pressed))',
                         'secondary-hover': 'hsl(var(--stroke-brand-secondary-hover))',
                     },
                     neutral: {
                         primary: 'hsl(var(--stroke-neutral-primary))',
+                        'primary-hover': 'hsl(var(--stroke-neutral-primary-hover))',
                         secondary: 'hsl(var(--stroke-neutral-secondary))',
                     },
                 },
@@ -108,8 +113,13 @@ module.exports = {
                         secondary: 'hsl(var(--surface-brand-secondary))',
                         'secondary-hover': 'hsl(var(--surface-brand-secondary-hover))',
                     },
+                    error: {
+                        secondary: 'hsl(var(--surface-error-secondary))',
+                    },
                     neutral: {
+                        'primary-hover': 'hsl(var(--surface-neutral-primary-hover))',
                         secondary: 'hsl(var(--surface-neutral-secondary))',
+                        tertiary: 'hsl(var(--surface-neutral-tertiary))',
                     },
                 },
             },
