@@ -11,7 +11,7 @@ import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import {CircleDotIcon} from 'lucide-react';
+import {SendIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import * as z from 'zod';
@@ -70,17 +70,20 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
 
     return (
         <Popover onOpenChange={setOpen} open={open}>
-            <PopoverTrigger asChild>
-                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <CircleDotIcon />
-                        </TooltipTrigger>
+            <Tooltip>
+                <TooltipTrigger>
+                    <PopoverTrigger asChild>
+                        <Button
+                            className="shadow-none hover:border-stroke-neutral-primary-hover hover:bg-surface-neutral-primary-hover active:border-stroke-brand-primary-pressed active:bg-surface-brand-secondary active:text-content-brand-primary-pressed [&[data-state=open]]:border-stroke-brand-primary-pressed [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
+                            variant="outline"
+                        >
+                            <SendIcon /> Publish
+                        </Button>
+                    </PopoverTrigger>
+                </TooltipTrigger>
 
-                        <TooltipContent>Publish the project</TooltipContent>
-                    </Tooltip>
-                </Button>
-            </PopoverTrigger>
+                <TooltipContent>Publish the project</TooltipContent>
+            </Tooltip>
 
             <PopoverContent align="end" className="flex h-full w-96 flex-col justify-between space-y-4">
                 <Form {...form}>
@@ -106,7 +109,11 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
                         </div>
 
                         <div className="flex justify-end">
-                            <Button size="sm" type="submit">
+                            <Button
+                                className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                size="sm"
+                                type="submit"
+                            >
                                 Publish
                             </Button>
                         </div>

@@ -1,5 +1,4 @@
 import {Button} from '@/components/ui/button';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {HistoryIcon} from 'lucide-react';
 
 interface ProjectHeaderHistoryButtonProps {
@@ -8,15 +7,9 @@ interface ProjectHeaderHistoryButtonProps {
 
 const ProjectHeaderHistoryButton = ({onClick}: ProjectHeaderHistoryButtonProps) => {
     return (
-        <Tooltip>
-            <TooltipTrigger asChild>
-                <Button className="hover:bg-background/70 [&_svg]:size-5" onClick={onClick} size="icon" variant="ghost">
-                    <HistoryIcon />
-                </Button>
-            </TooltipTrigger>
-
-            <TooltipContent>Project Version History</TooltipContent>
-        </Tooltip>
+        <Button className="justify-start hover:bg-surface-neutral-primary-hover" onClick={onClick} variant="ghost">
+            <HistoryIcon /> Project History
+        </Button>
     );
 };
 

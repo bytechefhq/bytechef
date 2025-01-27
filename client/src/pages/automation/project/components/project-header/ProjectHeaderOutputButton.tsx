@@ -16,7 +16,7 @@ const ProjectHeaderOutputButton = ({
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-background/70 [&_svg]:size-5"
+                    className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
                     onClick={() => {
                         setShowBottomPanelOpen(!showBottomPanel);
 

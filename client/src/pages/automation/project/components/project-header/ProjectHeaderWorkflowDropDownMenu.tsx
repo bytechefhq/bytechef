@@ -1,25 +1,19 @@
 import {Button} from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Separator} from '@/components/ui/separator';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
+import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
+import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 const ProjectHeaderWorkflowDropDownMenu = ({
     onShowDeleteWorkflowAlertDialog,
-    projectId,
+    project,
     workflowId,
 }: {
     onShowDeleteWorkflowAlertDialog: () => void;
-    projectId: number;
+    project: Project;
     workflowId: string;
 }) => {
     const {setShowEditWorkflowDialog} = useWorkflowEditorStore();
@@ -36,54 +30,48 @@ const ProjectHeaderWorkflowDropDownMenu = ({
     });
 
     return (
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <div>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button className="hover:bg-background/70" size="icon" variant="ghost">
-                                <EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />
-                            </Button>
-                        </TooltipTrigger>
+        <div className="flex flex-col">
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() => {
+                    setShowEditWorkflowDialog(true);
+                }}
+                variant="ghost"
+            >
+                <EditIcon /> Edit Workflow
+            </Button>
 
-                        <TooltipContent>Workflow Settings</TooltipContent>
-                    </Tooltip>
-                </div>
-            </DropdownMenuTrigger>
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() =>
+                    duplicateWorkflowMutation.mutate({
+                        id: project.id!,
+                        workflowId: workflowId,
+                    })
+                }
+                variant="ghost"
+            >
+                <CopyIcon /> Duplicate
+            </Button>
 
-            <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                    onClick={() => {
-                        setShowEditWorkflowDialog(true);
-                    }}
-                >
-                    Edit
-                </DropdownMenuItem>
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
+                variant="ghost"
+            >
+                <UploadIcon /> Export
+            </Button>
 
-                <DropdownMenuItem
-                    onClick={() =>
-                        duplicateWorkflowMutation.mutate({
-                            id: projectId,
-                            workflowId: workflowId,
-                        })
-                    }
-                >
-                    Duplicate
-                </DropdownMenuItem>
+            <Separator />
 
-                <DropdownMenuItem
-                    onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
-                >
-                    Export
-                </DropdownMenuItem>
-
-                <DropdownMenuSeparator />
-
-                <DropdownMenuItem className="text-destructive" onClick={() => onShowDeleteWorkflowAlertDialog()}>
-                    Delete
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
+            <Button
+                className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
+                onClick={() => onShowDeleteWorkflowAlertDialog()}
+                variant="ghost"
+            >
+                <Trash2Icon /> Delete
+            </Button>
+        </div>
     );
 };
 
