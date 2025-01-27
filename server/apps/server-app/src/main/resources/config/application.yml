@@ -75,10 +75,9 @@ management:
   tracing:
     sampling:
       probability: 1.0
-  zipkin:
+  otlp:
     tracing:
-      endpoint: ${bytechef.tracing.zipkin.endpoint}
-      encoding: PROTO3
+      endpoint: ${bytechef.tracing.otlp.endpoint}
 
 openapi:
   openAPIDefinition:
@@ -252,7 +251,7 @@ bytechef:
   tenant:
     mode: single
   tracing:
-    zipkin:
+    otlp:
       endpoint: http://localhost:4318/v1/traces
   webhook-url:
   # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.

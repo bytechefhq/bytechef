@@ -1725,18 +1725,18 @@ public class ApplicationProperties {
 
     public static class Tracing {
 
-        private Zipkin zipkin = new Zipkin();
+        private Otlp otlp = new Otlp();
 
-        public Zipkin getZipkin() {
-            return zipkin;
+        public Otlp getOtlp() {
+            return otlp;
         }
 
-        public void setZipkin(Zipkin zipkin) {
-            this.zipkin = zipkin;
+        public void setOtlp(Otlp otlp) {
+            this.otlp = otlp;
         }
     }
 
-    public static class Zipkin {
+    public static class Otlp {
 
         private String endpoint;
 
