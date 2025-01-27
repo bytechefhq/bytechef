@@ -113,7 +113,9 @@ public class GoogleSheetsUtils {
                                         .required(true),
                                     string(VALUE)
                                         .label("Column Value")
-                                        .required(true))));
+                                        .defaultValue("")
+                                        .required(true)))
+                        .required(true));
         } else {
             if (updateWholeRow) {
                 return List.of(
