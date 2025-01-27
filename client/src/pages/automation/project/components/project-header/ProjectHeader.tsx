@@ -1,16 +1,13 @@
 import {Button} from '@/components/ui/button';
+import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
-import ProjectHeaderHistoryButton from '@/pages/automation/project/components/project-header/ProjectHeaderHistoryButton';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
-import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderProjectDropDownMenu';
 import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
 import ProjectHeaderRunButton from '@/pages/automation/project/components/project-header/ProjectHeaderRunButton';
 import ProjectHeaderStopButton from '@/pages/automation/project/components/project-header/ProjectHeaderStopButton';
 import ProjectHeaderTitle from '@/pages/automation/project/components/project-header/ProjectHeaderTitle';
-import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowDropDownMenu';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -41,6 +38,8 @@ import {RefObject, useCallback, useEffect, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
 
+import ProjectHeaderSettingsMenu from './ProjectHeaderSettingsMenu';
+
 const workflowTestApi = new WorkflowTestApi();
 
 const ProjectHeader = ({
@@ -61,7 +60,6 @@ const ProjectHeader = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
-    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
     const {
         setShowBottomPanelOpen,
@@ -216,72 +214,86 @@ const ProjectHeader = ({
         }
     }, [handleStopClick, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
-    return (
-        <header className="flex items-center px-3 py-2.5">
-            <div className="flex flex-1">{project && <ProjectHeaderTitle project={project} />}</div>
-
-            <div className="flex items-center space-x-12">
-                <div className="flex space-x-1">
-                    <ProjectHeaderWorkflowSelect
-                        onValueChange={handleProjectWorkflowValueChange}
-                        projectId={projectId}
-                        projectWorkflowId={projectWorkflowId}
-                    />
-
-                    <ProjectHeaderWorkflowDropDownMenu
-                        onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
-                        projectId={projectId}
-                        workflowId={workflow.id!}
-                    />
-
-                    {!!projectId && (
-                        <WorkflowDialog
-                            createWorkflowMutation={createProjectWorkflowMutation}
-                            parentId={projectId}
-                            triggerNode={
-                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <PlusIcon />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>New workflow</TooltipContent>
-                                    </Tooltip>
-                                </Button>
-                            }
-                            updateWorkflowMutation={updateWorkflowMutation}
-                            useGetWorkflowQuery={useGetWorkflowQuery}
-                        />
-                    )}
-
-                    {workflowIsRunning ? (
-                        <ProjectHeaderStopButton onStopClick={handleStopClick} />
-                    ) : (
-                        <ProjectHeaderRunButton
-                            chatTrigger={chatTrigger ?? false}
-                            onRunClick={handleRunClick}
-                            runDisabled={runDisabled}
-                        />
-                    )}
-
-                    <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
-
-                    <CopilotButton source={Source.WORKFLOW_EDITOR} />
+    if (!project) {
+        return (
+            <header className="flex bg-background px-3 py-2.5">
+                <div className="flex flex-1">
+                    <Skeleton className="h-9 w-1/5" />
                 </div>
 
-                {project && (
-                    <div className="flex space-x-1">
-                        <ProjectHeaderPublishPopover project={project} />
+                <div className="flex items-center space-x-2">
+                    <Skeleton className="h-9 w-32" />
 
-                        <ProjectHeaderHistoryButton onClick={() => setShowProjectVersionHistorySheet(true)} />
+                    <Skeleton className="h-9 w-24" />
 
-                        <ProjectHeaderProjectDropDownMenu
-                            onDelete={() => setShowDeleteProjectAlertDialog(true)}
-                            onEdit={() => setShowEditProjectDialog(true)}
-                            project={project}
-                        />
-                    </div>
+                    <Skeleton className="h-9 w-16" />
+
+                    <Skeleton className="h-9 w-16" />
+                </div>
+            </header>
+        );
+    }
+
+    return (
+        <header className="flex items-center bg-background px-3 py-2.5">
+            <div className="flex flex-1">
+                <ProjectHeaderTitle project={project} />
+            </div>
+
+            <div className="flex items-center space-x-2">
+                <ProjectHeaderWorkflowSelect
+                    onValueChange={handleProjectWorkflowValueChange}
+                    projectId={projectId}
+                    projectWorkflowId={projectWorkflowId}
+                />
+
+                {!!projectId && (
+                    <WorkflowDialog
+                        createWorkflowMutation={createProjectWorkflowMutation}
+                        parentId={projectId}
+                        triggerNode={
+                            <Button
+                                className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <PlusIcon />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>New workflow</TooltipContent>
+                                </Tooltip>
+                            </Button>
+                        }
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        useGetWorkflowQuery={useGetWorkflowQuery}
+                    />
                 )}
+
+                <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
+
+                <ProjectHeaderSettingsMenu
+                    project={project}
+                    setShowDeleteProjectAlertDialog={setShowDeleteProjectAlertDialog}
+                    setShowDeleteWorkflowAlertDialog={setShowDeleteWorkflowAlertDialog}
+                    setShowEditProjectDialog={setShowEditProjectDialog}
+                    workflowId={workflow.id!}
+                />
+
+                <ProjectHeaderPublishPopover project={project} />
+
+                {workflowIsRunning ? (
+                    <ProjectHeaderStopButton onStopClick={handleStopClick} />
+                ) : (
+                    <ProjectHeaderRunButton
+                        chatTrigger={chatTrigger ?? false}
+                        onRunClick={handleRunClick}
+                        runDisabled={runDisabled}
+                    />
+                )}
+
+                <CopilotButton source={Source.WORKFLOW_EDITOR} />
             </div>
 
             {showDeleteProjectAlertDialog && (
@@ -298,7 +310,7 @@ const ProjectHeader = ({
                 />
             )}
 
-            {showEditProjectDialog && project && (
+            {showEditProjectDialog && (
                 <ProjectDialog onClose={() => setShowEditProjectDialog(false)} project={project} />
             )}
 
@@ -308,15 +320,6 @@ const ProjectHeader = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
-                />
-            )}
-
-            {showProjectVersionHistorySheet && (
-                <ProjectVersionHistorySheet
-                    onClose={() => {
-                        setShowProjectVersionHistorySheet(false);
-                    }}
-                    projectId={+projectId!}
                 />
             )}
         </header>

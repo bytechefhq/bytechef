@@ -13,13 +13,19 @@ const ProjectHeaderRunButton = ({chatTrigger, onRunClick, runDisabled}: ProjectH
         <Tooltip>
             <TooltipTrigger asChild>
                 <Button
-                    className="hover:bg-background/70 [&_svg]:size-5"
+                    className="w-20 bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                     disabled={runDisabled}
                     onClick={() => onRunClick()}
-                    size="icon"
-                    variant="ghost"
                 >
-                    {chatTrigger ? <MessageCircleMoreIcon /> : <PlayIcon className="text-success" />}
+                    {chatTrigger ? (
+                        <>
+                            <MessageCircleMoreIcon /> Chat
+                        </>
+                    ) : (
+                        <>
+                            <PlayIcon /> Run
+                        </>
+                    )}
                 </Button>
             </TooltipTrigger>
 

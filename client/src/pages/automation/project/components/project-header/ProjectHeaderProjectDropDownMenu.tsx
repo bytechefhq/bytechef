@@ -1,21 +1,16 @@
 import {Button} from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Separator} from '@/components/ui/separator';
 import {useToast} from '@/hooks/use-toast';
+import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
+import ProjectHeaderHistoryButton from '@/pages/automation/project/components/project-header/ProjectHeaderHistoryButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {SettingsIcon} from 'lucide-react';
-import {ChangeEvent, useRef} from 'react';
+import {CopyIcon, DownloadIcon, EditIcon, Trash2Icon} from 'lucide-react';
+import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const ProjectHeaderProjectDropDownMenu = ({
@@ -27,6 +22,8 @@ const ProjectHeaderProjectDropDownMenu = ({
     onEdit: () => void;
     project: Project;
 }) => {
+    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
+
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureProjectWorkflowImported} = useAnalytics();
@@ -73,51 +70,60 @@ const ProjectHeaderProjectDropDownMenu = ({
     };
 
     return (
-        <>
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <div>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button className="hover:bg-background/70 [&_svg]:size-5" size="icon" variant="ghost">
-                                    <SettingsIcon />
-                                </Button>
-                            </TooltipTrigger>
+        <div className="flex flex-col">
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() => onEdit()}
+                variant="ghost"
+            >
+                <EditIcon /> Edit Project
+            </Button>
 
-                            <TooltipContent>Project Settings</TooltipContent>
-                        </Tooltip>
-                    </div>
-                </DropdownMenuTrigger>
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() => duplicateProjectMutation.mutate(project.id!)}
+                variant="ghost"
+            >
+                <CopyIcon /> Duplicate
+            </Button>
 
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit()}>Edit</DropdownMenuItem>
+            <Button
+                className="justify-start hover:bg-surface-neutral-primary-hover"
+                onClick={() => {
+                    if (hiddenFileInputRef.current) {
+                        hiddenFileInputRef.current.click();
+                    }
+                }}
+                variant="ghost"
+            >
+                <DownloadIcon /> Import Workflow
+            </Button>
 
-                    {project && (
-                        <DropdownMenuItem onClick={() => duplicateProjectMutation.mutate(project.id!)}>
-                            Duplicate
-                        </DropdownMenuItem>
-                    )}
+            <Separator />
 
-                    <DropdownMenuItem
-                        onClick={() => {
-                            if (hiddenFileInputRef.current) {
-                                hiddenFileInputRef.current.click();
-                            }
-                        }}
-                    >
-                        Import Workflow
-                    </DropdownMenuItem>
+            <ProjectHeaderHistoryButton onClick={() => setShowProjectVersionHistorySheet(true)} />
 
-                    <DropdownMenuSeparator />
+            <Separator />
 
-                    <DropdownMenuItem className="text-destructive" onClick={() => onDelete()}>
-                        Delete
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-            </DropdownMenu>
+            <Button
+                className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
+                onClick={() => onDelete()}
+                variant="ghost"
+            >
+                <Trash2Icon /> Delete
+            </Button>
 
             <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
-        </>
+
+            {showProjectVersionHistorySheet && (
+                <ProjectVersionHistorySheet
+                    onClose={() => {
+                        setShowProjectVersionHistorySheet(false);
+                    }}
+                    projectId={Number(project.id!)}
+                />
+            )}
+        </div>
     );
 };
 
