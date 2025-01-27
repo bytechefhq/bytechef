@@ -40,7 +40,7 @@ public class ObservabilityEnvironmentPostProcessor implements EnvironmentPostPro
                 environment.getProperty("spring.autoconfigure.exclude") +
                     ",org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus." +
                     "PrometheusMetricsExportAutoConfiguration" +
-                    ",org.springframework.boot.actuate.autoconfigure.tracing.zipkin.ZipkinAutoConfiguration");
+                    ",org.springframework.boot.actuate.autoconfigure.tracing.otlp.OtlpTracingAutoConfiguration");
 
             source.put("bytechef.observability.loki.appender.level", "OFF");
         }
