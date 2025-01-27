@@ -341,17 +341,14 @@ public class GoogleSheetsUtils {
                     .map(value -> Objects.requireNonNullElse(value, ""))
                     .toList();
             } else if (values instanceof List<?> list) {
-                Sheets sheets = GoogleServices.getSheets(connectionParameters);
-                String spreadSheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
-                String sheetName = inputParameters.getRequiredString(SHEET_NAME);
+                if (inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER)) {
+                    Sheets sheets = GoogleServices.getSheets(connectionParameters);
+                    String spreadSheetId = inputParameters.getRequiredString(SPREADSHEET_ID);
+                    String sheetName = inputParameters.getRequiredString(SHEET_NAME);
 
-                List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
-                    sheets, spreadSheetId, sheetName, inputParameters.getRequiredInteger(ROW_NUMBER));
-
-                boolean isFirstRowHeader = inputParameters.getRequiredBoolean(IS_THE_FIRST_ROW_HEADER);
-
-                if (isFirstRowHeader) {
                     List<Object> firstRow = GoogleSheetsRowUtils.getRowValues(sheets, spreadSheetId, sheetName, 1);
+                    List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
+                        sheets, spreadSheetId, sheetName, inputParameters.getRequiredInteger(ROW_NUMBER));
 
                     for (Object o : list) {
                         if (o instanceof Map<?, ?> map) {
@@ -369,6 +366,12 @@ public class GoogleSheetsUtils {
                             .toList();
 
                     } else {
+                        List<Object> rowToUpdate = GoogleSheetsRowUtils.getRowValues(
+                            GoogleServices.getSheets(connectionParameters),
+                            inputParameters.getRequiredString(SPREADSHEET_ID),
+                            inputParameters.getRequiredString(SHEET_NAME),
+                            inputParameters.getRequiredInteger(ROW_NUMBER));
+
                         for (Object o : list) {
                             if (o instanceof Map<?, ?> map) {
                                 int indexOfColumnToUpdate = labelToColum((String) map.get(COLUMN)) - 1;
@@ -379,7 +382,7 @@ public class GoogleSheetsUtils {
                                     }
                                 }
 
-                                rowToUpdate.set(indexOfColumnToUpdate, map.get("value"));
+                                rowToUpdate.set(indexOfColumnToUpdate, map.get(VALUE));
                             }
                         }
 
