@@ -31,8 +31,9 @@ For help, you can use one of these channels to ask a question:
 - [Twitter](https://twitter.com/bytechefhq) - Get the product updates easily.
 
 ## Roadmap
+
 Check out our [roadmap](https://github.com/orgs/bytechefhq/projects/3) to get informed of the latest features released and the upcoming ones.
 
 ### Contributing
 
-If you'd like to contribute, kindly read our [Contributing Guide](CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to ByteChef.
+If you'd like to contribute, kindly read our [Contributing Guide](https://github.com/bytechefhq/bytechef/blob/master/CONTRIBUTING.md) to learn and understand about our development process, how to propose bug fixes and improvements, and how to build and test your changes to ByteChef.
