@@ -23,7 +23,7 @@ import {
 } from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const noIcon =
+const defaultIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></svg>';
 
 interface PropertyMentionsInputEditorProps {
@@ -74,15 +74,13 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     componentName = workflow.workflowTriggerComponentNames?.[0] || '';
                 }
 
-                return componentDefinitions.find((component) => component.name === componentName)?.icon || noIcon;
+                return componentDefinitions.find((component) => component.name === componentName)?.icon || defaultIcon;
             },
             [componentDefinitions, workflow.workflowTriggerComponentNames]
         );
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const extensions: any[] = useMemo((): any[] => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const extensions: any[] = [
+        const extensions = useMemo(() => {
+            const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
                 Mention.configure({
                     HTMLAttributes: {
@@ -154,35 +152,34 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             ({editor}: {editor: Editor}) => {
                 let value = editor.getHTML();
 
-                // replace <p> tags with new lines
+                value = value.replace(/\r\n/g, '\n');
+                value = value.replace(/\s+/g, ' ').trim();
 
-                let regex = /<p>(.*?)<\/p>/g;
+                const paragraphMatchRegex = /<p>(.*?)<\/p>/g;
 
-                let matches: string[] | null = value.match(regex);
+                const matchedParagraphs = value.match(paragraphMatchRegex);
 
-                if (matches) {
-                    value = matches.map((match) => match.replace(/<\/?p>/g, '')).join('\n');
+                if (matchedParagraphs) {
+                    value = matchedParagraphs.map((match) => match.replace(/<\/?p>/g, '')).join('\n');
                 }
 
-                // extract mention span tags
+                const mentionSpanRegex = /<span data-type="mention"[^>]*data-id="([^"]+)"[^>]*>.*?<\/span>/g;
 
-                regex = /<span data-type="mention"[^>]*data-id="([^"]+)"[^>]*>.*?<\/span>/g;
+                const foundMentions = value.match(mentionSpanRegex);
 
-                matches = value.match(regex);
+                if (foundMentions) {
+                    const dataIdRegex = /data-id="([^"]+)"/;
 
-                if (matches) {
-                    regex = /data-id="([^"]+)"/;
-
-                    for (const match of matches) {
-                        // extract mention id
-
-                        value = value.replace(match, `\${${match.match(regex)?.[1]}}`);
-                    }
+                    foundMentions.forEach((match) => {
+                        value = value.replace(match, `\${${match.match(dataIdRegex)?.[1]}}`);
+                    });
                 }
 
                 onChange(value);
 
-                setMentionOccurences(value.match(/property-mention/g)?.length || 0);
+                const propertyMentions = value.match(/property-mention/g);
+
+                setMentionOccurences(propertyMentions?.length || 0);
             },
             [onChange]
         );
@@ -206,9 +203,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 content = paragraphedLines.join('');
             }
 
-            const regex = /\${([^}]+)}/g;
+            const dataPillRegex = /\${([^}]+)}/g;
 
-            const matches = value.match(regex)?.map((match) => match.slice(2, -1));
+            const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
 
             if (matches) {
                 for (const match of matches) {
@@ -240,7 +237,6 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     }
                 },
             },
-            /* eslint-disable @typescript-eslint/no-explicit-any */
             extensions,
             onFocus: () => {
                 if (onFocus && editor) {
