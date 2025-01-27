@@ -125,6 +125,11 @@ export default defineConfig({
                             label: 'Components',
                             autogenerate: {directory: '/developer_guide/components'},
                             collapsed: true,
+                        },
+                        {
+                            label: 'Observability',
+                            autogenerate: {directory: '/developer_guide/observability'},
+                            collapsed: true,
                         }
                     ]
                 },
