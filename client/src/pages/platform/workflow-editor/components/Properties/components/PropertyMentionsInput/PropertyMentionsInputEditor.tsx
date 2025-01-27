@@ -10,17 +10,7 @@ import Text from '@tiptap/extension-text';
 import {Editor, EditorContent, Extension, mergeAttributes, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {EditorView} from 'prosemirror-view';
-import {
-    Dispatch,
-    ForwardedRef,
-    MutableRefObject,
-    SetStateAction,
-    forwardRef,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import {ForwardedRef, MutableRefObject, forwardRef, useCallback, useEffect, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const defaultIcon =
@@ -32,13 +22,11 @@ interface PropertyMentionsInputEditorProps {
     controlType?: string;
     dataPills: DataPillType[];
     elementId?: string;
-    initialized: boolean;
     path?: string;
     onChange: (value: string) => void;
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
-    setInitialized: Dispatch<SetStateAction<boolean>>;
     type: string;
     value?: string;
     workflow: Workflow;
@@ -52,12 +40,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             controlType,
             dataPills,
             elementId,
-            initialized,
             onChange,
             onFocus,
             path,
             placeholder,
-            setInitialized,
             type,
             value,
             workflow,
@@ -251,12 +237,10 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         }
 
         useEffect(() => {
-            if (value && editor && !initialized) {
+            if (value && editor) {
                 editor.commands.setContent(getContent(value)!);
-
-                setInitialized(true);
             }
-        }, [editor, getContent, initialized, setInitialized, value]);
+        }, [editor, getContent, value]);
 
         return (
             <>

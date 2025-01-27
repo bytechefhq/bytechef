@@ -5,7 +5,6 @@ import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/c
 import {DataPillType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
 import {MaximizeIcon} from 'lucide-react';
-import {Dispatch, SetStateAction, useState} from 'react';
 
 export interface PropertyMentionsInputEditorSheetProps {
     componentDefinitions: ComponentDefinitionBasic[];
@@ -16,7 +15,6 @@ export interface PropertyMentionsInputEditorSheetProps {
     onClose?: () => void;
     onFocus?: (editor: Editor) => void;
     placeholder?: string;
-    setInitialized: Dispatch<SetStateAction<boolean>>;
     type: string;
     value?: string;
     title: string;
@@ -34,49 +32,41 @@ const PropertyMentionsInputEditorSheet = ({
     type,
     value,
     workflow,
-}: PropertyMentionsInputEditorSheetProps) => {
-    const [initialized, setInitialized] = useState(false);
+}: PropertyMentionsInputEditorSheetProps) => (
+    <Sheet
+        onOpenChange={() => {
+            if (onClose) {
+                onClose();
+            }
+        }}
+    >
+        <SheetTrigger asChild>
+            <Button className="size-auto p-0.5" size="icon" variant="ghost">
+                <MaximizeIcon className="h-4" />
+            </Button>
+        </SheetTrigger>
 
-    return (
-        <Sheet
-            onOpenChange={() => {
-                setInitialized(false);
+        <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
+            <SheetHeader>
+                <SheetTitle>{title}</SheetTitle>
+            </SheetHeader>
 
-                if (onClose) {
-                    onClose();
-                }
-            }}
-        >
-            <SheetTrigger asChild>
-                <Button className="size-auto p-0.5" size="icon" variant="ghost">
-                    <MaximizeIcon className="h-4" />
-                </Button>
-            </SheetTrigger>
-
-            <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
-                <SheetHeader>
-                    <SheetTitle>{title}</SheetTitle>
-                </SheetHeader>
-
-                <div className="size-full pt-3">
-                    <div className="property-mentions-editor flex size-full overflow-y-auto rounded-md bg-white">
-                        <PropertyMentionsInputEditor
-                            componentDefinitions={componentDefinitions}
-                            controlType={controlType}
-                            dataPills={dataPills}
-                            initialized={initialized}
-                            onChange={onChange}
-                            placeholder={placeholder}
-                            setInitialized={setInitialized}
-                            type={type}
-                            value={value}
-                            workflow={workflow}
-                        />
-                    </div>
+            <div className="size-full pt-3">
+                <div className="property-mentions-editor flex size-full overflow-y-auto rounded-md bg-white">
+                    <PropertyMentionsInputEditor
+                        componentDefinitions={componentDefinitions}
+                        controlType={controlType}
+                        dataPills={dataPills}
+                        onChange={onChange}
+                        placeholder={placeholder}
+                        type={type}
+                        value={value}
+                        workflow={workflow}
+                    />
                 </div>
-            </SheetContent>
-        </Sheet>
-    );
-};
+            </div>
+        </SheetContent>
+    </Sheet>
+);
 
 export default PropertyMentionsInputEditorSheet;

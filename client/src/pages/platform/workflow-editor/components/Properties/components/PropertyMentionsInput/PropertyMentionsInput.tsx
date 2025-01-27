@@ -56,7 +56,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
         },
         ref: ForwardedRef<Editor>
     ) => {
-        const [initialized, setInitialized] = useState(false);
         const [isFocused, setIsFocused] = useState(false);
 
         const {componentDefinitions, dataPills, workflow} = useWorkflowDataStore();
@@ -112,9 +111,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                                     controlType={controlType}
                                     dataPills={dataPills}
                                     onChange={onChange}
-                                    onClose={() => setInitialized(false)}
                                     placeholder={placeholder}
-                                    setInitialized={setInitialized}
                                     title={label ?? ''}
                                     type={type}
                                     value={value}
@@ -159,13 +156,11 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             controlType={controlType}
                             dataPills={dataPills}
                             elementId={elementId}
-                            initialized={initialized}
                             onChange={onChange}
                             onFocus={onFocus}
                             path={path}
                             placeholder={placeholder}
                             ref={ref}
-                            setInitialized={setInitialized}
                             type={type}
                             value={value || defaultValue}
                             workflow={workflow}
