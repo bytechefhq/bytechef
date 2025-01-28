@@ -1,12 +1,10 @@
 import {
     ComponentDefinitionApi,
-    TaskDispatcherDefinitionApi,
     Workflow,
     WorkflowTask,
     WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
-import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefinitions.queries';
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
@@ -86,24 +84,6 @@ export default async function saveWorkflowDefinition({
         );
 
         return;
-    }
-
-    if (taskDispatcher && componentName && version) {
-        const newNodeTaskDispatcherDefinition = await queryClient.fetchQuery({
-            queryFn: () =>
-                new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
-                    taskDispatcherName: componentName,
-                    taskDispatcherVersion: version!,
-                }),
-            queryKey: TaskDispatcherKeys.taskDispatcherDefinition({
-                taskDispatcherName: componentName,
-                taskDispatcherVersion: version,
-            }),
-        });
-
-        if (!newNodeTaskDispatcherDefinition) {
-            return;
-        }
     }
 
     if (!operationName && !taskDispatcher) {
