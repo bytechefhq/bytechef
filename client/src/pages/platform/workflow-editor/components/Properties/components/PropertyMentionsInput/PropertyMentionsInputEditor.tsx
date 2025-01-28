@@ -238,7 +238,9 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         useEffect(() => {
             if (value && editor) {
-                editor.commands.setContent(getContent(value)!);
+                editor.commands.setContent(getContent(value)!, false, {
+                    preserveWhitespace: 'full',
+                });
             }
         }, [editor, getContent, value]);
 
