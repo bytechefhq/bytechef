@@ -556,6 +556,7 @@ const Property = ({
             hidden &&
             currentComponent &&
             path &&
+            objectName === undefined &&
             updateWorkflowNodeParameterMutation &&
             resolvePath(currentComponent.parameters ?? {}, path) !== defaultValue
         ) {
