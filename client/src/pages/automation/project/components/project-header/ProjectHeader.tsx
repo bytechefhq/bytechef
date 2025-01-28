@@ -5,9 +5,8 @@ import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/co
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
 import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
-import ProjectHeaderRunButton from '@/pages/automation/project/components/project-header/ProjectHeaderRunButton';
-import ProjectHeaderStopButton from '@/pages/automation/project/components/project-header/ProjectHeaderStopButton';
 import ProjectHeaderTitle from '@/pages/automation/project/components/project-header/ProjectHeaderTitle';
+import ProjectHeaderWorkflowActionsButton from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowActionsButton';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
@@ -283,15 +282,13 @@ const ProjectHeader = ({
 
                 <ProjectHeaderPublishPopover project={project} />
 
-                {workflowIsRunning ? (
-                    <ProjectHeaderStopButton onStopClick={handleStopClick} />
-                ) : (
-                    <ProjectHeaderRunButton
-                        chatTrigger={chatTrigger ?? false}
-                        onRunClick={handleRunClick}
-                        runDisabled={runDisabled}
-                    />
-                )}
+                <ProjectHeaderWorkflowActionsButton
+                    chatTrigger={chatTrigger ?? false}
+                    onRunClick={handleRunClick}
+                    onStopClick={handleStopClick}
+                    runDisabled={runDisabled}
+                    workflowIsRunning={workflowIsRunning}
+                />
 
                 <CopilotButton source={Source.WORKFLOW_EDITOR} />
             </div>
