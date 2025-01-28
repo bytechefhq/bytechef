@@ -71,16 +71,16 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
     return (
         <Popover onOpenChange={setOpen} open={open}>
             <Tooltip>
-                <TooltipTrigger>
-                    <PopoverTrigger asChild>
+                <PopoverTrigger asChild>
+                    <TooltipTrigger asChild>
                         <Button
                             className="shadow-none hover:border-stroke-neutral-primary-hover hover:bg-surface-neutral-primary-hover active:border-stroke-brand-primary-pressed active:bg-surface-brand-secondary active:text-content-brand-primary-pressed [&[data-state=open]]:border-stroke-brand-primary-pressed [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary-pressed"
                             variant="outline"
                         >
                             <SendIcon /> Publish
                         </Button>
-                    </PopoverTrigger>
-                </TooltipTrigger>
+                    </TooltipTrigger>
+                </PopoverTrigger>
 
                 <TooltipContent>Publish the project</TooltipContent>
             </Tooltip>
