@@ -232,7 +232,8 @@ const PropertyComboBox = ({
                             showInputTypeSwitchButton && 'mt-0'
                         )}
                         disabled={
-                            isRefetching || noOptionsAvailable || !!missingConnection || !connectionRequirementMet
+                            !options.length &&
+                            (isRefetching || noOptionsAvailable || !!missingConnection || !connectionRequirementMet)
                         }
                         name={name}
                         role="combobox"
