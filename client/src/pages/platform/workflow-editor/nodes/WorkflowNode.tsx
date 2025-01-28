@@ -4,7 +4,7 @@ import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/component
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {NodeDataType} from '@/shared/types';
-import {HoverCard} from '@radix-ui/react-hover-card';
+import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {PencilIcon, TrashIcon} from 'lucide-react';
@@ -87,6 +87,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             )}
 
             <HoverCard
+                key={id}
                 onOpenChange={(open) => {
                     if (open) {
                         setHoveredNodeName(data.name);
@@ -98,7 +99,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <HoverCardTrigger>
                     <Button
                         className={twMerge(
-                            'h-18 w-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none [&_svg]:size-9',
+                            'size-18 rounded-md border-2 border-gray-300 bg-white p-4 shadow hover:border-blue-200 hover:bg-blue-200 hover:shadow-none [&_svg]:size-9',
                             isSelected && workflowNodeDetailsPanelOpen && 'border-blue-300 bg-blue-100 shadow-none'
                         )}
                         onClick={handleNodeClick}
@@ -107,18 +108,25 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     </Button>
                 </HoverCardTrigger>
 
-                <HoverCardContent className="w-fit min-w-72 max-w-[601px] text-sm" side="right">
-                    {workflowNodeDescription?.description && (
-                        <div
-                            className="flex"
-                            dangerouslySetInnerHTML={{
-                                __html: sanitize(workflowNodeDescription.description, {
-                                    allowedAttributes: {div: ['class'], table: ['class'], td: ['class'], tr: ['class']},
-                                }),
-                            }}
-                        />
-                    )}
-                </HoverCardContent>
+                <HoverCardPortal>
+                    <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
+                        {workflowNodeDescription?.description && (
+                            <div
+                                className="flex"
+                                dangerouslySetInnerHTML={{
+                                    __html: sanitize(workflowNodeDescription.description, {
+                                        allowedAttributes: {
+                                            div: ['class'],
+                                            table: ['class'],
+                                            td: ['class'],
+                                            tr: ['class'],
+                                        },
+                                    }),
+                                }}
+                            />
+                        )}
+                    </HoverCardContent>
+                </HoverCardPortal>
             </HoverCard>
 
             <div className="ml-2 flex w-full min-w-max flex-col items-start">
