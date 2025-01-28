@@ -7,7 +7,7 @@ import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
-const ProjectHeaderWorkflowDropDownMenu = ({
+const ProjectHeaderWorkflowTabButtons = ({
     onShowDeleteWorkflowAlertDialog,
     project,
     workflowId,
@@ -33,9 +33,7 @@ const ProjectHeaderWorkflowDropDownMenu = ({
         <div className="flex flex-col">
             <Button
                 className="justify-start hover:bg-surface-neutral-primary-hover"
-                onClick={() => {
-                    setShowEditWorkflowDialog(true);
-                }}
+                onClick={() => setShowEditWorkflowDialog(true)}
                 variant="ghost"
             >
                 <EditIcon /> Edit Workflow
@@ -75,4 +73,4 @@ const ProjectHeaderWorkflowDropDownMenu = ({
     );
 };
 
-export default ProjectHeaderWorkflowDropDownMenu;
+export default ProjectHeaderWorkflowTabButtons;

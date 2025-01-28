@@ -13,7 +13,7 @@ import {CopyIcon, DownloadIcon, EditIcon, Trash2Icon} from 'lucide-react';
 import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-const ProjectHeaderProjectDropDownMenu = ({
+const ProjectHeaderProjectTabButtons = ({
     onDelete,
     onEdit,
     project,
@@ -127,4 +127,4 @@ const ProjectHeaderProjectDropDownMenu = ({
     );
 };
 
-export default ProjectHeaderProjectDropDownMenu;
+export default ProjectHeaderProjectTabButtons;

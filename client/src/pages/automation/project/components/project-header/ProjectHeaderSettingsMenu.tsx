@@ -1,8 +1,8 @@
 import {Button} from '@/components/ui/button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import ProjectHeaderProjectDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderProjectDropDownMenu';
-import ProjectHeaderWorkflowDropDownMenu from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowDropDownMenu';
+import ProjectHeaderProjectTabButtons from '@/pages/automation/project/components/project-header/ProjectHeaderProjectTabButtons';
+import ProjectHeaderWorkflowTabButtons from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowTabButtons';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {SettingsIcon} from 'lucide-react';
 
@@ -61,7 +61,7 @@ const ProjectHeaderSettingsMenu = ({
                     </DropdownMenuItem>
 
                     <TabsContent className="mt-0" value="workflow">
-                        <ProjectHeaderWorkflowDropDownMenu
+                        <ProjectHeaderWorkflowTabButtons
                             onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                             project={project}
                             workflowId={workflowId}
@@ -69,7 +69,7 @@ const ProjectHeaderSettingsMenu = ({
                     </TabsContent>
 
                     <TabsContent className="mt-0" value="project">
-                        <ProjectHeaderProjectDropDownMenu
+                        <ProjectHeaderProjectTabButtons
                             onDelete={() => setShowDeleteProjectAlertDialog(true)}
                             onEdit={() => setShowEditProjectDialog(true)}
                             project={project}
