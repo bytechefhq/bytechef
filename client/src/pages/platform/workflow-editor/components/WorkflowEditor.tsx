@@ -25,13 +25,14 @@ export interface WorkflowEditorProps {
 }
 
 const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDefinitions}: WorkflowEditorProps) => {
-    const {edges, nodes, onEdgesChange, onNodesChange, workflow} = useWorkflowDataStore(
+    const {workflow} = useWorkflowDataStore();
+
+    const {edges, nodes, onEdgesChange, onNodesChange} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
             onEdgesChange: state.onEdgesChange,
             onNodesChange: state.onNodesChange,
-            workflow: state.workflow,
         }))
     );
     const {copilotPanelOpen} = useCopilotStore();

@@ -3,10 +3,9 @@ import {TaskDispatcherKeys} from '@/shared/queries/platform/taskDispatcherDefini
 import {ClickedDefinitionType, NodeDataType, PropertyAllType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
-import {Node} from '@xyflow/react';
 import InlineSVG from 'react-inlinesvg';
 
-import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
@@ -15,7 +14,6 @@ import saveWorkflowDefinition from './saveWorkflowDefinition';
 interface HandleConditionClickProps {
     clickedItem: ClickedDefinitionType;
     edge?: boolean;
-    nodes: Array<Node>;
     queryClient: QueryClient;
     sourceNodeId: string;
     updateWorkflowMutation: UpdateWorkflowMutationType;
@@ -25,7 +23,6 @@ interface HandleConditionClickProps {
 export default async function handleConditionClick({
     clickedItem,
     edge,
-    nodes,
     queryClient,
     sourceNodeId,
     updateWorkflowMutation,
@@ -46,6 +43,8 @@ export default async function handleConditionClick({
     if (!clickedTaskDispatcherDefinition) {
         return;
     }
+
+    const {nodes} = useWorkflowDataStore.getState();
 
     const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
 
@@ -119,6 +118,5 @@ export default async function handleConditionClick({
         placeholderId: sourceNodeId,
         queryClient,
         updateWorkflowMutation,
-        workflow,
     });
 }

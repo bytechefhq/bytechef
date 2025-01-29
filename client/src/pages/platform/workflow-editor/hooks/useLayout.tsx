@@ -137,20 +137,14 @@ export default function useLayout({
     taskDispatcherDefinitions: Array<TaskDispatcherDefinitionBasic>;
 }) {
     const {
-        setEdges,
-        setNodes,
         workflow: {tasks, triggers},
-    } = useWorkflowDataStore(
-        useShallow((state) => ({
-            setEdges: state.setEdges,
-            setNodes: state.setNodes,
-            workflow: state.workflow,
-        }))
-    );
+    } = useWorkflowDataStore();
 
-    const {nodes} = useWorkflowDataStore(
+    const {nodes, setEdges, setNodes} = useWorkflowDataStore(
         useShallow((state) => ({
             nodes: state.nodes,
+            setEdges: state.setEdges,
+            setNodes: state.setNodes,
         }))
     );
 
