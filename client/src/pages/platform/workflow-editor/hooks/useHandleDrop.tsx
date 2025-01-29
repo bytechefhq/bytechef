@@ -30,12 +30,13 @@ export default function useHandleDrop(): [
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType) => void,
 ] {
-    const {edges, nodes, setEdges, workflow} = useWorkflowDataStore(
+    const {workflow} = useWorkflowDataStore();
+
+    const {edges, nodes, setEdges} = useWorkflowDataStore(
         useShallow((state) => ({
             edges: state.edges,
             nodes: state.nodes,
             setEdges: state.setEdges,
-            workflow: state.workflow,
         }))
     );
 
@@ -170,7 +171,6 @@ export default function useHandleDrop(): [
             nodeIndex: taskNodeIndex,
             queryClient,
             updateWorkflowMutation,
-            workflow,
         });
     }
 
@@ -291,7 +291,6 @@ export default function useHandleDrop(): [
             nodeIndex: targetEdgeIndex,
             queryClient,
             updateWorkflowMutation,
-            workflow,
         });
     }
 
@@ -352,7 +351,6 @@ export default function useHandleDrop(): [
             },
             queryClient,
             updateWorkflowMutation,
-            workflow,
         });
     }
 

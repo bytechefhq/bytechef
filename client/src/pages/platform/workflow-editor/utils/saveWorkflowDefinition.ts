@@ -8,6 +8,7 @@ import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefini
 import {NodeDataType, WorkflowDefinitionType} from '@/shared/types';
 import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import insertNewConditionSubtask from './insertNewConditionSubtask';
 
 const SPACE = 4;
@@ -27,7 +28,6 @@ interface SaveWorkflowDefinitionProps {
     queryClient: QueryClient;
     subtask?: boolean;
     updateWorkflowMutation: UseMutationResult<void, Error, UpdateWorkflowRequestType, unknown>;
-    workflow: Workflow;
 }
 
 export default async function saveWorkflowDefinition({
@@ -40,8 +40,9 @@ export default async function saveWorkflowDefinition({
     queryClient,
     subtask,
     updateWorkflowMutation,
-    workflow,
 }: SaveWorkflowDefinitionProps) {
+    const {workflow} = useWorkflowDataStore.getState();
+
     const workflowDefinition: WorkflowDefinitionType = JSON.parse(workflow.definition!);
 
     const {componentName, connections, description, label, metadata, name, parameters, taskDispatcher, trigger} =

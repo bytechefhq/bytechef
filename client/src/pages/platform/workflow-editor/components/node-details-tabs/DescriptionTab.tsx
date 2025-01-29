@@ -135,7 +135,6 @@ const DescriptionTab = ({
             },
             queryClient,
             updateWorkflowMutation,
-            workflow,
         });
     }, 200);
 
@@ -173,7 +172,6 @@ const DescriptionTab = ({
             },
             queryClient,
             updateWorkflowMutation,
-            workflow,
         });
     }, 200);
 

@@ -99,7 +99,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         }),
                     queryClient,
                     updateWorkflowMutation,
-                    workflow,
                 });
 
                 setPopoverOpen(false);
@@ -184,7 +183,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         }),
                     queryClient,
                     updateWorkflowMutation,
-                    workflow,
                 });
             } else {
                 if (conditionId) {
@@ -263,7 +261,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                         }),
                     queryClient,
                     updateWorkflowMutation,
-                    workflow,
                 });
 
                 setPopoverOpen(false);

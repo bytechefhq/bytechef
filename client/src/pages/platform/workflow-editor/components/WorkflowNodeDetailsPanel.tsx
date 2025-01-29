@@ -421,7 +421,6 @@ const WorkflowNodeDetailsPanel = ({
                 queryClient,
                 subtask: !!currentNode?.conditionData,
                 updateWorkflowMutation,
-                workflow,
             });
         },
         [

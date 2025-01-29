@@ -67,6 +67,5 @@ export default function handleConditionChildOperationClick({
         placeholderId,
         queryClient,
         updateWorkflowMutation,
-        workflow,
     });
 }
