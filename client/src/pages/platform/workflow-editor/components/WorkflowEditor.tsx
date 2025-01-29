@@ -130,15 +130,13 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
             if (event.target instanceof HTMLElement) {
                 const targetNodeElement = event.target.closest('.react-flow__node') as HTMLElement;
 
-                if (!targetNodeElement) {
-                    return;
-                }
-
-                if (targetNodeElement.dataset.nodetype === 'trigger') {
+                if (!targetNodeElement || targetNodeElement?.dataset.nodetype === 'trigger') {
                     return;
                 }
 
                 const targetNodeId = targetNodeElement.dataset.id!;
+
+                const {nodes} = useWorkflowDataStore.getState();
 
                 const targetNode = nodes.find((node) => node.id === targetNodeId);
 
@@ -158,6 +156,8 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
                 ) {
                     return;
                 }
+
+                const {edges} = useWorkflowDataStore.getState();
 
                 const targetEdge = edges.find((edge) => edge.id === targetEdgeElement.id);
 

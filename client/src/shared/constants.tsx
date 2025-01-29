@@ -1,3 +1,5 @@
+import {getRandomId} from './util/random-utils';
+
 export const AUTHORITIES = {
     ADMIN: 'ROLE_ADMIN',
     USER: 'ROLE_USER',
@@ -19,6 +21,8 @@ export const VALUE_PROPERTY_CONTROL_TYPES = {
 
 export const CONDITION_CASE_TRUE = 'caseTrue';
 export const CONDITION_CASE_FALSE = 'caseFalse';
+
+export const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 
 export const EDITOR_PLACEHOLDER = (
     <>

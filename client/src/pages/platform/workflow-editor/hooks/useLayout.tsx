@@ -1,4 +1,4 @@
-import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, EDGE_STYLES} from '@/shared/constants';
+import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE, EDGE_STYLES, FINAL_PLACEHOLDER_NODE_ID} from '@/shared/constants';
 import defaultNodes from '@/shared/defaultNodes';
 import {
     ComponentDefinitionBasic,
@@ -6,7 +6,6 @@ import {
     WorkflowTask,
 } from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
-import {getRandomId} from '@/shared/util/random-utils';
 import Dagre from '@dagrejs/dagre';
 import {Edge, Node} from '@xyflow/react';
 import {ComponentIcon} from 'lucide-react';
@@ -21,7 +20,6 @@ const NODE_WIDTH = 240;
 const NODE_HEIGHT = 100;
 const PLACEHOLDER_NODE_HEIGHT = 28;
 const DIRECTION = 'TB';
-const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 
 const TASK_DISPATCHER_NAMES = [
     'branch',

@@ -126,7 +126,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 captureComponentUsed(componentName, operationName, undefined);
 
-                const workflowNodeName = getFormattedName(clickedOperation.componentName!, nodes);
+                const workflowNodeName = getFormattedName(clickedOperation.componentName!);
 
                 const newWorkflowNodeData = {
                     componentName: clickedOperation.componentName,
@@ -188,7 +188,6 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 if (conditionId) {
                     handleConditionChildOperationClick({
                         conditionId,
-                        nodes,
                         operation: clickedOperation,
                         operationDefinition: clickedComponentActionDefinition,
                         placeholderId: sourceNodeId,
@@ -212,7 +211,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
 
                 captureComponentUsed(componentName, operationName, undefined);
 
-                const workflowNodeName = getFormattedName(clickedOperation.componentName!, nodes);
+                const workflowNodeName = getFormattedName(clickedOperation.componentName!);
 
                 const newWorkflowNodeData = {
                     ...componentDefinition,

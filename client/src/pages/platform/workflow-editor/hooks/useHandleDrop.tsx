@@ -18,7 +18,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {Edge, Node} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
-import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import getFormattedName from '../utils/getFormattedName';
@@ -30,15 +29,7 @@ export default function useHandleDrop(): [
     (targetEdge: Edge, droppedNode: ClickedDefinitionType) => void,
     (droppedNode: ClickedDefinitionType) => void,
 ] {
-    const {workflow} = useWorkflowDataStore();
-
-    const {edges, nodes, setEdges} = useWorkflowDataStore(
-        useShallow((state) => ({
-            edges: state.edges,
-            nodes: state.nodes,
-            setEdges: state.setEdges,
-        }))
-    );
+    const {setEdges, workflow} = useWorkflowDataStore();
 
     const {captureComponentUsed} = useAnalytics();
 
@@ -49,6 +40,8 @@ export default function useHandleDrop(): [
     const queryClient = useQueryClient();
 
     async function handleDropOnPlaceholderNode(targetNode: Node, droppedNode: ClickedDefinitionType) {
+        const {edges, nodes} = useWorkflowDataStore.getState();
+
         const sourceEdge = edges.find((edge) => edge.target === targetNode.id);
 
         if (!sourceEdge) {
@@ -85,10 +78,10 @@ export default function useHandleDrop(): [
                     <PlayIcon className="size-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
-                name: getFormattedName(droppedNode.name!, nodes),
+                name: getFormattedName(droppedNode.name!),
                 taskDispatcher: droppedNode.taskDispatcher,
                 version: droppedNode.version,
-                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
+                workflowNodeName: getFormattedName(droppedNode.name!),
             },
             name: droppedNode.name,
             type: 'workflow',
@@ -175,6 +168,8 @@ export default function useHandleDrop(): [
     }
 
     async function handleDropOnWorkflowEdge(targetEdge: Edge, droppedNode: ClickedDefinitionType) {
+        const {edges, nodes} = useWorkflowDataStore.getState();
+
         const previousNode = nodes.find((node) => node.id === targetEdge.source);
         const nextNode = nodes.find((node) => node.id === targetEdge.target);
 
@@ -193,10 +188,10 @@ export default function useHandleDrop(): [
                     <PlayIcon className="size-9 text-gray-700" />
                 ),
                 label: droppedNode?.title,
-                name: getFormattedName(droppedNode.name!, nodes),
+                name: getFormattedName(droppedNode.name!),
                 taskDispatcher: droppedNode.taskDispatcher,
                 version: droppedNode.version,
-                workflowNodeName: getFormattedName(droppedNode.name!, nodes),
+                workflowNodeName: getFormattedName(droppedNode.name!),
             },
             id: getRandomId(),
             name: droppedNode.name,
