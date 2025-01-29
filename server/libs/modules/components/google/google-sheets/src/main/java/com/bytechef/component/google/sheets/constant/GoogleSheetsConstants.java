@@ -38,6 +38,7 @@ public class GoogleSheetsConstants {
     public static final String HEADERS = "headers";
     public static final String INCLUDE_ITEMS_FROM_ALL_DRIVES = "includeItemsFromAllDrives";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
+    public static final String LABEL = "label";
     public static final String ROW_NUMBER = "rowNumber";
     public static final String ROW = "row";
     public static final String ROWS = "rows";
