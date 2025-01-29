@@ -17,7 +17,6 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -37,7 +36,7 @@ import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 import java.util.List;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 public class GoogleSheetsClearSheetAction {
 
@@ -46,7 +45,6 @@ public class GoogleSheetsClearSheetAction {
         .description("Clear a sheet of all values while preserving formats.")
         .properties(
             SPREADSHEET_ID_PROPERTY,
-            INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY,
             SHEET_ID_PROPERTY,
             IS_THE_FIRST_ROW_HEADER_PROPERTY)
         .perform(GoogleSheetsClearSheetAction::perform);

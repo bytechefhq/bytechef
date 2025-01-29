@@ -36,7 +36,6 @@ public class GoogleSheetsConstants {
     public static final String APPLICATION_VND_GOOGLE_APPS_SPREADSHEET = "application/vnd.google-apps.spreadsheet";
     public static final String COLUMN = "column";
     public static final String HEADERS = "headers";
-    public static final String INCLUDE_ITEMS_FROM_ALL_DRIVES = "includeItemsFromAllDrives";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
     public static final String LABEL = "label";
     public static final String ROW_NUMBER = "rowNumber";
@@ -49,13 +48,6 @@ public class GoogleSheetsConstants {
     public static final String VALUE_INPUT_OPTION = "valueInputOption";
     public static final String VALUE = "value";
     public static final String VALUES = "values";
-
-    public static final ModifiableBooleanProperty INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY =
-        bool(INCLUDE_ITEMS_FROM_ALL_DRIVES)
-            .label("Include Sheets from All Drives")
-            .description("Whether both My Drive and shared drive sheets should be included in results.")
-            .defaultValue(false)
-            .required(false);
 
     public static final ModifiableBooleanProperty IS_THE_FIRST_ROW_HEADER_PROPERTY = bool(IS_THE_FIRST_ROW_HEADER)
         .label("Is the First Row Headers?")
