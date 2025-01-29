@@ -16,21 +16,11 @@
 
 package com.bytechef.component.aitable.constant;
 
-import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.dynamicProperties;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.nullable;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.aitable.util.AITableUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableDynamicPropertiesProperty;
-import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 
@@ -61,23 +51,6 @@ public class AITableConstants {
     public static final ModifiableDynamicPropertiesProperty FIELDS_DYNAMIC_PROPERTY = dynamicProperties(FIELDS)
         .propertiesLookupDependsOn(DATASHEET_ID)
         .properties(AITableUtils::createPropertiesForRecord);
-
-    public static final ModifiableObjectProperty OUTPUT_PROPERTY = object()
-        .properties(
-            integer("code"),
-            bool("success"),
-            object("data")
-                .properties(
-                    array(RECORDS)
-                        .items(
-                            object()
-                                .properties(
-                                    string(RECORD_ID),
-                                    object(FIELDS)
-                                        .additionalProperties(
-                                            array(), bool(), date(), dateTime(), integer(), nullable(),
-                                            number(), object(), string(), time())))),
-            string("message"));
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
         .label("Space")

@@ -20,11 +20,9 @@ import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS_DYNAMIC_PROPERTY;
-import static com.bytechef.component.aitable.constant.AITableConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -46,7 +44,7 @@ public class AITableCreateRecordAction {
             SPACE_ID_PROPERTY,
             DATASHEET_ID_PROPERTY,
             FIELDS_DYNAMIC_PROPERTY)
-        .output(outputSchema(OUTPUT_PROPERTY))
+        .output()
         .perform(AITableCreateRecordAction::perform);
 
     private AITableCreateRecordAction() {

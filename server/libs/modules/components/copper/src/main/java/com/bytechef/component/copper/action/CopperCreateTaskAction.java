@@ -26,6 +26,7 @@ import static com.bytechef.component.copper.constant.CopperConstants.PRIORITY;
 import static com.bytechef.component.copper.constant.CopperConstants.REMINDER_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.STATUS;
 import static com.bytechef.component.copper.constant.CopperConstants.TAGS;
+import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
@@ -106,10 +107,9 @@ public class CopperCreateTaskAction {
                         string(ID),
                         string(NAME),
                         object("related_resource")
-                            .label("Related Resource")
                             .properties(
-                                string("id"),
-                                string("type")),
+                                string(ID),
+                                string(TYPE)),
                         string(ASSIGNEE_ID),
                         string(DUE_DATE),
                         string(REMINDER_DATE),
@@ -117,7 +117,8 @@ public class CopperCreateTaskAction {
                         string(PRIORITY),
                         string(STATUS),
                         string(DETAILS),
-                        array(TAGS),
+                        array(TAGS)
+                            .items(string()),
                         array(CUSTOM_FIELDS),
                         string("date_created"),
                         string("date_modified"))))

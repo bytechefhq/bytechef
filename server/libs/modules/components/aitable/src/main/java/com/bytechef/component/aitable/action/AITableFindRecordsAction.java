@@ -20,14 +20,12 @@ import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECORDS;
-import static com.bytechef.component.aitable.constant.AITableConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.aitable.util.AITableUtils.createQuery;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
@@ -69,7 +67,7 @@ public class AITableFindRecordsAction {
                 .label("Max Records")
                 .description("How many records are returned in total")
                 .required(false))
-        .output(outputSchema(OUTPUT_PROPERTY))
+        .output()
         .perform(AITableFindRecordsAction::perform);
 
     private AITableFindRecordsAction() {
