@@ -592,7 +592,7 @@ const Property = ({
             }
         }
 
-        if (mentionInput && propertyParameterValue) {
+        if (mentionInput && propertyParameterValue && !mentionInputValue) {
             setMentionInputValue(propertyParameterValue);
         }
 
