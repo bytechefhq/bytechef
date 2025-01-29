@@ -430,7 +430,7 @@ public class GoogleSheetsUtils {
         return options;
     }
 
-    private static Integer labelToColum(String label) {
+    public static Integer labelToColum(String label) {
         int columnNumber = 0;
 
         for (int i = 0; i < label.length(); i++) {
