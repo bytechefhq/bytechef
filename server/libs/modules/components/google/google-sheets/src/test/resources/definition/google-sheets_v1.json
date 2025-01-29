@@ -116,9 +116,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Clear Sheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -224,9 +224,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Column",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -372,9 +372,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Sheet",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -473,9 +473,67 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Delete a specified sheet from a spreadsheet.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "deleteSheet",
+    "outputDefinition" : null,
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The ID of the spreadsheet to apply the updates to.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "spreadsheetId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Spreadsheet ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    }, {
+      "advancedOption" : null,
+      "description" : "The ID of the sheet.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "sheetId",
+      "type" : "INTEGER",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Sheet ID",
+      "placeholder" : null,
+      "maxValue" : null,
+      "minValue" : null,
+      "options" : null,
+      "controlType" : "SELECT",
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : [ "spreadsheetId" ],
+        "options" : { }
+      }
+    } ],
+    "title" : "Delete Sheet",
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -604,9 +662,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find Row by Number",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -759,9 +817,9 @@
       }
     } ],
     "title" : "Insert Multiple Rows",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -914,9 +972,9 @@
       }
     } ],
     "title" : "Insert Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1084,9 +1142,9 @@
       }
     } ],
     "title" : "Update Row",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -1157,6 +1215,7 @@
     "baseUri" : null,
     "test" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1244,19 +1303,18 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "poll" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }
