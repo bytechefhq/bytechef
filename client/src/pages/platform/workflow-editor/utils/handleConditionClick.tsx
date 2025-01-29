@@ -5,7 +5,7 @@ import {Component1Icon} from '@radix-ui/react-icons';
 import {QueryClient} from '@tanstack/react-query';
 import InlineSVG from 'react-inlinesvg';
 
-import useWorkflowDataStore, {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
+import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import getFormattedName from './getFormattedName';
 import getParametersWithDefaultValues from './getParametersWithDefaultValues';
 import handleComponentAddedSuccess from './handleComponentAddedSuccess';
@@ -44,9 +44,7 @@ export default async function handleConditionClick({
         return;
     }
 
-    const {nodes} = useWorkflowDataStore.getState();
-
-    const workflowNodeName = getFormattedName(clickedItem.name!, nodes);
+    const workflowNodeName = getFormattedName(clickedItem.name!);
 
     const newConditionNodeData: NodeDataType = {
         ...clickedTaskDispatcherDefinition,

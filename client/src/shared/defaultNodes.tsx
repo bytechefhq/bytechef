@@ -1,6 +1,8 @@
 import {Node} from '@xyflow/react';
 import {PlayIcon} from 'lucide-react';
 
+import {FINAL_PLACEHOLDER_NODE_ID} from './constants';
+
 const defaultNodes: Node[] = [
     {
         data: {
@@ -20,7 +22,7 @@ const defaultNodes: Node[] = [
     },
     {
         data: {label: '+'},
-        id: '2',
+        id: FINAL_PLACEHOLDER_NODE_ID,
         position: {x: 0, y: 150},
         type: 'placeholder',
     },

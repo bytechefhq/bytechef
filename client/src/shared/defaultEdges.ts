@@ -1,10 +1,12 @@
 import {Edge} from '@xyflow/react';
 
+import {FINAL_PLACEHOLDER_NODE_ID} from './constants';
+
 const defaultEdges: Edge[] = [
     {
-        id: 'manual=>2',
+        id: `manual=>${FINAL_PLACEHOLDER_NODE_ID}`,
         source: 'manual',
-        target: '2',
+        target: FINAL_PLACEHOLDER_NODE_ID,
         type: 'placeholder',
     },
 ];

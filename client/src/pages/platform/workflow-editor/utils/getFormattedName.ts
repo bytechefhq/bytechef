@@ -1,7 +1,9 @@
 import {NodeDataType} from '@/shared/types';
-import {Node} from '@xyflow/react';
 
-export default function getFormattedName(itemName: string, nodes: Node[]): string {
+import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+
+export default function getFormattedName(itemName: string): string {
+    const {nodes} = useWorkflowDataStore.getState();
     const nodeNames = nodes.map((node) => (node.data as NodeDataType).name);
 
     const existingNodes = nodeNames.filter((name) => name?.includes(itemName));
