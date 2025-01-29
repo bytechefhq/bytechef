@@ -18,8 +18,6 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -63,7 +61,7 @@ public class GoogleSheetsCreateSheetAction {
             array(HEADERS)
                 .label("Headers")
                 .description("The headers of the new sheet.")
-                .items(bool(), number(), string())
+                .items(string())
                 .required(false))
         .output()
         .perform(GoogleSheetsCreateSheetAction::perform);
