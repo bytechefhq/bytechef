@@ -23,9 +23,6 @@ import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIEL
 import static com.bytechef.component.baserow.constant.BaserowConstants.USER_FIELD_NAMES_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -48,12 +45,7 @@ public class BaserowCreateRowAction {
                 .required(true),
             USER_FIELD_NAMES_PROPERTY,
             FIELDS_DYNAMIC_PROPERTY)
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string("id"),
-                        string("order"))))
+        .output()
         .perform(BaserowCreateRowAction::perform);
 
     private BaserowCreateRowAction() {

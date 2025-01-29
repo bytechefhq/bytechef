@@ -17,12 +17,7 @@
 package com.bytechef.component.microsoft.excel.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
-import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.IS_THE_FIRST_ROW_HEADER_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_DYNAMIC_PROPERTY;
 import static com.bytechef.component.microsoft.excel.constant.MicrosoftExcelConstants.ROW_NUMBER;
@@ -52,9 +47,7 @@ public class MicrosoftExcelUpdateRowAction {
                 .required(true),
             IS_THE_FIRST_ROW_HEADER_PROPERTY,
             ROW_DYNAMIC_PROPERTY)
-        .output(outputSchema(
-            object()
-                .additionalProperties(bool(), number(), string())))
+        .output()
         .perform(MicrosoftExcelUpdateRowAction::perform);
 
     private MicrosoftExcelUpdateRowAction() {

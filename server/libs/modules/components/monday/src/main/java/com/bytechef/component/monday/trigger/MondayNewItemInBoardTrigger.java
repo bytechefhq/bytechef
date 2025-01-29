@@ -17,14 +17,7 @@
 package com.bytechef.component.monday.trigger;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.date;
-import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.number;
-import static com.bytechef.component.definition.ComponentDsl.object;
-import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.monday.constant.MondayColumnType.getColumnTypeByName;
 import static com.bytechef.component.monday.constant.MondayConstants.BOARDS;
@@ -80,21 +73,7 @@ public class MondayNewItemInBoardTrigger {
                 .options((TriggerOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true))
-        .output(
-            outputSchema(
-                object()
-                    .properties(
-                        string(TYPE),
-                        string("triggerTime"),
-                        integer("subscriptionId"),
-                        integer("userId"),
-                        integer("boardId"),
-                        integer("pulseId"),
-                        string("pulseName"),
-                        string("groupId"),
-                        string("groupName"),
-                        object("columnValues")
-                            .additionalProperties(string(), number(), date(), time(), integer(), object(), bool()))))
+        .output()
         .webhookEnable(MondayNewItemInBoardTrigger::webhookEnable)
         .webhookDisable(MondayNewItemInBoardTrigger::webhookDisable)
         .webhookRequest(MondayNewItemInBoardTrigger::webhookRequest);
