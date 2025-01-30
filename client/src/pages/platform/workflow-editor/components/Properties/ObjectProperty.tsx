@@ -193,14 +193,11 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
 
     // set default values for subProperties when they are created
     useEffect(() => {
-        if (
-            !subProperties ||
-            !path ||
-            path.includes('.') ||
-            !currentComponent ||
-            !updateWorkflowNodeParameterMutation ||
-            !workflow.id
-        ) {
+        if (!subProperties || !path || !currentComponent || !updateWorkflowNodeParameterMutation || !workflow.id) {
+            return;
+        }
+
+        if (path.includes('.') && (!currentComponent.parameters || !Object.keys(currentComponent.parameters).length)) {
             return;
         }
 
