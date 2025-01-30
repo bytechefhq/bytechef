@@ -51,16 +51,18 @@ public class LLMUtils {
     }
 
     public static Message createMessage(ChatModel.Message message, ActionContext actionContext) {
+        String messageContent = processText(message.content());
+
         return switch (message.role()) {
-            case ASSISTANT -> new AssistantMessage(message.content());
-            case SYSTEM -> new SystemMessage(message.content());
+            case ASSISTANT -> new AssistantMessage(messageContent);
+            case SYSTEM -> new SystemMessage(messageContent);
             case TOOL -> new ToolResponseMessage(new ArrayList<>());
             case USER -> {
                 List<FileEntry> attachments = message.attachments();
-                StringBuilder content = new StringBuilder(message.content());
+                StringBuilder content = new StringBuilder(messageContent);
 
                 if (attachments == null || attachments.isEmpty()) {
-                    yield new UserMessage(message.content());
+                    yield new UserMessage(messageContent);
                 } else {
                     List<Media> media = new ArrayList<>();
 
@@ -109,5 +111,11 @@ public class LLMUtils {
         }
 
         return new BaseOutputDefinition.OutputResponse(outputSchemaProperty);
+    }
+
+    private static String processText(String messageContent) {
+        // Remove braces to avoid issues with prompt template
+        return messageContent.replace("{", " ")
+            .replace("}", " ");
     }
 }
