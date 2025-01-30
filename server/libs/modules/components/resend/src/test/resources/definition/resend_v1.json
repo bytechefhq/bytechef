@@ -674,7 +674,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }

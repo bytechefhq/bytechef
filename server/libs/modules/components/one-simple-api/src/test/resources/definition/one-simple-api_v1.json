@@ -2592,7 +2592,7 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
+    "test" : null,
+    "baseUri" : { }
   }
 }

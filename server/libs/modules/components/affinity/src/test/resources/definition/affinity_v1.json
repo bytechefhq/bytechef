@@ -113,6 +113,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -195,8 +196,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -242,8 +242,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Opportunity",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -365,6 +365,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -467,8 +468,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -534,8 +534,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Organization",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   }, {
     "batch" : null,
@@ -698,6 +698,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -841,8 +842,7 @@
         } ],
         "controlType" : "OBJECT_BUILDER",
         "optionsDataSource" : null
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -949,13 +949,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Person",
-    "workflowNodeDescription" : null,
     "perform" : null,
+    "workflowNodeDescription" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1004,5 +1001,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "unifiedApi" : null,
+  "dataStream" : null
 }

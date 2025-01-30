@@ -819,9 +819,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Contact",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -940,9 +940,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Group",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1769,9 +1769,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Contact",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2500,10 +2500,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Search Contacts",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -2572,8 +2575,5 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "triggers" : null,
-  "dataStream" : null,
-  "unifiedApi" : null
+  }
 }

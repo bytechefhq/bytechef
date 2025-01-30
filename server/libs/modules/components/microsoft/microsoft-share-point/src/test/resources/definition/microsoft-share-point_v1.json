@@ -164,7 +164,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Site",
+      "label" : "Site ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -187,7 +187,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -411,7 +411,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Site",
+      "label" : "Site ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -575,7 +575,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Site",
+      "label" : "Site ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -598,7 +598,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "List",
+      "label" : "List ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -737,7 +737,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Site",
+      "label" : "Site ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -760,7 +760,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -873,9 +873,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -964,5 +961,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : null,
+  "dataStream" : null,
+  "unifiedApi" : null
 }

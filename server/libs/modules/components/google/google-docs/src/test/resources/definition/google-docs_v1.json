@@ -68,9 +68,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Document",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -232,9 +232,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Document From Template",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -273,10 +273,13 @@
       }
     } ],
     "title" : "Get Document",
-    "perform" : { },
     "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "perform" : { }
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -345,8 +348,5 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "triggers" : null,
-  "dataStream" : null,
-  "unifiedApi" : null
+  }
 }

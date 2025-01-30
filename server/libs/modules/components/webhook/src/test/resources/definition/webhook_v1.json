@@ -287,6 +287,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -299,15 +300,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "headers" : { },
           "method" : "POST",
+          "headers" : { },
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "headers" : { },
         "method" : "POST",
+        "headers" : { },
         "parameters" : { }
       }
     },
@@ -339,15 +340,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "headers" : { },
           "method" : "POST",
+          "headers" : { },
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "headers" : { },
         "method" : "POST",
+        "headers" : { },
         "parameters" : { }
       }
     },
@@ -399,15 +400,15 @@
       "outputResponse" : {
         "outputSchema" : null,
         "sampleOutput" : {
-          "headers" : { },
           "method" : "POST",
+          "headers" : { },
           "parameters" : { }
         }
       },
       "outputSchema" : null,
       "sampleOutput" : {
-        "headers" : { },
         "method" : "POST",
+        "headers" : { },
         "parameters" : { }
       }
     },
@@ -468,6 +469,5 @@
     "webhookValidate" : { },
     "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

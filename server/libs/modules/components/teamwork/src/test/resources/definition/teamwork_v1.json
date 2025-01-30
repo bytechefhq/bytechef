@@ -647,7 +647,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Task List",
+      "label" : "Task List ID",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -762,9 +762,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "unifiedApi" : null,
-  "triggers" : [ ],
-  "dataStream" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -833,5 +830,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : [ ],
+  "unifiedApi" : null
 }

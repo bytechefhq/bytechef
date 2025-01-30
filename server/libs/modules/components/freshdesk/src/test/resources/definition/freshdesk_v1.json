@@ -1245,8 +1245,8 @@
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "triggers" : [ ],
   "unifiedApi" : null,
+  "triggers" : [ ],
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

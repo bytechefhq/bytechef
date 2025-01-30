@@ -233,6 +233,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -435,8 +436,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -450,7 +450,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Workspace",
+      "label" : "Workspace ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -475,7 +475,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Space",
+      "label" : "Space ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -490,7 +490,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "Folder where new list will be created.",
+      "description" : "ID of the folder where new list will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -502,7 +502,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Folder",
+      "label" : "Folder ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -862,6 +862,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1144,8 +1145,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1159,7 +1159,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Workspace",
+      "label" : "Workspace ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1184,7 +1184,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Space",
+      "label" : "Space ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1209,7 +1209,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Folder",
+      "label" : "Folder ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1224,7 +1224,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "List where new task will be created.",
+      "description" : "ID of the list where new task will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1236,7 +1236,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "List",
+      "label" : "List ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1476,6 +1476,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -1618,8 +1619,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -1633,7 +1633,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Workspace",
+      "label" : "Workspace ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1648,7 +1648,7 @@
       "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
-      "description" : "Space where new folder will be created.",
+      "description" : "ID of the space where new folder will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1660,7 +1660,7 @@
       "type" : "NUMBER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Space",
+      "label" : "Space ID",
       "placeholder" : null,
       "maxNumberPrecision" : null,
       "maxValue" : null,
@@ -1915,6 +1915,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2095,8 +2096,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2110,7 +2110,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Workspace",
+      "label" : "Workspace ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -2132,8 +2132,8 @@
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "listenerDisable" : null,
     "dynamicWebhookRefresh" : null,
+    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,
@@ -2430,6 +2430,7 @@
         },
         "sampleOutput" : null
       },
+      "sampleOutput" : null,
       "outputSchema" : {
         "advancedOption" : null,
         "description" : null,
@@ -2710,8 +2711,7 @@
         } ],
         "optionsDataSource" : null,
         "controlType" : "OBJECT_BUILDER"
-      },
-      "sampleOutput" : null
+      }
     },
     "properties" : [ {
       "advancedOption" : null,
@@ -2725,7 +2725,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Workspace",
+      "label" : "Workspace ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -2747,8 +2747,8 @@
     "deduplicate" : null,
     "webhookDisable" : { },
     "webhookEnable" : { },
-    "listenerDisable" : null,
     "dynamicWebhookRefresh" : null,
+    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookRequest" : { },
     "webhookValidate" : null,

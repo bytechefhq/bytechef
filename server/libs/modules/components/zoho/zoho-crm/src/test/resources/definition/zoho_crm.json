@@ -413,7 +413,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Role you want to assign the user with.",
+      "description" : "ID of the role you want to assign the user with.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -423,7 +423,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Role",
+      "label" : "Role ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -436,7 +436,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Profile you want to assign the user with.",
+      "description" : "ID of the profile you want to assign the user with.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -446,7 +446,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Profile",
+      "label" : "Profile ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -459,8 +459,8 @@
       }
     } ],
     "title" : "Add User",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -802,8 +802,8 @@
     },
     "properties" : null,
     "title" : "Get Organization",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1645,8 +1645,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "List Users",
-    "processErrorResponse" : null,
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "connection" : {
@@ -1762,7 +1762,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }
