@@ -60,6 +60,29 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
      */
     @Override
     public Object convert(@NonNull String text) {
+        return context.json(json -> json.read(processText(text), this.typeReference));
+    }
+
+    /**
+     * Provides the expected format of the response, instructing that it should adhere to the generated JSON schema.
+     *
+     * @return The instruction format string.
+     */
+    @Override
+    public String getFormat() {
+        String template =
+            """
+                Your response should be in JSON format.%n\
+                Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.%n\
+                Do not include markdown code blocks in your response.%n\
+                Remove the ```json markdown from the output.%n\
+                Here is the JSON Schema instance your output must adhere to:%n\
+                ```%s```%n\
+                """;
+        return String.format(template, this.jsonSchema);
+    }
+
+    private static String processText(String text) {
         // Remove leading and trailing whitespace
         text = text.trim();
 
@@ -83,27 +106,6 @@ public class JsonSchemaStructuredOutputConverter implements StructuredOutputConv
             text = text.trim();
         }
 
-        String finalText = text;
-
-        return context.json(json -> json.read(finalText, this.typeReference));
-    }
-
-    /**
-     * Provides the expected format of the response, instructing that it should adhere to the generated JSON schema.
-     *
-     * @return The instruction format string.
-     */
-    @Override
-    public String getFormat() {
-        String template =
-            """
-                Your response should be in JSON format.%n\
-                Do not include any explanations, only provide a RFC8259 compliant JSON response following this format without deviation.%n\
-                Do not include markdown code blocks in your response.%n\
-                Remove the ```json markdown from the output.%n\
-                Here is the JSON Schema instance your output must adhere to:%n\
-                ```%s```%n\
-                """;
-        return String.format(template, this.jsonSchema);
+        return text;
     }
 }

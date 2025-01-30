@@ -70,7 +70,7 @@ public interface ChatModel {
 
         List<Message> messages = inputParameters.getList(MESSAGES, new TypeReference<>() {});
 
-        List<org.springframework.ai.chat.messages.Message> list = new java.util.ArrayList<>(
+        List<org.springframework.ai.chat.messages.Message> aiChatMessages = new java.util.ArrayList<>(
             messages.stream()
                 .map(message -> createMessage(message, actionContext))
                 .toList());
@@ -78,10 +78,10 @@ public interface ChatModel {
         String responseSchema = inputParameters.getString(RESPONSE_SCHEMA);
 
         if (responseSchema != null && !responseSchema.isEmpty()) {
-            list.add(new SystemMessage(responseSchema));
+            aiChatMessages.add(new SystemMessage(responseSchema));
         }
 
-        return list;
+        return aiChatMessages;
     }
 
     @SuppressFBWarnings("NP")
