@@ -252,9 +252,9 @@
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "listenerDisable" : null,
     "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null

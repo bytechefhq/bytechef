@@ -71,7 +71,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Folder ID where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation.",
+      "description" : "ID of the folder where the new presentation will be saved. If not provided, the new presentation will be saved in the same folder as the template presentation.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -81,7 +81,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Folder for New Presentation",
+      "label" : "Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -134,10 +134,13 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Presentation Based on Template",
-    "workflowNodeDescription" : null,
+    "processErrorResponse" : null,
     "perform" : { },
-    "processErrorResponse" : null
+    "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -188,9 +191,6 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "apply" : null,
-      "authorizationCallback" : null,
-      "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : { },
@@ -199,15 +199,15 @@
       "refreshUrl" : { },
       "scopes" : { },
       "refreshToken" : null,
-      "tokenUrl" : { }
+      "tokenUrl" : { },
+      "apply" : null,
+      "authorizationCallback" : null,
+      "authorizationUrl" : { }
     } ],
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  },
-  "triggers" : null,
-  "dataStream" : null,
-  "unifiedApi" : null
+  }
 }

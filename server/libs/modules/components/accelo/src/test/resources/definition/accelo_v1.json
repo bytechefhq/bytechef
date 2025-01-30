@@ -1034,7 +1034,7 @@
         "optionsDataSource" : null
       }, {
         "advancedOption" : null,
-        "description" : "Company the new affiliated contact will be associated with.",
+        "description" : "ID of the company  to which the newly affiliated contact will be linked.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -1044,7 +1044,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Company",
+        "label" : "Company ID",
         "placeholder" : null,
         "controlType" : "SELECT",
         "languageId" : null,
@@ -1489,7 +1489,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Object the task is against.",
+      "description" : "ID of the object the task is against.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -1499,7 +1499,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Against Object",
+      "label" : "Against Object ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,

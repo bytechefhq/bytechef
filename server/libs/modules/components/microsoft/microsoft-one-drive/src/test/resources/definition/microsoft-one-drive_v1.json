@@ -223,7 +223,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Folder from which you want to download the file.",
+      "description" : "ID of the folder from which you want to download the file.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -233,7 +233,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -246,7 +246,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "File to download.",
+      "description" : "ID of the file to download.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -256,7 +256,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "File",
+      "label" : "File ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -452,7 +452,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Folder from which you want to list files. If no folder is specified, the root folder will be used.",
+      "description" : "ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -462,7 +462,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -658,7 +658,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Folder from which you want to list folders. If no folder is specified, the root folder will be used.",
+      "description" : "ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -668,7 +668,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -822,7 +822,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.",
+      "description" : "ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -832,7 +832,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1031,9 +1031,10 @@
     "properties" : null,
     "version" : 1,
     "authorizationRequired" : null,
-    "test" : null,
-    "baseUri" : { }
+    "baseUri" : { },
+    "test" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1223,7 +1224,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Parent Folder",
+      "label" : "Parent Folder ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -1252,6 +1253,5 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

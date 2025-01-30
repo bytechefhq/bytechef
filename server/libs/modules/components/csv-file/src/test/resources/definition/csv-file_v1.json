@@ -720,6 +720,7 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : null,
   "dataStream" : {
     "reader" : {
       "properties" : null,
@@ -732,6 +733,5 @@
     }
   },
   "triggers" : null,
-  "unifiedApi" : null,
-  "connection" : null
+  "unifiedApi" : null
 }

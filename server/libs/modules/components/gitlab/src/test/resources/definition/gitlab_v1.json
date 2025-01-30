@@ -352,7 +352,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Project where new issue will be created",
+      "description" : "ID of the project where new issue will be created.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -364,7 +364,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Project",
+      "label" : "Project ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -421,9 +421,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Issue",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -619,7 +619,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Project",
+      "label" : "Project ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -632,7 +632,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "The issue to comment on.",
+      "description" : "ID of the issue to comment on.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -644,7 +644,7 @@
       "type" : "INTEGER",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Issue",
+      "label" : "Issue ID",
       "placeholder" : null,
       "maxValue" : null,
       "minValue" : null,
@@ -678,9 +678,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Comment on Issue",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -751,6 +751,7 @@
     "baseUri" : { },
     "test" : null
   },
+  "dataStream" : null,
   "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
@@ -1029,8 +1030,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -1041,6 +1042,5 @@
     "webhookRequest" : { },
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
-  } ],
-  "dataStream" : null
+  } ]
 }

@@ -337,8 +337,8 @@
       "minValue" : 0.0,
       "numberPrecision" : null,
       "options" : null,
-      "controlType" : "NUMBER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "NUMBER"
     }, {
       "advancedOption" : null,
       "description" : "Specifies the output file name for the result image.",
@@ -685,8 +685,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "The vertical starting point of the crop area",
@@ -704,8 +704,8 @@
       "maxValue" : null,
       "minValue" : 0,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Width of the crop area",
@@ -723,8 +723,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Height of the crop area",
@@ -742,8 +742,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Specifies the output file name for the result image.",
@@ -1381,8 +1381,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Height in pixels",
@@ -1400,8 +1400,8 @@
       "maxValue" : null,
       "minValue" : null,
       "options" : null,
-      "controlType" : "INTEGER",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "INTEGER"
     }, {
       "advancedOption" : null,
       "description" : "Specifies the output file name for the result image.",
@@ -1760,8 +1760,8 @@
         "label" : "270°",
         "value" : 270
       } ],
-      "controlType" : "SELECT",
-      "optionsDataSource" : null
+      "optionsDataSource" : null,
+      "controlType" : "SELECT"
     }, {
       "advancedOption" : null,
       "description" : "Specifies the output file name for the result image.",
@@ -1788,8 +1788,8 @@
     "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

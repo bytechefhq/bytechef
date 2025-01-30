@@ -16,7 +16,7 @@
   "actions" : [ {
     "batch" : null,
     "deprecated" : null,
-    "description" : "Add labels to an email in your Gmail account",
+    "description" : "Add labels to an email in your Gmail account.",
     "help" : null,
     "metadata" : null,
     "name" : "addLabels",
@@ -270,7 +270,7 @@
       "placeholder" : null,
       "items" : [ {
         "advancedOption" : null,
-        "description" : "Label to add to this message",
+        "description" : "ID of the label to add to this message.",
         "displayCondition" : null,
         "expressionEnabled" : null,
         "hidden" : null,
@@ -280,7 +280,7 @@
         "type" : "STRING",
         "defaultValue" : null,
         "exampleValue" : null,
-        "label" : "Label",
+        "label" : "Label ID",
         "placeholder" : null,
         "controlType" : "SELECT",
         "languageId" : null,
@@ -300,9 +300,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Add Labels",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -336,9 +336,9 @@
       }
     } ],
     "title" : "Delete Mail",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -458,9 +458,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Mail",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -580,9 +580,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Thread",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1086,9 +1086,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Reply to Email",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1611,9 +1611,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Search Email",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -2155,9 +2155,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Send Email",
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "perform" : { },
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -2228,6 +2228,7 @@
     "baseUri" : null,
     "test" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -3241,10 +3242,10 @@
     "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
     "webhookRequest" : { },
     "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
@@ -3435,14 +3436,13 @@
     "webhookDisable" : null,
     "webhookEnable" : null,
     "dynamicWebhookRefresh" : null,
-    "workflowNodeDescription" : null,
-    "processErrorResponse" : null,
     "webhookRequest" : null,
     "listenerDisable" : null,
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }

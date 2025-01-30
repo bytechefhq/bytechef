@@ -285,7 +285,7 @@
     "workflowNodeDescription" : null
   } ],
   "connection" : null,
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

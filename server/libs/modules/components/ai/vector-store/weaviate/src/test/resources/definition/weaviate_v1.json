@@ -546,9 +546,6 @@
     "perform" : { },
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -637,5 +634,8 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
 }

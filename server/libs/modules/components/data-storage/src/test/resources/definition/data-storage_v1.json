@@ -351,8 +351,8 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Append Value to List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -481,8 +481,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Atomic Increment",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -822,8 +822,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Await Get Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -887,8 +887,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -971,8 +971,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Value from List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1106,8 +1106,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get All Entries(Keys and Values)",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1428,8 +1428,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Get Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -1745,8 +1745,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -2081,12 +2081,12 @@
       "optionsDataSource" : null
     } ],
     "title" : "Set Value in List",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
   "connection" : null,
-  "triggers" : null,
   "dataStream" : null,
+  "triggers" : null,
   "unifiedApi" : null
 }

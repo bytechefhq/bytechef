@@ -40,7 +40,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Project",
+      "label" : "Project ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -115,12 +115,10 @@
       "optionsDataSource" : null
     } ],
     "title" : "Update Project",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   } ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -820,7 +818,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : null,
+      "description" : "ID of the project you want to monitor.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -830,7 +828,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Project",
+      "label" : "Project ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -846,8 +844,8 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "workflowNodeDescription" : null,
     "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
     "poll" : null,
     "deduplicate" : null,
     "webhookDisable" : { },
@@ -859,6 +857,8 @@
     "webhookValidate" : null,
     "webhookValidateOnEnable" : { }
   } ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -911,11 +911,11 @@
       "acquire" : null,
       "apply" : null,
       "authorizationCallback" : null,
+      "pkce" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
       "oauth2AuthorizationExtraQueryParameters" : null,
-      "pkce" : null,
       "refresh" : null,
       "refreshUrl" : { },
       "scopes" : null,

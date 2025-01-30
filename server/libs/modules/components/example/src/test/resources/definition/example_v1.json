@@ -75,6 +75,14 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "connection" : {
+    "authorizations" : [ ],
+    "properties" : null,
+    "version" : 1,
+    "authorizationRequired" : null,
+    "baseUri" : { },
+    "test" : null
+  },
   "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
@@ -149,13 +157,5 @@
     "webhookValidate" : { },
     "webhookValidateOnEnable" : null
   } ],
-  "unifiedApi" : null,
-  "connection" : {
-    "authorizations" : [ ],
-    "properties" : null,
-    "version" : 1,
-    "authorizationRequired" : null,
-    "baseUri" : { },
-    "test" : null
-  }
+  "unifiedApi" : null
 }

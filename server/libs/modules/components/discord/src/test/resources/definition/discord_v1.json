@@ -258,7 +258,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Guild",
+      "label" : "Guild ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -271,7 +271,7 @@
       }
     }, {
       "advancedOption" : null,
-      "description" : "Channel where to send the message",
+      "description" : "ID of the channel where to send the message.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -283,7 +283,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Channel",
+      "label" : "Channel ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -602,7 +602,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Guild",
+      "label" : "Guild ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -839,7 +839,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Guild",
+      "label" : "Guild ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -924,8 +924,8 @@
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,
-  "unifiedApi" : null,
   "triggers" : [ ],
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,

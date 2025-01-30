@@ -1189,7 +1189,7 @@
           "optionsDataSource" : null
         }, {
           "advancedOption" : null,
-          "description" : "The type of the task based on the available task types in the account.",
+          "description" : "ID of the task type.",
           "displayCondition" : null,
           "expressionEnabled" : null,
           "hidden" : null,
@@ -1199,7 +1199,7 @@
           "type" : "INTEGER",
           "defaultValue" : null,
           "exampleValue" : null,
-          "label" : "Task Type",
+          "label" : "Task Type ID",
           "placeholder" : null,
           "maxValue" : null,
           "minValue" : null,

@@ -371,6 +371,9 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -502,8 +505,5 @@
     "authorizationRequired" : false,
     "baseUri" : null,
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null
+  }
 }

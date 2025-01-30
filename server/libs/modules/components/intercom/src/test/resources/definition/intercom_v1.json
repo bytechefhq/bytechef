@@ -730,7 +730,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Contact Name",
+      "label" : "Contact ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -900,7 +900,7 @@
       "optionsDataSource" : null
     }, {
       "advancedOption" : null,
-      "description" : "Receiver of the message",
+      "description" : "ID of the contact to send the message to.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,

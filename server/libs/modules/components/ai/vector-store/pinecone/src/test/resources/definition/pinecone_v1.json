@@ -48,8 +48,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Data Query",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -542,8 +542,8 @@
       "optionsDataSource" : null
     } ],
     "title" : "Load Data",
-    "perform" : { },
     "processErrorResponse" : null,
+    "perform" : { },
     "workflowNodeDescription" : null
   } ],
   "dataStream" : null,

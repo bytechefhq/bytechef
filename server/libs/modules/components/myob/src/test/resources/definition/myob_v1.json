@@ -449,7 +449,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Customer",
+      "label" : "Customer UID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -901,7 +901,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Supplier",
+      "label" : "Supplier UID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -918,9 +918,6 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "dataStream" : null,
-  "triggers" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1009,5 +1006,8 @@
     "authorizationRequired" : null,
     "baseUri" : null,
     "test" : null
-  }
+  },
+  "dataStream" : null,
+  "triggers" : null,
+  "unifiedApi" : null
 }

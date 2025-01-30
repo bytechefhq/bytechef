@@ -840,9 +840,6 @@
     "perform" : null,
     "processErrorResponse" : null
   } ],
-  "triggers" : [ ],
-  "dataStream" : null,
-  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -911,5 +908,8 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  }
+  },
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null
 }

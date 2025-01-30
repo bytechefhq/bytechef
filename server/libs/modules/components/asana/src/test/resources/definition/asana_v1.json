@@ -608,9 +608,9 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Project",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1486,10 +1486,13 @@
       "controlType" : "OBJECT_BUILDER"
     } ],
     "title" : "Create Task",
-    "perform" : null,
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : null
   } ],
+  "triggers" : [ ],
+  "dataStream" : null,
+  "unifiedApi" : null,
   "connection" : {
     "authorizations" : [ {
       "detectOn" : null,
@@ -1558,8 +1561,5 @@
     "authorizationRequired" : null,
     "baseUri" : { },
     "test" : null
-  },
-  "dataStream" : null,
-  "triggers" : [ ],
-  "unifiedApi" : null
+  }
 }

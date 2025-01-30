@@ -46,8 +46,8 @@
     "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
-  "connection" : null,
   "dataStream" : null,
   "triggers" : null,
-  "unifiedApi" : null
+  "unifiedApi" : null,
+  "connection" : null
 }

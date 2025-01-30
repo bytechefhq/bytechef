@@ -440,7 +440,7 @@
     },
     "properties" : [ {
       "advancedOption" : null,
-      "description" : "Form to retrieve submissions for.",
+      "description" : "ID of the form to retrieve submissions for.",
       "displayCondition" : null,
       "expressionEnabled" : null,
       "hidden" : null,
@@ -452,7 +452,7 @@
       "type" : "STRING",
       "defaultValue" : null,
       "exampleValue" : null,
-      "label" : "Form",
+      "label" : "Form ID",
       "placeholder" : null,
       "controlType" : "SELECT",
       "languageId" : null,
@@ -566,7 +566,7 @@
     "baseUri" : { },
     "test" : null
   },
-  "dataStream" : null,
   "unifiedApi" : null,
-  "triggers" : [ ]
+  "triggers" : [ ],
+  "dataStream" : null
 }
