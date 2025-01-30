@@ -17,6 +17,9 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
@@ -34,7 +37,7 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +57,14 @@ public class GoogleSheetsCreateColumnAction {
                 .label("Column Name")
                 .description("Name of the new column.")
                 .required(true))
-        .output()
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(SPREADSHEET_ID),
+                        string(SHEET_NAME),
+                        array(HEADERS)
+                            .items(string()))))
         .perform(GoogleSheetsCreateColumnAction::perform);
 
     private GoogleSheetsCreateColumnAction() {
@@ -81,7 +91,7 @@ public class GoogleSheetsCreateColumnAction {
 
     private static Map<String, Object> getResponseMap(String spreadSheetId, String sheetName, Sheets sheets)
         throws IOException {
-        Map<String, Object> responseMap = new HashMap<>();
+        Map<String, Object> responseMap = new LinkedHashMap<>();
 
         responseMap.put(SPREADSHEET_ID, spreadSheetId);
         responseMap.put(SHEET_NAME, sheetName);

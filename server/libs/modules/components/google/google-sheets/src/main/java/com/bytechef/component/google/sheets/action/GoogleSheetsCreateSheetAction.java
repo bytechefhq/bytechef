@@ -18,6 +18,8 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
@@ -40,7 +42,7 @@ import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Response;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +65,14 @@ public class GoogleSheetsCreateSheetAction {
                 .description("The headers of the new sheet.")
                 .items(string())
                 .required(false))
-        .output()
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(SPREADSHEET_ID),
+                        string(SHEET_NAME),
+                        array(HEADERS)
+                            .items(string()))))
         .perform(GoogleSheetsCreateSheetAction::perform);
 
     private GoogleSheetsCreateSheetAction() {
@@ -114,7 +123,7 @@ public class GoogleSheetsCreateSheetAction {
         AddSheetResponse addSheet = response.getAddSheet();
         SheetProperties sheetProperties = addSheet.getProperties();
 
-        Map<String, Object> newsSheet = new HashMap<>();
+        Map<String, Object> newsSheet = new LinkedHashMap<>();
 
         newsSheet.put(SPREADSHEET_ID, spreadsheetId);
         newsSheet.put(SHEET_ID, sheetProperties.getSheetId());
