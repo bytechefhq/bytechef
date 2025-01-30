@@ -33,8 +33,8 @@ public class NiftyConstants {
     public static final String PROJECT = "project";
 
     public static final ModifiableStringProperty PROJECT_PROPERTY = string(PROJECT)
-        .label("Project")
-        .description("Project within which the task will be created.")
+        .label("Project ID")
+        .description("ID of the project within which the task will be created.")
         .options((ActionOptionsFunction<String>) NiftyOptionUtils::getProjectIdOptions)
         .required(true);
 

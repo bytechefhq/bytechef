@@ -50,9 +50,9 @@ public class BoxUploadFileAction {
         .description("Uploads a small file to Box.")
         .properties(
             string(ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder where the file should be uploaded; if no folder is selected, the file will be " +
+                    "ID of the folder where the file should be uploaded; if no folder is selected, the file will be " +
                         "uploaded in the root folder.")
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
@@ -60,11 +60,12 @@ public class BoxUploadFileAction {
             fileEntry(FILE)
                 .label("File")
                 .required(true))
-        .output(outputSchema(
-            object()
-                .properties(
-                    array("entries")
-                        .items(FILE_OUTPUT_PROPERTY))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        array("entries")
+                            .items(FILE_OUTPUT_PROPERTY))))
         .perform(BoxUploadFileAction::perform);
 
     private BoxUploadFileAction() {

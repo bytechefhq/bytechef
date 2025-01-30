@@ -39,7 +39,7 @@ public class GoogleDriveDeleteFileAction {
         .description("Delete a selected file from Google Drive.")
         .properties(
             string(FILE_ID)
-                .label("File")
+                .label("File ID")
                 .description("The id of a file to delete.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))

@@ -55,8 +55,8 @@ public class JiraCreateIssueAction {
         .description("Creates a new issue.")
         .properties(
             string(PROJECT)
-                .label("Project Name")
-                .description("The name of the project to create the issue in.")
+                .label("Project ID")
+                .description("ID of the project to create the issue in.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(SUMMARY)
@@ -64,27 +64,27 @@ public class JiraCreateIssueAction {
                 .description("A brief summary of the issue.")
                 .required(true),
             string(ISSUETYPE)
-                .label("Issue Type")
-                .description("The type of issue.")
+                .label("Issue Type ID")
+                .description("Id of the issue type.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(PARENT)
-                .label("Parent")
-                .description("")
+                .label("Parent Issue ID")
+                .description("ID of the parent issue.")
                 .displayCondition("%s == '%s'".formatted(ISSUETYPE, "10003"))
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getIssueIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(true),
             string(ASSIGNEE)
-                .label("Assignee")
-                .description("User who will be assigned to the issue.")
+                .label("Assignee ID")
+                .description("ID of the user who will be assigned to the issue.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getUserIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(false),
             string(PRIORITY)
-                .label("Priority")
-                .description("Priority of the issue.")
+                .label("Priority ID")
+                .description("ID of the priority of the issue.")
                 .options((ActionOptionsFunction<String>) JiraOptionsUtils::getPriorityIdOptions)
                 .required(false),
             string(DESCRIPTION)

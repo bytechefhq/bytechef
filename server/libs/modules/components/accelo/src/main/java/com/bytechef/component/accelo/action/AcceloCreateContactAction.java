@@ -48,8 +48,8 @@ public class AcceloCreateContactAction {
             string("surname").label("Last Name")
                 .description("The last name of the contact.")
                 .required(false),
-            string("company_id").label("Company")
-                .description("Company the new affiliated contact will be associated with.")
+            string("company_id").label("Company ID")
+                .description("ID of the company  to which the newly affiliated contact will be linked.")
                 .required(true),
             string("phone").label("Phone")
                 .description("The contact's phone number in their role in the associated company.")

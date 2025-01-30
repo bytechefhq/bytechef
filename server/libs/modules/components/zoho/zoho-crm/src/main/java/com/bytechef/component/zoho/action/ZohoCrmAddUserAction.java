@@ -64,13 +64,13 @@ public class ZohoCrmAddUserAction {
                 .controlType(ControlType.EMAIL)
                 .required(true),
             string(ROLE)
-                .label("Role")
-                .description("Role you want to assign the user with.")
+                .label("Role ID")
+                .description("ID of the role you want to assign the user with.")
                 .options((ActionOptionsFunction<String>) ZohoCrmUtils::getRoleOptions)
                 .required(true),
             string(PROFILE)
-                .label("Profile")
-                .description("Profile you want to assign the user with.")
+                .label("Profile ID")
+                .description("ID of the profile you want to assign the user with.")
                 .options((ActionOptionsFunction<String>) ZohoCrmUtils::getProfileOptions)
                 .required(true))
         .output(

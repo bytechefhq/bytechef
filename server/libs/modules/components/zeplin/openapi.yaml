@@ -19,7 +19,8 @@ paths:
           required: true
           schema:
             type: "string"
-            title: "Project"
+            title: "Project ID"
+            description: "ID of the project to update."
       requestBody:
         required: true
         content:

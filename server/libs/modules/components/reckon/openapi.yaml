@@ -14,11 +14,11 @@ paths:
       operationId: "createContact"
       parameters:
         - name: "bookId"
-          description: "Book where new contact will be created."
+          description: "ID of the book where new contact will be created."
           in: "path"
           required: true
           schema:
-            title: "Book"
+            title: "Book ID"
             type: "string"
       requestBody:
         content:
@@ -53,11 +53,11 @@ paths:
       operationId: "createInvoice"
       parameters:
         - name: "bookId"
-          description: "Book where new invoice will be created."
+          description: "ID of the book where new invoice will be created."
           in: "path"
           required: true
           schema:
-            title: "Book"
+            title: "Book ID"
             type: "string"
       requestBody:
         content:
@@ -117,11 +117,11 @@ paths:
       operationId: "createPayment"
       parameters:
         - name: "bookId"
-          description: "Book where new payment will be created."
+          description: "ID of the book where new payment will be created."
           in: "path"
           required: true
           schema:
-            title: "Book"
+            title: "Book ID"
             type: "string"
       requestBody:
         content:

@@ -42,13 +42,13 @@ public class GitlabCreateCommentOnIssueAction {
                 "path", "/projects/{projectId}/issues/{issueId}/notes"
 
             ))
-        .properties(string("projectId").label("Project")
+        .properties(string("projectId").label("Project ID")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            integer("issueId").label("Issue")
-                .description("The issue to comment on.")
+            integer("issueId").label("Issue ID")
+                .description("ID of the issue to comment on.")
                 .required(true)
                 .metadata(
                     Map.of(

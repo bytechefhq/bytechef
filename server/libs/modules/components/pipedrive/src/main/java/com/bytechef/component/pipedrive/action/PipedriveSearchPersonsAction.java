@@ -68,7 +68,7 @@ public class PipedriveSearchPersonsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("organization_id").label("Organization")
+            integer("organization_id").label("Organization ID")
                 .description("Will filter persons by the provided organization.")
                 .required(false)
                 .metadata(

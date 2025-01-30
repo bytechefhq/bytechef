@@ -16,7 +16,6 @@
 
 package com.bytechef.component.intercom.action;
 
-import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,8 +42,8 @@ class IntercomGetContactActionTest {
     void testPerform() {
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
-        when(mockedParameters.getRequiredString(CONTACT_NAME))
-            .thenReturn((String) propertyStubsMap.get(CONTACT_NAME));
+        when(mockedParameters.getRequiredString(ID))
+            .thenReturn((String) propertyStubsMap.get(ID));
 
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -63,7 +62,7 @@ class IntercomGetContactActionTest {
     private static Map<String, Object> createPropertyStubsMap() {
         Map<String, Object> propertyStubsMap = new HashMap<>();
 
-        propertyStubsMap.put(CONTACT_NAME, ID);
+        propertyStubsMap.put(ID, ID);
 
         return propertyStubsMap;
     }

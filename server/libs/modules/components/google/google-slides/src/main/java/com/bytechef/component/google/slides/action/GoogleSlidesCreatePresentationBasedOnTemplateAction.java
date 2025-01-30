@@ -56,10 +56,10 @@ public class GoogleSlidesCreatePresentationBasedOnTemplateAction {
                 .description("Name of the new presentation.")
                 .required(true),
             string(FOLDER_ID)
-                .label("Folder for New Presentation")
+                .label("Folder ID")
                 .description(
-                    "Folder ID where the new presentation will be saved. If not provided, the new presentation " +
-                        "will be saved in the same folder as the template presentation.")
+                    "ID of the folder where the new presentation will be saved. If not provided, the new " +
+                        "presentation will be saved in the same folder as the template presentation.")
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
                 .required(false),
             object(VALUES)

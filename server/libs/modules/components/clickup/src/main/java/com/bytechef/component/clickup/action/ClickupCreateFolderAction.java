@@ -44,8 +44,8 @@ public class ClickupCreateFolderAction {
                 "application/json"
 
             ))
-        .properties(number("spaceId").label("Space")
-            .description("Space where new folder will be created.")
+        .properties(number("spaceId").label("Space ID")
+            .description("ID of the space where new folder will be created.")
             .required(true)
             .metadata(
                 Map.of(

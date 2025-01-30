@@ -48,8 +48,8 @@ public class NiftyCreateProjectAction {
             string("description").label("Description")
                 .description("Description of the project's purpose, goals, or any other relevent information.")
                 .required(false),
-            string("template_id").label("Template")
-                .description("Template that can be used to pre-configure the project.")
+            string("template_id").label("Template ID")
+                .description("ID of template that can be used to pre-configure the project.")
                 .required(false))
             .label("Project")
             .required(true)

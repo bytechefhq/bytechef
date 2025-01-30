@@ -51,7 +51,7 @@ public class TodoistCreateTaskAction {
                 .description(
                     "A description for the task. This value may contain some markdown-formatted text and hyperlinks.")
                 .required(false),
-            string("project_id").label("Project")
+            string("project_id").label("Project ID")
                 .description("Task project ID. If not set, task is put to user's Inbox.")
                 .required(false),
             integer("priority").label("Priority")

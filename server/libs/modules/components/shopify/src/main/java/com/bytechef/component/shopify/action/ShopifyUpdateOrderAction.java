@@ -45,8 +45,8 @@ public class ShopifyUpdateOrderAction {
                 "application/json"
 
             ))
-        .properties(integer("orderId").label("Order")
-            .description("The order to update.")
+        .properties(integer("orderId").label("Order ID")
+            .description("ID of the order to update.")
             .required(true)
             .metadata(
                 Map.of(

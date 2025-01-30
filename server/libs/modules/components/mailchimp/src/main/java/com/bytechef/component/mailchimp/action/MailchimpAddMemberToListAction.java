@@ -51,7 +51,7 @@ public class MailchimpAddMemberToListAction {
                 "application/json"
 
             ))
-        .properties(string("listId").label("List Id")
+        .properties(string("listId").label("List ID")
             .description("The unique ID for the list.")
             .required(true)
             .metadata(

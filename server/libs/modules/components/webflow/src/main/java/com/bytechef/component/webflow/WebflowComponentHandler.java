@@ -54,7 +54,7 @@ public class WebflowComponentHandler extends AbstractWebflowComponentHandler {
 
                 properties.addFirst(
                     string(SITE_ID)
-                        .label("Site")
+                        .label("Site ID")
                         .options((ActionOptionsFunction<String>) WebflowUtils::getSiteOptions)
                         .required(true));
 

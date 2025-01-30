@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http;
-import static com.bytechef.component.intercom.constant.IntercomConstants.CONTACT_NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.EMAIL;
+import static com.bytechef.component.intercom.constant.IntercomConstants.ID;
 import static com.bytechef.component.intercom.constant.IntercomConstants.NAME;
 import static com.bytechef.component.intercom.constant.IntercomConstants.PHONE;
 import static com.bytechef.component.intercom.constant.IntercomConstants.ROLE;
@@ -45,8 +45,8 @@ public class IntercomGetContactAction {
         .title("Get Contact")
         .description("Get a single Contact")
         .properties(
-            string(CONTACT_NAME)
-                .label("Contact Name")
+            string(ID)
+                .label("Contact ID")
                 .required(true)
                 .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(
@@ -54,7 +54,7 @@ public class IntercomGetContactAction {
                 object()
                     .properties(
                         string(TYPE),
-                        string(CONTACT_NAME),
+                        string(ID),
                         string(ROLE),
                         string(EMAIL),
                         string(PHONE),
@@ -65,7 +65,7 @@ public class IntercomGetContactAction {
         perform(Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         return actionContext
-            .http(http -> http.get("/contacts/" + inputParameters.getRequiredString(CONTACT_NAME)))
+            .http(http -> http.get("/contacts/" + inputParameters.getRequiredString(ID)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

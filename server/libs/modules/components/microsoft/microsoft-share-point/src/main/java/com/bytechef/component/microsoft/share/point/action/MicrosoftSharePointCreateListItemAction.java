@@ -50,7 +50,7 @@ public class MicrosoftSharePointCreateListItemAction {
         .properties(
             SITE_ID_PROPERTY,
             string(LIST_ID)
-                .label("List")
+                .label("List ID")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getListIdOptions)
                 .required(true),

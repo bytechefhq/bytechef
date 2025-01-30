@@ -52,7 +52,8 @@ public class ZeplinProjectNoteTrigger {
         .description("Triggers when new note is created, deleted or updated in specified project.")
         .properties(
             string(PROJECT_ID)
-                .label("Project")
+                .label("Project ID")
+                .description("ID of the project you want to monitor.")
                 .options((TriggerOptionsFunction<String>) ZeplinUtils::getProjectIdOptions)
                 .required(true))
         .type(TriggerType.DYNAMIC_WEBHOOK)

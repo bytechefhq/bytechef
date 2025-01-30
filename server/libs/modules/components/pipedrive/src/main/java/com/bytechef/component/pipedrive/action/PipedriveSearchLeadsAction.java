@@ -68,13 +68,13 @@ public class PipedriveSearchLeadsAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("person_id").label("Person")
+            integer("person_id").label("Person ID")
                 .description("Will filter leads by the provided person ID.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("organization_id").label("Organization")
+            integer("organization_id").label("Organization ID")
                 .description("Will filter leads by the provided organization ID.")
                 .required(false)
                 .metadata(

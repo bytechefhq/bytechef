@@ -49,8 +49,8 @@ public class BoxNewFolderTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(FOLDER_ID)
-                .label("Folder")
-                .description("Folder in which new folder will trigger this webhook.")
+                .label("Folder ID")
+                .description("ID of the folder in which new folder will trigger this webhook.")
                 .options((TriggerOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .required(true))
         .output(outputSchema(FILE_OUTPUT_PROPERTY))

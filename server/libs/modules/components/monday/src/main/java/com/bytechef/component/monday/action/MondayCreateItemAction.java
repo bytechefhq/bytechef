@@ -49,17 +49,17 @@ public class MondayCreateItemAction {
         .description("Create a new item in a board.")
         .properties(
             string(WORKSPACE_ID)
-                .label("Workspace")
+                .label("Workspace ID")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
-                .label("Board")
-                .description("The board where new item will be created.")
+                .label("Board ID")
+                .description("ID of the board where new item will be created.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),
             string(GROUP_ID)
-                .label("Group")
+                .label("Group ID")
                 .description("The item's group.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getGroupIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID, BOARD_ID)

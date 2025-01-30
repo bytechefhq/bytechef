@@ -45,7 +45,7 @@ public class DiscordCreateChannelAction {
                 "application/json"
 
             ))
-        .properties(string("guildId").label("Guild")
+        .properties(string("guildId").label("Guild ID")
             .required(true)
             .metadata(
                 Map.of(

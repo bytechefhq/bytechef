@@ -50,7 +50,7 @@ public class MyobCreateSupplierPaymentAction {
                 .maxLength(36)
                 .required(true),
             string(SUPPLIER)
-                .label("Supplier")
+                .label("Supplier UID")
                 .options((ActionOptionsFunction<String>) MyobUtils::getSupplierOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))

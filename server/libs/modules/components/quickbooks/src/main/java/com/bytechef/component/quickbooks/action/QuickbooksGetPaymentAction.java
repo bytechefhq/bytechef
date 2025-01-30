@@ -41,8 +41,8 @@ public class QuickbooksGetPaymentAction {
         .description("Gets details about a specific payment.")
         .properties(
             string(PAYMENT)
-                .label("Payment")
-                .description("Payment to get.")
+                .label("Payment ID")
+                .description("ID of the payment to get.")
                 .options(QuickbooksUtils.getOptions(Entity.PAYMENT, null))
                 .required(true))
         .output(outputSchema(PAYMENT_OUTPUT_PROPERTY))

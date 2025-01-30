@@ -49,10 +49,11 @@ public class BoxCreateFolderAction {
                 .maxLength(255)
                 .required(true),
             string(ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder where the new folder will be created; if no folder is selected, the folder will be " +
-                        "created in the root folder.")
+                    "ID of the folder where the new folder will be created; if no folder is selected, the folder will "
+                        +
+                        "be created in the root folder.")
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true))

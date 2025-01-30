@@ -45,8 +45,8 @@ public class GoogleDriveGetFileAction {
         .description("Retrieve a specified file from your Google Drive.")
         .properties(
             string(FILE_ID)
-                .label("File")
-                .description("File to be retrieved.")
+                .label("File ID")
+                .description("ID of the file to be retrieved.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .output(

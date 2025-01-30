@@ -53,11 +53,11 @@ public class TrelloNewCardTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(ID_BOARD)
-                .label("Board")
+                .label("Board ID")
                 .options((TriggerOptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID_LIST)
-                .label("List")
+                .label("List ID")
                 .options((TriggerOptionsFunction<String>) TrelloUtils::getListOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(false))

@@ -47,12 +47,12 @@ public class MicrosoftTeamsSendChannelMessageAction {
         .description("Sends a message to a channel.")
         .properties(
             string(TEAM_ID)
-                .label("Team")
-                .description("Team where the channel is located.")
+                .label("Team ID")
+                .description("ID of the team where the channel is located.")
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
                 .required(true),
             string(CHANNEL_ID)
-                .label("Channel")
+                .label("Channel ID")
                 .description("Channel to send message to.")
                 .optionsLookupDependsOn(TEAM_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getChannelIdOptions)

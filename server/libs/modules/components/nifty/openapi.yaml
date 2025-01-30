@@ -31,8 +31,8 @@ paths:
                   description: "Description of the project's purpose, goals, or any other relevent information."
                 template_id:
                   type: "string"
-                  title: "Template"
-                  description: "Template that can be used to pre-configure the project."
+                  title: "Template ID"
+                  description: "ID of template that can be used to pre-configure the project."
       responses:
         201:
           description: "Creation confirmation. Returns created Project"

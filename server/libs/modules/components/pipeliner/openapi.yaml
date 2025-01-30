@@ -27,8 +27,8 @@ paths:
                 owner_id:
                   type: "string"
                   format: "uuid"
-                  description: "User in Pipeliner Application that will become the owner of the newly created account."
-                  title: "Owner"
+                  description: "Id of the user in Pipeliner Application that will become the owner of the newly created account."
+                  title: "Owner ID"
                 name:
                   type: "string"
                   description: "Account name"
@@ -76,8 +76,8 @@ paths:
                 owner_id:
                   type: "string"
                   format: "uuid"
-                  description: "User in Pipeliner Application that will become the owner of the newly created Contact."
-                  title: "Owner"
+                  description: "ID of the user in Pipeliner Application that will become the owner of the newly created Contact."
+                  title: "Owner ID"
                 first_name:
                   type: "string"
                   description: "The firstname of the contact."
@@ -135,16 +135,17 @@ paths:
                 activity_type_id:
                   type: "string"
                   format: "uuid"
-                  description: "Type of task"
-                  title: "Activity Type"
+                  description: "Id of the activity type of task."
+                  title: "Activity Type ID"
                 unit_id:
                   type: "string"
                   format: "uuid"
                   description: "Sales Unit ID"
+                  title: "Unit ID"
                 owner_id:
                   type: "string"
                   format: "uuid"
-                  title: "Owner"
+                  title: "Owner ID"
               required:
                 - "subject"
                 - "activity_type_id"

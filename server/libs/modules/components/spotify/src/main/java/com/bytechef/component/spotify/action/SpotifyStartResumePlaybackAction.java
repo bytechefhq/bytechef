@@ -42,7 +42,7 @@ public class SpotifyStartResumePlaybackAction {
                 "path", "/me/player/play", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("deviceId").label("Device")
+        .properties(string("deviceId").label("Device ID")
             .required(false)
             .metadata(
                 Map.of(

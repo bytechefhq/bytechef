@@ -60,8 +60,8 @@ public class CopperCreateTaskAction {
                 .description("The name of the task.")
                 .required(true),
             string(ASSIGNEE_ID)
-                .label("Assignee")
-                .description("User to assign the task to.")
+                .label("Assignee ID")
+                .description("ID of the user to assign the task to.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             date(DUE_DATE)

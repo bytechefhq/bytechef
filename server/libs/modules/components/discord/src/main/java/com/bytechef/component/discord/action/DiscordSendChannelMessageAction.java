@@ -44,8 +44,8 @@ public class DiscordSendChannelMessageAction {
                 "application/json"
 
             ))
-        .properties(string("channelId").label("Channel")
-            .description("Channel where to send the message")
+        .properties(string("channelId").label("Channel ID")
+            .description("ID of the channel where to send the message.")
             .required(true)
             .metadata(
                 Map.of(

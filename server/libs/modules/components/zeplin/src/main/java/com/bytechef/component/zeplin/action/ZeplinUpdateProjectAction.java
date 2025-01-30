@@ -41,7 +41,7 @@ public class ZeplinUpdateProjectAction {
                 "application/json"
 
             ))
-        .properties(string("project_id").label("Project")
+        .properties(string("project_id").label("Project ID")
             .description("Project to update.")
             .required(true)
             .metadata(

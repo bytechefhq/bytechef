@@ -80,7 +80,7 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "Contact"
+            title: "Contact ID"
             type: "string"
       responses:
         204:
@@ -94,7 +94,7 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "Contact"
+            title: "Contact ID"
             type: "string"
       responses:
         200:

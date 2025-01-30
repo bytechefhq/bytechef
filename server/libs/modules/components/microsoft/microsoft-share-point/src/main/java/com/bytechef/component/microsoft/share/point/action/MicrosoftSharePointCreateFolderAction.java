@@ -48,7 +48,7 @@ public class MicrosoftSharePointCreateFolderAction {
         .properties(
             SITE_ID_PROPERTY,
             string(PARENT_FOLDER)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description("If no folder is selected, file will be uploaded to root folder.")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)

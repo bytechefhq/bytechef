@@ -48,8 +48,8 @@ public class AirtableNewRecordTrigger {
         .type(TriggerDefinition.TriggerType.POLLING)
         .properties(
             string(BASE_ID)
-                .label("Base")
-                .description("The base which contains the table that you want to monitor.")
+                .label("Base ID")
+                .description("ID of the base which contains the table that you want to monitor.")
                 .options(
                     (TriggerOptionsFunction<String>) (
                         inputParameters, connectionParameters, lookupDependsOnPaths, searchText,

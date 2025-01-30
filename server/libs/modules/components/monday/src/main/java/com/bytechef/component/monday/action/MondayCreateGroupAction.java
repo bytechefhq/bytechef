@@ -45,12 +45,12 @@ public class MondayCreateGroupAction {
         .description("Creates a new group in board.")
         .properties(
             string(WORKSPACE_ID)
-                .label("Workspace")
+                .label("Workspace ID")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
-                .label("Board")
-                .description("The board where new item will be created.")
+                .label("Board ID")
+                .description("Id of the board where new item will be created.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),

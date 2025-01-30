@@ -42,8 +42,8 @@ public class ReckonCreateContactAction {
                 "path", "/{bookId}/contacts", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("bookId").label("Book")
-            .description("Book where new contact will be created.")
+        .properties(string("bookId").label("Book ID")
+            .description("ID of the book where new contact will be created.")
             .required(true)
             .metadata(
                 Map.of(

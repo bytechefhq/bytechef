@@ -41,12 +41,12 @@ public class WebflowFulfillOrderAction {
                 "path", "/sites/{siteId}/orders/{orderId}/fulfill"
 
             ))
-        .properties(string("siteId").label("Site")
+        .properties(string("siteId").label("Site ID")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            string("orderId").label("Order")
+            string("orderId").label("Order ID")
                 .required(true)
                 .metadata(
                     Map.of(

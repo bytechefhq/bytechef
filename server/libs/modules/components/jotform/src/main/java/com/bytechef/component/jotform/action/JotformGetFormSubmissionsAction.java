@@ -42,8 +42,8 @@ public class JotformGetFormSubmissionsAction {
                 "path", "/form/{formId}/submissions"
 
             ))
-        .properties(string("formId").label("Form")
-            .description("Form to retrieve submissions for.")
+        .properties(string("formId").label("Form ID")
+            .description("ID of the form to retrieve submissions for.")
             .required(true)
             .metadata(
                 Map.of(

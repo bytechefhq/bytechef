@@ -46,13 +46,13 @@ public class PipelinerCreateTaskAction {
         .properties(object("__item").properties(string("subject").label("Subject")
             .description("Name of the entity and its default text representation.")
             .required(true),
-            string("activity_type_id").label("Activity Type")
-                .description("Type of task")
+            string("activity_type_id").label("Activity Type ID")
+                .description("Id of the activity type of task.")
                 .required(true),
-            string("unit_id").label("Unit Id")
+            string("unit_id").label("Unit ID")
                 .description("Sales Unit ID")
                 .required(true),
-            string("owner_id").label("Owner")
+            string("owner_id").label("Owner ID")
                 .required(true))
             .label("Task")
             .required(true)

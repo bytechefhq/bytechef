@@ -46,8 +46,8 @@ public class ReckonCreateInvoiceAction {
                 "path", "/{bookId}/invoices", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("bookId").label("Book")
-            .description("Book where new invoice will be created.")
+        .properties(string("bookId").label("Book ID")
+            .description("ID of the book where new invoice will be created.")
             .required(true)
             .metadata(
                 Map.of(

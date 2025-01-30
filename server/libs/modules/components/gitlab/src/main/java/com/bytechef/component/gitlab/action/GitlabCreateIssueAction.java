@@ -42,8 +42,8 @@ public class GitlabCreateIssueAction {
                 "path", "/projects/{projectId}/issues"
 
             ))
-        .properties(string("projectId").label("Project")
-            .description("Project where new issue will be created")
+        .properties(string("projectId").label("Project ID")
+            .description("ID of the project where new issue will be created.")
             .required(true)
             .metadata(
                 Map.of(

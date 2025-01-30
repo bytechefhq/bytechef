@@ -38,8 +38,8 @@ public class TodoistMarkTaskCompletedAction {
                 "path", "/tasks/{taskId}/close"
 
             ))
-        .properties(string("taskId").label("Task")
-            .description("Task to be closed.")
+        .properties(string("taskId").label("Task ID")
+            .description("ID of the task to be closed.")
             .required(true)
             .metadata(
                 Map.of(

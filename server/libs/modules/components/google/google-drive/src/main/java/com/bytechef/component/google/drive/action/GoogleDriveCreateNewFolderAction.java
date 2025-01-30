@@ -51,10 +51,11 @@ public class GoogleDriveCreateNewFolderAction {
                 .description("The name of the new folder.")
                 .required(true),
             string(FOLDER_ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder where the new folder will be created; if no folder is selected, the folder will be " +
-                        "created in the root folder.")
+                    "ID of the folder where the new folder will be created; if no folder is selected, the folder will "
+                        +
+                        "be created in the root folder.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(false))
         .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))

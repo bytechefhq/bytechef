@@ -143,8 +143,8 @@ paths:
                       type: "string"
                       format: "date"
                     dealTasktype:
-                      title: "Task Type"
-                      description: "The type of the task based on the available task types in the account."
+                      title: "Task Type ID"
+                      description: "ID of the task type."
                       type: "integer"
                       format: "int32"
       responses:

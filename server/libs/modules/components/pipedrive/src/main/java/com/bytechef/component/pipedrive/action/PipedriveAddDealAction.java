@@ -57,23 +57,23 @@ public class PipedriveAddDealAction {
                 .description(
                     "The currency of the deal. If omitted, currency will be set to the default currency of the authorized user.")
                 .required(false),
-            integer("user_id").label("User")
+            integer("user_id").label("User ID")
                 .description(
-                    "User which will be the owner of the  created deal. If not provided, the user making the request will be used.")
+                    "ID of the user which will be the owner of the created deal. If not provided, the user making the request will be used.")
                 .required(false),
-            integer("person_id").label("Person")
+            integer("person_id").label("Person ID")
                 .description(
-                    "Person which this deal will be linked to. This property is required unless `org_id` is specified.")
+                    "ID of the person which this deal will be linked to. This property is required unless `org_id` is specified.")
                 .required(false),
-            integer("org_id").label("Organization")
+            integer("org_id").label("Organization ID")
                 .description(
-                    "Organization which this deal will be linked to. This property is required unless `person_id` is specified.")
+                    "ID of the organization which this deal will be linked to. This property is required unless `person_id` is specified.")
                 .required(false),
-            integer("pipeline_id").label("Pipeline")
+            integer("pipeline_id").label("Pipeline ID")
                 .description(
-                    "Pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.")
+                    "Id of the pipeline this deal will be added to. By default, the deal will be added to the first stage of the specified pipeline. Please note that `pipeline_id` and `stage_id` should not be used together as `pipeline_id` will be ignored.")
                 .required(false),
-            integer("stage_id").label("Stage")
+            integer("stage_id").label("Stage ID")
                 .description(
                     "Stage this deal will be added to. Please note that a pipeline will be assigned automatically based on the `stage_id`. If omitted, the deal will be placed in the first stage of the default pipeline.")
                 .required(false),

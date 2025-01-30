@@ -42,8 +42,8 @@ public class SlackSendDirectMessageAction {
                 "conversation will be created.")
         .properties(
             string(CHANNEL)
-                .label("User")
-                .description("User to send the direct message to.")
+                .label("User ID")
+                .description("ID of the user to send the direct message to.")
                 .options((ActionOptionsFunction<String>) SlackUtils::getUserOptions)
                 .required(true),
             TEXT_PROPERTY)

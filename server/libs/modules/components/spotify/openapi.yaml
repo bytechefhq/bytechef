@@ -17,7 +17,7 @@ paths:
           in: "query"
           required: false
           schema:
-            title: "Device"
+            title: "Device ID"
             type: "string"
       requestBody:
         content:
@@ -52,7 +52,7 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "Playlist"
+            title: "Playlist ID"
             type: "string"
         - name: "uris"
           in: "query"

@@ -75,7 +75,7 @@ public class IntercomSendMessageAction {
                 .required(true),
             string(TO)
                 .label("To")
-                .description("Receiver of the message")
+                .description("ID of the contact to send the message to.")
                 .required(true)
                 .options((ActionOptionsFunction<String>) IntercomUtils::getContactIdOptions))
         .output(outputSchema(object()))
