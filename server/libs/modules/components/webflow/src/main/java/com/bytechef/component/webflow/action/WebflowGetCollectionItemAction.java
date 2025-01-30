@@ -41,13 +41,13 @@ public class WebflowGetCollectionItemAction {
                 "path", "/collections/{collectionId}/items/{itemId}"
 
             ))
-        .properties(string("collectionId").label("Collection")
+        .properties(string("collectionId").label("Collection ID")
             .description("")
             .required(true)
             .metadata(
                 Map.of(
                     "type", PropertyType.PATH)),
-            string("itemId").label("Item")
+            string("itemId").label("Item  ID")
                 .description("")
                 .required(true)
                 .metadata(

@@ -51,13 +51,13 @@ public class JiraUpdatedIssueTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(PROJECT)
-                .label("Project")
-                .description("Project where new issue is created.")
+                .label("Project ID")
+                .description("ID of the project where issues is updated.")
                 .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getProjectIdOptions)
                 .required(true),
             string(ISSUETYPE)
-                .label("Issue Type")
-                .description("The type of issue.")
+                .label("Issue Type ID")
+                .description("ID of the issue type.")
                 .options((TriggerOptionsFunction<String>) JiraOptionsUtils::getIssueTypesIdOptions)
                 .optionsLookupDependsOn(PROJECT)
                 .required(false))

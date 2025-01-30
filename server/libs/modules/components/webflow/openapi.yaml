@@ -18,13 +18,13 @@ paths:
           required: true
           schema:
             type: "string"
-            title: "Site"
+            title: "Site ID"
         - name: "orderId"
           in: "path"
           required: true
           schema:
             type: "string"
-            title: "Order"
+            title: "Order ID"
       responses:
         200:
           description: "Successful operation"
@@ -52,14 +52,14 @@ paths:
           required: true
           schema:
             type: "string"
-            title: "Collection"
+            title: "Collection ID"
         - name: "itemId"
           in: "path"
           description: ""
           required: true
           schema:
             type: "string"
-            title: "Item"
+            title: "Item  ID"
       responses:
         200:
           description: "Successful operation"

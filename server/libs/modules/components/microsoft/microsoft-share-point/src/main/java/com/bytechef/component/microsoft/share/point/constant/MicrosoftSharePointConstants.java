@@ -43,7 +43,7 @@ public class MicrosoftSharePointConstants {
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty SITE_ID_PROPERTY = string(SITE_ID)
-        .label("Site")
+        .label("Site ID")
         .options((ActionOptionsFunction<String>) MicrosoftSharePointUtils::getSiteOptions)
         .required(true);
 

@@ -14,12 +14,12 @@ paths:
       operationId: "getFormSubmissions"
       parameters:
         - name: "formId"
-          description: "Form to retrieve submissions for."
+          description: "ID of the form to retrieve submissions for."
           in: "path"
           required: true
           schema:
             type: "string"
-            title: "Form"
+            title: "Form ID"
       responses:
         201:
           description: "Creation confirmation. Returns created Account"

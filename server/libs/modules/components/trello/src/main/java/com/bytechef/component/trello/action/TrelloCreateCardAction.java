@@ -43,12 +43,13 @@ public class TrelloCreateCardAction {
         .description("Creates a new card.")
         .properties(
             string(ID_BOARD)
-                .label("Board")
+                .label("Board ID")
+                .description("ID of the board.")
                 .options((ActionOptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID_LIST)
-                .label("List")
-                .description("List the card should be created in.")
+                .label("List ID")
+                .description("ID of the list where the card should be created in.")
                 .options((ActionOptionsFunction<String>) TrelloUtils::getListOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(true),

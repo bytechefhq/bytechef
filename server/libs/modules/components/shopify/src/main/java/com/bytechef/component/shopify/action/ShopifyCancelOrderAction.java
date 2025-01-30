@@ -42,8 +42,8 @@ public class ShopifyCancelOrderAction {
                 "path", "/orders/{orderId}.json"
 
             ))
-        .properties(integer("orderId").label("Order Id")
-            .description("The order id.")
+        .properties(integer("orderId").label("Order ID")
+            .description("ID of the order to cancel.")
             .required(true)
             .metadata(
                 Map.of(

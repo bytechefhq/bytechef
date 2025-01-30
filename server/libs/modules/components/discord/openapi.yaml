@@ -16,11 +16,11 @@ paths:
       operationId: "sendChannelMessage"
       parameters:
         - name: "channelId"
-          description: "Channel where to send the message"
+          description: "ID of the channel where to send the message."
           in: "path"
           required: true
           schema:
-            title: "Channel"
+            title: "Channel ID"
             type: "string"
       requestBody:
         content:
@@ -69,7 +69,7 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "Guild"
+            title: "Guild ID"
             type: "string"
       requestBody:
         content:

@@ -69,7 +69,7 @@ paths:
           required: true
           schema:
             type: "integer"
-            title: "Task List"
+            title: "Task List ID"
       requestBody:
         content:
           application/json:

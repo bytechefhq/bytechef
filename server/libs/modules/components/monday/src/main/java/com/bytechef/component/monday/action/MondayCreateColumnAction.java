@@ -46,12 +46,12 @@ public class MondayCreateColumnAction {
         .description("Create a new column in board.")
         .properties(
             string(WORKSPACE_ID)
-                .label("Workspace")
+                .label("Workspace ID")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
-                .label("Board")
-                .description("The board where the new column should be created.")
+                .label("Board ID")
+                .description("Id of the board where the new column should be created.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),

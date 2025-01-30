@@ -88,8 +88,8 @@ paths:
                   description: "The last name of the contact."
                 company_id:
                   type: "string"
-                  title: "Company"
-                  description: "Company the new affiliated contact will be associated with."
+                  title: "Company ID"
+                  description: "ID of the company  to which the newly affiliated contact will be linked."
                 phone:
                   type: "string"
                   title: "Phone"

@@ -74,10 +74,10 @@ public class GoogleDriveCreateNewTextFileAction {
                 .defaultValue("plain/text")
                 .required(true),
             string(FOLDER_ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder where the file should be created; if no folder is selected, the file will be created " +
-                        "in the root folder.")
+                    "ID of the folder where the file should be created; if no folder is selected, the file will be " +
+                        "created in the root folder.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
                 .required(false))
         .output(outputSchema(GOOGLE_FILE_OUTPUT_PROPERTY), sampleOutput(GOOGLE_FILE_SAMPLE_OUTPUT))

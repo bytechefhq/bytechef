@@ -34,7 +34,7 @@ public class DiscordConstants {
     public static final String TTS = "tts";
 
     public static final ModifiableStringProperty GUILD_ID_PROPERTY = string(GUILD_ID)
-        .label("Guild")
+        .label("Guild ID")
         .options((ActionOptionsFunction<String>) DiscordUtils::getGuildIdOptions)
         .required(true);
 

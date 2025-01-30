@@ -34,19 +34,19 @@ public class ClickupConstants {
     public static final String WORKSPACE_ID = "workspaceId";
 
     public static final ModifiableNumberProperty FOLDER_ID_PROPERTY = number(FOLDER_ID)
-        .label("Folder")
+        .label("Folder ID")
         .options((ActionOptionsFunction<String>) ClickupUtils::getFolderIdOptions)
         .optionsLookupDependsOn(SPACE_ID, WORKSPACE_ID)
         .required(false);
 
     public static final ModifiableNumberProperty SPACE_ID_PROPERTY = number(SPACE_ID)
-        .label("Space")
+        .label("Space ID")
         .options((ActionOptionsFunction<String>) ClickupUtils::getSpaceIdOptions)
         .optionsLookupDependsOn(WORKSPACE_ID)
         .required(true);
 
     public static final ModifiableNumberProperty WORKSPACE_ID_PROPERTY = number(WORKSPACE_ID)
-        .label("Workspace")
+        .label("Workspace ID")
         .options((ActionOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
         .required(true);
 

@@ -49,11 +49,11 @@ public class PipedriveAddPersonAction {
         .properties(object("__item").properties(string("name").label("Name")
             .description("Person full name")
             .required(true),
-            integer("owner_id").label("Owner")
-                .description("User who will be marked as the owner of this person.")
+            integer("owner_id").label("Owner ID")
+                .description("ID of the user who will be marked as the owner of this person.")
                 .required(false),
-            integer("org_id").label("Organization")
-                .description("Organization this person will belong to.")
+            integer("org_id").label("Organization ID")
+                .description("ID of the organization this person will belong to.")
                 .required(false),
             array("email").items(object().properties(string("value").label("Email Address")
                 .required(true),

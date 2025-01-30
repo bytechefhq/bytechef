@@ -43,8 +43,8 @@ public class ClickupCreateTaskAction {
                 "path", "/list/{listId}/task", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(number("listId").label("List")
-            .description("List where new task will be created.")
+        .properties(number("listId").label("List ID")
+            .description("ID of the list where new task will be created.")
             .required(true)
             .metadata(
                 Map.of(

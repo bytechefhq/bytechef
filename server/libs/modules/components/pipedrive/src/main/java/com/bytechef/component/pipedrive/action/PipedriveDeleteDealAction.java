@@ -41,8 +41,8 @@ public class PipedriveDeleteDealAction {
                 "path", "/deals/{id}"
 
             ))
-        .properties(integer("id").label("Deal")
-            .description("Deal to delete")
+        .properties(integer("id").label("Deal ID")
+            .description("Id of the deal to delete.")
             .required(true)
             .metadata(
                 Map.of(

@@ -50,7 +50,7 @@ public class MyobCreateCustomerPaymentAction {
                 .maxLength(36)
                 .required(true),
             string(CUSTOMER)
-                .label("Customer")
+                .label("Customer UID")
                 .options((ActionOptionsFunction<String>) MyobUtils::getCustomerOptions)
                 .optionsLookupDependsOn(COMPANY_FILE)
                 .required(true))

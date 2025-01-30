@@ -51,8 +51,8 @@ public class CopperCreateActivityAction {
         .description("Creates a new activity.")
         .properties(
             string(ACTIVITY_TYPE)
-                .label("Activity Type")
-                .description("The activity type of this activity.")
+                .label("Activity Type ID")
+                .description("Id of activity type for this activity.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getActivityTypeOptions)
                 .required(true),
             string(DETAILS)
@@ -70,8 +70,8 @@ public class CopperCreateActivityAction {
                 .defaultValue(PERSON)
                 .required(true),
             string(ID)
-                .label("Parent Name")
-                .description("Parent this activity will be associated with.")
+                .label("Parent ID")
+                .description("ID of the parent this activity will be associated with.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getParentOptions)
                 .optionsLookupDependsOn(TYPE)
                 .required(true))

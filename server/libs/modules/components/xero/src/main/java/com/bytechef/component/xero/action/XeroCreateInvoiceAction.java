@@ -51,8 +51,8 @@ public class XeroCreateInvoiceAction {
         .description("Creates draft invoice (Acount Receivable).")
         .properties(
             string(CONTACT_ID)
-                .label("Contact")
-                .description("Contact to create the invoice for.")
+                .label("Contact ID")
+                .description("ID of the contact to create the invoice for.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
@@ -68,8 +68,8 @@ public class XeroCreateInvoiceAction {
             LINE_AMOUNT_TYPE_PROPERTY,
             LINE_ITEMS_ACCREC_PROPERTY,
             string(CURRENCY_CODE)
-                .label("Currency")
-                .description("Currency that invoice is raised in.")
+                .label("Currency Code")
+                .description("Currency code that invoice is raised in.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(REFERENCE)

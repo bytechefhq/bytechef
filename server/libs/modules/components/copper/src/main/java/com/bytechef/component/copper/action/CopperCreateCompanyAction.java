@@ -67,8 +67,8 @@ public class CopperCreateCompanyAction {
                 .description("The name of the company.")
                 .required(true),
             string(ASSIGNEE_ID)
-                .label("Assignee")
-                .description("User that will be the owner of the company.")
+                .label("Assignee ID")
+                .description("ID of the user that will be the owner of the company.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(EMAIL_DOMAIN)
@@ -76,8 +76,8 @@ public class CopperCreateCompanyAction {
                 .description("The domain to which email addresses for the company belong.")
                 .required(false),
             string(CONTACT_TYPE_ID)
-                .label("Contact Type")
-                .description("Contact type of the company.")
+                .label("Contact Type ID")
+                .description("ID of the Contact type for the company.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),
             string(DETAILS)

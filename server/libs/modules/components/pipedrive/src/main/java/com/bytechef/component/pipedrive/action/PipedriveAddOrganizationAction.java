@@ -46,8 +46,8 @@ public class PipedriveAddOrganizationAction {
         .properties(object("__item").properties(string("name").label("Name")
             .description("The name of the organization.")
             .required(true),
-            integer("owner_id").label("Owner")
-                .description("User who will be marked as the owner of this organization.")
+            integer("owner_id").label("Owner ID")
+                .description("ID of the user who will be marked as the owner of this organization.")
                 .required(false))
             .label("Organization")
             .metadata(

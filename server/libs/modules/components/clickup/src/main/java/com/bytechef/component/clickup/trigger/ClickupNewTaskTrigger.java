@@ -50,28 +50,29 @@ public class ClickupNewTaskTrigger {
         .description("Triggers when new task is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(string(WORKSPACE_ID)
-            .label("Workspace")
+            .label("Workspace ID")
             .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
             .required(true))
-        .output(outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(NAME),
-                    string("description"),
-                    string("url"),
-                    object("list")
-                        .properties(
-                            string(ID),
-                            string(NAME)),
-                    object("folder")
-                        .properties(
-                            string(ID),
-                            string(NAME)),
-                    object("space")
-                        .properties(
-                            string(ID),
-                            string(NAME)))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string(NAME),
+                        string("description"),
+                        string("url"),
+                        object("list")
+                            .properties(
+                                string(ID),
+                                string(NAME)),
+                        object("folder")
+                            .properties(
+                                string(ID),
+                                string(NAME)),
+                        object("space")
+                            .properties(
+                                string(ID),
+                                string(NAME)))))
         .webhookEnable(ClickupNewTaskTrigger::webhookEnable)
         .webhookDisable(ClickupNewTaskTrigger::webhookDisable)
         .webhookRequest(ClickupNewTaskTrigger::webhookRequest);

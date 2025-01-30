@@ -38,8 +38,8 @@ public class ShopifyDeleteOrderAction {
                 "path", "/orders/{orderId}.json"
 
             ))
-        .properties(integer("orderId").label("Order")
-            .description("The order to delete.")
+        .properties(integer("orderId").label("Order ID")
+            .description("ID of the order to delete.")
             .required(true)
             .metadata(
                 Map.of(

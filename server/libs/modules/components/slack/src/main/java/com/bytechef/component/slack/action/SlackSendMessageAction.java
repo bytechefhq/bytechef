@@ -41,8 +41,8 @@ public class SlackSendMessageAction {
         .description("Sends a message to a public channel, private channel, or existing direct message conversation.")
         .properties(
             string(CHANNEL)
-                .label("Channel")
-                .description("Channel, private group, or IM channel to send message to.")
+                .label("Channel ID")
+                .description("ID of the channel, private group, or IM channel to send message to.")
                 .options((ActionOptionsFunction<String>) SlackUtils::getChannelOptions)
                 .required(true),
             TEXT_PROPERTY)

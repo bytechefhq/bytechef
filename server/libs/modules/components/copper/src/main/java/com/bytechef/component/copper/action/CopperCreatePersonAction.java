@@ -91,8 +91,8 @@ public class CopperCreatePersonAction {
                                 .required(false)))
                 .required(false),
             string(ASSIGNEE_ID)
-                .label("Assignee")
-                .description("User that will be the owner of the person.")
+                .label("Assignee ID")
+                .description("User ID that will be the owner of the person.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getUserOptions)
                 .required(false),
             string(TITLE)
@@ -100,12 +100,12 @@ public class CopperCreatePersonAction {
                 .description("The professional title of the person.")
                 .required(false),
             string(COMPANY_ID)
-                .label("Company")
-                .description("Primary company with which the person is associated.")
+                .label("Company ID")
+                .description("ID of the primary company with which the person is associated.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getCompanyIdOptions)
                 .required(false),
             string(CONTACT_TYPE_ID)
-                .label("Contact type")
+                .label("Contact Type ID")
                 .description("The unique identifier of the contact type of the person.")
                 .options((ActionOptionsFunction<String>) CopperOptionUtils::getContactTypesOptions)
                 .required(false),

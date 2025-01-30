@@ -44,8 +44,8 @@ public class ClickupCreateListAction {
                 "application/json"
 
             ))
-        .properties(number("folderId").label("Folder")
-            .description("Folder where new list will be created.")
+        .properties(number("folderId").label("Folder ID")
+            .description("ID of the folder where new list will be created.")
             .required(true)
             .metadata(
                 Map.of(

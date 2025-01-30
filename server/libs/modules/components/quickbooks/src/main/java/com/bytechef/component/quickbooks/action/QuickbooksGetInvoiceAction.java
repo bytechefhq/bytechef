@@ -44,8 +44,8 @@ public class QuickbooksGetInvoiceAction {
         .description("Gets details about a specific invoice.")
         .properties(
             string(INVOICE)
-                .label("Invoice")
-                .description("Invoice to get.")
+                .label("Invoice ID")
+                .description("ID of the invoice to get.")
                 .options(QuickbooksUtils.getOptions(Entity.INVOICE, null))
                 .required(true))
         .output(

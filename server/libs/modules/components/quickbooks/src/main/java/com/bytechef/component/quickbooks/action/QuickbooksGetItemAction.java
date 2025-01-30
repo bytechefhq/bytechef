@@ -41,8 +41,8 @@ public class QuickbooksGetItemAction {
         .description("Gets details about a specific item.")
         .properties(
             string(ITEM)
-                .label("Item")
-                .description("Item to get.")
+                .label("Item ID")
+                .description("ID of the item to get.")
                 .options(QuickbooksUtils.getOptions(Entity.ITEM, null))
                 .required(true))
         .output(outputSchema(ITEM_OUTPUT_PROPERTY))

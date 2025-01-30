@@ -53,28 +53,28 @@ public class PipedriveGetLeadsAction {
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
-            integer("owner_id").label("Owner")
+            integer("owner_id").label("Owner iD")
                 .description(
                     "Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("person_id").label("Person")
+            integer("person_id").label("Person ID")
                 .description(
                     "If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("organization_id").label("Organization")
+            integer("organization_id").label("Organization ID")
                 .description(
                     "If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("filter_id").label("Filter")
+            integer("filter_id").label("Filter ID")
                 .description("Filter to use")
                 .required(false)
                 .metadata(

@@ -30,7 +30,7 @@ paths:
                 project_id:
                   type: "string"
                   description: "Task project ID. If not set, task is put to user's Inbox."
-                  title: "Project"
+                  title: "Project ID"
                 priority:
                   type: "integer"
                   description: "Task priority from 1 (normal) to 4 (urgent)."
@@ -67,11 +67,11 @@ paths:
       operationId: "markTaskCompleted"
       parameters:
         - name: "taskId"
-          description: "Task to be closed."
+          description: "ID of the task to be closed."
           in: "path"
           required: true
           schema:
-            title: "Task"
+            title: "Task ID"
             type: "string"
       responses:
         204:

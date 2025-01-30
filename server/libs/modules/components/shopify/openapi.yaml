@@ -48,11 +48,11 @@ paths:
                           product_id:
                             type: "integer"
                             description: "The ID of the product that the line item belongs to."
-                            title: "Product"
+                            title: "Product ID"
                           variant_id:
                             type: "integer"
                             description: "The ID of the product variant."
-                            title: "Variant"
+                            title: "Variant ID"
                           quantity:
                             type: "integer"
                             description: "The number of items that were purchased."
@@ -80,12 +80,12 @@ paths:
       operationId: "deleteOrder"
       parameters:
         - name: "orderId"
-          description: "The order to delete."
+          description: "ID of the order to delete."
           in: "path"
           required: true
           schema:
             type: "integer"
-            title: "Order"
+            title: "Order ID"
       responses:
         200:
           description: "Successful operation"
@@ -95,10 +95,11 @@ paths:
       operationId: "cancelOrder"
       parameters:
         - name: "orderId"
-          description: "The order id."
+          description: "ID of the order to cancel."
           in: "path"
           required: true
           schema:
+            title: "Order ID"
             type: "integer"
       responses:
         200:
@@ -113,12 +114,12 @@ paths:
       operationId: "updateOrder"
       parameters:
         - name: "orderId"
-          description: "The order to update."
+          description: "ID of the order to update."
           in: "path"
           required: true
           schema:
             type: "integer"
-            title: "Order"
+            title: "Order ID"
       requestBody:
         content:
           application/json:
@@ -156,12 +157,12 @@ paths:
       operationId: "closeOrder"
       parameters:
         - name: "orderId"
-          description: "The order to close."
+          description: "ID of the order to close."
           in: "path"
           required: true
           schema:
             type: "integer"
-            title: "Order"
+            title: "Order ID"
       responses:
         200:
           description: "Successful operation"

@@ -43,7 +43,7 @@ public class PipedriveGetLeadDetailsAction {
                 "path", "/leads/{id}"
 
             ))
-        .properties(string("id").label("Lead")
+        .properties(string("id").label("Lead ID")
             .required(true)
             .metadata(
                 Map.of(

@@ -67,7 +67,7 @@ public class MicrosoftOutlook365Constants {
     public static final String VALUE = "value";
 
     public static final ModifiableStringProperty CALENDAR_ID_PROPERTY = string(CALENDAR)
-        .label("Calendar")
+        .label("Calendar ID")
         .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getCalendarOptions)
         .required(true);
 

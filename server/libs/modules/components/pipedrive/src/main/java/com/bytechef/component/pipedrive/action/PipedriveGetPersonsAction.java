@@ -44,14 +44,14 @@ public class PipedriveGetPersonsAction {
                 "path", "/persons"
 
             ))
-        .properties(integer("user_id").label("Owner")
+        .properties(integer("user_id").label("User ID")
             .description(
                 "Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.")
             .required(false)
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
-            integer("filter_id").label("Filter")
+            integer("filter_id").label("Filter ID")
                 .description("Filter to use.")
                 .required(false)
                 .metadata(

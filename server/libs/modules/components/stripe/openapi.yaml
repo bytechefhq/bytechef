@@ -97,13 +97,13 @@ paths:
               title: "Invoice"
               type: "object"
               required:
-                - "customer_id"
+                - "customer"
                 - "currency"
               properties:
                 customer:
                   type: "string"
-                  title: "Customer"
-                  description: "Customer who will be billed."
+                  title: "Customer ID"
+                  description: "ID of the customer who will be billed."
                 currency:
                   type: "string"
                   description: "Currency used for invoice."

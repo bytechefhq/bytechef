@@ -41,14 +41,14 @@ public class BoxDownloadFileAction {
         .description("Download a selected file.")
         .properties(
             string(ID)
-                .label("Parent Folder")
-                .description("Folder from which you want to download the file.")
+                .label("Parent Folder ID")
+                .description("ID of the folder from which you want to download the file.")
                 .options((ActionOptionsFunction<String>) BoxUtils::getRootFolderOptions)
                 .defaultValue("0")
                 .required(true),
             string(FILE_ID)
-                .label("File")
-                .description("File to download.")
+                .label("File ID")
+                .description("ID of the file to download.")
                 .optionsLookupDependsOn(ID)
                 .options((ActionOptionsFunction<String>) BoxUtils::getFileIdOptions)
                 .required(true))

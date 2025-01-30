@@ -44,20 +44,20 @@ public class PipedriveGetDealsAction {
                 "path", "/deals"
 
             ))
-        .properties(integer("user_id").label("User")
+        .properties(integer("user_id").label("User ID")
             .description(
                 "Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.")
             .required(false)
             .metadata(
                 Map.of(
                     "type", PropertyType.QUERY)),
-            integer("filter_id").label("Filter")
-                .description("Filter to use.")
+            integer("filter_id").label("Filter ID")
+                .description("ID of the filter to use.")
                 .required(false)
                 .metadata(
                     Map.of(
                         "type", PropertyType.QUERY)),
-            integer("stage_id").label("Stage")
+            integer("stage_id").label("Stage ID")
                 .description("Deals within the given stage will be returned.")
                 .required(false)
                 .metadata(

@@ -41,12 +41,12 @@ public class TrelloGetCardAction {
         .description("Gets a card details.")
         .properties(
             string(ID_BOARD)
-                .label("Board")
-                .description("Board where card is located.")
+                .label("Board ID")
+                .description("ID of the board where card is located.")
                 .options((ActionOptionsFunction<String>) TrelloUtils::getBoardOptions)
                 .required(true),
             string(ID)
-                .label("Card")
+                .label("Card ID")
                 .options((ActionOptionsFunction<String>) TrelloUtils::getCardOptions)
                 .optionsLookupDependsOn(ID_BOARD)
                 .required(true))

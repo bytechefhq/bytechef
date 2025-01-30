@@ -46,10 +46,11 @@ public class MicrosoftOneDriveListFoldersAction {
         .description("List folders in a OneDrive folder.")
         .properties(
             string(PARENT_ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder from which you want to list folders. If no folder is specified, the root folder will " +
-                        "be used.")
+                    "ID of the Folder from which you want to list folders. If no folder is specified, the root folder "
+                        +
+                        "will be used.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false))
         .output(

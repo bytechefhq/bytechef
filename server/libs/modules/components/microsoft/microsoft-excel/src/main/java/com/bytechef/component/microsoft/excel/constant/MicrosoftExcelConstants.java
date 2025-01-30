@@ -54,7 +54,7 @@ public class MicrosoftExcelConstants {
         .required(true);
 
     public static final ModifiableStringProperty WORKBOOK_ID_PROPERTY = string(WORKBOOK_ID)
-        .label("Workbook")
+        .label("Workbook ID")
         .options((ActionOptionsFunction<String>) MicrosoftExcelUtils::getWorkbookIdOptions)
         .required(true);
 

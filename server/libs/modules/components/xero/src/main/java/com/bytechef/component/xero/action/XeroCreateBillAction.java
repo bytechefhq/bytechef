@@ -54,8 +54,8 @@ public class XeroCreateBillAction {
         .description("Creates draft bill (Accounts Payable).")
         .properties(
             string(CONTACT_ID)
-                .label("Contact")
-                .description("Contact to create the bill for.")
+                .label("Contact ID")
+                .description("ID of the contact to create the bill for.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
@@ -88,7 +88,7 @@ public class XeroCreateBillAction {
                                 .label("Price")
                                 .required(false),
                             string("AccountCode")
-                                .label("Account")
+                                .label("Account Code")
                                 .options((ActionOptionsFunction<String>) XeroUtils::getAccountCodeOptions)
                                 .required(false)))
                 .required(true),

@@ -41,7 +41,7 @@ public class PipedriveDeleteLeadAction {
                 "path", "/leads/{id}"
 
             ))
-        .properties(string("id").label("Lead")
+        .properties(string("id").label("Lead ID")
             .description("The ID of the lead")
             .required(true)
             .metadata(

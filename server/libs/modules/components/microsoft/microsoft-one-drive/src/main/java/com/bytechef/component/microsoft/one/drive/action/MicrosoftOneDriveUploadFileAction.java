@@ -46,9 +46,9 @@ public class MicrosoftOneDriveUploadFileAction {
         .description("Upload a file to your Microsoft OneDrive.")
         .properties(
             string(PARENT_ID)
-                .label("Parent Folder")
+                .label("Parent Folder ID")
                 .description(
-                    "Folder where the file should be uploaded; if no folder is selected, the file will be " +
+                    "ID of the Folder where the file should be uploaded; if no folder is selected, the file will be " +
                         "uploaded in the root folder.")
                 .options((ActionOptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
                 .required(false),

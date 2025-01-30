@@ -48,8 +48,8 @@ public class AITableUpdateRecordAction {
             SPACE_ID_PROPERTY,
             DATASHEET_ID_PROPERTY,
             string(RECORD_ID)
-                .label("Record")
-                .description("Record to update")
+                .label("Record ID")
+                .description("ID of the record to update.")
                 .optionsLookupDependsOn(DATASHEET_ID)
                 .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetRecordIdOptions)
                 .required(true),

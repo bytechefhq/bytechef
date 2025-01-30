@@ -69,8 +69,8 @@ public class XeroCreateQuoteAction {
         .description("Creates a new quote draft.")
         .properties(
             string(CONTACT_ID)
-                .label(CONTACT)
-                .description("Full name of a contact or organisation.")
+                .label("Contact ID")
+                .description("ID of the contact that the quote is being raised for.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getContactIdOptions)
                 .required(true),
             date(DATE)
@@ -84,8 +84,8 @@ public class XeroCreateQuoteAction {
                 .description("Date quote expires")
                 .required(false),
             string(CURRENCY_CODE)
-                .label("Currency")
-                .description("The currency that quote has been raised in.")
+                .label("Currency Code")
+                .description("The currency code that quote has been raised in.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getCurrencyCodeOptions)
                 .required(false),
             string(QUOTE_NUMBER)
@@ -98,8 +98,8 @@ public class XeroCreateQuoteAction {
                 .description("Additional reference number")
                 .required(false),
             string(BRANDING_THEME_ID)
-                .label("Branding Theme")
-                .description("The branding theme to be applied to this quote.")
+                .label("Branding Theme ID")
+                .description("The branding theme ID to be applied to this quote.")
                 .options((ActionOptionsFunction<String>) XeroUtils::getBrandingThemeIdOptions)
                 .required(false),
             string(TITLE)

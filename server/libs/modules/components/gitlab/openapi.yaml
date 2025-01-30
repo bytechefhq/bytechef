@@ -14,11 +14,11 @@ paths:
       operationId: "createIssue"
       parameters:
         - name: "projectId"
-          description: "Project where new issue will be created"
+          description: "ID of the project where new issue will be created."
           in: "path"
           required: true
           schema:
-            title: "Project"
+            title: "Project ID"
             type: "string"
         - name: "title"
           description: "The title of an issue."
@@ -66,14 +66,14 @@ paths:
           in: "path"
           required: true
           schema:
-            title: "Project"
+            title: "Project ID"
             type: "string"
         - name: "issueId"
-          description: "The issue to comment on."
+          description: "ID of the issue to comment on."
           in: "path"
           required: true
           schema:
-            title: "Issue"
+            title: "Issue ID"
             type: "integer"
         - name: "body"
           description: "The comment to add to the issue."

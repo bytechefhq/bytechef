@@ -42,8 +42,8 @@ public class AITableConstants {
     public static final String TYPE = "type";
 
     public static final ModifiableStringProperty DATASHEET_ID_PROPERTY = string(DATASHEET_ID)
-        .label("Datasheet")
-        .description("AITable Datasheet")
+        .label("Datasheet ID")
+        .description("AITable Datasheet ID")
         .optionsLookupDependsOn(SPACE_ID)
         .options((ActionOptionsFunction<String>) AITableUtils::getDatasheetIdOptions)
         .required(true);
@@ -53,7 +53,7 @@ public class AITableConstants {
         .properties(AITableUtils::createPropertiesForRecord);
 
     public static final ModifiableStringProperty SPACE_ID_PROPERTY = string(SPACE_ID)
-        .label("Space")
+        .label("Space ID")
         .options((ActionOptionsFunction<String>) AITableUtils::getSpaceIdOptions)
         .required(true);
 

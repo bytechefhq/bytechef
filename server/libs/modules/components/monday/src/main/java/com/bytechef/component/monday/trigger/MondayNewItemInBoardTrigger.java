@@ -65,11 +65,11 @@ public class MondayNewItemInBoardTrigger {
         .webhookValidateOnEnable(MondayNewItemInBoardTrigger::webhookValidateOnEnable)
         .properties(
             string(WORKSPACE_ID)
-                .label("Workspace")
+                .label("Workspace ID")
                 .options((TriggerOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
-                .label("Board")
+                .label("Board ID")
                 .options((TriggerOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true))

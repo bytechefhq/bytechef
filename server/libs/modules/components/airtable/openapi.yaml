@@ -16,18 +16,18 @@ paths:
       operationId: "createRecord"
       parameters:
       - name: "baseId"
-        description: "The base where table is located."
+        description: "ID of the base where table is located."
         in: "path"
         required: true
         schema:
-          title: "Base"
+          title: "Base ID"
           type: "string"
       - name: "tableId"
         description: "The table where the record will be created."
         in: "path"
         required: true
         schema:
-          title: "Table"
+          title: "Table ID"
           type: "string"
       requestBody:
         content:

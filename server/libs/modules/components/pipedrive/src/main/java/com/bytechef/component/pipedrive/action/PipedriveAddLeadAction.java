@@ -49,18 +49,18 @@ public class PipedriveAddLeadAction {
         .properties(object("__item").properties(string("title").label("Title")
             .description("The name of the lead.")
             .required(true),
-            integer("owner_id").label("Owner")
+            integer("owner_id").label("Owner ID")
                 .description("User which will be the owner of the created lead.")
                 .required(false),
-            array("label_ids").items(string().description("Lead labels which will be associated with the lead."))
+            array("label_ids").items(string().description("ID of the labels which will be associated with the lead."))
                 .placeholder("Add to Label Ids")
-                .label("Lead Labels")
-                .description("Lead labels which will be associated with the lead.")
+                .label("Lead Labels IDs")
+                .description("ID of the labels which will be associated with the lead.")
                 .required(false),
-            integer("person_id").label("Person")
+            integer("person_id").label("Person ID")
                 .description("Person which this lead will be linked to.")
                 .required(false),
-            integer("organization_id").label("Organization")
+            integer("organization_id").label("Organization ID")
                 .description("Organization which this lead will be linked to.")
                 .required(false),
             object("value").properties(number("amount").label("Amount")

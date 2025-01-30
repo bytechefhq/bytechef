@@ -14,11 +14,11 @@ paths:
       operationId: "createList"
       parameters:
         - name: "folderId"
-          description: "Folder where new list will be created."
+          description: "ID of the folder where new list will be created."
           in: "path"
           required: true
           schema:
-            title: "Folder"
+            title: "Folder ID"
             type: "number"
       requestBody:
         content:
@@ -68,11 +68,11 @@ paths:
       operationId: "createTask"
       parameters:
         - name: "listId"
-          description: "List where new task will be created."
+          description: "ID of the list where new task will be created."
           in: "path"
           required: true
           schema:
-            title: "List"
+            title: "List ID"
             type: "number"
       requestBody:
         content:
@@ -134,11 +134,11 @@ paths:
       operationId: "createFolder"
       parameters:
         - name: "spaceId"
-          description: "Space where new folder will be created."
+          description: "ID of the space where new folder will be created."
           in: "path"
           required: true
           schema:
-            title: "Space"
+            title: "Space ID"
             type: "number"
       requestBody:
         content:

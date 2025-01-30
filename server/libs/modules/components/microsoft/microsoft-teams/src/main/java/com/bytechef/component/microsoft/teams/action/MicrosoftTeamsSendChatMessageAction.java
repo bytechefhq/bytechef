@@ -46,7 +46,7 @@ public class MicrosoftTeamsSendChatMessageAction {
         .description("Sends a message in an existing chat.")
         .properties(
             string(CHAT_ID)
-                .label("Chat")
+                .label("Chat ID")
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getChatIdOptions)
                 .required(true),
             CONTENT_TYPE_PROPERTY,

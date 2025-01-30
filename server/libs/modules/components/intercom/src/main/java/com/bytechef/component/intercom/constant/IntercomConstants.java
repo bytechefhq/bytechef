@@ -23,7 +23,6 @@ public class IntercomConstants {
 
     public static final String AVATAR = "avatar";
     public static final String BODY = "body";
-    public static final String CONTACT_NAME = "id";
     public static final String EMAIL = "email";
     public static final String FROM = "from";
     public static final String ID = "id";

@@ -43,8 +43,8 @@ public class ShopifyCloseOrderAction {
                 "path", "/orders/{orderId}/close.json"
 
             ))
-        .properties(integer("orderId").label("Order")
-            .description("The order to close.")
+        .properties(integer("orderId").label("Order ID")
+            .description("ID of the order to close.")
             .required(true)
             .metadata(
                 Map.of(

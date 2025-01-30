@@ -41,8 +41,8 @@ public class QuickbooksGetCustomerAction {
         .description("Gets details about a specific customer.")
         .properties(
             string(CUSTOMER)
-                .label("Customer")
-                .description("Customer to get.")
+                .label("Customer ID")
+                .description("ID of the customer to get.")
                 .options(QuickbooksUtils.getOptions(Entity.CUSTOMER, null))
                 .required(true))
         .output(outputSchema(CUSTOMER_OUTPUT_PROPERTY))

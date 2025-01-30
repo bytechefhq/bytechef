@@ -36,21 +36,21 @@ public class MondayDeleteItemAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteItem")
         .title("Delete Item")
-        .description("Deletes an item from a board")
+        .description("Deletes an item from a board.")
         .properties(
             string(WORKSPACE_ID)
-                .label("Workspace")
+                .label("Workspace ID")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getWorkspaceIdOptions)
                 .required(true),
             string(BOARD_ID)
-                .label("Board")
-                .description("The board where the item is located.")
+                .label("Board ID")
+                .description("ID of the board where the item is located.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardIdOptions)
                 .optionsLookupDependsOn(WORKSPACE_ID)
                 .required(true),
             string(ITEM_ID)
-                .label("Item")
-                .description("Item to delete")
+                .label("Item ID")
+                .description("ID of the item to delete.")
                 .options((ActionOptionsFunction<String>) MondayOptionUtils::getBoardItemsOptions)
                 .optionsLookupDependsOn(BOARD_ID, WORKSPACE_ID)
                 .required(true))

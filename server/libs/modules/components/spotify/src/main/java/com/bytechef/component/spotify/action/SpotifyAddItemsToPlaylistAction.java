@@ -45,7 +45,7 @@ public class SpotifyAddItemsToPlaylistAction {
                 "application/json"
 
             ))
-        .properties(string("playlist_id").label("Playlist")
+        .properties(string("playlist_id").label("Playlist ID")
             .required(true)
             .metadata(
                 Map.of(

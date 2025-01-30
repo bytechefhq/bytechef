@@ -53,8 +53,8 @@ public class ActiveCampaignCreateTaskAction {
             date("duedate").label("Due Date")
                 .description("Due date of the task.")
                 .required(true),
-            integer("dealTasktype").label("Task Type")
-                .description("The type of the task based on the available task types in the account.")
+            integer("dealTasktype").label("Task Type ID")
+                .description("ID of the task type.")
                 .required(true))
             .label("Deal Task")
             .required(false))

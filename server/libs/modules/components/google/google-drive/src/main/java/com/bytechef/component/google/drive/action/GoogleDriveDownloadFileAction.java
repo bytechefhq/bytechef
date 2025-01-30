@@ -45,8 +45,8 @@ public class GoogleDriveDownloadFileAction {
         .description("Download selected file from Google Drive.")
         .properties(
             string(FILE_ID)
-                .label("File")
-                .description("File to download.")
+                .label("File ID")
+                .description("ID of the file to download.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true))
         .output(outputSchema(fileEntry()))

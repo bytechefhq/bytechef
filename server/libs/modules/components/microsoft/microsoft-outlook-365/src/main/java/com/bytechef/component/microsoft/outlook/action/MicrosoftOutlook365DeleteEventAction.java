@@ -40,8 +40,8 @@ public class MicrosoftOutlook365DeleteEventAction {
         .properties(
             CALENDAR_ID_PROPERTY,
             string(EVENT)
-                .label("Event")
-                .description("Event to delete.")
+                .label("Event ID")
+                .description("Id of the event to delete.")
                 .options((ActionOptionsFunction<String>) MicrosoftOutlook365OptionUtils::getEventOptions)
                 .optionsLookupDependsOn(CALENDAR)
                 .required(true))

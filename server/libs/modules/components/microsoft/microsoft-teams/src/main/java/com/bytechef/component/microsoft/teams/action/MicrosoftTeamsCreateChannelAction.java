@@ -43,8 +43,8 @@ public class MicrosoftTeamsCreateChannelAction {
         .description("Creates a new channel within a team.")
         .properties(
             string(TEAM_ID)
-                .label("Team")
-                .description("Team where the channel will be created.")
+                .label("Team ID")
+                .description("ID of the team where the channel will be created.")
                 .options((ActionOptionsFunction<String>) MicrosoftTeamsOptionUtils::getTeamIdOptions)
                 .required(true),
             string(DISPLAY_NAME)

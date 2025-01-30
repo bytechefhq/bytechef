@@ -45,7 +45,7 @@ public class GoogleDriveCopyFileAction {
         .description("Copy a selected file to a different location within Google Drive.")
         .properties(
             string(FILE_ID)
-                .label("File")
+                .label("File ID")
                 .description("The id of the file to be copied.")
                 .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, false))
                 .required(true),
@@ -54,10 +54,10 @@ public class GoogleDriveCopyFileAction {
                 .description("The name of the new file created as a result of the copy operation.")
                 .required(true),
             string(FOLDER_ID)
-                .label("Destination Folder")
-                .required(true)
+                .label("Destination Folder ID")
                 .description("The ID of the folder where the copied file will be stored.")
-                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true)))
+                .options(GoogleUtils.getFileOptionsByMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER, true))
+                .required(true))
         .output(
             outputSchema(
                 object()

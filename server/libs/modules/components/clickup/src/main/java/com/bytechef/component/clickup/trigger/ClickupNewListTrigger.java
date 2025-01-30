@@ -49,23 +49,25 @@ public class ClickupNewListTrigger {
         .title("New List")
         .description("Triggers when new list is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
-        .properties(string(WORKSPACE_ID)
-            .label("Workspace")
-            .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
-            .required(true))
-        .output(outputSchema(
-            object()
-                .properties(
-                    string(ID),
-                    string(NAME),
-                    object("folder")
-                        .properties(
-                            string(ID),
-                            string(NAME)),
-                    object("space")
-                        .properties(
-                            string(ID),
-                            string(NAME)))))
+        .properties(
+            string(WORKSPACE_ID)
+                .label("Workspace ID")
+                .options((TriggerOptionsFunction<String>) ClickupUtils::getWorkspaceIdOptions)
+                .required(true))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(ID),
+                        string(NAME),
+                        object("folder")
+                            .properties(
+                                string(ID),
+                                string(NAME)),
+                        object("space")
+                            .properties(
+                                string(ID),
+                                string(NAME)))))
         .webhookEnable(ClickupNewListTrigger::webhookEnable)
         .webhookDisable(ClickupNewListTrigger::webhookDisable)
         .webhookRequest(ClickupNewListTrigger::webhookRequest);
