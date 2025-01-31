@@ -35,6 +35,7 @@ public class GoogleSheetsConstants {
 
     public static final String APPLICATION_VND_GOOGLE_APPS_SPREADSHEET = "application/vnd.google-apps.spreadsheet";
     public static final String COLUMN = "column";
+    public static final String FOLDER_ID = "folderId";
     public static final String HEADERS = "headers";
     public static final String IS_THE_FIRST_ROW_HEADER = "isTheFirstRowHeader";
     public static final String LABEL = "label";
@@ -44,6 +45,7 @@ public class GoogleSheetsConstants {
     public static final String SHEET_ID = "sheetId";
     public static final String SHEET_NAME = "sheetName";
     public static final String SPREADSHEET_ID = "spreadsheetId";
+    public static final String TITLE = "title";
     public static final String UPDATE_WHOLE_ROW = "updateWholeRow";
     public static final String VALUE_INPUT_OPTION = "valueInputOption";
     public static final String VALUE = "value";
