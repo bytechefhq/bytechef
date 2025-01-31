@@ -50,28 +50,9 @@ Creates a new record in datasheet.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space | STRING | SELECT  |  |
-| Datasheet | STRING | SELECT  |  AITable Datasheet  |
+| Space ID | STRING | SELECT  |  |
+| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
 | DYNAMIC_PROPERTIES | null  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| BOOLEAN | SELECT  |
-| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-
-
 
 
 
@@ -83,30 +64,11 @@ Find records in datasheet
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space | STRING | SELECT  |  |
-| Datasheet | STRING | SELECT  |  AITable Datasheet  |
+| Space ID | STRING | SELECT  |  |
+| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
 | Field Names | [STRING] | ARRAY_BUILDER  |  The returned record results are limited to the specified fields.  |
 | Record IDs | [STRING] | ARRAY_BUILDER  |  The IDs of the records to find.  |
 | Max Records | INTEGER | INTEGER  |  How many records are returned in total  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| BOOLEAN | SELECT  |
-| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-
-
 
 
 
@@ -118,29 +80,10 @@ Update record in datasheet
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space | STRING | SELECT  |  |
-| Datasheet | STRING | SELECT  |  AITable Datasheet  |
-| Record | STRING | SELECT  |  Record to update  |
+| Space ID | STRING | SELECT  |  |
+| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
+| Record ID | STRING | SELECT  |  ID of the record to update.  |
 | DYNAMIC_PROPERTIES | null  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| BOOLEAN | SELECT  |
-| {[{STRING\(recordId), {}\(fields)}]\(records)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-
-
 
 
 

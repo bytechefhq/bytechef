@@ -85,7 +85,7 @@ Mark a tas as being completed.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | STRING | SELECT  |  Task to be closed.  |
+| Task ID | STRING | SELECT  |  ID of the task to be closed.  |
 
 
 

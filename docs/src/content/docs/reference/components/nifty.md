@@ -117,7 +117,7 @@ Creates new task
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  Project within which the task will be created.  |
+| Project ID | STRING | SELECT  |  ID of the project within which the task will be created.  |
 | Task | {STRING\(task_group_id), STRING\(name), STRING\(description), DATE_TIME\(due_date)} | OBJECT_BUILDER  |  |
 
 

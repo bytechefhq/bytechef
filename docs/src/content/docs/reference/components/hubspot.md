@@ -184,7 +184,7 @@ Move Contact to the recycling bin.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | STRING | SELECT  |  |
+| Contact ID | STRING | SELECT  |  |
 
 
 
@@ -196,7 +196,7 @@ Get contact details.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | STRING | SELECT  |  |
+| Contact ID | STRING | SELECT  |  |
 
 
 ### Output

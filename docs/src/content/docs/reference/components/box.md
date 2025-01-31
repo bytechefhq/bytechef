@@ -50,7 +50,7 @@ Triggers when file is uploaded to folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder | STRING | SELECT  |  Folder in which file uploads will trigger this webhook.  |
+| Folder ID | STRING | SELECT  |  ID of the folder in which file uploads will trigger this webhook.  |
 
 
 ### Output
@@ -83,7 +83,7 @@ Triggers when folder is created.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder | STRING | SELECT  |  Folder in which new folder will trigger this webhook.  |
+| Folder ID | STRING | SELECT  |  ID of the folder in which new folder will trigger this webhook.  |
 
 
 ### Output
@@ -123,7 +123,7 @@ Creates a new empty folder within the specified parent folder.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Folder Name | STRING | TEXT  |  The name for the new folder.  |
-| Parent Folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
 
 
 ### Output
@@ -154,8 +154,8 @@ Download a selected file.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder from which you want to download the file.  |
-| File | STRING | SELECT  |  File to download.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |
+| File ID | STRING | SELECT  |  ID of the file to download.  |
 
 
 ### Output
@@ -186,7 +186,7 @@ Uploads a small file to Box.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
 | File | FILE_ENTRY | FILE_ENTRY  |  |
 
 

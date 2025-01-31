@@ -116,7 +116,7 @@ Creates a new contact.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Book | STRING | SELECT  |  Book where new contact will be created.  |
+| Book ID | STRING | SELECT  |  ID of the book where new contact will be created.  |
 | Contact | {STRING\(name)} | OBJECT_BUILDER  |  |
 
 
@@ -145,7 +145,7 @@ Creates a new invoice.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Book | STRING | SELECT  |  Book where new invoice will be created.  |
+| Book ID | STRING | SELECT  |  ID of the book where new invoice will be created.  |
 | Invoice | {STRING\(customer), DATE\(invoiceDate), STRING\(amountTaxStatus), [{INTEGER\(lineNumber)}]\(lineItems)} | OBJECT_BUILDER  |  |
 
 
@@ -174,7 +174,7 @@ Creates a new payment.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Book | STRING | SELECT  |  Book where new payment will be created.  |
+| Book ID | STRING | SELECT  |  ID of the book where new payment will be created.  |
 | Payment | {STRING\(supplier), DATE\(paymentDate), NUMBER\(totalAmount)} | OBJECT_BUILDER  |  |
 
 

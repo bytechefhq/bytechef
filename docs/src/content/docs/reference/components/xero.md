@@ -173,7 +173,7 @@ Creates draft bill (Accounts Payable).
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | STRING | SELECT  |  Contact to create the bill for.  |
+| Contact ID | STRING | SELECT  |  ID of the contact to create the bill for.  |
 | Date | DATE | DATE  |  Date of the bill. If no date is specified, the current date will be used.  |
 | Due Date | DATE | DATE  |  Date bill is due. If no date is specified, the current date will be used.  |
 | Line Amount Type | STRING | SELECT  |  |
@@ -264,12 +264,12 @@ Creates draft invoice (Acount Receivable).
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | STRING | SELECT  |  Contact to create the invoice for.  |
+| Contact ID | STRING | SELECT  |  ID of the contact to create the invoice for.  |
 | Date | DATE | DATE  |  Date invoice was issued. If no date is specified, the current date will be used.  |
 | Due Date | DATE | DATE  |  Date invoice is due. If no date is specified, the current date will be used.  |
 | Line Amount Type | STRING | SELECT  |  |
 | Line Items | [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
-| Currency | STRING | SELECT  |  Currency that invoice is raised in.  |
+| Currency Code | STRING | SELECT  |  Currency code that invoice is raised in.  |
 | Invoice Reference | STRING | TEXT  |  Reference number of the invoice.  |
 
 
@@ -306,15 +306,15 @@ Creates a new quote draft.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | STRING | SELECT  |  Full name of a contact or organisation.  |
+| Contact ID | STRING | SELECT  |  ID of the contact that the quote is being raised for.  |
 | Date | DATE | DATE  |  Date quote was issued.  |
 | Line Items | [{STRING\(Description), INTEGER\(Quantity), NUMBER\(UnitAmount), NUMBER\(DiscountRate)}] | ARRAY_BUILDER  |  Line items on the invoice.  |
 | Line Amount Type | STRING | SELECT  |  |
 | Expiry Date | DATE | DATE  |  Date quote expires  |
-| Currency | STRING | SELECT  |  The currency that quote has been raised in.  |
+| Currency Code | STRING | SELECT  |  The currency code that quote has been raised in.  |
 | Quote Number | STRING | TEXT  |  Unique alpha numeric code identifying a quote.  |
 | Reference | STRING | TEXT  |  Additional reference number  |
-| Branding Theme | STRING | SELECT  |  The branding theme to be applied to this quote.  |
+| Branding Theme ID | STRING | SELECT  |  The branding theme ID to be applied to this quote.  |
 | Title | STRING | TEXT  |  The title of the quote.  |
 | Summary | STRING | TEXT  |  The summary of the quote.  |
 | Terms | STRING | TEXT_AREA  |  The terms of the quote.  |

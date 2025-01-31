@@ -37,7 +37,7 @@ null
 
 ___Sample Output:___
 
-```{headers={}, method=POST, parameters={}}```
+```{method=POST, headers={}, parameters={}}```
 
 
 null
@@ -61,7 +61,7 @@ Upon receiving a webhook request, it goes through a validation process. Once val
 
 ___Sample Output:___
 
-```{headers={}, method=POST, parameters={}}```
+```{method=POST, headers={}, parameters={}}```
 
 
 null
@@ -86,7 +86,7 @@ You have the flexibility to set up your preferred response. After a webhook requ
 
 ___Sample Output:___
 
-```{headers={}, method=POST, parameters={}}```
+```{method=POST, headers={}, parameters={}}```
 
 
 null

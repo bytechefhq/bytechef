@@ -73,7 +73,7 @@ Type: ARRAY
 
 
 ### New Folder
-Triggers when new file is uploaded to Google Drive.
+Triggers when new folder is uploaded to Google Drive.
 
 #### Type: POLLING
 #### Properties
@@ -116,9 +116,9 @@ Copy a selected file to a different location within Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | STRING | SELECT  |  The id of the file to be copied.  |
+| File ID | STRING | SELECT  |  The id of the file to be copied.  |
 | New File Name | STRING | TEXT  |  The name of the new file created as a result of the copy operation.  |
-| Destination Folder | STRING | SELECT  |  The ID of the folder where the copied file will be stored.  |
+| Destination Folder ID | STRING | SELECT  |  The ID of the folder where the copied file will be stored.  |
 
 
 ### Output
@@ -150,7 +150,7 @@ Creates a new empty folder in Google Drive.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Folder Name | STRING | TEXT  |  The name of the new folder.  |
-| Parent Folder | STRING | SELECT  |  Folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
 
 
 ### Output
@@ -158,7 +158,7 @@ Creates a new empty folder in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 
@@ -188,7 +188,7 @@ Creates a new text file in Google Drive.
 | File Name | STRING | TEXT  |  The name of the new text file.  |
 | Text | STRING | TEXT_AREA  |  The text content to add to file.  |
 | File Type | STRING | SELECT  |  Select file type.  |
-| Parent Folder | STRING | SELECT  |  Folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
 
 
 ### Output
@@ -196,7 +196,7 @@ Creates a new text file in Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 
@@ -223,7 +223,7 @@ Delete a selected file from Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | STRING | SELECT  |  The id of a file to delete.  |
+| File ID | STRING | SELECT  |  The id of a file to delete.  |
 
 
 
@@ -235,7 +235,7 @@ Download selected file from Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | STRING | SELECT  |  File to download.  |
+| File ID | STRING | SELECT  |  ID of the file to download.  |
 
 
 ### Output
@@ -266,7 +266,7 @@ Retrieve a specified file from your Google Drive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | STRING | SELECT  |  File to be retrieved.  |
+| File ID | STRING | SELECT  |  ID of the file to be retrieved.  |
 
 
 ### Output
@@ -298,7 +298,7 @@ Uploads a file in your Google Drive.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Parent Folder | STRING | SELECT  |  Folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
 
 
 ### Output
@@ -306,7 +306,7 @@ Uploads a file in your Google Drive.
 
 ___Sample Output:___
 
-```{name=new-file.txt, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr, mimeType=plain/text}```
+```{name=new-file.txt, mimeType=plain/text, id=1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr}```
 
 
 

@@ -52,7 +52,7 @@ Creates a new channel within a team.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team | STRING | SELECT  |  Team where the channel will be created.  |
+| Team ID | STRING | SELECT  |  ID of the team where the channel will be created.  |
 | Channel Name | STRING | TEXT  |  |
 | Description | STRING | TEXT  |  Description for the channel.  |
 
@@ -84,8 +84,8 @@ Sends a message to a channel.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team | STRING | SELECT  |  Team where the channel is located.  |
-| Channel | STRING | SELECT  |  Channel to send message to.  |
+| Team ID | STRING | SELECT  |  ID of the team where the channel is located.  |
+| Channel ID | STRING | SELECT  |  Channel to send message to.  |
 | Message Text Format | STRING | SELECT  |  |
 | Message Text | STRING | TEXT_AREA  |  |
 
@@ -117,7 +117,7 @@ Sends a message in an existing chat.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Chat | STRING | SELECT  |  |
+| Chat ID | STRING | SELECT  |  |
 | Message Text Format | STRING | SELECT  |  |
 | Message Text | STRING | TEXT_AREA  |  |
 

@@ -51,7 +51,7 @@ Triggers when file is uploaded to folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
+| Parent Folder ID | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -87,8 +87,8 @@ Download a file from your Microsoft OneDrive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder from which you want to download the file.  |
-| File | STRING | SELECT  |  File to download.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |
+| File ID | STRING | SELECT  |  ID of the file to download.  |
 
 
 ### Output
@@ -119,7 +119,7 @@ List files in a OneDrive folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder from which you want to list files. If no folder is specified, the root folder will be used.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -147,7 +147,7 @@ List folders in a OneDrive folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
 
 
 ### Output
@@ -175,7 +175,7 @@ Upload a file to your Microsoft OneDrive.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
+| Parent Folder ID | STRING | SELECT  |  ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
 | File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
 
 

@@ -73,7 +73,7 @@ Creates a new customer payment.
 | Company File | STRING | SELECT  |  The MYOB company file to use.  |
 | Pay From | STRING | SELECT  |  |
 | Account | STRING | TEXT  |  |
-| Customer | STRING | SELECT  |  |
+| Customer UID | STRING | SELECT  |  |
 
 
 
@@ -106,7 +106,7 @@ Creates a new supplier payment.
 | Company File | STRING | SELECT  |  The MYOB company file to use.  |
 | Pay From | STRING | SELECT  |  |
 | Account | STRING | TEXT  |  |
-| Supplier | STRING | SELECT  |  |
+| Supplier UID | STRING | SELECT  |  |
 
 
 

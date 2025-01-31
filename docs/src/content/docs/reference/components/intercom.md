@@ -88,7 +88,7 @@ Get a single Contact
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact Name | STRING | SELECT  |  |
+| Contact ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -125,7 +125,7 @@ Send a new message
 | Title | STRING | TEXT  |  Title of the Email/Message  |
 | Content | STRING | RICH_TEXT  |  Content of the message  |
 | Template | STRING | SELECT  |  The style of the outgoing message  |
-| To | STRING | SELECT  |  Receiver of the message  |
+| To | STRING | SELECT  |  ID of the contact to send the message to.  |
 
 
 ### Output

@@ -52,20 +52,10 @@ Append a row of values to an existing worksheet.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
+| Workbook ID | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
 | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-
 
 
 
@@ -77,7 +67,7 @@ Clear a worksheet of all values.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
+| Workbook ID | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
 | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 
@@ -91,7 +81,7 @@ Delete row on an existing sheet.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
+| Workbook ID | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
 | Row Number | INTEGER | INTEGER  |  The row number to delete.  |
 
@@ -105,20 +95,10 @@ Get row values from the worksheet by the row number.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
+| Workbook ID | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
 | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 | Row Number | INTEGER | INTEGER  |  The row number to get the values from.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-
 
 
 
@@ -130,21 +110,11 @@ Update a row in a worksheet.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook | STRING | SELECT  |  |
+| Workbook ID | STRING | SELECT  |  |
 | Worksheet | STRING | SELECT  |  |
 | Row Number | INTEGER | INTEGER  |  The row number to update.  |
 | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
 | DYNAMIC_PROPERTIES | null  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-
 
 
 

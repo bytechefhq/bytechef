@@ -85,7 +85,7 @@ Create a new task
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task List | INTEGER | SELECT  |  Task list where new task is added  |
+| Task List ID | INTEGER | SELECT  |  Task list where new task is added  |
 | Task | {{STRING\(name), STRING\(description), DATE\(dueAt)}\(task)} | OBJECT_BUILDER  |  |
 
 

@@ -50,7 +50,7 @@ Triggers when new list is created.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workspace | STRING | SELECT  |  |
+| Workspace ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -83,7 +83,7 @@ Triggers when new task is created.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workspace | STRING | SELECT  |  |
+| Workspace ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -125,9 +125,9 @@ Creates a new List in specified Folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workspace | NUMBER | SELECT  |  |
-| Space | NUMBER | SELECT  |  |
-| Folder | NUMBER | SELECT  |  Folder where new list will be created.  |
+| Workspace ID | NUMBER | SELECT  |  |
+| Space ID | NUMBER | SELECT  |  |
+| Folder ID | NUMBER | SELECT  |  ID of the folder where new list will be created.  |
 | List | {STRING\(name)} | OBJECT_BUILDER  |  |
 
 
@@ -156,10 +156,10 @@ Create a new task in a ClickUp workspace and list.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workspace | NUMBER | SELECT  |  |
-| Space | NUMBER | SELECT  |  |
-| Folder | NUMBER | SELECT  |  |
-| List | NUMBER | SELECT  |  List where new task will be created.  |
+| Workspace ID | NUMBER | SELECT  |  |
+| Space ID | NUMBER | SELECT  |  |
+| Folder ID | NUMBER | SELECT  |  |
+| List ID | NUMBER | SELECT  |  ID of the list where new task will be created.  |
 | Task | {STRING\(name), STRING\(description)} | OBJECT_BUILDER  |  |
 
 
@@ -188,8 +188,8 @@ Creates a new folder in a ClickUp workspace.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workspace | NUMBER | SELECT  |  |
-| Space | NUMBER | SELECT  |  Space where new folder will be created.  |
+| Workspace ID | NUMBER | SELECT  |  |
+| Space ID | NUMBER | SELECT  |  ID of the space where new folder will be created.  |
 | Folder | {STRING\(name)} | OBJECT_BUILDER  |  |
 
 

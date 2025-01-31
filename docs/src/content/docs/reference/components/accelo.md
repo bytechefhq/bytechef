@@ -116,7 +116,7 @@ Creates a new task.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Title | STRING | TEXT  |  |
 | Against Type | STRING | SELECT  |  The type of object the task is against.  |
-| Against Object | STRING | SELECT  |  Object the task is against.  |
+| Against Object ID | STRING | SELECT  |  ID of the object the task is against.  |
 | Start Date | DATE | DATE  |  The date the task is is scheduled to start.  |
 
 

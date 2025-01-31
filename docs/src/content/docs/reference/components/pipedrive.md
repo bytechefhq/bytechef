@@ -317,9 +317,9 @@ Returns all deals.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| User | INTEGER | SELECT  |  Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.  |
-| Filter | INTEGER | SELECT  |  Filter to use.  |
-| Stage | INTEGER | SELECT  |  Deals within the given stage will be returned.  |
+| User ID | INTEGER | SELECT  |  Deals matching the given user will be returned. However, `filter_id` and `owned_by_you` takes precedence over `user_id` when supplied.  |
+| Filter ID | INTEGER | SELECT  |  ID of the filter to use.  |
+| Stage ID | INTEGER | SELECT  |  Deals within the given stage will be returned.  |
 | Status | STRING | SELECT  |  |
 | Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).  |
 
@@ -380,8 +380,8 @@ Searches all deals by title, notes and/or custom fields.
 | Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
 | Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
 | Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
-| Person | INTEGER | SELECT  |  Will filter deals by the provided person.  |
-| Organization | INTEGER | SELECT  |  Will filter deals by the provided organization.  |
+| Person ID | INTEGER | SELECT  |  Will filter deals by the provided person.  |
+| Organization ID | INTEGER | SELECT  |  Will filter deals by the provided organization.  |
 | Status | STRING | SELECT  |  Will filter deals by the provided specific status.  |
 | Include Fields | STRING | SELECT  |  Supports including optional fields in the results which are not provided by default.  |
 
@@ -411,7 +411,7 @@ Marks a deal as deleted. After 30 days, the deal will be permanently deleted.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Deal | INTEGER | SELECT  |  Deal to delete  |
+| Deal ID | INTEGER | SELECT  |  Id of the deal to delete.  |
 
 
 ### Output
@@ -468,10 +468,10 @@ Returns multiple leads. Leads are sorted by the time they were created, from old
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Archived Status | STRING | SELECT  |  Filtering based on the archived status of a lead.  |
-| Owner | INTEGER | SELECT  |  Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.  |
-| Person | INTEGER | SELECT  |  If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.  |
-| Organization | INTEGER | SELECT  |  If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.  |
-| Filter | INTEGER | SELECT  |  Filter to use  |
+| Owner iD | INTEGER | SELECT  |  Leads matching the given user will be returned. However, `filter_id` takes precedence over `owner_id` when supplied.  |
+| Person ID | INTEGER | SELECT  |  If supplied, only leads matching the given person will be returned. However, `filter_id` takes precedence over `person_id` when supplied.  |
+| Organization ID | INTEGER | SELECT  |  If supplied, only leads matching the given organization will be returned. However, `filter_id` takes precedence over `organization_id` when supplied.  |
+| Filter ID | INTEGER | SELECT  |  Filter to use  |
 | Sort | STRING | SELECT  |  The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).  |
 
 
@@ -528,7 +528,7 @@ Deletes a specific lead.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Lead | STRING | SELECT  |  The ID of the lead  |
+| Lead ID | STRING | SELECT  |  The ID of the lead  |
 
 
 ### Output
@@ -556,7 +556,7 @@ Returns details of a specific lead.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Lead | STRING | SELECT  |  |
+| Lead ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -587,8 +587,8 @@ Searches all leads by title, notes and/or custom fields.
 | Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
 | Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
 | Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
-| Person | INTEGER | SELECT  |  Will filter leads by the provided person ID.  |
-| Organization | INTEGER | SELECT  |  Will filter leads by the provided organization ID.  |
+| Person ID | INTEGER | SELECT  |  Will filter leads by the provided person ID.  |
+| Organization ID | INTEGER | SELECT  |  Will filter leads by the provided organization ID.  |
 | Include Fields | STRING | SELECT  |  Supports including optional fields in the results which are not provided by default.  |
 
 
@@ -617,8 +617,8 @@ Returns all organizations.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Owner | INTEGER | SELECT  |  Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
-| Filter | INTEGER | SELECT  |  Filter to use  |
+| User ID | INTEGER | SELECT  |  Organizations owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
+| Filter ID | INTEGER | SELECT  |  Filter to use  |
 | First Characters | STRING | TEXT  |  Organizations whose name starts with the specified letter will be returned (case insensitive)  |
 | Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma (`field_name_1ASC`, `field_name_2 DESC`). Only first-level field keys are supported (no nested keys).  |
 
@@ -762,8 +762,8 @@ Returns all persons.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Owner | INTEGER | SELECT  |  Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
-| Filter | INTEGER | SELECT  |  Filter to use.  |
+| User ID | INTEGER | SELECT  |  Persons owned by the given user will be returned. However, `filter_id` takes precedence over `user_id` when both are supplied.  |
+| Filter ID | INTEGER | SELECT  |  Filter to use.  |
 | First Characters | STRING | TEXT  |  Persons whose name starts with the specified letter will be returned (case insensitive)  |
 | Sort | STRING | TEXT  |  The field names and sorting mode separated by a comma. Only first-level field keys are supported (no nested keys).  |
 
@@ -824,7 +824,7 @@ Searches all persons by name, email, phone, notes and/or custom fields.
 | Term | STRING | TEXT  |  The search term to look for. Minimum 2 characters (or 1 if using `exact_match`). Please note that the search term has to be URL encoded.  |
 | Fields | STRING | SELECT  |  A comma-separated string array. The fields to perform the search from. Defaults to all of them.  |
 | Exact Match | BOOLEAN | SELECT  |  When enabled, only full exact matches against the given term are returned. It is <b>not</b> case sensitive.  |
-| Organization | INTEGER | SELECT  |  Will filter persons by the provided organization.  |
+| Organization ID | INTEGER | SELECT  |  Will filter persons by the provided organization.  |
 
 
 ### Output

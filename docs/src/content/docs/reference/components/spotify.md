@@ -55,7 +55,7 @@ Start or resume current playback on an active device.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Device | STRING | TEXT  |  |
+| Device ID | STRING | TEXT  |  |
 | Item | {STRING\(context_uri), [STRING]\(uris), INTEGER\(position_ms)} | OBJECT_BUILDER  |  |
 
 
@@ -68,7 +68,7 @@ Adds one or more items to your playlist.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Playlist | STRING | SELECT  |  |
+| Playlist ID | STRING | SELECT  |  |
 | Tracks | [STRING] | ARRAY_BUILDER  |  |
 | Item | {INTEGER\(position)} | OBJECT_BUILDER  |  |
 

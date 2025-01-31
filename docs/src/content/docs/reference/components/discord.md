@@ -56,8 +56,8 @@ Post a new message to a specific #channel you choose.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild | STRING | SELECT  |  |
-| Channel | STRING | SELECT  |  Channel where to send the message  |
+| Guild ID | STRING | SELECT  |  |
+| Channel ID | STRING | SELECT  |  ID of the channel where to send the message.  |
 | Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  |
 
 
@@ -86,7 +86,7 @@ Create a new channel
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild | STRING | SELECT  |  |
+| Guild ID | STRING | SELECT  |  |
 | Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  |
 
 
@@ -115,7 +115,7 @@ Send direct message guild member.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild | STRING | SELECT  |  |
+| Guild ID | STRING | SELECT  |  |
 | Recipient | STRING | SELECT  |  The recipient to open a DM channel with.  |
 | Message Text | STRING | TEXT  |  Message contents (up to 2000 characters)  |
 | Text to Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |
