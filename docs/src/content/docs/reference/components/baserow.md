@@ -55,23 +55,6 @@ Creates a new row.
 | DYNAMIC_PROPERTIES | null  |
 
 
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
-
-
 
 
 ### Delete Row
@@ -127,23 +110,6 @@ Updates the specified row.
 | Row ID | INTEGER | INTEGER  |  ID of the row to be updated.  |
 | User Field Names | BOOLEAN | SELECT  |  The field names returned by this endpoint will be the actual names of the fields.  |
 | DYNAMIC_PROPERTIES | null  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
 
 
 

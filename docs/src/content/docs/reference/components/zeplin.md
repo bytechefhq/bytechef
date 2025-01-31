@@ -50,7 +50,7 @@ Triggers when new note is created, deleted or updated in specified project.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  |
+| Project ID | STRING | SELECT  |  ID of the project you want to monitor.  |
 
 
 ### Output
@@ -88,7 +88,7 @@ Updates an existing project.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  Project to update.  |
+| Project ID | STRING | SELECT  |  Project to update.  |
 | Project | {STRING\(name), STRING\(description)} | OBJECT_BUILDER  |  |
 
 

@@ -87,7 +87,7 @@ Creates an event in the specified calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar | STRING | SELECT  |  |
+| Calendar ID | STRING | SELECT  |  |
 | Subject | STRING | TEXT  |  The subject of the event.  |
 | All Day Event? | BOOLEAN | SELECT  |  |
 | Start Date | DATE | DATE  |  The start date of the event.  |
@@ -132,8 +132,8 @@ Deletes an event from the specified calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar | STRING | SELECT  |  |
-| Event | STRING | SELECT  |  Event to delete.  |
+| Calendar ID | STRING | SELECT  |  |
+| Event ID | STRING | SELECT  |  Id of the event to delete.  |
 
 
 
@@ -145,7 +145,7 @@ Gets a list of events in specified calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar | STRING | SELECT  |  |
+| Calendar ID | STRING | SELECT  |  |
 | Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find events that exist in this range.  |
 
 
@@ -174,7 +174,7 @@ Get free time slots from the Microsoft Outlook 365 calendar.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Calendar | STRING | SELECT  |  |
+| Calendar ID | STRING | SELECT  |  |
 | Date Range | {DATE_TIME\(from), DATE_TIME\(to)} | OBJECT_BUILDER  |  Date range to find free time.  |
 
 
@@ -203,7 +203,7 @@ Get a specific message
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message Id | STRING | SELECT  |  Id of the message  |
+| Message Id | STRING | SELECT  |  Id of the message.  |
 
 
 ### Output

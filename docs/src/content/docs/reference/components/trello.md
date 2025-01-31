@@ -50,8 +50,8 @@ Triggers when a new card is created on specified board or list.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board | STRING | SELECT  |  |
-| List | STRING | SELECT  |  |
+| Board ID | STRING | SELECT  |  |
+| List ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -104,8 +104,8 @@ Creates a new card.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board | STRING | SELECT  |  |
-| List | STRING | SELECT  |  List the card should be created in.  |
+| Board ID | STRING | SELECT  |  ID of the board.  |
+| List ID | STRING | SELECT  |  ID of the list where the card should be created in.  |
 | Name | STRING | TEXT  |  The name for the card.  |
 | Description | STRING | TEXT  |  The description for the card.  |
 
@@ -139,8 +139,8 @@ Gets a card details.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board | STRING | SELECT  |  Board where card is located.  |
-| Card | STRING | SELECT  |  |
+| Board ID | STRING | SELECT  |  ID of the board where card is located.  |
+| Card ID | STRING | SELECT  |  |
 
 
 ### Output

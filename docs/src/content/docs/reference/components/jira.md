@@ -51,8 +51,8 @@ Triggers when a new issue is created.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  Project where new issue is created.  |
-| Issue Type | STRING | SELECT  |  The type of issue.  |
+| Project ID | STRING | SELECT  |  Id of the project where new issue is created.  |
+| Issue Type ID | STRING | SELECT  |  ID of the issue type.  |
 
 
 ### Output
@@ -84,8 +84,8 @@ Triggers when an issue is updated.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  Project where new issue is created.  |
-| Issue Type | STRING | SELECT  |  The type of issue.  |
+| Project ID | STRING | SELECT  |  ID of the project where issues is updated.  |
+| Issue Type ID | STRING | SELECT  |  ID of the issue type.  |
 
 
 ### Output
@@ -123,12 +123,12 @@ Creates a new issue.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project Name | STRING | SELECT  |  The name of the project to create the issue in.  |
+| Project ID | STRING | SELECT  |  ID of the project to create the issue in.  |
 | Summary | STRING | TEXT  |  A brief summary of the issue.  |
-| Issue Type | STRING | SELECT  |  The type of issue.  |
-| Parent | STRING | SELECT  |    |
-| Assignee | STRING | SELECT  |  User who will be assigned to the issue.  |
-| Priority | STRING | SELECT  |  Priority of the issue.  |
+| Issue Type ID | STRING | SELECT  |  Id of the issue type.  |
+| Parent Issue ID | STRING | SELECT  |  ID of the parent issue.  |
+| Assignee ID | STRING | SELECT  |  ID of the user who will be assigned to the issue.  |
+| Priority ID | STRING | SELECT  |  ID of the priority of the issue.  |
 | Description | STRING | TEXT_AREA  |  Description of the issue.  |
 
 
@@ -159,8 +159,8 @@ Adds a comment to an issue.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project Name | STRING | SELECT  |  Project where the issue is located.  |
-| Issue Name | STRING | SELECT  |  Issue where the comment will be added.  |
+| Project ID | STRING | SELECT  |  ID of the project where the issue is located.  |
+| Issue ID | STRING | SELECT  |  ID of the issue where the comment will be added.  |
 | Comment | STRING | TEXT  |  The text of the comment.  |
 
 
@@ -196,8 +196,8 @@ Get issue details in selected project.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project Name | STRING | SELECT  |  Project where the issue is located.  |
-| Issue Name | STRING | SELECT  |  |
+| Project ID | STRING | SELECT  |  ID of the project where the issue is located.  |
+| Issue ID | STRING | SELECT  |  |
 
 
 ### Output

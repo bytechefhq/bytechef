@@ -175,7 +175,7 @@ Gets details about a specific customer.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Customer | STRING | SELECT  |  Customer to get.  |
+| Customer ID | STRING | SELECT  |  ID of the customer to get.  |
 
 
 ### Output
@@ -203,7 +203,7 @@ Gets details about a specific invoice.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Invoice | STRING | SELECT  |  Invoice to get.  |
+| Invoice ID | STRING | SELECT  |  ID of the invoice to get.  |
 
 
 ### Output
@@ -231,7 +231,7 @@ Gets details about a specific item.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Item | STRING | SELECT  |  Item to get.  |
+| Item ID | STRING | SELECT  |  ID of the item to get.  |
 
 
 ### Output
@@ -259,7 +259,7 @@ Gets details about a specific payment.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Payment | STRING | SELECT  |  Payment to get.  |
+| Payment ID | STRING | SELECT  |  ID of the payment to get.  |
 
 
 ### Output

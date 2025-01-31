@@ -112,7 +112,7 @@ Type: ARRAY
 
 
 ### Add Labels
-Add labels to an email in your Gmail account
+Add labels to an email in your Gmail account.
 
 #### Properties
 

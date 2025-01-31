@@ -51,7 +51,7 @@ Sends a message to a public channel, private channel, or existing direct message
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Channel | STRING | SELECT  |  Channel, private group, or IM channel to send message to.  |
+| Channel ID | STRING | SELECT  |  ID of the channel, private group, or IM channel to send message to.  |
 | Message | STRING | TEXT_AREA  |  The text of your message.  |
 
 
@@ -85,7 +85,7 @@ Sends a direct message to another user in a workspace. If it hasn't already, a d
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| User | STRING | SELECT  |  User to send the direct message to.  |
+| User ID | STRING | SELECT  |  ID of the user to send the direct message to.  |
 | Message | STRING | TEXT_AREA  |  The text of your message.  |
 
 

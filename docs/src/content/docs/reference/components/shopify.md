@@ -203,7 +203,7 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | INTEGER | SELECT  |  The order to delete.  |
+| Order ID | INTEGER | SELECT  |  ID of the order to delete.  |
 
 
 
@@ -215,7 +215,7 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | SELECT  |  The order id.  |
+| Order ID | INTEGER | SELECT  |  ID of the order to cancel.  |
 
 
 ### Output
@@ -250,7 +250,7 @@ Update an existing order.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | INTEGER | SELECT  |  The order to update.  |
+| Order ID | INTEGER | SELECT  |  ID of the order to update.  |
 | Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  |
 
 
@@ -286,7 +286,7 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | INTEGER | SELECT  |  The order to close.  |
+| Order ID | INTEGER | SELECT  |  ID of the order to close.  |
 
 
 ### Output

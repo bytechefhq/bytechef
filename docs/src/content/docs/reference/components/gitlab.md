@@ -90,7 +90,7 @@ Creates a new project issue.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  Project where new issue will be created  |
+| Project ID | STRING | SELECT  |  ID of the project where new issue will be created.  |
 | Title | STRING | TEXT  |  The title of an issue.  |
 | Description | STRING | TEXT  |  The description of an issue.  |
 
@@ -120,8 +120,8 @@ Adds a comment to the specified issue.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  |
-| Issue | INTEGER | SELECT  |  The issue to comment on.  |
+| Project ID | STRING | SELECT  |  |
+| Issue ID | INTEGER | SELECT  |  ID of the issue to comment on.  |
 | Comment | STRING | TEXT  |  The comment to add to the issue.  |
 
 

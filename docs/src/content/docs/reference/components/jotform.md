@@ -58,7 +58,7 @@ Get all submissions for a specific form.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form | STRING | SELECT  |  Form to retrieve submissions for.  |
+| Form ID | STRING | SELECT  |  ID of the form to retrieve submissions for.  |
 
 
 ### Output

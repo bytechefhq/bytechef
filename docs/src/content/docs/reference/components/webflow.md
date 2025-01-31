@@ -57,8 +57,8 @@ Updates an order's status to fulfilled.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
-| Order | STRING | SELECT  |  |
+| Site ID | STRING | SELECT  |  |
+| Order ID | STRING | SELECT  |  |
 
 
 ### Output
@@ -86,9 +86,9 @@ Get collection item in a collection.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
-| Collection | STRING | SELECT  |    |
-| Item | STRING | SELECT  |    |
+| Site ID | STRING | SELECT  |  |
+| Collection ID | STRING | SELECT  |    |
+| Item  ID | STRING | SELECT  |    |
 
 
 ### Output

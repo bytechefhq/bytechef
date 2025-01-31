@@ -51,10 +51,10 @@ Creates a new activity.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Activity Type | STRING | SELECT  |  The activity type of this activity.  |
+| Activity Type ID | STRING | SELECT  |  Id of activity type for this activity.  |
 | Details | STRING | TEXT  |  Text body of this activity.  |
 | Parent Type | STRING | SELECT  |  Parent type to associate this activity with.  |
-| Parent Name | STRING | SELECT  |  Parent this activity will be associated with.  |
+| Parent ID | STRING | SELECT  |  ID of the parent this activity will be associated with.  |
 
 
 ### Output
@@ -86,9 +86,9 @@ Creates a new company.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Name | STRING | TEXT  |  The name of the company.  |
-| Assignee | STRING | SELECT  |  User that will be the owner of the company.  |
+| Assignee ID | STRING | SELECT  |  ID of the user that will be the owner of the company.  |
 | Email Domain | STRING | TEXT  |  The domain to which email addresses for the company belong.  |
-| Contact Type | STRING | SELECT  |  Contact type of the company.  |
+| Contact Type ID | STRING | SELECT  |  ID of the Contact type for the company.  |
 | Details | STRING | TEXT  |  Description of the company.  |
 | Phone Numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the company.  |
 | Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the company.  |
@@ -134,10 +134,10 @@ Creates a new person.
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Name | STRING | TEXT  |  The first and last name of the person.  |
 | Emails | [{STRING\(email), STRING\(category)}\($Email)] | ARRAY_BUILDER  |  Email addresses belonging to the person.  |
-| Assignee | STRING | SELECT  |  User that will be the owner of the person.  |
+| Assignee ID | STRING | SELECT  |  User ID that will be the owner of the person.  |
 | Title | STRING | TEXT  |  The professional title of the person.  |
-| Company | STRING | SELECT  |  Primary company with which the person is associated.  |
-| Contact type | STRING | SELECT  |  The unique identifier of the contact type of the person.  |
+| Company ID | STRING | SELECT  |  ID of the primary company with which the person is associated.  |
+| Contact Type ID | STRING | SELECT  |  The unique identifier of the contact type of the person.  |
 | Details | STRING | TEXT  |  Description of the person.  |
 | Phone Numbers | [{STRING\(number), STRING\(category)}] | ARRAY_BUILDER  |  Phone numbers belonging to the person.  |
 | Socials | [{STRING\(url), STRING\(category)}] | ARRAY_BUILDER  |  Social profiles belonging to the person.  |
@@ -184,7 +184,7 @@ Creates a new task in Copper.
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
 | Name | STRING | TEXT  |  The name of the task.  |
-| Assignee | STRING | SELECT  |  User to assign the task to.  |
+| Assignee ID | STRING | SELECT  |  ID of the user to assign the task to.  |
 | Due Date | DATE | DATE  |  The due date of the task.  |
 | Reminder Date | DATE | DATE  |  The reminder date of the task.  |
 | Description | STRING | TEXT  |  Description of the task.  |
@@ -206,7 +206,7 @@ Type: OBJECT
 |:------------:|:--------------------:|
 | STRING | TEXT  |
 | STRING | TEXT  |
-| Related Resource | {STRING\(id), STRING\(type)} | OBJECT_BUILDER  |  |
+| {STRING\(id), STRING\(type)} | OBJECT_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
@@ -214,7 +214,7 @@ Type: OBJECT
 | STRING | TEXT  |
 | STRING | TEXT  |
 | STRING | TEXT  |
-| [] | ARRAY_BUILDER  |
+| [STRING] | ARRAY_BUILDER  |
 | [] | ARRAY_BUILDER  |
 | STRING | TEXT  |
 | STRING | TEXT  |

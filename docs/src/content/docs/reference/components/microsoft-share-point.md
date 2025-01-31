@@ -52,8 +52,8 @@ Creates a new folder at path you specify.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
-| Parent Folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
+| Site ID | STRING | SELECT  |  |
+| Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
 | Folder Name | STRING | TEXT  |  |
 
 
@@ -83,7 +83,7 @@ Creates a new list
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
+| Site ID | STRING | SELECT  |  |
 | List Name | STRING | TEXT  |  |
 | List Description | STRING | TEXT  |  |
 
@@ -115,8 +115,8 @@ Creates a new item in a list.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
-| List | STRING | SELECT  |  |
+| Site ID | STRING | SELECT  |  |
+| List ID | STRING | SELECT  |  |
 | DYNAMIC_PROPERTIES | null  |
 
 
@@ -145,8 +145,8 @@ Upload file to Microsoft SharePoint folder.
 
 |      Name      |     Type     |     Control Type     |     Description     |
 |:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site | STRING | SELECT  |  |
-| Parent Folder | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
+| Site ID | STRING | SELECT  |  |
+| Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
 | File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
 
 
