@@ -2,12 +2,16 @@ import {Button} from '@/components/ui/button';
 import {HistoryIcon} from 'lucide-react';
 
 interface ProjectHeaderHistoryButtonProps {
-    onClick: () => void;
+    handleShowProjectVersionHistorySheet: () => void;
 }
 
-const ProjectHeaderHistoryButton = ({onClick}: ProjectHeaderHistoryButtonProps) => {
+const ProjectHeaderHistoryButton = ({handleShowProjectVersionHistorySheet}: ProjectHeaderHistoryButtonProps) => {
     return (
-        <Button className="justify-start hover:bg-surface-neutral-primary-hover" onClick={onClick} variant="ghost">
+        <Button
+            className="justify-start hover:bg-surface-neutral-primary-hover"
+            onClick={handleShowProjectVersionHistorySheet}
+            variant="ghost"
+        >
             <HistoryIcon /> Project History
         </Button>
     );

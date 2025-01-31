@@ -62,7 +62,7 @@ const ProjectHeaderSettingsMenu = ({
 
                     <TabsContent className="mt-0" value="workflow">
                         <ProjectHeaderWorkflowTabButtons
-                            onShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
+                            handleShowDeleteWorkflowAlertDialog={() => setShowDeleteWorkflowAlertDialog(true)}
                             project={project}
                             workflowId={workflowId}
                         />
@@ -70,8 +70,8 @@ const ProjectHeaderSettingsMenu = ({
 
                     <TabsContent className="mt-0" value="project">
                         <ProjectHeaderProjectTabButtons
-                            onDelete={() => setShowDeleteProjectAlertDialog(true)}
-                            onEdit={() => setShowEditProjectDialog(true)}
+                            handleDeleteProject={() => setShowDeleteProjectAlertDialog(true)}
+                            handleEditProject={() => setShowEditProjectDialog(true)}
                             project={project}
                         />
                     </TabsContent>
