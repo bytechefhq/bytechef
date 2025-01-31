@@ -14,12 +14,12 @@ import {ChangeEvent, useRef, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const ProjectHeaderProjectTabButtons = ({
-    onDelete,
-    onEdit,
+    handleDeleteProject,
+    handleEditProject,
     project,
 }: {
-    onDelete: () => void;
-    onEdit: () => void;
+    handleDeleteProject: () => void;
+    handleEditProject: () => void;
     project: Project;
 }) => {
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
@@ -73,10 +73,10 @@ const ProjectHeaderProjectTabButtons = ({
         <div className="flex flex-col">
             <Button
                 className="justify-start hover:bg-surface-neutral-primary-hover"
-                onClick={() => onEdit()}
+                onClick={() => handleEditProject()}
                 variant="ghost"
             >
-                <EditIcon /> Edit Project
+                <EditIcon /> Edit
             </Button>
 
             <Button
@@ -101,13 +101,15 @@ const ProjectHeaderProjectTabButtons = ({
 
             <Separator />
 
-            <ProjectHeaderHistoryButton onClick={() => setShowProjectVersionHistorySheet(true)} />
+            <ProjectHeaderHistoryButton
+                handleShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
+            />
 
             <Separator />
 
             <Button
                 className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
-                onClick={() => onDelete()}
+                onClick={() => handleDeleteProject()}
                 variant="ghost"
             >
                 <Trash2Icon /> Delete

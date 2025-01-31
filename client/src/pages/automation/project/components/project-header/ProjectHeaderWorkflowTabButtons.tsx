@@ -8,11 +8,11 @@ import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 const ProjectHeaderWorkflowTabButtons = ({
-    onShowDeleteWorkflowAlertDialog,
+    handleShowDeleteWorkflowAlertDialog,
     project,
     workflowId,
 }: {
-    onShowDeleteWorkflowAlertDialog: () => void;
+    handleShowDeleteWorkflowAlertDialog: () => void;
     project: Project;
     workflowId: string;
 }) => {
@@ -36,7 +36,7 @@ const ProjectHeaderWorkflowTabButtons = ({
                 onClick={() => setShowEditWorkflowDialog(true)}
                 variant="ghost"
             >
-                <EditIcon /> Edit Workflow
+                <EditIcon /> Edit
             </Button>
 
             <Button
@@ -64,7 +64,7 @@ const ProjectHeaderWorkflowTabButtons = ({
 
             <Button
                 className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
-                onClick={() => onShowDeleteWorkflowAlertDialog()}
+                onClick={() => handleShowDeleteWorkflowAlertDialog()}
                 variant="ghost"
             >
                 <Trash2Icon /> Delete
