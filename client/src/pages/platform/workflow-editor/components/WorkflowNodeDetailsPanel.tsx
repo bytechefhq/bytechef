@@ -29,6 +29,7 @@ import {
 } from '@/shared/queries/platform/triggerDefinitions.queries';
 import {WorkflowNodeDynamicPropertyKeys} from '@/shared/queries/platform/workflowNodeDynamicProperties.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
+import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {
     ComponentPropertiesType,
@@ -89,6 +90,7 @@ const WorkflowNodeDetailsPanel = ({
     updateWorkflowMutation: UpdateWorkflowMutationType;
     workflowNodeOutputs: WorkflowNodeOutput[];
 }) => {
+    const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
     const [currentOperationName, setCurrentOperationName] = useState('');
     const [currentOperationProperties, setCurrentOperationProperties] = useState<Array<PropertyAllType>>([]);
 
@@ -171,6 +173,16 @@ const WorkflowNodeDetailsPanel = ({
         },
         !!currentNode && !!currentNode.taskDispatcher
     );
+
+    const displayConditionsQuery = useGetWorkflowNodeParameterDisplayConditionsQuery(
+        {
+            id: workflow.id!,
+            workflowNodeName: currentNodeName!,
+        },
+        !!currentNodeName && currentNodeName !== 'manual'
+    );
+
+    const {data: workflowNodeParameterDisplayConditions} = displayConditionsQuery;
 
     const currentNodeDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -438,6 +450,15 @@ const WorkflowNodeDetailsPanel = ({
 
     const handlePanelClose = useCallback(() => useWorkflowNodeDetailsPanelStore.getState().reset(), []);
 
+    // Set current node name
+    useEffect(() => {
+        if (currentNode?.name) {
+            setCurrentNodeName(currentNode?.name);
+        } else {
+            setCurrentNodeName(undefined);
+        }
+    }, [currentNode?.name]);
+
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
         if (currentNodeDefinition?.properties) {
@@ -574,6 +595,26 @@ const WorkflowNodeDetailsPanel = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [componentActions, currentNode?.workflowNodeName]);
+
+    // Update display conditions when currentNode changes
+    useEffect(() => {
+        if (currentNode && workflowNodeParameterDisplayConditions?.displayConditions) {
+            setCurrentNode({
+                ...currentNode,
+                displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+            });
+        }
+
+        if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
+            if (currentComponent.workflowNodeName === currentNode?.name) {
+                setCurrentComponent({
+                    ...currentComponent,
+                    displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
+                });
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
 
     if (!workflowNodeDetailsPanelOpen || !currentNode?.workflowNodeName || !currentTaskData) {
         return <></>;
@@ -727,6 +768,7 @@ const WorkflowNodeDetailsPanel = ({
                                     (!operationDataMissing && currentOperationProperties?.length ? (
                                         <Properties
                                             customClassName="p-4"
+                                            displayConditionsQuery={displayConditionsQuery}
                                             key={`${currentNode?.workflowNodeName}_${currentOperationName}_properties`}
                                             operationName={currentOperationName}
                                             properties={currentOperationProperties}

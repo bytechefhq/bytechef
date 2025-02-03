@@ -1,5 +1,7 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {GetWorkflowNodeParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
+import {UseQueryResult} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
 import {Fragment} from 'react';
 import {FieldValues} from 'react-hook-form/dist/types';
@@ -13,6 +15,7 @@ interface PropertiesProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */
     control?: Control<any, any>;
     controlPath?: string;
+    displayConditionsQuery?: UseQueryResult<GetWorkflowNodeParameterDisplayConditions200Response, Error>;
     customClassName?: string;
     operationName?: string;
     formState?: FormState<FieldValues>;
@@ -24,6 +27,7 @@ const Properties = ({
     control,
     controlPath,
     customClassName,
+    displayConditionsQuery,
     formState,
     operationName,
     path,
@@ -55,6 +59,7 @@ const Properties = ({
                     <Property
                         control={control}
                         controlPath={controlPath}
+                        displayConditionsQuery={displayConditionsQuery}
                         formState={formState}
                         key={`${currentNode?.workflowNodeName}_${currentNode?.operationName}_${property.name}_${index}`}
                         operationName={operationName}
@@ -78,6 +83,7 @@ const Properties = ({
                                 <Property
                                     control={control}
                                     controlPath={controlPath}
+                                    displayConditionsQuery={displayConditionsQuery}
                                     formState={formState}
                                     key={`${property.name}_${currentNode?.operationName}_${index}`}
                                     operationName={operationName}

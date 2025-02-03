@@ -10,8 +10,7 @@ import WorkflowTestChatPanel from '@/pages/platform/workflow-editor/components/w
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {ComponentDefinitionBasic, TaskDispatcherDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetPreviousWorkflowNodeOutputsQuery} from '@/shared/queries/platform/workflowNodeOutputs.queries';
-import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -29,27 +28,17 @@ const WorkflowEditorLayout = ({
     leftSidebarOpen,
     taskDispatcherDefinitions,
 }: WorkflowEditorLayoutProps) => {
-    const [currentNodeName, setCurrentNodeName] = useState<string | undefined>();
-
     const {componentActions, workflow} = useWorkflowDataStore();
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
+    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore();
 
     const {updateWorkflowMutation} = useWorkflowMutation();
-
-    const {data: workflowNodeParameterDisplayConditions} = useGetWorkflowNodeParameterDisplayConditionsQuery(
-        {
-            id: workflow.id!,
-            workflowNodeName: currentNodeName!,
-        },
-        !!currentNodeName && currentNodeName !== 'manual'
-    );
 
     const {data: workflowNodeOutputs, refetch: refetchWorkflowNodeOutputs} = useGetPreviousWorkflowNodeOutputsQuery(
         {
             id: workflow.id!,
-            lastWorkflowNodeName: currentNodeName,
+            lastWorkflowNodeName: currentNode?.name,
         },
-        !!componentActions?.length && !!currentNodeName && !!currentNode && !currentNode?.trigger
+        !!componentActions?.length && !!currentNode && !!currentNode?.name && !currentNode?.trigger
     );
 
     let previousComponentDefinitions: ComponentDefinitionBasic[] = [];
@@ -73,14 +62,6 @@ const WorkflowEditorLayout = ({
             .filter((componentDefinition) => !!componentDefinition);
     }
 
-    useEffect(() => {
-        if (currentNode?.name) {
-            setCurrentNodeName(currentNode?.name);
-        } else {
-            setCurrentNodeName(undefined);
-        }
-    }, [currentNode?.name]);
-
     // refetch workflowNodeOutputs when a task is opened
     useEffect(() => {
         if (!currentNode || currentNode?.trigger || workflowNodeOutputs || !workflow?.nodeNames) {
@@ -89,27 +70,7 @@ const WorkflowEditorLayout = ({
 
         refetchWorkflowNodeOutputs();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentNodeName, workflow?.nodeNames.length]);
-
-    // update display conditions when currentNode changes
-    useEffect(() => {
-        if (currentNode && workflowNodeParameterDisplayConditions?.displayConditions) {
-            setCurrentNode({
-                ...currentNode,
-                displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
-            });
-        }
-
-        if (currentComponent && workflowNodeParameterDisplayConditions?.displayConditions) {
-            if (currentComponent.workflowNodeName === currentNode?.name) {
-                setCurrentComponent({
-                    ...currentComponent,
-                    displayConditions: workflowNodeParameterDisplayConditions.displayConditions,
-                });
-            }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflowNodeParameterDisplayConditions?.displayConditions, currentNode?.name]);
+    }, [currentNode?.name, workflow?.nodeNames.length]);
 
     return (
         <ReactFlowProvider>
