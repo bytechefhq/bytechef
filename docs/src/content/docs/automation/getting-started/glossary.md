@@ -23,6 +23,10 @@ Connections are used to connect a component to an external service or applicatio
 
 These are events that initiate a workflow. Triggers listen for specific occurrences, such as receiving a new email, a change in a database, or a scheduled time event, and start the workflow when these events occur.
 
+## Projects
+
+Projects are containers that hold one or more workflows. Projects help organize and manage workflows, making it easier to group related automation processes together. Users can create, edit, duplicate, import, and delete projects to streamline their automation efforts.
+
 ## Workflows
 
 Workflows are a series of actions and triggers that automate processes within the ByteChef platform. Workflows can be created by combining various components and configuring them to work together seamlessly. Users can also customize workflows by adding conditions, loops, and other logic to create more complex automation processes.
