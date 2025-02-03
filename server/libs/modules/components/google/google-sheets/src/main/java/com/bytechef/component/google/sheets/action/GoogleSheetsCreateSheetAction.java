@@ -22,10 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.createRange;
 
@@ -35,16 +35,12 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.AddSheetRequest;
-import com.google.api.services.sheets.v4.model.AddSheetResponse;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Request;
-import com.google.api.services.sheets.v4.model.Response;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -78,7 +74,7 @@ public class GoogleSheetsCreateSheetAction {
     private GoogleSheetsCreateSheetAction() {
     }
 
-    public static Map<String, Object> perform(
+    public static SheetRecord perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
@@ -112,27 +108,11 @@ public class GoogleSheetsCreateSheetAction {
             appendValues(sheets, spreadsheetId, createRange(sheetName, 1), valueRange, "USER_ENTERED");
         }
 
-        return getNewSheetResponse(spreadsheetId, batchUpdateSpreadsheetResponse, headers);
-    }
+        SheetProperties sheetProperties = batchUpdateSpreadsheetResponse.getReplies()
+            .getFirst()
+            .getAddSheet()
+            .getProperties();
 
-    private static Map<String, Object> getNewSheetResponse(
-        String spreadsheetId, BatchUpdateSpreadsheetResponse batchUpdateSpreadsheetResponse, List<Object> headers) {
-
-        List<Response> responses = batchUpdateSpreadsheetResponse.getReplies();
-        Response response = responses.getFirst();
-        AddSheetResponse addSheet = response.getAddSheet();
-        SheetProperties sheetProperties = addSheet.getProperties();
-
-        Map<String, Object> newsSheet = new LinkedHashMap<>();
-
-        newsSheet.put(SPREADSHEET_ID, spreadsheetId);
-        newsSheet.put(SHEET_ID, sheetProperties.getSheetId());
-        newsSheet.put(SHEET_NAME, sheetProperties.getTitle());
-
-        if (headers != null) {
-            newsSheet.put(HEADERS, headers);
-        }
-
-        return newsSheet;
+        return new SheetRecord(spreadsheetId, sheetProperties.getSheetId(), sheetProperties.getTitle(), headers);
     }
 }

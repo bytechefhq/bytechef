@@ -20,6 +20,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -38,7 +39,6 @@ import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
 import com.google.api.services.sheets.v4.model.Response;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -101,14 +101,9 @@ class GoogleSheetsCreateSheetActionTest {
             when(mockedBatchUpdate.execute())
                 .thenReturn(batchUpdateSpreadsheetResponse);
 
-            Map<String, Object> expectedResponse = new HashMap<>();
+            SheetRecord expectedResponse = new SheetRecord("spreadsheetId", 123, "sheetName", headers);
 
-            expectedResponse.put(SPREADSHEET_ID, "spreadsheetId");
-            expectedResponse.put(SHEET_ID, 123);
-            expectedResponse.put(SHEET_NAME, "sheetName");
-            expectedResponse.put(HEADERS, headers);
-
-            Map<String, Object> result = GoogleSheetsCreateSheetAction.perform(parameters, parameters, mockedContext);
+            SheetRecord result = GoogleSheetsCreateSheetAction.perform(parameters, parameters, mockedContext);
 
             assertEquals(expectedResponse, result);
             assertEquals("sheetName", sheetNameArgumentCaptor.getValue());

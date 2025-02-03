@@ -18,22 +18,26 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
+import com.google.api.services.sheets.v4.model.SheetProperties;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Nikolina Spehar
@@ -45,13 +49,19 @@ public class GoogleSheetsListSheetsAction {
         .description("Get all sheets from the spreadsheet.")
         .properties(
             SPREADSHEET_ID_PROPERTY)
-        .output()
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        string(SPREADSHEET_ID),
+                        integer(SHEET_ID),
+                        string(SHEET_NAME))))
         .perform(GoogleSheetsListSheetsAction::perform);
 
     private GoogleSheetsListSheetsAction() {
     }
 
-    public static List<Map<String, Object>> perform(
+    public static List<SheetRecord> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
@@ -59,10 +69,10 @@ public class GoogleSheetsListSheetsAction {
         return getSheetsListResponse(sheets, inputParameters.getRequiredString(SPREADSHEET_ID));
     }
 
-    private static List<Map<String, Object>> getSheetsListResponse(
+    private static List<SheetRecord> getSheetsListResponse(
         Sheets sheets, String spreadsheetId) throws IOException {
 
-        List<Map<String, Object>> sheetsList = new ArrayList<>();
+        List<SheetRecord> sheetsList = new ArrayList<>();
 
         Collection<Sheet> spreadsheetData = sheets.spreadsheets()
             .get(spreadsheetId)
@@ -70,18 +80,12 @@ public class GoogleSheetsListSheetsAction {
             .getSheets();
 
         for (Sheet sheet : spreadsheetData) {
-            Integer sheetId = sheet.getProperties()
-                .getSheetId();
-            String sheetName = sheet.getProperties()
-                .getTitle();
+            SheetProperties sheetProperties = sheet.getProperties();
 
-            Map<String, Object> sheetProperties = new LinkedHashMap<>();
+            SheetRecord sheetRecord = new SheetRecord(
+                spreadsheetId, sheetProperties.getSheetId(), sheetProperties.getTitle(), null);
 
-            sheetProperties.put(SPREADSHEET_ID, spreadsheetId);
-            sheetProperties.put(SHEET_ID, sheetId);
-            sheetProperties.put(SHEET_NAME, sheetName);
-
-            sheetsList.add(sheetProperties);
+            sheetsList.add(sheetRecord);
         }
 
         return sheetsList;
