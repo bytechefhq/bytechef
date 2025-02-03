@@ -18,13 +18,13 @@ package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.INCLUDE_ITEMS_FROM_ALL_DRIVES_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsRowUtils.getRowValues;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.appendValues;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.columnToLabel;
 
@@ -34,10 +34,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author Monika Kušter
@@ -62,7 +59,7 @@ public class GoogleSheetsCreateColumnAction {
     private GoogleSheetsCreateColumnAction() {
     }
 
-    public static Map<String, Object> perform(
+    public static SheetRecord perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
@@ -78,17 +75,8 @@ public class GoogleSheetsCreateColumnAction {
 
         appendValues(sheets, spreadSheetId, range, valueRange, "USER_ENTERED");
 
-        return getResponseMap(spreadSheetId, sheetName, sheets);
-    }
+        List<Object> headers = getRowValues(sheets, spreadSheetId, sheetName, 1);
 
-    private static Map<String, Object> getResponseMap(String spreadSheetId, String sheetName, Sheets sheets)
-        throws IOException {
-        Map<String, Object> responseMap = new HashMap<>();
-
-        responseMap.put(SPREADSHEET_ID, spreadSheetId);
-        responseMap.put(SHEET_NAME, sheetName);
-        responseMap.put(HEADERS, getRowValues(sheets, spreadSheetId, sheetName, 1));
-
-        return responseMap;
+        return new SheetRecord(spreadSheetId, null, sheetName, headers);
     }
 }

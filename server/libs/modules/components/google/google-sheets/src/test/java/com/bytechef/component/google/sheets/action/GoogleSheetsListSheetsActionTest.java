@@ -16,9 +16,8 @@
 
 package com.bytechef.component.google.sheets.action;
 
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -82,31 +81,31 @@ class GoogleSheetsListSheetsActionTest {
             when(mockedSpreadsheet.getSheets())
                 .thenReturn(expectedSheets);
 
-            List<Map<String, Object>> result = GoogleSheetsListSheetsAction.perform(
+            List<SheetRecord> result = GoogleSheetsListSheetsAction.perform(
                 parameters, parameters, mockedContext);
 
             assertEquals(3, result.size());
 
             assertEquals("spreadsheetId", result.getFirst()
-                .get(SPREADSHEET_ID));
+                .spreadsheetId());
             assertEquals(1, result.getFirst()
-                .get(SHEET_ID));
+                .sheetId());
             assertEquals("sheetName1", result.getFirst()
-                .get(SHEET_NAME));
+                .sheetName());
 
             assertEquals("spreadsheetId", result.get(1)
-                .get(SPREADSHEET_ID));
+                .spreadsheetId());
             assertEquals(2, result.get(1)
-                .get(SHEET_ID));
+                .sheetId());
             assertEquals("sheetName2", result.get(1)
-                .get(SHEET_NAME));
+                .sheetName());
 
             assertEquals("spreadsheetId", result.get(2)
-                .get(SPREADSHEET_ID));
+                .spreadsheetId());
             assertEquals(3, result.get(2)
-                .get(SHEET_ID));
+                .sheetId());
             assertEquals("sheetName3", result.get(2)
-                .get(SHEET_NAME));
+                .sheetName());
         }
     }
 }

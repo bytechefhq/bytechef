@@ -17,9 +17,9 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.google.sheets.action.GoogleSheetsCreateColumnAction.COLUMN_NAME;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.HEADERS;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -33,7 +33,6 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -81,13 +80,9 @@ class GoogleSheetsCreateColumnActionTest {
                     valueInputOptionArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
 
-            Map<String, Object> expectedResponse = new HashMap<>();
+            SheetRecord expectedResponse = new SheetRecord("spreadsheetId", null, "name", newHeaders);
 
-            expectedResponse.put(SPREADSHEET_ID, "spreadsheetId");
-            expectedResponse.put(SHEET_NAME, "name");
-            expectedResponse.put(HEADERS, newHeaders);
-
-            Map<String, Object> result = GoogleSheetsCreateColumnAction.perform(parameters, parameters, mockedContext);
+            SheetRecord result = GoogleSheetsCreateColumnAction.perform(parameters, parameters, mockedContext);
 
             assertEquals(expectedResponse, result);
             assertEquals("name", sheetNameArgumentCaptor.getValue());
