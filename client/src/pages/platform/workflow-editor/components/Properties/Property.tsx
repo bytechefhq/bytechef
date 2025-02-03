@@ -21,11 +21,11 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
-import {Option} from '@/shared/middleware/platform/configuration';
-import {useGetWorkflowNodeParameterDisplayConditionsQuery} from '@/shared/queries/platform/workflowNodeParameters.queries';
+import {GetWorkflowNodeParameterDisplayConditions200Response, Option} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {UseQueryResult} from '@tanstack/react-query';
 import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
 import {decode} from 'html-entities';
@@ -64,6 +64,7 @@ interface PropertyProps {
     controlPath?: string;
     customClassName?: string;
     deletePropertyButton?: ReactNode;
+    displayConditionsQuery?: UseQueryResult<GetWorkflowNodeParameterDisplayConditions200Response, Error>;
     formState?: FormState<FieldValues>;
     objectName?: string;
     operationName?: string;
@@ -81,6 +82,7 @@ const Property = ({
     controlPath = 'parameters',
     customClassName,
     deletePropertyButton,
+    displayConditionsQuery,
     formState,
     objectName,
     operationName,
@@ -114,7 +116,7 @@ const Property = ({
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         (property.type !== 'STRING' && property.expressionEnabled) || false
     );
-    const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(false);
+    const [isFetchingCurrentDisplayCondition, setIsFetchingCurrentDisplayCondition] = useState(true);
 
     const editorRef = useRef<Editor>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -125,14 +127,11 @@ const Property = ({
     const {setDataPillPanelOpen} = useDataPillPanelStore();
     const {workflow} = useWorkflowDataStore();
 
-    const {isFetchedAfterMount: isDisplayConditionFetched} = useGetWorkflowNodeParameterDisplayConditionsQuery(
-        {
-            id: workflow.id!,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-            workflowNodeName: currentNode?.workflowNodeName!,
-        },
-        !!currentNode?.workflowNodeName
-    );
+    const {isFetchedAfterMount: isDisplayConditionsFetched, isPending: isDisplayConditionsPending} =
+        displayConditionsQuery ?? {
+            isFetchedAfterMount: false,
+            isPending: false,
+        };
 
     const previousOperationName = usePrevious(currentNode?.operationName);
 
@@ -433,39 +432,51 @@ const Property = ({
         });
     };
 
-    const handleSelectChange = (value: string, name: string) => {
-        if (!currentComponent || !workflow.id || !name || !path || !updateWorkflowNodeParameterMutation) {
-            return;
-        }
+    const handleSelectChange = useCallback(
+        (value: string, name: string) => {
+            if (!currentComponent || !workflow.id || !name || !path || !updateWorkflowNodeParameterMutation) {
+                return;
+            }
 
-        if (value === propertyParameterValue) {
-            return;
-        }
+            if (value === propertyParameterValue) {
+                return;
+            }
 
-        setSelectValue(value);
-        setPropertyParameterValue(value);
+            setSelectValue(value);
+            setPropertyParameterValue(value);
 
-        let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
+            let actualValue: boolean | null | number | string = type === 'BOOLEAN' ? value === 'true' : value;
 
-        if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
-            actualValue = parseInt(value);
-        } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
-            actualValue = parseFloat(value);
-        }
+            if (type === 'INTEGER' && !mentionInputValue.startsWith('${')) {
+                actualValue = parseInt(value);
+            } else if (type === 'NUMBER' && !mentionInputValue.startsWith('${')) {
+                actualValue = parseFloat(value);
+            }
 
-        if (value === 'null' || value === '') {
-            actualValue = null;
-        }
+            if (value === 'null' || value === '') {
+                actualValue = null;
+            }
 
-        saveProperty({
-            includeInMetadata: custom,
+            saveProperty({
+                includeInMetadata: custom,
+                path,
+                type,
+                updateWorkflowNodeParameterMutation,
+                value: actualValue,
+                workflowId: workflow.id,
+            });
+        },
+        [
+            currentComponent,
+            custom,
+            mentionInputValue,
             path,
+            propertyParameterValue,
             type,
             updateWorkflowNodeParameterMutation,
-            value: actualValue,
-            workflowId: workflow.id,
-        });
-    };
+            workflow.id,
+        ]
+    );
 
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
@@ -758,24 +769,30 @@ const Property = ({
         if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
             setIsFetchingCurrentDisplayCondition(true);
 
-            if (isDisplayConditionFetched) {
+            if (isDisplayConditionsFetched) {
                 setIsFetchingCurrentDisplayCondition(false);
             }
         }
-    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionFetched]);
+    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsFetched]);
 
     if (hidden) {
         return <></>;
     }
 
-    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
-        return <></>;
+    if (displayCondition && isDisplayConditionsPending && type !== 'ARRAY' && type !== 'OBJECT') {
+        return (
+            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
+                <Skeleton className="h-5 w-1/4" />
+
+                <Skeleton className="h-9 w-full" />
+            </div>
+        );
     }
 
     if (
         displayCondition &&
         currentComponent?.displayConditions?.[displayCondition] &&
-        isFetchingCurrentDisplayCondition &&
+        (isFetchingCurrentDisplayCondition || isDisplayConditionsPending) &&
         type !== 'ARRAY' &&
         type !== 'OBJECT'
     ) {
@@ -786,6 +803,10 @@ const Property = ({
                 <Skeleton className="h-9 w-full" />
             </div>
         );
+    }
+
+    if (displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+        return <></>;
     }
 
     return (
