@@ -51,6 +51,7 @@ import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -444,4 +445,7 @@ public class GoogleSheetsUtils {
         return options;
     }
 
+    @SuppressFBWarnings("EI")
+    public record SheetRecord(String spreadsheetId, Integer sheetId, String sheetName, List<Object> headers) {
+    }
 }
