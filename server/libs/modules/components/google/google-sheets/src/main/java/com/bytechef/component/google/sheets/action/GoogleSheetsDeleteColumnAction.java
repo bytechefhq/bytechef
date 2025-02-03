@@ -61,8 +61,9 @@ public class GoogleSheetsDeleteColumnAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
         String label = inputParameters.getRequiredString(LABEL);
+
         Integer columnNumber = labelToColum(label);
-        Sheets sheets = GoogleServices.getSheets(connectionParameters);
+
         DimensionRange dimensionRange = new DimensionRange()
             .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
             .setDimension("COLUMNS")
@@ -76,6 +77,8 @@ public class GoogleSheetsDeleteColumnAction {
 
         BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
             .setRequests(List.of(request));
+
+        Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
         sheets.spreadsheets()
             .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
