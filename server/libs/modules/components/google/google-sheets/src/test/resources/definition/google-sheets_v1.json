@@ -116,9 +116,9 @@
       "controlType" : "SELECT"
     } ],
     "title" : "Clear Sheet",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -224,9 +224,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Column",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -372,9 +372,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Create Sheet",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -450,9 +450,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Column",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -551,9 +551,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Delete Row",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -609,9 +609,9 @@
       }
     } ],
     "title" : "Delete Sheet",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -740,9 +740,9 @@
       "optionsDataSource" : null
     } ],
     "title" : "Find Row by Number",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -895,9 +895,9 @@
       }
     } ],
     "title" : "Insert Multiple Rows",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1050,9 +1050,9 @@
       }
     } ],
     "title" : "Insert Row",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1062,8 +1062,169 @@
     "name" : "listSheets",
     "outputDefinition" : {
       "output" : null,
-      "outputResponse" : null,
-      "outputSchema" : null,
+      "outputResponse" : {
+        "outputSchema" : {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : null,
+          "type" : "OBJECT",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "additionalProperties" : null,
+          "multipleValues" : null,
+          "options" : null,
+          "properties" : [ {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "spreadsheetId",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "sheetId",
+            "type" : "INTEGER",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "maxValue" : null,
+            "minValue" : null,
+            "options" : null,
+            "controlType" : "INTEGER",
+            "optionsDataSource" : null
+          }, {
+            "advancedOption" : null,
+            "description" : null,
+            "displayCondition" : null,
+            "expressionEnabled" : null,
+            "hidden" : null,
+            "metadata" : { },
+            "required" : null,
+            "name" : "sheetName",
+            "type" : "STRING",
+            "defaultValue" : null,
+            "exampleValue" : null,
+            "label" : null,
+            "placeholder" : null,
+            "controlType" : "TEXT",
+            "languageId" : null,
+            "maxLength" : null,
+            "minLength" : null,
+            "options" : null,
+            "optionsDataSource" : null
+          } ],
+          "controlType" : "OBJECT_BUILDER",
+          "optionsDataSource" : null
+        },
+        "sampleOutput" : null
+      },
+      "outputSchema" : {
+        "advancedOption" : null,
+        "description" : null,
+        "displayCondition" : null,
+        "expressionEnabled" : null,
+        "hidden" : null,
+        "metadata" : { },
+        "required" : null,
+        "name" : null,
+        "type" : "OBJECT",
+        "defaultValue" : null,
+        "exampleValue" : null,
+        "label" : null,
+        "placeholder" : null,
+        "additionalProperties" : null,
+        "multipleValues" : null,
+        "options" : null,
+        "properties" : [ {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "spreadsheetId",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "sheetId",
+          "type" : "INTEGER",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "maxValue" : null,
+          "minValue" : null,
+          "options" : null,
+          "controlType" : "INTEGER",
+          "optionsDataSource" : null
+        }, {
+          "advancedOption" : null,
+          "description" : null,
+          "displayCondition" : null,
+          "expressionEnabled" : null,
+          "hidden" : null,
+          "metadata" : { },
+          "required" : null,
+          "name" : "sheetName",
+          "type" : "STRING",
+          "defaultValue" : null,
+          "exampleValue" : null,
+          "label" : null,
+          "placeholder" : null,
+          "controlType" : "TEXT",
+          "languageId" : null,
+          "maxLength" : null,
+          "minLength" : null,
+          "options" : null,
+          "optionsDataSource" : null
+        } ],
+        "controlType" : "OBJECT_BUILDER",
+        "optionsDataSource" : null
+      },
       "sampleOutput" : null
     },
     "properties" : [ {
@@ -1091,9 +1252,9 @@
       }
     } ],
     "title" : "List Sheets",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1261,9 +1422,9 @@
       }
     } ],
     "title" : "Update Row",
-    "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null,
-    "processErrorResponse" : null
+    "perform" : { }
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -1422,14 +1583,14 @@
     "type" : "DYNAMIC_WEBHOOK",
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
-    "poll" : null,
-    "webhookDisable" : { },
-    "workflowNodeDescription" : null,
     "deduplicate" : null,
-    "processErrorResponse" : null,
+    "webhookDisable" : { },
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
+    "processErrorResponse" : null,
+    "workflowNodeDescription" : null,
+    "poll" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
