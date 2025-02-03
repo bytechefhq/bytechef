@@ -18,6 +18,7 @@ package com.bytechef.component.google.sheets.util;
 
 import com.google.api.services.sheets.v4.Sheets;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +32,7 @@ public class GoogleSheetsRowUtils {
     public static List<Object> getRowValues(
         Sheets sheets, String spreadSheetId, String sheetName, Integer rowNumber) throws IOException {
 
-        return sheets.spreadsheets()
+        List<List<Object>> sheetRowValues = sheets.spreadsheets()
             .values()
             .batchGet(spreadSheetId)
             .setRanges(List.of(GoogleSheetsUtils.createRange(sheetName, rowNumber)))
@@ -41,7 +42,8 @@ public class GoogleSheetsRowUtils {
             .execute()
             .getValueRanges()
             .getFirst()
-            .getValues()
-            .getFirst();
+            .getValues();
+
+        return sheetRowValues == null ? new ArrayList<>() : sheetRowValues.getFirst();
     }
 }
