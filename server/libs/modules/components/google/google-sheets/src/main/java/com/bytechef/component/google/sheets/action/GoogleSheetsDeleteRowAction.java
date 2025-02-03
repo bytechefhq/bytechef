@@ -19,21 +19,13 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.deleteDimension;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
-import com.google.api.services.sheets.v4.model.DimensionRange;
-import com.google.api.services.sheets.v4.model.Request;
-import java.util.List;
 
 /**
  * @author Monika Kušter
@@ -58,24 +50,7 @@ public class GoogleSheetsDeleteRowAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
-        Sheets sheets = GoogleServices.getSheets(connectionParameters);
-        DimensionRange dimensionRange = new DimensionRange()
-            .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
-            .setDimension("ROWS")
-            .setStartIndex(inputParameters.getRequiredInteger(ROW_NUMBER) - 1)
-            .setEndIndex(inputParameters.getRequiredInteger(ROW_NUMBER));
-
-        Request request = new Request()
-            .setDeleteDimension(
-                new DeleteDimensionRequest()
-                    .setRange(dimensionRange));
-
-        BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
-            .setRequests(List.of(request));
-
-        sheets.spreadsheets()
-            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
-            .execute();
+        deleteDimension(inputParameters, connectionParameters, inputParameters.getRequiredInteger(ROW_NUMBER), "ROWS");
 
         return null;
     }

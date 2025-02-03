@@ -26,6 +26,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_WHOLE_ROW;
@@ -43,6 +44,10 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
+import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.ValueRange;
@@ -203,6 +208,30 @@ public class GoogleSheetsUtils {
                 }
             }
         };
+    }
+
+    public static void deleteDimension(
+        Parameters inputParameters, Parameters connectionParameters, Integer index, String dimension) throws Exception {
+
+        Sheets sheets = GoogleServices.getSheets(connectionParameters);
+
+        DimensionRange dimensionRange = new DimensionRange()
+            .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
+            .setDimension(dimension)
+            .setStartIndex(index - 1)
+            .setEndIndex(index);
+
+        Request request = new Request()
+            .setDeleteDimension(
+                new DeleteDimensionRequest()
+                    .setRange(dimensionRange));
+
+        BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
+            .setRequests(List.of(request));
+
+        sheets.spreadsheets()
+            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
+            .execute();
     }
 
     public static Map<String, Object> getMapOfValuesForRow(Parameters inputParameters, Sheets sheets, List<Object> row)
@@ -374,7 +403,7 @@ public class GoogleSheetsUtils {
 
                         for (Object o : list) {
                             if (o instanceof Map<?, ?> map) {
-                                int indexOfColumnToUpdate = labelToColum((String) map.get(COLUMN)) - 1;
+                                int indexOfColumnToUpdate = labelToColumn((String) map.get(COLUMN)) - 1;
 
                                 if (indexOfColumnToUpdate >= rowToUpdate.size()) {
                                     for (int i = rowToUpdate.size(); i <= indexOfColumnToUpdate; i++) {
@@ -430,7 +459,7 @@ public class GoogleSheetsUtils {
         return options;
     }
 
-    public static Integer labelToColum(String label) {
+    public static Integer labelToColumn(String label) {
         int columnNumber = 0;
 
         for (int i = 0; i < label.length(); i++) {
