@@ -19,22 +19,14 @@ package com.bytechef.component.google.sheets.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LABEL;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.labelToColum;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.deleteDimension;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.labelToColumn;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.google.commons.GoogleServices;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
-import com.google.api.services.sheets.v4.model.DimensionRange;
-import com.google.api.services.sheets.v4.model.Request;
-import java.util.List;
 
 /**
  * @author Marija Horvat
@@ -62,27 +54,9 @@ public class GoogleSheetsDeleteColumnAction {
 
         String label = inputParameters.getRequiredString(LABEL);
 
-        Integer columnNumber = labelToColum(label);
+        Integer columnNumber = labelToColumn(label);
 
-        DimensionRange dimensionRange = new DimensionRange()
-            .setSheetId(inputParameters.getRequiredInteger(SHEET_ID))
-            .setDimension("COLUMNS")
-            .setStartIndex(columnNumber - 1)
-            .setEndIndex(columnNumber);
-
-        Request request = new Request()
-            .setDeleteDimension(
-                new DeleteDimensionRequest()
-                    .setRange(dimensionRange));
-
-        BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest = new BatchUpdateSpreadsheetRequest()
-            .setRequests(List.of(request));
-
-        Sheets sheets = GoogleServices.getSheets(connectionParameters);
-
-        sheets.spreadsheets()
-            .batchUpdate(inputParameters.getRequiredString(SPREADSHEET_ID), batchUpdateSpreadsheetRequest)
-            .execute();
+        deleteDimension(inputParameters, connectionParameters, columnNumber, "COLUMNS");
 
         return null;
     }

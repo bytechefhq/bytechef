@@ -26,6 +26,7 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.IS_THE_FIRST_ROW_HEADER;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.ROW_NUMBER;
+import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_NAME;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.UPDATE_WHOLE_ROW;
@@ -52,6 +53,11 @@ import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetResponse;
+import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
+import com.google.api.services.sheets.v4.model.DimensionRange;
+import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
@@ -89,6 +95,11 @@ class GoogleSheetsUtilsTest {
     private final ArgumentCaptor<String> valueRenderArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> dateTimeRenderArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<String> majorDimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<BatchUpdateSpreadsheetRequest> batchUpdateSpreadsheetRequestArgumentCaptor =
+        ArgumentCaptor.forClass(BatchUpdateSpreadsheetRequest.class);
+    private final BatchUpdateSpreadsheetResponse mockedBatchUpdateSpreadsheetResponse =
+        mock(BatchUpdateSpreadsheetResponse.class);
+    private final Sheets.Spreadsheets.BatchUpdate mockedBatchUpdate = mock(Sheets.Spreadsheets.BatchUpdate.class);
 
     @Test
     void appendValues() throws IOException {
@@ -432,6 +443,92 @@ class GoogleSheetsUtilsTest {
     }
 
     @Test
+    void testDeleteDimensionWhenColumn() throws Exception {
+
+        Parameters parameters = MockParametersFactory.create(
+            Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(parameters))
+                .thenReturn(mockedSheets);
+
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.batchUpdate(sheetNameArgumentCaptor.capture(),
+                batchUpdateSpreadsheetRequestArgumentCaptor.capture()))
+                    .thenReturn(mockedBatchUpdate);
+            when(mockedBatchUpdate.execute())
+                .thenReturn(mockedBatchUpdateSpreadsheetResponse);
+
+            GoogleSheetsUtils.deleteDimension(parameters, parameters, 2, "COLUMNS");
+
+            assertEquals("spreadsheetId", sheetNameArgumentCaptor.getValue());
+
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest =
+                batchUpdateSpreadsheetRequestArgumentCaptor.getValue();
+
+            List<Request> requests = batchUpdateSpreadsheetRequest.getRequests();
+
+            assertEquals(1, requests.size());
+
+            Request request = requests.getFirst();
+
+            DeleteDimensionRequest deleteDimensionRequest = request.getDeleteDimension();
+
+            DimensionRange dimensionRange = deleteDimensionRequest.getRange();
+
+            assertEquals(123, dimensionRange.getSheetId());
+            assertEquals("COLUMNS", dimensionRange.getDimension());
+            assertEquals(1, dimensionRange.getStartIndex());
+            assertEquals(2, dimensionRange.getEndIndex());
+        }
+    }
+
+    @Test
+    void testDeleteDimensionWhenRow() throws Exception {
+
+        Parameters parameters = MockParametersFactory.create(
+            Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_ID, 123));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(parameters))
+                .thenReturn(mockedSheets);
+
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.batchUpdate(sheetNameArgumentCaptor.capture(),
+                batchUpdateSpreadsheetRequestArgumentCaptor.capture()))
+                    .thenReturn(mockedBatchUpdate);
+            when(mockedBatchUpdate.execute())
+                .thenReturn(mockedBatchUpdateSpreadsheetResponse);
+
+            GoogleSheetsUtils.deleteDimension(parameters, parameters, 2, "ROWS");
+
+            assertEquals("spreadsheetId", sheetNameArgumentCaptor.getValue());
+
+            BatchUpdateSpreadsheetRequest batchUpdateSpreadsheetRequest =
+                batchUpdateSpreadsheetRequestArgumentCaptor.getValue();
+
+            List<Request> requests = batchUpdateSpreadsheetRequest.getRequests();
+
+            assertEquals(1, requests.size());
+
+            Request request = requests.getFirst();
+
+            DeleteDimensionRequest deleteDimensionRequest = request.getDeleteDimension();
+
+            DimensionRange dimensionRange = deleteDimensionRequest.getRange();
+
+            assertEquals(123, dimensionRange.getSheetId());
+            assertEquals("ROWS", dimensionRange.getDimension());
+            assertEquals(1, dimensionRange.getStartIndex());
+            assertEquals(2, dimensionRange.getEndIndex());
+        }
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     void testGetMapOfValuesForRowWhereFirstRowHeaders() throws IOException {
         List<Object> mockedRow = mock(List.class);
@@ -714,6 +811,14 @@ class GoogleSheetsUtilsTest {
         assertEquals("Z", GoogleSheetsUtils.columnToLabel(26));
         assertEquals("AA", GoogleSheetsUtils.columnToLabel(27));
         assertEquals("AB", GoogleSheetsUtils.columnToLabel(28));
+    }
+
+    @Test
+    void testLabelToColumn() {
+        assertEquals(1, GoogleSheetsUtils.labelToColumn("A"));
+        assertEquals(26, GoogleSheetsUtils.labelToColumn("Z"));
+        assertEquals(27, GoogleSheetsUtils.labelToColumn("AA"));
+        assertEquals(28, GoogleSheetsUtils.labelToColumn("AB"));
     }
 
     private static List<Sheet> getSheetList() {
