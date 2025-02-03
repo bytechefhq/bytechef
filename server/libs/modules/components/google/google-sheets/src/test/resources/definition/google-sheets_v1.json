@@ -117,8 +117,8 @@
     } ],
     "title" : "Clear Sheet",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -225,8 +225,8 @@
     } ],
     "title" : "Create Column",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -373,8 +373,8 @@
     } ],
     "title" : "Create Sheet",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -451,8 +451,8 @@
     } ],
     "title" : "Delete Column",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -552,8 +552,8 @@
     } ],
     "title" : "Delete Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -610,8 +610,8 @@
     } ],
     "title" : "Delete Sheet",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -741,8 +741,8 @@
     } ],
     "title" : "Find Row by Number",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -896,8 +896,8 @@
     } ],
     "title" : "Insert Multiple Rows",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1051,8 +1051,49 @@
     } ],
     "title" : "Insert Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
+  }, {
+    "batch" : null,
+    "deprecated" : null,
+    "description" : "Get all sheets from the spreadsheet.",
+    "help" : null,
+    "metadata" : null,
+    "name" : "listSheets",
+    "outputDefinition" : {
+      "output" : null,
+      "outputResponse" : null,
+      "outputSchema" : null,
+      "sampleOutput" : null
+    },
+    "properties" : [ {
+      "advancedOption" : null,
+      "description" : "The ID of the spreadsheet to apply the updates to.",
+      "displayCondition" : null,
+      "expressionEnabled" : null,
+      "hidden" : null,
+      "metadata" : { },
+      "required" : true,
+      "name" : "spreadsheetId",
+      "type" : "STRING",
+      "defaultValue" : null,
+      "exampleValue" : null,
+      "label" : "Spreadsheet ID",
+      "placeholder" : null,
+      "controlType" : "SELECT",
+      "languageId" : null,
+      "maxLength" : null,
+      "minLength" : null,
+      "options" : null,
+      "optionsDataSource" : {
+        "optionsLookupDependsOn" : null,
+        "options" : { }
+      }
+    } ],
+    "title" : "List Sheets",
+    "perform" : { },
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   }, {
     "batch" : null,
     "deprecated" : null,
@@ -1221,8 +1262,8 @@
     } ],
     "title" : "Update Row",
     "perform" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null
+    "workflowNodeDescription" : null,
+    "processErrorResponse" : null
   } ],
   "connection" : {
     "authorizations" : [ {
@@ -1274,16 +1315,16 @@
       "title" : "OAuth2 Authorization Code",
       "type" : "OAUTH2_AUTHORIZATION_CODE",
       "acquire" : null,
-      "oauth2AuthorizationExtraQueryParameters" : { },
-      "scopes" : { },
-      "pkce" : null,
-      "refresh" : null,
       "apply" : null,
       "authorizationCallback" : null,
       "authorizationUrl" : { },
       "clientId" : null,
       "clientSecret" : null,
+      "oauth2AuthorizationExtraQueryParameters" : { },
+      "pkce" : null,
+      "refresh" : null,
       "refreshUrl" : { },
+      "scopes" : { },
       "refreshToken" : null,
       "tokenUrl" : { }
     } ],
@@ -1293,6 +1334,7 @@
     "baseUri" : null,
     "test" : null
   },
+  "dataStream" : null,
   "triggers" : [ {
     "batch" : null,
     "deprecated" : null,
@@ -1381,18 +1423,17 @@
     "webhookRawBody" : null,
     "workflowSyncExecution" : null,
     "poll" : null,
-    "deduplicate" : null,
     "webhookDisable" : { },
+    "workflowNodeDescription" : null,
+    "deduplicate" : null,
+    "processErrorResponse" : null,
     "webhookEnable" : { },
     "dynamicWebhookRefresh" : null,
     "webhookRequest" : { },
-    "processErrorResponse" : null,
-    "workflowNodeDescription" : null,
     "listenerDisable" : null,
     "listenerEnable" : null,
     "webhookValidate" : null,
     "webhookValidateOnEnable" : null
   } ],
-  "dataStream" : null,
   "unifiedApi" : null
 }
