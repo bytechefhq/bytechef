@@ -32,6 +32,7 @@ import com.bytechef.component.google.sheets.action.GoogleSheetsDeleteSheetAction
 import com.bytechef.component.google.sheets.action.GoogleSheetsFindRowByNumAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertMultipleRowsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsInsertRowAction;
+import com.bytechef.component.google.sheets.action.GoogleSheetsListSheetsAction;
 import com.bytechef.component.google.sheets.action.GoogleSheetsUpdateRowAction;
 import com.bytechef.component.google.sheets.trigger.GoogleSheetsOnRowAddedTrigger;
 import com.google.auto.service.AutoService;
@@ -62,6 +63,7 @@ public class GoogleSheetsComponentHandler implements ComponentHandler {
             GoogleSheetsFindRowByNumAction.ACTION_DEFINITION,
             GoogleSheetsInsertMultipleRowsAction.ACTION_DEFINITION,
             GoogleSheetsInsertRowAction.ACTION_DEFINITION,
+            GoogleSheetsListSheetsAction.ACTION_DEFINITION,
             GoogleSheetsUpdateRowAction.ACTION_DEFINITION)
         .triggers(GoogleSheetsOnRowAddedTrigger.TRIGGER_DEFINITION);
 
