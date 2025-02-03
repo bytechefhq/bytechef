@@ -42,6 +42,13 @@ export default defineConfig({
                                 {label: 'Quick Start', link: '/automation/getting-started/quick-start'},
                             ],
                         },
+                        {
+                            label: 'Build Workflows',
+                            items: [
+                                {label: 'Overview', link: '/automation/build_workflows/overview'},
+                                {label: 'Project Guides', link: '/automation/build_workflows/project_guides'}
+                            ],
+                        }
                     ],
                 },
                 {
