@@ -48,8 +48,11 @@ paths:
         in: "query"
         required: true
         schema:
-          type: "string"
+          type: "integer"
           enum:
+            - 0
+            - 1
+          x-enum-varnames:
             - "AUTOMATION"
             - "EMBEDDED"
       - name: "actionDefinitions"

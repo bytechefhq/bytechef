@@ -88,11 +88,11 @@ public class ComponentDefinitionApiController implements ComponentDefinitionApi 
 
     @Override
     public ResponseEntity<List<ComponentDefinitionBasicModel>> getComponentDefinitions(
-        String modeType, Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
+        Integer modeType, Boolean actionDefinitions, Boolean connectionDefinitions, Boolean triggerDefinitions,
         List<String> include) {
 
         ComponentDefinitionFilter componentDefinitionFilter = componentDefinitionFilters.stream()
-            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(ModeType.valueOf(modeType)))
+            .filter(curComponentDefinitionFilter -> curComponentDefinitionFilter.supports(ModeType.values()[modeType]))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Unsupported mode type: " + modeType));
 
