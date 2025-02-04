@@ -29,6 +29,8 @@ import java.util.Map;
  */
 public interface Parameters extends Map<String, Object> {
 
+    boolean containsPath(String path);
+
     <T> T get(String key, Class<T> returnType);
 
     <T> T get(String key, Class<T> returnType, T defaultValue);

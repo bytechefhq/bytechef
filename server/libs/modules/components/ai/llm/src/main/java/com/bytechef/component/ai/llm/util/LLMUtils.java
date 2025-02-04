@@ -104,6 +104,10 @@ public class LLMUtils {
         BaseProperty.BaseValueProperty<?> outputSchemaProperty = string();
 
         if (inputParameters.getFromPath("response.responseFormat", ResponseFormat.class, TEXT) == JSON) {
+            if (!inputParameters.containsPath("response.responseSchema")) {
+                return null;
+            }
+
             String responseSchema = inputParameters.getRequiredFromPath("response.responseSchema", String.class);
 
             outputSchemaProperty = actionContext.outputSchema(

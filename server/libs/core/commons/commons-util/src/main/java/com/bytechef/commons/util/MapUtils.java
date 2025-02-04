@@ -97,6 +97,10 @@ public class MapUtils {
         return map.containsKey(key);
     }
 
+    public static boolean containsPath(Map<String, ?> map, String path) {
+        return readFromPath(map, path) != null;
+    }
+
     public static boolean isEmpty(Map<String, ?> map) {
         return map == null || map.isEmpty();
     }

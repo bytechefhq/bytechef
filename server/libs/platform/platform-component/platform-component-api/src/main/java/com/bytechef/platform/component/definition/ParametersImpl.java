@@ -52,6 +52,11 @@ public final class ParametersImpl implements Parameters {
     }
 
     @Override
+    public boolean containsPath(String path) {
+        return MapUtils.containsPath(map, path);
+    }
+
+    @Override
     public boolean containsValue(Object value) {
         return map.containsValue(value);
     }
