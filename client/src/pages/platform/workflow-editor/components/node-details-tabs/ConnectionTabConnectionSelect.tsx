@@ -41,6 +41,7 @@ const ConnectionTabConnectionSelect = ({
 }: ConnectionTabConnectionSelectPropsType) => {
     const [connectionId, setConnectionId] = useState<number | undefined>();
     const [currentConnection, setCurrentConnection] = useState<ConnectionI>();
+    const [showConnectionDialog, setShowConnectionDialog] = useState<boolean>(false);
 
     const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore();
 
@@ -160,24 +161,16 @@ const ConnectionTabConnectionSelect = ({
                         )}
 
                         {componentDefinition && (
-                            <ConnectionDialog
-                                componentDefinition={componentDefinition}
-                                connectionTagsQueryKey={ConnectionKeys!.connectionTags}
-                                connectionsQueryKey={ConnectionKeys!.connections}
-                                triggerNode={
-                                    <Button
-                                        className={twMerge('mt-auto p-2', !componentConnections?.length && 'w-full')}
-                                        title="Create a new connection"
-                                        variant="outline"
-                                    >
-                                        <PlusIcon className="size-5" />
+                            <Button
+                                className={twMerge('mt-auto p-2', !componentConnections?.length && 'w-full')}
+                                onClick={() => setShowConnectionDialog(true)}
+                                title="Create a new connection"
+                                variant="outline"
+                            >
+                                <PlusIcon className="size-5" />
 
-                                        {!componentConnections?.length && 'Create Connection'}
-                                    </Button>
-                                }
-                                useCreateConnectionMutation={useCreateConnectionMutation}
-                                useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
-                            />
+                                {!componentConnections?.length && 'Create Connection'}
+                            </Button>
                         )}
                     </div>
 
@@ -205,6 +198,17 @@ const ConnectionTabConnectionSelect = ({
                     authorizationParameters={currentConnection.authorizationParameters}
                     connectionDefinition={connectionDefinition}
                     connectionParameters={currentConnection.connectionParameters}
+                />
+            )}
+
+            {showConnectionDialog && (
+                <ConnectionDialog
+                    componentDefinition={componentDefinition}
+                    connectionTagsQueryKey={ConnectionKeys!.connectionTags}
+                    connectionsQueryKey={ConnectionKeys!.connections}
+                    onClose={() => setShowConnectionDialog(false)}
+                    useCreateConnectionMutation={useCreateConnectionMutation}
+                    useGetConnectionTagsQuery={useGetConnectionTagsQuery!}
                 />
             )}
         </div>
