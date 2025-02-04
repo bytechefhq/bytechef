@@ -272,6 +272,8 @@ const ProjectHeader = ({
 
                 <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
 
+                <CopilotButton source={Source.WORKFLOW_EDITOR} />
+
                 <ProjectHeaderSettingsMenu
                     project={project}
                     setShowDeleteProjectAlertDialog={setShowDeleteProjectAlertDialog}
@@ -289,8 +291,6 @@ const ProjectHeader = ({
                     runDisabled={runDisabled}
                     workflowIsRunning={workflowIsRunning}
                 />
-
-                <CopilotButton source={Source.WORKFLOW_EDITOR} />
             </div>
 
             {showDeleteProjectAlertDialog && (
