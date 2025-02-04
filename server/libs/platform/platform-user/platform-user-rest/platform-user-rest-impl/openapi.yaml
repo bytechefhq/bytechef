@@ -41,14 +41,14 @@ paths:
         required: true
       responses:
         "200":
-          description: "The secret API key object."
+          description: "The API secret key object."
           content:
             application/json:
               schema:
                 type: "object"
                 properties:
                   secretKey:
-                    description: "The secret API key."
+                    description: "The API secret key."
                     type: "string"
   /api-keys/{id}:
     delete:
@@ -131,7 +131,7 @@ paths:
 components:
   schemas:
     ApiKey:
-      description: "Contains generated key required for calling API."
+      description: "Contains generated key required for calling public API."
       type: "object"
       required:
         - name
@@ -166,10 +166,10 @@ components:
           format: "date-time"
           readOnly: true
         name:
-          description: "The name of an API key."
+          description: "The name of the API key."
           type: "string"
         secretKey:
-          description: "The preview of secret API key."
+          description: "The preview of the API secret key."
           type: "string"
           readOnly: true
     Authority:
