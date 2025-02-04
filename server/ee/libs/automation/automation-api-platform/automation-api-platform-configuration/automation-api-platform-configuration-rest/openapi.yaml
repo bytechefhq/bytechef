@@ -446,6 +446,7 @@ components:
     ApiCollection:
       description: "An API collection."
       required:
+        - "contextPath"
         - "enabled"
         - "environment"
         - "name"
@@ -457,6 +458,9 @@ components:
           description: "The version of an API collection."
           type: "integer"
           format: "int32"
+        contextPath:
+          description: "The collection context path."
+          type: "string"
         createdBy:
           description: "The created by."
           type: "string"
