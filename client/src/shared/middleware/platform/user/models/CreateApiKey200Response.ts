@@ -20,7 +20,7 @@ import { mapValues } from '../runtime';
  */
 export interface CreateApiKey200Response {
     /**
-     * The secret API key.
+     * The API secret key.
      * @type {string}
      * @memberof CreateApiKey200Response
      */

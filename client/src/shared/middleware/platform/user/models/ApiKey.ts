@@ -14,7 +14,7 @@
 
 import { mapValues } from '../runtime';
 /**
- * Contains generated key required for calling API.
+ * Contains generated key required for calling public API.
  * @export
  * @interface ApiKey
  */
@@ -56,13 +56,13 @@ export interface ApiKey {
      */
     readonly lastUsedDate?: Date;
     /**
-     * The name of an API key.
+     * The name of the API key.
      * @type {string}
      * @memberof ApiKey
      */
     name: string;
     /**
-     * The preview of secret API key.
+     * The preview of the API secret key.
      * @type {string}
      * @memberof ApiKey
      */
