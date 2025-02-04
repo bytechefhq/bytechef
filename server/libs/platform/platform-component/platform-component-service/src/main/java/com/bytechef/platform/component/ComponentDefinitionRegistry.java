@@ -165,7 +165,19 @@ public class ComponentDefinitionRegistry {
     }
 
     public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
-        ComponentDefinition componentDefinition;
+        return fetchComponentDefinition(name, version)
+            .orElseThrow(() -> new IllegalArgumentException("The component '%s' does not exist.".formatted(name)));
+    }
+
+    public boolean hasComponentDefinition(String name, Integer version) {
+        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
+
+        return componentDefinitions.stream()
+            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
+    }
+
+    public Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version) {
+        ComponentDefinition componentDefinition = null;
 
         if (version == null) {
             List<ComponentDefinition> filteredComponentDefinitions = getComponentDefinitions(name);
@@ -174,34 +186,24 @@ public class ComponentDefinitionRegistry {
         } else {
             Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitions.get(name);
 
-            if (componentDefinitionMap == null) {
-                throw new IllegalArgumentException("The component '%s' does not exist".formatted(name));
-            }
+            if (componentDefinitionMap != null) {
+                componentDefinition = componentDefinitionMap.get(version);
 
-            componentDefinition = componentDefinitionMap.get(version);
-
-            if (componentDefinition == null) {
-                componentDefinition = dynamicComponentHandlerListFactories.stream()
-                    .map(
-                        dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
-                            name, version))
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .findFirst()
-                    .orElseThrow(() -> new IllegalArgumentException(
-                        "No component with name=" + name + ", version=" + version))
-                    .getDefinition();
+                if (componentDefinition == null) {
+                    componentDefinition = dynamicComponentHandlerListFactories.stream()
+                        .map(
+                            dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
+                                name, version))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst()
+                        .map(ComponentHandler::getDefinition)
+                        .orElse(null);
+                }
             }
         }
 
-        return componentDefinition;
-    }
-
-    public boolean hasComponentDefinition(String name, Integer version) {
-        List<ComponentDefinition> componentDefinitions = getComponentDefinitions(name);
-
-        return componentDefinitions.stream()
-            .anyMatch(curComponentDefinition -> (version == null) || (version == curComponentDefinition.getVersion()));
+        return Optional.ofNullable(componentDefinition);
     }
 
     public List<ComponentDefinition> getComponentDefinitions() {
@@ -220,8 +222,13 @@ public class ComponentDefinitionRegistry {
     }
 
     public List<ComponentDefinition> getComponentDefinitions(String name) {
-        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.get(name)
-            .values()
+        Map<Integer, ComponentDefinition> integerComponentDefinitionMap = componentDefinitions.get(name);
+
+        if (integerComponentDefinitionMap == null) {
+            return List.of();
+        }
+
+        List<ComponentDefinition> filteredComponentDefinitions = integerComponentDefinitionMap.values()
             .stream()
             .toList();
 

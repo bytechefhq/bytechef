@@ -19,7 +19,6 @@ package com.bytechef.platform.configuration.facade;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
@@ -89,12 +88,12 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
             return Collections.emptyList();
         }
 
-        ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-            workflowNodeType.componentName(), workflowNodeType.componentVersion());
-
-        return componentConnectionFactoryResolver.resolve(componentDefinition)
-            .map(workflowConnectionFactory -> workflowConnectionFactory.create(
-                workflowNodeName, extensions, componentDefinition))
+        return componentDefinitionService
+            .fetchComponentDefinition(workflowNodeType.componentName(), workflowNodeType.componentVersion())
+            .map(componentDefinition -> componentConnectionFactoryResolver.resolve(componentDefinition)
+                .map(workflowConnectionFactory -> workflowConnectionFactory.create(
+                    workflowNodeName, extensions, componentDefinition))
+                .orElse(List.of()))
             .orElse(List.of());
     }
 }

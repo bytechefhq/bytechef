@@ -29,12 +29,15 @@ import com.bytechef.component.definition.unified.base.model.UnifiedOutputModel;
 import com.bytechef.platform.component.definition.DataStreamComponentDefinition.ComponentType;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.lang.NonNull;
 
 /**
  * @author Ivica Cardic
  */
 public interface ComponentDefinitionService {
+
+    Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version);
 
     ComponentDefinition getComponentDefinition(@NonNull String name, Integer version);
 

@@ -57,6 +57,12 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     }
 
     @Override
+    public Optional<ComponentDefinition> fetchComponentDefinition(@NonNull String name, Integer version) {
+        return componentDefinitionRegistry.fetchComponentDefinition(name, version)
+            .map(ComponentDefinition::new);
+    }
+
+    @Override
     public ComponentDefinition getComponentDefinition(@NonNull String name, Integer version) {
         com.bytechef.component.definition.ComponentDefinition componentDefinition =
             componentDefinitionRegistry.getComponentDefinition(name, version);

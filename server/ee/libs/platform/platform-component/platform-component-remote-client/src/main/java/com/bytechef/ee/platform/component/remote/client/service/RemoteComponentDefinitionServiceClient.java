@@ -27,6 +27,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
@@ -50,6 +51,11 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultRestClient, discoveryClient, objectMapper);
+    }
+
+    @Override
+    public Optional<ComponentDefinition> fetchComponentDefinition(String name, Integer version) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -126,9 +132,7 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
     }
 
     @Override
-    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(
-        Category category) {
-
+    public List<ComponentDefinition> getUnifiedApiComponentDefinitions(Category category) {
         throw new UnsupportedOperationException();
     }
 
