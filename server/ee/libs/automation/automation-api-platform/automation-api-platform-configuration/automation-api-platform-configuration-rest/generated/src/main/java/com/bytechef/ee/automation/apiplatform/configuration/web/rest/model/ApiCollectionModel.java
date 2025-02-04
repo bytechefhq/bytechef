@@ -28,10 +28,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:33:47.577231+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-24T11:35:32.971264+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
 public class ApiCollectionModel {
 
   private Integer collectionVersion;
+
+  private String contextPath;
 
   private String createdBy;
 
@@ -78,7 +80,8 @@ public class ApiCollectionModel {
   /**
    * Constructor with only required parameters
    */
-  public ApiCollectionModel(Boolean enabled, String name, Long projectId, Integer projectVersion, Long workspaceId) {
+  public ApiCollectionModel(String contextPath, Boolean enabled, String name, Long projectId, Integer projectVersion, Long workspaceId) {
+    this.contextPath = contextPath;
     this.enabled = enabled;
     this.name = name;
     this.projectId = projectId;
@@ -104,6 +107,26 @@ public class ApiCollectionModel {
 
   public void setCollectionVersion(Integer collectionVersion) {
     this.collectionVersion = collectionVersion;
+  }
+
+  public ApiCollectionModel contextPath(String contextPath) {
+    this.contextPath = contextPath;
+    return this;
+  }
+
+  /**
+   * The collection context path.
+   * @return contextPath
+   */
+  @NotNull 
+  @Schema(name = "contextPath", description = "The collection context path.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("contextPath")
+  public String getContextPath() {
+    return contextPath;
+  }
+
+  public void setContextPath(String contextPath) {
+    this.contextPath = contextPath;
   }
 
   public ApiCollectionModel createdBy(String createdBy) {
@@ -472,6 +495,7 @@ public class ApiCollectionModel {
     }
     ApiCollectionModel apiCollection = (ApiCollectionModel) o;
     return Objects.equals(this.collectionVersion, apiCollection.collectionVersion) &&
+        Objects.equals(this.contextPath, apiCollection.contextPath) &&
         Objects.equals(this.createdBy, apiCollection.createdBy) &&
         Objects.equals(this.createdDate, apiCollection.createdDate) &&
         Objects.equals(this.description, apiCollection.description) &&
@@ -493,7 +517,7 @@ public class ApiCollectionModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(collectionVersion, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
+    return Objects.hash(collectionVersion, contextPath, createdBy, createdDate, description, enabled, endpoints, id, name, lastModifiedBy, lastModifiedDate, projectId, project, projectDeploymentId, projectDeployment, projectVersion, tags, workspaceId, version);
   }
 
   @Override
@@ -501,6 +525,7 @@ public class ApiCollectionModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class ApiCollectionModel {\n");
     sb.append("    collectionVersion: ").append(toIndentedString(collectionVersion)).append("\n");
+    sb.append("    contextPath: ").append(toIndentedString(contextPath)).append("\n");
     sb.append("    createdBy: ").append(toIndentedString(createdBy)).append("\n");
     sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
