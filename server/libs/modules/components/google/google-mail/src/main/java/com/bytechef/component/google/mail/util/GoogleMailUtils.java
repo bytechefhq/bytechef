@@ -343,7 +343,9 @@ public class GoogleMailUtils {
         } else {
             MessagePartBody messagePartBody = payload.getBody();
 
-            bodyPlain = new String(messagePartBody.decodeData(), StandardCharsets.UTF_8);
+            if (messagePartBody.decodeData() != null) {
+                bodyPlain = new String(messagePartBody.decodeData(), StandardCharsets.UTF_8);
+            }
         }
 
         List<FileEntry> fileEntries = getFileEntries(message, actionContext, service);
