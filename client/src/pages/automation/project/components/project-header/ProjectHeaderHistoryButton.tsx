@@ -8,7 +8,7 @@ interface ProjectHeaderHistoryButtonProps {
 const ProjectHeaderHistoryButton = ({handleShowProjectVersionHistorySheet}: ProjectHeaderHistoryButtonProps) => {
     return (
         <Button
-            className="justify-start hover:bg-surface-neutral-primary-hover"
+            className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
             onClick={handleShowProjectVersionHistorySheet}
             variant="ghost"
         >
