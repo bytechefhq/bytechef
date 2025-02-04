@@ -48,9 +48,7 @@ public class GithubListRepositoryIssuesAction {
                 .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .description("The name of the repository")
                 .required(true))
-        .output(
-            outputSchema(
-                array()))
+        .output(outputSchema(array()))
         .perform(GithubListRepositoryIssuesAction::perform);
 
     private GithubListRepositoryIssuesAction() {
