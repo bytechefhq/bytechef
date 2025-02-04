@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.workflow.execution.dto;
+package com.bytechef.automation.workflow.execution.dto;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.embedded.configuration.domain.Integration;
-import com.bytechef.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.automation.configuration.domain.Project;
+import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.platform.workflow.execution.dto.JobDTO;
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,8 +28,7 @@ import org.springframework.lang.NonNull;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowExecution(
-    long id, Integration integration, @NonNull IntegrationInstanceConfiguration integrationInstanceConfiguration,
-    @NonNull IntegrationInstance integrationInstance, @NonNull JobDTO job, @NonNull Workflow workflow,
+public record WorkflowExecutionDTO(
+    long id, Project project, ProjectDeployment projectDeployment, @NonNull JobDTO job, @NonNull Workflow workflow,
     TriggerExecutionDTO triggerExecution) {
 }

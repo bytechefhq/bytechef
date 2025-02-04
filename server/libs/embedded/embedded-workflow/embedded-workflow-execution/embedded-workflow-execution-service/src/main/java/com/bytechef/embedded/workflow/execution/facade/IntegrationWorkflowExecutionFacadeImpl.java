@@ -39,7 +39,7 @@ import com.bytechef.embedded.configuration.service.IntegrationInstanceConfigurat
 import com.bytechef.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.configuration.service.IntegrationService;
 import com.bytechef.embedded.configuration.service.IntegrationWorkflowService;
-import com.bytechef.embedded.workflow.execution.dto.WorkflowExecution;
+import com.bytechef.embedded.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.Environment;
@@ -121,7 +121,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecution getWorkflowExecution(long id) {
+    public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
         JobDTO jobDTO = new JobDTO(
@@ -132,7 +132,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
 
-        return new WorkflowExecution(
+        return new WorkflowExecutionDTO(
             Validate.notNull(jobDTO.id(), "id"),
             integrationService.getWorkflowIntegration(jobDTO.workflowId()),
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
@@ -148,7 +148,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WorkflowExecution> getWorkflowExecutions(
+    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate,
         Long integrationId, Long integrationInstanceConfigurationId, String workflowId, int pageNumber) {
 
@@ -205,7 +205,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
                     IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
                         principalJobService.getJobPrincipalId(Validate.notNull(job.getId(), ""), ModeType.EMBEDDED));
 
-                    return new WorkflowExecution(
+                    return new WorkflowExecutionDTO(
                         Validate.notNull(job.getId(), "id"),
                         CollectionUtils.getFirst(
                             integrations,

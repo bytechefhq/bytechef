@@ -35,7 +35,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.automation.workflow.execution.dto.WorkflowExecution;
+import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -117,7 +117,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
     @Override
     @Transactional(readOnly = true)
-    public WorkflowExecution getWorkflowExecution(long id) {
+    public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
         JobDTO jobDTO = new JobDTO(
@@ -129,7 +129,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), ModeType.AUTOMATION);
 
-        return new WorkflowExecution(
+        return new WorkflowExecutionDTO(
             jobDTO.id(), projectService.getWorkflowProject(jobDTO.workflowId()),
             OptionalUtils.map(projectDeploymentIdOptional, projectDeploymentService::getProjectDeployment),
             jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
@@ -142,7 +142,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
 
     @Override
     @Transactional(readOnly = true)
-    public Page<WorkflowExecution> getWorkflowExecutions(
+    public Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Environment environment, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
         Long projectDeploymentId, String workflowId, int pageNumber) {
 
@@ -157,7 +157,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 CollectionUtils.map(projectFacade.getProjectWorkflows(), ProjectWorkflowDTO::getId));
         }
 
-        Page<WorkflowExecution> workflowExecutionPage;
+        Page<WorkflowExecutionDTO> workflowExecutionPage;
 
         if (workflowIds.isEmpty()) {
             workflowExecutionPage = Page.empty();
@@ -194,7 +194,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements WorkflowExecutionFaca
                 List<Workflow> workflows = workflowService.getWorkflows(
                     CollectionUtils.map(jobsPage.toList(), Job::getWorkflowId));
 
-                workflowExecutionPage = jobsPage.map(job -> new WorkflowExecution(
+                workflowExecutionPage = jobsPage.map(job -> new WorkflowExecutionDTO(
                     Validate.notNull(job.getId(), "id"),
                     CollectionUtils.getFirst(
                         projects,
