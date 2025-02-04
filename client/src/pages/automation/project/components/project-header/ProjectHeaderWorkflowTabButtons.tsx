@@ -32,7 +32,7 @@ const ProjectHeaderWorkflowTabButtons = ({
     return (
         <div className="flex flex-col">
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => setShowEditWorkflowDialog(true)}
                 variant="ghost"
             >
@@ -40,7 +40,7 @@ const ProjectHeaderWorkflowTabButtons = ({
             </Button>
 
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() =>
                     duplicateWorkflowMutation.mutate({
                         id: project.id!,
@@ -53,7 +53,7 @@ const ProjectHeaderWorkflowTabButtons = ({
             </Button>
 
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => (window.location.href = `/api/automation/internal/workflows/${workflowId}/export`)}
                 variant="ghost"
             >
@@ -63,7 +63,7 @@ const ProjectHeaderWorkflowTabButtons = ({
             <Separator />
 
             <Button
-                className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
+                className="justify-start rounded-none text-destructive hover:bg-surface-error-secondary hover:text-destructive"
                 onClick={() => handleShowDeleteWorkflowAlertDialog()}
                 variant="ghost"
             >

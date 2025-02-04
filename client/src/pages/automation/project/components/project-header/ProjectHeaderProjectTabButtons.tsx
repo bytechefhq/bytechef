@@ -72,7 +72,7 @@ const ProjectHeaderProjectTabButtons = ({
     return (
         <div className="flex flex-col">
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => handleEditProject()}
                 variant="ghost"
             >
@@ -80,7 +80,7 @@ const ProjectHeaderProjectTabButtons = ({
             </Button>
 
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => duplicateProjectMutation.mutate(project.id!)}
                 variant="ghost"
             >
@@ -88,7 +88,7 @@ const ProjectHeaderProjectTabButtons = ({
             </Button>
 
             <Button
-                className="justify-start hover:bg-surface-neutral-primary-hover"
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => {
                     if (hiddenFileInputRef.current) {
                         hiddenFileInputRef.current.click();
@@ -108,7 +108,7 @@ const ProjectHeaderProjectTabButtons = ({
             <Separator />
 
             <Button
-                className="justify-start text-destructive hover:bg-surface-error-secondary hover:text-destructive"
+                className="justify-start rounded-none text-destructive hover:bg-surface-error-secondary hover:text-destructive"
                 onClick={() => handleDeleteProject()}
                 variant="ghost"
             >
