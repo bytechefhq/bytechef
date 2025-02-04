@@ -68,8 +68,8 @@ export const useGetComponentDefinitionsQuery = (request: GetComponentDefinitions
                 ...request,
                 modeType:
                     currentType === ModeType.AUTOMATION
-                        ? GetComponentDefinitionsModeTypeEnum.Automation
-                        : GetComponentDefinitionsModeTypeEnum.Embedded,
+                        ? GetComponentDefinitionsModeTypeEnum.AUTOMATION
+                        : GetComponentDefinitionsModeTypeEnum.EMBEDDED,
             }),
         enabled: enabled === undefined ? true : enabled,
     });
