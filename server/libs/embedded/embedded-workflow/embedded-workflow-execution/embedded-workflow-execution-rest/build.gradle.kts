@@ -21,6 +21,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
             "Page" to "org.springframework.data.domain.Page",
             "Category" to "com.bytechef.embedded.configuration.web.rest.model.CategoryModel",
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
+            "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasic",
             "Environment" to "com.bytechef.embedded.configuration.web.rest.model.EnvironmentModel",
             "ExecutionError" to "com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel",

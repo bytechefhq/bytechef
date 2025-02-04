@@ -18,6 +18,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     outputDir.set("$projectDir/../platform-workflow-execution-rest-api/generated")
     schemaMappings.set(
         mapOf(
+            "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel",
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Page" to "org.springframework.data.domain.Page",

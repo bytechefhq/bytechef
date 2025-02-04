@@ -19,6 +19,7 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
     schemaMappings.set(
         mapOf(
             "Category" to "com.bytechef.automation.configuration.web.rest.model.CategoryModel",
+            "ComponentConnection" to "com.bytechef.platform.configuration.web.rest.model.ComponentConnection",
             "ComponentDefinitionBasic" to "com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasic",
             "DataStreamComponent" to "com.bytechef.platform.configuration.web.rest.model.DataStreamComponentModel",
             "Environment" to "com.bytechef.automation.configuration.web.rest.model.EnvironmentModel",
