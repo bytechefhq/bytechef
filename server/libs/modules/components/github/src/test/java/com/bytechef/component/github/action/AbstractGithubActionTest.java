@@ -37,6 +37,7 @@ abstract class AbstractGithubActionTest {
     protected Http.Executor mockedExecutor = mock(Http.Executor.class);
     protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
+    protected List<Map<String, Object>> responseList = List.of(Map.of("result", List.of("123", "abc")));
 
     @BeforeEach
     void beforeEach() {
