@@ -21,8 +21,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.LABEL;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SHEET_ID_PROPERTY;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID_PROPERTY;
+import static com.bytechef.component.google.sheets.util.GoogleSheetsColumnConverterUtils.labelToColumn;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.deleteDimension;
-import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.labelToColumn;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -52,9 +52,7 @@ public class GoogleSheetsDeleteColumnAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
-        String label = inputParameters.getRequiredString(LABEL);
-
-        Integer columnNumber = labelToColumn(label);
+        Integer columnNumber = labelToColumn(inputParameters.getRequiredString(LABEL));
 
         deleteDimension(inputParameters, connectionParameters, columnNumber, "COLUMNS");
 

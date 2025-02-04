@@ -258,7 +258,9 @@ public class GoogleSheetsUtils {
                 .boxed()
                 .collect(
                     Collectors.toMap(
-                        i -> "column_" + columnToLabel(i + 1), i -> String.valueOf(row.get(i)), (a, b) -> b,
+                        i -> "column_" + GoogleSheetsColumnConverterUtils.columnToLabel(i + 1),
+                        i -> String.valueOf(row.get(i)),
+                        (a, b) -> b,
                         LinkedHashMap::new));
         }
 
@@ -403,7 +405,8 @@ public class GoogleSheetsUtils {
 
                         for (Object o : list) {
                             if (o instanceof Map<?, ?> map) {
-                                int indexOfColumnToUpdate = labelToColumn((String) map.get(COLUMN)) - 1;
+                                int indexOfColumnToUpdate =
+                                    GoogleSheetsColumnConverterUtils.labelToColumn((String) map.get(COLUMN)) - 1;
 
                                 if (indexOfColumnToUpdate >= rowToUpdate.size()) {
                                     for (int i = rowToUpdate.size(); i <= indexOfColumnToUpdate; i++) {
@@ -424,24 +427,6 @@ public class GoogleSheetsUtils {
         return row;
     }
 
-    /**
-     * Returns column name in <code>A,B,C,..,AA,AB</code> naming convention.
-     *
-     * @param columnNumber column order number in column sequence
-     * @return column name in <code>column_A</code> format
-     */
-    public static String columnToLabel(int columnNumber) {
-        StringBuilder columnName = new StringBuilder();
-
-        while (columnNumber > 0) {
-            int modulo = (columnNumber - 1) % 26;
-            columnName.insert(0, (char) (65 + modulo));
-            columnNumber = (columnNumber - modulo) / 26;
-        }
-
-        return columnName.toString();
-    }
-
     private static List<Option<String>> getColumnOptions(Parameters inputParameters, Parameters connectionParameters)
         throws Exception {
 
@@ -459,13 +444,4 @@ public class GoogleSheetsUtils {
         return options;
     }
 
-    public static Integer labelToColumn(String label) {
-        int columnNumber = 0;
-
-        for (int i = 0; i < label.length(); i++) {
-            columnNumber = columnNumber * 26 + label.charAt(i) - 'A' + 1;
-        }
-
-        return columnNumber;
-    }
 }
