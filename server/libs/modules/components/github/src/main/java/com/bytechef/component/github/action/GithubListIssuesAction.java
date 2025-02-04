@@ -55,8 +55,8 @@ public class GithubListIssuesAction {
 
         return context
             .http(http -> http.get(
-                "/issues?filter=" + inputParameters.getRequiredString(FILTER) + "&state="
-                    + inputParameters.getRequiredString(STATE)))
+                "/issues?filter=" + inputParameters.getRequiredString(FILTER) + "&state=" +
+                    inputParameters.getRequiredString(STATE)))
             .configuration(responseType(Context.Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
