@@ -110,8 +110,8 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
                 jobService.update(job);
 
-                eventPublisher
-                    .publishEvent(new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
+                eventPublisher.publishEvent(
+                    new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
             }
         }
     }
