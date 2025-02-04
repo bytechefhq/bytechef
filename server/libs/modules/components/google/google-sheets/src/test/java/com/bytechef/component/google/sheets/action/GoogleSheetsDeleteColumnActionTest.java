@@ -26,47 +26,41 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.sheets.util.GoogleSheetsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.mockito.stubbing.Answer;
 
 /**
  * @author Marija Horvat
  */
 class GoogleSheetsDeleteColumnActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(LABEL, "B"));
-    private final ArgumentCaptor<String> dimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<Integer> columnNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<String> labelArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> dimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(LABEL, "B"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void perform() throws Exception {
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
-
-//            int columnNumber = 2;
-
-            googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.labelToColumn(labelArgumentCaptor.capture()))
-                .thenReturn(2);
-
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.deleteDimension(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
                     columnNumberArgumentCaptor.capture(), dimensionArgumentCaptor.capture()))
-                .thenAnswer((Answer<Void>) invocation -> null);
+                .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result = GoogleSheetsDeleteColumnAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result =
+                GoogleSheetsDeleteColumnAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertNull(result);
 
-            assertEquals("COLUMNS", dimensionArgumentCaptor.getValue());
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
             assertEquals(2, columnNumberArgumentCaptor.getValue());
-            assertEquals("B", labelArgumentCaptor.getValue());
+            assertEquals("COLUMNS", dimensionArgumentCaptor.getValue());
         }
     }
 }

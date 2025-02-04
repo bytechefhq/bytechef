@@ -805,22 +805,6 @@ class GoogleSheetsUtilsTest {
         }
     }
 
-    @Test
-    void testColumnToLabel() {
-        assertEquals("A", GoogleSheetsUtils.columnToLabel(1));
-        assertEquals("Z", GoogleSheetsUtils.columnToLabel(26));
-        assertEquals("AA", GoogleSheetsUtils.columnToLabel(27));
-        assertEquals("AB", GoogleSheetsUtils.columnToLabel(28));
-    }
-
-    @Test
-    void testLabelToColumn() {
-        assertEquals(1, GoogleSheetsUtils.labelToColumn("A"));
-        assertEquals(26, GoogleSheetsUtils.labelToColumn("Z"));
-        assertEquals(27, GoogleSheetsUtils.labelToColumn("AA"));
-        assertEquals(28, GoogleSheetsUtils.labelToColumn("AB"));
-    }
-
     private static List<Sheet> getSheetList() {
         Sheet sheet1 = createSheet("Sheet 1", 1234567890);
         Sheet sheet2 = createSheet("Sheet 2", 98765432);

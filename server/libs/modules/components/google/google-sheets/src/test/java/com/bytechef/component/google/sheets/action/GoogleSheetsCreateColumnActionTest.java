@@ -93,7 +93,7 @@ class GoogleSheetsCreateColumnActionTest {
             assertEquals("name", sheetNameArgumentCaptor.getValue());
             assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
             assertEquals(1, rowNumberArgumentCaptor.getValue());
-            assertEquals("name!null1", rangeArgumentCaptor.getValue());
+            assertEquals("name!D1", rangeArgumentCaptor.getValue());
             assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
 
             ValueRange valueRange = valueRangeArgumentCaptor.getValue();
