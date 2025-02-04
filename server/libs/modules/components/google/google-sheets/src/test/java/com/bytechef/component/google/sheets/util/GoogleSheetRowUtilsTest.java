@@ -46,6 +46,15 @@ class GoogleSheetRowUtilsTest {
 
     @Test
     void testGetRow() throws IOException {
+        testTemplate(List.of("value1", "value2", "value3"));
+    }
+
+    @Test
+    void testGetRowEmptySheet() throws IOException {
+        testTemplate(null);
+    }
+
+    private void testTemplate(List<String> values) throws IOException {
         String spreadSheetId = "spreadsheetId";
         String sheetName = "sheetName";
         Integer rowNumber = 1;
@@ -73,14 +82,12 @@ class GoogleSheetRowUtilsTest {
             when(mockedBatchGet.execute())
                 .thenReturn(new BatchGetValuesResponse().setValueRanges(List.of(mockedValueRange)));
 
-            List<String> values = List.of("value1", "value2", "value3");
-
             when(mockedValueRange.getValues())
-                .thenReturn(List.of(List.of(values)));
+                .thenReturn(values == null ? null : List.of(List.of(values)));
 
             List<Object> result = GoogleSheetsRowUtils.getRowValues(mockedSheets, spreadSheetId, sheetName, rowNumber);
 
-            assertEquals(List.of(values), result);
+            assertEquals(values == null ? List.of() : List.of(values), result);
             assertEquals("UNFORMATTED_VALUE", valueRenderOptionArgumentCaptor.getValue());
             assertEquals("FORMATTED_STRING", dateTimeRenderOptionArgumentCaptor.getValue());
             assertEquals("ROWS", majorDimensionArgumentCaptor.getValue());
