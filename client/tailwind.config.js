@@ -129,7 +129,7 @@ module.exports = {
                 'header-height': '34px',
             },
             inset: {
-                'data-pill-panel-placement': '530px',
+                'data-pill-panel-placement': '540px',
                 'node-handle-placement': '36px',
                 'workflow-node-popover-hover': '-40px',
             },

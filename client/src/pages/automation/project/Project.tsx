@@ -344,7 +344,7 @@ const Project = () => {
                                                 {rightSidebarOpen &&
                                                     componentDefinitions &&
                                                     taskDispatcherDefinitions && (
-                                                        <aside className="mb-4 flex w-96">
+                                                        <aside className="my-4 flex w-96">
                                                             <div className="flex-1">
                                                                 <WorkflowNodesSidebar
                                                                     data={{
@@ -358,7 +358,7 @@ const Project = () => {
 
                                                 <aside>
                                                     <RightSidebar
-                                                        className="mx-1.5 rounded-lg border"
+                                                        className="mx-3 mt-4 rounded-lg border"
                                                         navigation={rightSidebarNavigation}
                                                     />
                                                 </aside>
