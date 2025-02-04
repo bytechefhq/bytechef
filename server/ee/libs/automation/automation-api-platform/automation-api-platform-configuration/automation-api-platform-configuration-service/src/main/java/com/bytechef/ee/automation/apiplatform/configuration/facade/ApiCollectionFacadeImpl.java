@@ -354,7 +354,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
             parameter.name(entry.getKey());
             parameter.required(required.contains(entry.getKey()));
             parameter.in(in == null ? path.contains("{" + entry.getKey() + "}") ? "path" : "query" : in);
-            parameter.description((MapUtils.getFromPath(entry.getValue(), "description", String.class)));
+            parameter.description(MapUtils.getFromPath(entry.getValue(), "description", String.class));
             parameter.schema(
                 new Schema<>()
                     .type(MapUtils.getFromPath(entry.getValue(), "type", String.class))
