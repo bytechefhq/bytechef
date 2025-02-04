@@ -19,7 +19,7 @@ const WorkflowExecutionContent = ({
 }) => {
     return (
         <>
-            <div className="space-y-2 rounded-md bg-muted/50 p-2">
+            <div className="space-y-2 rounded-md p-2">
                 <header className="flex items-center justify-between">
                     <span className="text-sm font-semibold uppercase">Input</span>
 
@@ -76,7 +76,7 @@ const WorkflowExecutionContent = ({
             </div>
 
             {!error && (
-                <div className="space-y-2 rounded-md bg-muted/50 p-2">
+                <div className="space-y-2 rounded-md p-2">
                     <header className="flex items-center justify-between">
                         <span className="text-sm font-semibold uppercase">Output</span>
 
