@@ -17,6 +17,7 @@ const ApiCollectionList = ({apiCollections, tags}: {apiCollections: ApiCollectio
                                 apiCollectionEndpoints={apiCollection.endpoints}
                                 apiCollectionId={apiCollection.id!}
                                 collectionVersion={apiCollection.collectionVersion!}
+                                contextPath={apiCollection.contextPath}
                                 projectDeploymentId={apiCollection.projectDeploymentId!}
                                 projectId={apiCollection.projectId}
                                 projectVersion={apiCollection.projectVersion}

@@ -27,6 +27,7 @@ import {z} from 'zod';
 
 const formSchema = z.object({
     collectionVersion: z.coerce.number().min(1),
+    contextPath: z.coerce.string().min(1),
     description: z.string(),
     enabled: z.boolean().default(false),
     name: z.string().min(2, {
@@ -58,6 +59,7 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             collectionVersion: apiCollection?.collectionVersion || 1,
+            contextPath: apiCollection?.contextPath || '',
             description: apiCollection?.description || '',
             name: apiCollection?.name || '',
             projectId: apiCollection?.projectId,
@@ -226,6 +228,22 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
 
                                     <FormControl>
                                         <Textarea {...field} />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={control}
+                            name="contextPath"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Context Path</FormLabel>
+
+                                    <FormControl>
+                                        <Input {...field} />
                                     </FormControl>
 
                                     <FormMessage />

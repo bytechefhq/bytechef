@@ -40,10 +40,10 @@ const ApiCollectionListItemDropDownMenu = ({
 
                 <DropdownMenuItem
                     onClick={() =>
-                        (window.location.href = `/api/automation/api-platform/internal/api-collections/${apiCollectionId}/openapi`)
+                        (window.location.href = `/api/automation/api-platform/internal/api-collections/${apiCollectionId}/openapi.json`)
                     }
                 >
-                    Downaload OpenAPI Spec
+                    Download OpenAPI Spec
                 </DropdownMenuItem>
 
                 <DropdownMenuSeparator />

@@ -31,13 +31,14 @@ const formSchema = z.object({
     name: z.string().min(2, {
         message: 'Name must be at least 2 characters.',
     }),
-    path: z.string().min(1),
+    path: z.string(),
     workflowReferenceCode: z.string().min(1),
 });
 
 interface ApiEndpointDialogProps {
     apiCollectionId: number;
     apiEndpoint?: ApiCollectionEndpoint;
+    contextPath: string;
     onClose?: () => void;
     projectId: number;
     projectVersion: number;
@@ -47,6 +48,7 @@ interface ApiEndpointDialogProps {
 const ApiCollectionEndpointDialog = ({
     apiCollectionId,
     apiEndpoint,
+    contextPath,
     onClose,
     projectId,
     projectVersion,
@@ -259,7 +261,13 @@ const ApiCollectionEndpointDialog = ({
                                     <FormLabel>Path</FormLabel>
 
                                     <FormControl>
-                                        <Input {...field} />
+                                        <div className="flex">
+                                            <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-sm transition-colors">
+                                                {`/v${projectVersion}/${contextPath}/`}
+                                            </div>
+
+                                            <Input {...field} className="rounded-l-none border-l-0" />
+                                        </div>
                                     </FormControl>
 
                                     <FormMessage />

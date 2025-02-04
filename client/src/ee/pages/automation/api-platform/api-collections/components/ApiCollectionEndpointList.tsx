@@ -12,6 +12,7 @@ const ApiCollectionEndpointList = ({
     apiCollectionEndpoints,
     apiCollectionId,
     collectionVersion,
+    contextPath,
     projectDeploymentId,
     projectId,
     projectVersion,
@@ -19,6 +20,7 @@ const ApiCollectionEndpointList = ({
     apiCollectionEndpoints?: Array<ApiCollectionEndpoint>;
     apiCollectionId: number;
     collectionVersion: number;
+    contextPath: string;
     projectId: number;
     projectDeploymentId: number;
     projectVersion: number;
@@ -50,6 +52,7 @@ const ApiCollectionEndpointList = ({
                                         <ApiCollectionEndpointListItem
                                             apiCollectionEndpoint={apiCollectionEndpoint}
                                             collectionVersion={collectionVersion}
+                                            contextPath={contextPath}
                                             projectDeploymentId={projectDeploymentId}
                                             projectDeploymentWorkflow={
                                                 projectDeployment.projectDeploymentWorkflows.find(
@@ -73,6 +76,7 @@ const ApiCollectionEndpointList = ({
                         button={
                             <ApiCollectionEndpointDialog
                                 apiCollectionId={apiCollectionId}
+                                contextPath={contextPath}
                                 projectId={projectId}
                                 projectVersion={projectVersion}
                                 triggerNode={<Button>Create API Endpoint</Button>}
