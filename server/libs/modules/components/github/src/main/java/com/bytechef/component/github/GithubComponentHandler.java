@@ -28,6 +28,7 @@ import com.bytechef.component.github.action.GithubCreateCommentOnIssueAction;
 import com.bytechef.component.github.action.GithubCreateIssueAction;
 import com.bytechef.component.github.action.GithubGetIssueAction;
 import com.bytechef.component.github.action.GithubListIssuesAction;
+import com.bytechef.component.github.action.GithubListRepositoryIssuesAction;
 import com.bytechef.component.github.action.GithubStarRepositoryAction;
 import com.bytechef.component.github.trigger.GithubNewIssueTrigger;
 import com.bytechef.component.github.trigger.GithubNewPullRequestTrigger;
@@ -52,6 +53,7 @@ public class GithubComponentHandler implements ComponentHandler {
             GithubCreateIssueAction.ACTION_DEFINITION,
             GithubGetIssueAction.ACTION_DEFINITION,
             GithubListIssuesAction.ACTION_DEFINITION,
+            GithubListRepositoryIssuesAction.ACTION_DEFINITION,
             GithubStarRepositoryAction.ACTION_DEFINITION)
         .icon("path:assets/github.svg")
         .triggers(
