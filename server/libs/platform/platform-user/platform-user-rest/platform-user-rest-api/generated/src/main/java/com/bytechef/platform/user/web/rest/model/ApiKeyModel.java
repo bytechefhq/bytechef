@@ -19,12 +19,12 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * Contains generated key required for calling API.
+ * Contains generated key required for calling public API.
  */
 
-@Schema(name = "ApiKey", description = "Contains generated key required for calling API.")
+@Schema(name = "ApiKey", description = "Contains generated key required for calling public API.")
 @JsonTypeName("ApiKey")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.373487+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-27T19:19:15.592466+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ApiKeyModel {
 
   private @Nullable String createdBy;
@@ -184,11 +184,11 @@ public class ApiKeyModel {
   }
 
   /**
-   * The name of an API key.
+   * The name of the API key.
    * @return name
    */
   @NotNull 
-  @Schema(name = "name", description = "The name of an API key.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "name", description = "The name of the API key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("name")
   public String getName() {
     return name;
@@ -204,11 +204,11 @@ public class ApiKeyModel {
   }
 
   /**
-   * The preview of secret API key.
+   * The preview of the API secret key.
    * @return secretKey
    */
   
-  @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of secret API key.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @Schema(name = "secretKey", accessMode = Schema.AccessMode.READ_ONLY, description = "The preview of the API secret key.", requiredMode = Schema.RequiredMode.REQUIRED)
   @JsonProperty("secretKey")
   public String getSecretKey() {
     return secretKey;

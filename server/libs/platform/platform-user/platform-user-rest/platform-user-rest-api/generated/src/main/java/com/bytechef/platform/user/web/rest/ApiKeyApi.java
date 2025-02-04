@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.373487+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-27T19:19:15.592466+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "api-key", description = "The Platform User API Key Internal API")
 public interface ApiKeyApi {
@@ -47,7 +47,7 @@ public interface ApiKeyApi {
      * Create a new API key.
      *
      * @param apiKeyModel  (required)
-     * @return The secret API key object. (status code 200)
+     * @return The API secret key object. (status code 200)
      */
     @Operation(
         operationId = "createApiKey",
@@ -55,7 +55,7 @@ public interface ApiKeyApi {
         description = "Create a new API key.",
         tags = { "api-key" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The secret API key object.", content = {
+            @ApiResponse(responseCode = "200", description = "The API secret key object.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = CreateApiKey200ResponseModel.class))
             })
         }
