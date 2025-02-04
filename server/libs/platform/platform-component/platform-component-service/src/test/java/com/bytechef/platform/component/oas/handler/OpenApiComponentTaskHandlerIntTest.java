@@ -762,8 +762,7 @@ public class OpenApiComponentTaskHandlerIntTest {
 
     private OpenApiComponentTaskHandler createOpenApiComponentHandler(String actionName) {
         return new OpenApiComponentTaskHandler(
-            actionName, actionDefinitionFacade,
-            ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
+            actionName, actionDefinitionFacade, ComponentRegistryConfiguration.PETSTORE_COMPONENT_HANDLER);
     }
 
     private TaskExecution getTaskExecution(Map<String, Object> parameters) {

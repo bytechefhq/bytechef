@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.handler;
+package com.bytechef.atlas.worker.task.handler;
 
-import com.bytechef.component.ComponentHandler;
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface DynamicComponentHandlerFactory {
+public interface TaskHandlerProvider {
 
-    List<? extends ComponentHandler> getComponentHandlers();
-
-    Optional<ComponentHandler> fetchComponentHandler(String componentName, int componentVersion);
+    Map<String, TaskHandler<?>> getTaskHandlerMap();
 }

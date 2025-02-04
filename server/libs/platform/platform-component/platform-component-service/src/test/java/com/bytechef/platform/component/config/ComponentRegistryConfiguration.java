@@ -20,7 +20,6 @@ import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
-import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.petstore.PetstoreComponentHandler;
@@ -88,11 +87,6 @@ public class ComponentRegistryConfiguration {
         applicationProperties.setComponent(component);
 
         return applicationProperties;
-    }
-
-    @Bean
-    List<ComponentHandler> componentHandlers() {
-        return List.of(PETSTORE_COMPONENT_HANDLER);
     }
 
     @Bean

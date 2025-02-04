@@ -17,13 +17,13 @@
 package com.bytechef.platform.component.handler.factory;
 
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.platform.component.handler.ComponentHandlerServiceLoaderFactory;
+import com.bytechef.platform.component.handler.ComponentHandlerRegistry;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.handler.loader.DefaultComponentHandlerLoader;
 import com.bytechef.platform.component.jdbc.handler.loader.JdbcComponentHandlerLoader;
 import com.bytechef.platform.component.oas.handler.loader.OpenApiComponentHandlerLoader;
-import com.bytechef.platform.component.task.handler.ComponentTaskHandlerFactory;
-import com.bytechef.platform.component.trigger.handler.ComponentTriggerHandlerFactory;
+import com.bytechef.platform.component.task.handler.ComponentTaskHandlerProvider;
+import com.bytechef.platform.component.trigger.handler.ComponentTriggerHandlerProvider;
 import java.util.List;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
@@ -51,7 +51,7 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
             CollectionUtils.flatMap(COMPONENT_HANDLER_LOADERS, ComponentHandlerLoader::loadComponentHandlers);
 
         beanFactory.registerSingleton(
-            "componentHandlerServiceLoaderFactory", new ComponentHandlerServiceLoaderFactory(
+            "componentHandlerRegistry", new ComponentHandlerRegistry(
                 CollectionUtils.map(
                     componentHandlerEntries, ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)));
 
@@ -59,16 +59,15 @@ public class ComponentHandlerBeanFactoryPostProcessor implements BeanFactoryPost
 
         beanDefinitionRegistry.registerBeanDefinition(
             "componentTaskHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerFactory.class)
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTaskHandlerProvider.class)
                 .addConstructorArgValue(componentHandlerEntries)
                 .addConstructorArgReference("actionDefinitionFacade")
                 .getBeanDefinition());
 
         beanDefinitionRegistry.registerBeanDefinition(
             "componentTriggerHandlerMapFactory",
-            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerFactory.class)
+            BeanDefinitionBuilder.genericBeanDefinition(ComponentTriggerHandlerProvider.class)
                 .addConstructorArgValue(componentHandlerEntries)
-                .addConstructorArgReference("jobPrincipalAccessorRegistry")
                 .addConstructorArgReference("triggerDefinitionFacade")
                 .getBeanDefinition());
     }

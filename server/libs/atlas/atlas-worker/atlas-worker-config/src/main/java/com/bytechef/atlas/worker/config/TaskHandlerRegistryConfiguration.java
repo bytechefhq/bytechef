@@ -16,9 +16,9 @@
 
 package com.bytechef.atlas.worker.config;
 
-import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerFactory;
+import com.bytechef.atlas.worker.task.handler.DynamicTaskHandlerProvider;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerFactory;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerProvider;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.commons.util.MapUtils;
 import java.util.List;
@@ -34,12 +34,12 @@ public class TaskHandlerRegistryConfiguration {
     @Bean
     TaskHandlerRegistry taskHandlerRegistry(
         Map<String, TaskHandler<?>> taskHandlerMap,
-        @Autowired(required = false) TaskHandlerFactory taskHandlerFactory,
-        @Autowired(required = false) List<DynamicTaskHandlerFactory> dynamicTaskHandlerFactories) {
+        @Autowired(required = false) TaskHandlerProvider taskHandlerProvider,
+        @Autowired(required = false) List<DynamicTaskHandlerProvider> dynamicTaskHandlerFactories) {
 
         Map<String, TaskHandler<?>> mergedTaskHandlerMap = MapUtils.concat(
             taskHandlerMap,
-            taskHandlerFactory == null ? Map.of() : taskHandlerFactory.getTaskHandlerMap());
+            taskHandlerProvider == null ? Map.of() : taskHandlerProvider.getTaskHandlerMap());
 
         return new TaskHandlerRegistryImpl(
             mergedTaskHandlerMap, dynamicTaskHandlerFactories == null ? List.of() : dynamicTaskHandlerFactories);
@@ -47,7 +47,7 @@ public class TaskHandlerRegistryConfiguration {
 
     private record TaskHandlerRegistryImpl(
         Map<String, TaskHandler<?>> taskHandlerMap,
-        List<DynamicTaskHandlerFactory> dynamicTaskHandlerFactories) implements TaskHandlerRegistry {
+        List<DynamicTaskHandlerProvider> dynamicTaskHandlerFactories) implements TaskHandlerRegistry {
 
         @Override
         public TaskHandler<?> getTaskHandler(String type) {
@@ -57,7 +57,7 @@ public class TaskHandlerRegistryConfiguration {
                 taskHandler = taskHandlerMap.get(type);
             } else {
                 taskHandler = dynamicTaskHandlerFactories.stream()
-                    .map(dynamicTaskHandlerFactory -> dynamicTaskHandlerFactory.getTaskHandler(type))
+                    .map(dynamicTaskHandlerProvider -> dynamicTaskHandlerProvider.getTaskHandler(type))
                     .filter(Objects::nonNull)
                     .findFirst()
                     .orElseThrow();

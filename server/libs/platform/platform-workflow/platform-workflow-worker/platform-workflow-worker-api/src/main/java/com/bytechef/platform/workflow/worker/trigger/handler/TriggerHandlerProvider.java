@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.atlas.worker.task.handler;
+package com.bytechef.platform.workflow.worker.trigger.handler;
+
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
  */
-public interface DynamicTaskHandlerFactory {
+public interface TriggerHandlerProvider {
 
-    TaskHandler<?> getTaskHandler(String type);
+    Map<String, TriggerHandler> getTriggerHandlerMap();
 }

@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.component.handler;
-
-import com.bytechef.component.ComponentHandler;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+package com.bytechef.atlas.worker.task.handler;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record ComponentHandlerServiceLoaderFactory(
-    List<? extends ComponentHandler> componentHandlers) implements ComponentHandlerFactory {
+public interface DynamicTaskHandlerProvider {
 
-    public List<? extends ComponentHandler> getComponentHandlers() {
-        return componentHandlers;
-    }
+    TaskHandler<?> getTaskHandler(String type);
 }

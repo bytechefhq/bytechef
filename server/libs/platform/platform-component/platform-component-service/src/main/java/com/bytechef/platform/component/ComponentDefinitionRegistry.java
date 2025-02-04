@@ -38,13 +38,14 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Component.Registry;
-import com.bytechef.platform.component.handler.ComponentHandlerFactory;
-import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
+import com.bytechef.platform.component.handler.ComponentHandlerRegistry;
+import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import com.bytechef.platform.util.PropertyUtils;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -78,21 +79,16 @@ public class ComponentDefinitionRegistry {
         .actions(ComponentDsl.action("missing")
             .title("Missing Action"));
 
-    private final List<ComponentDefinition> componentDefinitions;
-    private final List<DynamicComponentHandlerFactory> dynamicComponentHandlerListFactories;
+    private final Map<String, Map<Integer, ComponentDefinition>> componentDefinitions = new HashMap<>();
+    private final List<DynamicComponentHandlerRegistry> dynamicComponentHandlerListFactories;
 
     public ComponentDefinitionRegistry(
         ApplicationProperties applicationProperties, List<ComponentHandler> componentHandlers,
-        List<ComponentHandlerFactory> componentHandlerFactories,
-        @Autowired(required = false) List<DynamicComponentHandlerFactory> dynamicComponentHandlerListFactories) {
+        ComponentHandlerRegistry componentHandlerRegistry,
+        @Autowired List<DynamicComponentHandlerRegistry> dynamicComponentHandlerRegistries) {
 
-        @SuppressWarnings("unchecked")
         List<ComponentHandler> mergedComponentHandlers = CollectionUtils.concat(
-            componentHandlers,
-            CollectionUtils.flatMap(
-                componentHandlerFactories,
-                componentHandlerListFactory -> (List<ComponentHandler>) componentHandlerListFactory
-                    .getComponentHandlers()));
+            componentHandlers, componentHandlerRegistry.componentHandlers());
 
         List<ComponentDefinition> componentDefinitions = CollectionUtils.concat(
             CollectionUtils.map(mergedComponentHandlers, ComponentHandler::getDefinition),
@@ -102,28 +98,31 @@ public class ComponentDefinitionRegistry {
 
         Registry registry = component.getRegistry();
 
-        if (!CollectionUtils.isEmpty(registry.getExclude())) {
+        List<String> exclude = registry.getExclude();
+
+        if (!CollectionUtils.isEmpty(exclude)) {
             componentDefinitions = componentDefinitions.stream()
-                .filter(componentDefinition -> !CollectionUtils.contains(
-                    registry.getExclude(), componentDefinition.getName()))
+                .filter(componentDefinition -> !CollectionUtils.contains(exclude, componentDefinition.getName()))
                 .toList();
         }
-
-        this.componentDefinitions = CollectionUtils.sort(componentDefinitions, this::compare);
 
         // Validate
 
         validate(componentDefinitions);
 
-        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerListFactories == null
-            ? List.of() : dynamicComponentHandlerListFactories;
+        for (ComponentDefinition componentDefinition : componentDefinitions) {
+            this.componentDefinitions.computeIfAbsent(componentDefinition.getName(), key -> new HashMap<>())
+                .put(componentDefinition.getVersion(), componentDefinition);
+        }
+
+        this.dynamicComponentHandlerListFactories = dynamicComponentHandlerRegistries == null
+            ? List.of() : dynamicComponentHandlerRegistries;
     }
 
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition
-            .getActions()
+        return componentDefinition.getActions()
             .orElse(Collections.emptyList())
             .stream()
             .filter(actionDefinition -> actionName.equalsIgnoreCase(actionDefinition.getName()))
@@ -173,17 +172,18 @@ public class ComponentDefinitionRegistry {
 
             componentDefinition = filteredComponentDefinitions.getLast();
         } else {
-            componentDefinition = componentDefinitions.stream()
-                .filter(
-                    curComponentDefinition -> name.equalsIgnoreCase(curComponentDefinition.getName()) &&
-                        version == curComponentDefinition.getVersion())
-                .findFirst()
-                .orElse(null);
+            Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitions.get(name);
+
+            if (componentDefinitionMap == null) {
+                throw new IllegalArgumentException("The component '%s' does not exist".formatted(name));
+            }
+
+            componentDefinition = componentDefinitionMap.get(version);
 
             if (componentDefinition == null) {
                 componentDefinition = dynamicComponentHandlerListFactories.stream()
                     .map(
-                        dynamicComponentHandlerFactory -> dynamicComponentHandlerFactory.fetchComponentHandler(
+                        dynamicComponentHandlerRegistry -> dynamicComponentHandlerRegistry.fetchComponentHandler(
                             name, version))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
@@ -207,24 +207,28 @@ public class ComponentDefinitionRegistry {
     public List<ComponentDefinition> getComponentDefinitions() {
         return CollectionUtils.sort(
             CollectionUtils.concat(
-                componentDefinitions,
+                componentDefinitions.values()
+                    .stream()
+                    .flatMap(map -> CollectionUtils.stream(map.values()))
+                    .toList(),
                 dynamicComponentHandlerListFactories.stream()
-                    .flatMap(dynamicComponentHandlerFactory -> CollectionUtils.stream(
-                        dynamicComponentHandlerFactory.getComponentHandlers()))
+                    .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
+                        dynamicComponentHandlerRegistry.getComponentHandlers()))
                     .map(ComponentHandler::getDefinition)
                     .toList()),
             this::compare);
     }
 
     public List<ComponentDefinition> getComponentDefinitions(String name) {
-        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.stream()
-            .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
+        List<ComponentDefinition> filteredComponentDefinitions = componentDefinitions.get(name)
+            .values()
+            .stream()
             .toList();
 
         if (filteredComponentDefinitions.isEmpty()) {
             filteredComponentDefinitions = dynamicComponentHandlerListFactories.stream()
-                .flatMap(dynamicComponentHandlerFactory -> CollectionUtils.stream(
-                    dynamicComponentHandlerFactory.getComponentHandlers()))
+                .flatMap(dynamicComponentHandlerRegistry -> CollectionUtils.stream(
+                    dynamicComponentHandlerRegistry.getComponentHandlers()))
                 .map(ComponentHandler::getDefinition)
                 .filter(componentDefinition -> Objects.equals(componentDefinition.getName(), name))
                 .toList();
@@ -247,8 +251,7 @@ public class ComponentDefinitionRegistry {
     public TriggerDefinition getTriggerDefinition(String componentName, int componentVersion, String triggerName) {
         ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
 
-        return componentDefinition
-            .getTriggers()
+        return componentDefinition.getTriggers()
             .orElse(Collections.emptyList())
             .stream()
             .filter(triggerDefinition -> triggerName.equalsIgnoreCase(triggerDefinition.getName()))

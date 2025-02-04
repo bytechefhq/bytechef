@@ -24,9 +24,8 @@ import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.handler.loader.ComponentHandlerLoader;
 import com.bytechef.platform.component.util.BeanUtils;
-import com.bytechef.platform.configuration.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandler;
-import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerFactory;
+import com.bytechef.platform.workflow.worker.trigger.handler.TriggerHandlerProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -36,21 +35,29 @@ import java.util.stream.Collectors;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record ComponentTriggerHandlerFactory(
-    List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
-    JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade)
-    implements TriggerHandlerFactory {
+public final class ComponentTriggerHandlerProvider implements TriggerHandlerProvider {
 
-    @Override
-    public Map<String, TriggerHandler> getTriggerHandlerMap() {
-        return componentHandlerEntries.stream()
+    private final Map<String, TriggerHandler> triggerHandlerMap;
+
+    public ComponentTriggerHandlerProvider(
+        List<ComponentHandlerLoader.ComponentHandlerEntry> componentHandlerEntries,
+        TriggerDefinitionFacade triggerDefinitionFacade) {
+
+        this.triggerHandlerMap = componentHandlerEntries.stream()
             .map(ComponentHandlerLoader.ComponentHandlerEntry::componentHandler)
             .map(ComponentHandler::getDefinition)
-            .map(this::collect)
+            .map(componentDefinition -> collect(componentDefinition, triggerDefinitionFacade))
             .reduce(Map.of(), MapUtils::concat);
     }
 
-    private Map<String, TriggerHandler> collect(ComponentDefinition componentDefinition) {
+    @Override
+    public Map<String, TriggerHandler> getTriggerHandlerMap() {
+        return triggerHandlerMap;
+    }
+
+    private Map<String, TriggerHandler> collect(
+        ComponentDefinition componentDefinition, TriggerDefinitionFacade triggerDefinitionFacade) {
+
         return OptionalUtils.orElse(componentDefinition.getTriggers(), List.of())
             .stream()
             .filter(triggerDefinition -> triggerDefinition != null &&

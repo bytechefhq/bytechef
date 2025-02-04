@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.worker.trigger.handler;
+package com.bytechef.platform.component.handler;
 
-import java.util.Map;
+import com.bytechef.component.ComponentHandler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 
 /**
  * @author Ivica Cardic
  */
-public interface TriggerHandlerFactory {
-
-    Map<String, TriggerHandler> getTriggerHandlerMap();
+@SuppressFBWarnings("EI")
+public record ComponentHandlerRegistry(List<ComponentHandler> componentHandlers) {
 }

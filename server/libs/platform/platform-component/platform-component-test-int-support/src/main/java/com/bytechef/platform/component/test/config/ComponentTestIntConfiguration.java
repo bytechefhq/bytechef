@@ -35,7 +35,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
 import com.bytechef.atlas.worker.task.handler.TaskHandler;
-import com.bytechef.atlas.worker.task.handler.TaskHandlerFactory;
+import com.bytechef.atlas.worker.task.handler.TaskHandlerProvider;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
@@ -113,11 +113,11 @@ public class ComponentTestIntConfiguration {
     ComponentJobTestExecutor componentWorkflowTestSupport(
         ContextService contextService, JobService jobService,
         TaskExecutionService taskExecutionService, Map<String, TaskHandler<?>> taskHandlerMap,
-        TaskHandlerFactory taskHandlerFactory, WorkflowService workflowService) {
+        TaskHandlerProvider taskHandlerProvider, WorkflowService workflowService) {
 
         return new ComponentJobTestExecutor(
             contextService, jobService, taskExecutionService,
-            MapUtils.concat(taskHandlerMap, taskHandlerFactory.getTaskHandlerMap()), workflowService);
+            MapUtils.concat(taskHandlerMap, taskHandlerProvider.getTaskHandlerMap()), workflowService);
     }
 
     @Bean(name = "connectionService")

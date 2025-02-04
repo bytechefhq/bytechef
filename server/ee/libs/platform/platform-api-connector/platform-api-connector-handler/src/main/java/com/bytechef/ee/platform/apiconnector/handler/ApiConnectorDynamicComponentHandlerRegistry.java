@@ -12,7 +12,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorService;
 import com.bytechef.ee.platform.apiconnector.handler.helper.ComponentDefinitionHelper;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
+import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +25,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class ApiConnectorDynamicComponentHandlerFactory implements DynamicComponentHandlerFactory {
+public class ApiConnectorDynamicComponentHandlerRegistry implements DynamicComponentHandlerRegistry {
 
     private final ApiConnectorService apiConnectorService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
 
     @SuppressFBWarnings("EI")
-    public ApiConnectorDynamicComponentHandlerFactory(
+    public ApiConnectorDynamicComponentHandlerRegistry(
         ApiConnectorService apiConnectorService, ComponentDefinitionHelper componentDefinitionHelper) {
 
         this.apiConnectorService = apiConnectorService;

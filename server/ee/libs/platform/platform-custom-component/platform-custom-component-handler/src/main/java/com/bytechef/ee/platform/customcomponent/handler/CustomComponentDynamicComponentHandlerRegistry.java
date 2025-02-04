@@ -19,7 +19,7 @@ import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.ComponentHandlerWrapper;
-import com.bytechef.platform.component.handler.DynamicComponentHandlerFactory;
+import com.bytechef.platform.component.handler.DynamicComponentHandlerRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.net.URL;
 import java.util.List;
@@ -33,13 +33,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-public class CustomComponentDynamicComponentHandlerFactory implements DynamicComponentHandlerFactory {
+public class CustomComponentDynamicComponentHandlerRegistry implements DynamicComponentHandlerRegistry {
 
     private final CustomComponentFileStorage customComponentFileStorage;
     private final CustomComponentService customComponentService;
 
     @SuppressFBWarnings("EI")
-    public CustomComponentDynamicComponentHandlerFactory(
+    public CustomComponentDynamicComponentHandlerRegistry(
         CustomComponentFileStorage customComponentFileStorage, CustomComponentService customComponentService) {
 
         this.customComponentFileStorage = customComponentFileStorage;
