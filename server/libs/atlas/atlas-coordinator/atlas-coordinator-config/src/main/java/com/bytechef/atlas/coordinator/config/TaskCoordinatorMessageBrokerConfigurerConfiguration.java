@@ -59,7 +59,6 @@ public class TaskCoordinatorMessageBrokerConfigurerConfiguration {
             messageEventPostReceiveProcessors, taskCoordinator);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> {
-
             Subscriptions subscriptions = applicationProperties.getCoordinator()
                 .getTask()
                 .getSubscriptions();

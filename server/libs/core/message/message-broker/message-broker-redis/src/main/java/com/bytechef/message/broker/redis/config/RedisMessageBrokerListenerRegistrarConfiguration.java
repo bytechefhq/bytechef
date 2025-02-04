@@ -61,8 +61,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
         RedisSMQ redisSMQ, TaskExecutor taskExecutor) {
 
         this.messageBrokerConfigurers = messageBrokerConfigurers == null
-            ? Collections.emptyList()
-            : messageBrokerConfigurers;
+            ? Collections.emptyList() : messageBrokerConfigurers;
         this.redisConnectionFactory = redisConnectionFactory;
         this.redisMessageDeserializer = redisMessageDeserializer;
         this.redisSMQ = redisSMQ;
@@ -91,7 +90,7 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     }
 
     @Override
-    public void destroy() throws InterruptedException {
+    public void destroy() {
         redisListenerEndpointRegistrar.stop();
         redisMessageListenerContainer.stop();
     }
