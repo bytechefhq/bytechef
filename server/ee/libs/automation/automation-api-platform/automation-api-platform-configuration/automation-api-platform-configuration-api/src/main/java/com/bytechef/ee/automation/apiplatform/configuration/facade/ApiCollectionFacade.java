@@ -33,6 +33,8 @@ public interface ApiCollectionFacade {
 
     List<Tag> getApiCollectionTags();
 
+    String getOpenApiSpecification(long id);
+
     ApiCollectionDTO updateApiCollection(@NonNull ApiCollectionDTO apiCollectionDTO);
 
     void updateApiCollectionTags(long id, List<Tag> tags);
