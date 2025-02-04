@@ -55,6 +55,12 @@ export interface ApiCollection {
      */
     collectionVersion?: number;
     /**
+     * The collection context path.
+     * @type {string}
+     * @memberof ApiCollection
+     */
+    contextPath: string;
+    /**
      * The created by.
      * @type {string}
      * @memberof ApiCollection
@@ -162,6 +168,7 @@ export interface ApiCollection {
  * Check if a given object implements the ApiCollection interface.
  */
 export function instanceOfApiCollection(value: object): value is ApiCollection {
+    if (!('contextPath' in value) || value['contextPath'] === undefined) return false;
     if (!('enabled' in value) || value['enabled'] === undefined) return false;
     if (!('name' in value) || value['name'] === undefined) return false;
     if (!('projectId' in value) || value['projectId'] === undefined) return false;
@@ -181,6 +188,7 @@ export function ApiCollectionFromJSONTyped(json: any, ignoreDiscriminator: boole
     return {
         
         'collectionVersion': json['collectionVersion'] == null ? undefined : json['collectionVersion'],
+        'contextPath': json['contextPath'],
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'description': json['description'] == null ? undefined : json['description'],
@@ -213,6 +221,7 @@ export function ApiCollectionToJSONTyped(value?: Omit<ApiCollection, 'createdBy'
     return {
         
         'collectionVersion': value['collectionVersion'],
+        'contextPath': value['contextPath'],
         'description': value['description'],
         'enabled': value['enabled'],
         'endpoints': value['endpoints'] == null ? undefined : ((value['endpoints'] as Array<any>).map(ApiCollectionEndpointToJSON)),
