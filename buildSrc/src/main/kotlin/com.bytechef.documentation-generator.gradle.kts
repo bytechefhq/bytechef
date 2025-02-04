@@ -336,7 +336,7 @@ $description
 
 ${getCategoriesString()}
 
-Version: $version
+Type: $name/v$version
 
 <hr />
 
