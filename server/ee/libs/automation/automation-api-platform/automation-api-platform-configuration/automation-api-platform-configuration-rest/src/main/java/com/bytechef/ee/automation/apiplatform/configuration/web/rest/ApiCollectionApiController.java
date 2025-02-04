@@ -45,6 +45,7 @@ public class ApiCollectionApiController implements ApiCollectionApi {
     @Override
     @SuppressFBWarnings("NP")
     public ResponseEntity<ApiCollectionModel> createApiCollection(ApiCollectionModel apiCollectionModel) {
+        validate(apiCollectionModel);
 
         ApiCollectionDTO apiCollection = conversionService.convert(apiCollectionModel, ApiCollectionDTO.class);
 
@@ -80,13 +81,20 @@ public class ApiCollectionApiController implements ApiCollectionApi {
 
     @Override
     @SuppressFBWarnings("NP")
-    public ResponseEntity<ApiCollectionModel> updateApiCollection(
-        Long id, ApiCollectionModel apiCollectionModel) {
+    public ResponseEntity<ApiCollectionModel> updateApiCollection(Long id, ApiCollectionModel apiCollectionModel) {
+        validate(apiCollectionModel);
 
         return ResponseEntity.ok(
             conversionService.convert(
                 apiCollectionFacade.updateApiCollection(
                     conversionService.convert(apiCollectionModel.id(id), ApiCollectionDTO.class)),
                 ApiCollectionModel.class));
+    }
+    private static void validate(ApiCollectionModel apiCollectionModel) {
+        String contextPath = apiCollectionModel.getContextPath();
+
+        if (contextPath.startsWith("/")) {
+            throw new IllegalArgumentException("Context path must not start with a slash.");
+        }
     }
 }

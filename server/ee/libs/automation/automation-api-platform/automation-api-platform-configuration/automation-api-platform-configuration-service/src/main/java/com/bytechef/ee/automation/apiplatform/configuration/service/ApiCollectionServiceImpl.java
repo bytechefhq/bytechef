@@ -55,6 +55,11 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
     }
 
     @Override
+    public ApiCollection getApiCollection(String contextPath) {
+        return OptionalUtils.get(apiCollectionRepository.findByContextPath(contextPath));
+    }
+
+    @Override
     public List<Long> getApiCollectionProjectIds(long workspaceId) {
         return apiCollectionRepository.findAllApiCollectionProjectIds(workspaceId);
     }
@@ -77,6 +82,7 @@ public class ApiCollectionServiceImpl implements ApiCollectionService {
         ApiCollection curApiCollection = getApiCollection(Validate.notNull(apiCollection.getId(), "id"));
 
         curApiCollection.setCollectionVersion(apiCollection.getCollectionVersion());
+        curApiCollection.setContextPath(apiCollection.getContextPath());
         curApiCollection.setDescription(apiCollection.getDescription());
         curApiCollection.setName(apiCollection.getName());
         curApiCollection.setTagIds(apiCollection.getTagIds());

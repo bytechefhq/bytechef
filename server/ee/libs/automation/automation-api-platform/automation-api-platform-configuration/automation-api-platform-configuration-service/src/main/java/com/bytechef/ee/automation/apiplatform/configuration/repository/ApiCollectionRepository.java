@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.repository;
 
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.ListPagingAndSortingRepository;
@@ -32,4 +33,6 @@ public interface ApiCollectionRepository
         WHERE project.workspace_id = :workspaceId
         """)
     List<Long> findAllApiCollectionProjectIds(@Param("workspaceId") long workspaceId);
+
+    Optional<ApiCollection> findByContextPath(String contextPath);
 }

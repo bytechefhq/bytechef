@@ -22,8 +22,8 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record ApiCollectionDTO(
-    int collectionVersion, String createdBy, Instant createdDate, String description, boolean enabled,
-    List<ApiCollectionEndpointDTO> endpoints, Long id, String lastModifiedBy, Instant lastModifiedDate,
+    int collectionVersion, String contextPath, String createdBy, Instant createdDate, String description,
+    boolean enabled, List<ApiCollectionEndpointDTO> endpoints, Long id, String lastModifiedBy, Instant lastModifiedDate,
     String name, Project project, long projectId, ProjectDeployment projectDeployment, long projectDeploymentId,
     int projectVersion, List<Tag> tags, int version) {
 
@@ -32,17 +32,19 @@ public record ApiCollectionDTO(
         ProjectDeployment projectDeployment, List<Tag> tags) {
 
         this(
-            apiCollection.getCollectionVersion(), apiCollection.getCreatedBy(), apiCollection.getCreatedDate(),
-            apiCollection.getDescription(), projectDeployment.isEnabled(), endpoints, apiCollection.getId(),
-            apiCollection.getLastModifiedBy(), apiCollection.getLastModifiedDate(), apiCollection.getName(), project,
-            projectDeployment.getProjectId(), projectDeployment, apiCollection.getProjectDeploymentId(),
-            projectDeployment.getProjectVersion(), tags, apiCollection.getVersion());
+            apiCollection.getCollectionVersion(), apiCollection.getContextPath(), apiCollection.getCreatedBy(),
+            apiCollection.getCreatedDate(), apiCollection.getDescription(), projectDeployment.isEnabled(), endpoints,
+            apiCollection.getId(), apiCollection.getLastModifiedBy(), apiCollection.getLastModifiedDate(),
+            apiCollection.getName(), project, projectDeployment.getProjectId(), projectDeployment,
+            apiCollection.getProjectDeploymentId(), projectDeployment.getProjectVersion(), tags,
+            apiCollection.getVersion());
     }
 
     public ApiCollection toApiCollection() {
         ApiCollection apiCollection = new ApiCollection();
 
         apiCollection.setCollectionVersion(collectionVersion);
+        apiCollection.setContextPath(contextPath);
         apiCollection.setDescription(description);
         apiCollection.setId(id);
         apiCollection.setName(name);

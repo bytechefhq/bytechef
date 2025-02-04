@@ -94,14 +94,14 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
     public ResponseEntity<?> handleDeleteMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(HttpMethod.GET, httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.DELETE, httpServletRequest, httpServletResponse);
     }
 
     @GetMapping(produces = "application/json")
     public ResponseEntity<?> handleGetMethod(
         final HttpServletRequest httpServletRequest, final HttpServletResponse httpServletResponse) {
 
-        return doHandle(HttpMethod.DELETE, httpServletRequest, httpServletResponse);
+        return doHandle(HttpMethod.GET, httpServletRequest, httpServletResponse);
     }
 
     @PatchMapping(produces = "application/json")
@@ -135,8 +135,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
             String path = requestURI.replace(API_PLATFORM_BASE_PATH, "");
 
-            ApiCollectionEndpoint apiCollectionEndpoint = getApiCollectionEndpoint(
+            ApiCollectionEndpointResult apiCollectionEndpointResult = getApiCollectionEndpoint(
                 httpMethod, path, getEnvironment(httpServletRequest));
+
+            ApiCollection apiCollection = apiCollectionEndpointResult.apiCollection;
+            ApiCollectionEndpoint apiCollectionEndpoint = apiCollectionEndpointResult.apiCollectionEndpoint;
 
             ProjectDeploymentWorkflow projectDeploymentWorkflow =
                 projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
@@ -147,20 +150,19 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                     .body("API Collection Endpoint is not enabled");
             }
 
-            ApiCollection apiCollection = apiCollectionService.getApiCollection(
-                apiCollectionEndpoint.getApiCollectionId());
-
             ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(
                 apiCollection.getProjectDeploymentId());
 
             if (!projectDeployment.isEnabled()) {
-                return ResponseEntity.status(404)
-                    .body("API Collection is not enabled");
+                return ResponseEntity.status(404).body("API Collection is not enabled");
             }
 
             variables = PATH_MATCHER
                 .extractUriTemplateVariables(
-                    getPathPattern(apiCollection.getCollectionVersion(), apiCollectionEndpoint.getPath()), path)
+                    getPathPattern(
+                        apiCollection.getContextPath(), apiCollection.getCollectionVersion(),
+                        apiCollectionEndpoint.getPath()),
+                    path)
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> Collections.singletonList(entry.getValue())));
@@ -182,7 +184,7 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         });
     }
 
-    private ApiCollectionEndpoint getApiCollectionEndpoint(
+    private ApiCollectionEndpointResult getApiCollectionEndpoint(
         HttpMethod httpMethod, String path, Environment environment) {
 
         for (ApiCollection apiCollection : apiCollectionService.getApiCollections(null, environment, null, null)) {
@@ -191,10 +193,11 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
 
             for (ApiCollectionEndpoint apiCollectionEndpoint : apiCollectionEndpoints) {
                 String pathPattern = getPathPattern(
-                    apiCollection.getCollectionVersion(), apiCollectionEndpoint.getPath());
+                    apiCollection.getContextPath(), apiCollection.getCollectionVersion(),
+                    apiCollectionEndpoint.getPath());
 
                 if (PATH_MATCHER.match(pathPattern, path) && apiCollectionEndpoint.getHttpMethod() == httpMethod) {
-                    return apiCollectionEndpoint;
+                    return new ApiCollectionEndpointResult(apiCollection, apiCollectionEndpoint);
                 }
             }
         }
@@ -212,7 +215,14 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
         return Environment.PRODUCTION;
     }
 
-    private static String getPathPattern(int collectionVersion, String apiCollectionEndpointPath) {
-        return "/v" + collectionVersion + "/" + apiCollectionEndpointPath;
+    private static String getPathPattern(
+        String apiCollectionContextPath, int apiCollectionVersion, String apiCollectionEndpointPath) {
+
+        return "/v" + apiCollectionVersion + "/" + apiCollectionContextPath +
+            (apiCollectionEndpointPath == null ? "" : "/" + apiCollectionEndpointPath);
+    }
+
+    private record ApiCollectionEndpointResult(
+        ApiCollection apiCollection, ApiCollectionEndpoint apiCollectionEndpoint) {
     }
 }

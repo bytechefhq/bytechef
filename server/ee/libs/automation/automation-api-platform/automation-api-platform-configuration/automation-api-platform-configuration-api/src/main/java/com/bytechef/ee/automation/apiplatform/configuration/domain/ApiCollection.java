@@ -34,6 +34,24 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("api_collection")
 public class ApiCollection {
 
+    @Id
+    private Long id;
+
+    @Column("project_deployment_id")
+    private AggregateReference<ProjectDeployment, Long> projectDeploymentId;
+
+    @Column
+    private String name;
+
+    @Column("context_path")
+    private String contextPath;
+
+    @Column
+    private String description;
+
+    @Column("collection_version")
+    private Integer collectionVersion;
+
     @MappedCollection(idColumn = "api_collection_id")
     private Set<ApiCollectionTag> apiCollectionTags = new HashSet<>();
 
@@ -45,15 +63,6 @@ public class ApiCollection {
     @CreatedDate
     private Instant createdDate;
 
-    @Column
-    private String description;
-
-    @Column("collection_version")
-    private Integer collectionVersion;
-
-    @Id
-    private Long id;
-
     @Column("last_modified_by")
     @LastModifiedBy
     private String lastModifiedBy;
@@ -61,12 +70,6 @@ public class ApiCollection {
     @Column("last_modified_date")
     @LastModifiedDate
     private Instant lastModifiedDate;
-
-    @Column
-    private String name;
-
-    @Column("project_deployment_id")
-    private AggregateReference<ProjectDeployment, Long> projectDeploymentId;
 
     @Version
     private int version;
@@ -93,8 +96,31 @@ public class ApiCollection {
         return id;
     }
 
+    public Long getProjectDeploymentId() {
+        return projectDeploymentId == null ? null : projectDeploymentId.getId();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getContextPath() {
+        return contextPath;
+    }
+
     public Integer getCollectionVersion() {
         return collectionVersion;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<Long> getTagIds() {
+        return apiCollectionTags
+            .stream()
+            .map(ApiCollectionTag::getTagId)
+            .toList();
     }
 
     public String getCreatedBy() {
@@ -105,10 +131,6 @@ public class ApiCollection {
         return createdDate;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
@@ -117,23 +139,24 @@ public class ApiCollection {
         return lastModifiedDate;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public Long getProjectDeploymentId() {
-        return projectDeploymentId == null ? null : projectDeploymentId.getId();
-    }
-
-    public List<Long> getTagIds() {
-        return apiCollectionTags
-            .stream()
-            .map(ApiCollectionTag::getTagId)
-            .toList();
-    }
-
     public int getVersion() {
         return version;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setProjectDeploymentId(Long projectDeploymentId) {
+        this.projectDeploymentId = projectDeploymentId == null ? null : AggregateReference.to(projectDeploymentId);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
     }
 
     public void setCollectionVersion(int collectionVersion) {
@@ -142,18 +165,6 @@ public class ApiCollection {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setProjectDeploymentId(Long projectDeploymentId) {
-        this.projectDeploymentId = projectDeploymentId == null ? null : AggregateReference.to(projectDeploymentId);
     }
 
     public void setTagIds(List<Long> tagIds) {
@@ -180,9 +191,11 @@ public class ApiCollection {
     public String toString() {
         return "ApiCollection{" +
             "id=" + id +
-            ", name='" + name + '\'' +
-            ", collectionVersion=" + collectionVersion +
             ", projectDeploymentId=" + projectDeploymentId +
+            ", name='" + name + '\'' +
+            ", contextPath='" + contextPath + '\'' +
+            ", collectionVersion=" + collectionVersion +
+            ", description='" + description + '\'' +
             ", apiCollectionTags=" + apiCollectionTags +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
