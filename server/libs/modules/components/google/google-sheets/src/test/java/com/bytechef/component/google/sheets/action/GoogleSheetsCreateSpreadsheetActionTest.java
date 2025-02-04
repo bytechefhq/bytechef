@@ -74,8 +74,8 @@ class GoogleSheetsCreateSpreadsheetActionTest {
             when(mockCreateRequest.execute())
                 .thenReturn(newSpreadSheet);
 
-            Object result =
-                GoogleSheetsCreateSpreadsheetAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = GoogleSheetsCreateSpreadsheetAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(newSpreadSheet, result);
 
