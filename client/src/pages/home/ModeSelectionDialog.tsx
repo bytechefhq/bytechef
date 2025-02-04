@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -10,7 +11,7 @@ import {
 import {Label} from '@/components/ui/label';
 import {RadioGroup, RadioGroupItem} from '@/components/ui/radio-group';
 import {BotIcon, CodeIcon} from 'lucide-react';
-import {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -66,10 +67,14 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                 onEscapeKeyDown={(event) => currentType === undefined && event.preventDefault()}
                 onInteractOutside={(event) => currentType === undefined && event.preventDefault()}
             >
-                <DialogHeader>
-                    <DialogTitle className="text-xl">Select how you will use ByteChef</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle className="text-xl">Select how you will use ByteChef</DialogTitle>
 
-                    <DialogDescription>You can change always change this configuration</DialogDescription>
+                        <DialogDescription>You can change always change this configuration</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <RadioGroup

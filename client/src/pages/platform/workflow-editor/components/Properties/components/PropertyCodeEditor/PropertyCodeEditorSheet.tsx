@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyCodeEditorSheetRightPanel from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanel';
 import CopilotButton from '@/shared/components/copilot/CopilotButton';
@@ -76,46 +76,46 @@ const PropertyCodeEditorSheet = ({
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
-                    <SheetHeader>
-                        <div className="flex flex-1 items-center justify-between px-4 py-2">
-                            <SheetTitle>Edit Script</SheetTitle>
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                        <SheetTitle>Edit Script</SheetTitle>
 
-                            <div className="flex items-center">
-                                <div className="mr-10 flex items-center">
-                                    {!scriptIsRunning && (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <span tabIndex={0}>
-                                                    <Button
-                                                        disabled={dirty}
-                                                        onClick={handleRunClick}
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <PlayIcon className="h-5 text-success" />
-                                                    </Button>
-                                                </span>
-                                            </TooltipTrigger>
+                        <div className="flex items-center gap-1">
+                            {!scriptIsRunning && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span tabIndex={0}>
+                                            <Button
+                                                className="[&_svg]:size-5"
+                                                disabled={dirty}
+                                                onClick={handleRunClick}
+                                                size="icon"
+                                                variant="ghost"
+                                            >
+                                                <PlayIcon className="text-success" />
+                                            </Button>
+                                        </span>
+                                    </TooltipTrigger>
 
-                                            <TooltipContent>Run the current workflow</TooltipContent>
-                                        </Tooltip>
-                                    )}
+                                    <TooltipContent>Run the current workflow</TooltipContent>
+                                </Tooltip>
+                            )}
 
-                                    {scriptIsRunning && (
-                                        <Button
-                                            onClick={() => {
-                                                // TODO
-                                            }}
-                                            size="icon"
-                                            variant="destructive"
-                                        >
-                                            <SquareIcon className="h-5" />
-                                        </Button>
-                                    )}
+                            {scriptIsRunning && (
+                                <Button
+                                    className="[&_svg]:size-5"
+                                    onClick={() => {
+                                        // TODO
+                                    }}
+                                    size="icon"
+                                    variant="destructive"
+                                >
+                                    <SquareIcon />
+                                </Button>
+                            )}
 
-                                    <CopilotButton source={Source.CODE_EDITOR} />
-                                </div>
-                            </div>
+                            <CopilotButton source={Source.CODE_EDITOR} />
+
+                            <SheetCloseButton />
                         </div>
                     </SheetHeader>
 

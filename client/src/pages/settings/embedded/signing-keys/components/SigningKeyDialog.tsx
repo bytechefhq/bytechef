@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -22,7 +23,7 @@ import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import {ClipboardIcon} from 'lucide-react';
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
@@ -118,13 +119,13 @@ const SigningKeyDialog = ({onClose, signingKey, triggerNode}: SigningKeyDialogPr
             <DialogContent className="min-w-signing-key-dialog-width">
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveSigningKey)}>
-                        <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>
-                                    {(privateKey ? 'Save your private ' : `${signingKey?.id ? 'Edit' : 'Create'}`) +
-                                        ' Signing Key'}
-                                </DialogTitle>
-                            </div>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <DialogTitle>
+                                {(privateKey ? 'Save your private ' : `${signingKey?.id ? 'Edit' : 'Create'}`) +
+                                    ' Signing Key'}
+                            </DialogTitle>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         {privateKey ? (

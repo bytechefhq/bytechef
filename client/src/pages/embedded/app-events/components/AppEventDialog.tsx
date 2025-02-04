@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -16,7 +17,7 @@ import {useCreateAppEventMutation, useUpdateAppEventMutation} from '@/shared/mut
 import {AppEventKeys} from '@/shared/queries/embedded/appEvents.queries';
 import Editor from '@monaco-editor/react';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface AppEventDialogProps {
@@ -90,12 +91,16 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveAppEvent)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${appEvent?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${appEvent?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
 
-                            <DialogDescription>
-                                Send app events from your application to trigger workflows using App Event trigger.
-                            </DialogDescription>
+                                <DialogDescription>
+                                    Send app events from your application to trigger workflows using App Event trigger.
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <FormField

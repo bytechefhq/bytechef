@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -12,7 +13,7 @@ import Editor from '@monaco-editor/react';
 import {editor} from 'monaco-editor';
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 
 const OutputTabSampleDataDialog = ({
     onClose,
@@ -73,12 +74,16 @@ const OutputTabSampleDataDialog = ({
     return (
         <Dialog onOpenChange={handleOpenChange} open={open}>
             <DialogContent className="max-w-output-tab-sample-data-dialog-width">
-                <DialogHeader>
-                    <DialogTitle>Upload Sample Output Data</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Upload Sample Output Data</DialogTitle>
 
-                    <DialogDescription>
-                        Add sample value in JSON format. Click Upload when you&apos;re done.
-                    </DialogDescription>
+                        <DialogDescription>
+                            Add sample value in JSON format. Click Upload when you&apos;re done.
+                        </DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">

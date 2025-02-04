@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import WorkflowOutputsSheetDialog from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetDialog';
 import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/components/WorkflowOutputsSheetTable';
 import {Workflow} from '@/shared/middleware/platform/configuration';
@@ -16,16 +16,18 @@ const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) =>
             onFocusOutside={(event) => event.preventDefault()}
             onPointerDownOutside={(event) => event.preventDefault()}
         >
-            <SheetHeader className="flex flex-row items-center justify-between space-y-0">
-                <SheetTitle className="flex">Workflow Outputs</SheetTitle>
+            <SheetHeader className="flex flex-row items-center justify-between">
+                <SheetTitle>Workflow Outputs</SheetTitle>
 
-                <div className="mr-8 flex items-center">
+                <div className="flex items-center gap-1">
                     {!!workflow.outputs?.length && (
                         <WorkflowOutputsSheetDialog
                             triggerNode={<Button size="sm">New Output</Button>}
                             workflow={workflow}
                         />
                     )}
+
+                    <SheetCloseButton />
                 </div>
             </SheetHeader>
 

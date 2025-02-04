@@ -3,6 +3,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -29,7 +30,7 @@ import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface IntegrationDialogProps {
@@ -164,14 +165,18 @@ const IntegrationDialog = ({integration, onClose, triggerNode}: IntegrationDialo
 
             <DialogContent>
                 <Form {...form}>
-                    <DialogHeader>
-                        <DialogTitle>{`${integration?.id ? 'Edit' : 'Create'} Integration`}</DialogTitle>
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                        <div className="flex flex-col space-y-1">
+                            <DialogTitle>{`${integration?.id ? 'Edit' : 'Create'} Integration`}</DialogTitle>
 
-                        <DialogDescription>
-                            {`Use this to ${
-                                integration?.id ? 'edit' : 'create'
-                            } your integration which will contain related workflows`}
-                        </DialogDescription>
+                            <DialogDescription>
+                                {`Use this to ${
+                                    integration?.id ? 'edit' : 'create'
+                                } your integration which will contain workflows`}
+                            </DialogDescription>
+                        </div>
+
+                        <DialogCloseButton />
                     </DialogHeader>
 
                     {categoriesError && !categoriesLoading && `An error has occurred: ${categoriesError.message}`}

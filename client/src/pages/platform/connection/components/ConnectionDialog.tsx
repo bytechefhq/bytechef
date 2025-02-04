@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -39,7 +40,7 @@ import {QueryKey, UseMutationResult, UseQueryResult, useQueryClient} from '@tans
 import {useCopyToClipboard} from '@uidotdev/usehooks';
 import CreatableSelect from 'components/CreatableSelect/CreatableSelect';
 import {ClipboardIcon} from 'lucide-react';
-import {ReactNode, useEffect, useMemo, useState} from 'react';
+import React, {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 import ComponentSelectionInput from './ComponentSelectionInput';
@@ -382,21 +383,25 @@ const ConnectionDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             {!componentDefinitionsLoading && (
-                <DialogContent className="gap-0 px-0 py-6" onInteractOutside={(event) => event.preventDefault()}>
+                <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                     <Form {...form}>
-                        <DialogHeader className="px-6">
-                            <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
-                            {!connection?.id && (
-                                <DialogDescription>
-                                    Create your connection to connect to the chosen service
-                                </DialogDescription>
-                            )}
+                                {!connection?.id && (
+                                    <DialogDescription>
+                                        Create your connection to connect to the chosen service
+                                    </DialogDescription>
+                                )}
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         {errors?.length > 0 && <Errors errors={errors} />}
 
-                        <div className="flex max-h-connection-dialog-height flex-col space-y-4 overflow-y-auto p-6">
+                        <div className="flex max-h-connection-dialog-height flex-col space-y-4 overflow-y-auto">
                             {(wizardStep === 'configuration_step' || oAuth2AuthorizationParametersLoading) && (
                                 <>
                                     {!connection?.id && (
@@ -650,7 +655,7 @@ const ConnectionDialog = ({
                             </div>
                         )}
 
-                        <DialogFooter className="px-6">
+                        <DialogFooter>
                             {wizardStep === 'oauth_step' && (
                                 <Button
                                     onClick={() => {

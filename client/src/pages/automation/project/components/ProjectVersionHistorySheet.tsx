@@ -1,6 +1,6 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 
@@ -19,8 +19,10 @@ const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistoryS
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <SheetHeader>
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0">
                     <SheetTitle>Project Version History</SheetTitle>
+
+                    <SheetCloseButton />
                 </SheetHeader>
 
                 <div className="overflow-y-auto">

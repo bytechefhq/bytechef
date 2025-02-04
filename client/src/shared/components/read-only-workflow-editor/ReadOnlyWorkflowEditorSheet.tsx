@@ -1,5 +1,5 @@
 import LoadingIcon from '@/components/LoadingIcon';
-import {Sheet, SheetContent} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
 import useReadOnlyWorkflowEditorSheetStore from '@/shared/components/read-only-workflow-editor/stores/useReadOnlyWorkflowEditorSheetStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
@@ -32,15 +32,17 @@ const ReadOnlyWorkflowEditorSheet = ({
             open={readOnlyWorkflowEditorSheetOpen}
         >
             <SheetContent className="flex flex-col bg-white p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
-                <div className="size-full bg-muted/50 p-4">
-                    <h1 className="text-lg font-semibold">{workflow?.label}</h1>
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                    <SheetTitle>{workflow?.label}</SheetTitle>
 
-                    {componentDefinitions && workflow ? (
-                        <ReadOnlyWorkflowEditor componentDefinitions={componentDefinitions} workflow={workflow} />
-                    ) : (
-                        <LoadingIcon />
-                    )}
-                </div>
+                    <SheetCloseButton />
+                </SheetHeader>
+
+                {componentDefinitions && workflow ? (
+                    <ReadOnlyWorkflowEditor componentDefinitions={componentDefinitions} workflow={workflow} />
+                ) : (
+                    <LoadingIcon />
+                )}
             </SheetContent>
         </Sheet>
     );

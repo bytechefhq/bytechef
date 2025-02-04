@@ -44,7 +44,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
         return (
             <>
-                <fieldset className="mb-3 w-full">
+                <fieldset className="w-full">
                     {label && (
                         <div className="flex w-full items-center justify-between">
                             <div className="flex items-center">

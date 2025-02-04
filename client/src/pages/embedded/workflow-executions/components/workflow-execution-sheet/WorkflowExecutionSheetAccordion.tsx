@@ -47,7 +47,7 @@ const WorkflowExecutionSheetAccordion = ({job, triggerExecution}: {job: Job; tri
                 </div>
             </div>
 
-            <div className="overflow-y-auto">
+            <div className="overflow-y-auto pl-1 pr-1.5">
                 <Accordion collapsible defaultValue={triggerExecution?.id || ''} type="single">
                     {triggerExecution && (
                         <AccordionItem key={triggerExecution.id} value={triggerExecution.id || ''}>

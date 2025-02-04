@@ -104,7 +104,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             </div>
                         )}
 
-                        <div className="flex items-center">
+                        <div className="flex items-center gap-1">
                             {(controlType === 'RICH_TEXT' || controlType === 'TEXT_AREA') && (
                                 <PropertyMentionsInputEditorSheet
                                     componentDefinitions={componentDefinitions}

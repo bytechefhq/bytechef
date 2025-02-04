@@ -1,6 +1,15 @@
 import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
-import {Dialog, DialogClose, DialogContent, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
@@ -8,7 +17,7 @@ import {Workflow, WorkflowInput} from '@/shared/middleware/platform/configuratio
 import {WorkflowDefinitionType} from '@/shared/types';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {Editor} from '@tiptap/react';
-import {ReactNode, useRef, useState} from 'react';
+import React, {ReactNode, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import sanitizeHtml from 'sanitize-html';
 import {z} from 'zod';
@@ -116,11 +125,15 @@ const WorkflowOutputsSheetDialog = ({
             {triggerNode && <DialogTrigger asChild>{triggerNode}</DialogTrigger>}
 
             <DialogContent className="grid w-workflow-outputs-sheet-dialog-width gap-4">
-                <header className="space-y-2">
-                    <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>{`${outputIndex === -1 ? 'Create' : 'Edit'} Workflow Output`}</DialogTitle>
 
-                    <p className="text-sm text-muted-foreground">{`${outputIndex === -1 ? 'Create a new' : 'Edit the'} workflow output expression.`}</p>
-                </header>
+                        <DialogDescription>{`${outputIndex === -1 ? 'Create a new' : 'Edit the'} workflow output expression.`}</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
+                </DialogHeader>
 
                 <Form {...form}>
                     <form className="space-y-4" onSubmit={form.handleSubmit(saveWorkflowOutputs)}>

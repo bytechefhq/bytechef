@@ -880,7 +880,7 @@ const Property = ({
                                         )}
                                     </div>
 
-                                    <div className="flex items-center">
+                                    <div className="flex items-center gap-1">
                                         {showInputTypeSwitchButton && (
                                             <InputTypeSwitchButton
                                                 handleClick={handleInputTypeSwitchButtonClick}

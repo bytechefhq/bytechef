@@ -3,6 +3,7 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -19,7 +20,7 @@ import {useSaveWorkflowTestConfigurationInputsMutation} from '@/shared/mutations
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 export interface WorkflowInputsSheetDialogProps {
@@ -138,10 +139,14 @@ const WorkflowInputsSheetDialog = ({
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkflowInputs)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${inputIndex === -1 ? 'Create' : 'Edit'} Input`}</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${inputIndex === -1 ? 'Create' : 'Edit'} Input`}</DialogTitle>
 
-                            <DialogDescription>Add new workflow input definition.</DialogDescription>
+                                <DialogDescription>Add new workflow input definition.</DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <FormField

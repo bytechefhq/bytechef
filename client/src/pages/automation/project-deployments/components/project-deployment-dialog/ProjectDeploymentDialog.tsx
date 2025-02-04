@@ -3,6 +3,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -275,33 +276,39 @@ const ProjectDeploymentDialog = ({
 
             <DialogContent className={twMerge('flex flex-col')} onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader>
-                        <DialogTitle>
-                            {updateProjectVersion
-                                ? 'Upgrade Project Version'
-                                : `${projectDeployment?.id ? 'Edit' : 'New'} Deployment ${!projectDeployment?.id ? '-' : ''} ${
-                                      !projectDeployment?.id ? projectDeploymentDialogSteps[activeStepIndex].name : ''
-                                  }`}
-                        </DialogTitle>
+                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0">
+                        <div className="flex w-full flex-col space-y-1">
+                            <DialogTitle>
+                                {updateProjectVersion
+                                    ? 'Upgrade Project Version'
+                                    : `${projectDeployment?.id ? 'Edit' : 'New'} Deployment ${!projectDeployment?.id ? '-' : ''} ${
+                                          !projectDeployment?.id
+                                              ? projectDeploymentDialogSteps[activeStepIndex].name
+                                              : ''
+                                      }`}
+                            </DialogTitle>
 
-                        {!projectDeployment?.id && (
-                            <nav aria-label="Progress">
-                                <ol className="space-y-4 md:flex md:space-y-0" role="list">
-                                    {projectDeploymentDialogSteps.map((step, index) => (
-                                        <li className="md:flex-1" key={step.name}>
-                                            <div
-                                                className={twMerge(
-                                                    'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-4',
-                                                    index <= activeStepIndex
-                                                        ? 'border-gray-900 hover:border-gray-800'
-                                                        : 'hover:border-gray-30 border-gray-200'
-                                                )}
-                                            ></div>
-                                        </li>
-                                    ))}
-                                </ol>
-                            </nav>
-                        )}
+                            {!projectDeployment?.id && (
+                                <nav aria-label="Progress">
+                                    <ol className="space-y-4 md:flex md:space-y-0" role="list">
+                                        {projectDeploymentDialogSteps.map((step, index) => (
+                                            <li className="md:flex-1" key={step.name}>
+                                                <div
+                                                    className={twMerge(
+                                                        'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0',
+                                                        index <= activeStepIndex
+                                                            ? 'border-gray-900 hover:border-gray-800'
+                                                            : 'hover:border-gray-30 border-gray-200'
+                                                    )}
+                                                ></div>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                </nav>
+                            )}
+                        </div>
+
+                        <DialogCloseButton />
                     </DialogHeader>
 
                     <div

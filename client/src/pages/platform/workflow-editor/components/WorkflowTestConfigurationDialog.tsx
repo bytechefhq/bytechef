@@ -3,6 +3,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -29,7 +30,7 @@ import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {PlusIcon} from 'lucide-react';
-import {Dispatch, SetStateAction, useState} from 'react';
+import React, {Dispatch, SetStateAction, useState} from 'react';
 import {UseFormReturn, useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
@@ -223,12 +224,16 @@ const WorkflowTestConfigurationDialog = ({
             >
                 <Form {...form}>
                     <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
-                        <DialogHeader>
-                            <DialogTitle>Workflow Test Configuration</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>Workflow Test Configuration</DialogTitle>
 
-                            <DialogDescription>
-                                Set workflow input, trigger output values and test connections.
-                            </DialogDescription>
+                                <DialogDescription>
+                                    Set workflow input, trigger output values and test connections.
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <div className="max-h-workflow-test-configuration-dialog-height overflow-y-auto">

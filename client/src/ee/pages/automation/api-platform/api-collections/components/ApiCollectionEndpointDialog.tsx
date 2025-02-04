@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -125,12 +126,16 @@ const ApiCollectionEndpointDialog = ({
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveOpenApiEndpoint)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${apiEndpoint?.id ? 'Edit' : 'Create'}`} API Endpoint</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${apiEndpoint?.id ? 'Edit' : 'Create'}`} API Endpoint</DialogTitle>
 
-                            <DialogDescription>
-                                Create new API endpoint and connect it with a workflow.
-                            </DialogDescription>
+                                <DialogDescription>
+                                    Create new API endpoint and connect it with a workflow.
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <FormField

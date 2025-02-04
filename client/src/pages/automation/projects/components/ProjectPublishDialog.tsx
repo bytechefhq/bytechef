@@ -44,9 +44,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
                         <DialogTitle>Publish Project {project.name}</DialogTitle>
                     </div>
 
-                    <DialogDescription>
-                        Publish project to activate its workflows in one of environments.
-                    </DialogDescription>
+                    <DialogDescription>Publish project to activate its workflows.</DialogDescription>
                 </DialogHeader>
 
                 <div className="flex flex-col space-y-4">

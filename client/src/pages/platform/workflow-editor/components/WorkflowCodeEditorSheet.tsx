@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
@@ -98,82 +98,80 @@ const WorkflowCodeEditorSheet = ({
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
-                    <SheetHeader>
-                        <div className="flex flex-1 items-center justify-between p-4">
-                            <SheetTitle>Edit Workflow</SheetTitle>
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                        <SheetTitle>Edit Workflow</SheetTitle>
 
-                            <div className="flex items-center">
-                                <div className="mr-8 flex items-center">
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1">
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="[&_svg]:size-5"
+                                        disabled={testConfigurationDisabled}
+                                        onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                        size="icon"
+                                        variant="ghost"
+                                    >
+                                        <Settings2Icon />
+                                    </Button>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Set the workflow test configuration</TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Button
+                                        className="[&_svg]:size-5"
+                                        disabled={!dirty}
+                                        onClick={() => handleWorkflowCodeEditorSheetSave(workflow, definition)}
+                                        size="icon"
+                                        type="submit"
+                                        variant="ghost"
+                                    >
+                                        <SaveIcon />
+                                    </Button>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Save current workflow</TooltipContent>
+                            </Tooltip>
+
+                            {!workflowIsRunning && (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span tabIndex={0}>
                                             <Button
                                                 className="[&_svg]:size-5"
-                                                disabled={testConfigurationDisabled}
-                                                onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                                disabled={runDisabled || dirty}
+                                                onClick={handleRunClick}
                                                 size="icon"
                                                 variant="ghost"
                                             >
-                                                <Settings2Icon />
+                                                <PlayIcon className="text-success" />
                                             </Button>
-                                        </TooltipTrigger>
+                                        </span>
+                                    </TooltipTrigger>
 
-                                        <TooltipContent>Set the workflow test configuration</TooltipContent>
-                                    </Tooltip>
+                                    <TooltipContent>
+                                        {runDisabled
+                                            ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
+                                            : `Run the current workflow`}
+                                    </TooltipContent>
+                                </Tooltip>
+                            )}
 
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                className="[&_svg]:size-5"
-                                                disabled={!dirty}
-                                                onClick={() => handleWorkflowCodeEditorSheetSave(workflow, definition)}
-                                                size="icon"
-                                                type="submit"
-                                                variant="ghost"
-                                            >
-                                                <SaveIcon />
-                                            </Button>
-                                        </TooltipTrigger>
+                            {workflowIsRunning && (
+                                <Button
+                                    onClick={() => {
+                                        // TODO
+                                    }}
+                                    size="icon"
+                                    variant="destructive"
+                                >
+                                    <SquareIcon className="h-5" />
+                                </Button>
+                            )}
 
-                                        <TooltipContent>Save current workflow</TooltipContent>
-                                    </Tooltip>
-
-                                    {!workflowIsRunning && (
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <span tabIndex={0}>
-                                                    <Button
-                                                        className="[&_svg]:size-5"
-                                                        disabled={runDisabled || dirty}
-                                                        onClick={handleRunClick}
-                                                        size="icon"
-                                                        variant="ghost"
-                                                    >
-                                                        <PlayIcon className="text-success" />
-                                                    </Button>
-                                                </span>
-                                            </TooltipTrigger>
-
-                                            <TooltipContent>
-                                                {runDisabled
-                                                    ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and component properties.`
-                                                    : `Run the current workflow`}
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    )}
-
-                                    {workflowIsRunning && (
-                                        <Button
-                                            onClick={() => {
-                                                // TODO
-                                            }}
-                                            size="icon"
-                                            variant="destructive"
-                                        >
-                                            <SquareIcon className="h-5" />
-                                        </Button>
-                                    )}
-                                </div>
-                            </div>
+                            <SheetCloseButton />
                         </div>
                     </SheetHeader>
 

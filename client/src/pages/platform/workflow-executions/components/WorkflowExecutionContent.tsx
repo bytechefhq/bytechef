@@ -1,7 +1,15 @@
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from '@/components/ui/dialog';
 import WorkflowExecutionContentClipboardButton from '@/pages/platform/workflow-executions/components/WorkflowExecutionContentClipboardButton';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ExpandIcon} from 'lucide-react';
+import React from 'react';
 import ReactJson from 'react-json-view';
 
 const WorkflowExecutionContent = ({
@@ -32,11 +40,13 @@ const WorkflowExecutionContent = ({
                             </DialogTrigger>
 
                             <DialogContent className="max-w-workflow-execution-content-width">
-                                <DialogHeader>
-                                    <div className="mr-3 flex items-center justify-between uppercase">
-                                        <DialogTitle>Input</DialogTitle>
+                                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <DialogTitle>Input</DialogTitle>
 
+                                    <div className="flex items-center gap-1">
                                         <WorkflowExecutionContentClipboardButton value={input} />
+
+                                        <DialogCloseButton />
                                     </div>
                                 </DialogHeader>
 
@@ -89,11 +99,13 @@ const WorkflowExecutionContent = ({
                                 </DialogTrigger>
 
                                 <DialogContent className="max-w-workflow-execution-content-width">
-                                    <DialogHeader>
-                                        <div className="mr-3 flex items-center justify-between uppercase">
-                                            <DialogTitle>Output</DialogTitle>
+                                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                                        <DialogTitle>Output</DialogTitle>
 
+                                        <div className="flex items-center gap-1">
                                             <WorkflowExecutionContentClipboardButton value={output} />
+
+                                            <DialogCloseButton />
                                         </div>
                                     </DialogHeader>
 
@@ -153,8 +165,10 @@ const WorkflowExecutionContent = ({
                                 </DialogTrigger>
 
                                 <DialogContent className="max-w-workflow-execution-content-width">
-                                    <DialogHeader>
+                                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                                         <DialogTitle className="uppercase text-destructive">Error</DialogTitle>
+
+                                        <DialogCloseButton />
                                     </DialogHeader>
 
                                     <div className="max-h-workflow-execution-content-height space-y-3 overflow-y-auto">

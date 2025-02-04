@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -15,7 +16,7 @@ import {Textarea} from '@/components/ui/textarea';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useEffect, useState} from 'react';
+import React, {ReactNode, useEffect, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {useParams} from 'react-router-dom';
 
@@ -139,13 +140,14 @@ const WorkflowDialog = ({
 
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader>
-                        <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                        <div className="flex flex-col space-y-1">
+                            <DialogTitle>{`${!workflow?.id ? 'Create' : 'Edit'}`} Workflow</DialogTitle>
 
-                        <DialogDescription>
-                            Use this to create a workflow. Creating a workflow will redirect you to the page where you
-                            can edit it.
-                        </DialogDescription>
+                            <DialogDescription>Use this form to create a workflow.</DialogDescription>
+                        </div>
+
+                        <DialogCloseButton />
                     </DialogHeader>
 
                     <FormField

@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -21,7 +22,7 @@ import {WorkspaceKeys} from '@/shared/queries/automation/workspaces.queries';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useState} from 'react';
+import React, {ReactNode, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
@@ -110,12 +111,16 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkspace)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
 
-                            <DialogDescription>
-                                Send app events from your application to trigger workflows using App Event trigger.
-                            </DialogDescription>
+                                <DialogDescription>
+                                    Send app events from your application to trigger workflows using App Event trigger.
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <FormField

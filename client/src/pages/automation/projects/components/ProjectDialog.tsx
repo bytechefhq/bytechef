@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -151,14 +152,18 @@ const ProjectDialog = ({onClose, project, triggerNode}: ProjectDialogProps) => {
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveProject)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${project?.id ? 'Edit' : 'Create'} Project`}</DialogTitle>
 
-                            <DialogDescription>
-                                {`Use this to ${
-                                    project?.id ? 'edit' : 'create'
-                                } your project which will contain related workflows`}
-                            </DialogDescription>
+                                <DialogDescription>
+                                    {`Use this to ${
+                                        project?.id ? 'edit' : 'create'
+                                    } your project which will contain workflows`}
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         {categoriesError && !categoriesLoading && `An error has occurred: ${categoriesError.message}`}

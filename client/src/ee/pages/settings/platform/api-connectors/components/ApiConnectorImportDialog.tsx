@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -84,12 +85,16 @@ const ApiConnectorImportDialog = ({apiConnector, onClose, triggerNode}: ApiConne
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(importOpenApiSpecification)}>
-                        <DialogHeader>
-                            <div className="flex items-center justify-between">
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
                                 <DialogTitle>{`${apiConnector?.id ? 'Edit' : 'Create'}`} API Connector</DialogTitle>
+
+                                <DialogDescription>
+                                    Create new API connector through the UI interface.
+                                </DialogDescription>
                             </div>
 
-                            <DialogDescription>Create new API connector through the UI interface.</DialogDescription>
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         <FormField

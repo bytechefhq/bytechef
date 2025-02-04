@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -134,12 +135,16 @@ const ApiCollectionDialog = ({apiCollection, onClose, triggerNode}: ApiCollectio
             <DialogContent>
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveOpenApiCollection)}>
-                        <DialogHeader>
-                            <DialogTitle>{`${apiCollection?.id ? 'Edit' : 'Create'}`} API Collection</DialogTitle>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${apiCollection?.id ? 'Edit' : 'Create'}`} API Collection</DialogTitle>
 
-                            <DialogDescription>
-                                Create new API collection and connect it with a project.
-                            </DialogDescription>
+                                <DialogDescription>
+                                    Create new API collection and connect it with a project.
+                                </DialogDescription>
+                            </div>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         {!apiCollection?.id && (

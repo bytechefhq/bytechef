@@ -1,5 +1,13 @@
 import {Button} from '@/components/ui/button';
-import {Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogClose,
+    DialogCloseButton,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import {
@@ -122,8 +130,10 @@ const ProjectDeploymentEditWorkflowDialog = ({
         >
             <DialogContent onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader>
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                         <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
+
+                        <DialogCloseButton />
                     </DialogHeader>
 
                     <ProjectDeploymentDialogWorkflowsStepItem

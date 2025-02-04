@@ -1,4 +1,4 @@
-import {Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import ConnectedUserSheetPanel from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
@@ -15,12 +15,12 @@ const ConnectedUserSheet = () => {
     return (
         <Sheet onOpenChange={() => setConnectedUserSheetOpen(!connectedUserSheetOpen)} open={connectedUserSheetOpen}>
             <SheetContent className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-md">
-                <SheetHeader className="p-4">
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
                     <SheetTitle className="flex justify-between">
                         {connectedUser && <ConnectedUserSheetTitle connectedUser={connectedUser} />}
                     </SheetTitle>
 
-                    <SheetDescription></SheetDescription>
+                    <SheetCloseButton />
                 </SheetHeader>
 
                 {connectedUserLoading ? (

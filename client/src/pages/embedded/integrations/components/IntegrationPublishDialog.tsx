@@ -1,5 +1,12 @@
 import {Button} from '@/components/ui/button';
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useToast} from '@/hooks/use-toast';
@@ -8,7 +15,7 @@ import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import React, {useState} from 'react';
 
 const IntegrationPublishDialog = ({integration, onClose}: {integration: Integration; onClose: () => void}) => {
     const [description, setDescription] = useState<string | undefined>(undefined);
@@ -38,14 +45,14 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
     return (
         <Dialog onOpenChange={() => onClose()} open={true}>
             <DialogContent className="flex flex-col">
-                <DialogHeader>
-                    <div className="flex items-center justify-between">
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
                         <DialogTitle>Publish Integration {integration.componentName}</DialogTitle>
+
+                        <DialogDescription>Publish integration to activate its workflows.</DialogDescription>
                     </div>
 
-                    <DialogDescription>
-                        Publish integration to activate its workflows in one of environments.
-                    </DialogDescription>
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="flex flex-col space-y-4">

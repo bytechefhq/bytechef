@@ -1,6 +1,6 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {IntegrationStatus} from '@/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/shared/queries/embedded/integrationVersions.queries';
@@ -20,8 +20,10 @@ const IntegrationVersionHistorySheet = ({integrationId, onClose}: IntegrationVer
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <SheetHeader>
+                <SheetHeader className="flex flex-row items-center justify-between space-y-0">
                     <SheetTitle>Integration Version History</SheetTitle>
+
+                    <SheetCloseButton />
                 </SheetHeader>
 
                 <div className="overflow-y-auto">

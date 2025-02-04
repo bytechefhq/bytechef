@@ -1,5 +1,5 @@
 import {Button} from '@/components/ui/button';
-import {Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle, SheetTrigger} from '@/components/ui/sheet';
 import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/PropertyMentionsInputEditor';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
@@ -42,13 +42,15 @@ const PropertyMentionsInputEditorSheet = ({
     >
         <SheetTrigger asChild>
             <Button className="size-auto p-0.5" size="icon" variant="ghost">
-                <MaximizeIcon className="h-4" />
+                <MaximizeIcon className="size-4" />
             </Button>
         </SheetTrigger>
 
         <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
-            <SheetHeader>
+            <SheetHeader className="flex flex-row items-center justify-between space-y-0">
                 <SheetTitle>{title}</SheetTitle>
+
+                <SheetCloseButton />
             </SheetHeader>
 
             <div className="size-full pt-3">

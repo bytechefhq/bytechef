@@ -1,5 +1,6 @@
 import LoadingIcon from '@/components/LoadingIcon';
 import {Badge} from '@/components/ui/badge';
+import {SheetCloseButton, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import ReadOnlyWorkflowEditor from '@/shared/components/read-only-workflow-editor/ReadOnlyWorkflowEditor';
 import {WorkflowExecution} from '@/shared/middleware/embedded/workflow/execution';
 import {useGetWorkflowQuery} from '@/shared/queries/embedded/workflows.queries';
@@ -22,17 +23,21 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
 
     return (
         <div className="flex size-full flex-col bg-muted/50">
-            <h1 className="flex items-center gap-x-2 p-4 text-base font-semibold">
-                <span>{integration?.name}</span>
+            <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <SheetTitle>
+                    <span>{integration?.name}</span>
 
-                <span>/</span>
+                    <span>/</span>
 
-                <span>{workflow?.label}</span>
+                    <span>{workflow?.label}</span>
 
-                <span>/</span>
+                    <span>/</span>
 
-                <Badge variant="secondary">{integrationInstance?.environment}</Badge>
-            </h1>
+                    <Badge variant="secondary">{integrationInstance?.environment}</Badge>
+                </SheetTitle>
+
+                <SheetCloseButton />
+            </SheetHeader>
 
             {componentDefinitions && workflowDetails ? (
                 <ReadOnlyWorkflowEditor componentDefinitions={componentDefinitions} workflow={workflowDetails} />

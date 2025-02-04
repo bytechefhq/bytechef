@@ -1,6 +1,6 @@
 import JsonSchemaBuilder from '@/components/JsonSchemaBuilder/JsonSchemaBuilder';
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
-import {Sheet, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetDescription, SheetHeader, SheetTitle} from '@/components/ui/sheet';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {SPACE} from '@/shared/constants';
 import Editor from '@monaco-editor/react';
@@ -22,27 +22,25 @@ const PropertyJsonSchemaBuilderSheet = ({locale, onChange, onClose, schema}: Pro
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <Tabs className="flex size-full flex-col" defaultValue="designer">
-                    <SheetHeader>
-                        <div className="p-4">
-                            <div className="mr-8 flex items-center justify-between">
-                                <div className="flex flex-col">
-                                    <SheetTitle>JSON Schema Builder</SheetTitle>
+                    <SheetHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                        <div className="flex flex-col">
+                            <SheetTitle>JSON Schema Builder</SheetTitle>
 
-                                    <SheetHeader>Define desired response format for the output</SheetHeader>
-                                </div>
+                            <SheetDescription>Define desired response format for the output</SheetDescription>
+                        </div>
 
-                                <div className="flex items-center gap-2">
-                                    {/*TODO Fix refresh doesn't not work properly, backend does not always return correct schema*/}
+                        <div className="flex items-center gap-1">
+                            {/*TODO Fix refresh doesn't not work properly, backend does not always return correct schema*/}
 
-                                    {/*<PropertyJsonSchemaBuilderSampleDataDialog onChange={onChange} />*/}
+                            {/*<PropertyJsonSchemaBuilderSampleDataDialog onChange={onChange} />*/}
 
-                                    <TabsList>
-                                        <TabsTrigger value="designer">Designer</TabsTrigger>
+                            <TabsList>
+                                <TabsTrigger value="designer">Designer</TabsTrigger>
 
-                                        <TabsTrigger value="editor">Editor</TabsTrigger>
-                                    </TabsList>
-                                </div>
-                            </div>
+                                <TabsTrigger value="editor">Editor</TabsTrigger>
+                            </TabsList>
+
+                            <SheetCloseButton />
                         </div>
                     </SheetHeader>
 

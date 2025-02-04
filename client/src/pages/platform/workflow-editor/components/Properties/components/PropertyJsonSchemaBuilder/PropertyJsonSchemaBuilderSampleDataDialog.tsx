@@ -2,6 +2,7 @@ import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {Button} from '@/components/ui/button';
 import {
     Dialog,
+    DialogCloseButton,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -15,7 +16,7 @@ import Editor from '@monaco-editor/react';
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 
 import {editor} from 'monaco-editor';
-import {useState} from 'react';
+import React, {useState} from 'react';
 
 const fetchGenerateSchema = async (data: string): Promise<Response> => {
     return await fetch('/api/platform/internal/generate-schema', {
@@ -96,10 +97,14 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
             </DialogTrigger>
 
             <DialogContent className="max-w-output-tab-sample-data-dialog-width">
-                <DialogHeader>
-                    <DialogTitle>Sample JSON</DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Sample JSON</DialogTitle>
 
-                    <DialogDescription>Generate JSON schema from sample JSON</DialogDescription>
+                        <DialogDescription>Generate JSON schema from sample JSON</DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
                 </DialogHeader>
 
                 <div className="relative mt-4 min-h-output-tab-sample-data-dialog-height flex-1">

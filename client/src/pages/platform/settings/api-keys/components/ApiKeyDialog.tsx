@@ -2,6 +2,7 @@ import {Button} from '@/components/ui/button';
 import {
     Dialog,
     DialogClose,
+    DialogCloseButton,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -115,12 +116,12 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
             <DialogContent className="min-w-api-key-dialog-width">
                 <Form {...form}>
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveApiKey)}>
-                        <DialogHeader>
-                            <div className="flex items-center justify-between">
-                                <DialogTitle>
-                                    {secretKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} secret API Key
-                                </DialogTitle>
-                            </div>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <DialogTitle>
+                                {secretKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} API Key
+                            </DialogTitle>
+
+                            <DialogCloseButton />
                         </DialogHeader>
 
                         {secretKey ? (
