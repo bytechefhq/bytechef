@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -33,30 +34,30 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceConfiguration", description = "Contains configurations and connections required for the execution of integration workflows.")
 @JsonTypeName("IntegrationInstanceConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.185479+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.055248+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class IntegrationInstanceConfigurationModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private Boolean enabled;
+  private @Nullable Boolean enabled;
 
-  private EnvironmentModel environment;
+  private @Nullable EnvironmentModel environment;
 
-  private Long id;
+  private @Nullable Long id;
 
-  private Long integrationId;
+  private @Nullable Long integrationId;
 
-  private Integer integrationVersion;
+  private @Nullable Integer integrationVersion;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
@@ -69,7 +70,7 @@ public class IntegrationInstanceConfigurationModel {
   @Valid
   private Map<String, Object> connectionParameters = new HashMap<>();
 
-  private IntegrationBasicModel integration;
+  private @Nullable IntegrationBasicModel integration;
 
   @Valid
   private List<@Valid IntegrationInstanceConfigurationWorkflowModel> integrationInstanceConfigurationWorkflows = new ArrayList<>();
@@ -77,7 +78,7 @@ public class IntegrationInstanceConfigurationModel {
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public IntegrationInstanceConfigurationModel() {
     super();

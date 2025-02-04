@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,20 +22,20 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ComponentDefinitionBasicModel {
 
-  private Integer actionsCount;
+  private @Nullable Integer actionsCount;
 
-  private String description;
+  private @Nullable String description;
 
-  private String icon;
+  private @Nullable String icon;
 
   private String name;
 
-  private String title;
+  private @Nullable String title;
 
-  private Integer triggersCount;
+  private @Nullable Integer triggersCount;
 
   private Integer version;
 

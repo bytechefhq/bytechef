@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,26 +24,26 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowBasic_1", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("WorkflowBasic_1")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.580671+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.401207+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowBasic1Model {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private String id;
+  private @Nullable String id;
 
-  private String label;
+  private @Nullable String label;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public WorkflowBasic1Model createdBy(String createdBy) {
     this.createdBy = createdBy;

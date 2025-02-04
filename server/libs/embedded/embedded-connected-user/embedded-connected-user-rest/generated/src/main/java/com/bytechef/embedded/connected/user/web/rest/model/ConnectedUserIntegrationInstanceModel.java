@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,24 +22,24 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ConnectedUserIntegrationInstance")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:07.762909+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:58.912170+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ConnectedUserIntegrationInstanceModel {
 
-  private String componentName;
+  private @Nullable String componentName;
 
-  private Boolean enabled;
+  private @Nullable Boolean enabled;
 
-  private Long id;
+  private @Nullable Long id;
 
-  private Long integrationId;
+  private @Nullable Long integrationId;
 
-  private Long integrationInstanceConfigurationId;
+  private @Nullable Long integrationInstanceConfigurationId;
 
-  private Integer integrationVersion;
+  private @Nullable Integer integrationVersion;
 
-  private Long connectionId;
+  private @Nullable Long connectionId;
 
-  private com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus;
+  private @Nullable com.bytechef.platform.connection.web.rest.model.CredentialStatusModel credentialStatus;
 
   public ConnectedUserIntegrationInstanceModel componentName(String componentName) {
     this.componentName = componentName;

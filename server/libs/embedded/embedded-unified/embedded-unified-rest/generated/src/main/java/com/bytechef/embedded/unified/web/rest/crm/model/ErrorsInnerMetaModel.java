@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -26,10 +27,10 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 @Schema(name = "errors_inner_meta", description = "Additional metadata about the error.")
 @JsonTypeName("errors_inner_meta")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:37.686914+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.250603+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ErrorsInnerMetaModel {
 
-  private Object cause;
+  private @Nullable Object cause;
 
   /**
    * The origin of the error.
@@ -68,7 +69,7 @@ public class ErrorsInnerMetaModel {
 
   private OriginEnum origin;
 
-  private String applicationName;
+  private @Nullable String applicationName;
 
   public ErrorsInnerMetaModel() {
     super();

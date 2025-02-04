@@ -6,6 +6,7 @@ import com.bytechef.platform.workflow.execution.web.rest.model.WebhookRetryModel
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -22,14 +23,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WebhookModel {
 
-  private String type;
+  private @Nullable String type;
 
-  private String url;
+  private @Nullable String url;
 
-  private WebhookRetryModel retry;
+  private @Nullable WebhookRetryModel retry;
 
   public WebhookModel type(String type) {
     this.type = type;

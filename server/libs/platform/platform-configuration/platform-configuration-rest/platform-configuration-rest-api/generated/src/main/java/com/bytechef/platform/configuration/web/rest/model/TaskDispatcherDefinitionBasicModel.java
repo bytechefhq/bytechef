@@ -6,6 +6,7 @@ import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -22,18 +23,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinitionBasic", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TaskDispatcherDefinitionBasicModel {
 
-  private String description;
+  private @Nullable String description;
 
-  private String icon;
+  private @Nullable String icon;
 
   private String name;
 
-  private ResourcesModel resources;
+  private @Nullable ResourcesModel resources;
 
-  private String title;
+  private @Nullable String title;
 
   private Integer version;
 

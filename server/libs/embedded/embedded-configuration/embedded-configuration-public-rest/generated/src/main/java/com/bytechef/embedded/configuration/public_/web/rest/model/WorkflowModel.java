@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,14 +22,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:07.684340+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:58.839699+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowModel {
 
-  private String workflowReferenceCode;
+  private @Nullable String workflowReferenceCode;
 
-  private String label;
+  private @Nullable String label;
 
-  private String description;
+  private @Nullable String description;
 
   public WorkflowModel workflowReferenceCode(String workflowReferenceCode) {
     this.workflowReferenceCode = workflowReferenceCode;

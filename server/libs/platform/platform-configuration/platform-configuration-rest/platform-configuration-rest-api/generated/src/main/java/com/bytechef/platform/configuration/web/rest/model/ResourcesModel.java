@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,10 +22,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Resources", description = "A set of available resources.")
 @JsonTypeName("Resources")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ResourcesModel {
 
-  private String documentationUrl;
+  private @Nullable String documentationUrl;
 
   public ResourcesModel documentationUrl(String documentationUrl) {
     this.documentationUrl = documentationUrl;

@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -27,48 +28,48 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerExecution", description = "Adds execution semantics to a trigger.")
 @JsonTypeName("TriggerExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TriggerExecutionModel {
 
-  private Boolean batch;
+  private @Nullable Boolean batch;
 
-  private String createdBy;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime endDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private ExecutionErrorModel error;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime endDate;
 
-  private Long executionTime;
+  private @Nullable ExecutionErrorModel error;
 
-  private String icon;
+  private @Nullable Long executionTime;
 
-  private String id;
+  private @Nullable String icon;
+
+  private @Nullable String id;
 
   @Valid
   private Map<String, Object> input = new HashMap<>();
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private Integer maxRetries;
+  private @Nullable Integer maxRetries;
 
-  private Object output;
+  private @Nullable Object output;
 
   private Integer priority;
 
-  private Integer retryAttempts;
+  private @Nullable Integer retryAttempts;
 
-  private String retryDelay;
+  private @Nullable String retryDelay;
 
-  private Integer retryDelayFactor;
+  private @Nullable Integer retryDelayFactor;
 
-  private Long retryDelayMillis;
+  private @Nullable Long retryDelayMillis;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private OffsetDateTime startDate;
@@ -116,11 +117,11 @@ public class TriggerExecutionModel {
 
   private StatusEnum status;
 
-  private com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger;
+  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTriggerModel workflowTrigger;
 
-  private String title;
+  private @Nullable String title;
 
-  private String type;
+  private @Nullable String type;
 
   public TriggerExecutionModel() {
     super();

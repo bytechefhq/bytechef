@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -32,12 +33,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T15:01:17.522826+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:58.763757+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ConnectionModel {
 
-  private Boolean active;
+  private @Nullable Boolean active;
 
-  private String authorizationName;
+  private @Nullable String authorizationName;
 
   @Valid
   private Map<String, Object> authorizationParameters = new HashMap<>();
@@ -49,21 +50,21 @@ public class ConnectionModel {
 
   private Integer connectionVersion;
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private CredentialStatusModel credentialStatus;
+  private @Nullable CredentialStatusModel credentialStatus;
 
-  private ConnectionEnvironmentModel environment;
+  private @Nullable ConnectionEnvironmentModel environment;
 
-  private Long id;
+  private @Nullable Long id;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
@@ -73,9 +74,9 @@ public class ConnectionModel {
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
-  private Integer version;
+  private @Nullable Integer version;
 
-  private Long workspaceId;
+  private @Nullable Long workspaceId;
 
   public ConnectionModel() {
     super();

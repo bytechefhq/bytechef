@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,17 +26,17 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationVersion", description = "The integration version.")
 @JsonTypeName("IntegrationVersion")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.185479+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.055248+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class IntegrationVersionModel {
 
-  private String description;
+  private @Nullable String description;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime publishedDate;
+  private @Nullable OffsetDateTime publishedDate;
 
-  private Integer version;
+  private @Nullable Integer version;
 
-  private IntegrationStatusModel status;
+  private @Nullable IntegrationStatusModel status;
 
   public IntegrationVersionModel description(String description) {
     this.description = description;

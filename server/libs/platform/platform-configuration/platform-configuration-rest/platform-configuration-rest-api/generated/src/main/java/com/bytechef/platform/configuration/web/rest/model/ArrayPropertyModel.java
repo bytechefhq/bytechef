@@ -18,6 +18,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -34,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ArrayProperty", description = "An array property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ArrayPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -46,16 +47,16 @@ public class ArrayPropertyModel extends ValuePropertyModel {
   @Valid
   private List<@Valid PropertyModel> items = new ArrayList<>();
 
-  private Long maxItems;
+  private @Nullable Long maxItems;
 
-  private Long minItems;
+  private @Nullable Long minItems;
 
-  private Boolean multipleValues;
+  private @Nullable Boolean multipleValues;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
-  private OptionsDataSourceModel optionsDataSource;
+  private @Nullable OptionsDataSourceModel optionsDataSource;
 
   public ArrayPropertyModel() {
     super();

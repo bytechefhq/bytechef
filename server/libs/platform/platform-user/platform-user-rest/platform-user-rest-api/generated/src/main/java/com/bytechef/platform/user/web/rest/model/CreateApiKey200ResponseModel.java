@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -20,10 +21,10 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createApiKey_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.197192+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.373487+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class CreateApiKey200ResponseModel {
 
-  private String secretKey;
+  private @Nullable String secretKey;
 
   public CreateApiKey200ResponseModel secretKey(String secretKey) {
     this.secretKey = secretKey;

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -30,37 +31,37 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeployment", description = "Contains configurations and connections required for the execution of project workflows.")
 @JsonTypeName("ProjectDeployment")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.657108+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ProjectDeploymentModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private Boolean enabled;
+  private @Nullable Boolean enabled;
 
-  private EnvironmentModel environment;
+  private @Nullable EnvironmentModel environment;
 
-  private Long id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastExecutionDate;
-
-  private String lastModifiedBy;
+  private @Nullable Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastExecutionDate;
+
+  private @Nullable String lastModifiedBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
-  private Long projectId;
+  private @Nullable Long projectId;
 
-  private Integer projectVersion;
+  private @Nullable Integer projectVersion;
 
-  private Object project;
+  private @Nullable Object project;
 
   @Valid
   private List<@Valid ProjectDeploymentWorkflowModel> projectDeploymentWorkflows = new ArrayList<>();
@@ -68,7 +69,7 @@ public class ProjectDeploymentModel {
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public ProjectDeploymentModel() {
     super();

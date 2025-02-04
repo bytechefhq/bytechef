@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -33,27 +34,27 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "NumberProperty", description = "A number property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class NumberPropertyModel extends ValuePropertyModel {
 
-  private Double defaultValue;
+  private @Nullable Double defaultValue;
 
-  private Double exampleValue;
+  private @Nullable Double exampleValue;
 
-  private Integer maxNumberPrecision;
+  private @Nullable Integer maxNumberPrecision;
 
-  private Double maxValue;
+  private @Nullable Double maxValue;
 
-  private Integer minNumberPrecision;
+  private @Nullable Integer minNumberPrecision;
 
-  private Double minValue;
+  private @Nullable Double minValue;
 
-  private Integer numberPrecision;
+  private @Nullable Integer numberPrecision;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
-  private OptionsDataSourceModel optionsDataSource;
+  private @Nullable OptionsDataSourceModel optionsDataSource;
 
   public NumberPropertyModel() {
     super();

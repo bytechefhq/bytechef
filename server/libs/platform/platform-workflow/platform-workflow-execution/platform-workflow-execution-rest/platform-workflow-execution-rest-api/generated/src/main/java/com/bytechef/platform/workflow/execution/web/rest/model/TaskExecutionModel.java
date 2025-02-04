@@ -11,6 +11,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -27,50 +28,50 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TaskExecutionModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime endDate;
+  private @Nullable OffsetDateTime endDate;
 
-  private ExecutionErrorModel error;
+  private @Nullable ExecutionErrorModel error;
 
-  private Long executionTime;
+  private @Nullable Long executionTime;
 
-  private String icon;
+  private @Nullable String icon;
 
-  private String id;
+  private @Nullable String id;
 
   @Valid
   private Map<String, Object> input = new HashMap<>();
 
   private String jobId;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private Integer maxRetries;
+  private @Nullable Integer maxRetries;
 
-  private Object output;
+  private @Nullable Object output;
 
-  private String parentId;
+  private @Nullable String parentId;
 
   private Integer priority;
 
-  private Integer progress;
+  private @Nullable Integer progress;
 
-  private Integer retryAttempts;
+  private @Nullable Integer retryAttempts;
 
-  private String retryDelay;
+  private @Nullable String retryDelay;
 
-  private Integer retryDelayFactor;
+  private @Nullable Integer retryDelayFactor;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private OffsetDateTime startDate;
@@ -118,15 +119,15 @@ public class TaskExecutionModel {
 
   private StatusEnum status;
 
-  private Integer taskNumber;
+  private @Nullable Integer taskNumber;
 
-  private String title;
+  private @Nullable String title;
 
-  private Long retryDelayMillis;
+  private @Nullable Long retryDelayMillis;
 
-  private com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask;
+  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel workflowTask;
 
-  private String type;
+  private @Nullable String type;
 
   public TaskExecutionModel() {
     super();

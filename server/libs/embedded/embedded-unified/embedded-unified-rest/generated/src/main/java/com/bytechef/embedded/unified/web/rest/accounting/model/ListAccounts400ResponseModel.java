@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -24,7 +25,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("listAccounts_400_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:37.456783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.113239+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ListAccounts400ResponseModel {
 
   @Valid

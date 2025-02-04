@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -32,37 +33,37 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Job", description = "Represents an execution of a workflow.")
 @JsonTypeName("Job")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class JobModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private Integer currentTask;
+  private @Nullable Integer currentTask;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime endDate;
+  private @Nullable OffsetDateTime endDate;
 
-  private ExecutionErrorModel error;
+  private @Nullable ExecutionErrorModel error;
 
-  private String id;
+  private @Nullable String id;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
-  private String label;
+  private @Nullable String label;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   @Valid
   private Map<String, Object> outputs = new HashMap<>();
 
-  private Long parentTaskExecutionId;
+  private @Nullable Long parentTaskExecutionId;
 
   private Integer priority;
 
@@ -118,7 +119,7 @@ public class JobModel {
   @Valid
   private List<@Valid WebhookModel> webhooks = new ArrayList<>();
 
-  private String workflowId;
+  private @Nullable String workflowId;
 
   public JobModel() {
     super();

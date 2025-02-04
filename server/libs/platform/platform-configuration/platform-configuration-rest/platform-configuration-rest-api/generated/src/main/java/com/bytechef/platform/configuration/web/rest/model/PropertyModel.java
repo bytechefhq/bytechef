@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -47,20 +48,20 @@ import jakarta.annotation.Generated;
   @JsonSubTypes.Type(value = ValuePropertyModel.class, name = "ValueProperty")
 })
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class PropertyModel {
 
   private Boolean advancedOption = false;
 
-  private String description;
+  private @Nullable String description;
 
-  private String displayCondition;
+  private @Nullable String displayCondition;
 
   private Boolean expressionEnabled = true;
 
   private Boolean hidden = false;
 
-  private String name;
+  private @Nullable String name;
 
   private Boolean required = false;
 

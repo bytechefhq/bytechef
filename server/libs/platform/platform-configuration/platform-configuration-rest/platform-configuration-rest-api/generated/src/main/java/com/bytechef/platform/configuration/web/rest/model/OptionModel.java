@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.Arrays;
 import org.openapitools.jackson.nullable.JsonNullable;
+import org.springframework.lang.Nullable;
 import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -24,12 +25,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Option", description = "Defines valid property value.")
 @JsonTypeName("Option")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class OptionModel {
 
-  private String description;
+  private @Nullable String description;
 
-  private String label;
+  private @Nullable String label;
 
   private JsonNullable<Object> value = JsonNullable.<Object>undefined();
 

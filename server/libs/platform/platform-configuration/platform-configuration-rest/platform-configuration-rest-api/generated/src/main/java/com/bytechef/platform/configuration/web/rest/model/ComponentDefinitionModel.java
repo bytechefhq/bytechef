@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -31,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -40,29 +41,29 @@ public class ComponentDefinitionModel {
   @Valid
   private List<@Valid ComponentCategoryModel> categories = new ArrayList<>();
 
-  private ConnectionDefinitionBasicModel connection;
+  private @Nullable ConnectionDefinitionBasicModel connection;
 
   private Boolean connectionRequired;
 
-  private Boolean dataStreamSupported;
+  private @Nullable Boolean dataStreamSupported;
 
-  private String description;
+  private @Nullable String description;
 
-  private String icon;
+  private @Nullable String icon;
 
   private String name;
 
-  private ResourcesModel resources;
+  private @Nullable ResourcesModel resources;
 
   @Valid
   private List<String> tags = new ArrayList<>();
 
-  private String title;
+  private @Nullable String title;
 
   @Valid
   private List<@Valid TriggerDefinitionBasicModel> triggers = new ArrayList<>();
 
-  private UnifiedApiCategoryModel unifiedApiCategory;
+  private @Nullable UnifiedApiCategoryModel unifiedApiCategory;
 
   private Integer version;
 

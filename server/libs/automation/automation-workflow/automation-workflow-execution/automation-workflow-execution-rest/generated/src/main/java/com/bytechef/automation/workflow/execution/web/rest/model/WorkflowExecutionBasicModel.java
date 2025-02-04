@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,18 +22,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecutionBasic", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecutionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.033970+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.943377+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowExecutionBasicModel {
 
-  private Long id;
+  private @Nullable Long id;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
+  private @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
+  private @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job;
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobBasicModel job;
 
-  private com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
+  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
 
   public WorkflowExecutionBasicModel id(Long id) {
     this.id = id;

@@ -6,6 +6,7 @@ import com.bytechef.platform.configuration.web.rest.model.HelpModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -22,16 +23,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinitionBasic", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ActionDefinitionBasicModel {
 
-  private String description;
+  private @Nullable String description;
 
-  private HelpModel help;
+  private @Nullable HelpModel help;
 
   private String name;
 
-  private String title;
+  private @Nullable String title;
 
   public ActionDefinitionBasicModel() {
     super();

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -33,23 +34,23 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "StringProperty", description = "A string property.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class StringPropertyModel extends ValuePropertyModel {
 
-  private String languageId;
+  private @Nullable String languageId;
 
-  private String defaultValue;
+  private @Nullable String defaultValue;
 
-  private String exampleValue;
+  private @Nullable String exampleValue;
 
-  private Integer maxLength;
+  private @Nullable Integer maxLength;
 
-  private Integer minLength;
+  private @Nullable Integer minLength;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
-  private OptionsDataSourceModel optionsDataSource;
+  private @Nullable OptionsDataSourceModel optionsDataSource;
 
   public StringPropertyModel() {
     super();

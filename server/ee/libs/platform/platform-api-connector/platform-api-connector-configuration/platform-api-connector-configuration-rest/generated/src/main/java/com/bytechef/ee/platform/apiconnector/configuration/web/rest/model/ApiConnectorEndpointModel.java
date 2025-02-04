@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,33 +26,33 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiConnectorEndpoint", description = "An API connector.")
 @JsonTypeName("ApiConnectorEndpoint")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:53:40.749951+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.700637+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ApiConnectorEndpointModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private HttpMethodModel httpMethod;
+  private @Nullable HttpMethodModel httpMethod;
 
-  private Long id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastExecutionDate;
-
-  private String lastModifiedBy;
+  private @Nullable Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastExecutionDate;
+
+  private @Nullable String lastModifiedBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
-  private String path;
+  private @Nullable String path;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public ApiConnectorEndpointModel() {
     super();

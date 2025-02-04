@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,26 +24,26 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workspace", description = "A workspace.")
 @JsonTypeName("Workspace")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.657108+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkspaceModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private Long id;
+  private @Nullable Long id;
 
   private String name;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public WorkspaceModel() {
     super();

@@ -9,6 +9,7 @@ import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,18 +26,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowNodeOutput", description = "The workflow node output")
 @JsonTypeName("WorkflowNodeOutput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowNodeOutputModel {
 
-  private ActionDefinitionModel actionDefinition;
+  private @Nullable ActionDefinitionModel actionDefinition;
 
   private PropertyModel outputSchema;
 
-  private Object sampleOutput;
+  private @Nullable Object sampleOutput;
 
-  private TaskDispatcherDefinitionModel taskDispatcherDefinition;
+  private @Nullable TaskDispatcherDefinitionModel taskDispatcherDefinition;
 
-  private TriggerDefinitionModel triggerDefinition;
+  private @Nullable TriggerDefinitionModel triggerDefinition;
 
   private String workflowNodeName;
 

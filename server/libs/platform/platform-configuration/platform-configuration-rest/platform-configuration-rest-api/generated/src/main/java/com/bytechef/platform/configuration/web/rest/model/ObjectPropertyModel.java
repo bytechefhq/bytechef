@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -36,7 +37,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ObjectProperty", description = "An object property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ObjectPropertyModel extends ValuePropertyModel {
 
   @Valid
@@ -48,12 +49,12 @@ public class ObjectPropertyModel extends ValuePropertyModel {
   @Valid
   private Map<String, Object> exampleValue = new HashMap<>();
 
-  private Boolean multipleValues;
+  private @Nullable Boolean multipleValues;
 
   @Valid
   private List<@Valid OptionModel> options = new ArrayList<>();
 
-  private OptionsDataSourceModel optionsDataSource;
+  private @Nullable OptionsDataSourceModel optionsDataSource;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -28,41 +29,41 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiCollection", description = "An API collection.")
 @JsonTypeName("ApiCollection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-24T11:35:32.971264+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.534520+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ApiCollectionModel {
 
-  private Integer collectionVersion;
+  private @Nullable Integer collectionVersion;
 
   private String contextPath;
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
   private Boolean enabled = false;
 
   @Valid
   private List<@Valid ApiCollectionEndpointModel> endpoints = new ArrayList<>();
 
-  private Long id;
+  private @Nullable Long id;
 
   private String name;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private Long projectId;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
+  private @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel project;
 
-  private Long projectDeploymentId;
+  private @Nullable Long projectDeploymentId;
 
-  private com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
+  private @Nullable com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel projectDeployment;
 
   private Integer projectVersion;
 
@@ -71,7 +72,7 @@ public class ApiCollectionModel {
 
   private Long workspaceId;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public ApiCollectionModel() {
     super();

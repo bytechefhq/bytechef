@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,22 +22,22 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowExecution", description = "Contains information about execution of a Integration workflow.")
 @JsonTypeName("WorkflowExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.580671+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.401207+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowExecutionModel {
 
-  private Long id;
+  private @Nullable Long id;
 
-  private com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel integration;
+  private @Nullable com.bytechef.embedded.configuration.web.rest.model.IntegrationBasicModel integration;
 
-  private com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration;
+  private @Nullable com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceConfigurationModel integrationInstanceConfiguration;
 
-  private com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance;
+  private @Nullable com.bytechef.embedded.configuration.web.rest.model.IntegrationInstanceBasicModel integrationInstance;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.JobModel job;
 
-  private com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
+  private @Nullable com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel triggerExecution;
 
-  private com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
+  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel workflow;
 
   public WorkflowExecutionModel id(Long id) {
     this.id = id;

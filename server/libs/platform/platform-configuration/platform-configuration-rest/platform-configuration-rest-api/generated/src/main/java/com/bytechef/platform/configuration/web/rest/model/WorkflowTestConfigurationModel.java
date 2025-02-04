@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -29,13 +30,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowTestConfigurationModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
   @Valid
   private Map<String, String> inputs = new HashMap<>();
@@ -43,14 +44,14 @@ public class WorkflowTestConfigurationModel {
   @Valid
   private List<@Valid WorkflowTestConfigurationConnectionModel> connections = new ArrayList<>();
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private String workflowId;
+  private @Nullable String workflowId;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public WorkflowTestConfigurationModel createdBy(String createdBy) {
     this.createdBy = createdBy;

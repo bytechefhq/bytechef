@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -29,33 +30,33 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Project", description = "A group of workflows that make one logical project.")
 @JsonTypeName("Project")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.657108+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ProjectModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private Long id;
+  private @Nullable Long id;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastPublishedDate;
+  private @Nullable OffsetDateTime lastPublishedDate;
 
-  private ProjectStatusModel lastStatus;
+  private @Nullable ProjectStatusModel lastStatus;
 
-  private Integer lastProjectVersion;
+  private @Nullable Integer lastProjectVersion;
 
-  private com.bytechef.platform.category.web.rest.model.CategoryModel category;
+  private @Nullable com.bytechef.platform.category.web.rest.model.CategoryModel category;
 
   @Valid
   private List<Long> projectWorkflowIds = new ArrayList<>();
@@ -65,7 +66,7 @@ public class ProjectModel {
 
   private Long workspaceId;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public ProjectModel() {
     super();

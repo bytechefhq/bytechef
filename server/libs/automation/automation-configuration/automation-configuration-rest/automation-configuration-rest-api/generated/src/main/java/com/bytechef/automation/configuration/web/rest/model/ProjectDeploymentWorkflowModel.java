@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -29,13 +30,13 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ProjectDeploymentWorkflow", description = "Contains configuration and connections required for the execution of a particular project workflow.")
 @JsonTypeName("ProjectDeploymentWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.657108+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ProjectDeploymentWorkflowModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
@@ -43,27 +44,27 @@ public class ProjectDeploymentWorkflowModel {
   @Valid
   private List<@Valid ProjectDeploymentWorkflowConnectionModel> connections = new ArrayList<>();
 
-  private Boolean enabled;
+  private @Nullable Boolean enabled;
 
-  private Long id;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastExecutionDate;
-
-  private String lastModifiedBy;
+  private @Nullable Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastExecutionDate;
 
-  private Long projectDeploymentId;
+  private @Nullable String lastModifiedBy;
 
-  private String staticWebhookUrl;
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastModifiedDate;
 
-  private String workflowId;
+  private @Nullable Long projectDeploymentId;
 
-  private String workflowReferenceCode;
+  private @Nullable String staticWebhookUrl;
 
-  private Integer version;
+  private @Nullable String workflowId;
+
+  private @Nullable String workflowReferenceCode;
+
+  private @Nullable Integer version;
 
   public ProjectDeploymentWorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;

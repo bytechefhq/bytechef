@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,33 +26,33 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceBasic", description = "Contains configurations and connections required for the execution of integration workflows for a connected user.")
 @JsonTypeName("IntegrationInstanceBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.185479+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.055248+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class IntegrationInstanceBasicModel {
 
   private Long connectionId;
 
-  private Long connectedUserId;
+  private @Nullable Long connectedUserId;
 
-  private String createdBy;
-
-  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
-
-  private Boolean enabled;
-
-  private EnvironmentModel environment;
-
-  private Long id;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastExecutionDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String lastModifiedBy;
+  private @Nullable Boolean enabled;
+
+  private @Nullable EnvironmentModel environment;
+
+  private @Nullable Long id;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastExecutionDate;
 
-  private Long integrationInstanceConfigurationId;
+  private @Nullable String lastModifiedBy;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastModifiedDate;
+
+  private @Nullable Long integrationInstanceConfigurationId;
 
   public IntegrationInstanceBasicModel() {
     super();

@@ -9,6 +9,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,27 +26,27 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationInstanceWorkflow", description = "Contains user configurations for the execution of a particular integration workflow.")
 @JsonTypeName("IntegrationInstanceWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.185479+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.055248+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class IntegrationInstanceWorkflowModel {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
   @Valid
   private Map<String, Object> inputs = new HashMap<>();
 
   private Boolean enabled;
 
-  private Long id;
+  private @Nullable Long id;
 
   private Long integrationInstanceConfigurationWorkflowId;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String workflowId;
 

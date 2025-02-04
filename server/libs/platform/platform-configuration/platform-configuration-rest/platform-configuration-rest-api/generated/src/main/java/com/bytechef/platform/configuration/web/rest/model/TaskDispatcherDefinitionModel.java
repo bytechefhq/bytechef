@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -26,12 +27,12 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskDispatcherDefinition", description = "A task dispatcher defines a strategy for dispatching tasks to be executed.")
 @JsonTypeName("TaskDispatcherDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TaskDispatcherDefinitionModel {
 
-  private String description;
+  private @Nullable String description;
 
-  private String icon;
+  private @Nullable String icon;
 
   private String name;
 
@@ -40,14 +41,14 @@ public class TaskDispatcherDefinitionModel {
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
-  private ResourcesModel resources;
+  private @Nullable ResourcesModel resources;
 
   @Valid
   private List<@Valid PropertyModel> taskProperties = new ArrayList<>();
 
-  private String title;
+  private @Nullable String title;
 
-  private Boolean variablePropertiesDefined;
+  private @Nullable Boolean variablePropertiesDefined;
 
   private Integer version;
 

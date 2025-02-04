@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -28,44 +29,44 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ApiConnector", description = "An API connector.")
 @JsonTypeName("ApiConnector")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:53:40.749951+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.700637+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ApiConnectorModel {
 
   private String connectorVersion;
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private String description;
+  private @Nullable String description;
 
-  private String definition;
+  private @Nullable String definition;
 
-  private Boolean enabled;
+  private @Nullable Boolean enabled;
 
   @Valid
   private List<@Valid ApiConnectorEndpointModel> endpoints = new ArrayList<>();
 
-  private String icon;
+  private @Nullable String icon;
 
-  private Long id;
+  private @Nullable Long id;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private String name;
 
-  private String specification;
+  private @Nullable String specification;
 
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
-  private String title;
+  private @Nullable String title;
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public ApiConnectorModel() {
     super();

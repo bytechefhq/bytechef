@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -23,16 +24,16 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Connection", description = "Contains all required information to open a connection to a service defined by componentName parameter.")
 @JsonTypeName("Connection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:07.684340+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:58.839699+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ConnectionModel {
 
-  private Boolean active;
+  private @Nullable Boolean active;
 
-  private Integer connectionVersion;
+  private @Nullable Integer connectionVersion;
 
-  private CredentialStatusModel credentialStatus;
+  private @Nullable CredentialStatusModel credentialStatus;
 
-  private Long id;
+  private @Nullable Long id;
 
   public ConnectionModel active(Boolean active) {
     this.active = active;

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -22,7 +23,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("testWorkflow_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.298889+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.467285+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TestWorkflowRequestModel {
 
   @Valid

@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -32,7 +33,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:37.686914+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.250603+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class LeadModel {
 
   @Valid
@@ -42,11 +43,11 @@ public class LeadModel {
 
   private JsonNullable<String> convertedAccountId = JsonNullable.<String>undefined();
 
-  private AccountModel convertedAccount;
+  private @Nullable AccountModel convertedAccount;
 
   private JsonNullable<String> convertedContactId = JsonNullable.<String>undefined();
 
-  private ContactModel convertedContact;
+  private @Nullable ContactModel convertedContact;
 
   @Valid
   private List<@Valid EmailsInnerModel> emails = new ArrayList<>();

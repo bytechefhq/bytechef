@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -26,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectionDefinition", description = "Definition of a connection to an outside service.")
 @JsonTypeName("ConnectionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ConnectionDefinitionModel {
 
   private Boolean authorizationRequired = true;
@@ -34,16 +35,16 @@ public class ConnectionDefinitionModel {
   @Valid
   private List<@Valid AuthorizationModel> authorizations = new ArrayList<>();
 
-  private String baseUri;
+  private @Nullable String baseUri;
 
-  private String componentDescription;
+  private @Nullable String componentDescription;
 
   private String componentName;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
-  private String componentTitle;
+  private @Nullable String componentTitle;
 
   private Integer version;
 

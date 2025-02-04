@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "UpdateConnectionRequest", description = "Contains all connection parameters that can be updated.")
 @JsonTypeName("UpdateConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T16:07:51.924513+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.308138+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class UpdateConnectionRequestModel {
 
   private String name;
@@ -33,7 +34,7 @@ public class UpdateConnectionRequestModel {
   @Valid
   private List<@Valid TagModel> tags = new ArrayList<>();
 
-  private Integer version;
+  private @Nullable Integer version;
 
   public UpdateConnectionRequestModel() {
     super();

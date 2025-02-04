@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -28,7 +29,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("account")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:37.456783+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.113239+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class AccountModel {
 
   private JsonNullable<String> accountNumber = JsonNullable.<String>undefined();
@@ -64,7 +65,7 @@ public class AccountModel {
   private JsonNullable<OffsetDateTime> createdDate = JsonNullable.<OffsetDateTime>undefined();
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   public AccountModel accountNumber(String accountNumber) {
     this.accountNumber = JsonNullable.of(accountNumber);

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -28,31 +29,31 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TriggerDefinition", description = "A trigger definition defines ways to trigger workflows from the outside services.")
 @JsonTypeName("TriggerDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class TriggerDefinitionModel {
 
-  private String componentName;
+  private @Nullable String componentName;
 
-  private Integer componentVersion;
+  private @Nullable Integer componentVersion;
 
-  private String description;
+  private @Nullable String description;
 
-  private HelpModel help;
+  private @Nullable HelpModel help;
 
   private String name;
 
   private Boolean outputDefined;
 
-  private Boolean outputFunctionDefined;
+  private @Nullable Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
-  private String title;
+  private @Nullable String title;
 
   private TriggerTypeModel type;
 
-  private Boolean workflowNodeDescriptionDefined;
+  private @Nullable Boolean workflowNodeDescriptionDefined;
 
   public TriggerDefinitionModel() {
     super();

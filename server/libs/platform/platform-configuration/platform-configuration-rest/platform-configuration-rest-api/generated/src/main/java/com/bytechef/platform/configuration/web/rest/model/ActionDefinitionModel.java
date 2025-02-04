@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -26,29 +27,29 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ActionDefinition", description = "An action is a portion of reusable code that accomplish a specific task. When building a workflow, each action is represented as a task inside the workflow. The task 'type' property is defined as [component name]/v[component version]/[action name]. Action properties are used to set properties of the task inside the workflow.")
 @JsonTypeName("ActionDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ActionDefinitionModel {
 
-  private String componentName;
+  private @Nullable String componentName;
 
-  private Integer componentVersion;
+  private @Nullable Integer componentVersion;
 
-  private String description;
+  private @Nullable String description;
 
-  private HelpModel help;
+  private @Nullable HelpModel help;
 
   private String name;
 
   private Boolean outputDefined;
 
-  private Boolean outputFunctionDefined;
+  private @Nullable Boolean outputFunctionDefined;
 
   @Valid
   private List<@Valid PropertyModel> properties = new ArrayList<>();
 
-  private String title;
+  private @Nullable String title;
 
-  private Boolean workflowNodeDescriptionDefined;
+  private @Nullable Boolean workflowNodeDescriptionDefined;
 
   public ActionDefinitionModel() {
     super();

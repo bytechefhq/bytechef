@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -20,16 +21,16 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Webhook_retry")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.033970+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.943377+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WebhookRetryModel {
 
-  private Integer initialInterval;
+  private @Nullable Integer initialInterval;
 
-  private Integer maxInterval;
+  private @Nullable Integer maxInterval;
 
-  private Integer maxAttempts;
+  private @Nullable Integer maxAttempts;
 
-  private Integer multiplier;
+  private @Nullable Integer multiplier;
 
   public WebhookRetryModel initialInterval(Integer initialInterval) {
     this.initialInterval = initialInterval;

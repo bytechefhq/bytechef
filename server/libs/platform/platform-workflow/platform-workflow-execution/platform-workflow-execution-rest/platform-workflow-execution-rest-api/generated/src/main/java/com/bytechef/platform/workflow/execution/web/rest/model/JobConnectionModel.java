@@ -5,6 +5,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,14 +22,14 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "JobConnection", description = "The connection used in a particular task.")
 @JsonTypeName("JobConnection")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class JobConnectionModel {
 
-  private Long id;
+  private @Nullable Long id;
 
-  private String key;
+  private @Nullable String key;
 
-  private String taskName;
+  private @Nullable String taskName;
 
   public JobConnectionModel id(Long id) {
     this.id = id;

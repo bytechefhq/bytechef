@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -31,35 +32,35 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Workflow", description = "The blueprint that describe the execution of a job.")
 @JsonTypeName("Workflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-21T06:08:32.285461+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:38:59.657108+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class WorkflowModel implements com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware {
 
-  private String createdBy;
+  private @Nullable String createdBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime createdDate;
+  private @Nullable OffsetDateTime createdDate;
 
-  private Integer connectionsCount;
+  private @Nullable Integer connectionsCount;
 
-  private String definition;
+  private @Nullable String definition;
 
-  private String description;
+  private @Nullable String description;
 
-  private com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format;
+  private @Nullable com.bytechef.platform.configuration.web.rest.model.WorkflowFormatModel format;
 
-  private String id;
+  private @Nullable String id;
 
   @Valid
   private List<@Valid WorkflowInputModel> inputs = new ArrayList<>();
 
-  private Integer inputsCount;
+  private @Nullable Integer inputsCount;
 
-  private String label;
+  private @Nullable String label;
 
-  private String lastModifiedBy;
+  private @Nullable String lastModifiedBy;
 
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-  private OffsetDateTime lastModifiedDate;
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   @Valid
   private List<@Valid WorkflowOutputModel> outputs = new ArrayList<>();
@@ -103,9 +104,9 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
     }
   }
 
-  private SourceTypeEnum sourceType;
+  private @Nullable SourceTypeEnum sourceType;
 
-  private Integer maxRetries;
+  private @Nullable Integer maxRetries;
 
   @Valid
   private List<String> workflowTaskComponentNames = new ArrayList<>();
@@ -119,11 +120,11 @@ public class WorkflowModel implements com.bytechef.platform.configuration.web.re
   @Valid
   private List<@Valid WorkflowTriggerModel> triggers = new ArrayList<>();
 
-  private Integer version;
+  private @Nullable Integer version;
 
-  private Long projectWorkflowId;
+  private @Nullable Long projectWorkflowId;
 
-  private String workflowReferenceCode;
+  private @Nullable String workflowReferenceCode;
 
   public WorkflowModel createdBy(String createdBy) {
     this.createdBy = createdBy;

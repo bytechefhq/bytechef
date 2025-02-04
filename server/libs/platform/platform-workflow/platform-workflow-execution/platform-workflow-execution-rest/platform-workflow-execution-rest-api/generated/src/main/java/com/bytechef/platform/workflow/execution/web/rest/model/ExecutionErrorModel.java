@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -24,10 +25,10 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ExecutionError", description = "Contains information about an error that happened during execution.")
 @JsonTypeName("ExecutionError")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-20T14:51:11.730693+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.868511+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ExecutionErrorModel {
 
-  private String message;
+  private @Nullable String message;
 
   @Valid
   private List<String> stackTrace = new ArrayList<>();

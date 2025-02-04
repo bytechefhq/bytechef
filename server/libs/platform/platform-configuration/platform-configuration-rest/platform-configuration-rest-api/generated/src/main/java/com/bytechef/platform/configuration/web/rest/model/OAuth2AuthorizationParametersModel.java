@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -25,15 +26,15 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("OAuth2AuthorizationParameters")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-22T08:20:38.691105+01:00[Europe/Zagreb]", comments = "Generator version: 7.10.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:00.511950+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class OAuth2AuthorizationParametersModel {
 
-  private String authorizationUrl;
+  private @Nullable String authorizationUrl;
 
   @Valid
   private Map<String, String> extraQueryParameters = new HashMap<>();
 
-  private String clientId;
+  private @Nullable String clientId;
 
   @Valid
   private List<String> scopes = new ArrayList<>();
