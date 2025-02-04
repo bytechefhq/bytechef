@@ -17,14 +17,11 @@
 package com.bytechef.component.google.sheets.action;
 
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.FOLDER_ID;
-import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -35,6 +32,7 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,72 +44,104 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsCreateSpreadsheetActionTest {
 
-    private final ArgumentCaptor<Spreadsheet> spreadsheetCaptor = ArgumentCaptor.forClass(Spreadsheet.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Spreadsheet> spreadsheetArgumentCaptor = ArgumentCaptor.forClass(Spreadsheet.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Create mockCreateRequest = mock(Sheets.Spreadsheets.Create.class);
     private final Drive mockedDrive = mock(Drive.class);
-    private final Drive.Files mockedDriveFiles = mock(Drive.Files.class);
-    private final Drive.Files.Update mockDriveUpdateRequest = mock(Drive.Files.Update.class);
-    private final Drive.Files.Get mockDriveGetRequest = mock(Drive.Files.Get.class);
+    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Drive.Files.Update mockedUpdate = mock(Drive.Files.Update.class);
+    private final Drive.Files.Get mockedGet = mock(Drive.Files.Get.class);
+    private final File file = new File().setParents(List.of("previous-folder-id"));
+    private Parameters mockedParameters;
+    private final Spreadsheet newSpreadSheet = new Spreadsheet().setSpreadsheetId("123");
 
     @Test
-    void perform() throws Exception {
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(TITLE, "spreadsheetName", FOLDER_ID, "folder_id"));
-
-        Parameters connectionParameters = MockParametersFactory.create(Map.of());
+    void performWhenFolderIdIsNotSet() throws Exception {
+        mockedParameters = MockParametersFactory.create(Map.of(TITLE, "spreadsheetName"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(connectionParameters))
+                .when(() -> GoogleServices.getSheets(mockedParameters))
                 .thenReturn(mockedSheets);
 
             when(mockedSheets.spreadsheets())
                 .thenReturn(mockedSpreadsheets);
-            when(mockedSpreadsheets.create(any(Spreadsheet.class)))
+            when(mockedSpreadsheets.create(spreadsheetArgumentCaptor.capture()))
                 .thenReturn(mockCreateRequest);
             when(mockCreateRequest.execute())
-                .thenReturn(new Spreadsheet().setSpreadsheetId(SPREADSHEET_ID));
+                .thenReturn(newSpreadSheet);
+
+            Object result =
+                GoogleSheetsCreateSpreadsheetAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+
+            assertEquals(newSpreadSheet, result);
+
+            Spreadsheet expectedSpreadsheet = new Spreadsheet()
+                .setProperties(
+                    new SpreadsheetProperties()
+                        .setTitle("spreadsheetName"));
+
+            assertEquals(expectedSpreadsheet, spreadsheetArgumentCaptor.getValue());
+        }
+    }
+
+    @Test
+    void performWhenFolderIdIsSet() throws Exception {
+        mockedParameters = MockParametersFactory.create(Map.of(TITLE, "spreadsheetName", FOLDER_ID, "folder_id"));
+
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getSheets(mockedParameters))
+                .thenReturn(mockedSheets);
+
+            when(mockedSheets.spreadsheets())
+                .thenReturn(mockedSpreadsheets);
+            when(mockedSpreadsheets.create(spreadsheetArgumentCaptor.capture()))
+                .thenReturn(mockCreateRequest);
+            when(mockCreateRequest.execute())
+                .thenReturn(newSpreadSheet);
 
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getDrive(connectionParameters))
+                .when(() -> GoogleServices.getDrive(mockedParameters))
                 .thenReturn(mockedDrive);
 
             when(mockedDrive.files())
-                .thenReturn(mockedDriveFiles);
-            when(mockedDriveFiles.get(SPREADSHEET_ID))
-                .thenReturn(mockDriveGetRequest);
-            when(mockDriveGetRequest.setFields(anyString()))
-                .thenReturn(mockDriveGetRequest);
-            when(mockDriveGetRequest.execute())
-                .thenReturn(new File().setParents(List.of("previous-folder-id")));
+                .thenReturn(mockedFiles);
+            when(mockedFiles.get(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setFields(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(file);
 
-            when(mockedDriveFiles.update(anyString(), any()))
-                .thenReturn(mockDriveUpdateRequest);
-            when(mockDriveUpdateRequest.setAddParents(anyString()))
-                .thenReturn(mockDriveUpdateRequest);
-            when(mockDriveUpdateRequest.setRemoveParents(anyString()))
-                .thenReturn(mockDriveUpdateRequest);
-            when(mockDriveUpdateRequest.setFields(anyString()))
-                .thenReturn(mockDriveUpdateRequest);
-            when(mockDriveUpdateRequest.execute())
-                .thenReturn(new File().setId(SPREADSHEET_ID));
+            when(mockedFiles.update(stringArgumentCaptor.capture(), any()))
+                .thenReturn(mockedUpdate);
+            when(mockedUpdate.setAddParents(stringArgumentCaptor.capture()))
+                .thenReturn(mockedUpdate);
+            when(mockedUpdate.setRemoveParents(stringArgumentCaptor.capture()))
+                .thenReturn(mockedUpdate);
+            when(mockedUpdate.setFields(stringArgumentCaptor.capture()))
+                .thenReturn(mockedUpdate);
+            when(mockedUpdate.execute())
+                .thenReturn(file);
 
             Object result =
-                GoogleSheetsCreateSpreadsheetAction.perform(parameters, connectionParameters, mockedContext);
+                GoogleSheetsCreateSpreadsheetAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-            assertEquals(new File().setId(SPREADSHEET_ID), result);
+            assertEquals(newSpreadSheet, result);
 
-            verify(mockedSpreadsheets).create(spreadsheetCaptor.capture());
-            assertEquals("spreadsheetName", spreadsheetCaptor.getValue()
-                .getProperties()
-                .getTitle());
+            Spreadsheet expectedSpreadsheet = new Spreadsheet()
+                .setProperties(
+                    new SpreadsheetProperties()
+                        .setTitle("spreadsheetName"));
 
-            verify(mockDriveUpdateRequest).setAddParents("folder_id");
-            verify(mockDriveUpdateRequest).setRemoveParents("previous-folder-id");
+            assertEquals(expectedSpreadsheet, spreadsheetArgumentCaptor.getValue());
 
+            assertEquals(List.of("123", "parents", "123", "folder_id", "previous-folder-id", "id, parents"),
+                stringArgumentCaptor.getAllValues());
         }
     }
 }
