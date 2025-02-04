@@ -68,8 +68,7 @@ public class GoogleSheetsCreateSpreadsheetAction {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        Spreadsheet newSpreadsheet = sheets
-            .spreadsheets()
+        Spreadsheet newSpreadsheet = sheets.spreadsheets()
             .create(spreadsheet)
             .execute();
 
