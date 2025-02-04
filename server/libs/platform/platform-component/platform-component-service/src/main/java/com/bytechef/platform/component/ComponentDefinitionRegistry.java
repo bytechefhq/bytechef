@@ -175,9 +175,7 @@ public class ComponentDefinitionRegistry {
             Map<Integer, ComponentDefinition> componentDefinitionMap = componentDefinitions.get(name);
 
             if (componentDefinitionMap == null) {
-//                throw new IllegalArgumentException("The component '%s' does not exist".formatted(name));
-
-                return MISSING_COMPONENT_DEFINITION;
+                throw new IllegalArgumentException("The component '%s' does not exist".formatted(name));
             }
 
             componentDefinition = componentDefinitionMap.get(version);
@@ -190,9 +188,8 @@ public class ComponentDefinitionRegistry {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst()
-//                    .orElseThrow(() -> new IllegalArgumentException(
-//                        "No component with name=" + name + ", version=" + version))
-                    .orElseGet(() -> () -> MISSING_COMPONENT_DEFINITION)
+                    .orElseThrow(() -> new IllegalArgumentException(
+                        "No component with name=" + name + ", version=" + version))
                     .getDefinition();
             }
         }
