@@ -3,7 +3,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 
 import getParentConditionTask from './getParentConditionTask';
 
-interface GetUpdatedConditionSubtasksProps {
+interface InsertConditionSubtasksProps {
     conditionId: string;
     tasks: Array<WorkflowTask>;
     newTask: WorkflowTask;
@@ -15,7 +15,7 @@ export default function insertNewConditionSubtask({
     newTask,
     placeholderId,
     tasks,
-}: GetUpdatedConditionSubtasksProps): Array<WorkflowTask> {
+}: InsertConditionSubtasksProps): Array<WorkflowTask> {
     let conditionTask = tasks.find((task) => task.name === conditionId);
 
     if (!conditionTask) {

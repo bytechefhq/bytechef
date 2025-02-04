@@ -28,7 +28,7 @@ export default async function handleConditionClick({
     updateWorkflowMutation,
     workflow,
 }: HandleConditionClickProps) {
-    const clickedTaskDispatcherDefinition = await queryClient.fetchQuery({
+    const conditionDefinition = await queryClient.fetchQuery({
         queryFn: () =>
             new TaskDispatcherDefinitionApi().getTaskDispatcherDefinition({
                 taskDispatcherName: clickedItem.name,
@@ -40,14 +40,14 @@ export default async function handleConditionClick({
         }),
     });
 
-    if (!clickedTaskDispatcherDefinition) {
+    if (!conditionDefinition) {
         return;
     }
 
     const workflowNodeName = getFormattedName(clickedItem.name!);
 
     const newConditionNodeData: NodeDataType = {
-        ...clickedTaskDispatcherDefinition,
+        ...conditionDefinition,
         componentName: clickedItem.name,
         icon: (
             <>
@@ -61,7 +61,7 @@ export default async function handleConditionClick({
         label: clickedItem?.title,
         name: workflowNodeName,
         taskDispatcher: true,
-        type: `${clickedTaskDispatcherDefinition.name}/v${clickedTaskDispatcherDefinition.version}`,
+        type: `${conditionDefinition.name}/v${conditionDefinition.version}`,
         workflowNodeName,
     };
 
@@ -99,7 +99,7 @@ export default async function handleConditionClick({
             ...newConditionNodeData,
             parameters: {
                 ...getParametersWithDefaultValues({
-                    properties: clickedTaskDispatcherDefinition?.properties as Array<PropertyAllType>,
+                    properties: conditionDefinition?.properties as Array<PropertyAllType>,
                 }),
                 caseFalse: [],
                 caseTrue: [],
