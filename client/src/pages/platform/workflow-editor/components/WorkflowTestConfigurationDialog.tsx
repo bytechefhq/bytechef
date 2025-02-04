@@ -227,8 +227,7 @@ const WorkflowTestConfigurationDialog = ({
                             <DialogTitle>Workflow Test Configuration</DialogTitle>
 
                             <DialogDescription>
-                                Set workflow input, trigger output values and test connections. Click save when you are
-                                done.
+                                Set workflow input, trigger output values and test connections.
                             </DialogDescription>
                         </DialogHeader>
 
@@ -240,8 +239,8 @@ const WorkflowTestConfigurationDialog = ({
 
                                         <Properties
                                             control={control}
+                                            controlPath="inputs"
                                             formState={formState}
-                                            path="inputs"
                                             properties={inputs.map((input) => {
                                                 if (input.type === 'string') {
                                                     return {
