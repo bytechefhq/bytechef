@@ -313,8 +313,8 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
  * @export
  */
 export const GetComponentDefinitionsModeTypeEnum = {
-    Automation: 'AUTOMATION',
-    Embedded: 'EMBEDDED'
+    AUTOMATION: 0,
+    EMBEDDED: 1
 } as const;
 export type GetComponentDefinitionsModeTypeEnum = typeof GetComponentDefinitionsModeTypeEnum[keyof typeof GetComponentDefinitionsModeTypeEnum];
 /**
