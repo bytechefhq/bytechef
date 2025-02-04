@@ -60,7 +60,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
         <Dialog onOpenChange={handleDialogClose} open={isDialogOpen}>
             <DialogContent
                 className={twMerge(
-                    'flex w-fit flex-col gap-10 p-6',
+                    'gap- flex w-fit flex-col p-6',
                     currentType === undefined && '[&>button:last-child]:hidden'
                 )}
                 onEscapeKeyDown={(event) => currentType === undefined && event.preventDefault()}
@@ -69,7 +69,7 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
                 <DialogHeader>
                     <DialogTitle className="text-xl">Select how you will use ByteChef</DialogTitle>
 
-                    <DialogDescription>You can change this later</DialogDescription>
+                    <DialogDescription>You can change always change this configuration</DialogDescription>
                 </DialogHeader>
 
                 <RadioGroup
@@ -132,20 +132,14 @@ const ModeSelectionDialog = ({handleDialogClose, isDialogOpen}: ModeSelectionDia
 
                 <DialogFooter>
                     {currentType !== undefined && (
-                        <Button
-                            aria-label="cancel"
-                            className="py-5"
-                            onClick={handleDialogClose}
-                            type="button"
-                            variant="outline"
-                        >
+                        <Button aria-label="cancel" onClick={handleDialogClose} type="button" variant="outline">
                             Cancel
                         </Button>
                     )}
 
                     <Button
                         aria-label="confirm"
-                        className="bg-surface-brand-primary py-5 hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                        className="bg-surface-brand-primary hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
                         disabled={selectedType === undefined}
                         onClick={handleChangeModeType}
                         type="button"

@@ -3,8 +3,8 @@ import {Link, useLocation} from 'react-router-dom';
 
 import './DesktopSidebar.css';
 
+import reactLogo from '@/assets/logo.svg';
 import DesktopSidebarBottomMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarBottomMenu';
-import DesktopSidebarTopMenu from '@/shared/layout/desktop-sidebar/DesktopSidebarTopMenu';
 import React from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -27,7 +27,9 @@ export function DesktopSidebar({
                 <div className="flex min-h-0 flex-1 flex-col">
                     <div className="flex-1">
                         <div className="flex items-center justify-center py-4">
-                            <DesktopSidebarTopMenu />
+                            <Link to="/">
+                                <img alt="ByteChef" className="h-8 w-auto cursor-pointer" src={reactLogo} />
+                            </Link>
                         </div>
 
                         <nav aria-label="Sidebar" className="flex flex-col items-center overflow-y-auto">

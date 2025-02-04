@@ -13,20 +13,26 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ModeSelectionDialog from '@/pages/home/ModeSelectionDialog';
+import {useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
-import {HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCog} from 'lucide-react';
-import React, {useEffect} from 'react';
+import {BlendIcon, DiamondIcon, HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCogIcon} from 'lucide-react';
+import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
 const DesktopSidebarBottomMenu = () => {
+    const [isModeSelectionDialogOpen, setIsModeSelectionDialogOpen] = useState(false);
+
     const {application} = useApplicationInfoStore();
     const {account, logout} = useAuthenticationStore();
+    const {currentType} = useModeTypeStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
     const analytics = useAnalytics();
@@ -38,6 +44,8 @@ const DesktopSidebarBottomMenu = () => {
     const navigate = useNavigate();
 
     const queryClient = useQueryClient();
+
+    const ff_520 = useFeatureFlagsStore()('ff-520');
 
     /* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
     const {data: workspaces} = useGetUserWorkspacesQuery(account?.id!, !!account);
@@ -96,12 +104,21 @@ const DesktopSidebarBottomMenu = () => {
 
                 <DropdownMenuSeparator />
 
+                <DropdownMenuItem
+                    className="cursor-pointer font-semibold"
+                    onClick={() => setIsModeSelectionDialogOpen(true)}
+                >
+                    <BlendIcon className="size-5" /> <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+
                 <div className="min-h-52 space-y-1">
                     {pathname.startsWith('/automation') && application?.edition === 'ee' && workspaces && (
                         <>
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                    Workspaces
+                                    <DiamondIcon className="size-5" /> Workspaces
                                 </DropdownMenuSubTrigger>
 
                                 <DropdownMenuPortal>
@@ -156,7 +173,7 @@ const DesktopSidebarBottomMenu = () => {
                         }
                     >
                         <div className="flex items-center space-x-1">
-                            <UserRoundCog className="size-5" />
+                            <UserRoundCogIcon className="size-5" />
 
                             <span>Your account</span>
                         </div>
@@ -177,6 +194,13 @@ const DesktopSidebarBottomMenu = () => {
                     Log Out
                 </DropdownMenuItem>
             </DropdownMenuContent>
+
+            {ff_520 && (
+                <ModeSelectionDialog
+                    handleDialogClose={() => setIsModeSelectionDialogOpen(false)}
+                    isDialogOpen={isModeSelectionDialogOpen}
+                />
+            )}
         </DropdownMenu>
     );
 };
