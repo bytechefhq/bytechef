@@ -26,6 +26,8 @@ import com.oblac.jrsmq.RedisSMQ;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,9 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 @ConditionalOnMessageBrokerRedis
 public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
+
+    private static final Logger logger =
+        LoggerFactory.getLogger(RedisMessageBrokerListenerRegistrarConfiguration.class);
 
     private final List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers;
     private MessageListenerAdapter messageListenerAdapter;
@@ -99,6 +104,10 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
     public void registerListenerEndpoint(
         RedisListenerEndpointRegistrar listenerEndpointRegistrar, MessageRoute messageRoute, int concurrency,
         Object delegate, String methodName) {
+
+        Class<?> delegateClass = delegate.getClass();
+
+        logger.info("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
 
         listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);
 

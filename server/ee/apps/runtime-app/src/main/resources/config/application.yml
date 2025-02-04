@@ -1,0 +1,127 @@
+management:
+  info:
+    git:
+      mode: full
+    env:
+      enabled: true
+  metrics:
+    enable:
+      http: true
+      jvm: true
+      logback: true
+      process: true
+      system: true
+    distribution:
+      percentiles-histogram:
+        all: true
+      percentiles:
+        all: 0, 0.5, 0.75, 0.95, 0.99, 1.0
+    tags:
+      application: ${spring.application.name}
+  observations:
+    key-values:
+      application: ${spring.application.name}
+  # Prometheus is the default metrics backend
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+        step: 60
+
+spring:
+  ai:
+    openai:
+      api-key: ${bytechef.ai.openai.api-key}
+  autoconfigure:
+    exclude:
+      org.springframework.ai.autoconfigure.anthropic.AnthropicAutoConfiguration,
+      org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration,
+      org.springframework.ai.autoconfigure.huggingface.HuggingfaceChatAutoConfiguration,
+      org.springframework.ai.autoconfigure.mistralai.MistralAiAutoConfiguration,
+      org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration,
+      org.springframework.ai.autoconfigure.stabilityai.StabilityAiImageAutoConfiguration,
+      org.springframework.ai.autoconfigure.vertexai.gemini.VertexAiGeminiAutoConfiguration,
+      org.springframework.ai.autoconfigure.watsonxai.WatsonxAiAutoConfiguration
+  application:
+    name: runtime-app
+  cache:
+    type: ${bytechef.cache.provider}
+  jmx:
+    enabled: false
+  output:
+    ansi:
+      console-available: true
+  profiles:
+    active: #spring.profiles.active#
+  shell:
+    noninteractive:
+      enabled: false
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  task:
+    execution:
+      thread-name-prefix: server-app-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: server-app-scheduling-
+      pool:
+        size: 2
+  threads:
+    virtual:
+#      enabled: true
+
+#####
+
+bytechef:
+  cache:
+    # Cache provider (redis | simple) default: simple
+    provider: simple
+  data-storage:
+    # Data storage provider
+    provider: filesystem
+  # Edition (ce - Community Edition | ee - Enterprise Edition) default: ee
+  edition: ee
+  # Encryption key provider (filesystem - the key generated on filesystem, property - the key read from property) default: filesystem
+  encryption:
+    provider: filesystem
+  file-storage:
+    # File storage provider (aws(ee) | filesystem | jdbc) default: filesystem
+    provider: filesystem
+    filesystem:
+      basedir: ${user.home}/bytechef/data/file-storage
+  mail:
+    base-url: ${bytechef.public-url}
+    from: noreply@bytechef.io
+    host:
+    port: 25
+  message-broker:
+    # Messaging provider between Coordinator and Workers (amqp | jms | kafka | redis) default: jms
+    provider: local
+  # When the worker is enabled, subscribe to the default "default" queue with 10 concurrent consumers.
+  # You may also route workflow tasks to other arbitrarily named task queues by specifying the "node"
+  # property on any given task.
+  # E.g. node: captions will route to the captions queue which a worker would subscribe to with workflow.worker.subscriptions.captions.
+  # Note: queue must be created before tasks can be routed to it. ByteChef will create the queue if it isn't already there when the worker
+  # bootstraps.
+  worker:
+    task:
+      subscriptions:
+        default: 10
+  workflow:
+    output-storage:
+      # Output storage provider for workflow output data
+      provider: filesystem
+    repository:
+      filesystem:
+        enabled: true
+        location-pattern: ${user.home}/bytechef/data/workflows/*.{json|yml|yaml}
+      classpath:
+        enabled: true
+        location-pattern: workflows/*.{json|yml|yaml}

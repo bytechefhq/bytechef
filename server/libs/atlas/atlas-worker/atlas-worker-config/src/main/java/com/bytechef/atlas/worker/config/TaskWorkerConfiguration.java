@@ -57,25 +57,15 @@ public class TaskWorkerConfiguration {
     }
 
     @Bean
-    TaskHandlerResolver defaultTaskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
-        return new DefaultTaskHandlerResolver(taskHandlerRegistry);
-    }
-
-    @Bean
-    TaskHandlerResolver taskDispatcherAdapterTaskHandlerResolver(TaskHandlerResolver taskHandlerResolver) {
-        return new TaskDispatcherAdapterTaskHandlerResolver(
-            taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolver);
-    }
-
-    @Bean
     @Primary
     TaskHandlerResolver taskHandlerResolver(TaskHandlerRegistry taskHandlerRegistry) {
         TaskHandlerResolverChain taskHandlerResolverChain = new TaskHandlerResolverChain();
 
         taskHandlerResolverChain.setTaskHandlerResolvers(
             List.of(
-                taskDispatcherAdapterTaskHandlerResolver(taskHandlerResolverChain),
-                defaultTaskHandlerResolver(taskHandlerRegistry)));
+                new TaskDispatcherAdapterTaskHandlerResolver(
+                    taskDispatcherAdapterTaskHandlerFactories, taskHandlerResolverChain),
+                new DefaultTaskHandlerResolver(taskHandlerRegistry)));
 
         return taskHandlerResolverChain;
     }

@@ -12,6 +12,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:config:jackson-config"))
     implementation(project(":server:libs:config:logback-config"))
+
     implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
 

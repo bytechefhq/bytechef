@@ -1,0 +1,19 @@
+logging:
+  level:
+    ROOT: INFO
+    com.bytechef: INFO
+
+management:
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+
+spring:
+  devtools:
+    restart:
+      enabled: false
+    livereload:
+      enabled: false
+  thymeleaf:
+    cache: true

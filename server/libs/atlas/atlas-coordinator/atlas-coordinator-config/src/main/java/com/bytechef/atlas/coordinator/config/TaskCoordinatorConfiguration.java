@@ -40,12 +40,12 @@ import com.bytechef.atlas.coordinator.task.dispatcher.DefaultTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherChain;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolver;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.CollectionUtils;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -133,13 +133,12 @@ public class TaskCoordinatorConfiguration {
     TaskCompletionHandler taskCompletionHandler() {
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
-        Stream<TaskCompletionHandler> taskCompletionHandlerStream = Stream.concat(
-            taskCompletionHandlerFactories.stream()
-                .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
-                    taskCompletionHandlerChain, taskDispatcher())),
-            Stream.of(defaultTaskCompletionHandler()));
-
-        taskCompletionHandlerChain.setTaskCompletionHandlers(taskCompletionHandlerStream.toList());
+        taskCompletionHandlerChain.setTaskCompletionHandlers(
+            CollectionUtils.concat(
+                taskCompletionHandlerFactories.stream()
+                    .map(taskCompletionHandlerFactory -> taskCompletionHandlerFactory.createTaskCompletionHandler(
+                        taskCompletionHandlerChain, taskDispatcher())),
+                Stream.of(defaultTaskCompletionHandler())));
 
         return taskCompletionHandlerChain;
     }
@@ -158,15 +157,12 @@ public class TaskCoordinatorConfiguration {
     TaskDispatcher<? super Task> taskDispatcher() {
         TaskDispatcherChain taskDispatcherChain = new TaskDispatcherChain();
 
-        List<TaskDispatcherResolver> resolvers = Stream
-            .concat(
+        taskDispatcherChain.setTaskDispatcherResolvers(
+            CollectionUtils.concat(
                 taskDispatcherResolverFactories.stream()
                     .map(taskDispatcherFactory -> taskDispatcherFactory.createTaskDispatcherResolver(
                         taskDispatcherChain)),
-                Stream.of(controlTaskDispatcher(), defaultTaskDispatcher()))
-            .toList();
-
-        taskDispatcherChain.setTaskDispatcherResolvers(resolvers);
+                Stream.of(controlTaskDispatcher(), defaultTaskDispatcher())));
 
         return taskDispatcherChain;
     }

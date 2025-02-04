@@ -36,8 +36,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-api"))
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client"))
-    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))

@@ -51,10 +51,10 @@ dependencies {
 
     implementation(project(":server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest"))
     implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-remote-client"))
+    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
-    implementation(project(":server:ee:libs:config:observability-config"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))

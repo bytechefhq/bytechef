@@ -185,11 +185,7 @@ public class JobSyncExecutor {
     }
 
     public Job execute(JobParametersDTO jobParametersDTO) {
-        Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
-
-        checkForError(job);
-
-        return checkForWebhookResponse(job);
+        return execute(jobParametersDTO, jobFacade);
     }
 
     public Job execute(JobParametersDTO jobParametersDTO, JobFactoryFunction jobFactoryFunction) {
@@ -197,15 +193,19 @@ public class JobSyncExecutor {
             eventPublisher, contextService, new JobServiceWrapper(jobFactoryFunction), taskExecutionService,
             taskFileStorage, workflowService);
 
+        return execute(jobParametersDTO, jobFacade);
+    }
+
+    private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
+        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
+    }
+
+    private Job execute(JobParametersDTO jobParametersDTO, JobFacade jobFacade) {
         Job job = jobService.getJob(jobFacade.createJob(jobParametersDTO));
 
         checkForError(job);
 
         return checkForWebhookResponse(job);
-    }
-
-    private static ApplicationEventPublisher createEventPublisher(SyncMessageBroker syncMessageBroker) {
-        return event -> syncMessageBroker.send(((MessageEvent<?>) event).getRoute(), event);
     }
 
     private List<ApplicationEventListener> getApplicationEventListeners(

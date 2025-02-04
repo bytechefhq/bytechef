@@ -49,8 +49,8 @@ public class MessageEventListener {
     @EventListener
     @Async
     public void onMessageEvent(MessageEvent<?> messageEvent) {
-        if (logger.isDebugEnabled()) {
-            logger.debug("onMessageEvent: " + messageEvent);
+        if (logger.isTraceEnabled()) {
+            logger.trace("onMessageEvent: " + messageEvent);
         }
 
         for (MessageEventPreSendProcessor messageEventPreSendProcessor : messageEventPreSendProcessors) {
