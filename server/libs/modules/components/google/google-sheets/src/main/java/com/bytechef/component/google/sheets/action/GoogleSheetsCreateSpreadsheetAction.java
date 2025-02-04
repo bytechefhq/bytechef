@@ -31,7 +31,6 @@ import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
-import java.util.List;
 
 /**
  * @author Marija Horvat
@@ -48,9 +47,11 @@ public class GoogleSheetsCreateSpreadsheetAction {
                 .required(true),
             string(FOLDER_ID)
                 .label("Folder ID")
-                .description("ID of the folder where the new spreadsheet will be stored.")
+                .description(
+                    "ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder " +
+                        "will be created in the root folder.")
                 .options(GoogleUtils.getFileOptionsByMimeType("application/vnd.google-apps.folder", true))
-                .required(true))
+                .required(false))
         .output()
         .perform(GoogleSheetsCreateSpreadsheetAction::perform);
 
@@ -60,19 +61,29 @@ public class GoogleSheetsCreateSpreadsheetAction {
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) throws Exception {
 
+        Spreadsheet spreadsheet = new Spreadsheet()
+            .setProperties(
+                new SpreadsheetProperties()
+                    .setTitle(inputParameters.getRequiredString(TITLE)));
+
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        String spreadsheetName = inputParameters.getRequiredString(TITLE);
-
-        Spreadsheet spreadsheet = new Spreadsheet()
-            .setProperties(new SpreadsheetProperties()
-                .setTitle(spreadsheetName));
-
-        spreadsheet = sheets.spreadsheets()
+        Spreadsheet newSpreadsheet = sheets
+            .spreadsheets()
             .create(spreadsheet)
             .execute();
 
-        String spreadsheetId = spreadsheet.getSpreadsheetId();
+        String folderId = inputParameters.getString(FOLDER_ID);
+
+        if (folderId != null) {
+            moveSpreadsheetToFolder(connectionParameters, newSpreadsheet.getSpreadsheetId(), folderId);
+        }
+
+        return newSpreadsheet;
+    }
+
+    private static void moveSpreadsheetToFolder(
+        Parameters connectionParameters, String spreadsheetId, String folderId) throws Exception {
 
         Drive drive = GoogleServices.getDrive(connectionParameters);
 
@@ -81,14 +92,10 @@ public class GoogleSheetsCreateSpreadsheetAction {
             .setFields("parents")
             .execute();
 
-        List<String> previousParents = newFile.getParents();
-
-        String removeParents = previousParents != null ? String.join(",", previousParents) : null;
-
-        return drive.files()
+        drive.files()
             .update(spreadsheetId, null)
-            .setAddParents(inputParameters.getRequiredString(FOLDER_ID))
-            .setRemoveParents(removeParents)
+            .setAddParents(folderId)
+            .setRemoveParents(String.join(",", newFile.getParents()))
             .setFields("id, parents")
             .execute();
     }
