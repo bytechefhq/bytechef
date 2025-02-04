@@ -46,7 +46,8 @@ export default defineConfig({
                             label: 'Build Workflows',
                             items: [
                                 {label: 'Overview', link: '/automation/build_workflows/overview'},
-                                {label: 'Project Guides', link: '/automation/build_workflows/project_guides'}
+                                {label: 'Project Guides', link: '/automation/build_workflows/project_guides'},
+                                {label: 'Workflow Guides', link: '/automation/build_workflows/workflow_guides'}
                             ],
                         }
                     ],
