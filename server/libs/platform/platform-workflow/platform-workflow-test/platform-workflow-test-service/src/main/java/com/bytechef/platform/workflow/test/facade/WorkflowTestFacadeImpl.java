@@ -98,7 +98,12 @@ public class WorkflowTestFacadeImpl implements WorkflowTestFacade {
 
         List<WorkflowTrigger> workflowTriggers = WorkflowTrigger.of(workflow);
 
-        if (!workflowTriggers.isEmpty()) {
+        if (workflowTriggers.isEmpty()) {
+            Map<String, ?> workflowTestConfigurationInputs = OptionalUtils.mapOrElse(
+                workflowTestConfigurationOptional, WorkflowTestConfiguration::getInputs, Map.of());
+
+            inputs = MapUtils.concat(inputs, (Map<String, Object>) workflowTestConfigurationInputs);
+        } else {
             WorkflowTrigger workflowTrigger = workflowTriggers.getFirst();
 
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
