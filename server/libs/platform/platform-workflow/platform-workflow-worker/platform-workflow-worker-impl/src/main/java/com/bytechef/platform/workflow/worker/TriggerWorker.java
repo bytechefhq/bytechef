@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.workflow.worker;
 
-import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.trigger.TriggerOutput;
@@ -45,6 +44,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.commons.lang3.Validate;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;

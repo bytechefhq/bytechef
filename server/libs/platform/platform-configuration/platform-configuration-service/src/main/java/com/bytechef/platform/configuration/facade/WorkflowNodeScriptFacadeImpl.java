@@ -16,12 +16,12 @@
 
 package com.bytechef.platform.configuration.facade;
 
-import com.bytechef.commons.util.ExceptionUtils;
 import com.bytechef.error.ExecutionError;
 import com.bytechef.platform.configuration.domain.WorkflowNodeTestOutput;
 import com.bytechef.platform.configuration.dto.ScriptTestExecutionDTO;
 import com.bytechef.platform.domain.OutputResponse;
 import java.util.Arrays;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
