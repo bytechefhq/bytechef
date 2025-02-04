@@ -99,9 +99,10 @@ const ApiCollectionEndpointListItem = ({
                     className={twMerge(
                         'mr-4 w-20 border-transparent',
                         apiCollectionEndpoint.httpMethod === 'DELETE' && 'bg-red-400',
-                        apiCollectionEndpoint.httpMethod === 'GET' && 'bg-blue-400',
-                        apiCollectionEndpoint.httpMethod === 'POST' && 'bg-green-400',
-                        apiCollectionEndpoint.httpMethod === 'PUT' && 'bg-amber-400'
+                        apiCollectionEndpoint.httpMethod === 'GET' && 'bg-green-400',
+                        apiCollectionEndpoint.httpMethod === 'POST' && 'bg-yellow-400',
+                        apiCollectionEndpoint.httpMethod === 'PATCH' && 'bg-amber-400',
+                        apiCollectionEndpoint.httpMethod === 'PUT' && 'bg-orange-400'
                     )}
                     variant="secondary"
                 >

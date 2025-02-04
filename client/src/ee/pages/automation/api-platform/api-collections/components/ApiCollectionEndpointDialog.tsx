@@ -204,7 +204,7 @@ const ApiCollectionEndpointDialog = ({
                                     <FormLabel>HTTP Method</FormLabel>
 
                                     <FormControl>
-                                        <Select onValueChange={field.onChange} value={apiEndpoint?.httpMethod}>
+                                        <Select onValueChange={field.onChange} value={field.value}>
                                             <SelectTrigger className="w-full">
                                                 <SelectValue placeholder="Select HTTP method" />
                                             </SelectTrigger>

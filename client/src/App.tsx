@@ -14,8 +14,8 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     FolderIcon,
-    LandmarkIcon,
     Layers3Icon,
+    LayoutTemplateIcon,
     Link2Icon,
     LucideIcon,
     Settings2Icon,
@@ -53,7 +53,7 @@ const automationNavigation: NavigationType[] = [
     },
     {
         href: '/automation/api-platform',
-        icon: LandmarkIcon,
+        icon: LayoutTemplateIcon,
         name: 'API Collections',
     },
     {
