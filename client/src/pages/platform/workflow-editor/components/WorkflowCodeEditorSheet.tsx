@@ -94,7 +94,7 @@ const WorkflowCodeEditorSheet = ({
         <>
             <Sheet onOpenChange={handleOpenChange} open>
                 <SheetContent
-                    className="flex w-11/12 flex-col gap-2 p-0 sm:max-w-screen-lg"
+                    className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
@@ -103,16 +103,17 @@ const WorkflowCodeEditorSheet = ({
                             <SheetTitle>Edit Workflow</SheetTitle>
 
                             <div className="flex items-center">
-                                <div className="mr-6 flex items-center">
+                                <div className="mr-8 flex items-center">
                                     <Tooltip>
                                         <TooltipTrigger asChild>
                                             <Button
                                                 className="[&_svg]:size-5"
                                                 disabled={testConfigurationDisabled}
                                                 onClick={() => setShowWorkflowTestConfigurationDialog(true)}
+                                                size="icon"
                                                 variant="ghost"
                                             >
-                                                <Settings2Icon /> Test Configuration
+                                                <Settings2Icon />
                                             </Button>
                                         </TooltipTrigger>
 
