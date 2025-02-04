@@ -141,9 +141,8 @@ const ApiKeyTable = ({apiKeys}: ApiKeyTableProps) => {
             </p>
 
             <p>
-                Do not share your API key with others, or expose it in the browser or other client-side code. In order
-                to protect the security of your account, ByteChef may also automatically disable any API key that we
-                have found has leaked publicly.
+                Do not share your API key with others or expose it in the browser or other client-side code. To protect
+                your account&#39;s security, ByteChef may automatically disable any API key that has leaked publicly.
             </p>
 
             <Table className="table-auto">

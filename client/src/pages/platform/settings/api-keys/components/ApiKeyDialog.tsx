@@ -36,7 +36,7 @@ interface ApiKeyDialogProps {
 
 const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
     const [isOpen, setIsOpen] = useState(!triggerNode);
-    const [secretApiKey, setSecretApiKey] = useState<string | undefined>();
+    const [secretKey, setSecretKey] = useState<string | undefined>();
 
     /* eslint-disable @typescript-eslint/no-unused-vars */
     const [_, copyToClipboard] = useCopyToClipboard();
@@ -59,7 +59,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                 queryKey: ApiKeyKeys.apiKeys,
             });
 
-            setSecretApiKey(result.secretKey);
+            setSecretKey(result.secretKey);
 
             reset();
         },
@@ -82,7 +82,7 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
         }
 
         reset();
-        setSecretApiKey(undefined);
+        setSecretKey(undefined);
     }
 
     function saveApiKey() {
@@ -118,12 +118,12 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                         <DialogHeader>
                             <div className="flex items-center justify-between">
                                 <DialogTitle>
-                                    {secretApiKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} secret API Key
+                                    {secretKey ? 'Save your' : `${apiKey?.id ? 'Edit' : 'Create'}`} secret API Key
                                 </DialogTitle>
                             </div>
                         </DialogHeader>
 
-                        {secretApiKey ? (
+                        {secretKey ? (
                             <div className="space-y-4">
                                 <p className="text-sm">
                                     Please save this secret API key somewhere safe and accessible. For security reasons,
@@ -132,11 +132,11 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                                 </p>
 
                                 <div className="flex space-x-1">
-                                    <Input readOnly={true} value={secretApiKey} />
+                                    <Input readOnly={true} value={secretKey} />
 
                                     <Button
                                         onClick={() => {
-                                            copyToClipboard(secretApiKey);
+                                            copyToClipboard(secretKey);
 
                                             toast({description: 'The secret API key is copied.'});
                                         }}
@@ -168,13 +168,11 @@ const ApiKeyDialog = ({apiKey, onClose, triggerNode}: ApiKeyDialogProps) => {
                         <DialogFooter>
                             <DialogClose asChild>
                                 <Button type="button" variant="outline">
-                                    {secretApiKey ? 'Done' : 'Cancel'}
+                                    {secretKey ? 'Done' : 'Cancel'}
                                 </Button>
                             </DialogClose>
 
-                            {!secretApiKey && (
-                                <Button type="submit">{apiKey?.id ? 'Save' : 'Create secret API Key'}</Button>
-                            )}
+                            {!secretKey && <Button type="submit">{apiKey?.id ? 'Save' : 'Create API Key'}</Button>}
                         </DialogFooter>
                     </form>
                 </Form>
