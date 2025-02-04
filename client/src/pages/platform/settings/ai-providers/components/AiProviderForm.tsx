@@ -3,6 +3,7 @@ import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, Form
 import {Input} from '@/components/ui/input';
 import {useUpdateAiProviderMutation} from '@/ee/mutations/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/queries/aiProviderrs.queries';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
 import {useForm} from 'react-hook-form';
@@ -28,6 +29,9 @@ const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCanc
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: AiProviderKeys.aiProviders,
+            });
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
             });
 
             onClose();

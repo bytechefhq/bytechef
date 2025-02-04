@@ -5,6 +5,7 @@ import {useEnableAiProviderMutation} from '@/ee/mutations/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/queries/aiProviderrs.queries';
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import AiProviderForm from '@/pages/platform/settings/ai-providers/components/AiProviderForm';
+import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
 import * as AccordionPrimitive from '@radix-ui/react-accordion';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useState} from 'react';
@@ -21,6 +22,9 @@ const AiProviderList = ({aiProviders}: {aiProviders: AiProvider[]}) => {
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: AiProviderKeys.aiProviders,
+            });
+            queryClient.invalidateQueries({
+                queryKey: WorkflowNodeOptionKeys.workflowNodeOptions,
             });
         },
     });
