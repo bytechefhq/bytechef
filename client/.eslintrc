@@ -142,6 +142,7 @@
                     "text-success",
                     "text-success-foreground",
                     "text-surface-brand-primary",
+                    "text-content-warning",
                     "w-112",
                     "w-appearance-theme-choice-skeleton-large-width",
                     "w-appearance-theme-choice-skeleton-small-width",
