@@ -17,6 +17,7 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -40,7 +41,7 @@ public class GithubListIssuesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listIssues")
         .title("List Issues")
-        .description("Retrieve issues assigned to the authenticated user across all accessible repositories")
+        .description("Retrieve issues assigned to the authenticated user across all accessible repositories.")
         .properties(
             string(FILTER)
                 .label("Filter")
@@ -65,7 +66,7 @@ public class GithubListIssuesAction {
                     option("All", "all", "All issues."))
                 .defaultValue("open")
                 .required(true))
-        .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
+        .output(outputSchema(array().items(ISSUE_OUTPUT_PROPERTY)))
         .perform(GithubListIssuesAction::perform);
 
     private GithubListIssuesAction() {
