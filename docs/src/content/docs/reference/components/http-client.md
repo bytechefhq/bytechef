@@ -2,16 +2,14 @@
 title: "HTTP Client"
 description: "Makes an HTTP request and returns the response data."
 ---
-## Reference
-<hr />
 
 Makes an HTTP request and returns the response data.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: httpClient/v1
 
 <hr />
 
@@ -26,11 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key | STRING | TEXT  |  |
-| Value | STRING | TEXT  |  |
-| Add to | STRING | SELECT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key | STRING | TEXT  |  | true  |
+| value | Value | STRING | TEXT  |  | true  |
+| addTo | Add to | STRING | SELECT  |  | true  |
 
 
 
@@ -38,9 +36,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
@@ -48,10 +46,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  | true  |
+| password | Password | STRING | TEXT  |  | true  |
 
 
 
@@ -59,10 +57,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  | true  |
+| password | Password | STRING | TEXT  |  | true  |
 
 
 
@@ -70,14 +68,14 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Authorization URL | STRING | TEXT  |  |
-| Token URL | STRING | TEXT  |  |
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Header Prefix | STRING | TEXT  |  |
-| Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| authorizationUrl | Authorization URL | STRING | TEXT  |  | true  |
+| tokenUrl | Token URL | STRING | TEXT  |  | true  |
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| headerPrefix | Header Prefix | STRING | TEXT  |  | null  |
+| scopes | Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |  null  |
 
 
 
@@ -85,13 +83,13 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Authorization URL | STRING | TEXT  |  |
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Header Prefix | STRING | TEXT  |  |
-| Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| authorizationUrl | Authorization URL | STRING | TEXT  |  | true  |
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| headerPrefix | Header Prefix | STRING | TEXT  |  | null  |
+| scopes | Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |  null  |
 
 
 
@@ -99,21 +97,19 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token URL | STRING | TEXT  |  |
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Header Prefix | STRING | TEXT  |  |
-| Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| tokenUrl | Token URL | STRING | TEXT  |  | true  |
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| headerPrefix | Header Prefix | STRING | TEXT  |  | null  |
+| scopes | Scopes | STRING | TEXT_AREA  |  Optional comma-delimited list of scopes  |  null  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -125,20 +121,20 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
 
 
 
@@ -148,21 +144,21 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| body | Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
 
 
 
@@ -172,21 +168,21 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| body | Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
 
 
 
@@ -196,21 +192,21 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| body | Body | {STRING\(bodyContentType), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), {}\(bodyContent), STRING\(bodyContent), FILE_ENTRY\(bodyContent), STRING\(bodyContentMimeType), STRING\(bodyContentMimeType)} | OBJECT_BUILDER  |  The body of the request.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
 
 
 
@@ -220,20 +216,20 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
 
 
 
@@ -243,20 +239,22 @@ The request method to use.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |
-| Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |
-| Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |
-| Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |
-| Headers | {} | OBJECT_BUILDER  |  Headers to send.  |
-| Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |
-| Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |
-| Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |
-| Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |
-| Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |
-| Proxy | STRING | TEXT  |  HTTP proxy to use.  |
-| Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| uri | URI | STRING | TEXT  |  The URI to make the request to. If HTTP Client Connection defines Base URI, then this value is appended to it.  |  true  |
+| allowUnauthorizedCerts | Allow Unauthorized Certs | BOOLEAN | SELECT  |  Download the response even if SSL certificate validation is not possible.  |  null  |
+| responseType | Response Format | STRING | SELECT  |  The format in which the data gets returned from the URL.  |  null  |
+| responseFilename | Response Filename | STRING | TEXT  |  The name of the file if the response is returned as a file object.  |  null  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Headers to send.  |  null  |
+| queryParameters | Query Parameters | {} | OBJECT_BUILDER  |  Query parameters to send.  |  null  |
+| fullResponse | Full Response | BOOLEAN | SELECT  |  Returns the full response data instead of only the body.  |  null  |
+| followAllRedirects | Follow All Redirects | BOOLEAN | SELECT  |  Follow non-GET HTTP 3xx redirects.  |  null  |
+| followRedirect | Follow GET Redirect | BOOLEAN | SELECT  |  Follow GET HTTP 3xx redirects.  |  null  |
+| ignoreResponseCode | Ignore Response Code | BOOLEAN | SELECT  |  Succeeds also when the status code is not 2xx.  |  null  |
+| proxy | Proxy | STRING | TEXT  |  HTTP proxy to use.  |  null  |
+| timeout | Timeout | INTEGER | INTEGER  |  Time in ms to wait for the server to send a response before aborting the request.  |  null  |
+
+
 
 
 

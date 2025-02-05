@@ -2,16 +2,14 @@
 title: "Github"
 description: "GitHub is a web-based platform for version control and collaboration using Git."
 ---
-## Reference
-<hr />
 
 GitHub is a web-based platform for version control and collaboration using Git.
 
 
-Categories: [developer-tools]
+Categories: developer-tools
 
 
-Version: 1
+Type: github/v1
 
 <hr />
 
@@ -26,85 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client id | STRING | TEXT  |  |
-| Client secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Issue
-Triggers when a new issue is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body)} | OBJECT_BUILDER  |
-| {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-
-### New Pull Request
-Triggers when a new pull request is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} | OBJECT_BUILDER  |
-| {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-| {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client id | STRING | TEXT  |  | true  |
+| clientSecret | Client secret | STRING | TEXT  |  | true  |
 
 
 
@@ -122,14 +45,14 @@ Adds an assignees to the specified issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-| Issue | STRING | SELECT  |  The issue to add assignee to.  |
-| Assignees | [STRING\($assignee)] | ARRAY_BUILDER  |  The list of assignees to add to the issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+| issue | Issue | STRING | SELECT  |  The issue to add assignee to.  |  true  |
+| assignees | Assignees | [STRING\($assignee)] | ARRAY_BUILDER  |  The list of assignees to add to the issue.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -138,17 +61,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| repository_url | STRING | TEXT  |
+| id | NUMBER | NUMBER  |
+| number | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+| state | STRING | TEXT  |
+| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| body | STRING | TEXT  |
 
 
 
@@ -160,14 +83,14 @@ Adds labels to the specified issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-| Issue | STRING | SELECT  |  The issue to add labels to.  |
-| Labels | [STRING\($label)] | ARRAY_BUILDER  |  The list of labels to add to the issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+| issue | Issue | STRING | SELECT  |  The issue to add labels to.  |  true  |
+| labels | Labels | [STRING\($label)] | ARRAY_BUILDER  |  The list of labels to add to the issue.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -176,9 +99,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
 
 
 
@@ -190,14 +113,14 @@ Adds a comment to the specified issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-| Issue | STRING | SELECT  |  The issue to comment on.  |
-| Comment | STRING | TEXT  |  The comment to add to the issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+| issue | Issue | STRING | SELECT  |  The issue to comment on.  |  true  |
+| body | Comment | STRING | TEXT  |  The comment to add to the issue.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -206,17 +129,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| repository_url | STRING | TEXT  |
+| id | NUMBER | NUMBER  |
+| number | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+| state | STRING | TEXT  |
+| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| body | STRING | TEXT  |
 
 
 
@@ -228,14 +151,14 @@ Create Issue in GitHub Repository
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  Repository where new issue will be created.  |
-| Title | STRING | TEXT  |  Title of the issue.  |
-| Description | STRING | TEXT  |  The description of the issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  Repository where new issue will be created.  |  true  |
+| title | Title | STRING | TEXT  |  Title of the issue.  |  false  |
+| body | Description | STRING | TEXT  |  The description of the issue.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -244,17 +167,17 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| repository_url | STRING | TEXT  |
+| id | NUMBER | NUMBER  |
+| number | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+| state | STRING | TEXT  |
+| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| body | STRING | TEXT  |
 
 
 
@@ -266,13 +189,13 @@ Get information from a specific issue
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Repository | STRING | SELECT  |  |
-| Issue | STRING | SELECT  |  The issue you want to get details from.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+| issue | Issue | STRING | SELECT  |  The issue you want to get details from.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -281,22 +204,169 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| repository_url | STRING | TEXT  |
+| id | NUMBER | NUMBER  |
+| number | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+| state | STRING | TEXT  |
+| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| body | STRING | TEXT  |
 
 
 
 
 
+
+### List Issues
+Retrieve issues assigned to the authenticated user across all accessible repositories
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| filter | Filter | STRING | SELECT  |  Specifies the types of issues to return.  |  true  |
+| state | State | STRING | SELECT  |  Indicates the state of the issues to return.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| repository_url | STRING | TEXT  |
+| id | NUMBER | NUMBER  |
+| number | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+| state | STRING | TEXT  |
+| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
+| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
+| body | STRING | TEXT  |
+
+
+
+
+
+
+### List Issues
+Get list of issues from the repository
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  The name of the repository  |  true  |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+
+
+
+
+
+### Star Repository
+Stars a repository for the authenticated user.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| owner | Owner | STRING | TEXT  |  The account owner of the repository. The name is not case sensitive.  |  true  |
+| repository | Repository | STRING | TEXT  |  The name of the repository including owner without the .git extension. The name is not case sensitive.  |  true  |
+
+
+
+
+
+
+## Triggers
+
+
+### New Issue
+Triggers when a new issue is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| issue | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), STRING\(body)} | OBJECT_BUILDER  |
+| sender | {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
+| action | STRING | TEXT  |
+| starred_at | STRING | TEXT  |
+| repository | {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Pull Request
+Triggers when a new pull request is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| repository | Repository | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| number | INTEGER | INTEGER  |
+| pull_request | {INTEGER\(id), STRING\(state), STRING\(title), STRING\(body), INTEGER\(commits)} | OBJECT_BUILDER  |
+| sender | {STRING\(login), INTEGER\(id)} | OBJECT_BUILDER  |
+| action | STRING | TEXT  |
+| repository | {INTEGER\(id), STRING\(name), STRING\(full_name), {STRING\(login), INTEGER\(id)}\(owner), STRING\(visibility), INTEGER\(forks), INTEGER\(open_issues), STRING\(default_branch)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
 
 <hr />
 

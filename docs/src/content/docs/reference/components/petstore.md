@@ -2,14 +2,12 @@
 title: "Petstore"
 description: "This is a sample Pet Store Server based on the OpenAPI 3.0 specification."
 ---
-## Reference
-<hr />
 
 This is a sample Pet Store Server based on the OpenAPI 3.0 specification.
 
 
 
-Version: 1
+Type: petstore/v1
 
 <hr />
 
@@ -24,10 +22,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -35,20 +33,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key | STRING | TEXT  |  |
-| Value | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key | STRING | TEXT  |  | true  |
+| value | Value | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -64,12 +54,12 @@ Add a new pet to the store
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| pet | Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -78,14 +68,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Name | STRING | TEXT  |  |
-| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
-| Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
-| Status | STRING | SELECT  |  pet status in the store  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| name | Name | STRING | TEXT  |  | true  |
+| category | Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  | false  |
+| photoUrls | Photo Urls | [STRING] | ARRAY_BUILDER  |  | true  |
+| tags | Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  | false  |
+| status | Status | STRING | SELECT  |  pet status in the store  |  false  |
 
 
 
@@ -97,12 +87,12 @@ Update an existing pet by Id
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| pet | Pet | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -111,14 +101,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Name | STRING | TEXT  |  |
-| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
-| Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
-| Status | STRING | SELECT  |  pet status in the store  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| name | Name | STRING | TEXT  |  | true  |
+| category | Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  | false  |
+| photoUrls | Photo Urls | [STRING] | ARRAY_BUILDER  |  | true  |
+| tags | Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  | false  |
+| status | Status | STRING | SELECT  |  pet status in the store  |  false  |
 
 
 
@@ -130,12 +120,12 @@ Multiple status values can be provided with comma separated strings
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Status | STRING | SELECT  |  Status values that need to be considered for filter  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| status | Status | STRING | SELECT  |  Status values that need to be considered for filter  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -144,9 +134,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
 
 
 
@@ -158,12 +148,12 @@ Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Tags | [STRING] | ARRAY_BUILDER  |  Tags to filter by  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| tags | Tags | [STRING] | ARRAY_BUILDER  |  Tags to filter by  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -172,9 +162,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {INTEGER\(id), STRING\(name), {INTEGER\(id), STRING\(name)}\(category), [STRING]\(photoUrls), [{INTEGER\(id), STRING\(name)}]\(tags), STRING\(status)} | OBJECT_BUILDER  |
 
 
 
@@ -186,10 +176,10 @@ delete a pet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Api Key | STRING | TEXT  |    |
-| Pet Id | INTEGER | INTEGER  |  Pet id to delete  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| api_key | Api Key | STRING | TEXT  |    |  false  |
+| petId | Pet Id | INTEGER | INTEGER  |  Pet id to delete  |  true  |
 
 
 
@@ -199,12 +189,12 @@ Returns a single pet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet Id | INTEGER | INTEGER  |  ID of pet to return  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| petId | Pet Id | INTEGER | INTEGER  |  ID of pet to return  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -213,14 +203,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Name | STRING | TEXT  |  |
-| Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  |
-| Photo Urls | [STRING] | ARRAY_BUILDER  |  |
-| Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  |
-| Status | STRING | SELECT  |  pet status in the store  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| name | Name | STRING | TEXT  |  | true  |
+| category | Category | {INTEGER\(id), STRING\(name)} | OBJECT_BUILDER  |  | false  |
+| photoUrls | Photo Urls | [STRING] | ARRAY_BUILDER  |  | true  |
+| tags | Tags | [{INTEGER\(id), STRING\(name)}] | ARRAY_BUILDER  |  | false  |
+| status | Status | STRING | SELECT  |  pet status in the store  |  false  |
 
 
 
@@ -232,11 +222,11 @@ Type: OBJECT
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet Id | INTEGER | INTEGER  |  ID of pet that needs to be updated  |
-| Name | STRING | TEXT  |  Name of pet that needs to be updated  |
-| Status | STRING | TEXT  |  Status of pet that needs to be updated  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| petId | Pet Id | INTEGER | INTEGER  |  ID of pet that needs to be updated  |  true  |
+| name | Name | STRING | TEXT  |  Name of pet that needs to be updated  |  false  |
+| status | Status | STRING | TEXT  |  Status of pet that needs to be updated  |  false  |
 
 
 
@@ -246,14 +236,14 @@ Type: OBJECT
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pet Id | INTEGER | INTEGER  |  ID of pet to update  |
-| Additional Metadata | STRING | TEXT  |  Additional Metadata  |
-| FILE_ENTRY | FILE_ENTRY  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| petId | Pet Id | INTEGER | INTEGER  |  ID of pet to update  |  true  |
+| additionalMetadata | Additional Metadata | STRING | TEXT  |  Additional Metadata  |  false  |
+| fileEntry | FILE_ENTRY | FILE_ENTRY  |
 
 
-### Output
+#### Output
 
 
 
@@ -262,11 +252,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Code | INTEGER | INTEGER  |  |
-| Type | STRING | TEXT  |  |
-| Message | STRING | TEXT  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| code | Code | INTEGER | INTEGER  |  | false  |
+| type | Type | STRING | TEXT  |  | false  |
+| message | Message | STRING | TEXT  |  | false  |
 
 
 
@@ -278,12 +268,12 @@ Returns a map of status codes to quantities
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 
 
 
-### Output
+#### Output
 
 
 
@@ -300,12 +290,12 @@ Place a new order in the store
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | {INTEGER\(id), INTEGER\(petId), INTEGER\(quantity), DATE_TIME\(shipDate), STRING\(status), BOOLEAN\(complete)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| order | Order | {INTEGER\(id), INTEGER\(petId), INTEGER\(quantity), DATE_TIME\(shipDate), STRING\(status), BOOLEAN\(complete)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -314,14 +304,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Pet Id | INTEGER | INTEGER  |  |
-| Quantity | INTEGER | INTEGER  |  |
-| Ship Date | DATE_TIME | DATE_TIME  |  |
-| Status | STRING | SELECT  |  Order Status  |
-| Complete | BOOLEAN | SELECT  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| petId | Pet Id | INTEGER | INTEGER  |  | false  |
+| quantity | Quantity | INTEGER | INTEGER  |  | false  |
+| shipDate | Ship Date | DATE_TIME | DATE_TIME  |  | false  |
+| status | Status | STRING | SELECT  |  Order Status  |  false  |
+| complete | Complete | BOOLEAN | SELECT  |  | false  |
 
 
 
@@ -333,9 +323,9 @@ For valid response try integer IDs with value < 1000. Anything above 1000 or non
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | INTEGER  |  ID of the order that needs to be deleted  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order Id | INTEGER | INTEGER  |  ID of the order that needs to be deleted  |  true  |
 
 
 
@@ -345,12 +335,12 @@ For valid response try integer IDs with value <= 5 or > 10. Other values will ge
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order Id | INTEGER | INTEGER  |  ID of order that needs to be fetched  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order Id | INTEGER | INTEGER  |  ID of order that needs to be fetched  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -359,14 +349,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Pet Id | INTEGER | INTEGER  |  |
-| Quantity | INTEGER | INTEGER  |  |
-| Ship Date | DATE_TIME | DATE_TIME  |  |
-| Status | STRING | SELECT  |  Order Status  |
-| Complete | BOOLEAN | SELECT  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| petId | Pet Id | INTEGER | INTEGER  |  | false  |
+| quantity | Quantity | INTEGER | INTEGER  |  | false  |
+| shipDate | Ship Date | DATE_TIME | DATE_TIME  |  | false  |
+| status | Status | STRING | SELECT  |  Order Status  |  false  |
+| complete | Complete | BOOLEAN | SELECT  |  | false  |
 
 
 
@@ -378,12 +368,12 @@ This can only be done by the logged in user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| user | User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -392,16 +382,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Username | STRING | TEXT  |  |
-| First Name | STRING | TEXT  |  |
-| Last Name | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| User Status | INTEGER | INTEGER  |  User Status  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| username | Username | STRING | TEXT  |  | false  |
+| firstName | First Name | STRING | TEXT  |  | false  |
+| lastName | Last Name | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| password | Password | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| userStatus | User Status | INTEGER | INTEGER  |  User Status  |  false  |
 
 
 
@@ -413,12 +403,12 @@ Creates list of users with given input array
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Items | [{INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)}] | ARRAY_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __items | Items | [{INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)}] | ARRAY_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -427,9 +417,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |
 
 
 
@@ -441,9 +431,9 @@ This can only be done by the logged in user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  The name that needs to be deleted  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  The name that needs to be deleted  |  true  |
 
 
 
@@ -453,12 +443,12 @@ This can only be done by the logged in user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  The name that needs to be fetched. Use user1 for testing.   |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  The name that needs to be fetched. Use user1 for testing.   |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -467,16 +457,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Username | STRING | TEXT  |  |
-| First Name | STRING | TEXT  |  |
-| Last Name | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| User Status | INTEGER | INTEGER  |  User Status  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| username | Username | STRING | TEXT  |  | false  |
+| firstName | First Name | STRING | TEXT  |  | false  |
+| lastName | Last Name | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| password | Password | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| userStatus | User Status | INTEGER | INTEGER  |  User Status  |  false  |
 
 
 
@@ -488,13 +478,13 @@ This can only be done by the logged in user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  name that need to be deleted  |
-| User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  name that need to be deleted  |  true  |
+| user | User | {INTEGER\(id), STRING\(username), STRING\(firstName), STRING\(lastName), STRING\(email), STRING\(password), STRING\(phone), INTEGER\(userStatus)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -503,19 +493,27 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Username | STRING | TEXT  |  |
-| First Name | STRING | TEXT  |  |
-| Last Name | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| User Status | INTEGER | INTEGER  |  User Status  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| username | Username | STRING | TEXT  |  | false  |
+| firstName | First Name | STRING | TEXT  |  | false  |
+| lastName | Last Name | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| password | Password | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| userStatus | User Status | INTEGER | INTEGER  |  User Status  |  false  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

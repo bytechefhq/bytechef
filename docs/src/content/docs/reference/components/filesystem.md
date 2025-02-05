@@ -2,20 +2,16 @@
 title: "Filesystem"
 description: "Allows multiple operations over files on the filesystem."
 ---
-## Reference
-<hr />
 
 Allows multiple operations over files on the filesystem.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: filesystem/v1
 
 <hr />
-
-
 
 
 
@@ -28,12 +24,12 @@ Reads all data from a specified file path and outputs it in file entry format.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File path | STRING | TEXT  |  The path of the file to read.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| filename | File path | STRING | TEXT  |  The path of the file to read.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -42,12 +38,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -59,13 +55,13 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  File entry object to be written.  |
-| File path | STRING | TEXT  |  The path to which the file should be written.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileEntry | File | FILE_ENTRY | FILE_ENTRY  |  File entry object to be written.  |  true  |
+| filename | File path | STRING | TEXT  |  The path to which the file should be written.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -79,9 +75,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| bytes | INTEGER | INTEGER  |
 
 
 
@@ -93,12 +89,12 @@ Creates a file in the temporary directory on the filesystem. Returns the created
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 null
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -120,12 +116,12 @@ Gets the path of the parent folder of the file. If the file doesn't exist, it th
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File path | STRING | TEXT  |  The path to full filename.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| filename | File path | STRING | TEXT  |  The path to full filename.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -147,13 +143,13 @@ Lists the content of a directory for the given path.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Path | STRING | TEXT  |  The path of a directory.  |
-| Recursive | BOOLEAN | SELECT  |  Should the subdirectories be included?  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
+| recursive | Recursive | BOOLEAN | SELECT  |  Should the subdirectories be included?  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -162,9 +158,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(fileName), STRING\(relativePath), INTEGER\(size)} | OBJECT_BUILDER  |
 
 
 
@@ -176,12 +172,12 @@ Creates a directory.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Path | STRING | TEXT  |  The path of a directory.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -203,12 +199,12 @@ Permanently removes the content of a directory.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Path | STRING | TEXT  |  The path of a directory.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| path | Path | STRING | TEXT  |  The path of a directory.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -218,6 +214,8 @@ ___Sample Output:___
 
 
 Type: BOOLEAN
+
+
 
 
 

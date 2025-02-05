@@ -2,16 +2,14 @@
 title: "Microsoft SharePoint"
 description: "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations."
 ---
-## Reference
-<hr />
 
 Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations.
 
 
-Categories: [file-storage, communication]
+Categories: file-storage, communication
 
 
-Version: 1
+Type: microsoftSharePoint/v1
 
 <hr />
 
@@ -26,19 +24,17 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Tenant Id | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| tenantId | Tenant Id | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -50,14 +46,14 @@ Creates a new folder at path you specify.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |
-| Folder Name | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| parentFolder | Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder.  |  false  |
+| name | Folder Name | STRING | TEXT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -66,10 +62,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -81,14 +77,14 @@ Creates a new list
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| List Name | STRING | TEXT  |  |
-| List Description | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| displayName | List Name | STRING | TEXT  |  | true  |
+| description | List Description | STRING | TEXT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -97,11 +93,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| description | STRING | TEXT  |
+| displayName | STRING | TEXT  |
 
 
 
@@ -113,14 +109,14 @@ Creates a new item in a list.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| List ID | STRING | SELECT  |  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| listId | List ID | STRING | SELECT  |  | true  |
+| columns | DYNAMIC_PROPERTIES | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -129,9 +125,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
 
 
 
@@ -143,14 +139,14 @@ Upload file to Microsoft SharePoint folder.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |
-| File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| parentFolder | Parent Folder ID | STRING | SELECT  |  If no folder is selected, file will be uploaded to root folder  |  false  |
+| file | File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -159,9 +155,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+
+
 
 
 

@@ -2,16 +2,14 @@
 title: "AWS S3"
 description: "AWS S3 is a simple object storage service provided by Amazon Web Services."
 ---
-## Reference
-<hr />
 
 AWS S3 is a simple object storage service provided by Amazon Web Services.
 
 
-Categories: [developer-tools, file-storage]
+Categories: developer-tools, file-storage
 
 
-Version: 1
+Type: awsS3/v1
 
 <hr />
 
@@ -26,20 +24,18 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Access Key ID | STRING | TEXT  |  |
-| Secret Access Key | STRING | TEXT  |  |
-| STRING | SELECT  |
-| Bucket | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| accessKeyId | Access Key ID | STRING | TEXT  |  | true  |
+| secretAccessKey | Secret Access Key | STRING | TEXT  |  | true  |
+| region | STRING | SELECT  |
+| bucketName | Bucket | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -51,13 +47,13 @@ Get the AWS S3 object.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Filename | STRING | TEXT  |  Filename to set for binary data.  |
-| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| filename | Filename | STRING | TEXT  |  Filename to set for binary data.  |  true  |
+| key | Key | STRING | TEXT  |  Key is most likely the name of the file.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -66,12 +62,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -83,12 +79,12 @@ Get the url of an AWS S3 object.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key or Entity Tag (Etag) | STRING | TEXT  |  Key is most likely the name of the file.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key or Entity Tag (Etag) | STRING | TEXT  |  Key is most likely the name of the file.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -110,12 +106,12 @@ Get the list AWS S3 objects. Every object needs to have read permission in order
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Prefix | STRING | TEXT  |  The prefix of an AWS S3 objects.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| prefix | Prefix | STRING | TEXT  |  The prefix of an AWS S3 objects.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -124,9 +120,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(key), STRING\(suffix), STRING\(uri)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(key), STRING\(suffix), STRING\(uri)} | OBJECT_BUILDER  |
 
 
 
@@ -138,13 +134,13 @@ You can share an object with a pre-signed URL for up to 12 hours or until your s
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
-| Signature Duration | STRING | TEXT  |  Time interval until the pre-signed URL expires  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key | STRING | TEXT  |  Key is most likely the name of the file.  |  true  |
+| signatureDuration | Signature Duration | STRING | TEXT  |  Time interval until the pre-signed URL expires  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -161,18 +157,20 @@ Store an object to AWS S3.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file that needs to be written to AWS S3.  |
-| Key | STRING | TEXT  |  Key is most likely the name of the file.  |
-| ACL | STRING | SELECT  |  The canned ACL to apply to the object.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileEntry | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file that needs to be written to AWS S3.  |  true  |
+| key | Key | STRING | TEXT  |  Key is most likely the name of the file.  |  true  |
+| acl | ACL | STRING | SELECT  |  The canned ACL to apply to the object.  |  null  |
 
 
-### Output
+#### Output
 
 
 
 Type: STRING
+
+
 
 
 

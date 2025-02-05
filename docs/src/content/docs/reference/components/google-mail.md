@@ -2,16 +2,14 @@
 title: "Gmail"
 description: "Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps."
 ---
-## Reference
-<hr />
 
 Gmail is a widely used email service by Google, offering free and feature-rich communication, organization, and storage capabilities accessible through web browsers and mobile apps.
 
 
-Categories: [communication]
+Categories: communication
 
 
-Version: 1
+Type: googleMail/v1
 
 <hr />
 
@@ -26,79 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Email
-Triggers when new mail is found in your Gmail inbox.
-
-#### Type: STATIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Topic Name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
-letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
-plus signs (+). Cannot start with goog.  |
-
-
-### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-
-### New Email Polling
-Periodically checks your Gmail inbox for any new incoming emails.
-
-#### Type: POLLING
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(threadId)} | OBJECT_BUILDER  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -116,13 +45,13 @@ Add labels to an email in your Gmail account.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message ID | STRING | SELECT  |  ID of the message to add labels  |
-| Labels | [STRING\($label)] | ARRAY_BUILDER  |  Labels to add to this message. You can add up to 100 labels with each update.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Message ID | STRING | SELECT  |  ID of the message to add labels  |  true  |
+| labelIds | Labels | [STRING\($label)] | ARRAY_BUILDER  |  Labels to add to this message. You can add up to 100 labels with each update.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -131,11 +60,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| labelIds | [STRING] | ARRAY_BUILDER  |
+| threadId | STRING | TEXT  |
 
 
 
@@ -147,9 +76,9 @@ Delete an email from your Gmail account permanently via Id
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message ID | STRING | SELECT  |  The ID of the message to delete.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Message ID | STRING | SELECT  |  The ID of the message to delete.  |  true  |
 
 
 
@@ -159,11 +88,11 @@ Get an email from your Gmail account via Id
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message ID | STRING | SELECT  |  The ID of the message to retrieve.  |
-| Format | STRING | SELECT  |  The format to return the message in.  |
-| Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Message ID | STRING | SELECT  |  The ID of the message to retrieve.  |  true  |
+| format | Format | STRING | SELECT  |  The format to return the message in.  |  false  |
+| metadataHeaders | Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |  false  |
 
 
 
@@ -173,11 +102,11 @@ Gets the specified thread.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Thread ID | STRING | SELECT  |  The ID of the thread to retrieve.  |
-| Format | STRING | SELECT  |  The format to return the message in.  |
-| Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Thread ID | STRING | SELECT  |  The ID of the thread to retrieve.  |  true  |
+| format | Format | STRING | SELECT  |  The format to return the message in.  |  false  |
+| metadataHeaders | Metadata headers | [STRING] | ARRAY_BUILDER  |  When given and format is METADATA, only include headers specified.  |  false  |
 
 
 
@@ -187,17 +116,17 @@ Send a reply to an email message.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message ID | STRING | SELECT  |  The ID of the message to reply to.  |
-| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
-| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Body | STRING | TEXT_AREA  |  Body text of the email  |
-| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Message ID | STRING | SELECT  |  The ID of the message to reply to.  |  true  |
+| to | To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |  true  |
+| bcc | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |  false  |
+| cc | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |  false  |
+| body | Body | STRING | TEXT_AREA  |  Body text of the email  |  true  |
+| attachments | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -206,11 +135,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| labelIds | [STRING] | ARRAY_BUILDER  |
+| threadId | STRING | TEXT  |
 
 
 
@@ -222,19 +151,19 @@ Lists the messages in the user's mailbox.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Max Results | NUMBER | NUMBER  |  Maximum number of messages to return.  |
-| Page Token | STRING | TEXT  |  Page token to retrieve a specific page of results in the list.  |
-| From | STRING | TEXT  |  The address sending the mail  |
-| To | STRING | TEXT  |  The address receiving the new mail  |
-| Subject | STRING | TEXT  |  Words in the subject line  |
-| Category | STRING | SELECT  |  Messages in a certain category  |
-| Labels | [STRING] | ARRAY_BUILDER  |  Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have.  |
-| Include Spam Trash | BOOLEAN | SELECT  |  Include messages from SPAM and TRASH in the results.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| maxResults | Max Results | NUMBER | NUMBER  |  Maximum number of messages to return.  |  false  |
+| pageToken | Page Token | STRING | TEXT  |  Page token to retrieve a specific page of results in the list.  |  false  |
+| from | From | STRING | TEXT  |  The address sending the mail  |  false  |
+| to | To | STRING | TEXT  |  The address receiving the new mail  |  false  |
+| subject | Subject | STRING | TEXT  |  Words in the subject line  |  false  |
+| category | Category | STRING | SELECT  |  Messages in a certain category  |  false  |
+| labelIds | Labels | [STRING] | ARRAY_BUILDER  |  Only return messages with labels that match all of the specified label IDs. Messages in a thread might have labels that other messages in the same thread don't have.  |  false  |
+| includeSpamTrash | Include Spam Trash | BOOLEAN | SELECT  |  Include messages from SPAM and TRASH in the results.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -243,11 +172,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| [{STRING\(id), STRING\(threadId)}] | ARRAY_BUILDER  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| messages | [{STRING\(id), STRING\(threadId)}] | ARRAY_BUILDER  |
+| nextPageToken | STRING | TEXT  |
+| resultSizeEstimate | NUMBER | NUMBER  |
 
 
 
@@ -259,18 +188,18 @@ Sends the specified message to the recipients in the To, Cc, and Bcc headers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
-| Subject | STRING | TEXT  |  Subject of the email.  |
-| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
-| Body | STRING | RICH_TEXT  |  Body text of the email  |
-| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| to | To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |  true  |
+| subject | Subject | STRING | TEXT  |  Subject of the email.  |  true  |
+| bcc | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |  false  |
+| cc | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |  false  |
+| replyTo | Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |  false  |
+| body | Body | STRING | RICH_TEXT  |  Body text of the email  |  true  |
+| attachments | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -279,16 +208,85 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| labelIds | [STRING] | ARRAY_BUILDER  |
+| threadId | STRING | TEXT  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New Email
+Triggers when new mail is found in your Gmail inbox.
+
+Type: STATIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| topicName | Topic Name | STRING | TEXT  |  Must be 3-255 characters, start with a letter, and contain only the following characters:
+letters, numbers, dashes (-), periods (.), underscores (_), tildes (~), percents (%) or
+plus signs (+). Cannot start with goog.  |  true  |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(threadId), [STRING]\(labelIds), STRING\(snippet), STRING\(historyId), NUMBER\(internalDate), {STRING\(partId), STRING\(mimeType), STRING\(filename), [{STRING\(name), STRING\(value)}]\(headers), {STRING\(attachmentId), INTEGER\(size), STRING\(data)}\(body), []\(parts)}\(payload), INTEGER\(sizeEstimate), STRING\(raw)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Email Polling
+Periodically checks your Gmail inbox for any new incoming emails.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(threadId)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
 
 <hr />
 

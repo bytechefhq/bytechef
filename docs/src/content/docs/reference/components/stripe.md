@@ -2,16 +2,14 @@
 title: "Stripe"
 description: "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely."
 ---
-## Reference
-<hr />
 
 Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely.
 
 
-Categories: [payment-processing]
+Categories: payment-processing
 
 
-Version: 1
+Type: stripe/v1
 
 <hr />
 
@@ -26,87 +24,9 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Customer
-Triggers when a new customer is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-
-### New Invoice
-Triggers on a new invoice.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
@@ -124,12 +44,12 @@ Creates a new customer.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Customer | {STRING\(email), STRING\(name), STRING\(description), STRING\(phone), {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)}\(address)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Customer | {STRING\(email), STRING\(name), STRING\(description), STRING\(phone), {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)}\(address)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -138,9 +58,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(description), STRING\(email), STRING\(name), STRING\(phone), {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)}\(address)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), STRING\(description), STRING\(email), STRING\(name), STRING\(phone), {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)}\(address)} | OBJECT_BUILDER  |
 
 
 
@@ -152,12 +72,12 @@ Creates a new invoice.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Invoice | {STRING\(customer), STRING\(currency), STRING\(description)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Invoice | {STRING\(customer), STRING\(currency), STRING\(description)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -166,12 +86,90 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(customer), STRING\(currency), STRING\(description)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), STRING\(customer), STRING\(currency), STRING\(description)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New Customer
+Triggers when a new customer is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| object | STRING | TEXT  |
+| description | STRING | TEXT  |
+| email | STRING | TEXT  |
+| name | STRING | TEXT  |
+| phone | STRING | TEXT  |
+| address | {STRING\(city), STRING\(country), STRING\(line1), STRING\(line2), STRING\(postal_code), STRING\(state)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Invoice
+Triggers on a new invoice.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| object | STRING | TEXT  |
+| currency | STRING | TEXT  |
+| customer | STRING | TEXT  |
+| customer_name | STRING | TEXT  |
+| description | STRING | TEXT  |
+
+
+
+
+
+
+
+<hr />
 

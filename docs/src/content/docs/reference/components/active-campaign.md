@@ -2,16 +2,14 @@
 title: "ActiveCampaign"
 description: "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools."
 ---
-## Reference
-<hr />
 
 ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools.
 
 
-Categories: [crm, marketing-automation]
+Categories: crm, marketing-automation
 
 
-Version: 1
+Type: active-campaign/v1
 
 <hr />
 
@@ -26,21 +24,13 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Account name | STRING | TEXT  |  Your account name, e.g. https://{youraccountname}.api-us1.com  |
-| Key | STRING | TEXT  |  |
-| API Key | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Account name | STRING | TEXT  |  Your account name, e.g. https://{youraccountname}.api-us1.com  |  true  |
+| key | Key | STRING | TEXT  |  | true  |
+| value | API Key | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -56,12 +46,12 @@ Creates a new account.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Account | {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Account | {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -70,9 +60,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {{STRING\(name), STRING\(accountUrl)}\(account)} | OBJECT_BUILDER  |
 
 
 
@@ -84,12 +74,12 @@ Creates a new contact.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Contact | {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -98,9 +88,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(phone)}\(contact)} | OBJECT_BUILDER  |
 
 
 
@@ -112,12 +102,12 @@ Creates a new task.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Task | {{STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -126,12 +116,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {{STRING\(id), STRING\(title), INTEGER\(relid), DATE\(duedate), INTEGER\(dealTasktype)}\(dealTask)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

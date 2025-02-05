@@ -2,20 +2,16 @@
 title: "Logger"
 description: "Logs a value to the system log."
 ---
-## Reference
-<hr />
 
 Logs a value to the system log.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: logger/v1
 
 <hr />
-
-
 
 
 
@@ -28,9 +24,9 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | STRING | TEXT  |
 
 
 
@@ -40,9 +36,9 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | STRING | TEXT  |
 
 
 
@@ -52,9 +48,9 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | STRING | TEXT  |
 
 
 
@@ -64,9 +60,11 @@ null
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | STRING | TEXT  |
+
+
 
 
 

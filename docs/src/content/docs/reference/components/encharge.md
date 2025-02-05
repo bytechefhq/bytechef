@@ -2,16 +2,14 @@
 title: "Encharge"
 description: "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns."
 ---
-## Reference
-<hr />
 
 Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.
 
 
-Categories: [marketing-automation]
+Categories: marketing-automation
 
 
-Version: 1
+Type: encharge/v1
 
 <hr />
 
@@ -26,20 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key | STRING | TEXT  |  |
-| Value | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key | STRING | TEXT  |  | true  |
+| value | Value | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -55,12 +45,12 @@ Create email template
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Email Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Email Template | {STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -69,9 +59,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {{INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)}\(email)} | OBJECT_BUILDER  |
 
 
 
@@ -83,12 +73,12 @@ Creates new People
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| People | [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] | ARRAY_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __items | People | [{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(phone)}] | ARRAY_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -97,9 +87,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {[{STRING\(email), STRING\(firstName), STRING\(lastName), STRING\(website), STRING\(title), STRING\(id), STRING\(phone)}]\(users)} | OBJECT_BUILDER  |
 
 
 
@@ -111,12 +101,20 @@ Add tag(s) to an existing user.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Tag | {STRING\(tag), STRING\(email)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Tag | {STRING\(tag), STRING\(email)} | OBJECT_BUILDER  |  | true  |
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 
 <hr />
 

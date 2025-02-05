@@ -2,16 +2,14 @@
 title: "Microsoft Teams"
 description: "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration."
 ---
-## Reference
-<hr />
 
 Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.
 
 
-Categories: [communication]
+Categories: communication
 
 
-Version: 1
+Type: microsoftTeams/v1
 
 <hr />
 
@@ -26,19 +24,17 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Tenant Id | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| tenantId | Tenant Id | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -50,14 +46,14 @@ Creates a new channel within a team.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team ID | STRING | SELECT  |  ID of the team where the channel will be created.  |
-| Channel Name | STRING | TEXT  |  |
-| Description | STRING | TEXT  |  Description for the channel.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| teamId | Team ID | STRING | SELECT  |  ID of the team where the channel will be created.  |  true  |
+| displayName | Channel Name | STRING | TEXT  |  | true  |
+| description | Description | STRING | TEXT  |  Description for the channel.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -66,11 +62,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| displayName | STRING | TEXT  |
+| description | STRING | TEXT  |
 
 
 
@@ -82,15 +78,15 @@ Sends a message to a channel.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Team ID | STRING | SELECT  |  ID of the team where the channel is located.  |
-| Channel ID | STRING | SELECT  |  Channel to send message to.  |
-| Message Text Format | STRING | SELECT  |  |
-| Message Text | STRING | TEXT_AREA  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| teamId | Team ID | STRING | SELECT  |  ID of the team where the channel is located.  |  true  |
+| channelId | Channel ID | STRING | SELECT  |  Channel to send message to.  |  true  |
+| contentType | Message Text Format | STRING | SELECT  |  | true  |
+| content | Message Text | STRING | TEXT_AREA  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -99,11 +95,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
-| {STRING\(teamId), STRING\(channelId)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| body | {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+| channelIdentity | {STRING\(teamId), STRING\(channelId)} | OBJECT_BUILDER  |
 
 
 
@@ -115,14 +111,14 @@ Sends a message in an existing chat.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Chat ID | STRING | SELECT  |  |
-| Message Text Format | STRING | SELECT  |  |
-| Message Text | STRING | TEXT_AREA  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| chatId | Chat ID | STRING | SELECT  |  | true  |
+| contentType | Message Text Format | STRING | SELECT  |  | true  |
+| content | Message Text | STRING | TEXT_AREA  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -131,11 +127,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| chatId | STRING | TEXT  |
+| body | {STRING\(contentType), STRING\(content)} | OBJECT_BUILDER  |
+
+
 
 
 

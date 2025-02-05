@@ -2,16 +2,14 @@
 title: "Google Sheets"
 description: "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time."
 ---
-## Reference
-<hr />
 
 Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.
 
 
-Categories: [productivity-and-collaboration]
+Categories: productivity-and-collaboration
 
 
-Version: 1
+Type: googleSheets/v1
 
 <hr />
 
@@ -26,33 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Row
-Triggers when a new row is added.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
-| Sheet | STRING | SELECT  |  The name of the sheet  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -70,11 +45,11 @@ Clear a sheet of all values while preserving formats.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetId | Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
 
 
 
@@ -84,14 +59,14 @@ Append a new column to the end of the sheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | SELECT  |  The name of the sheet.  |
-| Column Name | STRING | TEXT  |  Name of the new column.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | SELECT  |  The name of the sheet.  |  true  |
+| columnName | Column Name | STRING | TEXT  |  Name of the new column.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -100,11 +75,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| spreadsheetId | STRING | TEXT  |
+| sheetName | STRING | TEXT  |
+| headers | [STRING] | ARRAY_BUILDER  |
 
 
 
@@ -116,14 +91,14 @@ Create a blank sheet with title. Optionally, provide headers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | TEXT  |  The name of the new sheet.  |
-| Headers | [STRING] | ARRAY_BUILDER  |  The headers of the new sheet.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | TEXT  |  The name of the new sheet.  |  true  |
+| headers | Headers | [STRING] | ARRAY_BUILDER  |  The headers of the new sheet.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -132,11 +107,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| [STRING] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| spreadsheetId | STRING | TEXT  |
+| sheetName | STRING | TEXT  |
+| headers | [STRING] | ARRAY_BUILDER  |
 
 
 
@@ -148,11 +123,24 @@ Delete column on an existing sheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |
-| Column Label | STRING | TEXT  |  The label of the column to be deleted.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetId | Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |  true  |
+| label | Column Label | STRING | TEXT  |  The label of the column to be deleted.  |  true  |
+
+
+
+
+### Create Spreadsheet
+Create a new spreadsheet in a specified folder.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| title | Title | STRING | TEXT  |  Title of the new spreadsheet to be created.  |  true  |
+| folderId | Folder ID | STRING | SELECT  |  ID of the folder where the new spreadsheet will be stored. If no folder is selected, the folder will be created in the root folder.  |  false  |
 
 
 
@@ -162,11 +150,11 @@ Delete row on an existing sheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |
-| Row Number | INTEGER | INTEGER  |  The row number to delete.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetId | Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |  true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to delete.  |  true  |
 
 
 
@@ -176,10 +164,10 @@ Delete a specified sheet from a spreadsheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetId | Sheet ID | INTEGER | SELECT  |  The ID of the sheet.  |  true  |
 
 
 
@@ -189,12 +177,12 @@ Get a row in a Google Sheet by row number.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | SELECT  |  The name of the sheet.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
-| Row Number | INTEGER | INTEGER  |  The row number to get from the sheet.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | SELECT  |  The name of the sheet.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to get from the sheet.  |  true  |
 
 
 
@@ -204,13 +192,13 @@ Append rows to the end of the spreadsheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | SELECT  |  The name of the sheet.  |
-| Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | SELECT  |  The name of the sheet.  |  true  |
+| valueInputOption | Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| rows | DYNAMIC_PROPERTIES | null  |
 
 
 
@@ -220,13 +208,13 @@ Append a row of values to an existing sheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | SELECT  |  The name of the sheet.  |
-| Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | SELECT  |  The name of the sheet.  |  true  |
+| valueInputOption | Value Input Option | STRING | SELECT  |  How the input data should be interpreted.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| row | DYNAMIC_PROPERTIES | null  |
 
 
 
@@ -236,17 +224,40 @@ Overwrite values in an existing row.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |
-| Sheet Name | STRING | SELECT  |  The name of the sheet.  |
-| Row Number | INTEGER | INTEGER  |  The row number to update.  |
-| Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |
-| Update Whole Row | BOOLEAN | SELECT  |  Whether to update the whole row or just specific columns.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+| sheetName | Sheet Name | STRING | SELECT  |  The name of the sheet.  |  true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to update.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| updateWholeRow | Update Whole Row | BOOLEAN | SELECT  |  Whether to update the whole row or just specific columns.  |  true  |
+| row | DYNAMIC_PROPERTIES | null  |
 
 
 
+
+
+
+## Triggers
+
+
+### New Row
+Triggers when a new row is added.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet | STRING | SELECT  |  The spreadsheet to apply the updates to.  |  true  |
+| isTheFirstRowHeader | Is the First Row Headers? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| sheetName | Sheet | STRING | SELECT  |  The name of the sheet  |  true  |
+
+
+
+
+
+<hr />
 
 <hr />
 

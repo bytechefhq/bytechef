@@ -2,20 +2,16 @@
 title: "XML Helper"
 description: "Converts between XML string and object/array."
 ---
-## Reference
-<hr />
 
 Converts between XML string and object/array.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: xmlHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,12 +24,12 @@ Converts the XML string to object/array.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Source | STRING | TEXT  |  The XML string to convert to the data.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| source | Source | STRING | TEXT  |  The XML string to convert to the data.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -50,18 +46,20 @@ Writes the object/array to a XML string.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Type | STRING | SELECT  |  The value type.  |
-| Source | {} | OBJECT_BUILDER  |  The object to convert to XML string.  |
-| Source | [] | ARRAY_BUILDER  |  The array to convert to XML string.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| type | Type | STRING | SELECT  |  The value type.  |  null  |
+| source | Source | {} | OBJECT_BUILDER  |  The object to convert to XML string.  |  true  |
+| source | Source | [] | ARRAY_BUILDER  |  The array to convert to XML string.  |  true  |
 
 
-### Output
+#### Output
 
 
 
 Type: STRING
+
+
 
 
 

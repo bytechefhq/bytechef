@@ -2,16 +2,14 @@
 title: "Discord"
 description: "Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels."
 ---
-## Reference
-<hr />
 
 Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels.
 
 
-Categories: [communication]
+Categories: communication
 
 
-Version: 1
+Type: discord/v1
 
 <hr />
 
@@ -26,19 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Bot token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Bot token | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -54,14 +44,14 @@ Post a new message to a specific #channel you choose.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild ID | STRING | SELECT  |  |
-| Channel ID | STRING | SELECT  |  ID of the channel where to send the message.  |
-| Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| guildId | Guild ID | STRING | SELECT  |  | true  |
+| channelId | Channel ID | STRING | SELECT  |  ID of the channel where to send the message.  |  true  |
+| __item | Message | {STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -70,9 +60,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), STRING\(content), BOOLEAN\(tts)} | OBJECT_BUILDER  |
 
 
 
@@ -84,13 +74,13 @@ Create a new channel
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild ID | STRING | SELECT  |  |
-| Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| guildId | Guild ID | STRING | SELECT  |  | true  |
+| __item | Channel | {STRING\(name), INTEGER\(type)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -99,9 +89,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), INTEGER\(type), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), INTEGER\(type), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
@@ -113,15 +103,15 @@ Send direct message guild member.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Guild ID | STRING | SELECT  |  |
-| Recipient | STRING | SELECT  |  The recipient to open a DM channel with.  |
-| Message Text | STRING | TEXT  |  Message contents (up to 2000 characters)  |
-| Text to Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| guildId | Guild ID | STRING | SELECT  |  | true  |
+| recipient_id | Recipient | STRING | SELECT  |  The recipient to open a DM channel with.  |  true  |
+| content | Message Text | STRING | TEXT  |  Message contents (up to 2000 characters)  |  true  |
+| tts | Text to Speech | BOOLEAN | SELECT  |  True if this is a TTS message  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -130,14 +120,22 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 
 <hr />
 

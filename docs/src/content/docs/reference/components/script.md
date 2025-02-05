@@ -2,20 +2,16 @@
 title: "Script"
 description: "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages."
 ---
-## Reference
-<hr />
 
 Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.
 
 
-Categories: [helpers, developer-tools]
+Categories: helpers, developer-tools
 
 
-Version: 1
+Type: script/v1
 
 <hr />
-
-
 
 
 
@@ -28,10 +24,10 @@ Executes custom JavaScript code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
-| JavaScript Code | STRING | CODE_EDITOR  |  Add your JavaScript custom logic here.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
+| script | JavaScript Code | STRING | CODE_EDITOR  |  Add your JavaScript custom logic here.  |  true  |
 
 
 
@@ -41,10 +37,10 @@ Executes custom Python code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
-| Python Code | STRING | CODE_EDITOR  |  Add your Python custom logic here.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
+| script | Python Code | STRING | CODE_EDITOR  |  Add your Python custom logic here.  |  true  |
 
 
 
@@ -54,10 +50,12 @@ Executes custom Ruby code.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |
-| Ruby Code | STRING | CODE_EDITOR  |  Add your Ruby custom logic here.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| input | Input | {} | OBJECT_BUILDER  |  Initialize parameter values used in the custom code.  |  null  |
+| script | Ruby Code | STRING | CODE_EDITOR  |  Add your Ruby custom logic here.  |  true  |
+
+
 
 
 

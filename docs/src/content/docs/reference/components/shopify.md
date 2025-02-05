@@ -2,16 +2,14 @@
 title: "Shopify"
 description: "Shopify is an e-commerce platform that allows businesses to create online stores and sell products."
 ---
-## Reference
-<hr />
 
 Shopify is an e-commerce platform that allows businesses to create online stores and sell products.
 
 
-Categories: [e-commerce]
+Categories: e-commerce
 
 
-Version: 1
+Type: shopify/v1
 
 <hr />
 
@@ -26,129 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Shop name | STRING | TEXT  |  |
-| Access token | STRING | TEXT  |  |
-| Access Token | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Cancelled Order
-Triggers when order is cancelled.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
-
-
-
-
-
-
-
-### New Order
-Triggers when new order is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
-
-
-
-
-
-
-
-### New Paid Order
-Triggers when paid order is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-null
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| shopName | Shop name | STRING | TEXT  |  | true  |
+| key | Access token | STRING | TEXT  |  | true  |
+| value | Access Token | STRING | TEXT  |  | true  |
 
 
 
@@ -166,12 +46,12 @@ Adds an order into a Shopify store.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order | {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Order | {{[{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}]\(line_items), STRING\(total_tax), STRING\(currency)}\(order)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -180,16 +60,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
 
 
 
@@ -201,9 +81,9 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order ID | INTEGER | SELECT  |  ID of the order to delete.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order ID | INTEGER | SELECT  |  ID of the order to delete.  |  true  |
 
 
 
@@ -213,12 +93,12 @@ Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order ID | INTEGER | SELECT  |  ID of the order to cancel.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order ID | INTEGER | SELECT  |  ID of the order to cancel.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -227,16 +107,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
 
 
 
@@ -248,13 +128,13 @@ Update an existing order.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order ID | INTEGER | SELECT  |  ID of the order to update.  |
-| Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order ID | INTEGER | SELECT  |  ID of the order to update.  |  true  |
+| __item | Order | {{STRING\(note), STRING\(email), STRING\(phone), STRING\(tags)}\(order)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -263,16 +143,16 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
 
 
 
@@ -284,12 +164,12 @@ Closes an order. A closed order is one that has no more work to be done. All ite
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Order ID | INTEGER | SELECT  |  ID of the order to close.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| orderId | Order ID | INTEGER | SELECT  |  ID of the order to close.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -298,21 +178,139 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| Id | INTEGER | INTEGER  |  |
-| Currency | STRING | TEXT  |  |
-| Note | STRING | TEXT  |  |
-| Email | STRING | TEXT  |  |
-| Name | STRING | TEXT  |  |
-| Phone | STRING | TEXT  |  |
-| Tags | STRING | TEXT  |  |
-| Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New Cancelled Order
+Triggers when order is cancelled.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+
+
+
+
+
+
+
+### New Order
+Triggers when new order is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+
+
+
+
+
+
+
+### New Paid Order
+Triggers when paid order is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+null
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | Id | INTEGER | INTEGER  |  | false  |
+| currency | Currency | STRING | TEXT  |  | false  |
+| note | Note | STRING | TEXT  |  | false  |
+| email | Email | STRING | TEXT  |  | false  |
+| name | Name | STRING | TEXT  |  | false  |
+| phone | Phone | STRING | TEXT  |  | false  |
+| tags | Tags | STRING | TEXT  |  | false  |
+| line_items | Line Items | [{STRING\(fulfillment_status), STRING\(grams), NUMBER\(price), INTEGER\(product_id), INTEGER\(variant_id), INTEGER\(quantity), STRING\(title)}] | ARRAY_BUILDER  |  | false  |
+
+
+
+
+
+
+
+<hr />
 
 <hr />
 

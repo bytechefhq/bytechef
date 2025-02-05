@@ -2,16 +2,14 @@
 title: "Microsoft OneDrive"
 description: "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing files online."
 ---
-## Reference
-<hr />
 
 Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing files online.
 
 
-Categories: [file-storage]
+Categories: file-storage
 
 
-Version: 1
+Type: microsoftOneDrive/v1
 
 <hr />
 
@@ -26,48 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Tenant Id | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New File
-Triggers when file is uploaded to folder.
-
-#### Type: POLLING
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |
-
-
-### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| tenantId | Tenant Id | STRING | TEXT  |  | true  |
 
 
 
@@ -85,13 +46,13 @@ Download a file from your Microsoft OneDrive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |
-| File ID | STRING | SELECT  |  ID of the file to download.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| parentId | Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |  false  |
+| id | File ID | STRING | SELECT  |  ID of the file to download.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -100,12 +61,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -117,12 +78,12 @@ List files in a OneDrive folder.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| parentId | Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to list files. If no folder is specified, the root folder will be used.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -131,9 +92,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
@@ -145,12 +106,12 @@ List folders in a OneDrive folder.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| parentId | Parent Folder ID | STRING | SELECT  |  ID of the Folder from which you want to list folders. If no folder is specified, the root folder will be used.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -159,9 +120,9 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
@@ -173,13 +134,13 @@ Upload a file to your Microsoft OneDrive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
-| File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| parentId | Parent Folder ID | STRING | SELECT  |  ID of the Folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |  false  |
+| file | File | FILE_ENTRY | FILE_ENTRY  |  File to upload.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -188,13 +149,50 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New File
+Triggers when file is uploaded to folder.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| parentId | Parent Folder ID | STRING | SELECT  |  If no folder is specified, the root folder will be used.  |  false  |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
 

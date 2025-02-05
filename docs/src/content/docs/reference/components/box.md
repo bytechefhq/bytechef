@@ -2,16 +2,14 @@
 title: "Box"
 description: "Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents."
 ---
-## Reference
-<hr />
 
 Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents.
 
 
-Categories: [file-storage]
+Categories: file-storage
 
 
-Version: 1
+Type: box/v1
 
 <hr />
 
@@ -26,83 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New File
-Triggers when file is uploaded to folder.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder ID | STRING | SELECT  |  ID of the folder in which file uploads will trigger this webhook.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-
-### New Folder
-Triggers when folder is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder ID | STRING | SELECT  |  ID of the folder in which new folder will trigger this webhook.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -120,13 +45,13 @@ Creates a new empty folder within the specified parent folder.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder Name | STRING | TEXT  |  The name for the new folder.  |
-| Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| name | Folder Name | STRING | TEXT  |  The name for the new folder.  |  true  |
+| id | Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -135,12 +60,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| type | STRING | TEXT  |
+| id | STRING | TEXT  |
+| name | STRING | TEXT  |
+| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
@@ -152,13 +77,13 @@ Download a selected file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |
-| File ID | STRING | SELECT  |  ID of the file to download.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Parent Folder ID | STRING | SELECT  |  ID of the folder from which you want to download the file.  |  true  |
+| fileId | File ID | STRING | SELECT  |  ID of the file to download.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -167,12 +92,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -184,13 +109,13 @@ Uploads a small file to Box.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |
-| File | FILE_ENTRY | FILE_ENTRY  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be uploaded; if no folder is selected, the file will be uploaded in the root folder.  |  true  |
+| file | File | FILE_ENTRY | FILE_ENTRY  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -199,14 +124,87 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| entries | [{STRING\(type), STRING\(id), STRING\(name), {STRING\(type), STRING\(id), STRING\(name)}\(parent)}] | ARRAY_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New File
+Triggers when file is uploaded to folder.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| folderId | Folder ID | STRING | SELECT  |  ID of the folder in which file uploads will trigger this webhook.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| type | STRING | TEXT  |
+| id | STRING | TEXT  |
+| name | STRING | TEXT  |
+| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Folder
+Triggers when folder is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| folderId | Folder ID | STRING | SELECT  |  ID of the folder in which new folder will trigger this webhook.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| type | STRING | TEXT  |
+| id | STRING | TEXT  |
+| name | STRING | TEXT  |
+| parent | {STRING\(type), STRING\(id), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
 
 <hr />
 

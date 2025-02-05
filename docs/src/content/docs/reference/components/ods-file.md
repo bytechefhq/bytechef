@@ -2,20 +2,16 @@
 title: "ODS File"
 description: "Reads and writes data from a ODS file."
 ---
-## Reference
-<hr />
 
 Reads and writes data from a ODS file.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: odsFile/v1
 
 <hr />
-
-
 
 
 
@@ -28,15 +24,15 @@ Reads data from a ODS file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the ODS file to read from.  |
-| Sheet Name | STRING | TEXT  |  The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.  |
-| Header Row | BOOLEAN | SELECT  |  The first row of the file contains the header names.  |
-| Include Empty Cells | BOOLEAN | SELECT  |  When reading from file the empty cells will be filled with an empty string.  |
-| Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |
-| Page Number | INTEGER | INTEGER  |  The page number to get.  |
-| Read as String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileEntry | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the ODS file to read from.  |  true  |
+| sheetName | Sheet Name | STRING | TEXT  |  The name of the sheet to read from in the spreadsheet. If not set, the first one gets chosen.  |  null  |
+| headerRow | Header Row | BOOLEAN | SELECT  |  The first row of the file contains the header names.  |  null  |
+| includeEmptyCells | Include Empty Cells | BOOLEAN | SELECT  |  When reading from file the empty cells will be filled with an empty string.  |  null  |
+| pageSize | Page Size | INTEGER | INTEGER  |  The amount of child elements to return in a page.  |  null  |
+| pageNumber | Page Number | INTEGER | INTEGER  |  The page number to get.  |  null  |
+| readAsString | Read as String | BOOLEAN | SELECT  |  In some cases and file formats, it is necessary to read data specifically as string, otherwise some special characters are interpreted the wrong way.  |  null  |
 
 
 
@@ -46,14 +42,14 @@ Writes the data to a ODS file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Sheet Name | STRING | TEXT  |  The name of the sheet to create in the spreadsheet.  |
-| Rows | [{}] | ARRAY_BUILDER  |  The array of rows to write to the file.  |
-| Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.ods" will be used.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| sheetName | Sheet Name | STRING | TEXT  |  The name of the sheet to create in the spreadsheet.  |  null  |
+| rows | Rows | [{}] | ARRAY_BUILDER  |  The array of rows to write to the file.  |  true  |
+| filename | Filename | STRING | TEXT  |  Filename to set for binary data. By default, "file.ods" will be used.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -62,12 +58,14 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
+
+
 
 
 

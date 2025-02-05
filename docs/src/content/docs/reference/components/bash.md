@@ -2,18 +2,14 @@
 title: "Bash"
 description: "Allows you to run arbitrary Bash scripts."
 ---
-## Reference
-<hr />
 
 Allows you to run arbitrary Bash scripts.
 
 
 
-Version: 1
+Type: bash/v1
 
 <hr />
-
-
 
 
 
@@ -26,12 +22,12 @@ Creates a temporary script that executes bash commands. The script is afterwards
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Script | STRING | TEXT  |  Script written in bash. Multiple commands are possible with the ';' separator.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| script | Script | STRING | TEXT  |  Script written in bash. Multiple commands are possible with the ';' separator.  |  true  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -41,6 +37,8 @@ ___Sample Output:___
 
 
 Type: STRING
+
+
 
 
 

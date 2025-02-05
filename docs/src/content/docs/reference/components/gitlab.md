@@ -2,16 +2,14 @@
 title: "GitLab"
 description: "GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application."
 ---
-## Reference
-<hr />
 
 GitLab is a web-based DevOps lifecycle tool that provides a Git repository manager, CI/CD pipelines, issue tracking, and more in a single application.
 
 
-Categories: [developer-tools]
+Categories: developer-tools
 
 
-Version: 1
+Type: gitlab/v1
 
 <hr />
 
@@ -26,51 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Issue
-Triggers when a new issue is created.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -88,14 +45,14 @@ Creates a new project issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project ID | STRING | SELECT  |  ID of the project where new issue will be created.  |
-| Title | STRING | TEXT  |  The title of an issue.  |
-| Description | STRING | TEXT  |  The description of an issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| projectId | Project ID | STRING | SELECT  |  ID of the project where new issue will be created.  |  true  |
+| title | Title | STRING | TEXT  |  The title of an issue.  |  true  |
+| description | Description | STRING | TEXT  |  The description of an issue.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -104,9 +61,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), INTEGER\(iid), INTEGER\(project_id), STRING\(title), STRING\(description), STRING\(web_url)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {INTEGER\(id), INTEGER\(iid), INTEGER\(project_id), STRING\(title), STRING\(description), STRING\(web_url)} | OBJECT_BUILDER  |
 
 
 
@@ -118,14 +75,14 @@ Adds a comment to the specified issue.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project ID | STRING | SELECT  |  |
-| Issue ID | INTEGER | SELECT  |  ID of the issue to comment on.  |
-| Comment | STRING | TEXT  |  The comment to add to the issue.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| projectId | Project ID | STRING | SELECT  |  | true  |
+| issueId | Issue ID | INTEGER | SELECT  |  ID of the issue to comment on.  |  true  |
+| body | Comment | STRING | TEXT  |  The comment to add to the issue.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -134,12 +91,53 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), STRING\(body)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {INTEGER\(id), STRING\(body)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New Issue
+Triggers when a new issue is created.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| projectId | Project | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| description | STRING | TEXT  |
+| id | INTEGER | INTEGER  |
+| iid | INTEGER | INTEGER  |
+| projectId | INTEGER | INTEGER  |
+| title | STRING | TEXT  |
+
+
+
+
+
+
+
+<hr />
 

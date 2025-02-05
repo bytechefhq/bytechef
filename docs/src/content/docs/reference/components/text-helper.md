@@ -2,20 +2,16 @@
 title: "Text Helper"
 description: "Helper component which contains operations to help you work with text."
 ---
-## Reference
-<hr />
 
 Helper component which contains operations to help you work with text.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: textHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,10 +24,10 @@ Decodes base64 encoded text into human readable plain text.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Encoding Scheme | STRING | SELECT  |  |
-| Base64 Content | STRING | TEXT_AREA  |  The Base64 encoded content that needs to be decoded.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| encodingSchema | Encoding Scheme | STRING | SELECT  |  | null  |
+| content | Base64 Content | STRING | TEXT_AREA  |  The Base64 encoded content that needs to be decoded.  |  true  |
 
 
 
@@ -41,13 +37,13 @@ Concatenate two or more texts.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Texts | [STRING\($text)] | ARRAY_BUILDER  |  |
-| Separator | STRING | TEXT  |  The text that separates the texts you want to concatenate.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| texts | Texts | [STRING\($text)] | ARRAY_BUILDER  |  | true  |
+| separator | Separator | STRING | TEXT  |  The text that separates the texts you want to concatenate.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -64,13 +60,13 @@ Extract content from the HTML content.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| HTML Content | STRING | TEXT_AREA  |  HTML content to extract content from.  |
-| CSS Selector | STRING | TEXT  |  The CSS selector to search for.  |
-| Return Value | STRING | SELECT  |  The data to return.  |
-| Attribute | STRING | TEXT  |  The name of the attribute to return the value of  |
-| Return Array | BOOLEAN | SELECT  |  If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| content | HTML Content | STRING | TEXT_AREA  |  HTML content to extract content from.  |  true  |
+| querySelector | CSS Selector | STRING | TEXT  |  The CSS selector to search for.  |  true  |
+| returnValue | Return Value | STRING | SELECT  |  The data to return.  |  true  |
+| attribute | Attribute | STRING | TEXT  |  The name of the attribute to return the value of  |  true  |
+| returnArray | Return Array | BOOLEAN | SELECT  |  If selected, then extracted individual items are returned as an array. If you don't set this, all values are returned as a single string.  |  null  |
 
 
 
@@ -80,13 +76,13 @@ Find substring
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Text | STRING | TEXT_AREA  |  |
-| Expression | STRING | TEXT  |  Text to search for.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | Text | STRING | TEXT_AREA  |  | true  |
+| expression | Expression | STRING | TEXT  |  Text to search for.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -103,12 +99,12 @@ Converts HTML to markdown.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| HTML Content | STRING | TEXT_AREA  |  HTML content to be converted to markdown.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| html | HTML Content | STRING | TEXT_AREA  |  HTML content to be converted to markdown.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -125,12 +121,12 @@ Converts markdown to HTML.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Markdown content | STRING | TEXT_AREA  |  Markdown content to convert to HTML.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| markdown | Markdown content | STRING | TEXT_AREA  |  Markdown content to convert to HTML.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -147,15 +143,15 @@ Replace all instances of any word, character, or phrase in text with another.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Text | STRING | TEXT_AREA  |  |
-| Search Value | STRING | TEXT  |  Can be plain text or a regex expression.  |
-| Replace Value | STRING | TEXT  |  Leave blank to remove the search value.  |
-| Replace Only First Match | BOOLEAN | SELECT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | Text | STRING | TEXT_AREA  |  | true  |
+| searchValue | Search Value | STRING | TEXT  |  Can be plain text or a regex expression.  |  true  |
+| replaceValue | Replace Value | STRING | TEXT  |  Leave blank to remove the search value.  |  false  |
+| replaceOnlyFirst | Replace Only First Match | BOOLEAN | SELECT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -172,13 +168,13 @@ Split the text by delimiter.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Text | STRING | TEXT_AREA  |  |
-| Delimiter | STRING | TEXT  |  Delimiter used for splitting the text.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| text | Text | STRING | TEXT_AREA  |  | true  |
+| delimiter | Delimiter | STRING | TEXT  |  Delimiter used for splitting the text.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -187,9 +183,11 @@ Type: ARRAY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | STRING | TEXT  |
+
+
 
 
 

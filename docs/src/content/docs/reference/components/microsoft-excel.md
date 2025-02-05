@@ -2,16 +2,14 @@
 title: "Microsoft Excel"
 description: "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in tabular form."
 ---
-## Reference
-<hr />
 
 Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in tabular form.
 
 
-Categories: [productivity-and-collaboration]
+Categories: productivity-and-collaboration
 
 
-Version: 1
+Type: microsoftExcel/v1
 
 <hr />
 
@@ -26,19 +24,17 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-| Tenant Id | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
+| tenantId | Tenant Id | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -50,12 +46,12 @@ Append a row of values to an existing worksheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook ID | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| workbookId | Workbook ID | STRING | SELECT  |  | true  |
+| worksheetName | Worksheet | STRING | SELECT  |  | true  |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| row | DYNAMIC_PROPERTIES | null  |
 
 
 
@@ -65,11 +61,11 @@ Clear a worksheet of all values.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook ID | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| workbookId | Workbook ID | STRING | SELECT  |  | true  |
+| worksheetName | Worksheet | STRING | SELECT  |  | true  |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
 
 
 
@@ -79,11 +75,11 @@ Delete row on an existing sheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook ID | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Row Number | INTEGER | INTEGER  |  The row number to delete.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| workbookId | Workbook ID | STRING | SELECT  |  | true  |
+| worksheetName | Worksheet | STRING | SELECT  |  | true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to delete.  |  true  |
 
 
 
@@ -93,12 +89,12 @@ Get row values from the worksheet by the row number.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook ID | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
-| Row Number | INTEGER | INTEGER  |  The row number to get the values from.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| workbookId | Workbook ID | STRING | SELECT  |  | true  |
+| worksheetName | Worksheet | STRING | SELECT  |  | true  |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to get the values from.  |  true  |
 
 
 
@@ -108,13 +104,15 @@ Update a row in a worksheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Workbook ID | STRING | SELECT  |  |
-| Worksheet | STRING | SELECT  |  |
-| Row Number | INTEGER | INTEGER  |  The row number to update.  |
-| Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| workbookId | Workbook ID | STRING | SELECT  |  | true  |
+| worksheetName | Worksheet | STRING | SELECT  |  | true  |
+| rowNumber | Row Number | INTEGER | INTEGER  |  The row number to update.  |  true  |
+| isTheFirstRowHeader | Is the First Row Header? | BOOLEAN | SELECT  |  If the first row is header.  |  true  |
+| row | DYNAMIC_PROPERTIES | null  |
+
+
 
 
 

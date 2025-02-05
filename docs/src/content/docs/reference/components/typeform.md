@@ -2,16 +2,14 @@
 title: "Typeform"
 description: "Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback."
 ---
-## Reference
-<hr />
 
 Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback.
 
 
-Categories: [surveys-and-feedback]
+Categories: surveys-and-feedback
 
 
-Version: 1
+Type: typeform/v1
 
 <hr />
 
@@ -26,41 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Submission
-Triggers when form is submitted.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form Name | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -78,14 +45,14 @@ Creates a new form
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Title | STRING | TEXT  |  Title to use for the form.  |
-| Type | STRING | SELECT  |  Form type for the typeform.  |
-| Workspace | STRING | SELECT  |  Workspace where the form will be created.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| title | Title | STRING | TEXT  |  Title to use for the form.  |  true  |
+| type | Type | STRING | SELECT  |  Form type for the typeform.  |  false  |
+| workspace | Workspace | STRING | SELECT  |  Workspace where the form will be created.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -96,4 +63,35 @@ Type: OBJECT
 
 
 
+
+
+
+## Triggers
+
+
+### New Submission
+Triggers when form is submitted.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| form | Form Name | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+
+
+
+
+
+
+<hr />
 
