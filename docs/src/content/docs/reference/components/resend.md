@@ -2,16 +2,14 @@
 title: "Resend"
 description: "Resend is the email API for developers."
 ---
-## Reference
-<hr />
 
 Resend is the email API for developers.
 
 
-Categories: [marketing-automation]
+Categories: marketing-automation
 
 
-Version: 1
+Type: resend/v1
 
 <hr />
 
@@ -26,17 +24,15 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -48,23 +44,23 @@ Send an email
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| From | STRING | EMAIL  |  Sender email address.  |
-| To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |
-| Subject | STRING | TEXT  |  Email subject.  |
-| Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |
-| Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |
-| Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |
-| Content Type | STRING | SELECT  |  |
-| HTML | STRING | RICH_TEXT  |  The HTML version of the message.  |
-| Text | STRING | TEXT_AREA  |  The plain text version of the message.  |
-| Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |
-| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
-| [{STRING\(name), STRING\(value)}] | ARRAY_BUILDER  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| from | From | STRING | EMAIL  |  Sender email address.  |  true  |
+| to | To | [STRING\($email)] | ARRAY_BUILDER  |  Recipients email addresses.  |  true  |
+| subject | Subject | STRING | TEXT  |  Email subject.  |  true  |
+| bcc | Bcc | [STRING\($email)] | ARRAY_BUILDER  |  Bcc recipients email addresses.  |  false  |
+| cc | Cc | [STRING\($email)] | ARRAY_BUILDER  |  Cc recipients email addresses.  |  false  |
+| reply_to | Reply To | [STRING\($email)] | ARRAY_BUILDER  |  Reply-to email addresses.  |  false  |
+| contentType | Content Type | STRING | SELECT  |  | true  |
+| html | HTML | STRING | RICH_TEXT  |  The HTML version of the message.  |  false  |
+| text | Text | STRING | TEXT_AREA  |  The plain text version of the message.  |  false  |
+| headers | Headers | {} | OBJECT_BUILDER  |  Custom headers to add to the email.  |  false  |
+| attachments | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |  false  |
+| tags | [{STRING\(name), STRING\(value)}] | ARRAY_BUILDER  |
 
 
-### Output
+#### Output
 
 
 
@@ -73,9 +69,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+
+
 
 
 

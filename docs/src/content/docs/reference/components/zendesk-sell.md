@@ -2,16 +2,14 @@
 title: "Zendesk Sell"
 description: "Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently."
 ---
-## Reference
-<hr />
 
 Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.
 
 
-Categories: [crm]
+Categories: crm
 
 
-Version: 1
+Type: zendeskSell/v1
 
 <hr />
 
@@ -26,17 +24,15 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -48,18 +44,18 @@ Creates new contact. A contact may represent a single individual or an organizat
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Is Contact Represent an Organization? | BOOLEAN | SELECT  |  Is contact represent an organization or a single individual?  |
-| Name | STRING | TEXT  |  The name of the organisation.  |
-| First Name | STRING | TEXT  |  The first name of the person.  |
-| Last Name | STRING | TEXT  |  The last name of the person.  |
-| Title | STRING | TEXT  |  |
-| Website | STRING | TEXT  |  |
-| Email | STRING | EMAIL  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| is_organization | Is Contact Represent an Organization? | BOOLEAN | SELECT  |  Is contact represent an organization or a single individual?  |  true  |
+| name | Name | STRING | TEXT  |  The name of the organisation.  |  false  |
+| first_name | First Name | STRING | TEXT  |  The first name of the person.  |  false  |
+| last_name | Last Name | STRING | TEXT  |  The last name of the person.  |  true  |
+| title | Title | STRING | TEXT  |  | false  |
+| website | Website | STRING | TEXT  |  | false  |
+| email | Email | STRING | EMAIL  |  | false  |
 
 
-### Output
+#### Output
 
 
 
@@ -68,10 +64,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} | OBJECT_BUILDER  |
-| {INTEGER\(version), STRING\(type)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| data | {STRING\(id), BOOLEAN\(is_organization), STRING\(title), STRING\(website), STRING\(email)} | OBJECT_BUILDER  |
+| meta | {INTEGER\(version), STRING\(type)} | OBJECT_BUILDER  |
 
 
 
@@ -83,13 +79,13 @@ Creates new task.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task Name | STRING | TEXT  |  |
-| Due Date | DATE | DATE  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| content | Task Name | STRING | TEXT  |  | true  |
+| due_date | Due Date | DATE | DATE  |  | false  |
 
 
-### Output
+#### Output
 
 
 
@@ -98,10 +94,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {INTEGER\(id), STRING\(content), DATE\(due_date)} | OBJECT_BUILDER  |
-| {STRING\(type)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| data | {INTEGER\(id), STRING\(content), DATE\(due_date)} | OBJECT_BUILDER  |
+| meta | {STRING\(type)} | OBJECT_BUILDER  |
+
+
 
 
 

@@ -2,16 +2,14 @@
 title: "Figma"
 description: "Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects."
 ---
-## Reference
-<hr />
 
 Figma is a cloud-based design and prototyping tool that enables teams to collaborate in real-time on user interface and user experience projects.
 
 
-Categories: [productivity-and-collaboration]
+Categories: productivity-and-collaboration
 
 
-Version: 1
+Type: figma/v1
 
 <hr />
 
@@ -26,20 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -55,12 +45,12 @@ Gets a list of comments left on the file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File Key | STRING | TEXT  |  File to get comments from. Figma file key copy from Figma file URL.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileKey | File Key | STRING | TEXT  |  File to get comments from. Figma file key copy from Figma file URL.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -69,9 +59,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| [{STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)}] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | [{STRING\(id), STRING\(file_key), STRING\(parent_id), {STRING\(id), STRING\(handle), STRING\(img_url), STRING\(email)}\(user)}] | ARRAY_BUILDER  |
 
 
 
@@ -83,13 +73,13 @@ Posts a new comment on the file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File Key | STRING | TEXT  |  File to add comments in. Figma file key copy from Figma file URL.  |
-| Item | {STRING\(message)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileKey | File Key | STRING | TEXT  |  File to add comments in. Figma file key copy from Figma file URL.  |  true  |
+| __item | Item | {STRING\(message)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -98,12 +88,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(file_key), STRING\(parent_id), STRING\(message)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), STRING\(file_key), STRING\(parent_id), STRING\(message)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

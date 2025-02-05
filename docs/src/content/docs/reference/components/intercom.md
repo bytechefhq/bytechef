@@ -2,16 +2,14 @@
 title: "Intercom"
 description: "Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ..."
 ---
-## Reference
-<hr />
 
 Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...
 
 
-Categories: [customer-support]
+Categories: customer-support
 
 
-Version: 1
+Type: intercom/v1
 
 <hr />
 
@@ -26,18 +24,16 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client id | STRING | TEXT  |  |
-| Client secret | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client id | STRING | TEXT  |  | true  |
+| clientSecret | Client secret | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -49,16 +45,16 @@ Create new contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact Role | STRING | SELECT  |  Role of the contact  |
-| Contact Email | STRING | TEXT  |  Email of the contact  |
-| Contact Name | STRING | TEXT  |  Name of the contact  |
-| Contact Phone | STRING | TEXT  |  Phone of the contact must start with a "+" sign  |
-| Contact Image | STRING | TEXT  |  Image of the contact  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| role | Contact Role | STRING | SELECT  |  Role of the contact  |  true  |
+| email | Contact Email | STRING | TEXT  |  Email of the contact  |  true  |
+| name | Contact Name | STRING | TEXT  |  Name of the contact  |  false  |
+| phone | Contact Phone | STRING | TEXT  |  Phone of the contact must start with a "+" sign  |  false  |
+| avatar | Contact Image | STRING | TEXT  |  Image of the contact  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -67,14 +63,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| type | STRING | TEXT  |
+| id | STRING | TEXT  |
+| role | STRING | TEXT  |
+| email | STRING | TEXT  |
+| phone | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -86,12 +82,12 @@ Get a single Contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact ID | STRING | SELECT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| id | Contact ID | STRING | SELECT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -100,14 +96,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| type | STRING | TEXT  |
+| id | STRING | TEXT  |
+| role | STRING | TEXT  |
+| email | STRING | TEXT  |
+| phone | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -119,20 +115,22 @@ Send a new message
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Message Type | STRING | SELECT  |  In app message or email message  |
-| Title | STRING | TEXT  |  Title of the Email/Message  |
-| Content | STRING | RICH_TEXT  |  Content of the message  |
-| Template | STRING | SELECT  |  The style of the outgoing message  |
-| To | STRING | SELECT  |  ID of the contact to send the message to.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| message_type | Message Type | STRING | SELECT  |  In app message or email message  |  true  |
+| subject | Title | STRING | TEXT  |  Title of the Email/Message  |  true  |
+| body | Content | STRING | RICH_TEXT  |  Content of the message  |  true  |
+| template | Template | STRING | SELECT  |  The style of the outgoing message  |  true  |
+| to | To | STRING | SELECT  |  ID of the contact to send the message to.  |  true  |
 
 
-### Output
+#### Output
 
 
 
 Type: OBJECT
+
+
 
 
 

@@ -2,16 +2,14 @@
 title: "Email"
 description: "The Email connector sends emails using an SMTP email server."
 ---
-## Reference
-<hr />
 
 The Email connector sends emails using an SMTP email server.
 
 
-Categories: [communication, helpers]
+Categories: communication, helpers
 
 
-Version: 1
+Type: email/v1
 
 <hr />
 
@@ -26,18 +24,16 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Username | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| username | Username | STRING | TEXT  |  | true  |
+| password | Password | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -49,16 +45,18 @@ Send an email to any address.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| From Email | STRING | TEXT  |  From who to send the email.  |
-| To Email | [STRING] | ARRAY_BUILDER  |  Who to send the email to.  |
-| CC Email | [STRING] | ARRAY_BUILDER  |  Who to CC on the email.  |
-| BCC Email | [STRING] | ARRAY_BUILDER  |  Who to BCC on the email.  |
-| Reply To | [STRING] | ARRAY_BUILDER  |  When someone replies to this email, where should it go to?  |
-| Subject | STRING | TEXT  |  Your email subject.  |
-| Content | STRING | RICH_TEXT  |  Your email content. Will be sent as a HTML email.  |
-| Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| from | From Email | STRING | TEXT  |  From who to send the email.  |  true  |
+| to | To Email | [STRING] | ARRAY_BUILDER  |  Who to send the email to.  |  true  |
+| cc | CC Email | [STRING] | ARRAY_BUILDER  |  Who to CC on the email.  |  null  |
+| bcc | BCC Email | [STRING] | ARRAY_BUILDER  |  Who to BCC on the email.  |  null  |
+| replyTo | Reply To | [STRING] | ARRAY_BUILDER  |  When someone replies to this email, where should it go to?  |  null  |
+| subject | Subject | STRING | TEXT  |  Your email subject.  |  true  |
+| content | Content | STRING | RICH_TEXT  |  Your email content. Will be sent as a HTML email.  |  null  |
+| attachments | Attachments | [FILE_ENTRY] | ARRAY_BUILDER  |  A list of attachments to send with the email.  |  null  |
+
+
 
 
 

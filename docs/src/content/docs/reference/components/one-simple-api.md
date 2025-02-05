@@ -2,16 +2,14 @@
 title: "One Simple API"
 description: "A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!"
 ---
-## Reference
-<hr />
 
 A toolbox with all the things you need to get your project to success:  Image resize and CDN, PDF and Screenshots generation, Currency Exchange and Discounts, Email Validation, QR codes, and much more!
 
 
-Categories: [developer-tools]
+Categories: developer-tools
 
 
-Version: 1
+Type: oneSimpleAPI/v1
 
 <hr />
 
@@ -26,17 +24,15 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| API Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | API Token | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -48,14 +44,14 @@ Convert currency from one to another.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| From Currency | STRING | SELECT  |  Currency from which you want to convert.  |
-| To Currency | STRING | SELECT  |  Currency to which you want to convert.  |
-| Value | NUMBER | NUMBER  |  Value to convert.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| from_currency | From Currency | STRING | SELECT  |  Currency from which you want to convert.  |  true  |
+| to_currency | To Currency | STRING | SELECT  |  Currency to which you want to convert.  |  true  |
+| from_value | Value | NUMBER | NUMBER  |  Value to convert.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -64,13 +60,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| NUMBER | NUMBER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| from_currency | STRING | TEXT  |
+| from_value | STRING | TEXT  |
+| to_currency | STRING | TEXT  |
+| to_value | NUMBER | NUMBER  |
+| to_exchange_rate | STRING | TEXT  |
 
 
 
@@ -82,12 +78,12 @@ Shorten your desired URL
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URL | STRING | TEXT  |  Place the URL you want to shorten  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| url | URL | STRING | TEXT  |  Place the URL you want to shorten  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -96,13 +92,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| url | STRING | TEXT  |
+| single_use | STRING | TEXT  |
+| temporary_redirect | STRING | TEXT  |
+| forward_params | STRING | TEXT  |
+| short_url | STRING | TEXT  |
 
 
 
@@ -114,12 +110,12 @@ Get information about a certain webpage
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| URL | STRING | TEXT  |  Place the web page url you want to get info from  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| url | URL | STRING | TEXT  |  Place the web page url you want to get info from  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -128,11 +124,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(title), STRING\(description), STRING\(canonical)} | OBJECT_BUILDER  |
-| {STRING\(site), STRING\(title), STRING\(description)} | OBJECT_BUILDER  |
-| {STRING\(title), STRING\(url), STRING\(image), STRING\(description), STRING\(type)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| general | {STRING\(title), STRING\(description), STRING\(canonical)} | OBJECT_BUILDER  |
+| twitter | {STRING\(site), STRING\(title), STRING\(description)} | OBJECT_BUILDER  |
+| og | {STRING\(title), STRING\(url), STRING\(image), STRING\(description), STRING\(type)} | OBJECT_BUILDER  |
+
+
 
 
 

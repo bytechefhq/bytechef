@@ -2,18 +2,22 @@
 title: "Schedule"
 description: "With the Scheduled trigger, you can initiate customized workflows at specific time intervals."
 ---
-## Reference
-<hr />
 
 With the Scheduled trigger, you can initiate customized workflows at specific time intervals.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: schedule/v1
 
 <hr />
+
+
+
+
+## Actions
+
 
 
 
@@ -24,18 +28,18 @@ Version: 1
 ### Every Day
 Trigger off at a specific time either on a daily basis or selected days of the week.
 
-#### Type: LISTENER
+Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
-| Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of Week | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |
-| Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| hour | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |  true  |
+| minute | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |  true  |
+| dayOfWeek | Day of Week | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |  Days at which a workflow will be triggered.  |  null  |
+| timezone | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -44,13 +48,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| datetime | STRING | TEXT  |
+| hour | INTEGER | INTEGER  |
+| minute | INTEGER | INTEGER  |
+| dayOfWeek | {BOOLEAN\(1), BOOLEAN\(2), BOOLEAN\(3), BOOLEAN\(4), BOOLEAN\(5), BOOLEAN\(6), BOOLEAN\(7)} | OBJECT_BUILDER  |
+| timezone | STRING | TEXT  |
 
 
 
@@ -61,18 +65,18 @@ Type: OBJECT
 ### Every Week
 Trigger off at a specific day of the week.
 
-#### Type: LISTENER
+Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
-| Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
-| Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| hour | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |  true  |
+| minute | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |  true  |
+| dayOfWeek | Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |  true  |
+| timezone | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -81,13 +85,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| datetime | STRING | TEXT  |
+| hour | INTEGER | INTEGER  |
+| minute | INTEGER | INTEGER  |
+| dayOfWeek | INTEGER | INTEGER  |
+| timezone | STRING | TEXT  |
 
 
 
@@ -98,18 +102,18 @@ Type: OBJECT
 ### Every Month
 Trigger off at a specific time in month.
 
-#### Type: LISTENER
+Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
-| Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |
-| Day of Month | INTEGER | INTEGER  |  The day of the month  at which a workflow will be triggered.  |
-| Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| hour | Hour | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |  true  |
+| minute | Minute | INTEGER | INTEGER  |  The minute at which a workflow will be triggered.  |  true  |
+| dayOfMonth | Day of Month | INTEGER | INTEGER  |  The day of the month  at which a workflow will be triggered.  |  true  |
+| timezone | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -118,13 +122,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| datetime | STRING | TEXT  |
+| hour | INTEGER | INTEGER  |
+| minute | INTEGER | INTEGER  |
+| dayOfMonth | INTEGER | INTEGER  |
+| timezone | STRING | TEXT  |
 
 
 
@@ -135,16 +139,16 @@ Type: OBJECT
 ### Interval
 Trigger off periodically, for example every minute or day, based on a set interval.
 
-#### Type: LISTENER
+Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Interval | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |
-| Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| interval | Interval | INTEGER | INTEGER  |  The hour at which a workflow will be triggered.  |  true  |
+| timeUnit | Day of Week | INTEGER | SELECT  |  Days at which a workflow will be triggered.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -153,11 +157,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| INTEGER | INTEGER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| datetime | STRING | TEXT  |
+| interval | INTEGER | INTEGER  |
+| timeUnit | INTEGER | INTEGER  |
 
 
 
@@ -168,16 +172,16 @@ Type: OBJECT
 ### Cron
 Trigger off based on a custom schedule.
 
-#### Type: LISTENER
+Type: LISTENER
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Expression | STRING | TEXT  |  The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]  |
-| Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| expression | Expression | STRING | TEXT  |  The chron schedule expression. Format: [Minute] [Hour] [Day of Month] [Month] [Day of Week]  |  true  |
+| timezone | Timezone | STRING | SELECT  |  The timezone at which the cron expression will be scheduled.  |  null  |
 
 
-### Output
+#### Output
 
 
 
@@ -186,11 +190,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| datetime | STRING | TEXT  |
+| expression | STRING | TEXT  |
+| timezone | STRING | TEXT  |
 
 
 
@@ -199,10 +203,4 @@ Type: OBJECT
 
 
 <hr />
-
-
-
-## Actions
-
-
 

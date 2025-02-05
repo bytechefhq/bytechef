@@ -2,20 +2,16 @@
 title: "Math Helper"
 description: "Helper component to perform mathematical operations."
 ---
-## Reference
-<hr />
 
 Helper component to perform mathematical operations.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: mathHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,13 +24,13 @@ Add two numbers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Number | NUMBER | NUMBER  |  |
-| Second Number | NUMBER | NUMBER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| firstNumber | First Number | NUMBER | NUMBER  |  | true  |
+| secondNumber | Second Number | NUMBER | NUMBER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -51,13 +47,13 @@ Divide two numbers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Number | NUMBER | NUMBER  |  Number to be divided.  |
-| Second Number | NUMBER | NUMBER  |  Number to divide by.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| firstNumber | First Number | NUMBER | NUMBER  |  Number to be divided.  |  true  |
+| secondNumber | Second Number | NUMBER | NUMBER  |  Number to divide by.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -74,13 +70,13 @@ Get the remainder of the division of two numbers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Number | NUMBER | NUMBER  |  Number to be divided.  |
-| Second Number | NUMBER | NUMBER  |  Number to divide by.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| firstNumber | First Number | NUMBER | NUMBER  |  Number to be divided.  |  true  |
+| secondNumber | Second Number | NUMBER | NUMBER  |  Number to divide by.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -97,13 +93,13 @@ Multiply two numbers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Number | NUMBER | NUMBER  |  |
-| Second Number | NUMBER | NUMBER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| firstNumber | First Number | NUMBER | NUMBER  |  | true  |
+| secondNumber | Second Number | NUMBER | NUMBER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -120,17 +116,19 @@ Subtract two numbers.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| First Number | NUMBER | NUMBER  |  Number to subtract from.  |
-| Second Number | NUMBER | NUMBER  |  Number to subtract.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| firstNumber | First Number | NUMBER | NUMBER  |  Number to subtract from.  |  true  |
+| secondNumber | Second Number | NUMBER | NUMBER  |  Number to subtract.  |  true  |
 
 
-### Output
+#### Output
 
 
 
 Type: NUMBER
+
+
 
 
 

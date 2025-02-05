@@ -2,16 +2,14 @@
 title: "Google Docs"
 description: "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time."
 ---
-## Reference
-<hr />
 
 Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.
 
 
-Categories: [file-storage]
+Categories: file-storage
 
 
-Version: 1
+Type: googleDocs/v1
 
 <hr />
 
@@ -26,18 +24,16 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -49,10 +45,10 @@ Create a document on Google Docs.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Title | STRING | TEXT  |  Document title.  |
-| Content | STRING | TEXT_AREA  |  Document content.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| title | Title | STRING | TEXT  |  Document title.  |  true  |
+| body | Content | STRING | TEXT_AREA  |  Document content.  |  true  |
 
 
 
@@ -62,13 +58,13 @@ Creates a new document based on an existing one and can replace any placeholder 
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Template Document ID | STRING | SELECT  |  The ID of the template document from which the new document will be created.  |
-| New Document Name | STRING | TEXT  |  Name of the new document.  |
-| Folder for New Document | STRING | SELECT  |  Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document.  |
-| Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value.  |
-| Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileId | Template Document ID | STRING | SELECT  |  The ID of the template document from which the new document will be created.  |  true  |
+| fileName | New Document Name | STRING | TEXT  |  Name of the new document.  |  true  |
+| folderId | Folder for New Document | STRING | SELECT  |  Folder ID where the new document will be saved. If not provided, the new document will be saved in the same folder as the template document.  |  false  |
+| values | Variables | {} | OBJECT_BUILDER  |  Don't include the "[[]]", only the key name and its value.  |  false  |
+| images | Images | {} | OBJECT_BUILDER  |  Key: Image ID (get it manually from the Read File Action), Value: Image URL.  |  false  |
 
 
 
@@ -78,9 +74,11 @@ Retrieve a specified document from your Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Document Id | STRING | SELECT  |  The ID of the document to read.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| documentId | Document Id | STRING | SELECT  |  The ID of the document to read.  |  true  |
+
+
 
 
 

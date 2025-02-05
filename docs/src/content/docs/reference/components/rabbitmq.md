@@ -2,14 +2,12 @@
 title: "RabbitMQ"
 description: "RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system."
 ---
-## Reference
-<hr />
 
 RabbitMQ is an open-source message broker software that enables efficient communication between different systems, applications, and services. It supports multiple messaging protocols and facilitates a reliable and flexible messaging system.
 
 
 
-Version: 1
+Type: rabbitMQ/v1
 
 <hr />
 
@@ -27,27 +25,6 @@ null
 
 
 
-## Triggers
-
-
-### New Message
-Triggers on new RabbitMQ messages.
-
-#### Type: LISTENER
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
-
-
-
-
-
-<hr />
-
-
-
 ## Actions
 
 
@@ -56,11 +33,32 @@ Send a new RabbitMQ message.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| STRING | TEXT  |
-| {} | OBJECT_BUILDER  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| queue | STRING | TEXT  |
+| message | {} | OBJECT_BUILDER  |
 
 
 
+
+
+
+## Triggers
+
+
+### New Message
+Triggers on new RabbitMQ messages.
+
+Type: LISTENER
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| queue | STRING | TEXT  |
+
+
+
+
+
+<hr />
 

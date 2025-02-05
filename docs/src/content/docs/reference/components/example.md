@@ -2,16 +2,14 @@
 title: "Example"
 description: "Component description."
 ---
-## Reference
-<hr />
 
 Component description.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: example/v1
 
 <hr />
 
@@ -29,21 +27,48 @@ Version: 1
 
 
 
+## Actions
+
+
+### Title
+Description
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+
+
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
 ## Triggers
 
 
 ### Updated Issue
 Triggers when an issue is updated.
 
-#### Type: DYNAMIC_WEBHOOK
+Type: DYNAMIC_WEBHOOK
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 
 
 
-### Output
+#### Output
 
 
 
@@ -57,33 +82,6 @@ Type: STRING
 
 
 <hr />
-
-
-
-## Actions
-
-
-### Title
-Description
-
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-
-
-
-### Output
-
-
-
-Type: STRING
-
-
-
-
-
-
 
 <hr />
 

@@ -2,16 +2,14 @@
 title: "Webflow"
 description: "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code."
 ---
-## Reference
-<hr />
 
 Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.
 
 
-Categories: [developer-tools]
+Categories: developer-tools
 
 
-Version: 1
+Type: webflow/v1
 
 <hr />
 
@@ -26,20 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -55,13 +45,13 @@ Updates an order's status to fulfilled.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| Order ID | STRING | SELECT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| orderId | Order ID | STRING | SELECT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -70,9 +60,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(orderId), STRING\(status)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(orderId), STRING\(status)} | OBJECT_BUILDER  |
 
 
 
@@ -84,14 +74,14 @@ Get collection item in a collection.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Site ID | STRING | SELECT  |  |
-| Collection ID | STRING | SELECT  |    |
-| Item  ID | STRING | SELECT  |    |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| siteId | Site ID | STRING | SELECT  |  | true  |
+| collectionId | Collection ID | STRING | SELECT  |    |  true  |
+| itemId | Item  ID | STRING | SELECT  |    |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -100,12 +90,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), {STRING\(name), STRING\(slug)}\(fieldData)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(id), {STRING\(name), STRING\(slug)}\(fieldData)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

@@ -2,20 +2,16 @@
 title: "PDF Helper"
 description: "null"
 ---
-## Reference
-<hr />
 
 null
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: pdfHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,16 +24,18 @@ Extracts text from a PDF file.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| PDF File | FILE_ENTRY | FILE_ENTRY  |  The PDF file from which to extract text.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| file | PDF File | FILE_ENTRY | FILE_ENTRY  |  The PDF file from which to extract text.  |  true  |
 
 
-### Output
+#### Output
 
 
 
 Type: STRING
+
+
 
 
 

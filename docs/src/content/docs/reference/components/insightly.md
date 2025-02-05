@@ -2,16 +2,14 @@
 title: "Insightly"
 description: "Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform."
 ---
-## Reference
-<hr />
 
 Insightly is a customer relationship management (CRM) software that helps businesses manage contacts, sales, projects, and tasks in one platform.
 
 
-Categories: [crm]
+Categories: crm
 
 
-Version: 1
+Type: insightly/v1
 
 <hr />
 
@@ -26,20 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Pod | STRING | TEXT  |  Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1  |
-| API Key | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| pod | Pod | STRING | TEXT  |  Your instances pod can be found under your API URL, e.g. https://api.{pod}.insightly.com/v3.1  |  true  |
+| username | API Key | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -55,12 +45,12 @@ Creates new contact.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Contact | {STRING\(FIRST_NAME), STRING\(LAST_NAME), STRING\(EMAIL_ADDRESS), STRING\(PHONE), STRING\(TITLE)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -69,14 +59,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| CONTACT_ID | INTEGER | INTEGER  |
+| FIRST_NAME | STRING | TEXT  |
+| LAST_NAME | STRING | TEXT  |
+| EMAIL_ADDRESS | STRING | TEXT  |
+| PHONE | STRING | TEXT  |
+| TITLE | STRING | TEXT  |
 
 
 
@@ -88,12 +78,12 @@ Creates new organization.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Organization | {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Organization | {STRING\(ORGANISATION_NAME), STRING\(PHONE), STRING\(WEBSITE)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -102,12 +92,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| ORGANISATION_ID | INTEGER | INTEGER  |
+| ORGANISATION_NAME | STRING | TEXT  |
+| PHONE | STRING | TEXT  |
+| WEBSITE | STRING | TEXT  |
 
 
 
@@ -119,12 +109,12 @@ Creates new task.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {STRING\(TITLE), STRING\(STATUS)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Task | {STRING\(TITLE), STRING\(STATUS)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -133,16 +123,24 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| TASK_ID | INTEGER | INTEGER  |
+| TITLE | STRING | TEXT  |
+| STATUS | STRING | TEXT  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 
 <hr />
 

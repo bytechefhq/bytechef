@@ -2,16 +2,14 @@
 title: "Freshdesk"
 description: "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently."
 ---
-## Reference
-<hr />
 
 Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.
 
 
-Categories: [customer-support]
+Categories: customer-support
 
 
-Version: 1
+Type: freshdesk/v1
 
 <hr />
 
@@ -26,20 +24,12 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Domain | STRING | TEXT  |  Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2  |
-| API key | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| domain | Domain | STRING | TEXT  |  Your helpdesk domain name, e.g. https://{your_domain}.freshdesk.com/api/v2  |  true  |
+| username | API key | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -55,12 +45,12 @@ Creates a new company
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Company | {STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Company | {STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -69,9 +59,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {NUMBER\(id), STRING\(name), STRING\(description), STRING\(note)} | OBJECT_BUILDER  |
 
 
 
@@ -83,12 +73,12 @@ Creates a new contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Contact | {STRING\(name), STRING\(email), STRING\(phone), STRING\(mobile), STRING\(description), STRING\(job_title)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -97,9 +87,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(description), STRING\(email), NUMBER\(id), STRING\(job_title)} | OBJECT_BUILDER  |
 
 
 
@@ -111,12 +101,12 @@ Creates a new ticket
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Ticket | {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Ticket | {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |  | null  |
 
 
-### Output
+#### Output
 
 
 
@@ -125,12 +115,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | {STRING\(subject), STRING\(email), STRING\(description), INTEGER\(priority), INTEGER\(status)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

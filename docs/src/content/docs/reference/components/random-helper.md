@@ -2,20 +2,16 @@
 title: "Random Helper"
 description: "The Random Helper allows you to generate random values."
 ---
-## Reference
-<hr />
 
 The Random Helper allows you to generate random values.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: randomHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,13 +24,13 @@ Generates a random integer value.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |
-| End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| startInclusive | Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |  true  |
+| endInclusive | End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -51,17 +47,19 @@ Generates a random float value.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |
-| End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| startInclusive | Start Inclusive | INTEGER | INTEGER  |  The minimum possible generated value.  |  true  |
+| endInclusive | End Inclusive | INTEGER | INTEGER  |  The maximum possible generated value.  |  true  |
 
 
-### Output
+#### Output
 
 
 
 Type: NUMBER
+
+
 
 
 

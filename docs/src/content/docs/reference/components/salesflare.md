@@ -2,16 +2,14 @@
 title: "Salesflare"
 description: "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently."
 ---
-## Reference
-<hr />
 
 Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently.
 
 
-Categories: [crm]
+Categories: crm
 
 
-Version: 1
+Type: salesflare/v1
 
 <hr />
 
@@ -26,19 +24,11 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -54,9 +44,9 @@ Creates new account.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Account | {STRING\(name), STRING\(website), STRING\(description), STRING\(email), STRING\(phone_number), [STRING]\(social_profiles)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Account | {STRING\(name), STRING\(website), STRING\(description), STRING\(email), STRING\(phone_number), [STRING]\(social_profiles)} | OBJECT_BUILDER  |  | true  |
 
 
 
@@ -66,12 +56,12 @@ Creates new contacts.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contacts | [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] | ARRAY_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __items | Contacts | [{STRING\(email), STRING\(firstname), STRING\(lastname), STRING\(phone_number), STRING\(mobile_phone_number), STRING\(home_phone_number), STRING\(fax_number), [STRING]\(social_profiles)}] | ARRAY_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -80,9 +70,9 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| [{INTEGER\(id)}] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | [{INTEGER\(id)}] | ARRAY_BUILDER  |
 
 
 
@@ -94,12 +84,12 @@ Creates new tasks.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Tasks | [{STRING\(description), DATE\(reminder_date)}] | ARRAY_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __items | Tasks | [{STRING\(description), DATE\(reminder_date)}] | ARRAY_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -108,12 +98,20 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| [{INTEGER\(id)}] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| body | [{INTEGER\(id)}] | ARRAY_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

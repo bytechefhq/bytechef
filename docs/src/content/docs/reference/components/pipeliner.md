@@ -2,16 +2,14 @@
 title: "Pipeliner"
 description: "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting."
 ---
-## Reference
-<hr />
 
 Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting.
 
 
-Categories: [crm]
+Categories: crm
 
 
-Version: 1
+Type: pipeliner/v1
 
 <hr />
 
@@ -26,22 +24,14 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space Id | STRING | TEXT  |  Your Space ID  |
-| Server URL | STRING | SELECT  |  |
-| Username | STRING | TEXT  |  |
-| Password | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spaceId | Space Id | STRING | TEXT  |  Your Space ID  |  true  |
+| serverUrl | Server URL | STRING | SELECT  |  | true  |
+| username | Username | STRING | TEXT  |  | true  |
+| password | Password | STRING | TEXT  |  | true  |
 
 
-
-
-
-<hr />
-
-
-
-## Triggers
 
 
 
@@ -57,12 +47,12 @@ Creates new account.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Account | {STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Account | {STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -71,10 +61,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| BOOLEAN | SELECT  |
-| {STRING\(id), STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| success | BOOLEAN | SELECT  |
+| data | {STRING\(id), STRING\(owner_id), STRING\(name)} | OBJECT_BUILDER  |
 
 
 
@@ -86,12 +76,12 @@ Creates new Contact
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Contact | {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Contact | {STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -100,10 +90,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| BOOLEAN | SELECT  |
-| {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| success | BOOLEAN | SELECT  |
+| data | {STRING\(id), STRING\(owner_id), STRING\(first_name), STRING\(last_name)} | OBJECT_BUILDER  |
 
 
 
@@ -115,12 +105,12 @@ Creates new Task
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Task | {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| __item | Task | {STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -129,13 +119,21 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| BOOLEAN | SELECT  |
-| {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| success | BOOLEAN | SELECT  |
+| data | {STRING\(id), STRING\(subject), STRING\(activity_type_id), STRING\(unit_id), STRING\(owner_id)} | OBJECT_BUILDER  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+
+<hr />
 

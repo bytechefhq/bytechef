@@ -2,16 +2,14 @@
 title: "Infobip"
 description: "Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses."
 ---
-## Reference
-<hr />
 
 Infobip is a global communications platform that provide cloud-based messaging and omnichannel communication solutions for businesses.
 
 
-Categories: [communication]
+Categories: communication
 
 
-Version: 1
+Type: infobip/v1
 
 <hr />
 
@@ -26,18 +24,16 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| API Key | STRING | TEXT  |  |
-| Base URL | STRING | TEXT  |  Personalized base URL for API requests.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | API Key | STRING | TEXT  |  | true  |
+| baseUrl | Base URL | STRING | TEXT  |  Personalized base URL for API requests.  |  true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -49,14 +45,14 @@ Send a new SMS message
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| From | STRING | TEXT  |  The sender ID. It can be alphanumeric or numeric (e.g., CompanyName).  |
-| To | [STRING] | ARRAY_BUILDER  |  Message recipient numbers.  |
-| Text | STRING | TEXT  |  Content of the message being sent.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| sender | From | STRING | TEXT  |  The sender ID. It can be alphanumeric or numeric (e.g., CompanyName).  |  true  |
+| to | To | [STRING] | ARRAY_BUILDER  |  Message recipient numbers.  |  true  |
+| text | Text | STRING | TEXT  |  Content of the message being sent.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -65,10 +61,10 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| [STRING\($messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)}\($status), STRING\($to), INTEGER\($smsCount)] | ARRAY_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| bulkId | STRING | TEXT  |
+| messages | [STRING\($messageId), {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)}\($status), STRING\($to), INTEGER\($smsCount)] | ARRAY_BUILDER  |
 
 
 
@@ -80,14 +76,14 @@ Send a new SMS message
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| From | STRING | TEXT  |  Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.  |
-| To | STRING | TEXT  |  Message recipient number. Must be in international format.  |
-| Text | STRING | TEXT  |  Content of the message being sent.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| from | From | STRING | TEXT  |  Registered WhatsApp sender number. Must be in international format and comply with WhatsApp's requirements.  |  true  |
+| to | To | STRING | TEXT  |  Message recipient number. Must be in international format.  |  true  |
+| text | Text | STRING | TEXT  |  Content of the message being sent.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -96,12 +92,14 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| INTEGER | INTEGER  |
-| STRING | TEXT  |
-| {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| to | STRING | TEXT  |
+| messageCount | INTEGER | INTEGER  |
+| messageId | STRING | TEXT  |
+| status | {INTEGER\(groupId), STRING\(groupName), INTEGER\(id), STRING\(name), STRING\(description)} | OBJECT_BUILDER  |
+
+
 
 
 

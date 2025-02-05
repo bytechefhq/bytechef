@@ -2,16 +2,14 @@
 title: "Google Forms"
 description: "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking."
 ---
-## Reference
-<hr />
 
 Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking.
 
 
-Categories: [surveys-and-feedback]
+Categories: surveys-and-feedback
 
 
-Version: 1
+Type: googleForms/v1
 
 <hr />
 
@@ -26,31 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Response
-Triggers when response is submitted to Google Form.
-
-#### Type: POLLING
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form | STRING | SELECT  |  Form to watch for new responses.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -68,9 +45,9 @@ Get all responses of a form.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form ID | STRING | SELECT  |  ID of the form whose responses to retrieve.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| formId | Form ID | STRING | SELECT  |  ID of the form whose responses to retrieve.  |  true  |
 
 
 
@@ -80,9 +57,9 @@ Get the information about a form.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form ID | STRING | SELECT  |  ID of the form to retrieve.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| formId | Form ID | STRING | SELECT  |  ID of the form to retrieve.  |  true  |
 
 
 
@@ -92,13 +69,34 @@ Get the response of a form.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Form ID | STRING | SELECT  |  ID of the form whose response to retrieve.  |
-| Response ID | STRING | SELECT  |  ID of the response to retrieve.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| formId | Form ID | STRING | SELECT  |  ID of the form whose response to retrieve.  |  true  |
+| responseId | Response ID | STRING | SELECT  |  ID of the response to retrieve.  |  true  |
 
 
 
+
+
+
+## Triggers
+
+
+### New Response
+Triggers when response is submitted to Google Form.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| formId | Form | STRING | SELECT  |  Form to watch for new responses.  |  true  |
+
+
+
+
+
+<hr />
 
 <hr />
 

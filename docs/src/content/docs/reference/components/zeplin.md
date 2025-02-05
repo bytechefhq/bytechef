@@ -2,16 +2,14 @@
 title: "Zeplin"
 description: "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development."
 ---
-## Reference
-<hr />
 
 Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development.
 
 
-Categories: [communication]
+Categories: communication
 
 
-Version: 1
+Type: zeplin/v1
 
 <hr />
 
@@ -26,49 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### Project Note
-Triggers when new note is created, deleted or updated in specified project.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project ID | STRING | SELECT  |  ID of the project you want to monitor.  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(type), {STRING\(id), STRING\(status), [{STRING\(id), {STRING\(id), STRING\(email), STRING\(username)}\(author), STRING\(content)}]\(comments)}\(data)} | OBJECT_BUILDER  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -86,11 +45,50 @@ Updates an existing project.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Project ID | STRING | SELECT  |  Project to update.  |
-| Project | {STRING\(name), STRING\(description)} | OBJECT_BUILDER  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| project_id | Project ID | STRING | SELECT  |  Project to update.  |  true  |
+| __item | Project | {STRING\(name), STRING\(description)} | OBJECT_BUILDER  |  | true  |
 
 
 
+
+
+
+## Triggers
+
+
+### Project Note
+Triggers when new note is created, deleted or updated in specified project.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| project_id | Project ID | STRING | SELECT  |  ID of the project you want to monitor.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| context | {STRING\(id), STRING\(type), {STRING\(id), STRING\(status), [{STRING\(id), {STRING\(id), STRING\(email), STRING\(username)}\(author), STRING\(content)}]\(comments)}\(data)} | OBJECT_BUILDER  |
+| action | STRING | TEXT  |
+| event | STRING | TEXT  |
+
+
+
+
+
+
+
+<hr />
 

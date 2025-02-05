@@ -2,16 +2,14 @@
 title: "Trello"
 description: "Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams."
 ---
-## Reference
-<hr />
 
 Trello is a project management tool that uses boards, lists, and cards to help users organize tasks and collaborate with teams.
 
 
-Categories: [productivity-and-collaboration]
+Categories: productivity-and-collaboration
 
 
-Version: 1
+Type: trello/v1
 
 <hr />
 
@@ -26,52 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Key | STRING | TEXT  |  |
-| Token | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New Card
-Triggers when a new card is created on specified board or list.
-
-#### Type: DYNAMIC_WEBHOOK
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board ID | STRING | SELECT  |  |
-| List ID | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: OBJECT
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| key | Key | STRING | TEXT  |  | true  |
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
@@ -89,10 +45,10 @@ Creates a new board.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Name | STRING | TEXT  |  The new name for the board.  |
-| Description | STRING | TEXT  |  A new description for the board.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| name | Name | STRING | TEXT  |  The new name for the board.  |  true  |
+| desc | Description | STRING | TEXT  |  A new description for the board.  |  false  |
 
 
 
@@ -102,15 +58,15 @@ Creates a new card.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board ID | STRING | SELECT  |  ID of the board.  |
-| List ID | STRING | SELECT  |  ID of the list where the card should be created in.  |
-| Name | STRING | TEXT  |  The name for the card.  |
-| Description | STRING | TEXT  |  The description for the card.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| idBoard | Board ID | STRING | SELECT  |  ID of the board.  |  true  |
+| idList | List ID | STRING | SELECT  |  ID of the list where the card should be created in.  |  true  |
+| name | Name | STRING | TEXT  |  The name for the card.  |  false  |
+| desc | Description | STRING | TEXT  |  The description for the card.  |  false  |
 
 
-### Output
+#### Output
 
 
 
@@ -119,13 +75,13 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| desc | STRING | TEXT  |
+| idBoard | STRING | TEXT  |
+| idList | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -137,13 +93,13 @@ Gets a card details.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Board ID | STRING | SELECT  |  ID of the board where card is located.  |
-| Card ID | STRING | SELECT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| idBoard | Board ID | STRING | SELECT  |  ID of the board where card is located.  |  true  |
+| id | Card ID | STRING | SELECT  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -152,16 +108,58 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| desc | STRING | TEXT  |
+| idBoard | STRING | TEXT  |
+| idList | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New Card
+Triggers when a new card is created on specified board or list.
+
+Type: DYNAMIC_WEBHOOK
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| idBoard | Board ID | STRING | SELECT  |  | true  |
+| idList | List ID | STRING | SELECT  |  | false  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| desc | STRING | TEXT  |
+| idBoard | STRING | TEXT  |
+| idList | STRING | TEXT  |
+| name | STRING | TEXT  |
+
+
+
+
+
+
+
+<hr />
 

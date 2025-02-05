@@ -2,16 +2,14 @@
 title: "AITable"
 description: "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills."
 ---
-## Reference
-<hr />
 
 AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills.
 
 
-Categories: [productivity-and-collaboration]
+Categories: productivity-and-collaboration
 
 
-Version: 1
+Type: aitable/v1
 
 <hr />
 
@@ -26,17 +24,15 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Token | STRING | TEXT  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| token | Token | STRING | TEXT  |  | true  |
 
 
 
 
 
 <hr />
-
-
 
 
 
@@ -48,11 +44,11 @@ Creates a new record in datasheet.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space ID | STRING | SELECT  |  |
-| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spaceId | Space ID | STRING | SELECT  |  | true  |
+| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
+| fields | DYNAMIC_PROPERTIES | null  |
 
 
 
@@ -62,13 +58,13 @@ Find records in datasheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space ID | STRING | SELECT  |  |
-| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
-| Field Names | [STRING] | ARRAY_BUILDER  |  The returned record results are limited to the specified fields.  |
-| Record IDs | [STRING] | ARRAY_BUILDER  |  The IDs of the records to find.  |
-| Max Records | INTEGER | INTEGER  |  How many records are returned in total  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spaceId | Space ID | STRING | SELECT  |  | true  |
+| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
+| fields | Field Names | [STRING] | ARRAY_BUILDER  |  The returned record results are limited to the specified fields.  |  false  |
+| recordIds | Record IDs | [STRING] | ARRAY_BUILDER  |  The IDs of the records to find.  |  false  |
+| maxRecords | Max Records | INTEGER | INTEGER  |  How many records are returned in total  |  false  |
 
 
 
@@ -78,12 +74,14 @@ Update record in datasheet
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Space ID | STRING | SELECT  |  |
-| Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |
-| Record ID | STRING | SELECT  |  ID of the record to update.  |
-| DYNAMIC_PROPERTIES | null  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spaceId | Space ID | STRING | SELECT  |  | true  |
+| datasheetId | Datasheet ID | STRING | SELECT  |  AITable Datasheet ID  |  true  |
+| recordId | Record ID | STRING | SELECT  |  ID of the record to update.  |  true  |
+| fields | DYNAMIC_PROPERTIES | null  |
+
+
 
 
 

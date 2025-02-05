@@ -2,20 +2,16 @@
 title: "Image Helper"
 description: "Helper component which contains various actions for image manipulation."
 ---
-## Reference
-<hr />
 
 Helper component which contains various actions for image manipulation.
 
 
-Categories: [helpers]
+Categories: helpers
 
 
-Version: 1
+Type: imageHelper/v1
 
 <hr />
-
-
 
 
 
@@ -28,14 +24,14 @@ Compress image with specified quality.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
-| Quality | NUMBER | NUMBER  |  Compression quality of the image.  |
-| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
+| quality | Quality | NUMBER | NUMBER  |  Compression quality of the image.  |  true  |
+| resultFileName | Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -44,12 +40,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -61,17 +57,17 @@ Crops an image to the specified dimensions.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
-| X Coordinate | INTEGER | INTEGER  |  The horizontal starting point of the crop area  |
-| Y Coordinate | INTEGER | INTEGER  |  The vertical starting point of the crop area  |
-| Width | INTEGER | INTEGER  |  Width of the crop area  |
-| Height | INTEGER | INTEGER  |  Height of the crop area  |
-| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
+| x | X Coordinate | INTEGER | INTEGER  |  The horizontal starting point of the crop area  |  true  |
+| y | Y Coordinate | INTEGER | INTEGER  |  The vertical starting point of the crop area  |  true  |
+| width | Width | INTEGER | INTEGER  |  Width of the crop area  |  true  |
+| height | Height | INTEGER | INTEGER  |  Height of the crop area  |  true  |
+| resultFileName | Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -80,12 +76,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -97,10 +93,10 @@ Get metadata of the image.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
-| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
+| resultFileName | Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |  true  |
 
 
 
@@ -110,12 +106,12 @@ Converts image to Base64 string.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
 
 
-### Output
+#### Output
 
 
 
@@ -132,15 +128,15 @@ Resizes an image to the specified width and height.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
-| Width | INTEGER | INTEGER  |  Width in pixels  |
-| Height | INTEGER | INTEGER  |  Height in pixels  |
-| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
+| width | Width | INTEGER | INTEGER  |  Width in pixels  |  true  |
+| height | Height | INTEGER | INTEGER  |  Height in pixels  |  true  |
+| resultFileName | Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -149,12 +145,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -166,14 +162,14 @@ Rotates an image by a specified degree.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Image | FILE_ENTRY | FILE_ENTRY  |  |
-| Degree | INTEGER | SELECT  |  Specifies the degree of clockwise rotation applied to the image.  |
-| Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| image | Image | FILE_ENTRY | FILE_ENTRY  |  | true  |
+| degree | Degree | INTEGER | SELECT  |  Specifies the degree of clockwise rotation applied to the image.  |  true  |
+| resultFileName | Result File Name | STRING | TEXT  |  Specifies the output file name for the result image.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -182,12 +178,14 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
+
+
 
 
 

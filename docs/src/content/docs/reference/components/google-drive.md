@@ -2,16 +2,14 @@
 title: "Google Drive"
 description: "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online."
 ---
-## Reference
-<hr />
 
 Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.
 
 
-Categories: [file-storage]
+Categories: file-storage
 
 
-Version: 1
+Type: googleDrive/v1
 
 <hr />
 
@@ -26,77 +24,10 @@ Version: 1
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Client Id | STRING | TEXT  |  |
-| Client Secret | STRING | TEXT  |  |
-
-
-
-
-
-<hr />
-
-
-
-## Triggers
-
-
-### New File
-Triggers when new file is uploaded to Google Drive.
-
-#### Type: POLLING
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(mimeType), STRING\(name)} | OBJECT_BUILDER  |
-
-
-
-
-
-
-
-### New Folder
-Triggers when new folder is uploaded to Google Drive.
-
-#### Type: POLLING
-#### Properties
-
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Parent Folder | STRING | SELECT  |  |
-
-
-### Output
-
-
-
-Type: ARRAY
-
-
-#### Properties
-
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| {STRING\(id), STRING\(mimeType), STRING\(name)} | OBJECT_BUILDER  |
-
-
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| clientId | Client Id | STRING | TEXT  |  | true  |
+| clientSecret | Client Secret | STRING | TEXT  |  | true  |
 
 
 
@@ -114,14 +45,14 @@ Copy a selected file to a different location within Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File ID | STRING | SELECT  |  The id of the file to be copied.  |
-| New File Name | STRING | TEXT  |  The name of the new file created as a result of the copy operation.  |
-| Destination Folder ID | STRING | SELECT  |  The ID of the folder where the copied file will be stored.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileId | File ID | STRING | SELECT  |  The id of the file to be copied.  |  true  |
+| fileName | New File Name | STRING | TEXT  |  The name of the new file created as a result of the copy operation.  |  true  |
+| folderId | Destination Folder ID | STRING | SELECT  |  The ID of the folder where the copied file will be stored.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -130,12 +61,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| kind | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -147,13 +78,13 @@ Creates a new empty folder in Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| Folder Name | STRING | TEXT  |  The name of the new folder.  |
-| Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| folderName | Folder Name | STRING | TEXT  |  The name of the new folder.  |  true  |
+| folderId | Parent Folder ID | STRING | SELECT  |  ID of the folder where the new folder will be created; if no folder is selected, the folder will be created in the root folder.  |  false  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -167,11 +98,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -183,15 +114,15 @@ Creates a new text file in Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File Name | STRING | TEXT  |  The name of the new text file.  |
-| Text | STRING | TEXT_AREA  |  The text content to add to file.  |
-| File Type | STRING | SELECT  |  Select file type.  |
-| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileName | File Name | STRING | TEXT  |  The name of the new text file.  |  true  |
+| text | Text | STRING | TEXT_AREA  |  The text content to add to file.  |  true  |
+| mimeType | File Type | STRING | SELECT  |  Select file type.  |  true  |
+| folderId | Parent Folder ID | STRING | SELECT  |  ID of the folder where the file should be created; if no folder is selected, the file will be created in the root folder.  |  false  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -205,11 +136,11 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -221,9 +152,9 @@ Delete a selected file from Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File ID | STRING | SELECT  |  The id of a file to delete.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileId | File ID | STRING | SELECT  |  The id of a file to delete.  |  true  |
 
 
 
@@ -233,12 +164,12 @@ Download selected file from Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File ID | STRING | SELECT  |  ID of the file to download.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileId | File ID | STRING | SELECT  |  ID of the file to download.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -247,12 +178,12 @@ Type: FILE_ENTRY
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| extension | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
+| url | STRING | TEXT  |
 
 
 
@@ -264,12 +195,12 @@ Retrieve a specified file from your Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File ID | STRING | SELECT  |  ID of the file to be retrieved.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileId | File ID | STRING | SELECT  |  ID of the file to be retrieved.  |  true  |
 
 
-### Output
+#### Output
 
 
 
@@ -278,12 +209,12 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| kind | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
@@ -295,13 +226,13 @@ Uploads a file in your Google Drive.
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
-| File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |
-| Parent Folder ID | STRING | SELECT  |  ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| fileEntry | File | FILE_ENTRY | FILE_ENTRY  |  The object property which contains a reference to the file to upload.  |  true  |
+| folderId | Parent Folder ID | STRING | SELECT  |  ID of the folder where the file will be uploaded; if no folder is selected, the file will be uploaded to the root folder.  |  false  |
 
 
-### Output
+#### Output
 
 
 ___Sample Output:___
@@ -315,16 +246,83 @@ Type: OBJECT
 
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
-| STRING | TEXT  |
-| STRING | TEXT  |
-| STRING | TEXT  |
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| mimeType | STRING | TEXT  |
+| name | STRING | TEXT  |
 
 
 
 
 
+
+
+
+## Triggers
+
+
+### New File
+Triggers when new file is uploaded to Google Drive.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| folderId | Parent Folder | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(mimeType), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+### New Folder
+Triggers when new folder is uploaded to Google Drive.
+
+Type: POLLING
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| folderId | Parent Folder | STRING | SELECT  |  | true  |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(id), STRING\(mimeType), STRING\(name)} | OBJECT_BUILDER  |
+
+
+
+
+
+
+
+<hr />
 
 <hr />
 
