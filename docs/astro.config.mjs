@@ -39,7 +39,8 @@ export default defineConfig({
                             items: [
                                 // { label: 'Introduction', link: '/automation/getting-started/introduction' },
                                 {label: 'Glossary', link: '/automation/getting-started/glossary'},
-                                {label: 'Quick Start', link: '/automation/getting-started/quick-start'},
+                                {label: 'Quick Start - Star Repository on Github', link: '/automation/getting-started/quick-start-star-repository'},
+                                {label: 'Quick Start', link: '/automation/getting-started/quick-start'}
                             ],
                         },
                         {
