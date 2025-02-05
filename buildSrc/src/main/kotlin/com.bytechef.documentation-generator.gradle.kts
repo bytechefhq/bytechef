@@ -23,6 +23,7 @@ open class FindJsonFilesTask : DefaultTask() {
         var properties: Array<Properties>? = null
         var label: String? = null
         var type: String? = null
+        var required: Boolean? = false
 
         private fun getFullTypeObject(): String? {
             val sb = StringBuilder()
@@ -64,9 +65,11 @@ open class FindJsonFilesTask : DefaultTask() {
         override fun toString(): String {
             val typeFull = getFullType(type)
 
-            return if (label==null) "| $typeFull | $controlType  |"
-            else if(description==null) "| $label | $typeFull | $controlType  |  |"
-            else "| $label | $typeFull | $controlType  |  $description  |"
+            return if (label == null) {
+                if (name == null) "|  | $typeFull | $controlType  |"
+                else "| $name | $typeFull | $controlType  |"
+            } else if (description == null) "| $name | $label | $typeFull | $controlType  |  | $required  |"
+            else "| $name | $label | $typeFull | $controlType  |  $description  |  $required  |"
         }
     }
 
@@ -82,16 +85,16 @@ open class FindJsonFilesTask : DefaultTask() {
                 """
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 """
             } else if(items != null){
                 """
 #### Properties
 
-|     Type     |     Control Type     |
-|:------------:|:--------------------:|
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
 ${items?.joinToString("\n")}
 """
             } else ""
@@ -125,7 +128,7 @@ ___Sample Output:___
 
         override fun toString(): String {
             return """
-### Output
+#### Output
 
 ${getSampleOutputString()}
 $outputSchema
@@ -171,8 +174,8 @@ $description
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 ${getOutputDefinitionString()}
@@ -202,11 +205,11 @@ ${getOutputDefinitionString()}
 ### $title
 $description
 
-#### Type: $type
+Type: $type
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 ${getOutputResponseString()}
@@ -228,8 +231,8 @@ ${getOutputResponseString()}
 
 #### Properties
 
-|      Name      |     Type     |     Control Type     |     Description     |
-|:--------------:|:------------:|:--------------------:|:-------------------:|
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
 ${properties?.joinToString("\n")}
 
 """
@@ -282,7 +285,7 @@ ${authorizations?.joinToString("\n")}
             }
 
             return """
-Categories: ${categories.contentToString()}
+Categories: ${categories?.joinToString(", ")}
 """
         }
 
@@ -329,8 +332,6 @@ ${actions?.joinToString("\n")}
 title: "$title"
 description: "$description"
 ---
-## Reference
-<hr />
 
 $description
 
@@ -342,9 +343,9 @@ Type: $name/v$version
 
 ${getConnectionString()}
 
-${getTriggerString()}
-
 ${getActionsString()}
+
+${getTriggerString()}
 """
         }
     }
