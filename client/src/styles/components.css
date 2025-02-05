@@ -48,9 +48,12 @@
         --surface-neutral-secondary: 210 40% 98%;
         --surface-neutral-tertiary: 210 40% 96%;
         --content-brand-primary-pressed: 213 87% 34%;
+        --content-destructive: 0 74% 42%;
         --content-neutral-primary: 222 47% 11%;
         --content-neutral-secondary: 215 16% 47%;
         --content-neutral-tertiary: 215 20% 65%;
+        --content-success: 142 72% 29%;
+        --content-warning: 45 93% 47%;
         --stroke-neutral-primary: 213 27% 84%;
         --stroke-neutral-primary-hover: 215 20% 65%;
         --stroke-neutral-secondary: 214 32% 91%;

@@ -55,11 +55,14 @@ module.exports = {
                     brand: {
                         'primary-pressed': 'hsl(var(--content-brand-primary-pressed))',
                     },
+                    destructive: 'hsl(var(--content-destructive))',
                     neutral: {
                         primary: 'hsl(var(--content-neutral-primary))',
                         secondary: 'hsl(var(--content-neutral-secondary))',
                         tertiary: 'hsl(var(--content-neutral-tertiary))',
                     },
+                    success: 'hsl(var(--content-success))',
+                    warning: 'hsl(var(--content-warning))',
                 },
                 destructive: {
                     DEFAULT: 'hsl(var(--destructive))',
