@@ -45,14 +45,22 @@ const ProjectHeaderWorkflowActionsButton = ({
                 </div>
             </TooltipTrigger>
 
-            {workflowIsRunning && <TooltipContent>Stop the current workflow</TooltipContent>}
+            {runDisabled ? (
+                <TooltipContent className="mr-2 max-w-xs px-2">
+                    The workflow cannot be executed. Please set all required workflow input parameters, connections and
+                    component properties.
+                </TooltipContent>
+            ) : (
+                <TooltipContent>
+                    {workflowIsRunning ? (
+                        'Stop the current workflow'
+                    ) : (
+                        <>
+                            {chatTrigger && `Start the chat`}
 
-            {!workflowIsRunning && (
-                <TooltipContent className="max-w-sm px-2">
-                    {runDisabled
-                        ? `The workflow cannot be executed. Please set all required workflow input parameters, connections and
-                    component properties.`
-                        : `Run the current workflow`}
+                            {!chatTrigger && `Run the current workflow`}
+                        </>
+                    )}
                 </TooltipContent>
             )}
         </Tooltip>

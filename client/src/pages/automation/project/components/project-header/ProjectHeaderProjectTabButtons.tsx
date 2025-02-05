@@ -1,29 +1,29 @@
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
 import {useToast} from '@/hooks/use-toast';
-import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
-import ProjectHeaderHistoryButton from '@/pages/automation/project/components/project-header/ProjectHeaderHistoryButton';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, DownloadIcon, EditIcon, Trash2Icon} from 'lucide-react';
-import {ChangeEvent, useRef, useState} from 'react';
+import {CopyIcon, DownloadIcon, EditIcon, HistoryIcon, Trash2Icon} from 'lucide-react';
+import {ChangeEvent, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const ProjectHeaderProjectTabButtons = ({
+    handleCloseDropdownMenu,
     handleDeleteProject,
     handleEditProject,
+    handleShowProjectVersionHistorySheet,
     project,
 }: {
+    handleCloseDropdownMenu: () => void;
     handleDeleteProject: () => void;
     handleEditProject: () => void;
+    handleShowProjectVersionHistorySheet: () => void;
     project: Project;
 }) => {
-    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
-
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureProjectWorkflowImported} = useAnalytics();
@@ -69,8 +69,14 @@ const ProjectHeaderProjectTabButtons = ({
         }
     };
 
+    const handleButtonClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if ((event.target as HTMLElement).tagName === 'BUTTON') {
+            handleCloseDropdownMenu();
+        }
+    };
+
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col" onClick={handleButtonClick}>
             <Button
                 className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => handleEditProject()}
@@ -101,9 +107,13 @@ const ProjectHeaderProjectTabButtons = ({
 
             <Separator />
 
-            <ProjectHeaderHistoryButton
-                handleShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
-            />
+            <Button
+                className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                onClick={() => handleShowProjectVersionHistorySheet()}
+                variant="ghost"
+            >
+                <HistoryIcon /> Project History
+            </Button>
 
             <Separator />
 
@@ -116,15 +126,6 @@ const ProjectHeaderProjectTabButtons = ({
             </Button>
 
             <input className="hidden" onChange={handleFileChange} ref={hiddenFileInputRef} type="file" />
-
-            {showProjectVersionHistorySheet && (
-                <ProjectVersionHistorySheet
-                    onClose={() => {
-                        setShowProjectVersionHistorySheet(false);
-                    }}
-                    projectId={Number(project.id!)}
-                />
-            )}
         </div>
     );
 };
