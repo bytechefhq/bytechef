@@ -8,10 +8,12 @@ import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
 const ProjectHeaderWorkflowTabButtons = ({
+    handleCloseDropdownMenu,
     handleShowDeleteWorkflowAlertDialog,
     project,
     workflowId,
 }: {
+    handleCloseDropdownMenu: () => void;
     handleShowDeleteWorkflowAlertDialog: () => void;
     project: Project;
     workflowId: string;
@@ -29,8 +31,14 @@ const ProjectHeaderWorkflowTabButtons = ({
         },
     });
 
+    const handleButtonClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if ((event.target as HTMLElement).tagName === 'BUTTON') {
+            handleCloseDropdownMenu();
+        }
+    };
+
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col" onClick={handleButtonClick}>
             <Button
                 className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                 onClick={() => setShowEditWorkflowDialog(true)}

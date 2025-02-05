@@ -1,10 +1,12 @@
 import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
 import ProjectHeaderOutputButton from '@/pages/automation/project/components/project-header/ProjectHeaderOutputButton';
 import ProjectHeaderPublishPopover from '@/pages/automation/project/components/project-header/ProjectHeaderPublishPopover';
+import ProjectHeaderSettingsMenu from '@/pages/automation/project/components/project-header/ProjectHeaderSettingsMenu';
 import ProjectHeaderTitle from '@/pages/automation/project/components/project-header/ProjectHeaderTitle';
 import ProjectHeaderWorkflowActionsButton from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowActionsButton';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
@@ -32,12 +34,12 @@ import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/proje
 import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
-import {useQueryClient} from '@tanstack/react-query';
+import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
+import {CircleIcon, LoaderCircleIcon} from 'lucide-react';
 import {RefObject, useCallback, useEffect, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
-
-import ProjectHeaderSettingsMenu from './ProjectHeaderSettingsMenu';
+import {twMerge} from 'tailwind-merge';
 
 const workflowTestApi = new WorkflowTestApi();
 
@@ -59,6 +61,7 @@ const ProjectHeader = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
+    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
     const {
         setShowBottomPanelOpen,
@@ -83,6 +86,10 @@ const ProjectHeader = ({
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project, !showDeleteProjectAlertDialog);
 
     const queryClient = useQueryClient();
+
+    const isFetching = useIsFetching();
+
+    const isOnline = onlineManager.isOnline();
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
         onSuccess: (projectWorkflowId) => {
@@ -274,11 +281,35 @@ const ProjectHeader = ({
 
                 <CopilotButton source={Source.WORKFLOW_EDITOR} />
 
+                <Tooltip>
+                    <TooltipTrigger className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover">
+                        {isOnline && isFetching ? (
+                            <LoaderCircleIcon className="size-3 animate-spin text-content-warning" />
+                        ) : (
+                            <CircleIcon
+                                className={twMerge(
+                                    'size-3 cursor-pointer fill-content-destructive text-content-destructive',
+                                    isOnline && !isFetching && 'fill-content-success text-content-success'
+                                )}
+                            />
+                        )}
+                    </TooltipTrigger>
+
+                    {isOnline ? (
+                        <TooltipContent>
+                            {!isFetching ? 'All changes are saved' : 'Saving your progress'}
+                        </TooltipContent>
+                    ) : (
+                        <TooltipContent>You are offline</TooltipContent>
+                    )}
+                </Tooltip>
+
                 <ProjectHeaderSettingsMenu
                     project={project}
                     setShowDeleteProjectAlertDialog={setShowDeleteProjectAlertDialog}
                     setShowDeleteWorkflowAlertDialog={setShowDeleteWorkflowAlertDialog}
                     setShowEditProjectDialog={setShowEditProjectDialog}
+                    setShowProjectVersionHistorySheet={setShowProjectVersionHistorySheet}
                     workflowId={workflow.id!}
                 />
 
@@ -317,6 +348,15 @@ const ProjectHeader = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showProjectVersionHistorySheet && (
+                <ProjectVersionHistorySheet
+                    onClose={() => {
+                        setShowProjectVersionHistorySheet(false);
+                    }}
+                    projectId={Number(project.id!)}
                 />
             )}
         </header>
