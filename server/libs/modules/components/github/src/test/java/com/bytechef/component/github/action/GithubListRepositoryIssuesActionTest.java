@@ -36,10 +36,10 @@ class GithubListRepositoryIssuesActionTest extends AbstractGithubActionTest {
     @Test
     void testPerform() {
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(responseList);
 
-        Object result = GithubGetIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = GithubListRepositoryIssuesAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responseMap, result);
+        assertEquals(responseList, result);
     }
 }

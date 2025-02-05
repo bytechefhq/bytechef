@@ -25,8 +25,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Marija Horvat
@@ -34,14 +36,19 @@ import org.junit.jupiter.api.Test;
 public class GithubListIssuesActionTest extends AbstractGithubActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILTER, "all", STATE, "all"));
+    private final ArgumentCaptor<Map<String, List<String>>> queryArgumentCaptor = ArgumentCaptor.forClass(Map.class);
 
     @Test
     void testPerform() {
+        when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseList);
 
         Object result = GithubListIssuesAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseList, result);
+
+        assertEquals(Map.of(FILTER, List.of("all"), STATE, List.of("all")), queryArgumentCaptor.getValue());
     }
 }
