@@ -17,17 +17,17 @@
 package com.bytechef.component.github.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.github.constant.GithubConstants.FILTER;
-import static com.bytechef.component.github.constant.GithubConstants.FILTER_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.STATE;
-import static com.bytechef.component.github.constant.GithubConstants.STATE_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
@@ -42,22 +42,45 @@ public class GithubListIssuesAction {
         .title("List Issues")
         .description("Retrieve issues assigned to the authenticated user across all accessible repositories")
         .properties(
-            FILTER_PROPERTY,
-            STATE_PROPERTY)
+            string(FILTER)
+                .label("Filter")
+                .description("Specifies the types of issues to return.")
+                .options(
+                    option("Assigned", "assigned", "Issues assigned to the authenticated user."),
+                    option("Created", "created", "Issues created by the authenticated user."),
+                    option("Mentioned", "mentioned", "Issues mentioning the authenticated user."),
+                    option("Subscribed", "subscribed",
+                        "Issues the authenticated user is subscribed to updates for."),
+                    option("Repos", "repos",
+                        "All issues from repositories that the authenticated user has explicit access to."),
+                    option("All", "all", "All issues related to the authenticated user."))
+                .defaultValue("assigned")
+                .required(true),
+            string(STATE)
+                .label("State")
+                .description("Indicates the state of the issues to return.")
+                .options(
+                    option("Open", "open", "Open issues."),
+                    option("Closed", "closed", "Closed issues."),
+                    option("All", "all", "All issues."))
+                .defaultValue("open")
+                .required(true))
         .output(outputSchema(ISSUE_OUTPUT_PROPERTY))
         .perform(GithubListIssuesAction::perform);
 
     private GithubListIssuesAction() {
     }
 
-    public static List<Map<String, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static List<Map<String, Object>> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.get(
-                "/issues?filter=" + inputParameters.getRequiredString(FILTER) + "&state=" +
-                    inputParameters.getRequiredString(STATE)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+        return actionContext
+            .http(http -> http.get("/issues"))
+            .queryParameters(
+                Map.of(
+                    FILTER, List.of(inputParameters.getRequiredString(FILTER)),
+                    STATE, List.of(inputParameters.getRequiredString(STATE))))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }
