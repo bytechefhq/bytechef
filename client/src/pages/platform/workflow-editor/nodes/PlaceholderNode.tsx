@@ -24,6 +24,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
             conditionId={data.conditionId}
             hideTriggerComponents
             key={`${id}-${nodeIndex}`}
+            loopId={data.loopId}
             nodeIndex={nodeIndex}
             sourceNodeId={id}
         >

@@ -11,6 +11,7 @@ import {DragEventHandler, useCallback, useEffect, useMemo} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import ConditionEdge from '../edges/ConditionEdge';
+import LoopDecorativeEdge from '../edges/LoopDecorativeEdge';
 import PlaceholderEdge from '../edges/PlaceholderEdge';
 import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
@@ -56,6 +57,7 @@ const WorkflowEditor = ({componentDefinitions, leftSidebarOpen, taskDispatcherDe
     const edgeTypes = useMemo(
         () => ({
             condition: ConditionEdge,
+            loopDecorative: LoopDecorativeEdge,
             placeholder: PlaceholderEdge,
             workflow: WorkflowEdge,
         }),

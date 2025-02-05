@@ -15,7 +15,8 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import createConditionNode from '../utils/createConditionNode';
-import getNextPlaceholderId from '../utils/getNextPlaceholderId';
+import createLoopNode from '../utils/createLoopNode';
+import {getNextConditionPlaceholderId, getNextLoopPlaceholderId} from '../utils/getNextPlaceholderId';
 
 const NODE_WIDTH = 240;
 const NODE_HEIGHT = 100;
@@ -151,6 +152,14 @@ export default function useLayout({
     let caseTrueTaskNames;
     let caseFalseTaskNames;
 
+    const loopChildTasks: {
+        [key: string]: {
+            iteratee: string[];
+        };
+    } = {};
+
+    let loopTaskNames;
+
     // Prepare auxiliary nodes
     taskNodes.forEach((taskNode) => {
         if (taskNode.data.componentName === 'condition') {
@@ -202,7 +211,7 @@ export default function useLayout({
 
             const sourcePlaceholderNode = allNodes[sourcePlaceholderIndex];
 
-            const belowPlaceholderNodeId = getNextPlaceholderId(sourcePlaceholderNode.id);
+            const belowPlaceholderNodeId = getNextConditionPlaceholderId(sourcePlaceholderNode.id);
 
             const belowPlaceholderNode = {
                 data: {conditionCase, conditionId, label: '+'},
@@ -234,11 +243,68 @@ export default function useLayout({
             return;
         }
 
+        if (taskNode.data.componentName === 'loop' && (taskNode.data as NodeDataType).parameters?.iteratee?.length) {
+            loopTaskNames = (taskNode.data as NodeDataType).parameters?.iteratee.map((task: WorkflowTask) => task.name);
+
+            loopChildTasks[taskNode.id] = {
+                iteratee: loopTaskNames,
+            };
+        }
+
+        const isLoopChildTask = Object.values(loopChildTasks).some((loopTasks) =>
+            loopTasks.iteratee.includes(taskNode.id)
+        );
+
+        // Handle Loop child placeholder nodes
+        if (isLoopChildTask) {
+            const loopId = Object.keys(loopChildTasks).find((key) =>
+                loopChildTasks[key].iteratee.includes(taskNode.id)
+            );
+
+            if (!loopId) {
+                return;
+            }
+
+            const index = loopChildTasks[loopId].iteratee.indexOf(taskNode.id);
+
+            const sourcePlaceholderIndex = allNodes.findIndex(
+                (node) => node.id === `${loopId}-loop-placeholder-${index}`
+            );
+
+            if (sourcePlaceholderIndex === -1) {
+                return;
+            }
+
+            const sourcePlaceholderNode = allNodes[sourcePlaceholderIndex];
+
+            const belowPlaceholderNodeId = getNextLoopPlaceholderId(sourcePlaceholderNode.id);
+
+            const belowPlaceholderNode = {
+                data: {label: '+', loopId},
+                id: belowPlaceholderNodeId,
+                position: {x: 0, y: 0},
+                type: 'placeholder',
+            };
+
+            const loopChildTaskNode = {
+                ...taskNode,
+                data: {...taskNode.data, loopData: {index, loopId}},
+            };
+
+            allNodes.splice(sourcePlaceholderIndex + 1, 0, loopChildTaskNode, belowPlaceholderNode);
+
+            return;
+        }
+
         allNodes.push(taskNode);
 
         // Create left, right, and bottom placeholder nodes when the task node is a Condition
         if (taskNode.data.componentName === 'condition') {
             allNodes = createConditionNode({allNodes, taskNode});
+        }
+
+        if (taskNode.data.componentName === 'loop') {
+            allNodes = createLoopNode({allNodes, taskNode});
         }
 
         const currentTaskNode = allNodes.find((node) => node.id === taskNode.id);
@@ -265,6 +331,11 @@ export default function useLayout({
     triggerAndTaskNodes.forEach((taskNode, index) => {
         const nextNode = triggerAndTaskNodes[index + 1];
 
+        const conditionRelatedTaskNode =
+            taskNode.data.conditionData || taskNode.data.conditionId || taskNode.id.includes('condition');
+
+        const loopRelatedTaskNode = taskNode.data.loopData || taskNode.data.loopId || taskNode.id.includes('loop');
+
         const parentConditionId = Object.keys(conditionChildTasks).find((key) => {
             const conditionCases = conditionChildTasks[key];
 
@@ -274,153 +345,214 @@ export default function useLayout({
             );
         });
 
-        // Create initial edges for the Condition node
-        if (taskNode.data.componentName === 'condition') {
-            const leftPlaceholderEdge = {
-                id: `${taskNode.id}=>${taskNode.id}-left-placeholder-0`,
-                source: taskNode.id,
-                target: `${taskNode.id}-left-placeholder-0`,
-                type: 'condition',
-            };
+        if (conditionRelatedTaskNode) {
+            // Create initial edges for the Condition node
+            if (taskNode.data.componentName === 'condition') {
+                const leftPlaceholderEdge = {
+                    id: `${taskNode.id}=>${taskNode.id}-left-placeholder-0`,
+                    source: taskNode.id,
+                    target: `${taskNode.id}-left-placeholder-0`,
+                    type: 'condition',
+                };
 
-            const rightPlaceholderEdge = {
-                id: `${taskNode.id}=>${taskNode.id}-right-placeholder-0`,
-                source: taskNode.id,
-                target: `${taskNode.id}-right-placeholder-0`,
-                type: 'condition',
-            };
+                const rightPlaceholderEdge = {
+                    id: `${taskNode.id}=>${taskNode.id}-right-placeholder-0`,
+                    source: taskNode.id,
+                    target: `${taskNode.id}-right-placeholder-0`,
+                    type: 'condition',
+                };
 
-            taskEdges.push(leftPlaceholderEdge, rightPlaceholderEdge);
+                taskEdges.push(leftPlaceholderEdge, rightPlaceholderEdge);
 
-            return;
-        }
-
-        // Create the bottom Condition edge
-        if (
-            taskNode.id.includes('placeholder') &&
-            !taskNode.id.includes('bottom') &&
-            taskNode.data.conditionData &&
-            !taskNode.id.includes('condition')
-        ) {
-            const parentConditionTaskId = taskNode.id.split('-')[0];
-
-            taskEdges.push({
-                id: `${taskNode.id}=>${parentConditionTaskId}-bottom-placeholder`,
-                source: taskNode.id,
-                style: EDGE_STYLES,
-                target: `${parentConditionTaskId}-bottom-placeholder`,
-                type: 'smoothstep',
-            });
-
-            return;
-        }
-
-        // Create the edge for the Condition child placeholder node
-        if (taskNode.id.includes('placeholder') && !taskNode.id.includes('bottom') && parentConditionId) {
-            const nextPlaceholderNode = triggerAndTaskNodes
-                .slice(index + 1)
-                .find((node) => node.id.includes('placeholder') && node.data.conditionId === parentConditionId);
-
-            if (!nextPlaceholderNode) {
                 return;
             }
 
-            const placeholderNodeConditionCase = taskNode.id.includes('left')
-                ? CONDITION_CASE_TRUE
-                : CONDITION_CASE_FALSE;
+            // Create the bottom Condition edge
+            if (
+                taskNode.data.conditionData &&
+                taskNode.id.includes('placeholder') &&
+                !taskNode.id.includes('bottom') &&
+                !taskNode.id.includes('condition')
+            ) {
+                const parentConditionTaskId = taskNode.id.split('-')[0];
 
-            const nextTaskNode = triggerAndTaskNodes
-                .slice(index + 1)
-                .find(
-                    (node) =>
-                        !node.id.includes('placeholder') &&
-                        (node.data as NodeDataType).conditionData?.conditionCase === placeholderNodeConditionCase
+                taskEdges.push({
+                    id: `${taskNode.id}=>${parentConditionTaskId}-bottom-placeholder`,
+                    source: taskNode.id,
+                    style: EDGE_STYLES,
+                    target: `${parentConditionTaskId}-bottom-placeholder`,
+                    type: 'smoothstep',
+                });
+
+                return;
+            }
+
+            // Create the edge for the nested Condition child placeholder nodes
+            if (taskNode.id.includes('placeholder') && !taskNode.id.includes('bottom') && parentConditionId) {
+                const nextPlaceholderNode = triggerAndTaskNodes
+                    .slice(index + 1)
+                    .find((node) => node.id.includes('placeholder') && node.data.conditionId === parentConditionId);
+
+                if (!nextPlaceholderNode) {
+                    return;
+                }
+
+                const placeholderNodeConditionCase = taskNode.id.includes('left')
+                    ? CONDITION_CASE_TRUE
+                    : CONDITION_CASE_FALSE;
+
+                const nextTaskNode = triggerAndTaskNodes
+                    .slice(index + 1)
+                    .find(
+                        (node) =>
+                            !node.id.includes('placeholder') &&
+                            (node.data as NodeDataType).conditionData?.conditionCase === placeholderNodeConditionCase
+                    );
+
+                if (
+                    nextTaskNode &&
+                    (nextTaskNode.data as NodeDataType).conditionData?.conditionId === taskNode.data.conditionId
+                ) {
+                    taskEdges.push({
+                        id: `${taskNode.id}=>${nextTaskNode.id}`,
+                        source: taskNode.id,
+                        style: EDGE_STYLES,
+                        target: nextTaskNode.id,
+                        type: 'smoothstep',
+                    });
+
+                    return;
+                }
+
+                const edgeExists = taskEdges.some(
+                    (edge) => edge.source === taskNode.id && edge.target === nextPlaceholderNode.id
                 );
 
-            if (
-                nextTaskNode &&
-                (nextTaskNode.data as NodeDataType).conditionData?.conditionId === taskNode.data.conditionId
-            ) {
-                taskEdges.push({
-                    id: `${taskNode.id}=>${nextTaskNode.id}`,
-                    source: taskNode.id,
-                    style: EDGE_STYLES,
-                    target: nextTaskNode.id,
-                    type: 'smoothstep',
-                });
+                if (!edgeExists) {
+                    taskEdges.push({
+                        id: `${taskNode.id}=>${nextPlaceholderNode.id}`,
+                        source: taskNode.id,
+                        style: EDGE_STYLES,
+                        target: nextPlaceholderNode.id,
+                        type: 'smoothstep',
+                    });
+                }
 
                 return;
             }
 
-            const edgeExists = taskEdges.some(
-                (edge) => edge.source === taskNode.id && edge.target === nextPlaceholderNode.id
-            );
+            // Create edges for the Condition child node
+            if (taskNode.data.conditionData && !taskNode.id.includes('placeholder')) {
+                const {conditionCase, conditionId, index} = (taskNode.data as NodeDataType).conditionData!;
 
-            if (!edgeExists) {
-                taskEdges.push({
-                    id: `${taskNode.id}=>${nextPlaceholderNode.id}`,
+                const sourcePlaceholderId = `${conditionId}-${
+                    conditionCase === CONDITION_CASE_TRUE ? 'left' : 'right'
+                }-placeholder-${index}`;
+
+                const targetPlaceholderId = getNextConditionPlaceholderId(sourcePlaceholderId);
+
+                const edgeFromSourceNodeToTaskNode = {
+                    id: `${sourcePlaceholderId}=>${taskNode.id}`,
+                    source: sourcePlaceholderId,
+                    style: EDGE_STYLES,
+                    target: taskNode.id,
+                    type: 'smoothstep',
+                };
+
+                const edgeFromTaskNodeToTargetNode = {
+                    id: `${taskNode.id}=>${targetPlaceholderId}`,
                     source: taskNode.id,
                     style: EDGE_STYLES,
-                    target: nextPlaceholderNode.id,
+                    target: targetPlaceholderId,
                     type: 'smoothstep',
-                });
-            }
+                };
 
-            return;
+                taskEdges.pop();
+
+                taskEdges.push(edgeFromSourceNodeToTaskNode, edgeFromTaskNodeToTargetNode);
+
+                return;
+            }
         }
 
-        // Create edges for the Condition child node
-        if (taskNode.data.conditionData && !taskNode.id.includes('placeholder')) {
-            const {conditionCase, conditionId, index} = (taskNode.data as NodeDataType).conditionData!;
+        if (loopRelatedTaskNode) {
+            // Create initial edges for the Loop node
+            if (taskNode.data.componentName === 'loop') {
+                const loopPlaceholderEdge = {
+                    id: `${taskNode.id}=>${taskNode.id}-loop-placeholder-0`,
+                    source: taskNode.id,
+                    target: `${taskNode.id}-loop-placeholder-0`,
+                    type: 'condition',
+                };
 
-            const sourcePlaceholderId = `${conditionId}-${
-                conditionCase === CONDITION_CASE_TRUE ? 'left' : 'right'
-            }-placeholder-${index}`;
+                const decorativeEdge = {
+                    id: `${taskNode.id}=>${taskNode.id}-loop-bottom-placeholder`,
+                    source: taskNode.id,
+                    target: `${taskNode.id}-loop-bottom-placeholder`,
+                    type: 'loopDecorative',
+                };
 
-            const targetPlaceholderId = getNextPlaceholderId(sourcePlaceholderId);
+                taskEdges.push(decorativeEdge, loopPlaceholderEdge);
 
-            const edgeFromSourceNodeToTaskNode = {
-                id: `${sourcePlaceholderId}=>${taskNode.id}`,
-                source: sourcePlaceholderId,
-                style: EDGE_STYLES,
-                target: taskNode.id,
-                type: 'smoothstep',
-            };
+                return;
+            }
 
-            const edgeFromTaskNodeToTargetNode = {
-                id: `${taskNode.id}=>${targetPlaceholderId}`,
-                source: taskNode.id,
-                style: EDGE_STYLES,
-                target: targetPlaceholderId,
-                type: 'smoothstep',
-            };
+            // Create edges for the Loop child node
+            if (taskNode.data.loopData && !taskNode.id.includes('placeholder')) {
+                const {index, loopId} = (taskNode.data as NodeDataType).loopData!;
 
-            taskEdges.pop();
+                const sourcePlaceholderId = `${loopId}-loop-placeholder-${index}`;
 
-            taskEdges.push(edgeFromSourceNodeToTaskNode, edgeFromTaskNodeToTargetNode);
+                const targetPlaceholderId = getNextLoopPlaceholderId(sourcePlaceholderId);
 
-            return;
+                const edgeFromTaskNodeToTargetNode = {
+                    id: `${taskNode.id}=>${targetPlaceholderId}`,
+                    source: taskNode.id,
+                    style: EDGE_STYLES,
+                    target: targetPlaceholderId,
+                    type: 'smoothstep',
+                };
+
+                taskEdges.push(edgeFromTaskNodeToTargetNode);
+
+                return;
+            }
         }
 
         if (nextNode) {
-            const nextSideNode = triggerAndTaskNodes.find((node) => node.id === getNextPlaceholderId(taskNode.id));
+            if (conditionRelatedTaskNode) {
+                const nextSidePlaceholderNode = triggerAndTaskNodes.find(
+                    (node) => node.id === getNextConditionPlaceholderId(taskNode.id)
+                );
 
-            if (!nextSideNode) {
-                taskEdges.push({
-                    id: `${taskNode.id}=>${taskNode.data.conditionId}-bottom-placeholder`,
-                    source: taskNode.id,
-                    style: EDGE_STYLES,
-                    target: `${taskNode.data.conditionId}-bottom-placeholder`,
-                    type: 'smoothstep',
-                });
+                if (!nextSidePlaceholderNode) {
+                    taskEdges.push({
+                        id: `${taskNode.id}=>${taskNode.data.conditionId}-bottom-placeholder`,
+                        source: taskNode.id,
+                        style: EDGE_STYLES,
+                        target: `${taskNode.data.conditionId}-bottom-placeholder`,
+                        type: 'smoothstep',
+                    });
+                }
+
+                if (taskNode.data.conditionId && taskNode.data.conditionId === nextNode.data.conditionId) {
+                    const placeholderIndex = parseInt(taskNode.id.split('-').pop() || '0', 10);
+                    const nextNodePlaceholderIndex = parseInt(nextNode.id.split('-').pop() || '0', 10);
+
+                    if (placeholderIndex + 1 !== nextNodePlaceholderIndex) {
+                        return;
+                    }
+                }
             }
 
-            if (taskNode.data.conditionId && taskNode.data.conditionId === nextNode.data.conditionId) {
-                const placeholderIndex = parseInt(taskNode.id.split('-').pop() || '0', 10);
-                const nextNodePlaceholderIndex = parseInt(nextNode.id.split('-').pop() || '0', 10);
+            if (loopRelatedTaskNode) {
+                if (taskNode.data.loopId && taskNode.data.loopId === nextNode.data.loopId) {
+                    const placeholderIndex = parseInt(taskNode.id.split('-').pop() || '0', 10);
+                    const nextNodePlaceholderIndex = parseInt(nextNode.id.split('-').pop() || '0', 10);
 
-                if (placeholderIndex + 1 !== nextNodePlaceholderIndex) {
-                    return;
+                    if (placeholderIndex + 1 !== nextNodePlaceholderIndex) {
+                        return;
+                    }
                 }
             }
 
@@ -458,22 +590,28 @@ export default function useLayout({
         layoutNodes.forEach((node, index) => {
             let height = NODE_HEIGHT;
 
-            if (node.id.includes('placeholder')) {
-                height = PLACEHOLDER_NODE_HEIGHT * 2;
+            if (node.id.includes('condition')) {
+                if (node.id.includes('placeholder')) {
+                    height = PLACEHOLDER_NODE_HEIGHT * 2;
 
-                if (node.id.includes('placeholder-0')) {
-                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
+                    if (node.id.includes('placeholder-0')) {
+                        const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
 
-                    if (hasOtherConditionCaseNodes.length) {
-                        height = 0;
+                        if (hasOtherConditionCaseNodes.length) {
+                            height = 0;
+                        } else {
+                            height = PLACEHOLDER_NODE_HEIGHT * 2;
+                        }
                     } else {
-                        height = PLACEHOLDER_NODE_HEIGHT * 2;
+                        height = PLACEHOLDER_NODE_HEIGHT;
                     }
-                } else {
-                    height = PLACEHOLDER_NODE_HEIGHT;
-                }
 
-                if (node.id.includes('bottom')) {
+                    if (node.id.includes('bottom')) {
+                        height = PLACEHOLDER_NODE_HEIGHT;
+                    }
+                }
+            } else if (node.id.includes('loop')) {
+                if (node.id.includes('placeholder')) {
                     height = PLACEHOLDER_NODE_HEIGHT;
                 }
             } else if (!node.data.conditionData) {
@@ -501,21 +639,33 @@ export default function useLayout({
 
         layoutNodes = layoutNodes.map((node) => {
             let positionY = dagreGraph.node(node.id).y;
+            let positionX = dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(nodes[0].id).x - 72 / 2);
 
-            if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
-                const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
+            if (node.id.includes('condition')) {
+                if (node.id.includes('placeholder-0') && !node.id.includes('bottom')) {
+                    const hasOtherConditionCaseNodes = filterConditionCaseNodes(layoutNodes, node);
 
-                if (hasOtherConditionCaseNodes.length) {
+                    if (hasOtherConditionCaseNodes.length) {
+                        positionY += 35;
+                    }
+                } else if (node.id.includes('bottom-placeholder')) {
                     positionY += 35;
                 }
-            } else if (node.id.includes('bottom-placeholder')) {
+            }
+
+            if (node.data.loopId || node.data.loopData) {
+                positionX += 150;
+                positionY += 35;
+            }
+
+            if (node.id.includes('loop-bottom-placeholder')) {
                 positionY += 35;
             }
 
             return {
                 ...node,
                 position: {
-                    x: dagreGraph.node(node.id).x + (canvasWidth / 2 - dagreGraph.node(layoutNodes[0].id).x - 72 / 2),
+                    x: positionX,
                     y: positionY,
                 },
             };

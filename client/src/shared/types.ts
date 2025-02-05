@@ -125,6 +125,11 @@ export type NodeDataType = {
     };
     icon?: JSX.Element | ReactNode | string;
     label?: string;
+    loopData?: {
+        index: number;
+        loopId: string;
+    };
+    loopId?: string;
     metadata?: {
         ui?: {
             dynamicPropertyTypes?: {[key: string]: string};

@@ -16,12 +16,14 @@ import getFormattedName from '../utils/getFormattedName';
 import getParametersWithDefaultValues from '../utils/getParametersWithDefaultValues';
 import handleComponentAddedSuccess from '../utils/handleComponentAddedSuccess';
 import handleConditionChildOperationClick from '../utils/handleConditionChildOperationClick';
+import handleLoopChildOperationClick from '../utils/handleLoopChildOperationClick';
 import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 
 interface WorkflowNodesPopoverMenuOperationListProps {
     componentDefinition: ComponentDefinition;
     conditionId?: string;
     edge?: boolean;
+    loopId?: string;
     setPopoverOpen: (open: boolean) => void;
     sourceNodeId: string;
     trigger?: boolean;
@@ -31,6 +33,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
     componentDefinition,
     conditionId,
     edge,
+    loopId,
     setPopoverOpen,
     sourceNodeId,
     trigger,
@@ -185,7 +188,23 @@ const WorkflowNodesPopoverMenuOperationList = ({
                     updateWorkflowMutation,
                 });
             } else {
-                if (conditionId) {
+                if (loopId) {
+                    handleLoopChildOperationClick({
+                        loopId,
+                        operation: clickedOperation,
+                        operationDefinition: clickedComponentActionDefinition,
+                        placeholderId: sourceNodeId,
+                        queryClient,
+                        updateWorkflowMutation,
+                        workflow,
+                    });
+
+                    setPopoverOpen(false);
+
+                    captureComponentUsed(componentName, operationName, undefined);
+
+                    return;
+                } else if (conditionId) {
                     handleConditionChildOperationClick({
                         conditionId,
                         operation: clickedOperation,
