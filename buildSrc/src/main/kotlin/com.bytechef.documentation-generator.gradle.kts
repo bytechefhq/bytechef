@@ -1,4 +1,3 @@
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
 
@@ -28,13 +27,13 @@ open class FindJsonFilesTask : DefaultTask() {
         private fun getFullTypeObject(): String? {
             val sb = StringBuilder()
             sb.append("{")
-            if(properties!=null) {
+            if (properties != null) {
                 for (proprety: Properties in properties!!) {
                     sb.append(proprety.getFullType(proprety.type))
-                    if(proprety.name!=null) sb.append("\\").append("(${proprety.name})")
+                    if (proprety.name != null) sb.append("\\").append("(${proprety.name})")
                     sb.append(", ")
                 }
-                if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
+                if (sb.length > 2) sb.replace(sb.length - 2, sb.length, "")
             }
 //            if(sb.length>2)
             return sb.append("}").toString()
@@ -43,21 +42,21 @@ open class FindJsonFilesTask : DefaultTask() {
         private fun getFullTypeArray(): String? {
             val sb = StringBuilder()
             sb.append("[")
-            if(items!=null) {
+            if (items != null) {
                 for (proprety: Properties in items!!) {
                     sb.append(proprety.getFullType(proprety.type))
-                    if(proprety.name!=null) sb.append("\\").append("($${proprety.name})")
+                    if (proprety.name != null) sb.append("\\").append("($${proprety.name})")
                     sb.append(", ")
                 }
-                if(sb.length>2) sb.replace(sb.length-2, sb.length, "")
+                if (sb.length > 2) sb.replace(sb.length - 2, sb.length, "")
             }
             return sb.append("]").toString()
         }
 
-        private fun getFullType(type:String?): String? {
-            return if(type.equals("OBJECT")){
+        private fun getFullType(type: String?): String? {
+            return if (type.equals("OBJECT")) {
                 getFullTypeObject()
-            } else if(type.equals("ARRAY")){
+            } else if (type.equals("ARRAY")) {
                 getFullTypeArray()
             } else type;
         }
@@ -89,7 +88,7 @@ open class FindJsonFilesTask : DefaultTask() {
 |:------------:|:------------:|:--------------------:|
 ${properties?.joinToString("\n")}
 """
-            } else if(items != null){
+            } else if (items != null) {
                 """
 #### Properties
 
@@ -116,7 +115,7 @@ ${getPropertiesString()}
         var sampleOutput: Any? = null
 
         private fun getSampleOutputString(): String {
-            if(sampleOutput==null) return ""
+            if (sampleOutput == null) return ""
 
             return """
 ___Sample Output:___
@@ -142,7 +141,7 @@ $outputSchema
 //        var output: Any? = null
 
         private fun getOutputString(): String {
-            return if(outputResponse!=null) "$outputResponse"
+            return if (outputResponse != null) "$outputResponse"
             else return ""
         }
 
@@ -280,7 +279,7 @@ ${authorizations?.joinToString("\n")}
         var version: Int? = null
 
         private fun getCategoriesString(): String {
-            if(categories==null) {
+            if (categories == null) {
                 return ""
             }
 
@@ -290,7 +289,7 @@ Categories: ${categories?.joinToString(", ")}
         }
 
         private fun getConnectionString(): String {
-            if(connection==null) {
+            if (connection == null) {
                 return ""
             }
 
@@ -302,7 +301,7 @@ $connection
         }
 
         private fun getTriggerString(): String {
-            if(triggers==null) {
+            if (triggers == null) {
                 return ""
             }
 
@@ -316,7 +315,7 @@ ${triggers?.joinToString("\n")}
         }
 
         private fun getActionsString(): String {
-            if(actions==null) {
+            if (actions == null) {
                 return ""
             }
 
@@ -362,7 +361,7 @@ ${getTriggerString()}
             val jsonFile = File("$currentPath/src/test/resources/definition/${name}_v1.json")
             val readmeFile = File("$currentPath/src/main/resources/README.md")
 
-            if(jsonFile.exists()){
+            if (jsonFile.exists()) {
                 val mapper = ObjectMapper()
                 val jsonObject = mapper.readValue(jsonFile.readText(), Component::class.java)
                 val json = jsonObject.toString()
