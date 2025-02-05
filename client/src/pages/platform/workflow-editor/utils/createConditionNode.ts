@@ -1,5 +1,5 @@
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
-import {Node} from 'reactflow';
+import {Node} from '@xyflow/react';
 
 export default function createConditionNode({
     allNodes,

@@ -52,18 +52,18 @@ function renderApp() {
     const router = getRouter(queryClient);
 
     root.render(
-        <React.StrictMode>
-            <ThemeProvider defaultTheme="light">
-                <QueryClientProvider client={queryClient}>
-                    <PostHogProvider client={posthog}>
-                        <TooltipProvider>
-                            <RouterProvider router={router} />
-                        </TooltipProvider>
-                    </PostHogProvider>
+        // <React.StrictMode>
+        <ThemeProvider defaultTheme="light">
+            <QueryClientProvider client={queryClient}>
+                <PostHogProvider client={posthog}>
+                    <TooltipProvider>
+                        <RouterProvider router={router} />
+                    </TooltipProvider>
+                </PostHogProvider>
 
-                    <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
-                </QueryClientProvider>
-            </ThemeProvider>
-        </React.StrictMode>
+                <ReactQueryDevtools buttonPosition="bottom-right" initialIsOpen={false} />
+            </QueryClientProvider>
+        </ThemeProvider>
+        // </React.StrictMode>
     );
 }

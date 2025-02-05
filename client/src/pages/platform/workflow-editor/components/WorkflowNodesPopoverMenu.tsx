@@ -9,6 +9,7 @@ import {twMerge} from 'tailwind-merge';
 import {useWorkflowMutation} from '../providers/workflowMutationProvider';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import handleConditionClick from '../utils/handleConditionClick';
+import handleLoopClick from '../utils/handleLoopClick';
 import WorkflowNodesPopoverMenuComponentList from './WorkflowNodesPopoverMenuComponentList';
 import WorkflowNodesPopoverMenuOperationList from './WorkflowNodesPopoverMenuOperationList';
 
@@ -18,6 +19,7 @@ interface WorkflowNodesPopoverMenuProps extends PropsWithChildren {
     hideActionComponents?: boolean;
     hideTriggerComponents?: boolean;
     hideTaskDispatchers?: boolean;
+    loopId?: string;
     nodeIndex?: number;
     sourceNodeId: string;
 }
@@ -29,6 +31,7 @@ const WorkflowNodesPopoverMenu = ({
     hideActionComponents = false,
     hideTaskDispatchers = false,
     hideTriggerComponents = false,
+    loopId,
     nodeIndex,
     sourceNodeId,
 }: WorkflowNodesPopoverMenuProps) => {
@@ -54,15 +57,26 @@ const WorkflowNodesPopoverMenu = ({
 
     const handleComponentClick = useCallback(
         async (clickedItem: ClickedDefinitionType) => {
-            if (clickedItem.name.includes('condition')) {
-                await handleConditionClick({
-                    clickedItem,
-                    edge,
-                    queryClient,
-                    sourceNodeId,
-                    updateWorkflowMutation,
-                    workflow,
-                });
+            if (clickedItem.taskDispatcher) {
+                if (clickedItem.name.includes('condition')) {
+                    await handleConditionClick({
+                        clickedItem,
+                        edge,
+                        queryClient,
+                        sourceNodeId,
+                        updateWorkflowMutation,
+                        workflow,
+                    });
+                } else if (clickedItem.name.includes('loop')) {
+                    await handleLoopClick({
+                        clickedItem,
+                        edge,
+                        queryClient,
+                        sourceNodeId,
+                        updateWorkflowMutation,
+                        workflow,
+                    });
+                }
 
                 setPopoverOpen(false);
 
@@ -153,6 +167,7 @@ const WorkflowNodesPopoverMenu = ({
                             componentDefinition={componentDefinitionToBeAdded}
                             conditionId={conditionId}
                             edge={edge}
+                            loopId={loopId}
                             setPopoverOpen={setPopoverOpen}
                             sourceNodeId={sourceNodeId}
                             trigger={trigger}
