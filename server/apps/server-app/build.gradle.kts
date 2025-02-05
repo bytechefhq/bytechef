@@ -169,6 +169,7 @@ dependencies {
     implementation(project(":server:libs:modules:components:google:google-mail"))
     implementation(project(":server:libs:modules:components:google:google-sheets"))
     implementation(project(":server:libs:modules:components:google:google-slides"))
+    implementation(project(":server:libs:modules:components:google:google-tasks"))
     implementation(project(":server:libs:modules:components:http-client"))
     implementation(project(":server:libs:modules:components:hubspot"))
     implementation(project(":server:libs:modules:components:image-helper"))
