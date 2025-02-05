@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.github.constant.GithubConstants.ISSUE_OUTPUT_PROPERTY;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static com.bytechef.component.github.util.GithubUtils.getOwnerName;
 
@@ -40,26 +41,27 @@ import java.util.Map;
 public class GithubListRepositoryIssuesAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listRepositoryIssues")
-        .title("List Issues")
-        .description("Get list of issues from the repository")
+        .title("List Repository Issues")
+        .description("Lists issues in a repository. Only open issues will be listed.")
         .properties(
             string(REPOSITORY)
                 .label("Repository")
                 .options((ActionOptionsFunction<String>) GithubUtils::getRepositoryOptions)
                 .description("The name of the repository")
                 .required(true))
-        .output(outputSchema(array()))
+        .output(outputSchema(array().items(ISSUE_OUTPUT_PROPERTY)))
         .perform(GithubListRepositoryIssuesAction::perform);
 
     private GithubListRepositoryIssuesAction() {
     }
 
-    public static List<Map<String, Object>> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static List<Map<String, Object>> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
+        return actionContext
             .http(http -> http.get(
-                "/repos/" + getOwnerName(context) + "/" + inputParameters.getRequiredString(REPOSITORY) + "/issues"))
+                "/repos/" + getOwnerName(actionContext) + "/" + inputParameters.getRequiredString(REPOSITORY) +
+                    "/issues"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
