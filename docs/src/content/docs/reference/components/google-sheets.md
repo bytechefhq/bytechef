@@ -219,6 +219,36 @@ Append a row of values to an existing sheet.
 
 
 
+### List Sheets
+Get all sheets from the spreadsheet.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| spreadsheetId | Spreadsheet ID | STRING | SELECT  |  The ID of the spreadsheet to apply the updates to.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| spreadsheetId | STRING | TEXT  |
+| sheetId | INTEGER | INTEGER  |
+| sheetName | STRING | TEXT  |
+
+
+
+
+
+
 ### Update Row
 Overwrite values in an existing row.
 

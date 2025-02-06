@@ -222,7 +222,7 @@ Type: OBJECT
 
 
 ### List Issues
-Retrieve issues assigned to the authenticated user across all accessible repositories
+Retrieve issues assigned to the authenticated user across all accessible repositories.
 
 #### Properties
 
@@ -236,30 +236,22 @@ Retrieve issues assigned to the authenticated user across all accessible reposit
 
 
 
-Type: OBJECT
+Type: ARRAY
 
 
 #### Properties
 
 |     Name     |     Type     |     Control Type     |
 |:------------:|:------------:|:--------------------:|
-| url | STRING | TEXT  |
-| repository_url | STRING | TEXT  |
-| id | NUMBER | NUMBER  |
-| number | INTEGER | INTEGER  |
-| title | STRING | TEXT  |
-| state | STRING | TEXT  |
-| assignees | [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}] | ARRAY_BUILDER  |
-| labels | [{STRING\(id), STRING\(name), STRING\(description)}] | ARRAY_BUILDER  |
-| body | STRING | TEXT  |
+|  | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} | OBJECT_BUILDER  |
 
 
 
 
 
 
-### List Issues
-Get list of issues from the repository
+### List Repository Issues
+Lists issues in a repository. Only open issues will be listed.
 
 #### Properties
 
@@ -274,6 +266,12 @@ Get list of issues from the repository
 
 Type: ARRAY
 
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+|  | {STRING\(url), STRING\(repository_url), NUMBER\(id), INTEGER\(number), STRING\(title), STRING\(state), [{STRING\(login), STRING\(id), STRING\(html_url), STRING\(type)}]\(assignees), [{STRING\(id), STRING\(name), STRING\(description)}]\(labels), STRING\(body)} | OBJECT_BUILDER  |
 
 
 
@@ -373,8 +371,12 @@ Type: OBJECT
 # Additional instructions
 <hr />
 
-## CONNECTION
+## Connection Setup
 
-[Setting up OAuth2](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app)
+[Setting up OAuth2](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app) This link provides a comprehensive guide on how to create and configure an OAuth app on GitHub.
 
-<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)"><iframe src="https://www.guidejar.com/embed/056201df-2b7a-45c7-9691-3aad03b82487?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe></div>
+For a visual walkthrough, refer to the embedded video tutorial below. It offers a step-by-step demonstration of the OAuth2 setup process, making it easier to follow along and implement.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/bhsAUb5TGIexsFuLBica?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
