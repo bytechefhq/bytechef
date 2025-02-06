@@ -297,10 +297,7 @@ const ProjectHeader = ({
 
                     <TooltipContent>
                         {isOnline ? (
-                            <>
-                                {!isFetching && 'All changes are saved'}
-                                {!!isFetching && 'Saving your progress'}
-                            </>
+                            <>{!isFetching ? 'All changes are saved' : 'Saving your progress'}</>
                         ) : (
                             'You are offline'
                         )}

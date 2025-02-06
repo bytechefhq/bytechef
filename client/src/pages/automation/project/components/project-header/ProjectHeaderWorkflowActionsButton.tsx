@@ -49,7 +49,9 @@ const ProjectHeaderWorkflowActionsButton = ({
                 {!runDisabled ? (
                     <>
                         {workflowIsRunning && 'Stop the current workflow'}
+
                         {!workflowIsRunning && chatTrigger && 'Start the chat'}
+
                         {!workflowIsRunning && !chatTrigger && 'Run the current workflow'}
                     </>
                 ) : (
