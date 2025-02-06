@@ -84,28 +84,12 @@ class GoogleSheetsListSheetsActionTest {
             List<SheetRecord> result = GoogleSheetsListSheetsAction.perform(
                 parameters, parameters, mockedContext);
 
-            assertEquals(3, result.size());
+            List<SheetRecord> expectedSheetRecords = List.of(
+                new SheetRecord("spreadsheetId", 1, "sheetName1", null),
+                new SheetRecord("spreadsheetId", 2, "sheetName2", null),
+                new SheetRecord("spreadsheetId", 3, "sheetName3", null));
 
-            assertEquals("spreadsheetId", result.getFirst()
-                .spreadsheetId());
-            assertEquals(1, result.getFirst()
-                .sheetId());
-            assertEquals("sheetName1", result.getFirst()
-                .sheetName());
-
-            assertEquals("spreadsheetId", result.get(1)
-                .spreadsheetId());
-            assertEquals(2, result.get(1)
-                .sheetId());
-            assertEquals("sheetName2", result.get(1)
-                .sheetName());
-
-            assertEquals("spreadsheetId", result.get(2)
-                .spreadsheetId());
-            assertEquals(3, result.get(2)
-                .sheetId());
-            assertEquals("sheetName3", result.get(2)
-                .sheetName());
+            assertEquals(expectedSheetRecords, result);
         }
     }
 }

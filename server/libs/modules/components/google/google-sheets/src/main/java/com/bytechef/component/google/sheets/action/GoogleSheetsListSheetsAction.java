@@ -35,7 +35,6 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.SheetProperties;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -47,8 +46,7 @@ public class GoogleSheetsListSheetsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("listSheets")
         .title("List Sheets")
         .description("Get all sheets from the spreadsheet.")
-        .properties(
-            SPREADSHEET_ID_PROPERTY)
+        .properties(SPREADSHEET_ID_PROPERTY)
         .output(
             outputSchema(
                 object()
@@ -69,25 +67,18 @@ public class GoogleSheetsListSheetsAction {
         return getSheetsListResponse(sheets, inputParameters.getRequiredString(SPREADSHEET_ID));
     }
 
-    private static List<SheetRecord> getSheetsListResponse(
-        Sheets sheets, String spreadsheetId) throws IOException {
-
-        List<SheetRecord> sheetsList = new ArrayList<>();
-
+    private static List<SheetRecord> getSheetsListResponse(Sheets sheets, String spreadsheetId) throws IOException {
         Collection<Sheet> spreadsheetData = sheets.spreadsheets()
             .get(spreadsheetId)
             .execute()
             .getSheets();
 
-        for (Sheet sheet : spreadsheetData) {
-            SheetProperties sheetProperties = sheet.getProperties();
+        return spreadsheetData.stream()
+            .map(sheet -> {
+                SheetProperties sheetProperties = sheet.getProperties();
 
-            SheetRecord sheetRecord = new SheetRecord(
-                spreadsheetId, sheetProperties.getSheetId(), sheetProperties.getTitle(), null);
-
-            sheetsList.add(sheetRecord);
-        }
-
-        return sheetsList;
+                return new SheetRecord(spreadsheetId, sheetProperties.getSheetId(), sheetProperties.getTitle(), null);
+            })
+            .toList();
     }
 }
