@@ -295,13 +295,16 @@ const ProjectHeader = ({
                         )}
                     </TooltipTrigger>
 
-                    {isOnline ? (
-                        <TooltipContent>
-                            {!isFetching ? 'All changes are saved' : 'Saving your progress'}
-                        </TooltipContent>
-                    ) : (
-                        <TooltipContent>You are offline</TooltipContent>
-                    )}
+                    <TooltipContent>
+                        {isOnline ? (
+                            <>
+                                {!isFetching && 'All changes are saved'}
+                                {!!isFetching && 'Saving your progress'}
+                            </>
+                        ) : (
+                            'You are offline'
+                        )}
+                    </TooltipContent>
                 </Tooltip>
 
                 <ProjectHeaderSettingsMenu
