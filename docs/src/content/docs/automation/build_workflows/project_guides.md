@@ -6,7 +6,7 @@ description: "Learn how to create, manage, and organize projects within ByteChef
 Every project on ByteChef consists of one or more workflows. Projects help organize and manage workflows, making it
 easier to group related automation processes together.
 
-## Creating a Project
+## Create Project
 
 1. Navigate to the **Projects** tab.
 2. Click on the **New Project** button located in the top right corner.
@@ -17,7 +17,7 @@ easier to group related automation processes together.
 <iframe src="https://www.guidejar.com/embed/yvaNwrCiff9yL75oxQcS?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
-## Editing a Project
+## Edit Project
 
 1. Locate the project you wish to edit and click on the three dots next to its name.
 2. Select **Edit** from the dropdown menu.
@@ -28,7 +28,7 @@ easier to group related automation processes together.
 <iframe src="https://www.guidejar.com/embed/4q7V8ueUNR3AwCr19p3K?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
-## Duplicating a Project
+## Duplicate Project
 
 1. Find the project you want to duplicate and click on the three dots next to its name.
 2. Select **Duplicate** from the dropdown menu.
@@ -39,7 +39,7 @@ easier to group related automation processes together.
 <iframe src="https://www.guidejar.com/embed/4bAqjD5y9nSX4SC9lSWd?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
-## Creating a Workflow
+## Create Workflow
 
 1. Click on the three dots next to the project name where you want to add a workflow.
 2. Select **New Workflow** from the dropdown menu.
