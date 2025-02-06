@@ -8,6 +8,7 @@ import {QueryClient, UseMutationResult} from '@tanstack/react-query';
 import {WorkflowTaskDataType} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import getParentConditionTask from './getParentConditionTask';
+import getParentLoopTask from './getParentLoopTask';
 
 interface HandleDeleteTaskProps {
     currentNode?: NodeDataType;
@@ -76,6 +77,38 @@ export default function handleDeleteTask({
                         ...task.parameters,
                         caseFalse,
                         caseTrue,
+                    },
+                };
+            });
+        }
+    } else if (data.loopData) {
+        const parentLoopTask = getParentLoopTask(workflowTasks, data.loopData.loopId);
+
+        if (parentLoopTask?.parameters) {
+            parentLoopTask.parameters.iteratee = (parentLoopTask.parameters.iteratee as Array<WorkflowTask>).filter(
+                (childTask) => childTask.name !== data.name
+            );
+
+            updatedTasks = workflowTasks.map((task) => {
+                if (task.name !== parentLoopTask.name) {
+                    return task;
+                }
+
+                return parentLoopTask;
+            }) as Array<WorkflowTaskType>;
+        } else {
+            updatedTasks = workflowTasks.map((task) => {
+                if (task.name !== data.loopData?.loopId) {
+                    return task;
+                }
+
+                return {
+                    ...task,
+                    parameters: {
+                        ...task.parameters,
+                        iteratee: (task.parameters?.iteratee as Array<WorkflowTask>).filter(
+                            (childTask) => childTask.name !== data.name
+                        ),
                     },
                 };
             });
