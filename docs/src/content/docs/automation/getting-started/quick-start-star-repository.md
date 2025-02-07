@@ -25,32 +25,43 @@ In this guide, you will learn how to seamlessly integrate your GitHub account wi
 <iframe src="https://www.guidejar.com/embed/bhsAUb5TGIexsFuLBica?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
-## Star a Repository
+## Star Repository on GitHub
+
+### Create Project
 
 1. Navigate to the **Projects** tab in ByteChef.
 2. Click on the **Create Project** button.
 3. Enter a project name. Optionally, add a description, select a category, and include relevant tags.
 4. Click **Save**.
-5. Click on arrow under the project name.
-6. Click on the **Create Workflow** button.
-7. Enter a label for your workflow and optionally provide a description.
-8. Click **Save**.
-9. Click on the **+** button to add component.
-10. Find and select the GitHub component.
-11. Choose the **Star Repository** action from the list.
-12. Click on the **Connection** tab.
-13. Click **Create Connection**.
-14. Enter a connection name and paste the **Client ID** and **Client Secret** from GitHub.
-15. Click **Next**.
-16. Click **Connect**.
-17. Click **Authorize**.
-18. Click on **Choose Connection**.
-19. Select the connection you just created.
-20. Go to the **Properties** tab.
-21. For **Owner**, enter the repository owner's name (e.g., `bytechefhq`).
-22. For **Repository**, enter the repository name (e.g., `bytechef`).
-23. Click **Run** to execute the workflow. The repository will be starred.
-24. Verify by checking the **Stars** tab in your GitHub account to see the newly starred repository.
+
+### Create Workflow
+
+1. Click on arrow under the project name.
+2. Click on the **Create Workflow** button.
+3. Enter a label for your workflow and optionally provide a description.
+4. Click **Save**.
+
+### Add Component
+
+1. Click on the **+** button to add component.
+2. Find and select the GitHub component.
+3. Choose the **Star Repository** action from the list.
+4. Click on the **Connection** tab.
+5. Click **Create Connection**.
+6. Enter a connection name and paste the **Client ID** and **Client Secret** from GitHub.
+7. Click **Next**.
+8. Click **Connect**.
+9. Click **Authorize**.
+10. Click on **Choose Connection**.
+11. Select the connection you just created.
+12. Go to the **Properties** tab.
+13. For **Owner**, enter the repository owner's name (e.g., `bytechefhq`).
+14. For **Repository**, enter the repository name (e.g., `bytechef`).
+
+### Run Workflow
+
+1. Click **Run** to execute the workflow. The repository will be starred.
+2. Verify by checking the **Stars** tab in your GitHub account to see the newly starred repository.
 
 <div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
 <iframe src="https://www.guidejar.com/embed/u1ps6awfOoKVN8gbublE?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
