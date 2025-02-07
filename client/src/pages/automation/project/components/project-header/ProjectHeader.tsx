@@ -1,3 +1,4 @@
+import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@/components/ui/breadcrumb';
 import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
@@ -10,6 +11,7 @@ import ProjectHeaderSettingsMenu from '@/pages/automation/project/components/pro
 import ProjectHeaderTitle from '@/pages/automation/project/components/project-header/ProjectHeaderTitle';
 import ProjectHeaderWorkflowActionsButton from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowActionsButton';
 import ProjectHeaderWorkflowSelect from '@/pages/automation/project/components/project-header/ProjectHeaderWorkflowSelect';
+import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -35,7 +37,7 @@ import {WorkflowKeys, useGetWorkflowQuery} from '@/shared/queries/automation/wor
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
-import {CircleIcon, LoaderCircleIcon} from 'lucide-react';
+import {CircleIcon, LoaderCircleIcon, PanelLeftIcon} from 'lucide-react';
 import {RefObject, useCallback, useEffect, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useLoaderData, useNavigate, useSearchParams} from 'react-router-dom';
@@ -63,6 +65,7 @@ const ProjectHeader = ({
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
+    const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {
         setShowBottomPanelOpen,
         setShowEditWorkflowDialog,
@@ -241,18 +244,47 @@ const ProjectHeader = ({
     }
 
     return (
-        <header className="flex items-center bg-background px-3 py-2.5">
-            <div className="flex flex-1">
-                <ProjectHeaderTitle project={project} />
+        <header className="flex items-center justify-between bg-background px-3 py-2.5">
+            <div className="flex items-center">
+                {!leftSidebarOpen && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="hover:bg-surface-neutral-primary-hover [&_svg]:size-5"
+                                onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                                size="icon"
+                                variant="ghost"
+                            >
+                                <PanelLeftIcon />
+                            </Button>
+                        </TooltipTrigger>
+
+                        <TooltipContent>See projects</TooltipContent>
+                    </Tooltip>
+                )}
+
+                <Breadcrumb>
+                    <BreadcrumbList>
+                        <BreadcrumbSeparator />
+
+                        <BreadcrumbItem>
+                            <ProjectHeaderTitle project={project} />
+                        </BreadcrumbItem>
+
+                        <BreadcrumbSeparator />
+
+                        <BreadcrumbItem>
+                            <ProjectHeaderWorkflowSelect
+                                onValueChange={handleProjectWorkflowValueChange}
+                                projectId={projectId}
+                                projectWorkflowId={projectWorkflowId}
+                            />
+                        </BreadcrumbItem>
+                    </BreadcrumbList>
+                </Breadcrumb>
             </div>
 
             <div className="flex items-center space-x-2">
-                <ProjectHeaderWorkflowSelect
-                    onValueChange={handleProjectWorkflowValueChange}
-                    projectId={projectId}
-                    projectWorkflowId={projectWorkflowId}
-                />
-
                 {!!projectId && (
                     <WorkflowDialog
                         createWorkflowMutation={createProjectWorkflowMutation}
@@ -282,7 +314,7 @@ const ProjectHeader = ({
                 <CopilotButton source={Source.WORKFLOW_EDITOR} />
 
                 <Tooltip>
-                    <TooltipTrigger className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover">
+                    <TooltipTrigger className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring">
                         {isOnline && isFetching ? (
                             <LoaderCircleIcon className="size-3 animate-spin text-content-warning" />
                         ) : (

@@ -1,46 +1,29 @@
 import {Badge} from '@/components/ui/badge';
-import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
-import {PanelLeftIcon} from 'lucide-react';
-import * as React from 'react';
 
 const ProjectHeaderTitle = ({project}: {project: Project}) => {
-    const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
-
     return (
-        <div className="flex items-center space-x-2">
-            {!leftSidebarOpen && (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="hover:bg-background/70 [&_svg]:size-5"
-                            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                            size="icon"
-                            variant="ghost"
+        <Tooltip>
+            <TooltipTrigger asChild>
+                <div className="flex max-w-96 items-center space-x-2">
+                    <h1 className="truncate">{project?.name}</h1>
+
+                    <TooltipContent>{project.name}</TooltipContent>
+
+                    {project && (
+                        <Badge
+                            className="flex space-x-1"
+                            variant={project.lastStatus === ProjectStatus.Published ? 'success' : 'outline'}
                         >
-                            <PanelLeftIcon />
-                        </Button>
-                    </TooltipTrigger>
+                            <span>V{project.lastProjectVersion}</span>
 
-                    <TooltipContent>See projects</TooltipContent>
-                </Tooltip>
-            )}
-
-            <h1>{project?.name}</h1>
-
-            {project && (
-                <Badge
-                    className="flex space-x-1"
-                    variant={project.lastStatus === ProjectStatus.Published ? 'success' : 'outline'}
-                >
-                    <span>V{project.lastProjectVersion}</span>
-
-                    <span>{project.lastStatus}</span>
-                </Badge>
-            )}
-        </div>
+                            <span>{project.lastStatus}</span>
+                        </Badge>
+                    )}
+                </div>
+            </TooltipTrigger>
+        </Tooltip>
     );
 };
 

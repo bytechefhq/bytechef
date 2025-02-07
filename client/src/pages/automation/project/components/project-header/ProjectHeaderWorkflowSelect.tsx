@@ -7,6 +7,8 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 
 const ProjectHeaderWorkflowSelect = ({
@@ -20,6 +22,10 @@ const ProjectHeaderWorkflowSelect = ({
 }) => {
     const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
 
+    const {
+        workflow: {label: currentWorkflowLabel},
+    } = useWorkflowDataStore();
+
     return (
         <Select
             defaultValue={projectWorkflowId.toString()}
@@ -27,9 +33,15 @@ const ProjectHeaderWorkflowSelect = ({
             onValueChange={(value) => onValueChange(+value)}
             value={projectWorkflowId.toString()}
         >
-            <SelectTrigger className="mr-0.5 w-60 border-0 shadow-none hover:bg-background/70">
-                <SelectValue className="font-semibold" placeholder="Select a workflow" />
-            </SelectTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <SelectTrigger className="[&>span]:line-clamp-0 w-60 gap-2 border shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4">
+                        <SelectValue className="font-semibold" placeholder="Select a workflow" />
+                    </SelectTrigger>
+                </TooltipTrigger>
+
+                <TooltipContent>{currentWorkflowLabel}</TooltipContent>
+            </Tooltip>
 
             {projectWorkflows && (
                 <SelectContent>
@@ -38,7 +50,9 @@ const ProjectHeaderWorkflowSelect = ({
 
                         {projectWorkflows.map((workflow) => (
                             <SelectItem
+                                className="w-60 [&>span]:truncate"
                                 key={workflow.projectWorkflowId!}
+                                title={workflow.label!}
                                 value={workflow.projectWorkflowId!.toString()}
                             >
                                 {workflow.label!}
