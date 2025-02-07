@@ -55,6 +55,15 @@ description: "Learn how to create, edit, and manage workflows effectively."
 <iframe src="https://www.guidejar.com/embed/b6afQMMbdVz0ZR5s6ano?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
 </div>
 
+### Edit Component
+
+1. Click on the component you want to edit.
+2. Change title and add some notes.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(51.63511188% + 32px)">
+<iframe src="https://www.guidejar.com/embed/owUEJCVUqSi3T7YlqDHx?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ## Edit Workflow
 
 1. Click on the settings icon in the top right corner.
