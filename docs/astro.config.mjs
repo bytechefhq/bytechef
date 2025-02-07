@@ -46,9 +46,9 @@ export default defineConfig({
                         {
                             label: 'Build Workflows',
                             items: [
-                                {label: 'Overview', link: '/automation/build_workflows/overview'},
-                                {label: 'Project Guides', link: '/automation/build_workflows/project_guides'},
-                                {label: 'Workflow Guides', link: '/automation/build_workflows/workflow_guides'}
+                                {label: 'Overview', link: '/automation/build-workflows/overview'},
+                                {label: 'Project Guides', link: '/automation/build-workflows/project-guides'},
+                                {label: 'Workflow Guides', link: '/automation/build-workflows/workflow-guides'}
                             ],
                         }
                     ],
@@ -71,23 +71,23 @@ export default defineConfig({
                         {
                             label: 'Build Component',
                             items: [
-                                {label: 'Overview', link: '/developer_guide/build_component/overview'},
-                                {label: 'Initial Setup', link: '/developer_guide/build_component/initial_setup'},
+                                {label: 'Overview', link: '/developer-guide/build-component/overview'},
+                                {label: 'Initial Setup', link: '/developer-guide/build-component/initial-setup'},
                                 {
                                     label: 'Create Component Definition',
-                                    link: '/developer_guide/build_component/create_component_definition'
+                                    link: '/developer-guide/build-component/create-component-definition'
                                 },
                                 {
                                     label: 'Add Connection',
-                                    link: '/developer_guide/build_component/add_connection'
+                                    link: '/developer-guide/build-component/add-connection'
                                 },
                                 {
                                     label: 'Create Action',
-                                    link: '/developer_guide/build_component/create_action'
+                                    link: '/developer-guide/build-component/create-action'
                                 },
                                 {
                                     label: 'Create Trigger',
-                                    link: '/developer_guide/build_component/create_trigger'
+                                    link: '/developer-guide/build-component/create-trigger'
                                 }
                             ],
                             collapsed: true,
@@ -95,19 +95,19 @@ export default defineConfig({
                         {
                             label: 'Generate Component',
                             items: [
-                                {label: 'Overview', link: '/developer_guide/generate_component/overview'},
-                                {label: 'Initial Setup', link: '/developer_guide/generate_component/initial_setup'},
+                                {label: 'Overview', link: '/developer-guide/generate-component/overview'},
+                                {label: 'Initial Setup', link: '/developer-guide/generate-component/initial-setup'},
                                 {
                                     label: 'OpenAPI Specification',
-                                    link: '/developer_guide/generate_component/open_api_specification'
+                                    link: '/developer-guide/generate-component/open-api-specification'
                                 },
                                 {
                                     label: 'Customize Component',
-                                    link: '/developer_guide/generate_component/customize_component'
+                                    link: '/developer-guide/generate-component/customize-component'
                                 },
                                 {
                                     label: 'Create Trigger',
-                                    link: '/developer_guide/generate_component/create_trigger'
+                                    link: '/developer-guide/generate-component/create-trigger'
                                 }
                             ],
                             collapsed: true,
@@ -115,29 +115,29 @@ export default defineConfig({
                         {
                             label: 'Testing Triggers',
                             items: [
-                                {label: 'Working with Triggers', link: '/developer_guide/testing_triggers/triggers'},
+                                {label: 'Working with Triggers', link: '/developer-guide/testing-triggers/triggers'},
                             ],
                             collapsed: true,
                         },
                         {
                             label: 'Component Specification',
                             items: [
-                                {label: 'Component', link: '/developer_guide/component_specification/component'},
-                                {label: 'Connection', link: '/developer_guide/component_specification/connection'},
-                                {label: 'Action', link: '/developer_guide/component_specification/action'},
-                                {label: 'Trigger', link: '/developer_guide/component_specification/trigger'},
-                                {label: 'Property', link: '/developer_guide/component_specification/property'}
+                                {label: 'Component', link: '/developer-guide/component-specification/component'},
+                                {label: 'Connection', link: '/developer-guide/component-specification/connection'},
+                                {label: 'Action', link: '/developer-guide/component-specification/action'},
+                                {label: 'Trigger', link: '/developer-guide/component-specification/trigger'},
+                                {label: 'Property', link: '/developer-guide/component-specification/property'}
                             ],
                             collapsed: true,
                         },
                         {
                             label: 'Components',
-                            autogenerate: {directory: '/developer_guide/components'},
+                            autogenerate: {directory: '/developer-guide/components'},
                             collapsed: true,
                         },
                         {
                             label: 'Observability',
-                            autogenerate: {directory: '/developer_guide/observability'},
+                            autogenerate: {directory: '/developer-guide/observability'},
                             collapsed: true,
                         }
                     ]

@@ -33,4 +33,4 @@ public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = conne
 
 If another type of authorization is used, such as Basic or API Key, you can define it in the `authorizations` method
 of the `CONNECTION_DEFINITION` constant. For more information, refer to the
-[connection documentation](/developer_guide/component_specification/connection).
+[connection documentation](/developer-guide/component-specification/connection).

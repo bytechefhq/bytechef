@@ -22,4 +22,4 @@ private static final ComponentDefinition COMPONENT_DEFINITION = component("newCo
 
 Find and download a user interface icon in .svg format for your component and place it in `server/libs/modules/components/newcomponent/src/main/resources/assets/newcomponent.svg`
 
-For more information about any method in the `COMPONENT_DEFINITION`, refer to the [component documentation](/developer_guide/component_specification/component).
+For more information about any method in the `COMPONENT_DEFINITION`, refer to the [component documentation](/developer-guide/component-specification/component).

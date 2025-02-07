@@ -7,7 +7,7 @@ The trigger definition is used to specify the properties of a trigger. Below is 
 - `trigger(String name)` - Builds new `ModifiableTriggerDefinition` with the specified name. The name defines the trigger key (backend ID).
 - `description(String description)` - Provides a short description of the trigger.
 - `output` - Defines the output of the trigger.
-- `properties(P... properties)` - Lists the properties that the trigger needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer_guide/component_specification/property).
+- `properties(P... properties)` - Lists the properties that the trigger needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer-guide/component-specification/property).
 - `title(String title)` - Sets the name of the trigger that will be displayed in the UI.
 - `type(TriggerType type)` - Sets the type of the trigger. Possible types are `DYNAMIC_WEBHOOK`, `HYBRID`, `LISTENER`, `POLLING` and `STATIC_WEBHOOK`.
 
