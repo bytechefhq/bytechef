@@ -15,21 +15,13 @@ hero:
       variant: primary
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import {LinkCard, CardGrid} from '@astrojs/starlight/components';
 
 ## Next steps
 
 <CardGrid stagger>
-    <Card title="Automation Quick Start" icon="add-document">
-        Add Markdown or MDX files to `src/content/docs` to create new pages.
-    </Card>
-	<Card title="Embedded Quick Start" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Component Reference" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="How to Guides" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+    <LinkCard title="Automation Quick Start" href="/automation/getting-started/quick-start-star-repository"/>
+    <LinkCard title="Embedded Quick Start" href="/embedded/getting-started/quick-start"/>
+    <LinkCard title="Component Reference" href="/reference/overview"/>
+    <LinkCard title="How to Guides" href="/automation/build_workflows/overview"/>
 </CardGrid>
