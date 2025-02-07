@@ -34,4 +34,4 @@ protected static String perform(
     }
 ```
 
-For more information about any method in the `ACTION_DEFINITION`, refer to the [action documentation](/developer_guide/component_specification/action).
+For more information about any method in the `ACTION_DEFINITION`, refer to the [action documentation](/developer-guide/component-specification/action).

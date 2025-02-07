@@ -18,5 +18,5 @@ The action definition is used to specify the properties of an action. Below is a
         - `http` - Sends HTTP requests.
         - `event` - Can publish an event.
 - `output` - Defines the output of the action.
-- `properties(P... properties)` - Lists the properties that the action needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer_guide/component_specification/property).
+- `properties(P... properties)` - Lists the properties that the action needs to perform its task. Properties will be shown in the Properties tab. For more information, refer to the [Property](/developer-guide/component-specification/property).
 - `title(String title)` - Sets the name of the action in Chicago Style that will be displayed in the UI.

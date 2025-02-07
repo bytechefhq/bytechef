@@ -17,4 +17,4 @@ public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = action("dum
                 string()));
 ```
 
-For more information about any method in the `TRIGGER_DEFINITION`, refer to the [trigger documentation](/developer_guide/component_specification/trigger).
+For more information about any method in the `TRIGGER_DEFINITION`, refer to the [trigger documentation](/developer-guide/component-specification/trigger).

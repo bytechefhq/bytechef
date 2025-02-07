@@ -31,7 +31,7 @@ description: "Working with Triggers as a developer"
 4. Activate Local Profile:
 
 - Ensure that the `local` profile is added to active profiles in your IntelliJ configuration.
-  ![intellij_scr](intellij_scr.png)
+  ![intellij-scr](intellij-scr.png)
 
 5. Start the ByteChef application.
 
