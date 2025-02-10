@@ -3,7 +3,7 @@ title: Welcome
 description: A reference page in my new Starlight docs site.
 ---
 
-ByteChef is an open-source, low-code, extendable API integration and workflow automation platform. It automates daily routines that require interaction between independent business applications. ByteChef maintains automation definitions in easy-to-understand workflow like format. anl-readme-md
+ByteChef is an open-source, low-code, extendable API integration and workflow automation platform. It automates daily routines that require interaction between independent business applications. ByteChef maintains automation definitions in easy-to-understand workflow like format.
 
 ## Why ByteChef?
 
