@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {CopilotRuntimeProvider} from '@/shared/components/copilot/CopilotRuntimeProvider';
+import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {Thread} from '@assistant-ui/react';
 import {Cross2Icon} from '@radix-ui/react-icons';

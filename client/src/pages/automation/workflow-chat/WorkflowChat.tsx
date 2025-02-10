@@ -1,4 +1,4 @@
-import {WorkflowTestChatRuntimeProvider} from '@/pages/automation/workflow-chat/WorkflowChatRuntimeProvider';
+import {WorkflowTestChatRuntimeProvider} from '@/pages/automation/workflow-chat/runtime-providers/WorkflowChatRuntimeProvider';
 import {useWorkflowChatStore} from '@/pages/automation/workflow-chat/stores/useWorkflowChatStore';
 import {Thread} from '@assistant-ui/react';
 import {useEffect} from 'react';
