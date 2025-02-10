@@ -1,5 +1,5 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
-import Property from '@/pages/platform/workflow-editor/components/properties/Property';
+import Property from '@/pages/platform/workflow-editor/components/properties1/Property';
 import {GetWorkflowNodeParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';

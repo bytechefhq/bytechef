@@ -1,5 +1,5 @@
-import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnections';
-import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelInputs';
+import PropertyCodeEditorSheetRightPanelConnections from '@/pages/platform/workflow-editor/components/properties1/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnections';
+import PropertyCodeEditorSheetRightPanelInputs from '@/pages/platform/workflow-editor/components/properties1/components/property-code-editor/PropertyCodeEditorSheetRightPanelInputs';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 
 interface PropertyCodeEditorSheetConnectionsSheetRightPanelProps {

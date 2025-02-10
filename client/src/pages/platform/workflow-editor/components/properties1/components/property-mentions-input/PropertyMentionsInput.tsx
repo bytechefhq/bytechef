@@ -6,9 +6,9 @@ import './PropertyMentionsInput.css';
 
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
-import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditor';
-import PropertyMentionsInputEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSheet';
+import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties1/components/InputTypeSwitchButton';
+import PropertyMentionsInputEditor from '@/pages/platform/workflow-editor/components/properties1/components/property-mentions-input/PropertyMentionsInputEditor';
+import PropertyMentionsInputEditorSheet from '@/pages/platform/workflow-editor/components/properties1/components/property-mentions-input/PropertyMentionsInputEditorSheet';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';

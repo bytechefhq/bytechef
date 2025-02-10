@@ -13,7 +13,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import Properties from '@/pages/platform/workflow-editor/components/properties1/Properties';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ConnectionI, useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
