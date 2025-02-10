@@ -5,13 +5,19 @@ import WorkflowInputsSheetTable from '@/pages/platform/workflow-editor/component
 import {Workflow, WorkflowTestConfiguration} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowInputsSheetProps {
-    onClose: () => void;
+    onSheetOpenChange: (open: boolean) => void;
+    sheetOpen: boolean;
     workflow: Workflow;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
-const WorkflowInputsSheet = ({onClose, workflow, workflowTestConfiguration}: WorkflowInputsSheetProps) => (
-    <Sheet onOpenChange={onClose} open>
+const WorkflowInputsSheet = ({
+    onSheetOpenChange,
+    sheetOpen,
+    workflow,
+    workflowTestConfiguration,
+}: WorkflowInputsSheetProps) => (
+    <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-workflow-inputs-sheet-width"
             onFocusOutside={(event) => event.preventDefault()}

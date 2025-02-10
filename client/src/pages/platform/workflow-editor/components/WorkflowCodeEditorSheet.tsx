@@ -14,16 +14,18 @@ import {useState} from 'react';
 const workflowTestApi = new WorkflowTestApi();
 
 interface WorkflowCodeEditorSheetProps {
-    onClose: () => void;
+    onSheetOpenClose: (open: boolean) => void;
     runDisabled: boolean;
+    sheetOpen: boolean;
     testConfigurationDisabled: boolean;
     workflow: Workflow;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowCodeEditorSheet = ({
-    onClose,
+    onSheetOpenClose,
     runDisabled,
+    sheetOpen,
     testConfigurationDisabled,
     workflow,
     workflowTestConfiguration,
@@ -82,17 +84,17 @@ const WorkflowCodeEditorSheet = ({
         }
     };
 
-    const handleOpenChange = () => {
+    const handleOpenChange = (open: boolean) => {
         if (dirty) {
             handleWorkflowCodeEditorSheetSave(workflow, definition);
         }
 
-        onClose();
+        onSheetOpenClose(open);
     };
 
     return (
         <>
-            <Sheet onOpenChange={handleOpenChange} open>
+            <Sheet onOpenChange={handleOpenChange} open={sheetOpen}>
                 <SheetContent
                     className="flex w-11/12 flex-col gap-0 p-0 sm:max-w-screen-lg"
                     onFocusOutside={(event) => event.preventDefault()}

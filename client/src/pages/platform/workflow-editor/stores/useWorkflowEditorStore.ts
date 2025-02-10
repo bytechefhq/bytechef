@@ -10,14 +10,20 @@ interface WorkflowEditorI {
     showEditWorkflowDialog: boolean;
     setShowEditWorkflowDialog: (showEditWorkflowDialog: boolean) => void;
 
-    showPropertyCodeEditorSheet: boolean;
     setShowPropertyCodeEditorSheet: (showPropertyCodeEditorSheet: boolean) => void;
-
     showWorkflowCodeEditorSheet: boolean;
-    setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
 
+    setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet: boolean) => void;
     workflowIsRunning: boolean;
+
+    showPropertyCodeEditorSheet: boolean;
     setWorkflowIsRunning: (workflowIsRunning: boolean) => void;
+
+    showWorkflowInputsSheet: boolean;
+    setShowWorkflowInputsSheet: (showWorkflowInputsSheet: boolean) => void;
+
+    showWorkflowOutputsSheet: boolean;
+    setShowWorkflowOutputsSheet: (showWorkflowOutputsSheet: boolean) => void;
 
     workflowTestExecution?: WorkflowTestExecution;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) => void;
@@ -48,6 +54,18 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setShowWorkflowCodeEditorSheet: (showWorkflowCodeEditorSheet) =>
                 set(() => ({
                     showWorkflowCodeEditorSheet,
+                })),
+
+            showWorkflowInputsSheet: false,
+            setShowWorkflowInputsSheet: (showWorkflowInputsSheet) =>
+                set(() => ({
+                    showWorkflowInputsSheet: showWorkflowInputsSheet,
+                })),
+
+            showWorkflowOutputsSheet: false,
+            setShowWorkflowOutputsSheet: (showWorkflowOutputsSheet) =>
+                set(() => ({
+                    showWorkflowOutputsSheet: showWorkflowOutputsSheet,
                 })),
 
             workflowIsRunning: false,

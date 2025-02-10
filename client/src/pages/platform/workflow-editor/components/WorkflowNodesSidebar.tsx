@@ -57,26 +57,28 @@ const WorkflowNodesSidebar = ({
     }, [componentDefinitions, filter, taskDispatcherDefinitions]);
 
     return (
-        <div className="flex h-full flex-col rounded-lg border-border/50 bg-background pb-4">
-            <header className="p-3 text-center text-gray-600">
-                <Input
-                    name="workflowNodeFilter"
-                    onChange={(event) => setFilter(event.target.value)}
-                    placeholder="Filter actions and flows"
-                    value={filter}
-                />
-            </header>
+        <aside className="my-4 flex w-96">
+            <div className="flex h-full flex-1 flex-col rounded-lg border-border/50 bg-background pb-4">
+                <header className="p-3 text-center text-gray-600">
+                    <Input
+                        name="workflowNodeFilter"
+                        onChange={(event) => setFilter(event.target.value)}
+                        placeholder="Filter actions and flows"
+                        value={filter}
+                    />
+                </header>
 
-            <main className="size-full pt-1">
-                <WorkflowNodesTabs
-                    actionComponentDefinitions={filteredActionComponentDefinitions}
-                    hideTriggerComponents
-                    itemsDraggable
-                    taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
-                    triggerComponentDefinitions={filteredTriggerComponentDefinitions}
-                />
-            </main>
-        </div>
+                <main className="size-full pt-1">
+                    <WorkflowNodesTabs
+                        actionComponentDefinitions={filteredActionComponentDefinitions}
+                        hideTriggerComponents
+                        itemsDraggable
+                        taskDispatcherDefinitions={filteredTaskDispatcherDefinitions}
+                        triggerComponentDefinitions={filteredTriggerComponentDefinitions}
+                    />
+                </main>
+            </div>
+        </aside>
     );
 };
 

@@ -5,12 +5,13 @@ import WorkflowOutputsSheetTable from '@/pages/platform/workflow-editor/componen
 import {Workflow} from '@/shared/middleware/platform/configuration';
 
 interface WorkflowOutputsSheetProps {
-    onClose: () => void;
+    onSheetOpenChange: (open: boolean) => void;
+    sheetOpen: boolean;
     workflow: Workflow;
 }
 
-const WorkflowOutputsSheet = ({onClose, workflow}: WorkflowOutputsSheetProps) => (
-    <Sheet onOpenChange={onClose} open>
+const WorkflowOutputsSheet = ({onSheetOpenChange, sheetOpen, workflow}: WorkflowOutputsSheetProps) => (
+    <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
         <SheetContent
             className="flex flex-col p-4 sm:max-w-workflow-outputs-sheet-width"
             onFocusOutside={(event) => event.preventDefault()}
