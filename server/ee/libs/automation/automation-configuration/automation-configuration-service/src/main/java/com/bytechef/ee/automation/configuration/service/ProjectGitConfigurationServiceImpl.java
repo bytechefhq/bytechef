@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import com.bytechef.ee.automation.configuration.repository.ProjectGitConfigurationRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +40,11 @@ public class ProjectGitConfigurationServiceImpl implements ProjectGitConfigurati
     public ProjectGitConfiguration getProjectGitConfiguration(long projectId) {
         return fetchProjectGitConfiguration(projectId)
             .orElseThrow(() -> new RuntimeException("ProjectGitConfiguration not found"));
+    }
+
+    @Override
+    public List<ProjectGitConfiguration> getWorkspaceProjectGitConfigurations(long workspaceId) {
+        return projectGitConfigurationRepository.findAllByWorkspaceId(workspaceId);
     }
 
     @Override

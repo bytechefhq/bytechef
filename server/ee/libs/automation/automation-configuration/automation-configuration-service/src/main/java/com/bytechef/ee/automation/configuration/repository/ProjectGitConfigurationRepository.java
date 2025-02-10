@@ -9,7 +9,9 @@ package com.bytechef.ee.automation.configuration.repository;
 
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import java.util.List;
 import java.util.Optional;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +25,11 @@ import org.springframework.stereotype.Repository;
 public interface ProjectGitConfigurationRepository extends ListCrudRepository<ProjectGitConfiguration, Long> {
 
     Optional<ProjectGitConfiguration> findByProjectId(long projectId);
+
+    @Query("""
+            SELECT * FROM project_git_configuration
+            JOIN project ON project_git_configuration.project_id = project.id
+            WHERE workspace_id = :workspaceId
+        """)
+    List<ProjectGitConfiguration> findAllByWorkspaceId(long workspaceId);
 }

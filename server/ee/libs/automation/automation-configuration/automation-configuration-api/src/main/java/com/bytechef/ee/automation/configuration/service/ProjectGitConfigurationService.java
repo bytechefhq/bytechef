@@ -8,6 +8,7 @@
 package com.bytechef.ee.automation.configuration.service;
 
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -20,6 +21,8 @@ public interface ProjectGitConfigurationService {
     Optional<ProjectGitConfiguration> fetchProjectGitConfiguration(long projectId);
 
     ProjectGitConfiguration getProjectGitConfiguration(long projectId);
+
+    List<ProjectGitConfiguration> getWorkspaceProjectGitConfigurations(long workspaceId);
 
     void save(ProjectGitConfiguration projectGitConfiguration);
 }

@@ -12,9 +12,9 @@ import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import com.bytechef.ee.automation.configuration.facade.ProjectGitFacade;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
 import com.bytechef.ee.automation.configuration.web.rest.model.ProjectGitConfigurationModel;
-import com.bytechef.ee.automation.configuration.web.rest.model.PushProjectToGitRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,15 +55,18 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
-    public ResponseEntity<Void> pullProjectFromGit(Long id) {
-        projectGitFacade.pullProjectFromGit(id);
-
-        return noContent();
+    public ResponseEntity<List<ProjectGitConfigurationModel>> getWorkspaceProjectGitConfigurations(Long id) {
+        return ResponseEntity.ok(
+            projectGitConfigurationService.getWorkspaceProjectGitConfigurations(id)
+                .stream()
+                .map(projectGitConfiguration -> conversionService.convert(
+                    projectGitConfiguration, ProjectGitConfigurationModel.class))
+                .toList());
     }
 
     @Override
-    public ResponseEntity<Void> pushProjectToGit(Long id, PushProjectToGitRequestModel pushProjectToGitRequestModel) {
-        projectGitFacade.pushProjectToGit(id, pushProjectToGitRequestModel.getCommitMessage());
+    public ResponseEntity<Void> pullProjectFromGit(Long id) {
+        projectGitFacade.pullProjectFromGit(id);
 
         return noContent();
     }
