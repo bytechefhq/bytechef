@@ -36,6 +36,7 @@ public class GoogleTasksConstants {
     public static final ModifiableObjectProperty TASK_OUTPUT_PROPERTY =
         object()
             .properties(
+                string("id"),
                 string(TITLE),
                 string(NOTES),
                 string(STATUS));
