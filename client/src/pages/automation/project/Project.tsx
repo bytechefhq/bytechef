@@ -371,7 +371,7 @@ const Project = () => {
                             <ResizableHandle className="bg-muted" />
 
                             <ResizablePanel
-                                className="border-r border-r-border/50 bg-background"
+                                className="bg-background"
                                 defaultSize={0}
                                 ref={bottomResizablePanelRef}
                             >
