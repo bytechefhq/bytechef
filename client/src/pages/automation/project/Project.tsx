@@ -1,6 +1,5 @@
 import PageLoader from '@/components/PageLoader';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeader from '@/pages/automation/project/components/project-header/ProjectHeader';
 import ProjectsSidebar from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebar';
 import ProjectsSidebarHeader from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebarHeader';
@@ -52,7 +51,6 @@ import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
 
 const Project = () => {
-    const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
@@ -394,15 +392,6 @@ const Project = () => {
 
             {workflow && (
                 <>
-                    {showProjectVersionHistorySheet && (
-                        <ProjectVersionHistorySheet
-                            onClose={() => {
-                                setShowProjectVersionHistorySheet(false);
-                            }}
-                            projectId={+projectId!}
-                        />
-                    )}
-
                     {showWorkflowCodeEditorSheet && (
                         <ConnectionReactQueryProvider
                             value={{
