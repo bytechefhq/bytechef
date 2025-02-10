@@ -13,8 +13,8 @@ tags:
 paths:
   /projects/{id}/git/configuration:
     get:
-      description: "Get git configuration of a project."
-      summary: "Get git configuration of a project."
+      description: "Get project git configuration of a project."
+      summary: "Get project git configuration of a project."
       tags:
         - "project-git"
       operationId: "getProjectGitConfiguration"
@@ -28,7 +28,7 @@ paths:
             format: "int64"
       responses:
         "200":
-          description: "The git configuration object."
+          description: "The project git configuration object."
           content:
             application/json:
               schema:
@@ -71,40 +71,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                commitMessage:
-                  type: "string"
-        required: true
-      responses:
-        "204":
-          description: "Successful operation."
-  /projects/{id}/git/push:
-    post:
-      description: "Pushes project to git repository."
-      summary: "Pushes project to git repository."
-      tags:
-        - "project-git"
-      operationId: "pushProjectToGit"
-      parameters:
-        - name: "id"
-          description: "The id of a project."
-          in: "path"
-          required: true
-          schema:
-            type: "integer"
-            format: "int64"
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                commitMessage:
-                  type: "string"
-        required: true
       responses:
         "204":
           description: "Successful operation."
@@ -233,6 +199,30 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workspace"
+  /workspaces/{id}/git/configurations:
+    get:
+      description: "Get workspace project git configurations."
+      summary: "Get workspace project git configurations."
+      tags:
+        - "project-git"
+      operationId: "getWorkspaceProjectGitConfigurations"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The list of workspace project git configuration objects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/ProjectGitConfiguration"
 components:
   schemas:
     ProjectGitConfiguration:
