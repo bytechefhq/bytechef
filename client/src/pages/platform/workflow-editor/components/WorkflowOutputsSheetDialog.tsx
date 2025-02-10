@@ -22,7 +22,7 @@ import {useForm} from 'react-hook-form';
 import sanitizeHtml from 'sanitize-html';
 import {z} from 'zod';
 
-import PropertyMentionsInput from './Properties/components/PropertyMentionsInput/PropertyMentionsInput';
+import PropertyMentionsInput from './properties/components/property-mentions-input/PropertyMentionsInput';
 
 const SPACE = 4;
 

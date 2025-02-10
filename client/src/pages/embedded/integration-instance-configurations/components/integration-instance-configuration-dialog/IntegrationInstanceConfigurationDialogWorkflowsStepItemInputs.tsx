@@ -1,4 +1,4 @@
-import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
+import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {ControlType, PropertyType, Workflow} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';

@@ -1,7 +1,7 @@
+import DeletePropertyButton from '@/pages/platform/workflow-editor/components/properties/components/DeletePropertyButton';
 import {ArrayPropertyType, ComponentType} from '@/shared/types';
 
 import Property from '../Property';
-import DeletePropertyButton from './DeletePropertyButton';
 
 interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;

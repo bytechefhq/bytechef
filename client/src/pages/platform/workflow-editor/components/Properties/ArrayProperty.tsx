@@ -1,4 +1,6 @@
 import {Button} from '@/components/ui/button';
+import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
+import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
@@ -9,8 +11,6 @@ import {Fragment, useCallback, useEffect, useState} from 'react';
 
 import {encodeParameters, encodePath} from '../../utils/encodingUtils';
 import getParameterItemType from '../../utils/getParameterItemType';
-import ArrayPropertyItem from './components/ArrayPropertyItem';
-import SubPropertyPopover from './components/SubPropertyPopover';
 
 interface ArrayPropertyProps {
     onDeleteClick: (path: string) => void;
