@@ -7,6 +7,8 @@ In this guide, you will learn how to create a workflow in ByteChef and configure
 through the steps to add a trigger, connect it to a Google Calendar component, set up an action using the OpenAI
 component, publish the project, create a deployment, and monitor the workflow execution.
 
+**Note**: If you are testing ByteChef locally, be sure to check out our [Working with Triggers](../../../developer-guide/testing-triggers/triggers) guide for detailed instructions.
+
 ### Create Workflow
 
 1. Click on the three dots next to the project name where you want to add a workflow.
