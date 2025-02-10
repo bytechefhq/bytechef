@@ -19,9 +19,17 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {
+    usePullProjectFromGitMutation,
+    useUpdateProjectGitConfigurationMutation,
+} from '@/ee/mutations/projectGit.mutations';
+import {ProjectGitConfigurationKeys} from '@/ee/queries/projectGit.queries';
+import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {useToast} from '@/hooks/use-toast';
+import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectPublishDialog from '@/pages/automation/projects/components/ProjectPublishDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
@@ -31,6 +39,7 @@ import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories
 import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
@@ -42,24 +51,25 @@ import ProjectDialog from '../ProjectDialog';
 
 interface ProjectItemProps {
     project: Project;
+    projectGitConfiguration?: ProjectGitConfiguration;
     remainingTags?: Tag[];
 }
 
-const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
-    const [showEditDialog, setShowEditDialog] = useState(false);
+const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: ProjectItemProps) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showPublishProjectDialog, setShowPublishProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
     const {captureProjectWorkflowCreated, captureProjectWorkflowImported} = useAnalytics();
-
     const navigate = useNavigate();
-
     const [searchParams] = useSearchParams();
-
     const {toast} = useToast();
+
+    const ff_1039 = useFeatureFlagsStore()('ff-1039');
 
     const queryClient = useQueryClient();
 
@@ -109,6 +119,22 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
         },
     });
 
+    const pullProjectFromGitMutation = usePullProjectFromGitMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
+
+            toast({description: 'Project pulled from git repository successfully.'});
+        },
+    });
+
+    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectGitConfigurationKeys.projectGitConfigurations,
+            });
+        },
+    });
+
     const updateProjectTagsMutation = useUpdateProjectTagsMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
@@ -127,6 +153,28 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
                 },
             });
         }
+    };
+
+    const handleUpdateProjectGitConfigurationSubmit = ({
+        onSuccess,
+        projectGitConfiguration,
+    }: {
+        projectGitConfiguration: {branch: string; enabled: boolean};
+        onSuccess: () => void;
+    }) => {
+        updateProjectGitConfigurationMutation.mutate(
+            {
+                id: project.id!,
+                projectGitConfiguration,
+            },
+            {
+                onSuccess,
+            }
+        );
+    };
+
+    const handlePullProjectFromGitClick = () => {
+        pullProjectFromGitMutation.mutate({id: project.id!});
     };
 
     return (
@@ -275,6 +323,27 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
 
                                 <DropdownMenuSeparator />
 
+                                {ff_1039 && (
+                                    <EEVersion hidden={true}>
+                                        <DropdownMenuItem
+                                            className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                                            disabled={!projectGitConfiguration?.enabled}
+                                            onClick={handlePullProjectFromGitClick}
+                                        >
+                                            Pull Project from Git
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuItem
+                                            className="justify-start hover:bg-surface-neutral-primary-hover"
+                                            onClick={() => setShowProjectGitConfigurationDialog(true)}
+                                        >
+                                            Git Configuration
+                                        </DropdownMenuItem>
+
+                                        <DropdownMenuSeparator />
+                                    </EEVersion>
+                                )}
+
                                 <DropdownMenuItem
                                     className="text-destructive"
                                     onClick={() => setShowDeleteDialog(true)}
@@ -316,6 +385,14 @@ const ProjectListItem = ({project, remainingTags}: ProjectItemProps) => {
             </AlertDialog>
 
             {showEditDialog && <ProjectDialog onClose={() => setShowEditDialog(false)} project={project} />}
+
+            {showProjectGitConfigurationDialog && (
+                <ProjectGitConfigurationDialog
+                    onClose={() => setShowProjectGitConfigurationDialog(false)}
+                    onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
+                    projectGitConfiguration={projectGitConfiguration}
+                />
+            )}
 
             {showPublishProjectDialog && !!project.id && (
                 <ProjectPublishDialog onClose={() => setShowPublishProjectDialog(false)} project={project} />

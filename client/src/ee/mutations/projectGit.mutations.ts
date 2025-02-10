@@ -1,7 +1,6 @@
 import {
     ProjectGitApi,
     PullProjectFromGitRequest,
-    PushProjectToGitOperationRequest,
     UpdateProjectGitConfigurationRequest,
 } from '@/ee/shared/middleware/automation/configuration';
 import {useMutation} from '@tanstack/react-query';
@@ -15,20 +14,6 @@ export const usePullProjectFromGitMutation = (mutationProps?: PullProjectFromGit
     useMutation<void, Error, PullProjectFromGitRequest>({
         mutationFn: (requestParameters: PullProjectFromGitRequest) => {
             return new ProjectGitApi().pullProjectFromGit(requestParameters);
-        },
-        onError: mutationProps?.onError,
-        onSuccess: mutationProps?.onSuccess,
-    });
-
-interface PushProjectToGitMutationProps {
-    onError?: (error: Error, variables: PushProjectToGitOperationRequest) => void;
-    onSuccess?: (result: void, variables: PushProjectToGitOperationRequest) => void;
-}
-
-export const usePushProjectToGitMutation = (mutationProps?: PushProjectToGitMutationProps) =>
-    useMutation<void, Error, PushProjectToGitOperationRequest>({
-        mutationFn: (requestParameters: PushProjectToGitOperationRequest) => {
-            return new ProjectGitApi().pushProjectToGit(requestParameters);
         },
         onError: mutationProps?.onError,
         onSuccess: mutationProps?.onSuccess,
