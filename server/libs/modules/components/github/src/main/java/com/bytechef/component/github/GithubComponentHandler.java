@@ -41,7 +41,7 @@ import com.google.auto.service.AutoService;
 public class GithubComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("github")
-        .title("Github")
+        .title("GitHub")
         .description("GitHub is a web-based platform for version control and collaboration using Git.")
         .customAction(true)
         .categories(ComponentCategory.DEVELOPER_TOOLS)
