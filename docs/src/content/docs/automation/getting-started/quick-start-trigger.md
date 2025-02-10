@@ -14,6 +14,10 @@ component, publish the project, create a deployment, and monitor the workflow ex
 3. Provide a label for your workflow. Optionally, add a description to explain its purpose.
 4. Click **Save** to create the workflow.
 
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/c6eZEJIZYA1aoWesXI7v?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ### Add Trigger
 
 1. Click on the pencil icon to edit the trigger.
@@ -31,6 +35,10 @@ component, publish the project, create a deployment, and monitor the workflow ex
 13. Go to the **Properties** tab.
 14. For **Calendar Identifier**, select the calendar you want to monitor.
 
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/7hcdEZScz1LPEMFqtbiJ?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ### Add Action
 
 1. Click on the **+** button to add component.
@@ -45,6 +53,10 @@ component, publish the project, create a deployment, and monitor the workflow ex
 10. For **Role**, select the appropriate role (e.g., `user`).
 11. For **Content**, enter the prompt text, such as `Desribe this event:`.
 
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/DJY0kLqoCFX1cci6molN?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ### Use Data Pill
 
 1. After clicking on the content field, the Data Pill Panel will open on the left. Use the data pill to insert output
@@ -52,6 +64,10 @@ component, publish the project, create a deployment, and monitor the workflow ex
 2. Click on **Google Calendar** component in Data Pill Panel.
 3. Click on **trigger_1**, which is the output of the trigger for the Google Calendar component.
 4. Output of Google Calendar trigger is now inserted into the content field.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/OouHIYrdrN4TIUSyyhGw?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
 
 ### Publish Project and Create Deployment
 
@@ -67,6 +83,10 @@ component, publish the project, create a deployment, and monitor the workflow ex
 10. Click **Save**.
 11. Enable the deployment. Your workflow will now run whenever a new or updated event is detected in your Google
     Calendar.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/ua8BPgHqcndU62z7A4QV?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
 
 ### Monitor Workflow Execution
 
