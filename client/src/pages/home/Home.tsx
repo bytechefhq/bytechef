@@ -3,7 +3,7 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 
-import ModeSelectionDialog from './ModeSelectionDialog';
+import ModeSelectionDialog from './components/ModeSelectionDialog';
 
 const Home = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);

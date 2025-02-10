@@ -1,5 +1,5 @@
 import {resetAll} from '@/pages/account/public/tests/utils/testUtils';
-import ModeSelectionDialog from '@/pages/home/ModeSelectionDialog';
+import ModeSelectionDialog from '@/pages/home/components/ModeSelectionDialog';
 import {ModeType} from '@/pages/home/stores/useModeTypeStore';
 import {mockModeTypeStore} from '@/pages/home/tests/mocks/mockModeTypeStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
