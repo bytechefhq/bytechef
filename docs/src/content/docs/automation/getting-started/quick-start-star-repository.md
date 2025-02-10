@@ -34,12 +34,20 @@ In this guide, you will learn how to seamlessly integrate your GitHub account wi
 3. Enter a project name. Optionally, add a description, select a category, and include relevant tags.
 4. Click **Save**.
 
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/gMtlYa5JKNmHvwAIsNtp?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
+
 ### Create Workflow
 
 1. Click on arrow under the project name.
 2. Click on the **Create Workflow** button.
 3. Enter a label for your workflow and optionally provide a description.
 4. Click **Save**.
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/UjYJ9Dz6TUre3mXPFgEt?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
 
 ### Add Component
 
@@ -57,6 +65,10 @@ In this guide, you will learn how to seamlessly integrate your GitHub account wi
 12. Go to the **Properties** tab.
 13. For **Owner**, enter the repository owner's name (e.g., `bytechefhq`).
 14. For **Repository**, enter the repository name (e.g., `bytechef`).
+
+<div style="position:relative;height:0;width:100%;overflow:hidden;z-index:99999;box-sizing:border-box;padding-bottom:calc(53.02672956% + 32px)">
+<iframe src="https://www.guidejar.com/embed/0J48BzwQXALJeJlvypy1?type=1&controls=on" width="100%" height="100%" style="height:100%;position:absolute;inset:0" allowfullscreen frameborder="0"></iframe>
+</div>
 
 ### Run Workflow
 
