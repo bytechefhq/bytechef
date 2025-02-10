@@ -30,10 +30,10 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Marija Horvat
  */
-public class GoogleTasksListTasksActionTest extends AbstractGoogleTasksActionTest {
+class GoogleTasksListTasksActionTest extends AbstractGoogleTasksActionTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(TITLE, "test", SHOW_COMPLETED, true));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(TITLE, "test", SHOW_COMPLETED, true));
     private final ArgumentCaptor<String> queryKeyCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Object> queryValueCaptor = ArgumentCaptor.forClass(Object.class);
 
@@ -42,11 +42,11 @@ public class GoogleTasksListTasksActionTest extends AbstractGoogleTasksActionTes
         when(mockedExecutor.queryParameters(queryKeyCaptor.capture(), queryValueCaptor.capture()))
             .thenReturn(mockedExecutor);
 
-        Object result = GoogleTasksListTasksAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = GoogleTasksListTasksAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 
         assertEquals(SHOW_COMPLETED, queryKeyCaptor.getValue());
-        assertEquals(mockedParameters.getRequiredBoolean(SHOW_COMPLETED), queryValueCaptor.getValue());
+        assertEquals(true, queryValueCaptor.getValue());
     }
 }

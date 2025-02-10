@@ -23,16 +23,16 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NOTES;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.STATUS;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_ID;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
 import static com.bytechef.component.google.tasks.util.GoogleTasksUtils.createTaskRequestBody;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
@@ -49,14 +49,13 @@ public class GoogleTasksUpdateTaskAction {
         .properties(
             string(LIST_ID)
                 .label("List ID")
-                .description(
-                    "ID of the list where specific task is stored.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .description("ID of the list where specific task is stored.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true),
             string(TASK_ID)
                 .label("Task ID")
                 .description("ID of the task to update.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleTasksUtils::getTasksIdOptions)
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getTasksIdOptions)
                 .optionsLookupDependsOn(LIST_ID)
                 .required(true),
             string(TITLE)
@@ -74,22 +73,23 @@ public class GoogleTasksUpdateTaskAction {
                 .label("Notes")
                 .description("Notes describing the task. If empty, notes will not be changed.")
                 .required(false))
-        .output(outputSchema(OUTPUT_PROPERTY))
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(GoogleTasksUpdateTaskAction::perform);
 
     private GoogleTasksUpdateTaskAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         Map<String, Object> body = createTaskRequestBody(inputParameters);
 
-        return context
-            .http(http -> http.patch("https://tasks.googleapis.com/tasks/v1/lists/" +
-                inputParameters.getRequiredString(LIST_ID) + "/tasks/" + inputParameters.getRequiredString(TASK_ID)))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .body(Context.Http.Body.of(body))
+        return actionContext
+            .http(http -> http.patch(
+                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) +
+                    "/tasks/" + inputParameters.getRequiredString(TASK_ID)))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(body))
             .execute()
             .getBody(new TypeReference<>() {});
     }

@@ -21,7 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import java.util.Map;
@@ -33,15 +33,15 @@ import org.mockito.ArgumentCaptor;
  */
 abstract class AbstractGoogleTasksActionTest {
 
-    protected ActionContext mockedContext = mock(ActionContext.class);
-    protected Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    protected ArgumentCaptor<Context.Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Context.Http.Body.class);
-    protected Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    protected ActionContext mockedActionContext = mock(ActionContext.class);
+    protected Http.Executor mockedExecutor = mock(Http.Executor.class);
+    protected ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    protected Http.Response mockedResponse = mock(Http.Response.class);
     protected Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
 
     @BeforeEach
     void beforeEach() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -49,7 +49,6 @@ abstract class AbstractGoogleTasksActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
     }

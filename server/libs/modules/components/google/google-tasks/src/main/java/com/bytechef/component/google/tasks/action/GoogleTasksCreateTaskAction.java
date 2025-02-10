@@ -23,15 +23,15 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NOTES;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.STATUS;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
 import static com.bytechef.component.google.tasks.util.GoogleTasksUtils.createTaskRequestBody;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
@@ -52,9 +52,8 @@ public class GoogleTasksCreateTaskAction {
                 .required(true),
             string(LIST_ID)
                 .label("List ID")
-                .description(
-                    "ID of the list where the new task will be stored.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .description("ID of the list where the new task will be stored.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true),
             string(STATUS)
                 .label("Status")
@@ -68,23 +67,22 @@ public class GoogleTasksCreateTaskAction {
                 .label("Notes")
                 .description("Notes describing the task.")
                 .required(false))
-        .output(outputSchema(OUTPUT_PROPERTY))
+        .output(outputSchema(TASK_OUTPUT_PROPERTY))
         .perform(GoogleTasksCreateTaskAction::perform);
 
     private GoogleTasksCreateTaskAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         Map<String, Object> body = createTaskRequestBody(inputParameters);
 
-        return context
-            .http(http -> http.post("https://tasks.googleapis.com/tasks/v1/lists/" +
-                inputParameters.getRequiredString(LIST_ID) + "/tasks"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
-            .body(
-                Context.Http.Body.of(body))
+        return actionContext
+            .http(http -> http.post(
+                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
+            .configuration(responseType(Http.ResponseType.JSON))
+            .body(Http.Body.of(body))
             .execute()
             .getBody(new TypeReference<>() {});
     }

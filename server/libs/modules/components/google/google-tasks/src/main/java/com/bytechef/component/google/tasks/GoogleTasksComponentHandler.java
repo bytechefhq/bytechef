@@ -35,8 +35,9 @@ public class GoogleTasksComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("googleTasks")
         .title("Google Tasks")
-        .description("Google Tasks is a cloud-based task management tool that allows users to create, edit, and " +
-            "organize to-do lists, set deadlines, and track tasks across devices in real-time.")
+        .description(
+            "Google Tasks is a cloud-based task management tool that allows users to create, edit, and organize " +
+                "to-do lists, set deadlines, and track tasks across devices in real-time.")
         .customAction(true)
         .icon("path:assets/google-tasks.svg")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
