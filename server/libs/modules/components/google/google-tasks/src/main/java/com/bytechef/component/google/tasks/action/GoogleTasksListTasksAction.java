@@ -23,13 +23,13 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.SHOW_COMPLETED;
+import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.OptionsDataSource.ActionOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.google.tasks.util.GoogleTasksUtils;
@@ -46,30 +46,30 @@ public class GoogleTasksListTasksAction {
         .properties(
             string(LIST_ID)
                 .label("List ID")
-                .description(
-                    "ID of the list where tasks are stored.")
-                .options((OptionsDataSource.ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
+                .description("ID of the list where tasks are stored.")
+                .options((ActionOptionsFunction<String>) GoogleTasksUtils::getListsIdOptions)
                 .required(true),
             bool(SHOW_COMPLETED)
                 .label("Show completed")
-                .description("Show also completed tasks. By default both completed task and task that " +
-                    "needs action will be shown.")
+                .description(
+                    "Show also completed tasks. By default both completed task and task that needs action will be " +
+                        "shown.")
                 .defaultValue(true)
                 .required(true))
-        .output(outputSchema(array().items(OUTPUT_PROPERTY)))
+        .output(outputSchema(array().items(TASK_OUTPUT_PROPERTY)))
         .perform(GoogleTasksListTasksAction::perform);
 
     private GoogleTasksListTasksAction() {
     }
 
-    public static Map<String, Object> perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    protected static Map<String, Object> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return context
-            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/" +
-                inputParameters.getRequiredString(LIST_ID) + "/tasks"))
+        return actionContext
+            .http(http -> http.get(
+                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
             .queryParameters(SHOW_COMPLETED, inputParameters.getRequiredBoolean(SHOW_COMPLETED))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+            .configuration(responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
     }

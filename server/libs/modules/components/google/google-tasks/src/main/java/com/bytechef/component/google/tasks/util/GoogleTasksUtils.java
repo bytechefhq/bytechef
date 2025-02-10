@@ -17,13 +17,13 @@
 package com.bytechef.component.google.tasks.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NOTES;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.STATUS;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -42,39 +42,33 @@ public class GoogleTasksUtils {
 
     public static List<Option<String>> getListsIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) {
+        String searchText, ActionContext actionContext) {
 
-        List<Option<String>> listsId = new ArrayList<>();
-        Context.Http.Executor executor = context
+        Map<String, Object> response = actionContext
             .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/users/@me/lists"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON));
-
-        Map<String, Object> response = executor.execute()
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
             .getBody(new TypeReference<>() {});
 
-        if (response.get("items") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    listsId.add(
-                        option((String) map.get("title"), (String) map.get("id")));
-                }
-            }
-        }
-        return listsId;
+        return getOptions(response);
     }
 
     public static List<Option<String>> getTasksIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) {
+        String searchText, ActionContext actionContext) {
 
-        List<Option<String>> tasksId = new ArrayList<>();
-
-        Map<String, Object> response = context
-            .http(http -> http.get("https://tasks.googleapis.com/tasks/v1/lists/" +
-                inputParameters.getRequiredString(LIST_ID) + "/tasks"))
-            .configuration(responseType(Context.Http.ResponseType.JSON))
+        Map<String, Object> response = actionContext
+            .http(http -> http.get(
+                "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) + "/tasks"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
+
+        return getOptions(response);
+    }
+
+    private static List<Option<String>> getOptions(Map<String, Object> response) {
+        List<Option<String>> tasksId = new ArrayList<>();
 
         if (response.get("items") instanceof List<?> list) {
             for (Object o : list) {
@@ -84,6 +78,7 @@ public class GoogleTasksUtils {
                 }
             }
         }
+
         return tasksId;
     }
 

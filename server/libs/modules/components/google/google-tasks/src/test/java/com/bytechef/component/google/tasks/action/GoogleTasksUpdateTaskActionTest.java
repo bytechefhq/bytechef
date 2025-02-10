@@ -20,7 +20,7 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
@@ -29,18 +29,18 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-public class GoogleTasksUpdateTaskActionTest extends AbstractGoogleTasksActionTest {
+class GoogleTasksUpdateTaskActionTest extends AbstractGoogleTasksActionTest {
 
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(TITLE, "test", STATUS, "needsAction"));
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(TITLE, "test", STATUS, "needsAction"));
 
     @Test
     void testPerform() {
-        Object result = GoogleTasksUpdateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = GoogleTasksUpdateTaskAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 
-        Context.Http.Body capturedBody = bodyArgumentCaptor.getValue();
+        Http.Body capturedBody = bodyArgumentCaptor.getValue();
         assertEquals(Map.of(TITLE, "test", STATUS, "needsAction"), capturedBody.getContent());
     }
 }

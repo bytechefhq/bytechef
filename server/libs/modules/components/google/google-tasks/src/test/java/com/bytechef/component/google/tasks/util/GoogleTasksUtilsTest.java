@@ -16,13 +16,14 @@
 
 package com.bytechef.component.google.tasks.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
@@ -34,12 +35,15 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Marija Horvat
  */
-public class GoogleTasksUtilsTest {
+class GoogleTasksUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Context.Http.Executor mockedExecutor = mock(Context.Http.Executor.class);
-    private Parameters mockedParameters;
-    private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+
+    private final List<Option<String>> expectedOptions = List.of(
+        option("List 1", "list1"), option("List 2", "list2"));
     private final Map<String, Object> responseMap = Map.of(
         "items", List.of(
             Map.of("title", "List 1", "id", "list1"),
@@ -47,7 +51,7 @@ public class GoogleTasksUtilsTest {
 
     @Test
     void getListsIdOptions() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -57,18 +61,14 @@ public class GoogleTasksUtilsTest {
             .thenReturn(responseMap);
 
         List<Option<String>> result = GoogleTasksUtils.getListsIdOptions(
-            mock(Parameters.class), mock(Parameters.class), Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
-        assertEquals(2, result.size());
-        assertEquals("List 1", result.get(0).getLabel());
-        assertEquals("list1", result.get(0).getValue());
-        assertEquals("List 2", result.get(1).getLabel());
-        assertEquals("list2", result.get(1).getValue());
+        assertEquals(expectedOptions, result);
     }
 
     @Test
     void getTasksIdOptions() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -78,11 +78,9 @@ public class GoogleTasksUtilsTest {
             .thenReturn(responseMap);
 
         List<Option<String>> result = GoogleTasksUtils.getTasksIdOptions(
-            mockedParameters, mock(Parameters.class), Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
-        assertEquals(2, result.size());
-        assertEquals("List 1", result.getFirst().getLabel());
-        assertEquals("list1", result.getFirst().getValue());
+        assertEquals(expectedOptions, result);
     }
 
     @Test
