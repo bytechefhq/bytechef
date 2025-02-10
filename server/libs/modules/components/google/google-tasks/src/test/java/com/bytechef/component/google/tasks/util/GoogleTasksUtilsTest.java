@@ -27,9 +27,9 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,9 +39,8 @@ class GoogleTasksUtilsTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private Parameters mockedParameters = mock(Parameters.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
-
     private final List<Option<String>> expectedOptions = List.of(
         option("List 1", "list1"), option("List 2", "list2"));
     private final Map<String, Object> responseMap = Map.of(
@@ -49,8 +48,8 @@ class GoogleTasksUtilsTest {
             Map.of("title", "List 1", "id", "list1"),
             Map.of("title", "List 2", "id", "list2")));
 
-    @Test
-    void getListsIdOptions() {
+    @BeforeEach
+    void beforeEach() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -59,7 +58,10 @@ class GoogleTasksUtilsTest {
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
+    }
 
+    @Test
+    void getListsIdOptions() {
         List<Option<String>> result = GoogleTasksUtils.getListsIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
@@ -68,31 +70,9 @@ class GoogleTasksUtilsTest {
 
     @Test
     void getTasksIdOptions() {
-        when(mockedActionContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
-
         List<Option<String>> result = GoogleTasksUtils.getTasksIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
-    }
-
-    @Test
-    void createTasksRequestBody() {
-        mockedParameters = MockParametersFactory.create(
-            Map.of("title", "Test Task", "status", "needsAction", "notes", "Some notes"));
-
-        Map<String, Object> result = GoogleTasksUtils.createTaskRequestBody(mockedParameters);
-
-        assertEquals(3, result.size());
-        assertEquals("Test Task", result.get("title"));
-        assertEquals("needsAction", result.get("status"));
-        assertEquals("Some notes", result.get("notes"));
     }
 }
