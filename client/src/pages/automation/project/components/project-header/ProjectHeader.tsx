@@ -2,6 +2,10 @@ import {Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbSeparator} from '@
 import {Button} from '@/components/ui/button';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {usePullProjectFromGitMutation} from '@/ee/mutations/projectGit.mutations';
+import {useGetProjectGitConfigurationQuery} from '@/ee/queries/projectGit.queries';
+import {useToast} from '@/hooks/use-toast';
+import ProjectGitConfigurationDialog from '@/pages/automation/project/components/ProjectGitConfigurationDialog';
 import ProjectVersionHistorySheet from '@/pages/automation/project/components/ProjectVersionHistorySheet';
 import ProjectHeaderDeleteProjectAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteProjectAlertDialog';
 import ProjectHeaderDeleteWorkflowAlertDialog from '@/pages/automation/project/components/project-header/ProjectHeaderDeleteWorkflowAlertDialog';
@@ -61,6 +65,7 @@ const ProjectHeader = ({
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
+    const [showGitConfigurationDialog, setShowGitConfigurationDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
     const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
@@ -83,6 +88,10 @@ const ProjectHeader = ({
     const navigate = useNavigate();
 
     const [searchParams] = useSearchParams();
+
+    const {toast} = useToast();
+
+    const {data: projectGitConfiguration} = useGetProjectGitConfigurationQuery(projectId);
 
     const {data: project} = useGetProjectQuery(projectId, useLoaderData() as Project, !showDeleteProjectAlertDialog);
 
@@ -141,6 +150,14 @@ const ProjectHeader = ({
         },
     });
 
+    const pullProjectFromGitMutation = usePullProjectFromGitMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ProjectKeys.project(projectId)});
+
+            toast({description: 'Project pulled from git repository successfully.'});
+        },
+    });
+
     const handleDeleteProjectAlertDialogClick = () => {
         if (projectId) {
             deleteProjectMutation.mutate(projectId);
@@ -162,6 +179,10 @@ const ProjectHeader = ({
         setCurrentNode(undefined);
 
         navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
+    };
+
+    const handlePullProjectFromGit = () => {
+        pullProjectFromGitMutation.mutate({id: projectId});
     };
 
     const handleRunClick = () => {
@@ -309,8 +330,6 @@ const ProjectHeader = ({
 
                 <ProjectHeaderOutputButton bottomResizablePanelRef={bottomResizablePanelRef} />
 
-                <CopilotButton source={Source.WORKFLOW_EDITOR} />
-
                 <Tooltip>
                     <TooltipTrigger className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring">
                         {isOnline && isFetching ? (
@@ -335,10 +354,13 @@ const ProjectHeader = ({
                 </Tooltip>
 
                 <ProjectHeaderSettingsMenu
+                    handlePullProjectFromGit={handlePullProjectFromGit}
                     project={project}
+                    projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
                     setShowDeleteProjectAlertDialog={setShowDeleteProjectAlertDialog}
                     setShowDeleteWorkflowAlertDialog={setShowDeleteWorkflowAlertDialog}
                     setShowEditProjectDialog={setShowEditProjectDialog}
+                    setShowGitConfigurationDialog={setShowGitConfigurationDialog}
                     setShowProjectVersionHistorySheet={setShowProjectVersionHistorySheet}
                     workflowId={workflow.id!}
                 />
@@ -378,6 +400,14 @@ const ProjectHeader = ({
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
+                />
+            )}
+
+            {showGitConfigurationDialog && (
+                <ProjectGitConfigurationDialog
+                    onClose={() => setShowGitConfigurationDialog(false)}
+                    projectGitConfiguration={projectGitConfiguration}
+                    projectId={projectId}
                 />
             )}
 

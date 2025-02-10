@@ -38,7 +38,7 @@ const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCanc
         },
     });
 
-    function onSubmit(values: z.infer<typeof formSchema>) {
+    function handleSubmit(values: z.infer<typeof formSchema>) {
         updateAiProviderMutation.mutate({
             id,
             updateAiProviderRequest: {
@@ -49,7 +49,7 @@ const AiProviderForm = ({id, onClose, showCancel = false}: {id: number; showCanc
 
     return (
         <Form {...form}>
-            <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
                 <FormField
                     control={form.control}
                     name="apiKey"

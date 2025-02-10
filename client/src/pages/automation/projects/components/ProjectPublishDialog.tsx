@@ -29,7 +29,7 @@ const ProjectPublishDialog = ({onClose, project}: {onClose: () => void; project:
             });
 
             toast({
-                description: 'The project is published.',
+                description: 'The project has been published.',
             });
 
             onClose();

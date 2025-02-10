@@ -1,13 +1,23 @@
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
 import {useToast} from '@/hooks/use-toast';
+import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CopyIcon, DownloadIcon, EditIcon, HistoryIcon, Trash2Icon} from 'lucide-react';
+import {
+    CopyIcon,
+    DownloadIcon,
+    EditIcon,
+    GitBranchIcon,
+    GitPullRequestArrowIcon,
+    HistoryIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {ChangeEvent, useRef} from 'react';
 import {useNavigate} from 'react-router-dom';
 
@@ -15,14 +25,20 @@ const ProjectHeaderProjectTabButtons = ({
     handleCloseDropdownMenu,
     handleDeleteProject,
     handleEditProject,
+    handlePullProjectFromGit,
+    handleShowGitConfigurationDialog,
     handleShowProjectVersionHistorySheet,
     project,
+    projectGitConfigurationEnabled,
 }: {
     handleCloseDropdownMenu: () => void;
     handleDeleteProject: () => void;
     handleEditProject: () => void;
+    handlePullProjectFromGit: () => void;
+    handleShowGitConfigurationDialog: () => void;
     handleShowProjectVersionHistorySheet: () => void;
     project: Project;
+    projectGitConfigurationEnabled: boolean;
 }) => {
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,6 +47,8 @@ const ProjectHeaderProjectTabButtons = ({
     const navigate = useNavigate();
 
     const {toast} = useToast();
+
+    const ff_1039 = useFeatureFlagsStore()('ff-1039');
 
     const queryClient = useQueryClient();
 
@@ -106,6 +124,29 @@ const ProjectHeaderProjectTabButtons = ({
             </Button>
 
             <Separator />
+
+            {ff_1039 && (
+                <EEVersion>
+                    <Button
+                        className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
+                        disabled={!projectGitConfigurationEnabled}
+                        onClick={handlePullProjectFromGit}
+                        variant="ghost"
+                    >
+                        <GitPullRequestArrowIcon /> Pull Project from Git
+                    </Button>
+
+                    <Button
+                        className="justify-start hover:bg-surface-neutral-primary-hover"
+                        onClick={() => handleShowGitConfigurationDialog()}
+                        variant="ghost"
+                    >
+                        <GitBranchIcon /> Git Configuration
+                    </Button>
+
+                    <Separator />
+                </EEVersion>
+            )}
 
             <Button
                 className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
