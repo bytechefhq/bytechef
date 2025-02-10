@@ -110,10 +110,9 @@ public class ProjectFacadeImpl implements ProjectFacade {
     @Override
     public long createProject(@NonNull ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
-
         Category category = projectDTO.category();
 
-        if (projectDTO.category() != null) {
+        if (category != null) {
             category = categoryService.save(category);
 
             project.setCategory(category);
@@ -371,6 +370,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<Tag> tags = checkTags(projectDTO.tags());
 
         Project project = projectDTO.toProject();
+        Category category = projectDTO.category();
+
+        if (category != null) {
+            category = categoryService.save(category);
+
+            project.setCategory(category);
+        }
 
         project.setTags(tags);
 

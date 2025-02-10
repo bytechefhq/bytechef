@@ -110,10 +110,9 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     @Override
     public long createIntegration(@NonNull IntegrationDTO integrationDTO) {
         Integration integration = integrationDTO.toIntegration();
-
         Category category = integrationDTO.category();
 
-        if (integrationDTO.category() != null) {
+        if (category != null) {
             category = categoryService.save(category);
 
             integration.setCategory(category);
@@ -382,6 +381,13 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
             : tagService.save(integrationDTO.tags());
 
         Integration integration = integrationDTO.toIntegration();
+        Category category = integrationDTO.category();
+
+        if (category != null) {
+            category = categoryService.save(category);
+
+            integration.setCategory(category);
+        }
 
         integration.setTags(tags);
 
