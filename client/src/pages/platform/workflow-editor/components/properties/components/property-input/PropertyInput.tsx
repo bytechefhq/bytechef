@@ -2,7 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties1/components/InputTypeSwitchButton';
+import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';

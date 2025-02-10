@@ -1,4 +1,4 @@
-import DeletePropertyButton from '@/pages/platform/workflow-editor/components/properties1/components/DeletePropertyButton';
+import DeletePropertyButton from '@/pages/platform/workflow-editor/components/properties/components/DeletePropertyButton';
 import {ArrayPropertyType, ComponentType} from '@/shared/types';
 
 import Property from '../Property';
