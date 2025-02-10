@@ -1,7 +1,5 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
@@ -9,6 +7,8 @@ import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
 import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {ComponentConnection, Workflow} from '@/shared/middleware/platform/configuration';
 import {useGetWorkflowTestConfigurationConnectionsQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {WorkflowDefinitionType, WorkflowTaskType} from '@/shared/types';

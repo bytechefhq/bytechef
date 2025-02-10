@@ -4,7 +4,6 @@ import IntegrationHeader from '@/pages/embedded/integration/components/integrati
 import IntegrationsSidebar from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebar';
 import IntegrationsSidebarHeader from '@/pages/embedded/integration/components/integrations-sidebar/IntegrationsSidebarHeader';
 import useIntegrationsLeftSidebarStore from '@/pages/embedded/integration/stores/useIntegrationsLeftSidebarStore';
-import {ConnectionReactQueryProvider} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
@@ -18,6 +17,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import {ConnectionReactQueryProvider} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';

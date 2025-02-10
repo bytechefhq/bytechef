@@ -13,7 +13,7 @@ import {
 import {Form} from '@/components/ui/form';
 import IntegrationInstanceConfigurationDialogOauth2Step from '@/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogOauth2Step';
 import {useWorkflowsEnabledStore} from '@/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
-import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
+import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {
     ComponentConnection,

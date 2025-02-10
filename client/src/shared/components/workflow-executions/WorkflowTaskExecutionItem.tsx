@@ -1,4 +1,4 @@
-import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
+import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {TaskExecution} from '@/shared/middleware/platform/workflow/execution';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';

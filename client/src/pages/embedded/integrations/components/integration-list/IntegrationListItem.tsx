@@ -22,7 +22,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useToast} from '@/hooks/use-toast';
 import IntegrationDialog from '@/pages/embedded/integrations/components/IntegrationDialog';
 import IntegrationPublishDialog from '@/pages/embedded/integrations/components/IntegrationPublishDialog';
-import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration, Tag} from '@/shared/middleware/embedded/configuration';
 import {

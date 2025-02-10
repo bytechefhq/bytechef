@@ -2,7 +2,7 @@ import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
 import {Button} from '@/components/ui/button';
 import ConnectionsFilterTitle from '@/pages/embedded/connections/components/ConnectionsFilterTitle';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';

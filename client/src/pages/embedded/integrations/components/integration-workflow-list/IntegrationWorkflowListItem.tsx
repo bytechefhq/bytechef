@@ -17,7 +17,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useDeleteWorkflowMutation, useUpdateWorkflowMutation} from '@/shared/mutations/embedded/workflows.mutations';
