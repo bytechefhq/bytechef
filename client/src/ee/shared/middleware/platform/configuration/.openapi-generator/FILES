@@ -1,7 +1,9 @@
 apis/AiProviderApi.ts
+apis/GitConfigurationApi.ts
 apis/index.ts
 index.ts
 models/AiProvider.ts
+models/GitConfiguration.ts
 models/UpdateAiProviderRequest.ts
 models/index.ts
 runtime.ts

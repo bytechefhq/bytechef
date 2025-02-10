@@ -1,6 +1,9 @@
+apis/ProjectGitApi.ts
 apis/WorkspaceApi.ts
 apis/index.ts
 index.ts
+models/ProjectGitConfiguration.ts
+models/PushProjectToGitRequest.ts
 models/Workspace.ts
 models/index.ts
 runtime.ts
