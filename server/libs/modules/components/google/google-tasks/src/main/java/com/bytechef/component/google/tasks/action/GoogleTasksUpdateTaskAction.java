@@ -27,7 +27,6 @@ import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_ID;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TASK_OUTPUT_PROPERTY;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
-import static com.bytechef.component.google.tasks.util.GoogleTasksUtils.createTaskRequestBody;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -82,14 +81,16 @@ public class GoogleTasksUpdateTaskAction {
     protected static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        Map<String, Object> body = createTaskRequestBody(inputParameters);
-
         return actionContext
             .http(http -> http.patch(
                 "https://tasks.googleapis.com/tasks/v1/lists/" + inputParameters.getRequiredString(LIST_ID) +
                     "/tasks/" + inputParameters.getRequiredString(TASK_ID)))
             .configuration(responseType(Http.ResponseType.JSON))
-            .body(Http.Body.of(body))
+            .body(
+                Http.Body.of(
+                    TITLE, inputParameters.getString(TITLE),
+                    STATUS, inputParameters.getString(STATUS),
+                    NOTES, inputParameters.getString(NOTES)))
             .execute()
             .getBody(new TypeReference<>() {});
     }

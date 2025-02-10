@@ -18,9 +18,6 @@ package com.bytechef.component.google.tasks.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.LIST_ID;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.NOTES;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.STATUS;
-import static com.bytechef.component.google.tasks.constant.GoogleTasksConstants.TITLE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
@@ -28,7 +25,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -80,24 +76,5 @@ public class GoogleTasksUtils {
         }
 
         return tasksId;
-    }
-
-    public static Map<String, Object> createTaskRequestBody(Parameters inputParameters) {
-
-        Map<String, Object> body = new HashMap<>();
-
-        if (inputParameters.get(TITLE) != null) {
-            body.put(TITLE, inputParameters.getRequiredString(TITLE));
-        }
-
-        if (inputParameters.get(STATUS) != null) {
-            body.put(STATUS, inputParameters.getRequiredString(STATUS));
-        }
-
-        if (inputParameters.get(NOTES) != null && inputParameters.getString(NOTES) != null) {
-            body.put(NOTES, inputParameters.getString(NOTES));
-        }
-
-        return body;
     }
 }
