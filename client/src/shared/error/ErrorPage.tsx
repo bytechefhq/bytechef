@@ -9,7 +9,7 @@ export default function ErrorPage() {
                 </h1>
 
                 <p className="mt-4 text-muted-foreground">
-                    Wea are sorry, but an unexpected error has occurred. Please try again later or contact support if
+                    We are sorry, but an unexpected error has occurred. Please try again later or contact support if
                     the issue persists.
                 </p>
 
