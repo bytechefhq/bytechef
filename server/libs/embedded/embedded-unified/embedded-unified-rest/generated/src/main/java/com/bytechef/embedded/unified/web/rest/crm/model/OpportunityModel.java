@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("opportunity")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-09T08:09:17.937846+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-10T12:53:20.000984+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class OpportunityModel {
 
   private JsonNullable<String> accountId = JsonNullable.<String>undefined();
