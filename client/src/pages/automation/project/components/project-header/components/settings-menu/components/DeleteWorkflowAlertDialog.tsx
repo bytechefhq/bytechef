@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {KeyboardKey, useKeyDown} from '@/shared/hooks/useKeyDown';
 
-const ProjectHeaderDeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
+const DeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => {
     useKeyDown(onDelete, [KeyboardKey.enter]);
 
     return (
@@ -36,4 +36,4 @@ const ProjectHeaderDeleteWorkflowAlertDialog = ({onClose, onDelete}: {onClose: (
     );
 };
 
-export default ProjectHeaderDeleteWorkflowAlertDialog;
+export default DeleteWorkflowAlertDialog;

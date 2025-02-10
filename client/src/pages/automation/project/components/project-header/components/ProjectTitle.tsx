@@ -2,7 +2,7 @@ import {Badge} from '@/components/ui/badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Project, ProjectStatus} from '@/shared/middleware/automation/configuration';
 
-const ProjectHeaderTitle = ({project}: {project: Project}) => {
+const ProjectTitle = ({project}: {project: Project}) => {
     return (
         <Tooltip>
             <TooltipTrigger asChild>
@@ -27,4 +27,4 @@ const ProjectHeaderTitle = ({project}: {project: Project}) => {
     );
 };
 
-export default ProjectHeaderTitle;
+export default ProjectTitle;
