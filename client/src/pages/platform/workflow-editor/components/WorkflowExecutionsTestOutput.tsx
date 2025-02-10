@@ -1,8 +1,8 @@
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import WorkflowExecutionBadge from '@/pages/platform/workflow-executions/components/WorkflowExecutionBadge';
-import WorkflowExecutionContent from '@/pages/platform/workflow-executions/components/WorkflowExecutionContent';
-import WorkflowTaskExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTaskExecutionItem';
-import WorkflowTriggerExecutionItem from '@/pages/platform/workflow-executions/components/WorkflowTriggerExecutionItem';
+import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
+import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
+import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
+import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/platform/workflow/execution';
 import {WorkflowTestExecution} from '@/shared/middleware/platform/workflow/test';
 import {ChevronDownIcon} from '@radix-ui/react-icons';

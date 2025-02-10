@@ -13,9 +13,9 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {ConnectionI, useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
     ComponentConnection,
     Workflow,

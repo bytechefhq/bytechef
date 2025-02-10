@@ -16,7 +16,7 @@ import IntegrationDialog from '@/pages/embedded/integrations/components/Integrat
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import WorkflowDialog from '@/pages/platform/workflow/components/WorkflowDialog';
+import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration, Workflow} from '@/shared/middleware/embedded/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';

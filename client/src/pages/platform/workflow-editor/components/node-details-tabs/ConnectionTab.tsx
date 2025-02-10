@@ -1,6 +1,7 @@
 import {Button} from '@/components/ui/button';
-import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import ConnectionTabConnectionSelect from '@/pages/platform/workflow-editor/components/node-details-tabs/ConnectionTabConnectionSelect';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
     ComponentConnection,
     ComponentDefinition,
@@ -9,7 +10,6 @@ import {
 import {Cross2Icon} from '@radix-ui/react-icons';
 import EmptyList from 'components/EmptyList';
 import {LinkIcon} from 'lucide-react';
-import ConnectionDialog from 'pages/platform/connection/components/ConnectionDialog';
 
 import {useConnectionNoteStore} from '../../stores/useConnectionNoteStore';
 

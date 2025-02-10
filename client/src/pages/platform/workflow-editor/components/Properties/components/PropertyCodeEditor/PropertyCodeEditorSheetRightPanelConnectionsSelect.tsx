@@ -1,8 +1,8 @@
 import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import {useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import {useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {ComponentConnection, WorkflowTestConfigurationConnection} from '@/shared/middleware/platform/configuration';
 import {useSaveWorkflowTestConfigurationConnectionMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';

@@ -2,7 +2,7 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {ComponentConnection} from '@/shared/middleware/platform/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/embedded/connections.mutations';

@@ -17,10 +17,10 @@ import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
-import {TokenPayloadI} from '@/pages/platform/connection/components/oauth2/useOAuth2';
-import {ConnectionI} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import Properties from '@/pages/platform/workflow-editor/components/Properties/Properties';
+import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import {TokenPayloadI} from '@/shared/components/connection/oauth2/useOAuth2';
+import {ConnectionI} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {Authorization, ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ConnectionEnvironment, Tag} from '@/shared/middleware/platform/connection';
 import {

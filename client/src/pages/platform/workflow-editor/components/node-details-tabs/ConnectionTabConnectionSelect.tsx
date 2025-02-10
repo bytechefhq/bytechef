@@ -3,10 +3,10 @@ import {Badge} from '@/components/ui/badge';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
-import ConnectionParameters from '@/pages/platform/connection/components/ConnectionParameters';
-import {ConnectionI, useConnectionQuery} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
+import ConnectionParameters from '@/shared/components/connection/ConnectionParameters';
+import {ConnectionI, useConnectionQuery} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {
     ComponentConnection,
     ComponentDefinition,

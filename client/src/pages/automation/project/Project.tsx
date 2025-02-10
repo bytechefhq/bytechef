@@ -5,10 +5,6 @@ import ProjectsSidebar from '@/pages/automation/project/components/projects-side
 import ProjectsSidebarHeader from '@/pages/automation/project/components/projects-sidebar/ProjectsSidebarHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {
-    ConnectionReactQueryProvider,
-    RequestI,
-} from '@/pages/platform/connection/providers/connectionReactQueryProvider';
 import WorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/components/WorkflowCodeEditorSheet';
 import WorkflowEditorLayout from '@/pages/platform/workflow-editor/components/WorkflowEditorLayout';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
@@ -22,6 +18,10 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import {
+    ConnectionReactQueryProvider,
+    RequestI,
+} from '@/shared/components/connection/providers/connectionReactQueryProvider';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';

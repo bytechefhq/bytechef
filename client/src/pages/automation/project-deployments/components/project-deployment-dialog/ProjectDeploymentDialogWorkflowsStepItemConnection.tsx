@@ -3,7 +3,7 @@ import {Button} from '@/components/ui/button';
 import {FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import ConnectionDialog from '@/pages/platform/connection/components/ConnectionDialog';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {
