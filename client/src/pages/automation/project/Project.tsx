@@ -22,6 +22,7 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {RightSidebar} from '@/shared/layout/RightSidebar';
@@ -45,7 +46,7 @@ import {useGetTaskDispatcherDefinitionsQuery} from '@/shared/queries/platform/ta
 import {useGetWorkflowTestConfigurationQuery} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {CableIcon, Code2Icon, PuzzleIcon, SlidersIcon} from 'lucide-react';
+import {CableIcon, Code2Icon, PuzzleIcon, SlidersIcon, SparklesIcon} from 'lucide-react';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useParams} from 'react-router-dom';
@@ -54,6 +55,7 @@ const Project = () => {
     const [showWorkflowInputsSheet, setShowWorkflowInputsSheet] = useState(false);
     const [showWorkflowOutputsSheet, setShowWorkflowOutputsSheet] = useState(false);
 
+    const {copilotPanelOpen, setContext, setCopilotPanelOpen} = useCopilotStore();
     const {leftSidebarOpen} = useProjectsLeftSidebarStore();
     const {rightSidebarOpen, setRightSidebarOpen} = useRightSidebarStore();
     const {
@@ -73,6 +75,7 @@ const Project = () => {
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
+    const ff_1570 = useFeatureFlagsStore()('ff-1570');
     const ff_1840 = useFeatureFlagsStore()('ff-1840');
 
     const queryClient = useQueryClient();
@@ -172,9 +175,32 @@ const Project = () => {
                     name: 'Workflow Code Editor',
                     onClick: () => setShowWorkflowCodeEditorSheet(true),
                 },
-            ].filter((item) => (item.name === 'Workflow Outputs' ? ff_1840 : true)),
+                {
+                    icon: SparklesIcon,
+                    name: 'Copilot',
+                    onClick: () => {
+                        if (copilotPanelOpen) {
+                            setContext({parameters: {}, source: Source.WORKFLOW_EDITOR, workflowId: workflow.id!});
+                        } else {
+                            setContext(undefined);
+                        }
+
+                        setCopilotPanelOpen(!copilotPanelOpen);
+                    },
+                },
+            ].filter((item) => {
+                if (item.name === 'Copilot') {
+                    return ff_1570;
+                }
+
+                if (item.name === 'Workflow Outputs') {
+                    return ff_1840;
+                }
+
+                return true;
+            }),
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [ff_1840, rightSidebarOpen]
+        [copilotPanelOpen, ff_1840, rightSidebarOpen]
     );
 
     const workflowTestConfigurationInputs = useMemo(
