@@ -242,7 +242,7 @@ const ProjectHeader = ({
     }
 
     return (
-        <header className="flex items-center justify-between bg-background px-3 py-2.5">
+        <header className="flex items-center justify-between px-3 py-2.5">
             <div className="flex items-center">
                 {!leftSidebarOpen && (
                     <Tooltip>
