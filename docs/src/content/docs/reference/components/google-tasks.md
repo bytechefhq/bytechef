@@ -64,6 +64,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Control Type     |
 |:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
 | title | STRING | TEXT  |
 | notes | STRING | TEXT  |
 | status | STRING | TEXT  |
@@ -73,7 +74,7 @@ Type: OBJECT
 
 
 
-### List Task
+### List Tasks
 Returns all tasks in the specified task list.
 
 #### Properties
@@ -95,7 +96,7 @@ Type: ARRAY
 
 |     Name     |     Type     |     Control Type     |
 |:------------:|:------------:|:--------------------:|
-|  | {STRING\(title), STRING\(notes), STRING\(status)} | OBJECT_BUILDER  |
+|  | {STRING\(id), STRING\(title), STRING\(notes), STRING\(status)} | OBJECT_BUILDER  |
 
 
 
@@ -127,6 +128,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Control Type     |
 |:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
 | title | STRING | TEXT  |
 | notes | STRING | TEXT  |
 | status | STRING | TEXT  |
