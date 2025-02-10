@@ -40,8 +40,8 @@ import java.util.Map;
  */
 public class GoogleTasksListTasksAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listTask")
-        .title("List Task")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("listTasks")
+        .title("List Tasks")
         .description("Returns all tasks in the specified task list.")
         .properties(
             string(LIST_ID)
