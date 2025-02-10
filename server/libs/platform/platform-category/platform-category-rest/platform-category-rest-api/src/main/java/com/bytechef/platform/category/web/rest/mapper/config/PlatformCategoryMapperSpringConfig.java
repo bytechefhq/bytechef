@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.workflow.test.web.rest.mapper.config;
+package com.bytechef.platform.category.web.rest.mapper.config;
 
-import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
-import com.bytechef.platform.workflow.test.web.rest.adapter.WorkflowTestConversionServiceAdapter;
+import com.bytechef.platform.category.web.rest.adapter.PlatformCategoryConversionServiceAdapter;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -25,10 +25,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    WorkflowExecutionConversionServiceAdapter.class, WorkflowTestConversionServiceAdapter.class
+    DateTimeMapper.class, PlatformCategoryConversionServiceAdapter.class
 })
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.platform.workflow.test.web.rest.adapter",
-    conversionServiceAdapterClassName = "WorkflowTestConversionServiceAdapter")
-public interface WorkflowTestMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.platform.category.web.rest.adapter",
+    conversionServiceAdapterClassName = "PlatformCategoryConversionServiceAdapter")
+public interface PlatformCategoryMapperSpringConfig {
 }

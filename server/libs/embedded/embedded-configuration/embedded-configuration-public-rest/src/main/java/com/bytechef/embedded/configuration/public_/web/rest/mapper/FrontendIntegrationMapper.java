@@ -18,7 +18,7 @@ package com.bytechef.embedded.configuration.public_.web.rest.mapper;
 
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
-import com.bytechef.embedded.configuration.public_.web.rest.mapper.config.IntegrationConfigurationMapperSpringConfig;
+import com.bytechef.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
 import com.bytechef.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.embedded.configuration.public_.web.rest.model.WorkflowModel;
 import org.mapstruct.Mapper;
@@ -26,7 +26,7 @@ import org.mapstruct.Mapping;
 import org.springframework.core.convert.converter.Converter;
 
 @Mapper(
-    config = IntegrationConfigurationMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl")
+    config = EmbeddedConfigurationPublicMapperSpringConfig.class, implementationName = "EmbeddedPublic<CLASS_NAME>Impl")
 public interface FrontendIntegrationMapper extends Converter<IntegrationInstanceConfigurationDTO, IntegrationModel> {
 
     @Override

@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
 import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
-import com.bytechef.platform.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
+import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import java.util.Optional;
 import org.mapstruct.Mapper;
@@ -26,7 +26,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
+@Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
 public interface TaskExecutionMapper extends Converter<TaskExecutionDTO, TaskExecutionModel> {
 
     @Override

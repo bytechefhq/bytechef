@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.configuration.web.rest.mapper.config;
+package com.bytechef.embedded.connection.web.rest.mapper.config;
 
-import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
+import com.bytechef.embedded.connection.web.rest.adapter.EmbeddedConnectionConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
-import com.bytechef.web.rest.mapper.JsonNullableMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -26,10 +25,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, JsonNullableMapper.class, WorkflowConfigurationConversionServiceAdapter.class
+    DateTimeMapper.class, EmbeddedConnectionConversionServiceAdapter.class
 })
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.platform.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "WorkflowConfigurationConversionServiceAdapter")
-public interface WorkflowConfigurationMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.embedded.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "EmbeddedConnectionConversionServiceAdapter")
+public interface EmbeddedConnectionMapperSpringConfig {
 }

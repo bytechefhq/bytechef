@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.connection.web.rest.mapper.config;
+package com.bytechef.platform.tag.web.rest.mapper.config;
 
-import com.bytechef.automation.connection.web.rest.adapter.ProjectConnectionConversionServiceAdapter;
+import com.bytechef.platform.tag.web.rest.adapter.PlatformTagConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -25,11 +25,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, ProjectConnectionConversionServiceAdapter.class,
+    DateTimeMapper.class, PlatformTagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
-
-    conversionServiceAdapterPackage = "com.bytechef.automation.connection.web.rest.adapter",
-    conversionServiceAdapterClassName = "ProjectConnectionConversionServiceAdapter")
-public interface ConnectionMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.platform.tag.web.rest.adapter",
+    conversionServiceAdapterClassName = "PlatformTagConversionServiceAdapter")
+public interface PlatformTagMapperSpringConfig {
 }

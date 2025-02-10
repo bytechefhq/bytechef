@@ -8,7 +8,7 @@
 package com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper;
 
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionEndpointDTO;
-import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.ApiPlatformMapperSpringConfig;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.EeAutomationApiPlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -21,7 +21,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ivica Cardic
  */
-@Mapper(config = ApiPlatformMapperSpringConfig.class)
+@Mapper(config = EeAutomationApiPlatformConfigurationMapperSpringConfig.class)
 public interface ApiCollectionEndpointMapper extends Converter<ApiCollectionEndpointDTO, ApiCollectionEndpointModel> {
 
     @Override

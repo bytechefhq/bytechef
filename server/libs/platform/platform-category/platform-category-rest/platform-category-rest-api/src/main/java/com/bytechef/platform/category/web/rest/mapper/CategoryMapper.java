@@ -17,7 +17,7 @@
 package com.bytechef.platform.category.web.rest.mapper;
 
 import com.bytechef.platform.category.domain.Category;
-import com.bytechef.platform.category.web.rest.mapper.config.CategoryMapperSpringConfig;
+import com.bytechef.platform.category.web.rest.mapper.config.PlatformCategoryMapperSpringConfig;
 import com.bytechef.platform.category.web.rest.model.CategoryModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = CategoryMapperSpringConfig.class)
+@Mapper(config = PlatformCategoryMapperSpringConfig.class)
 public interface CategoryMapper extends Converter<Category, CategoryModel> {
 
     CategoryModel convert(Category category);

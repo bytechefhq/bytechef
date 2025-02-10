@@ -16,10 +16,10 @@
 
 package com.bytechef.automation.configuration.web.rest.mapper.config;
 
-import com.bytechef.automation.configuration.web.rest.adapter.ProjectConfigurationConversionServiceAdapter;
-import com.bytechef.platform.category.web.rest.adapter.CategoryConversionServiceAdapter;
-import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
-import com.bytechef.platform.tag.web.rest.adapter.TagConversionServiceAdapter;
+import com.bytechef.automation.configuration.web.rest.adapter.AutomationConfigurationConversionServiceAdapter;
+import com.bytechef.platform.category.web.rest.adapter.PlatformCategoryConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
+import com.bytechef.platform.tag.web.rest.adapter.PlatformTagConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -28,11 +28,12 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, ProjectConfigurationConversionServiceAdapter.class, CategoryConversionServiceAdapter.class,
-    WorkflowConfigurationConversionServiceAdapter.class, TagConversionServiceAdapter.class
+    DateTimeMapper.class, AutomationConfigurationConversionServiceAdapter.class,
+    PlatformCategoryConversionServiceAdapter.class, PlatformConfigurationConversionServiceAdapter.class,
+    PlatformTagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.automation.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "ProjectConfigurationConversionServiceAdapter")
-public interface ProjectConfigurationMapperSpringConfig {
+    conversionServiceAdapterClassName = "AutomationConfigurationConversionServiceAdapter")
+public interface AutomationConfigurationMapperSpringConfig {
 }

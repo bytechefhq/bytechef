@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.Option;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.OptionModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowConfigurationMapperSpringConfig.class, uses = {
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
     JsonNullableMapper.class
 })
 public interface OptionMapper extends Converter<Option, OptionModel> {

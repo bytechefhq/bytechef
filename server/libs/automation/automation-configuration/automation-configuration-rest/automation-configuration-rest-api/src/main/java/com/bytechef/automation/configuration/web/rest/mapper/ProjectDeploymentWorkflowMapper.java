@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentWorkflowDTO;
-import com.bytechef.automation.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentWorkflowModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -31,7 +31,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ProjectDeploymentWorkflowMapper {
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentWorkflowToProjectDeploymentWorkflowModelMapper
         extends Converter<ProjectDeploymentWorkflow, ProjectDeploymentWorkflowModel> {
 
@@ -46,7 +46,7 @@ public class ProjectDeploymentWorkflowMapper {
         ProjectDeploymentWorkflow invertConvert(ProjectDeploymentWorkflowModel projectDeploymentWorkflowModel);
     }
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentWorkflowDTOToProjectDeploymentWorkflowModelMapper
         extends Converter<ProjectDeploymentWorkflowDTO, ProjectDeploymentWorkflowModel> {
 

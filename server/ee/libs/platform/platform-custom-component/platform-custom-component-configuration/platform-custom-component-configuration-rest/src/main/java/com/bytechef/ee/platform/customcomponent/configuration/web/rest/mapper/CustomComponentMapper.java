@@ -8,7 +8,7 @@
 package com.bytechef.ee.platform.customcomponent.configuration.web.rest.mapper;
 
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
-import com.bytechef.ee.platform.customcomponent.configuration.web.rest.mapper.config.CustomComponentMapperSpringConfig;
+import com.bytechef.ee.platform.customcomponent.configuration.web.rest.mapper.config.EePlatformCustomComponentConfigurationMapperSpringConfig;
 import com.bytechef.ee.platform.customcomponent.configuration.web.rest.model.CustomComponentModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -21,7 +21,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ivica Cardic
  */
-@Mapper(config = CustomComponentMapperSpringConfig.class)
+@Mapper(config = EePlatformCustomComponentConfigurationMapperSpringConfig.class)
 public interface CustomComponentMapper extends Converter<CustomComponent, CustomComponentModel> {
 
     @Override

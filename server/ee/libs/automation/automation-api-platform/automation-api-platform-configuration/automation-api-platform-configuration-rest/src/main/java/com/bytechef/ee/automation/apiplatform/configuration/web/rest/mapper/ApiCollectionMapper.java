@@ -12,7 +12,7 @@ import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.web.rest.model.ProjectBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
-import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.ApiPlatformMapperSpringConfig;
+import com.bytechef.ee.automation.apiplatform.configuration.web.rest.mapper.config.EeAutomationApiPlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * @author Ivica Cardic
  */
-@Mapper(config = ApiPlatformMapperSpringConfig.class)
+@Mapper(config = EeAutomationApiPlatformConfigurationMapperSpringConfig.class)
 public interface ApiCollectionMapper extends Converter<ApiCollectionDTO, ApiCollectionModel> {
 
     @Override

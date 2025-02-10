@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModel;
@@ -33,7 +33,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public abstract class WorkflowMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowToWorkflowModelMapper implements Converter<Workflow, WorkflowModel> {
 
         @Override
@@ -45,7 +45,7 @@ public abstract class WorkflowMapper {
         public abstract WorkflowModel convert(Workflow workflow);
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowDTOToWorkflowModelMapper implements Converter<WorkflowDTO, WorkflowModel> {
 
         @Override
@@ -62,7 +62,7 @@ public abstract class WorkflowMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public abstract static class WorkflowModelToWorkflowBasicModel implements Converter<Workflow, WorkflowBasicModel> {
 
         @Override

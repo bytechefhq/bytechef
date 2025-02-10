@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.Authorization;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -26,7 +26,7 @@ import org.springframework.lang.NonNull;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+@Mapper(config = PlatformConfigurationMapperSpringConfig.class)
 public interface AuthorizationMapper extends Converter<Authorization, AuthorizationModel> {
 
     @Override

@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.apiconnector.configuration.web.rest.mapper;
 
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.dto.ApiConnectorDTO;
-import com.bytechef.ee.platform.apiconnector.configuration.web.rest.mapper.config.ApiConnectorMapperSpringConfig;
+import com.bytechef.ee.platform.apiconnector.configuration.web.rest.mapper.config.EePlatformApiConnectorConfigurationMapperSpringConfig;
 import com.bytechef.ee.platform.apiconnector.configuration.web.rest.model.ApiConnectorModel;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
@@ -24,7 +24,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ApiConnectorMapper {
 
-    @Mapper(config = ApiConnectorMapperSpringConfig.class)
+    @Mapper(config = EePlatformApiConnectorConfigurationMapperSpringConfig.class)
     public interface ApiConnectorToApiConnectorModelMapper extends Converter<ApiConnector, ApiConnectorModel> {
 
         @Override
@@ -41,7 +41,7 @@ public class ApiConnectorMapper {
         ApiConnector invertConvert(ApiConnectorModel apiConnectorModel);
     }
 
-    @Mapper(config = ApiConnectorMapperSpringConfig.class)
+    @Mapper(config = EePlatformApiConnectorConfigurationMapperSpringConfig.class)
     public interface ApiConnectorDTOToApiConnectorModelMapper extends Converter<ApiConnectorDTO, ApiConnectorModel> {
 
         @Override

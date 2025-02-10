@@ -18,11 +18,11 @@ package com.bytechef.embedded.unified.web.rest.accounting.mapper;
 
 import com.bytechef.component.definition.unified.accounting.model.AccountUnifiedInputModel;
 import com.bytechef.embedded.unified.web.rest.accounting.model.CreateUpdateAccountModel;
-import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.unified.web.rest.mapper.config.EmbeddedUnifiedMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-@Mapper(config = UnifiedConfigurationMapperSpringConfig.class)
+@Mapper(config = EmbeddedUnifiedMapperSpringConfig.class)
 public interface AccountingCreateUpdateAccountModelMapper
     extends Converter<CreateUpdateAccountModel, AccountUnifiedInputModel> {
 

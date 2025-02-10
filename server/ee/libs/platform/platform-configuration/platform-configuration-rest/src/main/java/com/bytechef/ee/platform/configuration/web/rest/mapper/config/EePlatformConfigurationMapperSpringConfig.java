@@ -16,7 +16,7 @@
 
 package com.bytechef.ee.platform.configuration.web.rest.mapper.config;
 
-import com.bytechef.ee.platform.configuration.web.rest.adapter.ConfigurationConversionServiceAdapter;
+import com.bytechef.ee.platform.configuration.web.rest.adapter.EePlatformConfigurationConversionServiceAdapter;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,10 +24,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    ConfigurationConversionServiceAdapter.class
+    EePlatformConfigurationConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.ee.platform.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "ConfigurationConversionServiceAdapter")
-public interface ConfigurationMapperSpringConfig {
+    conversionServiceAdapterClassName = "EePlatformConfigurationConversionServiceAdapter")
+public interface EePlatformConfigurationMapperSpringConfig {
 }

@@ -16,10 +16,10 @@
 
 package com.bytechef.embedded.workflow.execution.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.web.rest.adapter.IntegrationConfigurationConversionServiceAdapter;
-import com.bytechef.embedded.workflow.execution.web.rest.adapter.IntegrationWorkflowExecutionConversionServiceAdapter;
-import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
-import com.bytechef.platform.workflow.execution.web.rest.adapter.WorkflowExecutionConversionServiceAdapter;
+import com.bytechef.embedded.configuration.web.rest.adapter.EmbeddedConfigurationConversionServiceAdapter;
+import com.bytechef.embedded.workflow.execution.web.rest.adapter.EmbeddedWorkflowExecutionConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
+import com.bytechef.platform.workflow.execution.web.rest.adapter.PlatformWorkflowExecutionConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -28,12 +28,12 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, IntegrationConfigurationConversionServiceAdapter.class,
-    IntegrationWorkflowExecutionConversionServiceAdapter.class, WorkflowConfigurationConversionServiceAdapter.class,
-    WorkflowExecutionConversionServiceAdapter.class
+    DateTimeMapper.class, EmbeddedConfigurationConversionServiceAdapter.class,
+    EmbeddedWorkflowExecutionConversionServiceAdapter.class, PlatformConfigurationConversionServiceAdapter.class,
+    PlatformWorkflowExecutionConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.embedded.workflow.execution.web.rest.adapter",
-    conversionServiceAdapterClassName = "IntegrationWorkflowExecutionConversionServiceAdapter")
-public interface WorkflowExecutionMapperSpringConfig {
+    conversionServiceAdapterClassName = "EmbeddedWorkflowExecutionConversionServiceAdapter")
+public interface EmbeddedWorkflowExecutionMapperSpringConfig {
 }

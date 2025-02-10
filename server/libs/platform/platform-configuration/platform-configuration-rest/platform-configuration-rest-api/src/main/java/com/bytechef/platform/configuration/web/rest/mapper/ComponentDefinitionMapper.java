@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentDefinitionModel;
 import org.mapstruct.Mapper;
@@ -25,14 +25,14 @@ import org.springframework.core.convert.converter.Converter;
 
 public class ComponentDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionModel> {
 
         ComponentDefinitionModel convert(ComponentDefinition componentDefinition);
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 

@@ -18,7 +18,7 @@ package com.bytechef.automation.configuration.web.rest.mapper;
 
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.dto.ProjectDeploymentDTO;
-import com.bytechef.automation.configuration.web.rest.mapper.config.ProjectConfigurationMapperSpringConfig;
+import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.ProjectDeploymentModel;
 import org.mapstruct.InheritInverseConfiguration;
@@ -32,7 +32,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class ProjectDeploymentMapper {
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentBasicToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentBasicModel> {
 
@@ -41,7 +41,7 @@ public class ProjectDeploymentMapper {
         ProjectDeploymentBasicModel convert(ProjectDeployment projectInstanc);
     }
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentToProjectDeploymentModelMapper
         extends Converter<ProjectDeployment, ProjectDeploymentModel> {
 
@@ -53,7 +53,7 @@ public class ProjectDeploymentMapper {
         ProjectDeploymentModel convert(ProjectDeployment projectDeployment);
     }
 
-    @Mapper(config = ProjectConfigurationMapperSpringConfig.class)
+    @Mapper(config = AutomationConfigurationMapperSpringConfig.class)
     public interface ProjectDeploymentDTOToProjectDeploymentModelMapper
         extends Converter<ProjectDeploymentDTO, ProjectDeploymentModel> {
 

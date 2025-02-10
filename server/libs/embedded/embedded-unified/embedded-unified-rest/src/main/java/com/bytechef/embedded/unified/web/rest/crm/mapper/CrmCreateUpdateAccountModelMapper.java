@@ -18,11 +18,11 @@ package com.bytechef.embedded.unified.web.rest.crm.mapper;
 
 import com.bytechef.component.definition.unified.crm.model.AccountUnifiedInputModel;
 import com.bytechef.embedded.unified.web.rest.crm.model.CreateUpdateAccountModel;
-import com.bytechef.embedded.unified.web.rest.mapper.config.UnifiedConfigurationMapperSpringConfig;
+import com.bytechef.embedded.unified.web.rest.mapper.config.EmbeddedUnifiedMapperSpringConfig;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 
-@Mapper(config = UnifiedConfigurationMapperSpringConfig.class, uses = {
+@Mapper(config = EmbeddedUnifiedMapperSpringConfig.class, uses = {
     CrmLifecycleStageModelMapper.class
 })
 public interface CrmCreateUpdateAccountModelMapper

@@ -31,7 +31,7 @@ import com.bytechef.platform.component.domain.OptionsDataSource;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.domain.TimeProperty;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.ArrayPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.BooleanPropertyModel;
 import com.bytechef.platform.configuration.web.rest.model.DatePropertyModel;
@@ -59,7 +59,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class PropertyMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, uses = {
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
         JsonNullableMapper.class
     })
     public interface ComponentPropertyMapper extends Converter<Property, PropertyModel>, Property.PropertyVisitor {
@@ -164,7 +164,7 @@ public class PropertyMapper {
         }
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, uses = {
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, uses = {
         JsonNullableMapper.class
     })
     public interface TaskDispatcherPropertyMapper

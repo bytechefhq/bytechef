@@ -17,7 +17,7 @@
 package com.bytechef.platform.workflow.execution.web.rest.mapper;
 
 import com.bytechef.platform.workflow.execution.dto.TriggerExecutionDTO;
-import com.bytechef.platform.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
+import com.bytechef.platform.workflow.execution.web.rest.mapper.config.PlatformWorkflowExecutionMapperSpringConfig;
 import com.bytechef.platform.workflow.execution.web.rest.model.TriggerExecutionModel;
 import java.util.Optional;
 import org.mapstruct.Mapper;
@@ -27,7 +27,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = WorkflowExecutionMapperSpringConfig.class)
+@Mapper(config = PlatformWorkflowExecutionMapperSpringConfig.class)
 public interface TriggerExecutionMapper extends Converter<TriggerExecutionDTO, TriggerExecutionModel> {
 
     @Override

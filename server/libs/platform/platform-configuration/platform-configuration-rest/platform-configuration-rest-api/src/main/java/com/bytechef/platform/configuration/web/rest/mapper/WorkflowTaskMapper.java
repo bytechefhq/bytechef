@@ -18,7 +18,7 @@ package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowTaskModel;
 import java.util.List;
 import org.mapstruct.IterableMapping;
@@ -32,7 +32,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class WorkflowTaskMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public interface WorkflowTaskToWorkflowTaskModelMapper extends Converter<WorkflowTask, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskToWorkflowTaskModelMapper")
@@ -45,7 +45,7 @@ public class WorkflowTaskMapper {
         List<WorkflowTaskModel> map(List<WorkflowTask> workflowTasks);
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class, implementationName = "Platform<CLASS_NAME>Impl")
     public interface WorkflowTaskDTOToWorkflowTaskModelMapper extends Converter<WorkflowTaskDTO, WorkflowTaskModel> {
 
         @Named(value = "workflowTaskDTOToWorkflowTaskModelMapper")

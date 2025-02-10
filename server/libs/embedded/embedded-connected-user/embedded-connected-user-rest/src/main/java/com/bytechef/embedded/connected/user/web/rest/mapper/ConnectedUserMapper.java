@@ -17,7 +17,7 @@
 package com.bytechef.embedded.connected.user.web.rest.mapper;
 
 import com.bytechef.embedded.connected.user.dto.ConnectedUserDTO;
-import com.bytechef.embedded.connected.user.web.rest.mapper.config.ConnectedUserMapperSpringConfig;
+import com.bytechef.embedded.connected.user.web.rest.mapper.config.EmbeddedConnectedUserMapperSpringConfig;
 import com.bytechef.embedded.connected.user.web.rest.model.ConnectedUserModel;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConnectedUserMapperSpringConfig.class)
+@Mapper(config = EmbeddedConnectedUserMapperSpringConfig.class)
 public interface ConnectedUserMapper extends Converter<ConnectedUserDTO, ConnectedUserModel> {
 
     @Override

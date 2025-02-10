@@ -16,10 +16,10 @@
 
 package com.bytechef.embedded.configuration.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.web.rest.adapter.IntegrationConfigurationConversionServiceAdapter;
-import com.bytechef.platform.category.web.rest.adapter.CategoryConversionServiceAdapter;
-import com.bytechef.platform.configuration.web.rest.adapter.WorkflowConfigurationConversionServiceAdapter;
-import com.bytechef.platform.tag.web.rest.adapter.TagConversionServiceAdapter;
+import com.bytechef.embedded.configuration.web.rest.adapter.EmbeddedConfigurationConversionServiceAdapter;
+import com.bytechef.platform.category.web.rest.adapter.PlatformCategoryConversionServiceAdapter;
+import com.bytechef.platform.configuration.web.rest.adapter.PlatformConfigurationConversionServiceAdapter;
+import com.bytechef.platform.tag.web.rest.adapter.PlatformTagConversionServiceAdapter;
 import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
@@ -28,12 +28,12 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    DateTimeMapper.class, CategoryConversionServiceAdapter.class,
-    IntegrationConfigurationConversionServiceAdapter.class, WorkflowConfigurationConversionServiceAdapter.class,
-    TagConversionServiceAdapter.class
+    DateTimeMapper.class, EmbeddedConfigurationConversionServiceAdapter.class,
+    PlatformCategoryConversionServiceAdapter.class, PlatformConfigurationConversionServiceAdapter.class,
+    PlatformTagConversionServiceAdapter.class
 })
 @SpringMapperConfig(
     conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.web.rest.adapter",
-    conversionServiceAdapterClassName = "IntegrationConfigurationConversionServiceAdapter")
-public interface IntegrationConfigurationMapperSpringConfig {
+    conversionServiceAdapterClassName = "EmbeddedConfigurationConversionServiceAdapter")
+public interface EmbeddedConfigurationMapperSpringConfig {
 }

@@ -16,7 +16,7 @@
 
 package com.bytechef.ee.platform.configuration.web.rest.mapper;
 
-import com.bytechef.ee.platform.configuration.web.rest.mapper.config.ConfigurationMapperSpringConfig;
+import com.bytechef.ee.platform.configuration.web.rest.mapper.config.EePlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.platform.configuration.web.rest.model.AiProviderModel;
 import com.bytechef.platform.configuration.dto.AiProviderDTO;
 import org.mapstruct.Mapper;
@@ -25,7 +25,7 @@ import org.springframework.core.convert.converter.Converter;
 /**
  * @author Ivica Cardic
  */
-@Mapper(config = ConfigurationMapperSpringConfig.class)
+@Mapper(config = EePlatformConfigurationMapperSpringConfig.class)
 public interface AiProviderMapper extends Converter<AiProviderDTO, AiProviderModel> {
 
     @Override

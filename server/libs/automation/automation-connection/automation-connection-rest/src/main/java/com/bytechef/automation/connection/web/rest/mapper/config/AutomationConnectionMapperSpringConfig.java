@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.embedded.configuration.public_.web.rest.mapper.config;
+package com.bytechef.automation.connection.web.rest.mapper.config;
 
-import com.bytechef.embedded.configuration.public_.web.rest.adapter.IntegrationPublicConfigurationConversionServiceAdapter;
+import com.bytechef.automation.connection.web.rest.adapter.AutomationConnectionConversionServiceAdapter;
+import com.bytechef.web.rest.mapper.DateTimeMapper;
 import org.mapstruct.MapperConfig;
 import org.mapstruct.extensions.spring.SpringMapperConfig;
 
@@ -24,10 +25,10 @@ import org.mapstruct.extensions.spring.SpringMapperConfig;
  * @author Ivica Cardic
  */
 @MapperConfig(componentModel = "spring", uses = {
-    IntegrationPublicConfigurationConversionServiceAdapter.class
+    DateTimeMapper.class, AutomationConnectionConversionServiceAdapter.class,
 })
 @SpringMapperConfig(
-    conversionServiceAdapterPackage = "com.bytechef.embedded.configuration.public_.web.rest.adapter",
-    conversionServiceAdapterClassName = "IntegrationPublicConfigurationConversionServiceAdapter")
-public interface IntegrationConfigurationMapperSpringConfig {
+    conversionServiceAdapterPackage = "com.bytechef.automation.connection.web.rest.adapter",
+    conversionServiceAdapterClassName = "AutomationConnectionConversionServiceAdapter")
+public interface AutomationConnectionMapperSpringConfig {
 }

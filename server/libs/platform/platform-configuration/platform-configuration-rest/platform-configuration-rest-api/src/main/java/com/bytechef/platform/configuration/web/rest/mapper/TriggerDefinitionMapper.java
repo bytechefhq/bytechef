@@ -17,7 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.mapper;
 
 import com.bytechef.platform.component.domain.TriggerDefinition;
-import com.bytechef.platform.configuration.web.rest.mapper.config.WorkflowConfigurationMapperSpringConfig;
+import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionModel;
 import org.mapstruct.Mapper;
@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
  */
 public class TriggerDefinitionMapper {
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionModelMapper
         extends Converter<TriggerDefinition, TriggerDefinitionModel> {
 
@@ -36,7 +36,7 @@ public class TriggerDefinitionMapper {
         TriggerDefinitionModel convert(TriggerDefinition triggerDefinition);
     }
 
-    @Mapper(config = WorkflowConfigurationMapperSpringConfig.class)
+    @Mapper(config = PlatformConfigurationMapperSpringConfig.class)
     public interface TriggerDefinitionToTriggerDefinitionBasicModelMapper
         extends Converter<TriggerDefinition, TriggerDefinitionBasicModel> {
 

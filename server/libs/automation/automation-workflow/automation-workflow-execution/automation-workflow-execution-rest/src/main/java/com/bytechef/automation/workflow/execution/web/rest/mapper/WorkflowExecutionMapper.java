@@ -17,7 +17,7 @@
 package com.bytechef.automation.workflow.execution.web.rest.mapper;
 
 import com.bytechef.automation.workflow.execution.dto.WorkflowExecutionDTO;
-import com.bytechef.automation.workflow.execution.web.rest.mapper.config.WorkflowExecutionMapperSpringConfig;
+import com.bytechef.automation.workflow.execution.web.rest.mapper.config.AutomationWorkflowExecutionMapperSpringConfig;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import org.mapstruct.Mapper;
@@ -29,7 +29,7 @@ import org.springframework.core.convert.converter.Converter;
 public class WorkflowExecutionMapper {
 
     @Mapper(
-        config = WorkflowExecutionMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
+        config = AutomationWorkflowExecutionMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
     public interface WorkflowExecutionDTOToWorkflowExecutionModelMapper
         extends Converter<WorkflowExecutionDTO, WorkflowExecutionModel> {
 
@@ -38,7 +38,7 @@ public class WorkflowExecutionMapper {
     }
 
     @Mapper(
-        config = WorkflowExecutionMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
+        config = AutomationWorkflowExecutionMapperSpringConfig.class, implementationName = "Automation<CLASS_NAME>Impl")
     public interface WorkflowExecutionDTOToWorkflowExecutionBasicModelMapper
         extends Converter<WorkflowExecutionDTO, WorkflowExecutionBasicModel> {
 
