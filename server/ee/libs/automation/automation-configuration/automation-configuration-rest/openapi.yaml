@@ -71,6 +71,14 @@ paths:
           schema:
             type: "integer"
             format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                commitMessage:
+                  type: "string"
+        required: true
       responses:
         "204":
           description: "Successful operation."

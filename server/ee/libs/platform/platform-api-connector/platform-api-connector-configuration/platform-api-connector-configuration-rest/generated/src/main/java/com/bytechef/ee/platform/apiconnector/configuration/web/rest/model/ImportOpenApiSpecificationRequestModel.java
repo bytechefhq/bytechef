@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("importOpenApiSpecification_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-01-26T16:39:01.700637+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-06T15:10:26.371658+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 public class ImportOpenApiSpecificationRequestModel {
 
   private String name;

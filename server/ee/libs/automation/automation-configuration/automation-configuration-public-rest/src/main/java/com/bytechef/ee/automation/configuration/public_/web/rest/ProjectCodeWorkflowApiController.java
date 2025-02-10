@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
+ * @version ee
+ * 
  * @author Ivica Cardic
  */
 @RestController("com.bytechef.automation.configuration.public_.web.rest.ProjectApiController")
