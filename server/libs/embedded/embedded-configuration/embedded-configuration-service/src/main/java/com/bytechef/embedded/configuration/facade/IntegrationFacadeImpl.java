@@ -102,7 +102,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         IntegrationWorkflow integrationWorkflow = integrationWorkflowService.addWorkflow(
-            id, integration.getLastIntegrationVersion(), workflow.getId());
+            id, integration.getLastVersion(), workflow.getId());
 
         return integrationWorkflow.getId();
     }
@@ -193,7 +193,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         }
 
         integrationWorkflowService.delete(
-            integration.getId(), integration.getLastIntegrationVersion(), workflowId);
+            integration.getId(), integration.getLastVersion(), workflowId);
 
         workflowTestConfigurationService.delete(workflowId);
 
@@ -286,7 +286,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
         Integration integration = integrationService.getIntegration(id);
 
         return integrationWorkflowService
-            .getIntegrationWorkflows(integration.getId(), integration.getLastIntegrationVersion())
+            .getIntegrationWorkflows(integration.getId(), integration.getLastVersion())
             .stream()
             .map(integrationWorkflow -> new IntegrationWorkflowDTO(
                 workflowFacade.getWorkflow(integrationWorkflow.getWorkflowId()), integrationWorkflow))
@@ -349,7 +349,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
     public void publishIntegration(long id, String description) {
         Integration integration = integrationService.getIntegration(id);
 
-        int oldIntegrationVersion = integration.getLastIntegrationVersion();
+        int oldIntegrationVersion = integration.getLastVersion();
 
         List<IntegrationWorkflow> oldIntegrationWorkflows = integrationWorkflowService
             .getIntegrationWorkflows(integration.getId(), oldIntegrationVersion);
@@ -406,7 +406,7 @@ public class IntegrationFacadeImpl implements IntegrationFacade {
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
         return integrationWorkflowService.getIntegrationWorkflowIds(
-            integration.getId(), integration.getLastIntegrationVersion());
+            integration.getId(), integration.getLastVersion());
     }
 
     private IntegrationDTO toIntegrationDTO(Integration integration) {

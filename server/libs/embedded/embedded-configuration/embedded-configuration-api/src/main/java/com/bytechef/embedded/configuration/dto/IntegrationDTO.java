@@ -45,7 +45,7 @@ public record IntegrationDTO(
             integration.getComponentName(), integration.getCreatedBy(), integration.getCreatedDate(),
             integration.getDescription(), null, integration.getId(), integration.getIntegrationVersions(), null,
             integration.getLastModifiedBy(), integration.getLastModifiedDate(), integration.getLastPublishedDate(),
-            integration.getLastStatus(), integration.getLastIntegrationVersion(), integration.getName(), List.of(),
+            integration.getLastStatus(), integration.getLastVersion(), integration.getName(), List.of(),
             null, integration.getVersion());
     }
 
@@ -58,7 +58,7 @@ public record IntegrationDTO(
             integration.getCreatedBy(), integration.getCreatedDate(), getDescription(componentDefinition, integration),
             componentDefinition.getIcon(), integration.getId(), integration.getIntegrationVersions(),
             integrationWorkflowIds, integration.getLastModifiedBy(), integration.getLastModifiedDate(),
-            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastIntegrationVersion(),
+            integration.getLastPublishedDate(), integration.getLastStatus(), integration.getLastVersion(),
             integration.getName(), tags, componentDefinition.getTitle(), integration.getVersion());
     }
 

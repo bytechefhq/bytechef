@@ -30,9 +30,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.dircache.DirCacheIterator;
 import org.eclipse.jgit.lib.AbbreviatedObjectId;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
@@ -43,6 +45,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.treewalk.FileTreeIterator;
 import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +57,7 @@ import org.springframework.core.io.ByteArrayResource;
  */
 public class JGitWorkflowOperations implements GitWorkflowOperations {
 
-    private static final Logger logger = LoggerFactory.getLogger(JGitWorkflowOperations.class);
+    private static final Logger log = LoggerFactory.getLogger(JGitWorkflowOperations.class);
 
     private static final String LATEST = "latest";
 
@@ -80,10 +83,78 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     }
 
     @Override
+    public WorkflowResource getFile(String fileId) {
+        try {
+            Repository repository = getRepository();
+            int blobIdDelim = fileId.lastIndexOf(':');
+
+            if (blobIdDelim > -1) {
+                String path = fileId.substring(0, blobIdDelim);
+                String blobId = fileId.substring(blobIdDelim + 1);
+
+                return readBlob(repository, path, blobId);
+            } else {
+                return readBlob(repository, fileId, LATEST);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
     public List<WorkflowResource> getHeadFiles() {
         Repository repository = getRepository();
 
         return getHeadFiles(repository, extensions, searchPaths);
+    }
+
+    @Override
+    public synchronized void write(List<WorkflowResource> workflowResources, String commitMessage) {
+        Repository repository = getRepository();
+
+        Git git = new Git(repository);
+
+        try {
+            RevWalk rw = new RevWalk(repository);
+            try (TreeWalk tw = new TreeWalk(repository)) {
+                RevCommit commitToCheck = rw.parseCommit(repository.resolve("HEAD"));
+
+                tw.addTree(commitToCheck.getTree());
+                tw.addTree(new DirCacheIterator(repository.readDirCache()));
+                tw.addTree(new FileTreeIterator(repository));
+                tw.setRecursive(true);
+
+                while (tw.next()) {
+                    git.rm()
+                        .addFilepattern(tw.getPathString())
+                        .call();
+                }
+            }
+
+            for (WorkflowResource workflowResource : workflowResources) {
+                File workflowFile = new File(repositoryDir, Objects.requireNonNull(workflowResource.getFilename()));
+
+                Path path = workflowFile.toPath();
+
+                Files.copy(
+                    workflowResource.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+
+                git.add()
+                    .addFilepattern(".")
+                    .call();
+
+            }
+
+            git.commit()
+                .setMessage(commitMessage)
+                .call();
+
+            git.push()
+                .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
+                .call();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private List<WorkflowResource> getHeadFiles(
@@ -122,8 +193,8 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
 
                     ObjectId firstObjectId = treeWalk.getObjectId(0);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Loading {} [{}]", path, firstObjectId.name());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Loading {} [{}]", path, firstObjectId.name());
                     }
 
                     workflowResources.add(
@@ -140,7 +211,9 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     private synchronized Repository getRepository() {
         clear();
 
-        logger.info("Cloning {} {}", url, branch);
+        if (log.isDebugEnabled()) {
+            log.debug("Cloning repository: {}", url);
+        }
 
         CloneCommand cloneCommand = Git.cloneRepository()
             .setURI(url)
@@ -158,25 +231,6 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
         }
     }
 
-    @Override
-    public WorkflowResource getFile(String fileId) {
-        try {
-            Repository repository = getRepository();
-            int blobIdDelim = fileId.lastIndexOf(':');
-
-            if (blobIdDelim > -1) {
-                String path = fileId.substring(0, blobIdDelim);
-                String blobId = fileId.substring(blobIdDelim + 1);
-
-                return readBlob(repository, path, blobId);
-            } else {
-                return readBlob(repository, fileId, LATEST);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     private WorkflowResource readBlob(Repository repository, String path, String blobId) throws Exception {
         WorkflowResource workflowResource = null;
 
@@ -185,8 +239,8 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 List<WorkflowResource> headFiles = getHeadFiles(repository, extensions, List.of(path));
 
                 if (headFiles.isEmpty()) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Could not find: " + path + ":" + blobId);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Could not find: " + path + ":" + blobId);
                     }
                 } else {
                     workflowResource = headFiles.get(0);
@@ -195,8 +249,8 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 ObjectId objectId = repository.resolve(blobId);
 
                 if (objectId == null) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Could not find: " + path + ":" + blobId);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Could not find: " + path + ":" + blobId);
                     }
                 } else {
                     ObjectLoader objectLoader = objectReader.open(objectId);

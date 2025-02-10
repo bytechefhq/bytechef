@@ -57,5 +57,9 @@ public class GitWorkflowRepositoryTest {
             return new WorkflowResource(
                 "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML);
         }
+
+        @Override
+        public void write(List<WorkflowResource> workflowResources, String commitMessage) {
+        }
     }
 }

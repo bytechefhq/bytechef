@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.configuration.facade;
 import com.bytechef.component.ai.llm.constant.LLMConstants;
 import com.bytechef.component.ai.llm.constant.Provider;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
@@ -18,6 +19,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @version ee
@@ -25,6 +27,8 @@ import org.springframework.stereotype.Service;
  * @author Ivica Cardic
  */
 @Service
+@Transactional
+@ConditionalOnEEVersion
 public class AiProviderFacadeImpl implements AiProviderFacade {
 
     private final ComponentDefinitionService componentDefinitionService;
@@ -46,6 +50,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<AiProviderDTO> getAiProviders() {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 

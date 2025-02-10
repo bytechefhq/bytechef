@@ -84,7 +84,7 @@ public class DemoProjectConfiguration {
                         resource.getContentAsString(StandardCharsets.UTF_8), Workflow.Format.JSON, SourceType.JDBC);
 
                     projectWorkflowService.addWorkflow(
-                        Validate.notNull(project.getId(), "id"), project.getLastProjectVersion(), workflow.getId());
+                        Validate.notNull(project.getId(), "id"), project.getLastVersion(), workflow.getId());
                 }
             }
         };

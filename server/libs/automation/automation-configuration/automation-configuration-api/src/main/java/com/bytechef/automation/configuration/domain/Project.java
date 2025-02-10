@@ -176,8 +176,15 @@ public final class Project {
         return getMaxProjectVersion().getStatus();
     }
 
-    public int getLastProjectVersion() {
+    public int getLastVersion() {
         return getMaxProjectVersion().getVersion();
+    }
+
+    public ProjectVersion getLastPublishedProjectVersion() {
+        return projectVersions.stream()
+            .filter(projectVersion -> projectVersion.getStatus() == Status.PUBLISHED)
+            .max(Comparator.comparingInt(ProjectVersion::getVersion))
+            .orElseThrow();
     }
 
     public List<ProjectVersion> getProjectVersions() {

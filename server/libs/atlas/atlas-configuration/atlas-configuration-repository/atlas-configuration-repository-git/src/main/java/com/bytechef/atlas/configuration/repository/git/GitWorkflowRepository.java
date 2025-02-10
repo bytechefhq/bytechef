@@ -27,14 +27,18 @@ import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.config.ApplicationProperties;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ByteArrayResource;
 
 /**
  * @author Arik Cohen
@@ -46,18 +50,25 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private final GitWorkflowOperations gitWorkflowOperations;
 
+    @SuppressFBWarnings("EI")
     public GitWorkflowRepository(GitWorkflowOperations gitWorkflowOperations) {
         this.gitWorkflowOperations = gitWorkflowOperations;
     }
 
+    @SuppressFBWarnings("EI")
     public GitWorkflowRepository(ApplicationProperties applicationProperties) {
         ApplicationProperties.Workflow.Repository.Git git = applicationProperties.getWorkflow()
             .getRepository()
             .getGit();
 
         this.gitWorkflowOperations = new JGitWorkflowOperations(
-            git.getUrl(), git.getBranch(), List.of("yaml", "yml"), Arrays.asList(git.getSearchPaths()),
+            git.getUrl(), git.getBranch(), List.of("json", "yaml", "yml"), Arrays.asList(git.getSearchPaths()),
             git.getUsername(), git.getPassword());
+    }
+
+    public GitWorkflowRepository(String url, String branch, String username, String password) {
+        this.gitWorkflowOperations = new JGitWorkflowOperations(
+            url, branch, List.of("json", "yaml", "yml"), List.of(), username, password);
     }
 
     @Override
@@ -110,6 +121,31 @@ public class GitWorkflowRepository implements WorkflowRepository {
         }
 
         return workflow;
+    }
+
+    public void save(List<Workflow> workflows, String commitMessage) {
+        gitWorkflowOperations.write(
+            workflows.stream()
+                .map(workflow -> new WorkflowResource(
+                    workflow.getId(), Map.of(), getResource(workflow), workflow.getFormat()))
+                .toList(),
+            commitMessage);
+    }
+
+    private static ByteArrayResource getResource(Workflow workflow) {
+        String definition = workflow.getDefinition();
+
+        return new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)) {
+
+            @Override
+            public String getFilename() {
+                Workflow.Format format = workflow.getFormat();
+
+                String name = format.name();
+
+                return workflow.getLabel() + "." + name.toLowerCase();
+            }
+        };
     }
 
     private static String decode(String str) {

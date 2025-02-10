@@ -39,7 +39,7 @@ public record ProjectDTO(
         this(
             category, project.getCreatedBy(), project.getCreatedDate(), project.getDescription(), project.getId(),
             project.getName(), project.getLastModifiedBy(), project.getLastModifiedDate(),
-            project.getLastPublishedDate(), project.getLastStatus(), project.getLastProjectVersion(),
+            project.getLastPublishedDate(), project.getLastStatus(), project.getLastVersion(),
             project.getProjectVersions(), projectWorkflowIds, tags, project.getVersion(), project.getWorkspaceId());
     }
 
@@ -48,7 +48,7 @@ public record ProjectDTO(
             project.getCategoryId() == null ? null : new Category(project.getCategoryId()), project.getCreatedBy(),
             project.getCreatedDate(), project.getDescription(), project.getId(), project.getName(),
             project.getLastModifiedBy(), project.getLastModifiedDate(), project.getLastPublishedDate(),
-            project.getLastStatus(), project.getLastProjectVersion(), project.getProjectVersions(), List.of(),
+            project.getLastStatus(), project.getLastVersion(), project.getProjectVersions(), List.of(),
             List.of(), project.getVersion(), project.getWorkspaceId());
     }
 

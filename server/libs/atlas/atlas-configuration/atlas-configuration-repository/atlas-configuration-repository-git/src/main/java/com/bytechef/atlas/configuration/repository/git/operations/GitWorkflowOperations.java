@@ -29,4 +29,6 @@ public interface GitWorkflowOperations {
     List<WorkflowResource> getHeadFiles();
 
     WorkflowResource getFile(String fileId);
+
+    void write(List<WorkflowResource> workflowResources, String commitMessage);
 }

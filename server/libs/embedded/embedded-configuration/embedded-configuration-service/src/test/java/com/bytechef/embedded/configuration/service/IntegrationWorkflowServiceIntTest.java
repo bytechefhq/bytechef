@@ -62,11 +62,11 @@ public class IntegrationWorkflowServiceIntTest {
 
         integrationWorkflowService.addWorkflow(
             Validate.notNull(integration.getId(), "id"),
-            Validate.notNull(integration.getLastIntegrationVersion(), "latVersion"),
+            Validate.notNull(integration.getLastVersion(), "latVersion"),
             "workflow2");
 
         assertThat(
-            integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion()))
+            integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastVersion()))
                 .contains("workflow2");
     }
 

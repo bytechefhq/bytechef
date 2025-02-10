@@ -102,7 +102,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Workflow workflow = workflowService.create(definition, Format.JSON, SourceType.JDBC);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.addWorkflow(
-            id, project.getLastProjectVersion(), workflow.getId());
+            id, project.getLastVersion(), workflow.getId());
 
         return projectWorkflow.getId();
     }
@@ -187,7 +187,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             }
         }
 
-        projectWorkflowService.delete(project.getId(), project.getLastProjectVersion(), workflowId);
+        projectWorkflowService.delete(project.getId(), project.getLastVersion(), workflowId);
 
         workflowTestConfigurationService.delete(workflowId);
 
@@ -205,12 +205,12 @@ public class ProjectFacadeImpl implements ProjectFacade {
         newProject.setWorkspaceId(project.getWorkspaceId());
 
         List<String> workflowIds = copyWorkflowIds(
-            projectWorkflowService.getWorkflowIds(project.getId(), project.getLastProjectVersion()));
+            projectWorkflowService.getWorkflowIds(project.getId(), project.getLastVersion()));
 
         newProject = projectService.create(newProject);
 
         for (String workflowId : workflowIds) {
-            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastProjectVersion(), workflowId);
+            projectWorkflowService.addWorkflow(newProject.getId(), newProject.getLastVersion(), workflowId);
         }
 
         return toProjectDTO(newProject);
@@ -230,7 +230,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
             Validate.notNull(workflow.getId(), "id"),
             JsonUtils.writeWithDefaultPrettyPrinter(definitionMap), workflow.getVersion());
 
-        projectWorkflowService.addWorkflow(id, project.getLastProjectVersion(), workflow.getId());
+        projectWorkflowService.addWorkflow(id, project.getLastVersion(), workflow.getId());
 
         return workflow.getId();
     }
@@ -290,7 +290,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         Project project = projectService.getProject(id);
 
         return projectWorkflowService
-            .getProjectWorkflows(project.getId(), project.getLastProjectVersion())
+            .getProjectWorkflows(project.getId(), project.getLastVersion())
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowFacade.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow))
@@ -341,7 +341,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public void publishProject(long id, String description) {
         Project project = projectService.getProject(id);
 
-        int oldProjectVersion = project.getLastProjectVersion();
+        int oldProjectVersion = project.getLastVersion();
 
         List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), oldProjectVersion);
@@ -453,7 +453,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         category -> Objects.equals(project.getCategoryId(), category.getId()),
                         null),
                     project,
-                    projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
+                    projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()),
                     CollectionUtils.filter(
                         tagService.getTags(
                             projects.stream()
@@ -469,7 +469,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private ProjectDTO toProjectDTO(Project project) {
         return new ProjectDTO(
             getCategory(project), project,
-            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
+            projectWorkflowService.getProjectWorkflowIds(project.getId(), project.getLastVersion()),
             tagService.getTags(project.getTagIds()));
     }
 }

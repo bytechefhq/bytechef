@@ -268,7 +268,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements WorkflowExecution
     }
 
     private List<String> getWorkflowIds(Integration integration) {
-        return integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion());
+        return integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastVersion());
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

@@ -73,9 +73,9 @@ public class ProjectWorkflowServiceIntTest {
         Project project = projectRepository.save(getProject());
 
         projectWorkflowService.addWorkflow(
-            Validate.notNull(project.getId(), "id"), project.getLastProjectVersion(), "workflow2");
+            Validate.notNull(project.getId(), "id"), project.getLastVersion(), "workflow2");
 
-        assertThat(projectWorkflowService.getWorkflowIds(project.getId(), project.getLastProjectVersion()))
+        assertThat(projectWorkflowService.getWorkflowIds(project.getId(), project.getLastVersion()))
             .contains("workflow2");
     }
 

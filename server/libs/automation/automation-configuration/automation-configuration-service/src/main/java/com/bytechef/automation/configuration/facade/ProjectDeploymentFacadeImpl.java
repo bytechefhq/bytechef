@@ -135,7 +135,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                 ProjectDeploymentErrorType.CREATE_PROJECT_DEPLOYMENT);
         }
 
-        if (project.getLastProjectVersion() == projectDeployment.getProjectVersion()) {
+        if (project.getLastVersion() == projectDeployment.getProjectVersion()) {
             throw new ConfigurationException(
                 "Project version v=%s cannot be in DRAFT".formatted(projectDeployment.getProjectVersion()),
                 ProjectDeploymentErrorType.CREATE_PROJECT_DEPLOYMENT);

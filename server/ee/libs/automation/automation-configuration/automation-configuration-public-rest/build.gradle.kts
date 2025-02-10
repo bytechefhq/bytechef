@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
 
-    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-code-workflow:automation-configuration-code-workflow-api"))
+    implementation(project(":server:ee:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
 
     testImplementation("org.springframework:spring-webflux")

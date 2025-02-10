@@ -161,7 +161,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
                 IntegrationInstanceConfigurationErrorType.CREATE_INTEGRATION_INSTANCE_CONFIGURATION);
         }
 
-        if (integration.getLastIntegrationVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
+        if (integration.getLastVersion() == integrationInstanceConfiguration.getIntegrationVersion()) {
             throw new ConfigurationException(
                 "Integration version v=%s cannot be in DRAFT".formatted(
                     integrationInstanceConfiguration.getIntegrationVersion()),
@@ -723,7 +723,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     private List<Long> getIntegrationWorkflowIds(Integration integration) {
         return integrationWorkflowService.getIntegrationWorkflowIds(
-            integration.getId(), integration.getLastIntegrationVersion());
+            integration.getId(), integration.getLastVersion());
     }
 
     private List<Tag> getTags(List<IntegrationInstanceConfiguration> integrationInstanceConfigurations) {
