@@ -12,11 +12,8 @@ import {
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Switch} from '@/components/ui/switch';
-import {useUpdateProjectGitConfigurationMutation} from '@/ee/mutations/projectGit.mutations';
-import {ProjectGitConfigurationKeys} from '@/ee/queries/projectGit.queries';
 import {ProjectGitConfiguration} from '@/ee/shared/middleware/automation/configuration';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {useQueryClient} from '@tanstack/react-query';
 import React from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
@@ -30,12 +27,18 @@ const formSchema = z.object({
 
 const ProjectGitConfigurationDialog = ({
     onClose,
+    onUpdateProjectGitConfigurationSubmit,
     projectGitConfiguration,
-    projectId,
 }: {
     onClose: () => void;
+    onUpdateProjectGitConfigurationSubmit: ({
+        onSuccess,
+        projectGitConfiguration,
+    }: {
+        projectGitConfiguration: z.infer<typeof formSchema>;
+        onSuccess: () => void;
+    }) => void;
     projectGitConfiguration?: ProjectGitConfiguration;
-    projectId: number;
 }) => {
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
@@ -45,22 +48,10 @@ const ProjectGitConfigurationDialog = ({
         resolver: zodResolver(formSchema),
     });
 
-    const queryClient = useQueryClient();
-
-    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
-        onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(projectId),
-            });
-
-            onClose();
-        },
-    });
-
-    function handleSubmit(values: z.infer<typeof formSchema>) {
-        updateProjectGitConfigurationMutation.mutate({
-            id: projectId,
-            projectGitConfiguration: values,
+    function handleSubmit(projectGitConfiguration: z.infer<typeof formSchema>) {
+        onUpdateProjectGitConfigurationSubmit({
+            onSuccess: onClose,
+            projectGitConfiguration,
         });
     }
 

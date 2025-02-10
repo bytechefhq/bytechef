@@ -29,7 +29,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
     const [showDeleteProjectAlertDialog, setShowDeleteProjectAlertDialog] = useState(false);
     const [showDeleteWorkflowAlertDialog, setShowDeleteWorkflowAlertDialog] = useState(false);
     const [showEditProjectDialog, setShowEditProjectDialog] = useState(false);
-    const [showGitConfigurationDialog, setShowGitConfigurationDialog] = useState(false);
+    const [showProjectGitConfigurationDialog, setShowProjectGitConfigurationDialog] = useState(false);
     const [showProjectVersionHistorySheet, setShowProjectVersionHistorySheet] = useState(false);
 
     const {setShowEditWorkflowDialog, showEditWorkflowDialog} = useWorkflowEditorStore();
@@ -41,8 +41,10 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
         handleDuplicateWorkflowClick,
         handleImportProjectWorkflowClick,
         handlePullProjectFromGitClick,
+        handleUpdateProjectGitConfigurationSubmit,
         hiddenFileInputRef,
         projectGitConfiguration,
+        projectVersions,
     } = useSettingsMenu({project, workflow});
 
     const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -111,7 +113,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                                 onDuplicateProjectClick={handleDuplicateProjectClick}
                                 onPullProjectFromGitClick={handlePullProjectFromGitClick}
                                 onShowEditProjectDialogClick={() => setShowEditProjectDialog(true)}
-                                onShowGitConfigurationDialog={() => setShowGitConfigurationDialog(true)}
+                                onShowProjectGitConfigurationDialog={() => setShowProjectGitConfigurationDialog(true)}
                                 onShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
                                 projectGitConfigurationEnabled={projectGitConfiguration?.enabled ?? false}
                             />
@@ -151,20 +153,19 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                 />
             )}
 
-            {showGitConfigurationDialog && (
+            {showProjectGitConfigurationDialog && (
                 <ProjectGitConfigurationDialog
-                    onClose={() => setShowGitConfigurationDialog(false)}
+                    onClose={() => setShowProjectGitConfigurationDialog(false)}
+                    onUpdateProjectGitConfigurationSubmit={handleUpdateProjectGitConfigurationSubmit}
                     projectGitConfiguration={projectGitConfiguration}
-                    projectId={project.id!}
                 />
             )}
 
-            {showProjectVersionHistorySheet && (
+            {showProjectVersionHistorySheet && projectVersions && (
                 <ProjectVersionHistorySheet
-                    onClose={() => {
-                        setShowProjectVersionHistorySheet(false);
-                    }}
-                    projectId={Number(project.id!)}
+                    onSheetOpenChange={setShowProjectVersionHistorySheet}
+                    projectVersions={projectVersions}
+                    sheetOpen={showProjectVersionHistorySheet}
                 />
             )}
 

@@ -1,19 +1,21 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {Badge} from '@/components/ui/badge';
 import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
-import {ProjectStatus} from '@/shared/middleware/automation/configuration';
-import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
+import {ProjectStatus, ProjectVersion} from '@/shared/middleware/automation/configuration';
 
 interface ProjectVersionHistorySheetProps {
-    onClose: () => void;
-    projectId: number;
+    onSheetOpenChange: (open: boolean) => void;
+    projectVersions: ProjectVersion[];
+    sheetOpen: boolean;
 }
 
-const ProjectVersionHistorySheet = ({onClose, projectId}: ProjectVersionHistorySheetProps) => {
-    const {data: projectVersions} = useGetProjectVersionsQuery(projectId);
-
+const ProjectVersionHistorySheet = ({
+    onSheetOpenChange,
+    projectVersions,
+    sheetOpen,
+}: ProjectVersionHistorySheetProps) => {
     return (
-        <Sheet onOpenChange={() => onClose()} open>
+        <Sheet onOpenChange={onSheetOpenChange} open={sheetOpen}>
             <SheetContent
                 className="flex flex-col p-4 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
                 onFocusOutside={(event) => event.preventDefault()}

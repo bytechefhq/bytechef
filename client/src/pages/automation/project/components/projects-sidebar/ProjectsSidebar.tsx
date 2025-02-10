@@ -1,24 +1,18 @@
 import {Badge} from '@/components/ui/badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import {useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
+import {Project} from '@/shared/middleware/automation/configuration';
 import * as React from 'react';
-import {useNavigate, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-const ProjectsSidebar = ({projectId}: {projectId: number}) => {
-    const {currentWorkspaceId} = useWorkspaceStore();
-
-    const navigate = useNavigate();
-
-    const [searchParams] = useSearchParams();
-
-    const {data: projects} = useGetWorkspaceProjectsQuery({
-        categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
-        id: currentWorkspaceId!,
-        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
-    });
-
+const ProjectsSidebar = ({
+    onProjectClick,
+    projectId,
+    projects,
+}: {
+    onProjectClick: (projectId: number, projectWorkflowId: number) => void;
+    projectId: number;
+    projects?: Project[];
+}) => {
     return (
         <div className="space-y-0.5 overflow-y-scroll px-2">
             {projects &&
@@ -29,11 +23,7 @@ const ProjectsSidebar = ({projectId}: {projectId: number}) => {
                             curProject.id === projectId && 'bg-muted/50'
                         )}
                         key={curProject.id}
-                        onClick={() =>
-                            navigate(
-                                `/automation/projects/${curProject?.id}/project-workflows/${curProject?.projectWorkflowIds![0]}?${searchParams}`
-                            )
-                        }
+                        onClick={() => onProjectClick(curProject.id!, curProject?.projectWorkflowIds![0])}
                     >
                         <div className={twMerge('flex flex-col gap-1', curProject.id === projectId && 'font-semibold')}>
                             <div className="flex">

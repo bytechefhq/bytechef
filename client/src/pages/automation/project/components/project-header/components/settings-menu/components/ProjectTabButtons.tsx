@@ -20,7 +20,7 @@ const ProjectTabButtons = ({
     onDuplicateProjectClick,
     onPullProjectFromGitClick,
     onShowEditProjectDialogClick,
-    onShowGitConfigurationDialog,
+    onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
     projectGitConfigurationEnabled,
 }: {
@@ -30,7 +30,7 @@ const ProjectTabButtons = ({
     onDuplicateProjectClick: () => void;
     onShowEditProjectDialogClick: () => void;
     onPullProjectFromGitClick: () => void;
-    onShowGitConfigurationDialog: () => void;
+    onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
     projectGitConfigurationEnabled: boolean;
 }) => {
@@ -75,7 +75,7 @@ const ProjectTabButtons = ({
             <Separator />
 
             {ff_1039 && (
-                <EEVersion>
+                <EEVersion hidden={true}>
                     <Button
                         className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
                         disabled={!projectGitConfigurationEnabled}
@@ -87,7 +87,7 @@ const ProjectTabButtons = ({
 
                     <Button
                         className="justify-start hover:bg-surface-neutral-primary-hover"
-                        onClick={onShowGitConfigurationDialog}
+                        onClick={onShowProjectGitConfigurationDialog}
                         variant="ghost"
                     >
                         <GitBranchIcon /> Git Configuration

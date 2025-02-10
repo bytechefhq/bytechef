@@ -16,37 +16,51 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
-import {useParams} from 'react-router-dom';
 
 const Project = () => {
-    const {leftSidebarOpen} = useProjectsLeftSidebarStore();
+    const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
     const {workflowIsRunning, workflowTestExecution} = useWorkflowEditorStore();
     const {workflow} = useWorkflowDataStore();
 
-    const {projectId, projectWorkflowId} = useParams();
-
     const {
         bottomResizablePanelRef,
+        categories,
         deleteWorkflowNodeParameterMutation,
+        filterData,
+        handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
+        projectId,
+        projectWorkflowId,
+        projects,
+        tags,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
         useGetConnectionsQuery,
-    } = useProject({
-        projectId: parseInt(projectId!),
-        projectWorkflowId: parseInt(projectWorkflowId!),
-    });
-
+    } = useProject();
     const {runDisabled} = useWorkflowLayout();
 
     return (
         <>
             <LayoutContainer
                 className="bg-muted/50"
-                leftSidebarBody={<ProjectsSidebar projectId={+projectId!} />}
+                leftSidebarBody={
+                    <ProjectsSidebar onProjectClick={handleProjectClick} projectId={projectId} projects={projects} />
+                }
                 leftSidebarClass="bg-background"
-                leftSidebarHeader={<Header right={<ProjectsSidebarHeader />} title="Projects" />}
+                leftSidebarHeader={
+                    <Header
+                        right={
+                            <ProjectsSidebarHeader
+                                categories={categories}
+                                filterData={filterData}
+                                onLeftSidebarOpenClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
+                                tags={tags}
+                            />
+                        }
+                        title="Projects"
+                    />
+                }
                 leftSidebarOpen={leftSidebarOpen}
                 leftSidebarWidth="96"
                 topHeader={
@@ -57,8 +71,8 @@ const Project = () => {
                                 workflow.triggers &&
                                 workflow.triggers.findIndex((trigger) => trigger.type.includes('chat/')) !== -1
                             }
-                            projectId={parseInt(projectId)}
-                            projectWorkflowId={parseInt(projectWorkflowId!)}
+                            projectId={projectId}
+                            projectWorkflowId={projectWorkflowId}
                             runDisabled={runDisabled}
                             updateWorkflowMutation={updateWorkflowMutation}
                         />

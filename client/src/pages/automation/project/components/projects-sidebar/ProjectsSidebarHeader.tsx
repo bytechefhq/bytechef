@@ -1,31 +1,23 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
 import {Type} from '@/pages/automation/projects/Projects';
 import ProjectsLeftSidebarNav from '@/pages/automation/projects/components/ProjectsLeftSidebarNav';
-import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
-import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
+import {Category, Tag} from '@/shared/middleware/automation/configuration';
 import {FilterIcon, PanelLeftIcon} from 'lucide-react';
 import * as React from 'react';
-import {useSearchParams} from 'react-router-dom';
 
-const ProjectsSidebarHeader = () => {
-    const {leftSidebarOpen, setLeftSidebarOpen} = useProjectsLeftSidebarStore();
-    const [searchParams] = useSearchParams();
-
-    const filterData = {
-        id: searchParams.get('categoryId')
-            ? parseInt(searchParams.get('categoryId')!)
-            : searchParams.get('tagId')
-              ? parseInt(searchParams.get('tagId')!)
-              : undefined,
-        type: searchParams.get('tagId') ? Type.Tag : Type.Category,
-    };
-
-    const {data: categories} = useGetProjectCategoriesQuery();
-    const {data: tags} = useGetProjectTagsQuery();
-
+const ProjectsSidebarHeader = ({
+    categories,
+    filterData,
+    onLeftSidebarOpenClick,
+    tags,
+}: {
+    categories?: Category[];
+    filterData: {id?: number; type: Type};
+    onLeftSidebarOpenClick: () => void;
+    tags?: Tag[];
+}) => {
     return (
         <div className="flex items-center">
             <Popover>
@@ -48,22 +40,20 @@ const ProjectsSidebarHeader = () => {
                 </PopoverContent>
             </Popover>
 
-            {leftSidebarOpen && (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="hover:bg-muted [&_svg]:size-5"
-                            onClick={() => setLeftSidebarOpen(!leftSidebarOpen)}
-                            size="icon"
-                            variant="ghost"
-                        >
-                            <PanelLeftIcon />
-                        </Button>
-                    </TooltipTrigger>
+            <Tooltip>
+                <TooltipTrigger asChild>
+                    <Button
+                        className="hover:bg-muted [&_svg]:size-5"
+                        onClick={onLeftSidebarOpenClick}
+                        size="icon"
+                        variant="ghost"
+                    >
+                        <PanelLeftIcon />
+                    </Button>
+                </TooltipTrigger>
 
-                    <TooltipContent>See projects</TooltipContent>
-                </Tooltip>
-            )}
+                <TooltipContent>See projects</TooltipContent>
+            </Tooltip>
         </div>
     );
 };

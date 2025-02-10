@@ -1,3 +1,4 @@
+import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
@@ -11,14 +12,17 @@ import {
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
+import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
+import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
 import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
-import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
+import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useRef} from 'react';
 import {ImperativePanelHandle} from 'react-resizable-panels';
+import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 
-export const useProject = ({projectId, projectWorkflowId}: {projectId: number; projectWorkflowId: number}) => {
+export const useProject = () => {
     const {setWorkflow, workflow} = useWorkflowDataStore();
 
     const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore();
@@ -28,9 +32,22 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
 
     const bottomResizablePanelRef = useRef<ImperativePanelHandle>(null);
 
+    const {projectId, projectWorkflowId} = useParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    const filterData = {
+        id: searchParams.get('categoryId')
+            ? parseInt(searchParams.get('categoryId')!)
+            : searchParams.get('tagId')
+              ? parseInt(searchParams.get('tagId')!)
+              : undefined,
+        type: searchParams.get('tagId') ? Type.Tag : Type.Category,
+    };
+
     const {data: currentWorkflow} = useGetProjectWorkflowQuery(
-        projectId,
-        projectWorkflowId,
+        +projectId!,
+        +projectWorkflowId!,
         !!projectId && !!projectWorkflowId
     );
 
@@ -44,12 +61,22 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
         );
     };
 
+    const {data: categories} = useGetProjectCategoriesQuery();
+
+    const {data: projects} = useGetWorkspaceProjectsQuery({
+        categoryId: searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')!) : undefined,
+        id: currentWorkspaceId!,
+        tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
+    });
+
+    const {data: tags} = useGetProjectTagsQuery();
+
     const queryClient = useQueryClient();
 
     const deleteWorkflowNodeParameterMutation = useDeleteWorkflowNodeParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectKeys.project(projectId),
+                queryKey: ProjectKeys.project(+projectId!),
             });
 
             queryClient.invalidateQueries({
@@ -61,7 +88,7 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
     const updateWorkflowEditorMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, projectWorkflowId),
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
         },
         useUpdateWorkflowMutation: useUpdateWorkflowMutation,
@@ -72,7 +99,7 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
     const updateWorkflowMutation = useUpdatePlatformWorkflowMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflows(projectId),
+                queryKey: ProjectWorkflowKeys.projectWorkflows(+projectId!),
             });
 
             setShowEditWorkflowDialog(false);
@@ -85,10 +112,14 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
     const updateWorkflowNodeParameterMutation = useUpdateWorkflowNodeParameterMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, projectWorkflowId),
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
             });
         },
     });
+
+    const handleProjectClick = (projectId: number, projectWorkflowId: number) => {
+        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
+    };
 
     const handleWorkflowExecutionsTestOutputCloseClick = () => {
         setShowBottomPanelOpen(false);
@@ -131,8 +162,15 @@ export const useProject = ({projectId, projectWorkflowId}: {projectId: number; p
 
     return {
         bottomResizablePanelRef,
+        categories,
         deleteWorkflowNodeParameterMutation,
+        filterData,
+        handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
+        projectId: +projectId!,
+        projectWorkflowId: +projectWorkflowId!,
+        projects,
+        tags,
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,

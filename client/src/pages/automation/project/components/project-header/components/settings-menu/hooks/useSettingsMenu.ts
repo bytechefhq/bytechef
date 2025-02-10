@@ -1,5 +1,8 @@
-import {usePullProjectFromGitMutation} from '@/ee/mutations/projectGit.mutations';
-import {useGetProjectGitConfigurationQuery} from '@/ee/queries/projectGit.queries';
+import {
+    usePullProjectFromGitMutation,
+    useUpdateProjectGitConfigurationMutation,
+} from '@/ee/mutations/projectGit.mutations';
+import {ProjectGitConfigurationKeys, useGetProjectGitConfigurationQuery} from '@/ee/queries/projectGit.queries';
 import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
@@ -11,6 +14,7 @@ import {
 } from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
+import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
@@ -27,6 +31,8 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     const {toast} = useToast();
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+
+    const {data: projectVersions} = useGetProjectVersionsQuery(project.id!);
 
     const queryClient = useQueryClient();
 
@@ -100,6 +106,14 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         },
     });
 
+    const updateProjectGitConfigurationMutation = useUpdateProjectGitConfigurationMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(project.id!),
+            });
+        },
+    });
+
     const handleDeleteProjectAlertDialogClick = () => {
         if (project.id) {
             deleteProjectMutation.mutate(project.id);
@@ -140,6 +154,24 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         pullProjectFromGitMutation.mutate({id: project.id!});
     };
 
+    const handleUpdateProjectGitConfigurationSubmit = ({
+        onSuccess,
+        projectGitConfiguration,
+    }: {
+        projectGitConfiguration: {branch: string; enabled: boolean};
+        onSuccess: () => void;
+    }) => {
+        updateProjectGitConfigurationMutation.mutate(
+            {
+                id: project.id!,
+                projectGitConfiguration,
+            },
+            {
+                onSuccess,
+            }
+        );
+    };
+
     return {
         handleDeleteProjectAlertDialogClick,
         handleDeleteWorkflowAlertDialogClick,
@@ -147,7 +179,9 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
         handleDuplicateWorkflowClick,
         handleImportProjectWorkflowClick,
         handlePullProjectFromGitClick,
+        handleUpdateProjectGitConfigurationSubmit,
         hiddenFileInputRef,
         projectGitConfiguration,
+        projectVersions,
     };
 };
