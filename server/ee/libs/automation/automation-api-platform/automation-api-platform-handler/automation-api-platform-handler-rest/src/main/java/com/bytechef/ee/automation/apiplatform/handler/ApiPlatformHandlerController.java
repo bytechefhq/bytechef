@@ -154,7 +154,8 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
                 apiCollection.getProjectDeploymentId());
 
             if (!projectDeployment.isEnabled()) {
-                return ResponseEntity.status(404).body("API Collection is not enabled");
+                return ResponseEntity.status(404)
+                    .body("API Collection is not enabled");
             }
 
             variables = PATH_MATCHER

@@ -123,7 +123,9 @@ public class ApiCollectionApiController implements ApiCollectionApi {
 
         String name = apiCollection.getName();
 
-        name = name.toLowerCase().replace(" ", "_").trim();
+        name = name.toLowerCase()
+            .replace(" ", "_")
+            .trim();
 
         return "%s_openapi.json".formatted(name);
     }

@@ -272,8 +272,11 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
         Operation operation = new Operation();
 
         operation.description(description);
-        operation.operationId(
-            httpMethod.name().toLowerCase() + StringUtils.capitalize(apiCollectionEndpoint.getName()));
+
+        String name = httpMethod.name();
+
+        operation.operationId(name.toLowerCase() + StringUtils.capitalize(apiCollectionEndpoint.getName()));
+
         operation.parameters(createParameters(path, parameters));
         operation.requestBody(createRequestBody(parameters));
         operation.responses(createApiResponses(parameters));
@@ -313,7 +316,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
                             .properties(
                                 Map.of(
                                     "message",
-                                    new Schema<>().type("string").description("Error message"))))));
+                                    new Schema<>()
+                                        .type("string")
+                                        .description("Error message"))))));
     }
 
     private static String createPath(ApiCollectionEndpoint apiCollectionEndpoint, ApiCollection apiCollection) {

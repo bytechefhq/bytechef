@@ -62,7 +62,8 @@ public class ApiCollectionEndpointApiController implements ApiCollectionEndpoint
     public ResponseEntity<Void> deleteApiCollectionEndpoint(Long id) {
         apiCollectionEndpointService.delete(id);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override
