@@ -9,19 +9,25 @@ import {SettingsIcon} from 'lucide-react';
 import {useState} from 'react';
 
 interface ProjectHeaderSettingsMenuProps {
+    handlePullProjectFromGit: () => void;
     project: Project;
+    projectGitConfigurationEnabled: boolean;
     setShowDeleteProjectAlertDialog: (value: boolean) => void;
     setShowEditProjectDialog: (value: boolean) => void;
     setShowDeleteWorkflowAlertDialog: (value: boolean) => void;
+    setShowGitConfigurationDialog: (value: boolean) => void;
     setShowProjectVersionHistorySheet: (value: boolean) => void;
     workflowId: string;
 }
 
 const ProjectHeaderSettingsMenu = ({
+    handlePullProjectFromGit,
     project,
+    projectGitConfigurationEnabled,
     setShowDeleteProjectAlertDialog,
     setShowDeleteWorkflowAlertDialog,
     setShowEditProjectDialog,
+    setShowGitConfigurationDialog,
     setShowProjectVersionHistorySheet,
     workflowId,
 }: ProjectHeaderSettingsMenuProps) => {
@@ -80,8 +86,11 @@ const ProjectHeaderSettingsMenu = ({
                             handleCloseDropdownMenu={() => setOpenDropdownMenu(false)}
                             handleDeleteProject={() => setShowDeleteProjectAlertDialog(true)}
                             handleEditProject={() => setShowEditProjectDialog(true)}
+                            handlePullProjectFromGit={handlePullProjectFromGit}
+                            handleShowGitConfigurationDialog={() => setShowGitConfigurationDialog(true)}
                             handleShowProjectVersionHistorySheet={() => setShowProjectVersionHistorySheet(true)}
                             project={project}
+                            projectGitConfigurationEnabled={projectGitConfigurationEnabled}
                         />
                     </TabsContent>
                 </Tabs>

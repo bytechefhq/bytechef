@@ -35,7 +35,7 @@ const IntegrationPublishDialog = ({integration, onClose}: {integration: Integrat
             });
 
             toast({
-                description: 'The integration is published.',
+                description: 'The integration has been published.',
             });
 
             onClose();

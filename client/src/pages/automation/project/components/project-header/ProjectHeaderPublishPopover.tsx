@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
@@ -50,7 +51,7 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
             });
 
             toast({
-                description: 'The project is published.',
+                description: 'The project has been published.',
             });
 
             reset({description: undefined});
@@ -111,9 +112,11 @@ const ProjectHeaderPublishPopover = ({project}: {project: Project}) => {
                         <div className="flex justify-end">
                             <Button
                                 className="bg-surface-brand-primary shadow-none hover:bg-surface-brand-primary-hover active:bg-surface-brand-primary-pressed"
+                                disabled={publishProjectMutation.isPending}
                                 size="sm"
                                 type="submit"
                             >
+                                {publishProjectMutation.isPending && <LoadingIcon />}
                                 Publish
                             </Button>
                         </div>

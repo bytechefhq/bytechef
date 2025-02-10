@@ -27,6 +27,7 @@ import {WorkflowExecutions as EmbeddedIntegrationWorkflowExecutions} from '@/pag
 import Home from '@/pages/home/Home';
 import AiProviders from '@/pages/platform/settings/ai-providers/AiProviders';
 import ApiKeys from '@/pages/platform/settings/api-keys/ApiKeys';
+import GitConfiguration from '@/pages/platform/settings/git-configuration/GitConfiguration';
 import Workspaces from '@/pages/settings/automation/workspaces/Workspaces';
 import SigningKeys from '@/pages/settings/embedded/signing-keys/SigningKeys';
 import PrivateRoute from '@/shared/auth/PrivateRoute';
@@ -119,6 +120,16 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <GitConfiguration />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'git-configuration',
+        },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <ApiKeys />
                 </PrivateRoute>
             ),
@@ -140,6 +151,10 @@ const platformSettingsRoutes = {
         {
             href: `api-connectors`,
             title: 'API Connectors',
+        },
+        {
+            href: 'git-configuration',
+            title: 'Git Configuration',
         },
         {
             href: 'api-keys',

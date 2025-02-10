@@ -47,7 +47,7 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
             });
 
             toast({
-                description: 'The integration is published.',
+                description: 'The integration has been published.',
             });
 
             reset({description: undefined});
