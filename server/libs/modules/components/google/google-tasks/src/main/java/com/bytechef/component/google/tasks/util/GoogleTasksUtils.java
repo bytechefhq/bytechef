@@ -66,11 +66,10 @@ public class GoogleTasksUtils {
     private static List<Option<String>> getOptions(Map<String, Object> response) {
         List<Option<String>> tasksId = new ArrayList<>();
 
-        if (response.get("items") instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map) {
-                    tasksId.add(
-                        option((String) map.get("title"), (String) map.get("id")));
+        if (response.get("items") instanceof List<?> items) {
+            for (Object item : items) {
+                if (item instanceof Map<?, ?> map) {
+                    tasksId.add(option((String) map.get("title"), (String) map.get("id")));
                 }
             }
         }
