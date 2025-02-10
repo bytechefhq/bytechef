@@ -365,11 +365,7 @@ const Integration = () => {
 
                             <ResizableHandle className="bg-muted" />
 
-                            <ResizablePanel
-                                className="bg-background"
-                                defaultSize={0}
-                                ref={bottomResizablePanelRef}
-                            >
+                            <ResizablePanel className="bg-background" defaultSize={0} ref={bottomResizablePanelRef}>
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={() => {
                                         setShowBottomPanelOpen(false);
