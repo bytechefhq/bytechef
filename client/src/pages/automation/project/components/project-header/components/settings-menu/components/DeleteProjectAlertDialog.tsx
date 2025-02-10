@@ -9,7 +9,7 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const ProjectHeaderDeleteProjectAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
+const DeleteProjectAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
     <AlertDialog open>
         <AlertDialogContent>
             <AlertDialogHeader>
@@ -31,4 +31,4 @@ const ProjectHeaderDeleteProjectAlertDialog = ({onClose, onDelete}: {onClose: ()
     </AlertDialog>
 );
 
-export default ProjectHeaderDeleteProjectAlertDialog;
+export default DeleteProjectAlertDialog;

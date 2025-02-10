@@ -1,39 +1,23 @@
 import {Button} from '@/components/ui/button';
 import {Separator} from '@/components/ui/separator';
-import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
-import {Project} from '@/shared/middleware/automation/configuration';
-import {useDuplicateWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
-import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {useQueryClient} from '@tanstack/react-query';
 import {CopyIcon, EditIcon, Trash2Icon, UploadIcon} from 'lucide-react';
 
-const ProjectHeaderWorkflowTabButtons = ({
-    handleCloseDropdownMenu,
-    handleShowDeleteWorkflowAlertDialog,
-    project,
+const WorkflowTabButtons = ({
+    onCloseDropdownMenu,
+    onDuplicateWorkflow,
+    onShowDeleteWorkflowAlertDialog,
+    onShowEditWorkflowDialog,
     workflowId,
 }: {
-    handleCloseDropdownMenu: () => void;
-    handleShowDeleteWorkflowAlertDialog: () => void;
-    project: Project;
+    onCloseDropdownMenu: () => void;
+    onDuplicateWorkflow: () => void;
+    onShowEditWorkflowDialog: () => void;
+    onShowDeleteWorkflowAlertDialog: () => void;
     workflowId: string;
 }) => {
-    const {setShowEditWorkflowDialog} = useWorkflowEditorStore();
-
-    const queryClient = useQueryClient();
-
-    const duplicateWorkflowMutation = useDuplicateWorkflowMutation({
-        onError: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({queryKey: ProjectKeys.projects});
-        },
-    });
-
     const handleButtonClick = (event: React.MouseEvent<HTMLDivElement>) => {
         if ((event.target as HTMLElement).tagName === 'BUTTON') {
-            handleCloseDropdownMenu();
+            onCloseDropdownMenu();
         }
     };
 
@@ -41,7 +25,7 @@ const ProjectHeaderWorkflowTabButtons = ({
         <div className="flex flex-col" onClick={handleButtonClick}>
             <Button
                 className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={() => setShowEditWorkflowDialog(true)}
+                onClick={onShowEditWorkflowDialog}
                 variant="ghost"
             >
                 <EditIcon /> Edit
@@ -49,12 +33,7 @@ const ProjectHeaderWorkflowTabButtons = ({
 
             <Button
                 className="justify-start rounded-none hover:bg-surface-neutral-primary-hover"
-                onClick={() =>
-                    duplicateWorkflowMutation.mutate({
-                        id: project.id!,
-                        workflowId: workflowId,
-                    })
-                }
+                onClick={onDuplicateWorkflow}
                 variant="ghost"
             >
                 <CopyIcon /> Duplicate
@@ -72,7 +51,7 @@ const ProjectHeaderWorkflowTabButtons = ({
 
             <Button
                 className="justify-start rounded-none text-destructive hover:bg-surface-error-secondary hover:text-destructive"
-                onClick={() => handleShowDeleteWorkflowAlertDialog()}
+                onClick={() => onShowDeleteWorkflowAlertDialog()}
                 variant="ghost"
             >
                 <Trash2Icon /> Delete
@@ -81,4 +60,4 @@ const ProjectHeaderWorkflowTabButtons = ({
     );
 };
 
-export default ProjectHeaderWorkflowTabButtons;
+export default WorkflowTabButtons;

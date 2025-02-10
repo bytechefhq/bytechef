@@ -8,24 +8,20 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {Workflow} from '@/shared/middleware/automation/configuration';
 
-const ProjectHeaderWorkflowSelect = ({
+const WorkflowSelect = ({
+    currentWorkflowLabel,
     onValueChange,
-    projectId,
     projectWorkflowId,
+    projectWorkflows,
 }: {
+    currentWorkflowLabel: string;
     onValueChange: (projectWorkflowId: number) => void;
     projectId: number;
     projectWorkflowId: number;
+    projectWorkflows: Workflow[];
 }) => {
-    const {data: projectWorkflows} = useGetProjectWorkflowsQuery(projectId, !!projectId);
-
-    const {
-        workflow: {label: currentWorkflowLabel},
-    } = useWorkflowDataStore();
-
     return (
         <Select
             defaultValue={projectWorkflowId.toString()}
@@ -65,4 +61,4 @@ const ProjectHeaderWorkflowSelect = ({
     );
 };
 
-export default ProjectHeaderWorkflowSelect;
+export default WorkflowSelect;
