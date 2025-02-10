@@ -53,6 +53,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-api"))
 
+    implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
+
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-web")
 }

@@ -16,9 +16,9 @@
 
 package com.bytechef.ee.platform.configuration.web.rest.mapper;
 
+import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
 import com.bytechef.ee.platform.configuration.web.rest.mapper.config.EePlatformConfigurationMapperSpringConfig;
 import com.bytechef.ee.platform.configuration.web.rest.model.AiProviderModel;
-import com.bytechef.platform.configuration.dto.AiProviderDTO;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

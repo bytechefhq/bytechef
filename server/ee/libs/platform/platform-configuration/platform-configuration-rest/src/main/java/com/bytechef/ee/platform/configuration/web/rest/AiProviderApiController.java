@@ -9,10 +9,10 @@ package com.bytechef.ee.platform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.ee.platform.configuration.web.rest.model.AiProviderModel;
 import com.bytechef.ee.platform.configuration.web.rest.model.UpdateAiProviderRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
