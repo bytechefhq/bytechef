@@ -15,7 +15,7 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
-import {ModeType, useModeTypeStore} from './stores/useModeTypeStore';
+import {ModeType, useModeTypeStore} from '../stores/useModeTypeStore';
 
 interface ModeSelectionDialogProps {
     isDialogOpen: boolean;
