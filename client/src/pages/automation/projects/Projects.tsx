@@ -68,8 +68,8 @@ const Projects = () => {
                 errors={[categoriesError, projectsError, tagsError]}
                 loading={categoriesIsLoading || projectsIsLoading || tagsIsLoading}
             >
-                {projects && projects?.length > 0 ? (
-                    projects && tags && <ProjectList projects={projects} tags={tags} />
+                {projects && projects?.length > 0 && tags ? (
+                    <ProjectList projects={projects} tags={tags} />
                 ) : (
                     <EmptyList
                         button={<ProjectDialog project={undefined} triggerNode={<Button>Create Project</Button>} />}
