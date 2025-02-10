@@ -4,7 +4,7 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/c
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import DataStreamComponentsTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DataStreamComponentsTab';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
+import Properties from '@/pages/platform/workflow-editor/components/properties1/Properties';
 import {CONDITION_CASE_FALSE, CONDITION_CASE_TRUE} from '@/shared/constants';
 import {
     ActionDefinitionApi,

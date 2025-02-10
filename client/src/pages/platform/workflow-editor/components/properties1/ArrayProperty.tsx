@@ -1,6 +1,6 @@
 import {Button} from '@/components/ui/button';
-import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties/components/ArrayPropertyItem';
-import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
+import ArrayPropertyItem from '@/pages/platform/workflow-editor/components/properties1/components/ArrayPropertyItem';
+import SubPropertyPopover from '@/pages/platform/workflow-editor/components/properties1/components/SubPropertyPopover';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
