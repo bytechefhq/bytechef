@@ -1,12 +1,11 @@
 import {Button} from '@/components/ui/button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
+import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {PopoverClose} from '@radix-ui/react-popover';
 import {XIcon} from 'lucide-react';
-
-import PropertyInput from './PropertyInput/PropertyInput';
-import PropertySelect from './PropertySelect';
 
 interface SubPropertyPopoverProps {
     array?: boolean;

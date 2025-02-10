@@ -1,4 +1,5 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import Property from '@/pages/platform/workflow-editor/components/properties/Property';
 import {GetWorkflowNodeParameterDisplayConditions200Response} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
@@ -9,7 +10,6 @@ import {Control, FormState} from 'react-hook-form/dist/types/form';
 import {twMerge} from 'tailwind-merge';
 
 import useWorkflowNodeDetailsPanelStore from '../../stores/useWorkflowNodeDetailsPanelStore';
-import Property from './Property';
 
 interface PropertiesProps {
     /* eslint-disable @typescript-eslint/no-explicit-any */

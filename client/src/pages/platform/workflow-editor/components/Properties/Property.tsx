@@ -3,17 +3,19 @@ import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/Properties/components/InputTypeSwitchButton';
-import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditor';
-import PropertyComboBox from '@/pages/platform/workflow-editor/components/Properties/components/PropertyComboBox';
-import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/Properties/components/PropertyDynamicProperties';
-import PropertyInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyInput/PropertyInput';
-import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/Properties/components/PropertyJsonSchemaBuilder/PropertyJsonSchemaBuilder';
-import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/Properties/components/PropertyMentionsInput/PropertyMentionsInput';
+import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
+import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
+import InputTypeSwitchButton from '@/pages/platform/workflow-editor/components/properties/components/InputTypeSwitchButton';
+import PropertyComboBox from '@/pages/platform/workflow-editor/components/properties/components/PropertyComboBox';
+import PropertyDynamicProperties from '@/pages/platform/workflow-editor/components/properties/components/PropertyDynamicProperties';
 import PropertySelect, {
     SelectOptionType,
-} from '@/pages/platform/workflow-editor/components/Properties/components/PropertySelect';
-import PropertyTextArea from '@/pages/platform/workflow-editor/components/Properties/components/PropertyTextArea';
+} from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
+import PropertyTextArea from '@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea';
+import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditor';
+import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
+import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
+import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowNodeParameterMutation} from '@/pages/platform/workflow-editor/providers/workflowNodeParameterMutationProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -38,8 +40,6 @@ import {twMerge} from 'tailwind-merge';
 import {useDebouncedCallback} from 'use-debounce';
 
 import {decodePath, encodeParameters, encodePath} from '../../utils/encodingUtils';
-import ArrayProperty from './ArrayProperty';
-import ObjectProperty from './ObjectProperty';
 
 const INPUT_PROPERTY_CONTROL_TYPES = [
     'DATE',

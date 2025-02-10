@@ -2,7 +2,7 @@ import RequiredMark from '@/components/RequiredMark';
 import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/Properties/components/PropertyCodeEditor/PropertyCodeEditorSheet';
+import PropertyCodeEditorSheet from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheet';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {Workflow} from '@/shared/middleware/platform/configuration';
 import {ExclamationTriangleIcon, QuestionMarkCircledIcon} from '@radix-ui/react-icons';
