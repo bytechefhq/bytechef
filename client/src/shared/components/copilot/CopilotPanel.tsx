@@ -8,18 +8,31 @@ import {BotMessageSquareIcon, MessageSquareOffIcon} from 'lucide-react';
 import {useEffect} from 'react';
 
 const CopilotPanel = () => {
-    const {generateConversationId, resetMessages, setCopilotPanelOpen} = useCopilotStore();
+    const {context, generateConversationId, resetMessages, setContext, setCopilotPanelOpen} = useCopilotStore();
 
     const handleCleanMessages = () => {
         resetMessages();
-
         generateConversationId();
+    };
+
+    const handleCloseClick = () => {
+        setContext(undefined);
+        setCopilotPanelOpen(false);
     };
 
     useEffect(() => {
         generateConversationId();
+        resetMessages();
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        generateConversationId();
+        resetMessages();
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [context?.source]);
 
     return (
         <div className="relative h-full min-h-[50vh] w-[450px]">
@@ -39,7 +52,7 @@ const CopilotPanel = () => {
                         <TooltipContent>Clean messages</TooltipContent>
                     </Tooltip>
 
-                    <Button onClick={() => setCopilotPanelOpen(false)} size="icon" variant="ghost">
+                    <Button onClick={handleCloseClick} size="icon" variant="ghost">
                         <Cross2Icon />
                     </Button>
                 </div>

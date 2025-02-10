@@ -5,7 +5,6 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon} from 'lucide-react';
-import {useEffect} from 'react';
 
 export interface CopilotButtonProps {
     source: Source;
@@ -20,25 +19,19 @@ const CopilotButton = ({parameters = {}, source}: CopilotButtonProps) => {
 
     const ff_1570 = useFeatureFlagsStore()('ff-1570');
 
-    useEffect(() => {
+    const handleClick = () => {
         setContext({parameters, source, workflowId: workflow.id!});
 
-        return () => {
-            setContext(undefined);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [source, workflow]);
+        if (!copilotPanelOpen) {
+            setCopilotPanelOpen(!copilotPanelOpen);
+        }
+    };
 
     return (
         <Tooltip>
             <TooltipTrigger asChild>
                 {ai.copilot.enabled && ff_1570 && (
-                    <Button
-                        className="[&_svg]:size-5"
-                        onClick={() => !copilotPanelOpen && setCopilotPanelOpen(!copilotPanelOpen)}
-                        size="icon"
-                        variant="ghost"
-                    >
+                    <Button className="[&_svg]:size-5" onClick={handleClick} size="icon" variant="ghost">
                         <SparklesIcon />
                     </Button>
                 )}
