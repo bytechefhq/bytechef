@@ -8,6 +8,8 @@ servers:
 tags:
   - name: "project-code-workflow"
     description: "The Automation Project Code Workflow Public API"
+  - name: "project-git"
+    description: "The Automation Project Git Public API"
 paths:
   /projects/deploy:
     post:
@@ -31,6 +33,24 @@ paths:
                   type: "string"
                   format: "binary"
         required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /projects/{id}/git/pull:
+    post:
+      description: "Pulls project from git repository."
+      summary: "Pulls project from git repository."
+      tags:
+        - "project-git"
+      operationId: "pullProjectFromGit"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "204":
           description: "Successful operation."

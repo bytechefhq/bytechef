@@ -1,13 +1,15 @@
 ---
 openapi: "3.0.1"
 info:
-  title: "The Platform Properties Internal API"
+  title: "The Platform Internal API"
   version: "1"
 servers:
   - url: "/api/platform/internal"
 tags:
   - name: "ai-provider"
-    description: "The Platform Properties AI Provider Internal API"
+    description: "The Platform AI Provider Internal API"
+  - name: "git-configuration"
+    description: "The Platform Git Configuration Internal API"
 paths:
   /ai-providers:
     get:
@@ -91,6 +93,35 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+  /git-configuration:
+    get:
+      description: "Get git configuration."
+      summary: "Get git configuration."
+      tags:
+        - "git-configuration"
+      operationId: "getGitConfiguration"
+      responses:
+        "200":
+          description: "The git configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GitConfiguration"
+    put:
+      description: "Update git configuration."
+      summary: "Update git configuration."
+      tags:
+        - "git-configuration"
+      operationId: "updateGitConfiguration"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GitConfiguration"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
 components:
   schemas:
     AiProvider:
@@ -118,4 +149,20 @@ components:
         enabled:
           description: "The enabled status of an AI provider."
           type: "boolean"
-
+    GitConfiguration:
+      description: "The git configuration."
+      required:
+        - url
+        - username
+        - password
+      properties:
+        url:
+          description: "The repository url."
+          type: "string"
+        username:
+          description: "The username."
+          type: "string"
+        password:
+          description: "The password."
+          type: "string"
+          writeOnly: true

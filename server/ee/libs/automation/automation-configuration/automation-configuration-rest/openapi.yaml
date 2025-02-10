@@ -8,7 +8,98 @@ servers:
 tags:
   - name: "workspace"
     description: "The Automation Workspace Internal API"
+  - name: "project-git"
+    description: "The Automation Project Git Internal API"
 paths:
+  /projects/{id}/git/configuration:
+    get:
+      description: "Get git configuration of a project."
+      summary: "Get git configuration of a project."
+      tags:
+        - "project-git"
+      operationId: "getProjectGitConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The git configuration object."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectGitConfiguration"
+    put:
+      description: "Update git configuration of an existing project."
+      summary: "Update git configuration of an existing project."
+      tags:
+        - "project-git"
+      operationId: "updateProjectGitConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjectGitConfiguration"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
+  /projects/{id}/git/pull:
+    post:
+      description: "Pulls project from git repository."
+      summary: "Pulls project from git repository."
+      tags:
+        - "project-git"
+      operationId: "pullProjectFromGit"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "204":
+          description: "Successful operation."
+  /projects/{id}/git/push:
+    post:
+      description: "Pushes project to git repository."
+      summary: "Pushes project to git repository."
+      tags:
+        - "project-git"
+      operationId: "pushProjectToGit"
+      parameters:
+        - name: "id"
+          description: "The id of a project."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                commitMessage:
+                  type: "string"
+        required: true
+      responses:
+        "204":
+          description: "Successful operation."
   /users/{id}/workspaces:
     get:
       description: "Get all user workspaces."
@@ -136,5 +227,44 @@ paths:
                 $ref: "#/components/schemas/Workspace"
 components:
   schemas:
+    ProjectGitConfiguration:
+      description: "The git configuration."
+      required:
+        - projectId
+        - branch
+        - enabled
+      properties:
+        projectId:
+          description: "The project id of a project git configuration."
+          type: "integer"
+          format: "int64"
+          readOnly: true
+        branch:
+          description: "The branch."
+          type: "string"
+        enabled:
+          description: "The enabled."
+          type: "boolean"
+        createdBy:
+          description: "The created by."
+          type: "string"
+          readOnly: true
+        createdDate:
+          description: "The created date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        lastModifiedBy:
+          description: "The last modified by."
+          type: "string"
+          readOnly: true
+        lastModifiedDate:
+          description: "The last modified date."
+          type: "string"
+          format: "date-time"
+          readOnly: true
+        __version:
+          type: "integer"
+          format: "int32"
     Workspace:
       $ref: "../../../../../libs/automation/automation-configuration/automation-configuration-rest/automation-configuration-rest-impl/openapi.yaml#/components/schemas/Workspace"
