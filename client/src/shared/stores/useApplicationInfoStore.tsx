@@ -3,7 +3,7 @@
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
 
-export type EditionType = 'ce' | 'ee';
+export type EditionType = 'CE' | 'EE';
 
 export interface ApplicationInfoI {
     ai: {

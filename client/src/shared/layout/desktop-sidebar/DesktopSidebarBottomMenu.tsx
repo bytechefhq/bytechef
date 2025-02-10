@@ -139,7 +139,7 @@ const DesktopSidebarBottomMenu = () => {
                 <DropdownMenuSeparator />
 
                 <div className="min-h-52 space-y-1">
-                    {pathname.startsWith('/automation') && application?.edition === 'ee' && workspaces && (
+                    {pathname.startsWith('/automation') && application?.edition === 'EE' && workspaces && (
                         <>
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
