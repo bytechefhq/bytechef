@@ -1,5 +1,5 @@
 ---
-title: "Github"
+title: "GitHub"
 description: "GitHub is a web-based platform for version control and collaboration using Git."
 ---
 
