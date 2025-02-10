@@ -15,7 +15,7 @@ const IntegrationHeaderHistoryButton = ({onClick}: IntegrationHeaderHistoryButto
                 </Button>
             </TooltipTrigger>
 
-            <TooltipContent>Project Version History</TooltipContent>
+            <TooltipContent>Integration Version History</TooltipContent>
         </Tooltip>
     );
 };
