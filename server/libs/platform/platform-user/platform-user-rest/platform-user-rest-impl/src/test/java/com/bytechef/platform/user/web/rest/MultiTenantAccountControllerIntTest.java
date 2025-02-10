@@ -72,7 +72,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
     classes = {
         UserIntTestConfiguration.class, MultiTenantAccountControllerConfiguration.class
     }, properties = {
-        "bytechef.tenant.mode=multi", "bytechef.edition=ee", "spring.main.allow-bean-definition-overriding=true"
+        "bytechef.tenant.mode=multi", "bytechef.edition=EE", "spring.main.allow-bean-definition-overriding=true"
     })
 @AutoConfigureMockMvc
 @UserIntTestConfigurationSharedMocks
