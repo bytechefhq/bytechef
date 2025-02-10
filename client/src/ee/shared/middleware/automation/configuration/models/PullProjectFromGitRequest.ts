@@ -16,29 +16,29 @@ import { mapValues } from '../runtime';
 /**
  * 
  * @export
- * @interface PushProjectToGitRequest
+ * @interface PullProjectFromGitRequest
  */
-export interface PushProjectToGitRequest {
+export interface PullProjectFromGitRequest {
     /**
      * 
      * @type {string}
-     * @memberof PushProjectToGitRequest
+     * @memberof PullProjectFromGitRequest
      */
     commitMessage?: string;
 }
 
 /**
- * Check if a given object implements the PushProjectToGitRequest interface.
+ * Check if a given object implements the PullProjectFromGitRequest interface.
  */
-export function instanceOfPushProjectToGitRequest(value: object): value is PushProjectToGitRequest {
+export function instanceOfPullProjectFromGitRequest(value: object): value is PullProjectFromGitRequest {
     return true;
 }
 
-export function PushProjectToGitRequestFromJSON(json: any): PushProjectToGitRequest {
-    return PushProjectToGitRequestFromJSONTyped(json, false);
+export function PullProjectFromGitRequestFromJSON(json: any): PullProjectFromGitRequest {
+    return PullProjectFromGitRequestFromJSONTyped(json, false);
 }
 
-export function PushProjectToGitRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PushProjectToGitRequest {
+export function PullProjectFromGitRequestFromJSONTyped(json: any, ignoreDiscriminator: boolean): PullProjectFromGitRequest {
     if (json == null) {
         return json;
     }
@@ -48,11 +48,11 @@ export function PushProjectToGitRequestFromJSONTyped(json: any, ignoreDiscrimina
     };
 }
 
-export function PushProjectToGitRequestToJSON(json: any): PushProjectToGitRequest {
-    return PushProjectToGitRequestToJSONTyped(json, false);
+export function PullProjectFromGitRequestToJSON(json: any): PullProjectFromGitRequest {
+    return PullProjectFromGitRequestToJSONTyped(json, false);
 }
 
-export function PushProjectToGitRequestToJSONTyped(value?: PushProjectToGitRequest | null, ignoreDiscriminator: boolean = false): any {
+export function PullProjectFromGitRequestToJSONTyped(value?: PullProjectFromGitRequest | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
