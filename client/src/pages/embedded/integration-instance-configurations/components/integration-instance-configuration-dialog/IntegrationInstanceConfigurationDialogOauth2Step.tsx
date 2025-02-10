@@ -1,5 +1,5 @@
 import {Label} from '@/components/ui/label';
-import Properties from '@/pages/platform/workflow-editor/components/properties1/Properties';
+import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {IntegrationInstanceConfiguration} from '@/shared/middleware/embedded/configuration';
 import {Authorization} from '@/shared/middleware/platform/configuration';
 import {useGetOAuth2PropertiesQuery} from '@/shared/queries/platform/oauth2.queries';

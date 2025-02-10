@@ -1,6 +1,6 @@
 import PropertyMentionsInputEditorSuggestionList, {
     PropertyMentionsInputListRefType,
-} from '@/pages/platform/workflow-editor/components/properties1/components/property-mentions-input/PropertyMentionsInputEditorSuggestionList';
+} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputEditorSuggestionList';
 import {DataPillType} from '@/shared/types';
 import {MentionOptions} from '@tiptap/extension-mention';
 import {ReactRenderer} from '@tiptap/react';

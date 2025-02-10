@@ -1,5 +1,5 @@
-import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties1/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
-import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties1/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
+import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInputBubbleMenu';
+import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {ComponentDefinitionBasic, Workflow} from '@/shared/middleware/platform/configuration';
 import {DataPillType} from '@/shared/types';
 import Document from '@tiptap/extension-document';

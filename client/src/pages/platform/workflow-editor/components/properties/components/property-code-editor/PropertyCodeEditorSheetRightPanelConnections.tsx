@@ -1,10 +1,10 @@
 import {Button} from '@/components/ui/button';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties1/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
+import PropertyCodeEditorSheetRightPanelConnectionsLabel from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsLabel';
 import PropertyCodeEditorSheetRightPanelConnectionsPopover, {
     connectionFormSchema,
-} from '@/pages/platform/workflow-editor/components/properties1/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsPopover';
-import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties1/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
+} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsPopover';
+import PropertyCodeEditorSheetRightPanelConnectionsSelect from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditorSheetRightPanelConnectionsSelect';
 import {useWorkflowMutation} from '@/pages/platform/workflow-editor/providers/workflowMutationProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
