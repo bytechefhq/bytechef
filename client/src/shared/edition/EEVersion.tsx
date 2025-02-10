@@ -2,11 +2,15 @@ import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {Building2Icon} from 'lucide-react';
 import {ReactNode} from 'react';
 
-const EEVersion = ({children}: {children: ReactNode}) => {
+const EEVersion = ({children, hidden = false}: {children: ReactNode; hidden?: boolean}) => {
     const {application} = useApplicationInfoStore();
 
-    if (application?.edition === 'ee') {
+    if (application?.edition === 'EE') {
         return <>{children}</>;
+    }
+
+    if (hidden) {
+        return <></>;
     }
 
     return (
