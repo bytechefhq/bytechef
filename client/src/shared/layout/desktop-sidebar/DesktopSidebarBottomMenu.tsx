@@ -13,8 +13,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import ModeSelectionDialog from '@/pages/home/ModeSelectionDialog';
-import {useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
+import {ModeType, useModeTypeStore} from '@/pages/home/stores/useModeTypeStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {useGetUserWorkspacesQuery} from '@/shared/queries/automation/workspaces.queries';
@@ -24,15 +23,13 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {PlusIcon} from '@radix-ui/react-icons';
 import {useQueryClient} from '@tanstack/react-query';
 import {BlendIcon, DiamondIcon, HelpCircleIcon, SettingsIcon, User2Icon, UserRoundCogIcon} from 'lucide-react';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 
 const DesktopSidebarBottomMenu = () => {
-    const [isModeSelectionDialogOpen, setIsModeSelectionDialogOpen] = useState(false);
-
     const {application} = useApplicationInfoStore();
     const {account, logout} = useAuthenticationStore();
-    const {currentType} = useModeTypeStore();
+    const {currentType, setCurrentType} = useModeTypeStore();
     const {currentWorkspaceId, setCurrentWorkspaceId} = useWorkspaceStore();
 
     const analytics = useAnalytics();
@@ -55,6 +52,18 @@ const DesktopSidebarBottomMenu = () => {
         helpHub.shutdown();
         queryClient.resetQueries();
         logout();
+    };
+
+    const handleModeTypeChange = (value: string) => {
+        const selectedType = +value;
+
+        setCurrentType(selectedType);
+
+        if (selectedType === ModeType.AUTOMATION) {
+            navigate('/automation');
+        } else if (selectedType === ModeType.EMBEDDED) {
+            navigate('/embedded');
+        }
     };
 
     const handleWorkflowValueChange = (value: string) => {
@@ -104,12 +113,28 @@ const DesktopSidebarBottomMenu = () => {
 
                 <DropdownMenuSeparator />
 
-                <DropdownMenuItem
-                    className="cursor-pointer font-semibold"
-                    onClick={() => setIsModeSelectionDialogOpen(true)}
-                >
-                    <BlendIcon className="size-5" /> <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
-                </DropdownMenuItem>
+                {ff_520 && (
+                    <DropdownMenuSub>
+                        <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
+                            <BlendIcon className="size-5" />
+
+                            <span>Mode: {currentType === 0 ? 'Automation' : 'Embedded'}</span>
+                        </DropdownMenuSubTrigger>
+
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                                <DropdownMenuRadioGroup
+                                    onValueChange={handleModeTypeChange}
+                                    value={currentType?.toString()}
+                                >
+                                    <DropdownMenuRadioItem value="1">Embedded</DropdownMenuRadioItem>
+
+                                    <DropdownMenuRadioItem value="0">Automation</DropdownMenuRadioItem>
+                                </DropdownMenuRadioGroup>
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                )}
 
                 <DropdownMenuSeparator />
 
@@ -194,13 +219,6 @@ const DesktopSidebarBottomMenu = () => {
                     Log Out
                 </DropdownMenuItem>
             </DropdownMenuContent>
-
-            {ff_520 && (
-                <ModeSelectionDialog
-                    handleDialogClose={() => setIsModeSelectionDialogOpen(false)}
-                    isDialogOpen={isModeSelectionDialogOpen}
-                />
-            )}
         </DropdownMenu>
     );
 };
