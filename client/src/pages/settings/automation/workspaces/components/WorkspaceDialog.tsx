@@ -113,11 +113,9 @@ const WorkspaceDialog = ({onClose, triggerNode, workspace}: WorkspaceDialogProps
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(saveWorkspace)}>
                         <DialogHeader className="flex flex-row items-center justify-between space-y-0">
                             <div className="flex flex-col space-y-1">
-                                <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} App Event</DialogTitle>
+                                <DialogTitle>{`${workspace?.id ? 'Edit' : 'Create'}`} Workspace</DialogTitle>
 
-                                <DialogDescription>
-                                    Send app events from your application to trigger workflows using App Event trigger.
-                                </DialogDescription>
+                                <DialogDescription>Define workspace name and description.</DialogDescription>
                             </div>
 
                             <DialogCloseButton />

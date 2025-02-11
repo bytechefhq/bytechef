@@ -6,7 +6,7 @@ interface UpdateGitConfigurationMutationProps {
     onSuccess?: (result: void, variables: UpdateGitConfigurationRequest) => void;
 }
 
-export const useUpdateGitConfigurationMutation = (mutationProps?: UpdateGitConfigurationMutationProps) =>
+export const useUpdateWorkspaceGitConfigurationMutation = (mutationProps?: UpdateGitConfigurationMutationProps) =>
     useMutation<void, Error, UpdateGitConfigurationRequest>({
         mutationFn: (requestParameters: UpdateGitConfigurationRequest) => {
             return new GitConfigurationApi().updateGitConfiguration(requestParameters);

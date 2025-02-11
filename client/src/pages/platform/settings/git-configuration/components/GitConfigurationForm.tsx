@@ -1,13 +1,14 @@
 import {Button} from '@/components/ui/button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {useUpdateGitConfigurationMutation} from '@/ee/mutations/gitConfiguration.mutations';
+import {useUpdateWorkspaceGitConfigurationMutation} from '@/ee/mutations/gitConfiguration.mutations';
 import {GitConfigurationKeys} from '@/ee/queries/gitConfiguration.queries';
 import {GitConfiguration} from '@/ee/shared/middleware/platform/configuration';
 import {useToast} from '@/hooks/use-toast';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
@@ -24,6 +25,8 @@ const formSchema = z.object({
 });
 
 const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfiguration}) => {
+    const {currentWorkspaceId} = useWorkspaceStore();
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             password: gitConfiguration?.password || '',
@@ -37,7 +40,7 @@ const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfigu
 
     const queryClient = useQueryClient();
 
-    const updateGitConfigurationMutation = useUpdateGitConfigurationMutation({
+    const updateGitConfigurationMutation = useUpdateWorkspaceGitConfigurationMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({
                 queryKey: GitConfigurationKeys.gitConfiguration,
@@ -50,8 +53,15 @@ const GitConfigurationForm = ({gitConfiguration}: {gitConfiguration?: GitConfigu
     function handleSubmit(values: z.infer<typeof formSchema>) {
         updateGitConfigurationMutation.mutate({
             gitConfiguration: values,
+            id: currentWorkspaceId!,
         });
     }
+
+    useEffect(() => {
+        form.setValue('password', gitConfiguration?.password || '');
+        form.setValue('url', gitConfiguration?.url || '');
+        form.setValue('username', gitConfiguration?.username || '');
+    }, [form, gitConfiguration]);
 
     return (
         <Form {...form}>

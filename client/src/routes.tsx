@@ -85,6 +85,30 @@ const getAccountRoutes = (path: string) => ({
     path: 'account',
 });
 
+const currentWorkspaceSettingsRoutes = {
+    children: [
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <GitConfiguration />
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'git-configuration',
+        },
+    ],
+    navItems: [
+        {
+            title: 'Current Workspace',
+        },
+        {
+            href: 'git-configuration',
+            title: 'Git Configuration',
+        },
+    ],
+};
+
 const platformSettingsRoutes = {
     children: [
         {
@@ -120,16 +144,6 @@ const platformSettingsRoutes = {
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
-                    <EEVersion>
-                        <GitConfiguration />
-                    </EEVersion>
-                </PrivateRoute>
-            ),
-            path: 'git-configuration',
-        },
-        {
-            element: (
-                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
                     <ApiKeys />
                 </PrivateRoute>
             ),
@@ -151,10 +165,6 @@ const platformSettingsRoutes = {
         {
             href: `api-connectors`,
             title: 'API Connectors',
-        },
-        {
-            href: 'git-configuration',
-            title: 'Git Configuration',
         },
         {
             href: 'api-keys',
@@ -329,6 +339,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                             ),
                                             path: 'workspaces',
                                         },
+                                        ...currentWorkspaceSettingsRoutes.children,
                                         ...platformSettingsRoutes.children,
                                     ],
                                     element: (
@@ -338,6 +349,7 @@ export const getRouter = (queryClient: QueryClient) =>
                                                     href: '/automation/settings/workspaces',
                                                     title: 'Workspaces',
                                                 },
+                                                ...currentWorkspaceSettingsRoutes.navItems,
                                                 ...platformSettingsRoutes.navItems,
                                             ]}
                                         />
