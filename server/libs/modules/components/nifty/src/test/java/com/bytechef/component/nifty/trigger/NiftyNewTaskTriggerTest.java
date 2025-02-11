@@ -19,7 +19,6 @@ package com.bytechef.component.nifty.trigger;
 import static com.bytechef.component.nifty.constant.NiftyConstants.APP_ID;
 import static com.bytechef.component.nifty.constant.NiftyConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -34,7 +33,6 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -56,11 +54,11 @@ class NiftyNewTaskTriggerTest {
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private static final String workflowExecutionId = "testWorkflowExecutionId";
 
     @Test
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
+        String workflowExecutionId = "testWorkflowExecutionId";
 
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -73,24 +71,22 @@ class NiftyNewTaskTriggerTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("webhook", Map.of(ID, "123")));
 
-        WebhookEnableOutput webhookEnableOutput = NiftyNewTaskTrigger.webhookEnable(
+        WebhookEnableOutput result = NiftyNewTaskTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
+
+        assertEquals(expectedWebhookEnableOutput, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
         assertEquals(Map.of("endpoint", webhookUrl, "event", List.of("taskCreated"), APP_ID, "app"), body.getContent());
-
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
-
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
-
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
     }
 
     @Test
     void testWebhookDisable() {
+        String workflowExecutionId = "testWorkflowExecutionId";
+
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
