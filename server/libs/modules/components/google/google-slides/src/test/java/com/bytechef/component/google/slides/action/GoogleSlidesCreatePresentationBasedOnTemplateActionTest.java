@@ -51,6 +51,7 @@ class GoogleSlidesCreatePresentationBasedOnTemplateActionTest {
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         FILE_ID, "123", NAME, "newFileName",
         VALUES, Map.of("key1", "value1", "key2", "value2")));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws Exception {
@@ -68,13 +69,15 @@ class GoogleSlidesCreatePresentationBasedOnTemplateActionTest {
         try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
 
             googleUtilsMockedStatic
-                .when(() -> GoogleUtils.copyFileOnGoogleDrive(mockedParameters, mockedParameters))
+                .when(() -> GoogleUtils.copyFileOnGoogleDrive(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(new File().setId("destinationFile"));
 
             Object result = GoogleSlidesCreatePresentationBasedOnTemplateAction.perform(mockedParameters,
                 mockedParameters, mockedActionContext);
 
             assertEquals(mockedObject, result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
 
             Http.Body body = bodyArgumentCaptor.getValue();
 
