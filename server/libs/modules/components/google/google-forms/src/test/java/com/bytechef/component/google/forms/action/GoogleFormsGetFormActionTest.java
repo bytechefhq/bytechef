@@ -35,7 +35,7 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleFormGetFormActionTest {
+class GoogleFormsGetFormActionTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
