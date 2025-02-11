@@ -143,7 +143,9 @@ const DesktopSidebarBottomMenu = () => {
                         <>
                             <DropdownMenuSub>
                                 <DropdownMenuSubTrigger className="cursor-pointer font-semibold">
-                                    <DiamondIcon className="size-5" /> Workspaces
+                                    <DiamondIcon className="size-5" />
+
+                                    {`Workspace: ${workspaces.find((w) => w.id === currentWorkspaceId)?.name}`}
                                 </DropdownMenuSubTrigger>
 
                                 <DropdownMenuPortal>
