@@ -22,52 +22,78 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.drive.Drive;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mayank Madan
  */
-class GoogleDriveDeleteFileActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveDeleteFileActionTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "testId"));
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Drive.Files.Delete mockedDelete = mock(Drive.Files.Delete.class);
+    private final Drive mockedDrive = mock(Drive.class);
+    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FILE_ID, "testId"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedFiles.delete(fileIdArgumentCaptor.capture()))
-            .thenReturn(mockedDelete);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.delete(stringArgumentCaptor.capture()))
+                .thenReturn(mockedDelete);
 
-        doNothing()
-            .when(mockedDelete)
-            .execute();
+            doNothing()
+                .when(mockedDelete)
+                .execute();
 
-        GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
-        assertEquals("testId", fileIdArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals("testId", stringArgumentCaptor.getValue());
 
-        verify(mockedDelete).execute();
+            verify(mockedDelete).execute();
+        }
     }
 
     @Test
     void testPerformThrowsIOException() throws IOException {
-        when(mockedFiles.delete(fileIdArgumentCaptor.capture()))
-            .thenReturn(mockedDelete);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.delete(stringArgumentCaptor.capture()))
+                .thenReturn(mockedDelete);
 
-        doThrow(new IOException("Error deleting file"))
-            .when(mockedDelete)
-            .execute();
+            doThrow(new IOException("Error deleting file"))
+                .when(mockedDelete)
+                .execute();
 
-        assertThrows(IOException.class,
-            () -> GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext));
+            assertThrows(IOException.class,
+                () -> GoogleDriveDeleteFileAction.perform(mockedParameters, mockedParameters, mockedActionContext));
 
-        assertEquals("testId", fileIdArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals("testId", stringArgumentCaptor.getValue());
+        }
     }
 }

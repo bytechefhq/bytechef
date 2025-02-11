@@ -20,40 +20,63 @@ import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.
 import static com.bytechef.component.google.drive.constant.GoogleDriveConstants.FOLDER_NAME;
 import static com.bytechef.google.commons.constant.GoogleCommonsContants.FOLDER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
+import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author Mario Cvjetojevic
  * @author Monika Kušter
  */
-class GoogleDriveCreateNewFolderActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveCreateNewFolderActionTest {
 
+    private final ArgumentCaptor<File> fileArgumentCaptor = ArgumentCaptor.forClass(File.class);
+    private final Drive.Files.Create mockedCreate = mock(Drive.Files.Create.class);
+    private final Drive mockedDrive = mock(Drive.class);
+    private final Drive.Files mockedFiles = mock(Drive.Files.class);
+    private final File mockedGoogleFile = mock(File.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FOLDER_NAME, "folderName", FOLDER_ID, "parentFolder"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
-        when(mockedFiles.create(fileArgumentCaptor.capture()))
-            .thenReturn(mockedCreate);
-        when(mockedCreate.execute())
-            .thenReturn(mockedGoogleFile);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.create(fileArgumentCaptor.capture()))
+                .thenReturn(mockedCreate);
+            when(mockedCreate.execute())
+                .thenReturn(mockedGoogleFile);
 
-        File result = GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            File result =
+                GoogleDriveCreateNewFolderAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
 
-        assertEquals(mockedGoogleFile, result);
+            assertEquals(mockedGoogleFile, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
 
-        File file = fileArgumentCaptor.getValue();
+            File expectedFile = new File()
+                .setName("folderName")
+                .setMimeType(APPLICATION_VND_GOOGLE_APPS_FOLDER)
+                .setParents(List.of("parentFolder"));
 
-        assertEquals("folderName", file.getName());
-        assertEquals(APPLICATION_VND_GOOGLE_APPS_FOLDER, file.getMimeType());
-        assertEquals(List.of("parentFolder"), file.getParents());
+            assertEquals(expectedFile, fileArgumentCaptor.getValue());
+        }
     }
 }
