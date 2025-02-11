@@ -27,6 +27,7 @@ import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEve
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -36,6 +37,7 @@ class GoogleCalendarGetEventsActionTest {
 
     private final Parameters mockedParameters = mock(Parameters.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
@@ -43,13 +45,15 @@ class GoogleCalendarGetEventsActionTest {
             mockStatic(GoogleCalendarUtils.class)) {
 
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters))
+                .when(() -> GoogleCalendarUtils.getCustomEvents(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(List.of(mockedCustomEvent));
 
-            List<CustomEvent> result =
-                GoogleCalendarGetEventsAction.perform(mockedParameters, mockedParameters, mock(ActionContext.class));
+            List<CustomEvent> result = GoogleCalendarGetEventsAction.perform(
+                mockedParameters, mockedParameters, mock(ActionContext.class));
 
             assertEquals(List.of(mockedCustomEvent), result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         }
     }
 }

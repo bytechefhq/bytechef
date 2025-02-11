@@ -47,16 +47,14 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarAddAttendeesToEventActionTest {
 
-    private final ArgumentCaptor<Parameters> parameters1ArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<Parameters> parameters2ArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<Event> event1ArgumentCaptor = ArgumentCaptor.forClass(Event.class);
-    private final ArgumentCaptor<Event> event2ArgumentCaptor = ArgumentCaptor.forClass(Event.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic;
     private MockedStatic<GoogleServices> googleServicesMockedStatic;
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "eventId", ATTENDEES, List.of("attendee1", "attendee2")));
 
@@ -65,23 +63,19 @@ class GoogleCalendarAddAttendeesToEventActionTest {
         googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class);
         googleServicesMockedStatic = mockStatic(GoogleServices.class);
 
-        googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parameters))
+        googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
             .thenReturn(mockedCalendar);
         googleCalendarUtilsMockedStatic
-            .when(() -> GoogleCalendarUtils.updateEvent(parameters1ArgumentCaptor.capture(),
-                parameters2ArgumentCaptor.capture(), event2ArgumentCaptor.capture()))
+            .when(() -> GoogleCalendarUtils.updateEvent(
+                parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(), eventArgumentCaptor.capture()))
             .thenReturn(mockedEvent);
         googleCalendarUtilsMockedStatic
-            .when(() -> GoogleCalendarUtils.createCustomEvent(event1ArgumentCaptor.capture()))
+            .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
             .thenReturn(mockedCustomEvent);
     }
 
     @AfterEach
     void afterEach() {
-        assertEquals(mockedEvent, event1ArgumentCaptor.getValue());
-        assertEquals(parameters, parameters1ArgumentCaptor.getValue());
-        assertEquals(parameters, parameters2ArgumentCaptor.getValue());
-
         googleCalendarUtilsMockedStatic.close();
         googleServicesMockedStatic.close();
     }
@@ -89,11 +83,12 @@ class GoogleCalendarAddAttendeesToEventActionTest {
     @Test
     void testPerform() throws IOException {
         EventAttendee oldAttendee = new EventAttendee().setEmail("oldAttendee");
-        ArrayList<EventAttendee> objects = new ArrayList<>();
+        List<EventAttendee> objects = new ArrayList<>();
         objects.add(oldAttendee);
 
         googleCalendarUtilsMockedStatic
-            .when(() -> GoogleCalendarUtils.getEvent(parameters, parameters))
+            .when(() -> GoogleCalendarUtils.getEvent(
+                parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
             .thenReturn(new Event().setAttendees(objects));
 
         CustomEvent result =
@@ -101,31 +96,36 @@ class GoogleCalendarAddAttendeesToEventActionTest {
 
         assertEquals(mockedCustomEvent, result);
 
-        ArrayList<EventAttendee> newAttendees = new ArrayList<>();
+        assertEquals(List.of(parameters, parameters, parameters, parameters), parametersArgumentCaptor.getAllValues());
+
+        List<EventAttendee> newAttendees = new ArrayList<>();
 
         newAttendees.add(new EventAttendee().setEmail("oldAttendee"));
         newAttendees.add(new EventAttendee().setEmail("attendee1"));
         newAttendees.add(new EventAttendee().setEmail("attendee2"));
 
-        assertEquals(new Event().setAttendees(newAttendees), event2ArgumentCaptor.getValue());
+        assertEquals(List.of(new Event().setAttendees(newAttendees), mockedEvent), eventArgumentCaptor.getAllValues());
     }
 
     @Test
     void testPerformForNoAttendees() throws IOException {
         googleCalendarUtilsMockedStatic
-            .when(() -> GoogleCalendarUtils.getEvent(parameters, parameters))
+            .when(() -> GoogleCalendarUtils.getEvent(
+                parametersArgumentCaptor.capture(),
+                parametersArgumentCaptor.capture()))
             .thenReturn(new Event());
 
         CustomEvent result =
             GoogleCalendarAddAttendeesToEventAction.perform(parameters, parameters, mockedActionContext);
 
         assertEquals(mockedCustomEvent, result);
+        assertEquals(List.of(parameters, parameters, parameters, parameters), parametersArgumentCaptor.getAllValues());
 
         ArrayList<EventAttendee> newAttendees = new ArrayList<>();
 
         newAttendees.add(new EventAttendee().setEmail("attendee1"));
         newAttendees.add(new EventAttendee().setEmail("attendee2"));
 
-        assertEquals(new Event().setAttendees(newAttendees), event2ArgumentCaptor.getValue());
+        assertEquals(List.of(new Event().setAttendees(newAttendees), mockedEvent), eventArgumentCaptor.getAllValues());
     }
 }

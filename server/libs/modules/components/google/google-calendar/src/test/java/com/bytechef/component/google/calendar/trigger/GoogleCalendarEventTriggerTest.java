@@ -21,7 +21,6 @@ import static com.bytechef.component.google.calendar.constant.GoogleCalendarCons
 import static com.bytechef.component.google.calendar.constant.GoogleCalendarConstants.RESOURCE_ID;
 import static com.bytechef.component.google.calendar.trigger.GoogleCalendarEventTrigger.webhookRequest;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -35,6 +34,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils;
 import com.bytechef.component.google.calendar.util.GoogleCalendarUtils.CustomEvent;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.Calendar.Channels;
@@ -45,10 +45,8 @@ import com.google.api.services.calendar.Calendar.Events.Watch;
 import com.google.api.services.calendar.model.Channel;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -58,99 +56,95 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarEventTriggerTest {
 
-    private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Channel> channelArgumentCaptor = ArgumentCaptor.forClass(Channel.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
-    private final Channel mockedChannel = mock(Channel.class);
     private final Channels mockedChannels = mock(Channels.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
-    private final Events mockedEvents = mock(Events.class);
-    private final com.google.api.services.calendar.model.Events mockedEvents2 = mock(
-        com.google.api.services.calendar.model.Events.class);
-    protected MockedStatic<GoogleServices> mockedGoogleServices;
+    private final Events mockedCalendarEvents = mock(Events.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final List mockedList = mock(List.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
+    private Parameters mockedParameters;
     private final Stop mockedStop = mock(Stop.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Watch mockedWatch = mock(Watch.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-    private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private static final String workflowExecutionId = "testWorkflowExecutionId";
-
-    @BeforeEach
-    public void beforeEach() {
-        mockedGoogleServices = mockStatic(GoogleServices.class);
-
-        mockedGoogleServices.when(() -> GoogleServices.getCalendar(mockedParameters))
-            .thenReturn(mockedCalendar);
-    }
-
-    @AfterEach
-    public void afterEach() {
-        mockedGoogleServices.close();
-    }
 
     @Test
     void testWebhookEnable() throws IOException {
         String webhookUrl = "testWebhookUrl";
+        UUID uuid = UUID.randomUUID();
 
-        when(mockedParameters.getRequiredString(CALENDAR_ID))
-            .thenReturn("calendar_id");
+        mockedParameters = MockParametersFactory.create(Map.of(CALENDAR_ID, "calendar_id"));
 
-        when(mockedCalendar.events())
-            .thenReturn(mockedEvents);
-        when(mockedEvents.watch(calendarIdArgumentCaptor.capture(), channelArgumentCaptor.capture()))
-            .thenReturn(mockedWatch);
-        when(mockedWatch.execute())
-            .thenReturn(mockedChannel);
-        when(mockedChannel.getId())
-            .thenReturn("1234");
-        when(mockedChannel.getResourceId())
-            .thenReturn("resourceId");
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<UUID> uuidMockedStatic = mockStatic(UUID.class)) {
 
-        WebhookEnableOutput webhookEnableOutput = GoogleCalendarEventTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            uuidMockedStatic.when(UUID::randomUUID)
+                .thenReturn(uuid);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedCalendar);
+            when(mockedCalendar.events())
+                .thenReturn(mockedCalendarEvents);
+            when(mockedCalendarEvents.watch(stringArgumentCaptor.capture(), channelArgumentCaptor.capture()))
+                .thenReturn(mockedWatch);
+            when(mockedWatch.execute())
+                .thenReturn(
+                    new Channel()
+                        .setId("1234")
+                        .setResourceId("resourceId"));
 
-        Map<String, String> expectedParameters = Map.of(ID, "1234", RESOURCE_ID, "resourceId");
+            WebhookEnableOutput result = GoogleCalendarEventTrigger.webhookEnable(
+                mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(
+                Map.of(ID, "1234", RESOURCE_ID, "resourceId"), null);
 
-        Channel channelArgumentCaptorValue = channelArgumentCaptor.getValue();
+            assertEquals(expectedWebhookEnableOutput, result);
 
-        assertEquals(channelArgumentCaptorValue.getAddress(), webhookUrl);
-        assertEquals(true, channelArgumentCaptorValue.getPayload());
-        assertEquals("web_hook", channelArgumentCaptorValue.getType());
+            Channel channel = new Channel()
+                .setAddress(webhookUrl)
+                .setId(String.valueOf(uuid))
+                .setPayload(true)
+                .setType("web_hook");
 
-        assertEquals("calendar_id", calendarIdArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(channel, channelArgumentCaptor.getValue());
+            assertEquals("calendar_id", stringArgumentCaptor.getValue());
+        }
     }
 
     @Test
     void testWebhookDisable() throws IOException {
-        when(mockedParameters.getRequiredString(ID))
-            .thenReturn("123");
-        when(mockedParameters.getRequiredString(RESOURCE_ID))
-            .thenReturn("abc");
+        mockedParameters = MockParametersFactory.create(Map.of(ID, "123", RESOURCE_ID, "abc"));
 
-        when(mockedCalendar.channels())
-            .thenReturn(mockedChannels);
-        when(mockedChannels.stop(channelArgumentCaptor.capture()))
-            .thenReturn(mockedStop);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedCalendar);
+            when(mockedCalendar.channels())
+                .thenReturn(mockedChannels);
+            when(mockedChannels.stop(channelArgumentCaptor.capture()))
+                .thenReturn(mockedStop);
 
-        GoogleCalendarEventTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            GoogleCalendarEventTrigger.webhookDisable(
+                mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
 
-        Channel channelArgumentCaptorValue = channelArgumentCaptor.getValue();
+            Channel expectedChannel = new Channel()
+                .setId("123")
+                .setResourceId("abc");
 
-        assertEquals("123", channelArgumentCaptorValue.getId());
-        assertEquals("abc", channelArgumentCaptorValue.getResourceId());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(expectedChannel, channelArgumentCaptor.getValue());
+        }
     }
 
     @Test
@@ -158,25 +152,24 @@ class GoogleCalendarEventTriggerTest {
         Event event = new Event();
         java.util.List<Event> events = java.util.List.of(event);
 
-        when(mockedParameters.getRequiredString(CALENDAR_ID))
-            .thenReturn("calendar_id");
+        mockedParameters = MockParametersFactory.create(Map.of(CALENDAR_ID, "calendar_id"));
 
-        when(mockedCalendar.events())
-            .thenReturn(mockedEvents);
-        when(mockedEvents.list(calendarIdArgumentCaptor.capture()))
-            .thenReturn(mockedList);
-        when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))
-            .thenReturn(mockedList);
-        when(mockedList.execute())
-            .thenReturn(mockedEvents2);
-        when(mockedEvents2.getItems())
-            .thenReturn(events);
-
-        try (
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createCustomEvent(event))
+                .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedCalendar);
+            when(mockedCalendar.events())
+                .thenReturn(mockedCalendarEvents);
+            when(mockedCalendarEvents.list(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setOrderBy(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.execute())
+                .thenReturn(new com.google.api.services.calendar.model.Events().setItems(events));
 
             CustomEvent result = webhookRequest(
                 mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
@@ -184,8 +177,9 @@ class GoogleCalendarEventTriggerTest {
 
             assertEquals(mockedCustomEvent, result);
 
-            assertEquals("calendar_id", calendarIdArgumentCaptor.getValue());
-            assertEquals("updated", orderByArgumentCaptor.getValue());
+            assertEquals(event, eventArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(java.util.List.of("calendar_id", "updated"), stringArgumentCaptor.getAllValues());
         }
     }
 }
