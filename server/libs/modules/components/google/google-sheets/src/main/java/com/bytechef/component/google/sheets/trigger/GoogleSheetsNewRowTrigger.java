@@ -134,21 +134,20 @@ public class GoogleSheetsNewRowTrigger {
 
         Sheets sheets = GoogleServices.getSheets(connectionParameters);
 
-        Optional<Object> currentRowNumOptional =
-            context.data(data -> data.fetch(WORKFLOW, "currentRow"));
+        Optional<Object> currentRowNumOptional = context.data(data -> data.fetch(WORKFLOW, "currentRow"));
 
         int currentRowNum = currentRowNumOptional.map(o -> Integer.parseInt(o.toString()))
             .orElse(0);
 
-        List<List<Object>> values =
-            GoogleSheetsUtils.getSpreadsheetValues(sheets, inputParameters.getRequiredString(SPREADSHEET_ID),
-                inputParameters.getRequiredString(SHEET_NAME));
+        List<List<Object>> values = GoogleSheetsUtils.getSpreadsheetValues(
+            sheets, inputParameters.getRequiredString(SPREADSHEET_ID), inputParameters.getRequiredString(SHEET_NAME));
 
-        if (values == null)
+        if (values == null) {
             return Collections.emptyList();
+        } else {
+            context.data(data -> data.put(WORKFLOW, "currentRow", values.size()));
 
-        context.data(data -> data.put(WORKFLOW, "currentRow", values.size()));
-
-        return getMapOfValuesForRowAndColumn(inputParameters, sheets, values, currentRowNum, values.size());
+            return getMapOfValuesForRowAndColumn(inputParameters, sheets, values, currentRowNum, values.size());
+        }
     }
 }
