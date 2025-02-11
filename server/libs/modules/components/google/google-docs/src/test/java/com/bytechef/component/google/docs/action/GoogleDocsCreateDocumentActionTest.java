@@ -20,69 +20,77 @@ import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.BO
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.docs.util.GoogleDocsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.Document;
+import com.google.api.services.docs.v1.model.EndOfSegmentLocation;
 import com.google.api.services.docs.v1.model.InsertTextRequest;
 import com.google.api.services.docs.v1.model.Request;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
-class GoogleDocsCreateDocumentActionTest extends AbstractGoogleDocsActionTest {
+class GoogleDocsCreateDocumentActionTest {
 
-    private final ArgumentCaptor<String> documentIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Docs> docsArgumentCaptor = ArgumentCaptor.forClass(Docs.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> requestsArgumentCaptor = ArgumentCaptor.forClass(List.class);
-    private final ArgumentCaptor<String> titleArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Docs mockedDocs = mock(Docs.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(TITLE, "title", BODY, "text"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     @SuppressWarnings("unchecked")
     void perform() throws IOException {
-        when(mockedParameters.getRequiredString(TITLE))
-            .thenReturn("title");
-        when(mockedParameters.getRequiredString(BODY))
-            .thenReturn("text");
-
         Document document = new Document().setDocumentId("123");
 
-        try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class)) {
+
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDocs(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDocs);
             googleDocsUtilsMockedStatic
-                .when(() -> GoogleDocsUtils.createDocument(titleArgumentCaptor.capture(), any(Docs.class)))
+                .when(() -> GoogleDocsUtils.createDocument(
+                    stringArgumentCaptor.capture(), docsArgumentCaptor.capture()))
                 .thenReturn(document);
             googleDocsUtilsMockedStatic
-                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), documentIdArgumentCaptor.capture(),
-                    requestsArgumentCaptor.capture()))
+                .when(() -> GoogleDocsUtils.writeToDocument(
+                    docsArgumentCaptor.capture(), stringArgumentCaptor.capture(), listArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result = GoogleDocsCreateDocumentAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result =
+                GoogleDocsCreateDocumentAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertNull(result);
 
-            assertEquals("title", titleArgumentCaptor.getValue());
-            assertEquals("123", documentIdArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of("title", "123"), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedDocs, mockedDocs), docsArgumentCaptor.getAllValues());
 
-            List<Request> requests = requestsArgumentCaptor.getValue();
+            Request request = new Request()
+                .setInsertText(
+                    new InsertTextRequest()
+                        .setText("text")
+                        .setEndOfSegmentLocation(new EndOfSegmentLocation()));
 
-            assertEquals(1, requests.size());
-
-            InsertTextRequest insertTextRequest = requests.getFirst()
-                .getInsertText();
-
-            assertEquals("text", insertTextRequest.getText());
-            assertTrue(insertTextRequest.getEndOfSegmentLocation()
-                .isEmpty());
+            assertEquals(List.of(request), listArgumentCaptor.getValue());
         }
     }
 }

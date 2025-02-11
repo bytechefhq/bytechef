@@ -20,12 +20,14 @@ import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.IM
 import static com.bytechef.component.google.docs.constant.GoogleDocsConstants.VALUES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.docs.util.GoogleDocsUtils;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.docs.v1.Docs;
 import com.google.api.services.docs.v1.model.ReplaceAllTextRequest;
@@ -43,58 +45,64 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleDocsCreateDocumentFromTemplateActionTest extends AbstractGoogleDocsActionTest {
+class GoogleDocsCreateDocumentFromTemplateActionTest {
 
-    private final ArgumentCaptor<String> destinationFileArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Docs> docsArgumentCaptor = ArgumentCaptor.forClass(Docs.class);
     @SuppressWarnings("rawtypes")
-    private final ArgumentCaptor<List> requestsArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Docs mockedDocs = mock(Docs.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(VALUES, Map.of("textKey1", "textValue1"), IMAGES, Map.of("imageId1", "url1")));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     @SuppressWarnings("unchecked")
     void perform() throws Exception {
-        when(mockedParameters.getMap(VALUES, String.class, Map.of()))
-            .thenReturn(Map.of("textKey1", "textValue1"));
-        when(mockedParameters.getMap(IMAGES, String.class, Map.of()))
-            .thenReturn(Map.of("imageId1", "url1"));
-
-        try (MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleDocsUtils> googleDocsUtilsMockedStatic = mockStatic(GoogleDocsUtils.class);
             MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class)) {
 
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDocs(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedDocs);
             googleUtilsMockedStatic
-                .when(() -> GoogleUtils.copyFileOnGoogleDrive(mockedParameters, mockedParameters))
+                .when(() -> GoogleUtils.copyFileOnGoogleDrive(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(new File().setId("destinationFile"));
 
             googleDocsUtilsMockedStatic
-                .when(() -> GoogleDocsUtils.writeToDocument(any(Docs.class), destinationFileArgumentCaptor.capture(),
-                    requestsArgumentCaptor.capture()))
+                .when(() -> GoogleDocsUtils.writeToDocument(
+                    docsArgumentCaptor.capture(), stringArgumentCaptor.capture(), listArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result = GoogleDocsCreateDocumentFromTemplateAction.perform(mockedParameters, mockedParameters,
-                mockedContext);
+            Object result = GoogleDocsCreateDocumentFromTemplateAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertNull(result);
+            assertEquals(
+                List.of(mockedParameters, mockedParameters, mockedParameters),
+                parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedDocs, docsArgumentCaptor.getValue());
+            assertEquals("destinationFile", stringArgumentCaptor.getValue());
 
-            assertEquals("destinationFile", destinationFileArgumentCaptor.getValue());
+            Request replaceAllText = new Request()
+                .setReplaceAllText(
+                    new ReplaceAllTextRequest()
+                        .setContainsText(
+                            new SubstringMatchCriteria()
+                                .setText("[[textKey1]]")
+                                .setMatchCase(true))
+                        .setReplaceText("textValue1"));
 
-            List<Request> requests = requestsArgumentCaptor.getValue();
+            Request replaceImage = new Request()
+                .setReplaceImage(
+                    new ReplaceImageRequest()
+                        .setImageObjectId("imageId1")
+                        .setUri("url1"));
 
-            assertEquals(2, requests.size());
-
-            ReplaceAllTextRequest replaceAllText = requests.getFirst()
-                .getReplaceAllText();
-
-            assertEquals("textValue1", replaceAllText.getReplaceText());
-
-            SubstringMatchCriteria substringMatchCriteria = replaceAllText.getContainsText();
-
-            assertEquals("[[textKey1]]", substringMatchCriteria.getText());
-            assertTrue(substringMatchCriteria.getMatchCase());
-
-            ReplaceImageRequest replaceImageRequest = requests.get(1)
-                .getReplaceImage();
-
-            assertEquals("imageId1", replaceImageRequest.getImageObjectId());
-            assertEquals("url1", replaceImageRequest.getUri());
+            assertEquals(List.of(replaceAllText, replaceImage), listArgumentCaptor.getValue());
         }
     }
 }
