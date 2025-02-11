@@ -32,6 +32,7 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -42,32 +43,31 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarDeleteEventActionTest {
 
-    private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> eventIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
     private final Calendar.Events.Delete mockedDelete = mock(Calendar.Events.Delete.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", EVENT_ID, "id"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
 
-            googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parameters))
+            googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
 
             when(mockedCalendar.events())
                 .thenReturn(mockedEvents);
-            when(mockedEvents.delete(calendarIdArgumentCaptor.capture(), eventIdArgumentCaptor.capture()))
+            when(mockedEvents.delete(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedDelete);
 
             Object result = GoogleCalendarDeleteEventAction.perform(parameters, parameters, mock(ActionContext.class));
 
             assertNull(result);
-
-            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
-            assertEquals("id", eventIdArgumentCaptor.getValue());
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of("calendarId", "id"), stringArgumentCaptor.getAllValues());
 
             verify(mockedDelete, times(1)).execute();
         }

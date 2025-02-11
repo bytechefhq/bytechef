@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -45,9 +46,11 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarGetFreeTimeSlotsActionTest {
 
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(DATE_RANGE,
             Map.of(FROM, LocalDateTime.of(2000, 1, 14, 8, 0, 0), TO, LocalDateTime.of(2000, 1, 20, 8, 0, 0))));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
@@ -57,11 +60,12 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
             mockStatic(GoogleCalendarUtils.class)) {
 
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters))
+                .when(() -> GoogleCalendarUtils.getCustomEvents(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(customEvents);
 
-            List<Interval> result = GoogleCalendarGetFreeTimeSlotsAction.perform(mockedParameters, mockedParameters,
-                mock(ActionContext.class));
+            List<Interval> result = GoogleCalendarGetFreeTimeSlotsAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             List<Interval> expectedIntervals = new ArrayList<>();
 
@@ -77,6 +81,7 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
                 .add(new Interval(LocalDateTime.of(2000, 1, 20, 7, 0, 0), LocalDateTime.of(2000, 1, 20, 8, 0, 0)));
 
             assertEquals(expectedIntervals, result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         }
     }
 
@@ -108,14 +113,16 @@ class GoogleCalendarGetFreeTimeSlotsActionTest {
             mockStatic(GoogleCalendarUtils.class)) {
 
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.getCustomEvents(mockedParameters, mockedParameters))
+                .when(() -> GoogleCalendarUtils.getCustomEvents(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(List.of(
                     createCustomEvent(LocalDateTime.of(2000, 1, 13, 2, 2, 2), LocalDateTime.of(2000, 1, 21, 9, 0, 0))));
 
-            List<Interval> result = GoogleCalendarGetFreeTimeSlotsAction.perform(mockedParameters, mockedParameters,
-                mock(ActionContext.class));
+            List<Interval> result = GoogleCalendarGetFreeTimeSlotsAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(List.of(), result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         }
     }
 }

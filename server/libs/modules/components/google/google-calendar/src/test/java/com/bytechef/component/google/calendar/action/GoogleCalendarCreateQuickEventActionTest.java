@@ -33,6 +33,7 @@ import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -43,45 +44,45 @@ import org.mockito.MockedStatic;
  */
 class GoogleCalendarCreateQuickEventActionTest {
 
-    private final ArgumentCaptor<String> calendarIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> eventTextArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Event> eventArgumentCaptor = ArgumentCaptor.forClass(Event.class);
     private final Calendar mockedCalendar = mock(Calendar.class);
     private final CustomEvent mockedCustomEvent = mock(CustomEvent.class);
     private final Event mockedEvent = mock(Event.class);
     private final Calendar.Events mockedEvents = mock(Calendar.Events.class);
     private final Calendar.Events.QuickAdd mockedQuickAdd = mock(Calendar.Events.QuickAdd.class);
-    private final ArgumentCaptor<String> sendUpdatesArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters parameters = MockParametersFactory.create(
         Map.of(CALENDAR_ID, "calendarId", TEXT, "text", SEND_UPDATES, "sendUpdates"));
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() throws IOException {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleCalendarUtils> googleCalendarUtilsMockedStatic = mockStatic(GoogleCalendarUtils.class)) {
 
-            googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parameters))
+            googleServicesMockedStatic.when(() -> GoogleServices.getCalendar(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedCalendar);
             googleCalendarUtilsMockedStatic
-                .when(() -> GoogleCalendarUtils.createCustomEvent(mockedEvent))
+                .when(() -> GoogleCalendarUtils.createCustomEvent(eventArgumentCaptor.capture()))
                 .thenReturn(mockedCustomEvent);
 
             when(mockedCalendar.events())
                 .thenReturn(mockedEvents);
-            when(mockedEvents.quickAdd(calendarIdArgumentCaptor.capture(), eventTextArgumentCaptor.capture()))
+            when(mockedEvents.quickAdd(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedQuickAdd);
-            when(mockedQuickAdd.setSendUpdates(sendUpdatesArgumentCaptor.capture()))
+            when(mockedQuickAdd.setSendUpdates(stringArgumentCaptor.capture()))
                 .thenReturn(mockedQuickAdd);
             when(mockedQuickAdd.execute())
                 .thenReturn(mockedEvent);
 
-            CustomEvent result =
-                GoogleCalendarCreateQuickEventAction.perform(parameters, parameters, mock(ActionContext.class));
+            CustomEvent result = GoogleCalendarCreateQuickEventAction.perform(
+                parameters, parameters, mock(ActionContext.class));
 
             assertEquals(mockedCustomEvent, result);
 
-            assertEquals("calendarId", calendarIdArgumentCaptor.getValue());
-            assertEquals("sendUpdates", sendUpdatesArgumentCaptor.getValue());
-            assertEquals("text", eventTextArgumentCaptor.getValue());
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedEvent, eventArgumentCaptor.getValue());
+            assertEquals(List.of("calendarId", "text", "sendUpdates"), stringArgumentCaptor.getAllValues());
         }
     }
 }
