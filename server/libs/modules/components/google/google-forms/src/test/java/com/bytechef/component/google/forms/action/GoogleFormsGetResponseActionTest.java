@@ -44,16 +44,18 @@ import org.mockito.MockedStatic;
 class GoogleFormsGetResponseActionTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> formIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FORM_ID, "formId", RESPONSE_ID, "responseId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
+    @SuppressWarnings("rawtypes")
     private final ArgumentCaptor<Map> responseArgumentCaptor = ArgumentCaptor.forClass(Map.class);
     private final Map<String, Object> map = new HashMap<>();
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerform() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
@@ -66,15 +68,15 @@ class GoogleFormsGetResponseActionTest {
 
         try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class)) {
             googleFormsUtilsMockedStatic
-                .when(() -> GoogleFormsUtils.createCustomResponse(contextArgumentCaptor.capture(),
-                    formIdArgumentCaptor.capture(), responseArgumentCaptor.capture()))
+                .when(() -> GoogleFormsUtils.createCustomResponse(
+                    contextArgumentCaptor.capture(), stringArgumentCaptor.capture(), responseArgumentCaptor.capture()))
                 .thenReturn(map);
 
             Map<String, Object> result =
                 GoogleFormsGetResponseAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(map, result);
-            assertEquals("formId", formIdArgumentCaptor.getValue());
+            assertEquals("formId", stringArgumentCaptor.getValue());
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
             assertEquals(map, responseArgumentCaptor.getValue());
         }
