@@ -57,6 +57,7 @@ class GoogleSheetsCreateSpreadsheetActionTest {
     private final File file = new File().setParents(List.of("previous-folder-id"));
     private Parameters mockedParameters;
     private final Spreadsheet newSpreadSheet = new Spreadsheet().setSpreadsheetId("123");
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void performWhenFolderIdIsNotSet() throws Exception {
@@ -64,7 +65,7 @@ class GoogleSheetsCreateSpreadsheetActionTest {
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(mockedParameters))
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
 
             when(mockedSheets.spreadsheets())
@@ -78,6 +79,7 @@ class GoogleSheetsCreateSpreadsheetActionTest {
                 mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(newSpreadSheet, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
 
             Spreadsheet expectedSpreadsheet = new Spreadsheet()
                 .setProperties(
@@ -94,7 +96,7 @@ class GoogleSheetsCreateSpreadsheetActionTest {
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(mockedParameters))
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
 
             when(mockedSheets.spreadsheets())
@@ -128,10 +130,11 @@ class GoogleSheetsCreateSpreadsheetActionTest {
             when(mockedUpdate.execute())
                 .thenReturn(file);
 
-            Object result =
-                GoogleSheetsCreateSpreadsheetAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = GoogleSheetsCreateSpreadsheetAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(newSpreadSheet, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
 
             Spreadsheet expectedSpreadsheet = new Spreadsheet()
                 .setProperties(
@@ -140,7 +143,8 @@ class GoogleSheetsCreateSpreadsheetActionTest {
 
             assertEquals(expectedSpreadsheet, spreadsheetArgumentCaptor.getValue());
 
-            assertEquals(List.of("123", "parents", "123", "folder_id", "previous-folder-id", "id, parents"),
+            assertEquals(
+                List.of("123", "parents", "123", "folder_id", "previous-folder-id", "id, parents"),
                 stringArgumentCaptor.getAllValues());
         }
     }
