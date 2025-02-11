@@ -93,13 +93,21 @@ paths:
       responses:
         "204":
           description: "Successful operation."
-  /git-configuration:
+  /workspaces/{id}/git-configuration:
     get:
-      description: "Get git configuration."
-      summary: "Get git configuration."
+      description: "Get git configuration of a workspace."
+      summary: "Get git configuration of a workspace."
       tags:
         - "git-configuration"
       operationId: "getGitConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The git configuration object."
@@ -113,6 +121,14 @@ paths:
       tags:
         - "git-configuration"
       operationId: "updateGitConfiguration"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       requestBody:
         content:
           application/json:

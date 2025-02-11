@@ -11,10 +11,10 @@ tags:
   - name: "project-git"
     description: "The Automation Project Git Internal API"
 paths:
-  /projects/{id}/git/configuration:
+  /projects/{id}/project-git-configuration:
     get:
-      description: "Get project git configuration of a project."
-      summary: "Get project git configuration of a project."
+      description: "Get git configuration of a project."
+      summary: "Get git configuration of a project ."
       tags:
         - "project-git"
       operationId: "getProjectGitConfiguration"
@@ -199,10 +199,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Workspace"
-  /workspaces/{id}/git/configurations:
+  /workspaces/{id}/project-git-configurations:
     get:
-      description: "Get workspace project git configurations."
-      summary: "Get workspace project git configurations."
+      description: "Get project git configurations of a workspace."
+      summary: "Get project git configurations of a workspace."
       tags:
         - "project-git"
       operationId: "getWorkspaceProjectGitConfigurations"
