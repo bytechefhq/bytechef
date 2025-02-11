@@ -175,7 +175,7 @@ class GoogleSheetsNewRowTriggerTest {
 
             assertEquals(List.of(mockedSheets, mockedSheets), sheetsArgumentCaptor.getAllValues());
             assertEquals(List.of("123", "abc"), stringArgumentCaptor.getAllValues());
-            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(List.of(123, 1), integerArgumentCaptor.getAllValues());
         }
     }

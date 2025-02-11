@@ -35,6 +35,7 @@ import com.google.api.services.sheets.v4.model.Spreadsheet;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -42,20 +43,21 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsListSheetsActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Sheets mockedSheets = mock(Sheets.class);
-    private final Parameters parameters = MockParametersFactory.create(
-        Map.of(SPREADSHEET_ID, "spreadsheetId"));
-    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Spreadsheets.Get mockedGet = mock(Spreadsheets.Get.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(SPREADSHEET_ID, "spreadsheetId"));
+    private final Sheets mockedSheets = mock(Sheets.class);
     private final Spreadsheet mockedSpreadsheet = mock(Spreadsheet.class);
+    private final Spreadsheets mockedSpreadsheets = mock(Spreadsheets.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void perform() throws Exception {
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
 
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(parameters))
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
 
             List<Sheet> expectedSheets = List.of(
@@ -74,7 +76,7 @@ class GoogleSheetsListSheetsActionTest {
 
             when(mockedSheets.spreadsheets())
                 .thenReturn(mockedSpreadsheets);
-            when(mockedSpreadsheets.get(parameters.getString(SPREADSHEET_ID)))
+            when(mockedSpreadsheets.get(stringArgumentCaptor.capture()))
                 .thenReturn(mockedGet);
             when(mockedGet.execute())
                 .thenReturn(mockedSpreadsheet);
@@ -82,7 +84,7 @@ class GoogleSheetsListSheetsActionTest {
                 .thenReturn(expectedSheets);
 
             List<SheetRecord> result = GoogleSheetsListSheetsAction.perform(
-                parameters, parameters, mockedContext);
+                mockedParameters, mockedParameters, mockedActionContext);
 
             List<SheetRecord> expectedSheetRecords = List.of(
                 new SheetRecord("spreadsheetId", 1, "sheetName1", null),
@@ -90,6 +92,9 @@ class GoogleSheetsListSheetsActionTest {
                 new SheetRecord("spreadsheetId", 3, "sheetName3", null));
 
             assertEquals(expectedSheetRecords, result);
+
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals("spreadsheetId", stringArgumentCaptor.getValue());
         }
     }
 }

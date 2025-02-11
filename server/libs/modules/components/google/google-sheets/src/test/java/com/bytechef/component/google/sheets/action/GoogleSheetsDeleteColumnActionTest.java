@@ -38,11 +38,11 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsDeleteColumnActionTest {
 
-    private final ArgumentCaptor<Integer> columnNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<String> dimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(LABEL, "B"));
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void perform() throws Exception {
@@ -50,17 +50,17 @@ class GoogleSheetsDeleteColumnActionTest {
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.deleteDimension(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
-                    columnNumberArgumentCaptor.capture(), dimensionArgumentCaptor.capture()))
+                    integerArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenAnswer(Answers.RETURNS_DEFAULTS);
 
-            Object result =
-                GoogleSheetsDeleteColumnAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            Object result = GoogleSheetsDeleteColumnAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertNull(result);
 
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
-            assertEquals(2, columnNumberArgumentCaptor.getValue());
-            assertEquals("COLUMNS", dimensionArgumentCaptor.getValue());
+            assertEquals(2, integerArgumentCaptor.getValue());
+            assertEquals("COLUMNS", stringArgumentCaptor.getValue());
         }
     }
 }

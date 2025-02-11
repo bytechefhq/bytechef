@@ -31,18 +31,19 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Monika Domiter
+ * @author Monika Kušter
  */
 class GoogleSheetRowUtilsTest {
 
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final Sheets.Spreadsheets.Values.BatchGet mockedBatchGet = mock(Sheets.Spreadsheets.Values.BatchGet.class);
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
     private final ValueRange mockedValueRange = mock(ValueRange.class);
-    private final Sheets.Spreadsheets.Values.BatchGet mockedBatchGet = mock(Sheets.Spreadsheets.Values.BatchGet.class);
-    private final ArgumentCaptor<String> valueRenderOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> dateTimeRenderOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> majorDimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testGetRow() throws IOException {
@@ -54,30 +55,29 @@ class GoogleSheetRowUtilsTest {
         testTemplate(null);
     }
 
+    @SuppressWarnings("unchecked")
     private void testTemplate(List<String> values) throws IOException {
-        String spreadSheetId = "spreadsheetId";
-        String sheetName = "sheetName";
-        Integer rowNumber = 1;
         String range = "range";
 
         try (MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetName, rowNumber))
+                .when(() -> GoogleSheetsUtils.createRange(
+                    stringArgumentCaptor.capture(), integerArgumentCaptor.capture()))
                 .thenReturn(range);
 
             when(mockedSheets.spreadsheets())
                 .thenReturn(mockedSpreadsheets);
             when(mockedSpreadsheets.values())
                 .thenReturn(mockedValues);
-            when(mockedValues.batchGet(spreadSheetId))
+            when(mockedValues.batchGet(stringArgumentCaptor.capture()))
                 .thenReturn(mockedBatchGet);
-            when(mockedBatchGet.setRanges(List.of(range)))
+            when(mockedBatchGet.setRanges(listArgumentCaptor.capture()))
                 .thenReturn(mockedBatchGet);
-            when(mockedBatchGet.setValueRenderOption(valueRenderOptionArgumentCaptor.capture()))
+            when(mockedBatchGet.setValueRenderOption(stringArgumentCaptor.capture()))
                 .thenReturn(mockedBatchGet);
-            when(mockedBatchGet.setDateTimeRenderOption(dateTimeRenderOptionArgumentCaptor.capture()))
+            when(mockedBatchGet.setDateTimeRenderOption(stringArgumentCaptor.capture()))
                 .thenReturn(mockedBatchGet);
-            when(mockedBatchGet.setMajorDimension(majorDimensionArgumentCaptor.capture()))
+            when(mockedBatchGet.setMajorDimension(stringArgumentCaptor.capture()))
                 .thenReturn(mockedBatchGet);
             when(mockedBatchGet.execute())
                 .thenReturn(new BatchGetValuesResponse().setValueRanges(List.of(mockedValueRange)));
@@ -85,13 +85,14 @@ class GoogleSheetRowUtilsTest {
             when(mockedValueRange.getValues())
                 .thenReturn(values == null ? null : List.of(List.of(values)));
 
-            List<Object> result = GoogleSheetsRowUtils.getRowValues(mockedSheets, spreadSheetId, sheetName, rowNumber);
+            List<Object> result = GoogleSheetsRowUtils.getRowValues(mockedSheets, "spreadsheetId", "sheetName", 1);
 
             assertEquals(values == null ? List.of() : List.of(values), result);
-            assertEquals("UNFORMATTED_VALUE", valueRenderOptionArgumentCaptor.getValue());
-            assertEquals("FORMATTED_STRING", dateTimeRenderOptionArgumentCaptor.getValue());
-            assertEquals("ROWS", majorDimensionArgumentCaptor.getValue());
-
+            assertEquals(
+                List.of("spreadsheetId", "sheetName", "UNFORMATTED_VALUE", "FORMATTED_STRING", "ROWS"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(1, integerArgumentCaptor.getValue());
+            assertEquals(List.of(range), listArgumentCaptor.getValue());
         }
     }
 }

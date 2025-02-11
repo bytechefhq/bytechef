@@ -21,7 +21,6 @@ import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstant
 import static com.bytechef.component.google.sheets.constant.GoogleSheetsConstants.SPREADSHEET_ID;
 import static com.bytechef.component.google.sheets.util.GoogleSheetsUtils.SheetRecord;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -45,21 +44,19 @@ import org.mockito.stubbing.Answer;
  */
 class GoogleSheetsCreateColumnActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "name", COLUMN_NAME, "new column"));
     private final Sheets mockedSheets = mock(Sheets.class);
-    private final ArgumentCaptor<String> rangeArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
     void perform() throws Exception {
         List<Object> newHeaders = List.of("header1", "header2", "header3", "new column");
-
-        Parameters parameters = MockParametersFactory.create(
-            Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "name", COLUMN_NAME, "new column"));
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
             MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class);
@@ -67,34 +64,37 @@ class GoogleSheetsCreateColumnActionTest {
                 mockStatic(GoogleSheetsRowUtils.class)) {
 
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(parameters))
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
             googleSheetsRowUtilsMockedStatic
                 .when(() -> GoogleSheetsRowUtils.getRowValues(
-                    any(Sheets.class), spreadsheetIdArgumentCaptor.capture(), sheetNameArgumentCaptor.capture(),
-                    rowNumberArgumentCaptor.capture()))
+                    sheetsArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                    integerArgumentCaptor.capture()))
                 .thenReturn(List.of("header1", "header2", "header3"), newHeaders);
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.appendValues(any(Sheets.class), spreadsheetIdArgumentCaptor.capture(),
-                    rangeArgumentCaptor.capture(), valueRangeArgumentCaptor.capture(),
-                    valueInputOptionArgumentCaptor.capture()))
+                .when(() -> GoogleSheetsUtils.appendValues(
+                    sheetsArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                    valueRangeArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
 
             SheetRecord expectedResponse = new SheetRecord("spreadsheetId", null, "name", newHeaders);
 
-            SheetRecord result = GoogleSheetsCreateColumnAction.perform(parameters, parameters, mockedContext);
+            SheetRecord result = GoogleSheetsCreateColumnAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(expectedResponse, result);
-            assertEquals("name", sheetNameArgumentCaptor.getValue());
-            assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals(1, rowNumberArgumentCaptor.getValue());
-            assertEquals("name!D1", rangeArgumentCaptor.getValue());
-            assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(mockedSheets, mockedSheets, mockedSheets), sheetsArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("spreadsheetId", "name", "spreadsheetId", "name!D1", "USER_ENTERED", "spreadsheetId", "name"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(1, integerArgumentCaptor.getValue());
 
-            ValueRange valueRange = valueRangeArgumentCaptor.getValue();
+            ValueRange expectedValueRange = new ValueRange()
+                .setValues(List.of(List.of("new column")))
+                .setMajorDimension("COLUMNS");
 
-            assertEquals("COLUMNS", valueRange.getMajorDimension());
-            assertEquals(List.of(List.of("new column")), valueRange.getValues());
+            assertEquals(expectedValueRange, valueRangeArgumentCaptor.getValue());
         }
     }
 }

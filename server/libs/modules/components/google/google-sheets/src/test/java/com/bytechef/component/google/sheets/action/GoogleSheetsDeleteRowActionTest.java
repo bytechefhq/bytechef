@@ -38,11 +38,11 @@ import org.mockito.stubbing.Answer;
  */
 class GoogleSheetsDeleteRowActionTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ROW_NUMBER, 2));
-    private final ArgumentCaptor<String> dimensionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Integer> rowNumberArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void perform() throws Exception {
@@ -51,15 +51,16 @@ class GoogleSheetsDeleteRowActionTest {
             googleSheetsUtilsMockedStatic
                 .when(() -> GoogleSheetsUtils.deleteDimension(
                     parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
-                    rowNumberArgumentCaptor.capture(), dimensionArgumentCaptor.capture()))
+                    integerArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenAnswer((Answer<Void>) invocation -> null);
 
-            Object result = GoogleSheetsDeleteRowAction.perform(mockedParameters, mockedParameters, mockedContext);
+            Object result = GoogleSheetsDeleteRowAction.perform(
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertNull(result);
 
-            assertEquals("ROWS", dimensionArgumentCaptor.getValue());
-            assertEquals(2, rowNumberArgumentCaptor.getValue());
+            assertEquals("ROWS", stringArgumentCaptor.getValue());
+            assertEquals(2, integerArgumentCaptor.getValue());
             assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         }
     }

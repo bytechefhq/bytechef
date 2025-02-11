@@ -45,24 +45,26 @@ import org.mockito.MockedStatic;
  */
 class GoogleSheetsInsertMultipleRowsActionTest {
 
+    private final ArgumentCaptor<Integer> integerArgumentCaptor = ArgumentCaptor.forClass(Integer.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Sheets.Spreadsheets.Values.Append mockedAppend = mock(Sheets.Spreadsheets.Values.Append.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final ArgumentCaptor<String> sheetNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> valueInputOptionArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> rangeArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<Integer> rowNumberArgumentCapture = ArgumentCaptor.forClass(Integer.class);
-    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
     private final Sheets mockedSheets = mock(Sheets.class);
     private final Sheets.Spreadsheets mockedSpreadsheets = mock(Sheets.Spreadsheets.class);
     private final Sheets.Spreadsheets.Values mockedValues = mock(Sheets.Spreadsheets.Values.class);
-    private final ArgumentCaptor<String> spreadsheetIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Sheets> sheetsArgumentCaptor = ArgumentCaptor.forClass(Sheets.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<ValueRange> valueRangeArgumentCaptor = ArgumentCaptor.forClass(ValueRange.class);
 
     @Test
+    @SuppressWarnings("unchecked")
     void perform() throws Exception {
         Map<Object, Object> responseMap = Map.of();
         List<Object> row = List.of("abc", "sheetName", false);
 
-        Parameters parameters = MockParametersFactory.create(
+        Parameters mockedParameters = MockParametersFactory.create(
             Map.of(SPREADSHEET_ID, "spreadsheetId", SHEET_NAME, "sheetName", VALUE_INPUT_OPTION, "USER_ENTERED", ROWS,
                 Map.of(VALUES, List.of(row))));
 
@@ -70,44 +72,44 @@ class GoogleSheetsInsertMultipleRowsActionTest {
             MockedStatic<GoogleSheetsUtils> googleSheetsUtilsMockedStatic = mockStatic(GoogleSheetsUtils.class)) {
 
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getSheets(parameters))
+                .when(() -> GoogleServices.getSheets(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedSheets);
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.createRange(sheetNameArgumentCaptor.capture(),
-                    rowNumberArgumentCapture.capture()))
+                .when(() -> GoogleSheetsUtils.createRange(
+                    stringArgumentCaptor.capture(), integerArgumentCaptor.capture()))
                 .thenReturn("range");
             googleSheetsUtilsMockedStatic
-                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(parameters, mockedSheets, row))
+                .when(() -> GoogleSheetsUtils.getMapOfValuesForRow(
+                    parametersArgumentCaptor.capture(), sheetsArgumentCaptor.capture(), listArgumentCaptor.capture()))
                 .thenReturn(responseMap);
 
             when(mockedSheets.spreadsheets())
                 .thenReturn(mockedSpreadsheets);
             when(mockedSpreadsheets.values())
                 .thenReturn(mockedValues);
-            when(mockedValues.append(spreadsheetIdArgumentCaptor.capture(), rangeArgumentCaptor.capture(),
-                valueRangeArgumentCaptor.capture()))
+            when(mockedValues.append(
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), valueRangeArgumentCaptor.capture()))
                     .thenReturn(mockedAppend);
-            when(mockedAppend.setValueInputOption(valueInputOptionArgumentCaptor.capture()))
+            when(mockedAppend.setValueInputOption(stringArgumentCaptor.capture()))
                 .thenReturn(mockedAppend);
 
             List<Map<String, Object>> result = GoogleSheetsInsertMultipleRowsAction.perform(
-                parameters, parameters, mockedContext);
+                mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(List.of(responseMap), result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedSheets, sheetsArgumentCaptor.getValue());
+            assertEquals(
+                List.of("sheetName", "spreadsheetId", "range", "USER_ENTERED"),
+                stringArgumentCaptor.getAllValues());
+            assertNull(integerArgumentCaptor.getValue());
+            assertEquals(row, listArgumentCaptor.getValue());
 
-            assertEquals("sheetName", sheetNameArgumentCaptor.getValue());
-            assertNull(rowNumberArgumentCapture.getValue());
-            assertEquals("spreadsheetId", spreadsheetIdArgumentCaptor.getValue());
-            assertEquals("range", rangeArgumentCaptor.getValue());
-            assertEquals("USER_ENTERED", valueInputOptionArgumentCaptor.getValue());
+            ValueRange valueRange = new ValueRange()
+                .setValues(List.of(row))
+                .setMajorDimension("ROWS");
 
-            ValueRange valueRange = valueRangeArgumentCaptor.getValue();
-
-            assertEquals("ROWS", valueRange.getMajorDimension());
-
-            List<List<Object>> valueRangeValues = valueRange.getValues();
-
-            assertEquals(row, valueRangeValues.getFirst());
+            assertEquals(valueRange, valueRangeArgumentCaptor.getValue());
         }
     }
 }
