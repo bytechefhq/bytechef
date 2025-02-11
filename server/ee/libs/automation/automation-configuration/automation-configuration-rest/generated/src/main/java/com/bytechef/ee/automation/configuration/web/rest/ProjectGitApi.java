@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-10T12:53:20.224896+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-11T11:21:30.395907+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "project-git", description = "The Automation Project Git Internal API")
 public interface ProjectGitApi {
@@ -42,16 +42,16 @@ public interface ProjectGitApi {
     }
 
     /**
-     * GET /projects/{id}/git/configuration : Get project git configuration of a project.
-     * Get project git configuration of a project.
+     * GET /projects/{id}/project-git-configuration : Get git configuration of a project .
+     * Get git configuration of a project.
      *
      * @param id The id of a project. (required)
      * @return The project git configuration object. (status code 200)
      */
     @Operation(
         operationId = "getProjectGitConfiguration",
-        summary = "Get project git configuration of a project.",
-        description = "Get project git configuration of a project.",
+        summary = "Get git configuration of a project .",
+        description = "Get git configuration of a project.",
         tags = { "project-git" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The project git configuration object.", content = {
@@ -61,10 +61,10 @@ public interface ProjectGitApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/projects/{id}/git/configuration",
+        value = "/projects/{id}/project-git-configuration",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<ProjectGitConfigurationModel> getProjectGitConfiguration(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -83,16 +83,16 @@ public interface ProjectGitApi {
 
 
     /**
-     * GET /workspaces/{id}/git/configurations : Get workspace project git configurations.
-     * Get workspace project git configurations.
+     * GET /workspaces/{id}/project-git-configurations : Get project git configurations of a workspace.
+     * Get project git configurations of a workspace.
      *
      * @param id The id of a workspace. (required)
      * @return The list of workspace project git configuration objects. (status code 200)
      */
     @Operation(
         operationId = "getWorkspaceProjectGitConfigurations",
-        summary = "Get workspace project git configurations.",
-        description = "Get workspace project git configurations.",
+        summary = "Get project git configurations of a workspace.",
+        description = "Get project git configurations of a workspace.",
         tags = { "project-git" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of workspace project git configuration objects.", content = {
@@ -102,10 +102,10 @@ public interface ProjectGitApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/workspaces/{id}/git/configurations",
+        value = "/workspaces/{id}/project-git-configurations",
         produces = { "application/json" }
     )
-
+    
     default ResponseEntity<List<ProjectGitConfigurationModel>> getWorkspaceProjectGitConfigurations(
         @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -143,7 +143,7 @@ public interface ProjectGitApi {
         method = RequestMethod.POST,
         value = "/projects/{id}/git/pull"
     )
-
+    
     default ResponseEntity<Void> pullProjectFromGit(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
@@ -153,7 +153,7 @@ public interface ProjectGitApi {
 
 
     /**
-     * PUT /projects/{id}/git/configuration : Update git configuration of an existing project.
+     * PUT /projects/{id}/project-git-configuration : Update git configuration of an existing project.
      * Update git configuration of an existing project.
      *
      * @param id The id of a project. (required)
@@ -171,10 +171,10 @@ public interface ProjectGitApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/projects/{id}/git/configuration",
+        value = "/projects/{id}/project-git-configuration",
         consumes = { "application/json" }
     )
-
+    
     default ResponseEntity<Void> updateProjectGitConfiguration(
         @Parameter(name = "id", description = "The id of a project.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "ProjectGitConfigurationModel", description = "", required = true) @Valid @RequestBody ProjectGitConfigurationModel projectGitConfigurationModel

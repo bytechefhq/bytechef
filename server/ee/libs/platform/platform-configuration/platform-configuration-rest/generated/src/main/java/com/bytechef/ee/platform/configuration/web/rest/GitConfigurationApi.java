@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-08T08:36:33.040732+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2025-02-11T11:21:30.526517+01:00[Europe/Zagreb]", comments = "Generator version: 7.11.0")
 @Validated
 @Tag(name = "git-configuration", description = "The Platform Git Configuration Internal API")
 public interface GitConfigurationApi {
@@ -42,15 +42,16 @@ public interface GitConfigurationApi {
     }
 
     /**
-     * GET /git-configuration : Get git configuration.
-     * Get git configuration.
+     * GET /workspaces/{id}/git-configuration : Get git configuration of a workspace.
+     * Get git configuration of a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The git configuration object. (status code 200)
      */
     @Operation(
         operationId = "getGitConfiguration",
-        summary = "Get git configuration.",
-        description = "Get git configuration.",
+        summary = "Get git configuration of a workspace.",
+        description = "Get git configuration of a workspace.",
         tags = { "git-configuration" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The git configuration object.", content = {
@@ -60,12 +61,12 @@ public interface GitConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.GET,
-        value = "/git-configuration",
+        value = "/workspaces/{id}/git-configuration",
         produces = { "application/json" }
     )
     
     default ResponseEntity<GitConfigurationModel> getGitConfiguration(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -82,9 +83,10 @@ public interface GitConfigurationApi {
 
 
     /**
-     * PUT /git-configuration : Update git configuration.
+     * PUT /workspaces/{id}/git-configuration : Update git configuration.
      * Update git configuration.
      *
+     * @param id The id of a workspace. (required)
      * @param gitConfigurationModel  (required)
      * @return Successful operation. (status code 204)
      */
@@ -99,11 +101,12 @@ public interface GitConfigurationApi {
     )
     @RequestMapping(
         method = RequestMethod.PUT,
-        value = "/git-configuration",
+        value = "/workspaces/{id}/git-configuration",
         consumes = { "application/json" }
     )
     
     default ResponseEntity<Void> updateGitConfiguration(
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
         @Parameter(name = "GitConfigurationModel", description = "", required = true) @Valid @RequestBody GitConfigurationModel gitConfigurationModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
