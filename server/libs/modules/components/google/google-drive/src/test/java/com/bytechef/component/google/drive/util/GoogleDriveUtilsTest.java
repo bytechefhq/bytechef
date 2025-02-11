@@ -37,8 +37,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -51,65 +49,43 @@ import org.mockito.MockedStatic;
 class GoogleDriveUtilsTest {
 
     private final List<File> files = new ArrayList<>();
-    private MockedStatic<GoogleServices> googleServicesMockedStatic;
     private final Drive mockedDrive = mock(Drive.class);
-    private final FileList mockedFileList = mock(FileList.class);
     private final Drive.Files mockedFiles = mock(Drive.Files.class);
     private final Drive.Files.List mockedList = mock(Drive.Files.List.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory
-            .create(Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
-    private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> fieldsArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> orderByArgumentCaptor = ArgumentCaptor.forClass(String.class);
-
-    @BeforeEach
-    void beforeEach() throws IOException {
-        googleServicesMockedStatic = mockStatic(GoogleServices.class);
-
-        googleServicesMockedStatic
-            .when(() -> GoogleServices.getDrive(any(Parameters.class)))
-            .thenReturn(mockedDrive);
-
-        files.add(
-            new File()
-                .setName("name")
-                .setId("id"));
-
-        when(mockedDrive.files())
-            .thenReturn(mockedFiles);
-        when(mockedFiles.list())
-            .thenReturn(mockedList);
-        when(mockedList.setQ(qArgumentCaptor.capture()))
-            .thenReturn(mockedList);
-        when(mockedList.execute())
-            .thenReturn(mockedFileList);
-        when(mockedFileList.getFiles())
-            .thenReturn(files);
-    }
-
-    @AfterEach
-    void afterEach() {
-        googleServicesMockedStatic.close();
-    }
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FOLDER_ID, "parent", LAST_TIME_CHECKED, LocalDateTime.of(2000, 1, 1, 1, 1, 1)));
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetPollOutput() {
-        when(mockedList.setFields(fieldsArgumentCaptor.capture()))
-            .thenReturn(mockedList);
-        when(mockedList.setOrderBy(orderByArgumentCaptor.capture()))
-            .thenReturn(mockedList);
+    void testGetPollOutput() throws IOException {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getDrive(any(Parameters.class)))
+                .thenReturn(mockedDrive);
+            when(mockedDrive.files())
+                .thenReturn(mockedFiles);
+            when(mockedFiles.list())
+                .thenReturn(mockedList);
+            when(mockedList.setQ(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setFields(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.setOrderBy(stringArgumentCaptor.capture()))
+                .thenReturn(mockedList);
+            when(mockedList.execute())
+                .thenReturn(new FileList().setFiles(files));
 
-        PollOutput pollOutput =
-            GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
+            PollOutput pollOutput =
+                GoogleDriveUtils.getPollOutput(mockedParameters, mockedParameters, mockedParameters, false);
 
-        assertEquals(files, pollOutput.records());
-        assertFalse(pollOutput.pollImmediately());
+            assertEquals(files, pollOutput.records());
+            assertFalse(pollOutput.pollImmediately());
 
-        assertEquals(
-            "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
-            qArgumentCaptor.getValue());
-        assertEquals("files(id, name, mimeType, webViewLink, kind)", fieldsArgumentCaptor.getValue());
-        assertEquals("createdTime asc", orderByArgumentCaptor.getValue());
+            assertEquals(
+                List.of(
+                    "mimeType = 'application/vnd.google-apps.folder' and 'parent' in parents and trashed = false and createdTime > '2000-01-01T01:01:01'",
+                    "files(id, name, mimeType, webViewLink, kind)", "createdTime asc"),
+                stringArgumentCaptor.getAllValues());
+        }
     }
 }

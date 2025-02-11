@@ -23,34 +23,42 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.google.commons.GoogleUtils;
 import com.google.api.services.drive.model.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Mayank Madan
  * @author Monika Kušter
  */
-class GoogleDriveCopyFileActionTest extends AbstractGoogleDriveActionTest {
+class GoogleDriveCopyFileActionTest {
+
+    private final File mockedFile = mock(File.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILE_ID, "originalFileId", FILE_NAME, "newFileName", FOLDER_ID, "newFolderId"));
-    private final File mockedFile = mock(File.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
         try (MockedStatic<GoogleUtils> googleUtilsMockedStatic = mockStatic(GoogleUtils.class);) {
             googleUtilsMockedStatic
-                .when(() -> GoogleUtils.copyFileOnGoogleDrive(mockedParameters, mockedParameters))
+                .when(() -> GoogleUtils.copyFileOnGoogleDrive(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture()))
                 .thenReturn(mockedFile);
 
-            File result = GoogleDriveCopyFileAction.perform(mockedParameters, mockedParameters, mockedActionContext);
+            File result = GoogleDriveCopyFileAction.perform(
+                mockedParameters, mockedParameters, mock(ActionContext.class));
 
             assertEquals(mockedFile, result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
         }
     }
 }
