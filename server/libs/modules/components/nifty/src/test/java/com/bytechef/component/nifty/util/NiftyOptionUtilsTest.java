@@ -48,17 +48,16 @@ class NiftyOptionUtilsTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ArgumentCaptor<String> queryNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> queryValueArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<Object[]> queryArgumentCaptor = ArgumentCaptor.forClass(Object[].class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -114,8 +113,7 @@ class NiftyOptionUtilsTest {
             NiftyOptionUtils.getProjectTemplateOptions(mockedParameters, mockedParameters, Map.of(), "",
                 mockedActionContext));
 
-        assertEquals("type", queryNameArgumentCaptor.getValue());
-        assertEquals("project", queryValueArgumentCaptor.getValue());
+        assertEquals(List.of("type", "project"), stringArgumentCaptor.getAllValues());
     }
 
     @Test
