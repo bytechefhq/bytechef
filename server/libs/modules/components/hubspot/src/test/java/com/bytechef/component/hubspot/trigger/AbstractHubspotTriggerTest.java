@@ -39,9 +39,8 @@ import org.mockito.MockedStatic;
  */
 abstract class AbstractHubspotTriggerTest {
 
-    protected ArgumentCaptor<String> appIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<String> eventTypeArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<String> hapikeyArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
     protected MockedStatic<HubspotUtils> hubspotUtilsMockedStatic;
     protected Map<String, Object> map = new HashMap<>();
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -51,19 +50,17 @@ abstract class AbstractHubspotTriggerTest {
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
     protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    protected ArgumentCaptor<String> subscriptionIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
         ArgumentCaptor.forClass(TriggerContext.class);
-    protected ArgumentCaptor<String> webhookUrlArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         hubspotUtilsMockedStatic = mockStatic(HubspotUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         hubspotUtilsMockedStatic.close();
     }
 }

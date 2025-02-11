@@ -35,7 +35,6 @@ import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -54,8 +53,7 @@ class HubspotUtilsTest {
         MockParametersFactory.create(Map.of("__item", Map.of("properties", Map.of("pipeline", "123"))));
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
-    private final ArgumentCaptor<String> queryNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> queryValueArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testExtractFirstContentMap() {
@@ -74,13 +72,10 @@ class HubspotUtilsTest {
         Map<String, Object> propertiesMap = Map.of("firstname", "first", "lastname", "last");
 
         mockHttpResponse();
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "properties", propertiesMap))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("first last", "123"));
+        List<Option<String>> expectedOptions = List.of(option("first last", "123"));
 
         assertEquals(
             expectedOptions,
@@ -90,13 +85,10 @@ class HubspotUtilsTest {
     @Test
     void testGetDealStageOptions() {
         mockHttpResponse();
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", LABEL, "label"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("label", "123"));
+        List<Option<String>> expectedOptions = List.of(option("label", "123"));
 
         assertEquals(
             expectedOptions,
@@ -109,9 +101,7 @@ class HubspotUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(RESULTS, List.of(Map.of(ID, "123", "email", "label"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("label", "123"));
+        List<Option<String>> expectedOptions = List.of(option("label", "123"));
 
         assertEquals(
             expectedOptions,
@@ -160,7 +150,7 @@ class HubspotUtilsTest {
     void testSubscribeWebhook() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -171,40 +161,32 @@ class HubspotUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "abc"));
 
-        String result =
-            HubspotUtils.subscribeWebhook("eventType", "appId", "hubspot key", "webhookUrl", mockedTriggerContext);
+        String result = HubspotUtils.subscribeWebhook(
+            "eventType", "appId", "hubspot key", "webhookUrl", mockedTriggerContext);
 
         assertEquals("abc", result);
 
-        List<String> names = queryNameArgumentCaptor.getAllValues();
-
-        assertEquals(HAPIKEY, names.get(0));
-        assertEquals(HAPIKEY, names.get(1));
-
-        List<String> values = queryValueArgumentCaptor.getAllValues();
-
-        assertEquals("hubspot key", values.get(0));
-        assertEquals("hubspot key", values.get(1));
+        assertEquals(List.of(HAPIKEY, "hubspot key", HAPIKEY, "hubspot key"), stringArgumentCaptor.getAllValues());
 
         List<Object> contents = bodyArgumentCaptor.getAllValues()
             .stream()
             .map(Http.Body::getContent)
             .toList();
 
-        assertEquals(Map.of("throttling", Map.of(
-            "period", "SECONDLY",
-            "maxConcurrentRequests", 10),
-            "targetUrl", "webhookUrl"),
-            contents.get(0));
-
-        assertEquals(Map.of(EVENT_TYPE, "eventType", "active", true), contents.get(1));
+        assertEquals(List.of(
+            Map.of("throttling", Map.of(
+                "period", "SECONDLY",
+                "maxConcurrentRequests", 10),
+                "targetUrl", "webhookUrl"),
+            Map.of(EVENT_TYPE, "eventType", "active", true)),
+            contents);
     }
 
     @Test
     void testUnsubscribeWebhook() {
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -213,7 +195,6 @@ class HubspotUtilsTest {
 
         HubspotUtils.unsubscribeWebhook("appId", "subscriptionId", "hubspot key", mockedTriggerContext);
 
-        assertEquals(HAPIKEY, queryNameArgumentCaptor.getValue());
-        assertEquals("hubspot key", queryValueArgumentCaptor.getValue());
+        assertEquals(List.of(HAPIKEY, "hubspot key"), stringArgumentCaptor.getAllValues());
     }
 }
