@@ -12,6 +12,7 @@ export const useGetProjectGitConfigurationQuery = (id: number) =>
     useQuery<ProjectGitConfiguration, Error>({
         queryKey: ProjectGitConfigurationKeys.projectGitConfiguration(id),
         queryFn: () => new ProjectGitApi().getProjectGitConfiguration({id}),
+        retry: false,
     });
 
 export const useGetWorkspaceProjectGitConfigurationsQuery = (workspaceId: number, enabled: boolean) =>

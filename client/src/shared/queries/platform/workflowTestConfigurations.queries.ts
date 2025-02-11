@@ -36,4 +36,5 @@ export const useGetWorkflowTestConfigurationQuery = (requestParameters: GetWorkf
     useQuery<WorkflowTestConfiguration, Error>({
         queryKey: WorkflowTestConfigurationKeys.workflowTestConfiguration(requestParameters.workflowId),
         queryFn: () => new WorkflowTestConfigurationApi().getWorkflowTestConfiguration(requestParameters),
+        retry: false,
     });

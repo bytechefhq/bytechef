@@ -13,4 +13,5 @@ export const useGetWorkspaceGitConfigurationQuery = (workspaceId: number) =>
     useQuery<GitConfiguration, Error>({
         queryKey: GitConfigurationKeys.workspaceGitConfiguration(workspaceId),
         queryFn: () => new GitConfigurationApi().getGitConfiguration({id: workspaceId}),
+        retry: false,
     });
