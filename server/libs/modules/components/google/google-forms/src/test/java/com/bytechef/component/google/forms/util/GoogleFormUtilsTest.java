@@ -44,6 +44,7 @@ class GoogleFormUtilsTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
+    @SuppressWarnings("unchecked")
     void testGetResponseIdOptions() {
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);

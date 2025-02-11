@@ -38,7 +38,7 @@ import org.mockito.MockedStatic;
 class GoogleFormGetFormActionTest {
 
     private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
-    private final ArgumentCaptor<String> formIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(FORM_ID, "formId"));
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Map<String, Object> map = new HashMap<>();
@@ -47,14 +47,14 @@ class GoogleFormGetFormActionTest {
     void testPerform() {
         try (MockedStatic<GoogleFormsUtils> googleFormsUtilsMockedStatic = mockStatic(GoogleFormsUtils.class)) {
             googleFormsUtilsMockedStatic
-                .when(() -> GoogleFormsUtils.getForm(formIdArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                .when(() -> GoogleFormsUtils.getForm(stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(map);
 
             Map<String, Object> result =
                 GoogleFormsGetFormAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
             assertEquals(map, result);
-            assertEquals("formId", formIdArgumentCaptor.getValue());
+            assertEquals("formId", stringArgumentCaptor.getValue());
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
         }
     }
