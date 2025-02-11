@@ -42,7 +42,7 @@ import org.jsoup.select.Elements;
  */
 public class TextHelperExtractContentFromHtmlAction {
 
-    private enum ReturnValue {
+    protected enum ReturnValue {
 
         ATTRIBUTE, HTML, TEXT;
     }

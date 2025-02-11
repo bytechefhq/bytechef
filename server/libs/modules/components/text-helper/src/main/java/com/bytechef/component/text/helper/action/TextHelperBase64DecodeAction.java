@@ -19,6 +19,7 @@ package com.bytechef.component.text.helper.action;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.text.helper.constant.TextHelperConstants.CONTENT;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA_BASE64;
 import static com.bytechef.component.text.helper.constant.TextHelperConstants.ENCODING_SCHEMA_BASE64URL;
@@ -27,7 +28,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.text.helper.constant.TextHelperConstants;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -46,9 +46,9 @@ public class TextHelperBase64DecodeAction {
                 .options(
                     option("Base64", ENCODING_SCHEMA_BASE64),
                     option("Base64 URL", ENCODING_SCHEMA_BASE64URL))
-                .controlType(ControlType.SELECT)
-                .defaultValue(ENCODING_SCHEMA_BASE64),
-            string(TextHelperConstants.CONTENT)
+                .defaultValue(ENCODING_SCHEMA_BASE64)
+                .required(true),
+            string(CONTENT)
                 .label("Base64 Content")
                 .description("The Base64 encoded content that needs to be decoded.")
                 .controlType(ControlType.TEXT_AREA)
@@ -59,7 +59,7 @@ public class TextHelperBase64DecodeAction {
     protected static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        String base64Content = inputParameters.getRequiredString(TextHelperConstants.CONTENT);
+        String base64Content = inputParameters.getRequiredString(CONTENT);
 
         if (base64Content.isEmpty()) {
             return base64Content;
