@@ -51,7 +51,7 @@ import java.util.UUID;
 /**
  * @author Marko Kriskovic
  */
-public class GoogleSheetsOnRowAddedTrigger {
+public class GoogleSheetsNewRowTrigger {
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRow")
         .title("New Row")
@@ -72,11 +72,11 @@ public class GoogleSheetsOnRowAddedTrigger {
                 .optionsLookupDependsOn(SPREADSHEET_ID)
                 .required(true))
         .output()
-        .webhookEnable(GoogleSheetsOnRowAddedTrigger::webhookEnable)
-        .webhookDisable(GoogleSheetsOnRowAddedTrigger::webhookDisable)
-        .webhookRequest(GoogleSheetsOnRowAddedTrigger::webhookRequest);
+        .webhookEnable(GoogleSheetsNewRowTrigger::webhookEnable)
+        .webhookDisable(GoogleSheetsNewRowTrigger::webhookDisable)
+        .webhookRequest(GoogleSheetsNewRowTrigger::webhookRequest);
 
-    private GoogleSheetsOnRowAddedTrigger() {
+    private GoogleSheetsNewRowTrigger() {
     }
 
     protected static WebhookEnableOutput webhookEnable(
