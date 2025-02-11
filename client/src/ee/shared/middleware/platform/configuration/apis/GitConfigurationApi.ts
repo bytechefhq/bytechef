@@ -22,7 +22,12 @@ import {
     GitConfigurationToJSON,
 } from '../models/index';
 
+export interface GetGitConfigurationRequest {
+    id: number;
+}
+
 export interface UpdateGitConfigurationRequest {
+    id: number;
     gitConfiguration: GitConfiguration;
 }
 
@@ -32,16 +37,23 @@ export interface UpdateGitConfigurationRequest {
 export class GitConfigurationApi extends runtime.BaseAPI {
 
     /**
-     * Get git configuration.
-     * Get git configuration.
+     * Get git configuration of a workspace.
+     * Get git configuration of a workspace.
      */
-    async getGitConfigurationRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GitConfiguration>> {
+    async getGitConfigurationRaw(requestParameters: GetGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<GitConfiguration>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getGitConfiguration().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/git-configuration`,
+            path: `/workspaces/{id}/git-configuration`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
@@ -51,11 +63,11 @@ export class GitConfigurationApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get git configuration.
-     * Get git configuration.
+     * Get git configuration of a workspace.
+     * Get git configuration of a workspace.
      */
-    async getGitConfiguration(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GitConfiguration> {
-        const response = await this.getGitConfigurationRaw(initOverrides);
+    async getGitConfiguration(requestParameters: GetGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<GitConfiguration> {
+        const response = await this.getGitConfigurationRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -64,6 +76,13 @@ export class GitConfigurationApi extends runtime.BaseAPI {
      * Update git configuration.
      */
     async updateGitConfigurationRaw(requestParameters: UpdateGitConfigurationRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<void>> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling updateGitConfiguration().'
+            );
+        }
+
         if (requestParameters['gitConfiguration'] == null) {
             throw new runtime.RequiredError(
                 'gitConfiguration',
@@ -78,7 +97,7 @@ export class GitConfigurationApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
         const response = await this.request({
-            path: `/git-configuration`,
+            path: `/workspaces/{id}/git-configuration`.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id']))),
             method: 'PUT',
             headers: headerParameters,
             query: queryParameters,
