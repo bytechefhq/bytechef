@@ -37,7 +37,7 @@ class GoogleDocsUtilsTest {
     private final ArgumentCaptor<BatchUpdateDocumentRequest> batchUpdateDocumentRequestArgumentCaptor =
         ArgumentCaptor.forClass(BatchUpdateDocumentRequest.class);
     private final ArgumentCaptor<Document> documentArgumentCaptor = ArgumentCaptor.forClass(Document.class);
-    private final ArgumentCaptor<String> documentIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final Docs.Documents.BatchUpdate mockedBatchUpdate = mock(Docs.Documents.BatchUpdate.class);
     private final Docs.Documents.Create mockedCreate = mock(Docs.Documents.Create.class);
     private final Docs mockedDocs = mock(Docs.class);
@@ -58,8 +58,7 @@ class GoogleDocsUtilsTest {
         Document result = GoogleDocsUtils.createDocument("Title", mockedDocs);
 
         assertEquals(mockedDocument, result);
-        assertEquals("Title", documentArgumentCaptor.getValue()
-            .getTitle());
+        assertEquals(new Document().setTitle("Title"), documentArgumentCaptor.getValue());
     }
 
     @Test
@@ -67,13 +66,14 @@ class GoogleDocsUtilsTest {
         when(mockedDocs.documents())
             .thenReturn(mockedDocuments);
         when(mockedDocuments.batchUpdate(
-            documentIdArgumentCaptor.capture(), batchUpdateDocumentRequestArgumentCaptor.capture()))
+            stringArgumentCaptor.capture(), batchUpdateDocumentRequestArgumentCaptor.capture()))
                 .thenReturn(mockedBatchUpdate);
 
         GoogleDocsUtils.writeToDocument(mockedDocs, "id", mockedList);
 
-        assertEquals("id", documentIdArgumentCaptor.getValue());
-        assertEquals(mockedList, batchUpdateDocumentRequestArgumentCaptor.getValue()
-            .getRequests());
+        assertEquals("id", stringArgumentCaptor.getValue());
+        assertEquals(
+            new BatchUpdateDocumentRequest().setRequests(mockedList),
+            batchUpdateDocumentRequestArgumentCaptor.getValue());
     }
 }
