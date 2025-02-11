@@ -118,9 +118,17 @@ const IntegrationHeader = ({
         onSuccess: () => {
             setShowDeleteWorkflowAlertDialog(false);
 
-            navigate(
-                `/embedded/integrations/${integrationId}/integration-workflows/${integration?.integrationWorkflowIds?.filter((integrationWorkflowId) => integrationWorkflowId !== (workflow as Workflow).integrationWorkflowId)[0]}?${searchParams}`
+            const integrationWorkflowIds = integration?.integrationWorkflowIds?.filter(
+                (integrationWorkflowId) => integrationWorkflowId !== (workflow as Workflow).integrationWorkflowId
             );
+
+            if (integrationWorkflowIds?.length) {
+                navigate(
+                    `/embedded/integrations/${integrationId}/integration-workflows/${integrationWorkflowIds[0]}?${searchParams}`
+                );
+            } else {
+                navigate('/embedded/integrations');
+            }
 
             queryClient.removeQueries({
                 queryKey: IntegrationWorkflowKeys.integrationWorkflow(
