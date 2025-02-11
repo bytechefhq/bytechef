@@ -40,8 +40,8 @@ public class GitConfigurationApiController implements GitConfigurationApi {
     }
 
     @Override
-    public ResponseEntity<GitConfigurationModel> getGitConfiguration() {
-        return gitConfigurationFacade.fetchGitConfiguration()
+    public ResponseEntity<GitConfigurationModel> getGitConfiguration(Long id) {
+        return gitConfigurationFacade.fetchGitConfiguration(id)
             .map(gitConfigurationDTO -> conversionService.convert(gitConfigurationDTO, GitConfigurationModel.class))
             .map(gitConfigurationModel -> gitConfigurationModel.password(PASSWORD))
             .map(ResponseEntity::ok)
@@ -49,7 +49,7 @@ public class GitConfigurationApiController implements GitConfigurationApi {
     }
 
     @Override
-    public ResponseEntity<Void> updateGitConfiguration(GitConfigurationModel gitConfigurationModel) {
+    public ResponseEntity<Void> updateGitConfiguration(Long id, GitConfigurationModel gitConfigurationModel) {
         if (PASSWORD.equals(gitConfigurationModel.getPassword())) {
             gitConfigurationModel.password(null);
         }
@@ -57,7 +57,7 @@ public class GitConfigurationApiController implements GitConfigurationApi {
         GitConfigurationDTO gitConfigurationDTO = conversionService.convert(
             gitConfigurationModel, GitConfigurationDTO.class);
 
-        gitConfigurationFacade.save(gitConfigurationDTO);
+        gitConfigurationFacade.save(gitConfigurationDTO, id);
 
         return noContent();
     }

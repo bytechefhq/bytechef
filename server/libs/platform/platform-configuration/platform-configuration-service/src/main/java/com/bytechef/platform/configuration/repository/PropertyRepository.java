@@ -28,7 +28,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PropertyRepository extends CrudRepository<Property, Long> {
 
-    List<Property> findAllByKeyIn(List<String> keys);
+    List<Property> findAllByKeyInAndScope(List<String> keys, int scope);
 
-    Optional<Property> findByKey(String key);
+    List<Property> findAllByKeyInAndScopeAndScopeId(List<String> keys, int scope, long scopeId);
+
+    Optional<Property> findByKeyAndScope(String key, int scope);
+
+    Optional<Property> findByKeyAndScopeAndScopeId(String key, int scope, long scopeId);
 }

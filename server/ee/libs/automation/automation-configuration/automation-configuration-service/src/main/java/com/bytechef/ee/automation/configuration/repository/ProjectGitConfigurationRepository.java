@@ -27,9 +27,9 @@ public interface ProjectGitConfigurationRepository extends ListCrudRepository<Pr
     Optional<ProjectGitConfiguration> findByProjectId(long projectId);
 
     @Query("""
-            SELECT * FROM project_git_configuration
-            JOIN project ON project_git_configuration.project_id = project.id
-            WHERE workspace_id = :workspaceId
+        SELECT project_git_configuration.* FROM project_git_configuration
+        JOIN project ON project_git_configuration.project_id = project.id
+        WHERE workspace_id = :workspaceId
         """)
     List<ProjectGitConfiguration> findAllByWorkspaceId(long workspaceId);
 }

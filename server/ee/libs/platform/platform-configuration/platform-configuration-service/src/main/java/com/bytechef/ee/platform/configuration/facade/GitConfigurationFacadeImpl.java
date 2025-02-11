@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.configuration.facade;
 import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.ee.platform.configuration.dto.GitConfigurationDTO;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -40,21 +41,21 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<GitConfigurationDTO> fetchGitConfiguration() {
-        return propertyService.fetchProperty(GIT_CONFIGURATION)
+    public Optional<GitConfigurationDTO> fetchGitConfiguration(long workspaceId) {
+        return propertyService.fetchProperty(GIT_CONFIGURATION, Scope.WORKSPACE, workspaceId)
             .map(property -> ConvertUtils.convertValue(property.getValue(), GitConfigurationDTO.class));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public GitConfigurationDTO getGitConfiguration() {
-        return fetchGitConfiguration()
+    public GitConfigurationDTO getGitConfiguration(long workspaceId) {
+        return fetchGitConfiguration(workspaceId)
             .orElseThrow(() -> new RuntimeException("Git configuration not found"));
     }
 
     @Override
-    public void save(GitConfigurationDTO gitConfigurationDTO) {
-        fetchGitConfiguration().ifPresentOrElse(
+    public void save(GitConfigurationDTO gitConfigurationDTO, long workspaceId) {
+        fetchGitConfiguration(workspaceId).ifPresentOrElse(
             curGitConfigurationDTO -> {
                 Map<String, Object> map = new HashMap<>(
                     ConvertUtils.convertValue(curGitConfigurationDTO, new TypeReference<>() {}));
@@ -65,9 +66,10 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
                     map.put("password", gitConfigurationDTO.password());
                 }
 
-                propertyService.save(GIT_CONFIGURATION, map);
+                propertyService.save(GIT_CONFIGURATION, map, Scope.WORKSPACE, workspaceId);
             },
             () -> propertyService.save(
-                GIT_CONFIGURATION, ConvertUtils.convertValue(gitConfigurationDTO, new TypeReference<>() {})));
+                GIT_CONFIGURATION, ConvertUtils.convertValue(gitConfigurationDTO, new TypeReference<>() {}),
+                Scope.WORKSPACE, workspaceId));
     }
 }

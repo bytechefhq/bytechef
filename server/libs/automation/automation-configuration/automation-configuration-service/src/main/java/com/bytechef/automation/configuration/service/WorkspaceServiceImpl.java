@@ -58,6 +58,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
+    public Workspace getProjectWorkspace(long projectId) {
+        return workspaceRepository.findByProjectId(projectId);
+    }
+
+    @Override
     public List<Workspace> getWorkspaces() {
         return workspaceRepository.findAll();
     }

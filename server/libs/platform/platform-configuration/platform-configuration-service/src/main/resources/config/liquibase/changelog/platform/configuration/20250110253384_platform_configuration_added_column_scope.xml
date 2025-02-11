@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20250110253384-1" author="Ivica Cardic">
+        <preConditions>
+            <uniqueConstraintExists constraintName="property_key_key" tableName="property"/>
+        </preConditions>
+
+        <dropUniqueConstraint constraintName="property_key_key" tableName="property"/>
+    </changeSet>
+
+    <changeSet id="20250110253384-2" author="Ivica Cardic">
+        <preConditions onFail="CONTINUE">
+            <uniqueConstraintExists constraintName="property_key_key1" tableName="property"/>
+        </preConditions>
+
+        <dropUniqueConstraint constraintName="property_key_key1" tableName="property"/>
+    </changeSet>
+
+    <changeSet id="20250110253384-3" author="Ivica Cardic">
+        <preConditions onFail="CONTINUE">
+            <uniqueConstraintExists constraintName="property_key_key2" tableName="property"/>
+        </preConditions>
+
+        <dropUniqueConstraint constraintName="property_key_key2" tableName="property"/>
+    </changeSet>
+
+    <changeSet id="20250110253384" author="Ivica Cardic">
+        <addColumn tableName="property">
+            <column name="scope" type="INT"/>
+        </addColumn>
+
+        <addColumn tableName="property">
+            <column name="scope_id" type="BIGINT" />
+        </addColumn>
+
+        <update tableName="property">
+            <column name="scope" valueNumeric="0"/>
+            <where>key LIKE 'ai.provider.%'</where>
+        </update>
+
+        <update tableName="property">
+            <column name="scope" valueNumeric="3"/>
+            <column name="scope_id" valueNumeric="1049"/>
+            <where>key = 'git.configuration'</where>
+        </update>
+
+        <addNotNullConstraint tableName="property" columnName="scope"/>
+
+        <addUniqueConstraint constraintName="uk_property_key_scope_scope_id" tableName="property" columnNames="key,scope,scope_id"/>
+    </changeSet>
+</databaseChangeLog>

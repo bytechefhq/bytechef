@@ -58,9 +58,7 @@ public class ProjectBeforeSaveEventListener extends AbstractRelationalEventListe
             if (curProject.getLastVersion() != project.getLastVersion()) {
                 ProjectVersion projectVersion = project.getLastPublishedProjectVersion();
 
-                projectGitFacade.pushProjectToGit(
-                    project.getId(),
-                    "V%s - %s".formatted(projectVersion.getVersion(), projectVersion.getDescription()));
+                projectGitFacade.pushProjectToGit(project.getId(), projectVersion.getDescription());
             }
         }
     }

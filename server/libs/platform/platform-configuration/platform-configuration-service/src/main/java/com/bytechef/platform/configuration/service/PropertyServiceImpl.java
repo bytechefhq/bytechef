@@ -38,38 +38,53 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void delete(@NonNull String key) {
-        propertyRepository.findByKey(key)
-            .ifPresent(propertyRepository::delete);
+    public void delete(@NonNull String key, Property.Scope scope, Long scopeId) {
+        if (scopeId == null) {
+            propertyRepository.findByKeyAndScope(key, scope.ordinal())
+                .ifPresent(propertyRepository::delete);
+        } else {
+            propertyRepository.findByKeyAndScopeAndScopeId(key, scope.ordinal(), scopeId)
+                .ifPresent(propertyRepository::delete);
+        }
     }
 
     @Override
-    public Optional<Property> fetchProperty(@NonNull String key) {
-        return propertyRepository.findByKey(key);
+    public Optional<Property> fetchProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+        if (scopeId == null) {
+            return propertyRepository.findByKeyAndScope(key, scope.ordinal());
+        } else {
+            return propertyRepository.findByKeyAndScopeAndScopeId(key, scope.ordinal(), scopeId);
+        }
     }
 
     @Override
-    public Property getProperty(@NonNull String key) {
-        return OptionalUtils.get(propertyRepository.findByKey(key));
+    public Property getProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
+        return OptionalUtils.get(fetchProperty(key, scope, scopeId));
     }
 
     @Override
-    public List<Property> getProperties(@NonNull List<String> keys) {
-        return propertyRepository.findAllByKeyIn(keys);
+    public List<Property> getProperties(@NonNull List<String> keys, Property.Scope scope, Long scopeId) {
+        if (scopeId == null) {
+            return propertyRepository.findAllByKeyInAndScope(keys, scope.ordinal());
+        } else {
+            return propertyRepository.findAllByKeyInAndScopeAndScopeId(keys, scope.ordinal(), scopeId);
+        }
     }
 
     @Override
-    public void save(@NonNull String key, @NonNull Map<String, ?> value) {
-        propertyRepository.findByKey(key)
-            .ifPresentOrElse(properties -> {
-                properties.setValue(value);
+    public void save(@NonNull String key, @NonNull Map<String, ?> value, Property.Scope scope, Long scopeId) {
+        fetchProperty(key, scope, scopeId)
+            .ifPresentOrElse(property -> {
+                property.setValue(value);
 
-                propertyRepository.save(properties);
+                propertyRepository.save(property);
             }, () -> {
                 Property property = new Property();
 
                 property.setEnabled(true);
                 property.setKey(key);
+                property.setScope(scope);
+                property.setScopeId(scopeId);
                 property.setValue(value);
 
                 propertyRepository.save(property);
@@ -77,8 +92,8 @@ public class PropertyServiceImpl implements PropertyService {
     }
 
     @Override
-    public void update(@NonNull String key, boolean enabled) {
-        propertyRepository.findByKey(key)
+    public void update(@NonNull String key, boolean enabled, Property.Scope scope, Long scopeId) {
+        fetchProperty(key, scope, scopeId)
             .ifPresent(properties -> {
                 properties.setEnabled(enabled);
 

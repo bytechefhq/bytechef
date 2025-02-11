@@ -28,9 +28,12 @@ public interface WorkspaceService {
 
     void delete(long id);
 
+    Workspace getProjectWorkspace(long projectId);
+
     List<Workspace> getWorkspaces();
 
     Workspace getWorkspace(long id);
 
     Workspace update(Workspace workspace);
+
 }

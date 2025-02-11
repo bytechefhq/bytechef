@@ -11,9 +11,11 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.automation.configuration.service.WorkspaceService;
 import com.bytechef.ee.automation.configuration.domain.ProjectGitConfiguration;
 import com.bytechef.ee.automation.configuration.service.ProjectGitConfigurationService;
 import com.bytechef.ee.automation.configuration.service.ProjectGitService;
@@ -43,12 +45,14 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final WorkflowService workflowService;
+    private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
     public ProjectGitFacadeImpl(
         GitConfigurationFacade gitConfigurationFacade, ProjectFacade projectFacade,
         ProjectGitConfigurationService projectGitConfigurationService, ProjectGitService projectGitService,
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService, WorkflowService workflowService) {
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
+        WorkflowService workflowService, WorkspaceService workspaceService) {
 
         this.gitConfigurationFacade = gitConfigurationFacade;
         this.projectFacade = projectFacade;
@@ -57,11 +61,14 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
         this.workflowService = workflowService;
+        this.workspaceService = workspaceService;
     }
 
     @Override
     public void pullProjectFromGit(long projectId) {
-        GitConfigurationDTO gitConfiguration = gitConfigurationFacade.getGitConfiguration();
+        Workspace workspace = workspaceService.getProjectWorkspace(projectId);
+
+        GitConfigurationDTO gitConfiguration = gitConfigurationFacade.getGitConfiguration(workspace.getId());
         ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationService.getProjectGitConfiguration(
             projectId);
 
@@ -101,7 +108,9 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             projectId, project.getLastVersion());
 
-        GitConfigurationDTO gitConfigurationDTO = gitConfigurationFacade.getGitConfiguration();
+        Workspace workspace = workspaceService.getProjectWorkspace(projectId);
+
+        GitConfigurationDTO gitConfigurationDTO = gitConfigurationFacade.getGitConfiguration(workspace.getId());
         ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationService.getProjectGitConfiguration(
             projectId);
 

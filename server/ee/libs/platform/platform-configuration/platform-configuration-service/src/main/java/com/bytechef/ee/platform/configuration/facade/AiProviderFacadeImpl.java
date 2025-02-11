@@ -14,6 +14,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -46,7 +47,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void deleteAiProvider(int id) {
         Provider provider = getProvider(id);
 
-        propertyService.delete(provider.getKey());
+        propertyService.delete(provider.getKey(), Scope.PLATFORM, null);
     }
 
     @Override
@@ -58,7 +59,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             LLMConstants.PROVIDERS
                 .stream()
                 .map(Provider::getKey)
-                .toList());
+                .toList(),
+            Scope.PLATFORM, null);
 
         return LLMConstants.PROVIDERS
             .stream()
@@ -95,14 +97,14 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     public void updateAiProvider(int id, boolean enabled) {
         Provider provider = getProvider(id);
 
-        propertyService.update(provider.getKey(), enabled);
+        propertyService.update(provider.getKey(), enabled, Scope.PLATFORM, null);
     }
 
     @Override
     public void updateAiProvider(int id, String apiKey) {
         Provider provider = getProvider(id);
 
-        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey));
+        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null);
     }
 
     private static Provider getProvider(int id) {

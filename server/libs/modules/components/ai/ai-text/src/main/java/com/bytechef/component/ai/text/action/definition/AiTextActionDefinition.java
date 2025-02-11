@@ -72,6 +72,7 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -113,7 +114,8 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         List<String> activeProviderKeys = propertyService.getProperties(
             LLMConstants.PROVIDERS.stream()
                 .map(Provider::getKey)
-                .toList())
+                .toList(),
+            Scope.PLATFORM, null)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)
@@ -133,7 +135,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         return activeProviderKeys.stream()
             .filter(key::equals)
             .findFirst()
-            .map(propertyService::getProperty)
+            .map(curKey -> propertyService.getProperty(curKey, Scope.PLATFORM, null))
             .map(property -> (String) property.get("apiKey"))
             .orElse(null);
     }

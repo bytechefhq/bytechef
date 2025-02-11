@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.service;
 
 import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,15 +28,15 @@ import org.springframework.lang.NonNull;
  */
 public interface PropertyService {
 
-    void delete(@NonNull String key);
+    void delete(@NonNull String key, Scope scope, Long scopeId);
 
-    Optional<Property> fetchProperty(@NonNull String key);
+    Optional<Property> fetchProperty(@NonNull String key, Scope scope, Long scopeId);
 
-    Property getProperty(@NonNull String key);
+    Property getProperty(@NonNull String key, Scope scope, Long scopeId);
 
-    List<Property> getProperties(@NonNull List<String> keys);
+    List<Property> getProperties(@NonNull List<String> keys, Scope scope, Long scopeId);
 
-    void save(@NonNull String key, @NonNull Map<String, ?> value);
+    void save(@NonNull String key, @NonNull Map<String, ?> value, Scope scope, Long scopeId);
 
-    void update(@NonNull String key, boolean enabled);
+    void update(@NonNull String key, boolean enabled, Scope scope, Long scopeId);
 }

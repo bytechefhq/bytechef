@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.repository;
 
 import com.bytechef.automation.configuration.domain.Workspace;
+import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,4 +26,11 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface WorkspaceRepository extends ListCrudRepository<Workspace, Long> {
+
+    @Query("""
+        SELECT workspace.* FROM workspace
+        JOIN project ON workspace.id = project.workspace_id
+        WHERE project_id = :projectId
+        """)
+    Workspace findByProjectId(long projectId);
 }

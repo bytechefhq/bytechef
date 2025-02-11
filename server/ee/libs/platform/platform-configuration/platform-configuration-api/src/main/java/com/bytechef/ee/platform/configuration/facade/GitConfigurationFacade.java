@@ -17,9 +17,9 @@ import java.util.Optional;
  */
 public interface GitConfigurationFacade {
 
-    Optional<GitConfigurationDTO> fetchGitConfiguration();
+    Optional<GitConfigurationDTO> fetchGitConfiguration(long workspaceId);
 
-    GitConfigurationDTO getGitConfiguration();
+    GitConfigurationDTO getGitConfiguration(long workspaceId);
 
-    void save(GitConfigurationDTO gitConfigurationDTO);
+    void save(GitConfigurationDTO gitConfigurationDTO, long workspaceId);
 }

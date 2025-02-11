@@ -24,32 +24,32 @@ import org.springframework.stereotype.Component;
 public class RemotePropertyServiceClient implements PropertyService {
 
     @Override
-    public void delete(@NonNull String key) {
+    public void delete(@NonNull String key, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Optional<Property> fetchProperty(@NonNull String key) {
+    public Optional<Property> fetchProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Property getProperty(@NonNull String key) {
+    public Property getProperty(@NonNull String key, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public List<Property> getProperties(@NonNull List<String> keys) {
+    public List<Property> getProperties(@NonNull List<String> keys, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void save(@NonNull String key, @NonNull Map<String, ?> value) {
+    public void save(@NonNull String key, @NonNull Map<String, ?> value, Property.Scope scope, Long scopeId) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public void update(@NonNull String key, boolean enabled) {
+    public void update(@NonNull String key, boolean enabled, Property.Scope scope, Long scopeID) {
         throw new UnsupportedOperationException();
     }
 }

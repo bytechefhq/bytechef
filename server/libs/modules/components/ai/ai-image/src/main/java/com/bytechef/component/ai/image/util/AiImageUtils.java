@@ -31,6 +31,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.openai.constant.OpenAiConstants;
 import com.bytechef.config.ApplicationProperties.Ai;
 import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +64,8 @@ public class AiImageUtils {
         List<String> activeProviderKeys = propertyService.getProperties(
             LLMConstants.PROVIDERS.stream()
                 .map(Provider::getKey)
-                .toList())
+                .toList(),
+            Scope.PLATFORM, null)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)

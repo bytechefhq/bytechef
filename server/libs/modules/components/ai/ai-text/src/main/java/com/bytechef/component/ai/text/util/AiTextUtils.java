@@ -54,6 +54,7 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.AmazonBedrockTitan;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.configuration.domain.Property;
+import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
 import java.util.Map;
@@ -95,7 +96,8 @@ public class AiTextUtils {
         List<String> activeProviderKeys = propertyService.getProperties(
             LLMConstants.PROVIDERS.stream()
                 .map(Provider::getKey)
-                .toList())
+                .toList(),
+            Scope.PLATFORM, null)
             .stream()
             .filter(property -> property.getValue() != null && property.isEnabled())
             .map(Property::getKey)

@@ -37,11 +37,21 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("property")
 public class Property {
 
+    public enum Scope {
+        PLATFORM, AUTOMATION, EMBEDDED, WORKSPACE, PROJECT, INTEGRATION
+    }
+
     @Id
     private Long id;
 
     @Column
     private String key;
+
+    @Column
+    private int scope;
+
+    @Column
+    private Long scopeId;
 
     @Column
     private EncryptedMapWrapper value;
@@ -101,6 +111,14 @@ public class Property {
         return key;
     }
 
+    public Scope getScope() {
+        return Scope.values()[scope];
+    }
+
+    public Long getScopeId() {
+        return scopeId;
+    }
+
     public Map<String, ?> getValue() {
         return Collections.unmodifiableMap(value.getMap());
     }
@@ -135,6 +153,14 @@ public class Property {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public void setScope(Scope scope) {
+        this.scope = scope.ordinal();
+    }
+
+    public void setScopeId(Long scopeId) {
+        this.scopeId = scopeId;
     }
 
     public void setValue(Map<String, ?> value) {
@@ -172,6 +198,8 @@ public class Property {
         return "Properties{" +
             "id=" + id +
             ", key='" + key + '\'' +
+            ", scope=" + scope +
+            ", scopeId=" + scopeId +
             ", value=" + value +
             ", enabled=" + enabled +
             ", createdBy='" + createdBy + '\'' +
