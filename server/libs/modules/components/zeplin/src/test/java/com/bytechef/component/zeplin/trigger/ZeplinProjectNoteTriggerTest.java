@@ -18,7 +18,6 @@ package com.bytechef.component.zeplin.trigger;
 
 import static com.bytechef.component.zeplin.constant.ZeplinConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -29,14 +28,12 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
 import com.bytechef.component.definition.TriggerDefinition.HttpParameters;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -64,6 +61,8 @@ class ZeplinProjectNoteTriggerTest {
 
     @Test
     void testWebhookEnable() {
+        UUID uuid = UUID.randomUUID();
+
         when(mockedTriggerContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
@@ -74,23 +73,19 @@ class ZeplinProjectNoteTriggerTest {
             .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ID, "abc"));
-        UUID uuid = UUID.randomUUID();
 
         try (MockedStatic<UUID> uuidMockedStatic = mockStatic(UUID.class)) {
 
             uuidMockedStatic.when(UUID::randomUUID)
                 .thenReturn(uuid);
 
-            TriggerDefinition.WebhookEnableOutput webhookEnableOutput = ZeplinProjectNoteTrigger.webhookEnable(
+            WebhookEnableOutput result = ZeplinProjectNoteTrigger.webhookEnable(
                 mockedParameters, mockedParameters, "testWebhookUrl", TEST_WORKFLOW_EXECUTION_ID, mockedTriggerContext);
 
-            Map<String, ?> parameters = webhookEnableOutput.parameters();
-            LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(
+                Map.of(ID, "abc"), null);
 
-            Map<String, Object> expectedParameters = Map.of(ID, "abc");
-
-            assertEquals(expectedParameters, parameters);
-            assertNull(webhookExpirationDate);
+            assertEquals(expectedWebhookEnableOutput, result);
 
             Http.Body body = bodyArgumentCaptor.getValue();
 
