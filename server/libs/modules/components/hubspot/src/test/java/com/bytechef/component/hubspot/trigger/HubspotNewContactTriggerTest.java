@@ -20,12 +20,11 @@ import static com.bytechef.component.hubspot.constant.HubspotConstants.APP_ID;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.HAPIKEY;
 import static com.bytechef.component.hubspot.constant.HubspotConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.hubspot.util.HubspotUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -39,25 +38,21 @@ class HubspotNewContactTriggerTest extends AbstractHubspotTriggerTest {
         mockedParameters = MockParametersFactory.create(Map.of(APP_ID, "appID", HAPIKEY, "hubspot api key"));
 
         hubspotUtilsMockedStatic.when(
-            () -> HubspotUtils.subscribeWebhook(eventTypeArgumentCaptor.capture(), appIdArgumentCaptor.capture(),
-                hapikeyArgumentCaptor.capture(), webhookUrlArgumentCaptor.capture(),
+            () -> HubspotUtils.subscribeWebhook(
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                stringArgumentCaptor.capture(),
                 triggerContextArgumentCaptor.capture()))
             .thenReturn("123");
-        WebhookEnableOutput webhookEnableOutput = HubspotNewContactTrigger.webhookEnable(
+
+        WebhookEnableOutput result = HubspotNewContactTrigger.webhookEnable(
             mockedParameters, mockedParameters, "testWebhookUrl", workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
-
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
-
-        assertEquals("contact.creation", eventTypeArgumentCaptor.getValue());
-        assertEquals("appID", appIdArgumentCaptor.getValue());
-        assertEquals("hubspot api key", hapikeyArgumentCaptor.getValue());
-        assertEquals("testWebhookUrl", webhookUrlArgumentCaptor.getValue());
+        assertEquals(expectedWebhookEnableOutput, result);
+        assertEquals(
+            List.of("contact.creation", "appID", "hubspot api key", "testWebhookUrl"),
+            stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
@@ -71,19 +66,17 @@ class HubspotNewContactTriggerTest extends AbstractHubspotTriggerTest {
 
         hubspotUtilsMockedStatic
             .verify(() -> HubspotUtils.unsubscribeWebhook(
-                appIdArgumentCaptor.capture(), subscriptionIdArgumentCaptor.capture(),
-                hapikeyArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()));
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()));
 
-        assertEquals("appID", appIdArgumentCaptor.getValue());
-        assertEquals("subscriptionId", subscriptionIdArgumentCaptor.getValue());
-        assertEquals("hubspot api key", hapikeyArgumentCaptor.getValue());
+        assertEquals(List.of("appID", "subscriptionId", "hubspot api key"), stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookRequest() {
         hubspotUtilsMockedStatic.when(
-            () -> HubspotUtils.extractFirstContentMap(mockedWebhookBody))
+            () -> HubspotUtils.extractFirstContentMap(webhookBodyArgumentCaptor.capture()))
             .thenReturn(map);
 
         Object result = HubspotNewContactTrigger.webhookRequest(
@@ -91,5 +84,6 @@ class HubspotNewContactTriggerTest extends AbstractHubspotTriggerTest {
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(map, result);
+        assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
     }
 }
