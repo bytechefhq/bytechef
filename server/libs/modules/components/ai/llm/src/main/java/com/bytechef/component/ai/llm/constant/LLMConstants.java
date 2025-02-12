@@ -186,13 +186,15 @@ public class LLMConstants {
                 .label("Response Format")
                 .description("In which format do you want the response to be in?")
                 .options(
-                    option("Text", ChatModel.ResponseFormat.TEXT.name(), "Text response"),
-                    option("JSON", ChatModel.ResponseFormat.JSON.name(), "JSON response with key-value pairs"))
+                    option("Text", ChatModel.ResponseFormat.TEXT.name(), "Response as text"),
+                    option(
+                        "Structured data", ChatModel.ResponseFormat.JSON.name(),
+                        "Response as data in a simple format using keys and values"))
                 .defaultValue(ChatModel.ResponseFormat.TEXT.name())
                 .required(false),
             string(RESPONSE_SCHEMA)
                 .label("Response Schema")
-                .description("Define the JSON schema for the response.")
+                .description("Define desired structure for the structured data response.")
                 .controlType(JSON_SCHEMA_BUILDER)
                 .displayCondition("response.responseFormat == '%s'".formatted(ChatModel.ResponseFormat.JSON.name()))
                 .required(false))
