@@ -18,11 +18,10 @@ package com.bytechef.component.stripe.trigger;
 
 import static com.bytechef.component.stripe.constant.StripeConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.stripe.util.StripeUtils;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -36,19 +35,19 @@ class StripeNewCustomerTriggerTest extends AbstractStripeTriggerTest {
         String webhookUrl = "testWebhookUrl";
 
         stripeUtilsMockedStatic.when(
-            () -> StripeUtils.subscribeWebhook(webhookUrl, mockedTriggerContext, "customer.created"))
+            () -> StripeUtils.subscribeWebhook(
+                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn("123");
 
         WebhookEnableOutput webhookEnableOutput = StripeNewCustomerTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, "123");
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        assertEquals(List.of(webhookUrl, "customer.created"), stringArgumentCaptor.getAllValues());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
@@ -63,7 +62,7 @@ class StripeNewCustomerTriggerTest extends AbstractStripeTriggerTest {
     @Test
     void testWebhookRequest() {
         stripeUtilsMockedStatic.when(
-            () -> StripeUtils.getNewObject(mockedWebhookBody))
+            () -> StripeUtils.getNewObject(webhookBodyArgumentCaptor.capture()))
             .thenReturn(mockedObject);
 
         Object result = StripeNewCustomerTrigger.webhookRequest(
@@ -71,5 +70,6 @@ class StripeNewCustomerTriggerTest extends AbstractStripeTriggerTest {
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(mockedObject, result);
+        assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
     }
 }
