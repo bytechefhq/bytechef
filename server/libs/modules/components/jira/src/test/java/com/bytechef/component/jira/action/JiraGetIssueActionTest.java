@@ -18,19 +18,29 @@ package com.bytechef.component.jira.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 /**
  * @author Monika Domiter
  */
-class JiraGetIssueActionTest extends AbstractJiraActionTest {
+class JiraGetIssueActionTest {
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = mock(Parameters.class);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -39,7 +49,7 @@ class JiraGetIssueActionTest extends AbstractJiraActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Object result = JiraGetIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = JiraGetIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
     }

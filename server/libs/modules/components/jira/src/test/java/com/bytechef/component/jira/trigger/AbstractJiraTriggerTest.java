@@ -29,6 +29,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.jira.util.JiraUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -46,14 +47,18 @@ abstract class AbstractJiraTriggerTest {
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
+    protected ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         jiraUtilsMockedStatic = mockStatic(JiraUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         jiraUtilsMockedStatic.close();
     }
 }

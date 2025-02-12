@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -44,17 +45,19 @@ import org.mockito.MockedStatic;
  */
 class JiraOptionsUtilsTest {
 
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    protected ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
     private List<Option<String>> result;
-
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final List<Option<String>> expectedOptions = List.of(option("abc", "123"));
 
     @BeforeEach
     void beforeEach() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -71,13 +74,18 @@ class JiraOptionsUtilsTest {
 
         try (MockedStatic<JiraUtils> jiraUtilsMockedStatic = mockStatic(JiraUtils.class)) {
             jiraUtilsMockedStatic
-                .when(() -> JiraUtils.getProjectName(mockedParameters, mockedParameters, mockedContext))
+                .when(() -> JiraUtils.getProjectName(
+                    parametersArgumentCaptor.capture(), parametersArgumentCaptor.capture(),
+                    actionContextArgumentCaptor.capture()))
                 .thenReturn("PROJECT");
 
             result =
-                JiraOptionsUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+                JiraOptionsUtils.getIssueIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+                    mockedActionContext);
 
             assertEquals(expectedOptions, result);
+            assertEquals(List.of(mockedParameters, mockedParameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
         }
     }
 
@@ -89,7 +97,7 @@ class JiraOptionsUtilsTest {
             .thenReturn(list);
 
         result = JiraOptionsUtils.getIssueTypesIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -101,7 +109,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(list);
 
-        result = JiraOptionsUtils.getPriorityIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        result = JiraOptionsUtils.getPriorityIdOptions(mockedParameters, mockedParameters, Map.of(), "",
+            mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -113,7 +122,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(valuesMap);
 
-        result = JiraOptionsUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        result =
+            JiraOptionsUtils.getProjectIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }
@@ -125,7 +135,8 @@ class JiraOptionsUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(list);
 
-        result = JiraOptionsUtils.getUserIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
+        result =
+            JiraOptionsUtils.getUserIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
 
         assertEquals(expectedOptions, result);
     }

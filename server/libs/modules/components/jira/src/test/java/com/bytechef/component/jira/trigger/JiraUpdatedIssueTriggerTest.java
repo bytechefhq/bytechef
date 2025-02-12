@@ -19,14 +19,13 @@ package com.bytechef.component.jira.trigger;
 import static com.bytechef.component.jira.constant.JiraConstants.ID;
 import static com.bytechef.component.jira.constant.JiraConstants.ISSUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.jira.util.JiraUtils;
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -40,19 +39,29 @@ class JiraUpdatedIssueTriggerTest extends AbstractJiraTriggerTest {
         String webhookUrl = "testWebhookUrl";
 
         jiraUtilsMockedStatic.when(
-            () -> JiraUtils.subscribeWebhook(mockedParameters, webhookUrl, mockedTriggerContext, "jira:issue_updated"))
+            () -> JiraUtils.subscribeWebhook(
+                parametersArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(123);
 
         WebhookEnableOutput webhookEnableOutput = JiraUpdatedIssueTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, 123);
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+        assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+        assertEquals(List.of(webhookUrl, "jira:issue_updated"), stringArgumentCaptor.getAllValues());
+    }
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+    @Test
+    void testWebhookDisable() {
+        JiraUpdatedIssueTrigger.webhookDisable(
+            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+
+        jiraUtilsMockedStatic
+            .verify(() -> JiraUtils.unsubscribeWebhook(mockedParameters, mockedTriggerContext));
     }
 
     @Test
