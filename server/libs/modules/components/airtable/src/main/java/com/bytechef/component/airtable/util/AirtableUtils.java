@@ -194,17 +194,17 @@ public class AirtableUtils {
             .toList();
     }
 
-    private record AirtableChoice(String id, String name, String color) {
+    protected record AirtableChoice(String id, String name, String color) {
     }
 
-    private record AirtableField(
+    protected record AirtableField(
         String id, String name, String description, String type, AirtableOptions options) {
     }
 
-    private record AirtableOptions(List<AirtableChoice> choices) {
+    protected record AirtableOptions(List<AirtableChoice> choices) {
     }
 
-    private record AirtableTable(
+    protected record AirtableTable(
         String id, String name, List<AirtableField> fields, String description, String primaryFieldId,
         List<AirtableTableView> views) {
     }
