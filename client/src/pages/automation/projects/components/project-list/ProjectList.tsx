@@ -20,7 +20,7 @@ const ProjectList = ({
                 const projectTagIds = project.tags?.map((tag) => tag.id);
 
                 return (
-                    <Collapsible className="group" key={project.id}>
+                    <Collapsible className="group" defaultOpen={!project.projectWorkflowIds?.length} key={project.id}>
                         <ProjectListItem
                             key={project.id}
                             project={project}

@@ -208,7 +208,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                     <TooltipContent>{project.description}</TooltipContent>
                                 </Tooltip>
                             ) : (
-                                <span className="text-base font-semibold">{project.name}</span>
+                                <CollapsibleTrigger className="text-base font-semibold">
+                                    {project.name}
+                                </CollapsibleTrigger>
                             )}
                         </div>
 
