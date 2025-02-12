@@ -18,12 +18,11 @@
 
 package com.bytechef.atlas.configuration.repository.git;
 
-import static com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.*;
-
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
+import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.GitInfo;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.HeadFiles;
 import com.bytechef.atlas.configuration.repository.git.operations.JGitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
