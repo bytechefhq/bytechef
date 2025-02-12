@@ -19,12 +19,11 @@ package com.bytechef.component.github.trigger;
 import static com.bytechef.component.github.constant.GithubConstants.ID;
 import static com.bytechef.component.github.constant.GithubConstants.REPOSITORY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.github.util.GithubUtils;
-import java.time.LocalDateTime;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -37,30 +36,27 @@ class GithubNewIssueTriggerTest extends AbstractGithubTriggerTest {
     void testWebhookEnable() {
         String webhookUrl = "testWebhookUrl";
 
-        when(mockedParameters.getRequiredString(REPOSITORY))
-            .thenReturn("repo");
+        mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, "repo"));
 
         githubUtilsMockedStatic.when(
-            () -> GithubUtils.subscribeWebhook("repo", "issues", webhookUrl, mockedTriggerContext))
+            () -> GithubUtils.subscribeWebhook(
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
+                triggerContextArgumentCaptor.capture()))
             .thenReturn(123);
         WebhookEnableOutput webhookEnableOutput = GithubNewIssueTrigger.webhookEnable(
             mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
 
-        Map<String, ?> parameters = webhookEnableOutput.parameters();
-        LocalDateTime webhookExpirationDate = webhookEnableOutput.webhookExpirationDate();
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, 123), null);
 
-        Map<String, Object> expectedParameters = Map.of(ID, 123);
+        assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
 
-        assertEquals(expectedParameters, parameters);
-        assertNull(webhookExpirationDate);
+        assertEquals(List.of("repo", "issues", webhookUrl), stringArgumentCaptor.getAllValues());
+        assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
 
     @Test
     void testWebhookDisable() {
-        when(mockedParameters.getRequiredString(REPOSITORY))
-            .thenReturn("repo");
-        when(mockedParameters.getInteger(ID))
-            .thenReturn(123);
+        mockedParameters = MockParametersFactory.create(Map.of(REPOSITORY, "repo", ID, 123));
 
         GithubNewIssueTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
@@ -74,7 +70,7 @@ class GithubNewIssueTriggerTest extends AbstractGithubTriggerTest {
         Map<String, Object> content = Map.of("id", 123);
 
         githubUtilsMockedStatic.when(
-            () -> GithubUtils.getContent(mockedWebhookBody))
+            () -> GithubUtils.getContent(webhookBodyArgumentCaptor.capture()))
             .thenReturn(content);
 
         Map<String, Object> result = GithubNewIssueTrigger.webhookRequest(
@@ -82,5 +78,6 @@ class GithubNewIssueTriggerTest extends AbstractGithubTriggerTest {
             mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
 
         assertEquals(content, result);
+        assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
     }
 }
