@@ -52,8 +52,7 @@ class QuickbooksUtilsTest {
     private final Parameters mockedParameters = mock(Parameters.class);
     private final Context.Http.Response mockedResponse = mock(Context.Http.Response.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final ArgumentCaptor<String> queryNameArgumentCapture = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> queryValueArgumentCapture = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testGetPropertiesForItemWithInventoryType() {
@@ -91,18 +90,22 @@ class QuickbooksUtilsTest {
     }
 
     private void setupHttpMock(Map<String, Object> responseBody) {
-        when(mockedActionContext.http(any())).thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryNameArgumentCapture.capture(), queryValueArgumentCapture.capture()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any())).thenReturn(mockedExecutor);
-        when(mockedExecutor.execute()).thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class))).thenReturn(responseBody);
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.configuration(any()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.execute())
+            .thenReturn(mockedResponse);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseBody);
     }
 
     private void verifyQuery(Entity expectedEntity) {
-        assertEquals("query", queryNameArgumentCapture.getValue());
-        assertEquals(URLEncoder.encode("SELECT * FROM " + expectedEntity.getName(), StandardCharsets.UTF_8),
-            queryValueArgumentCapture.getValue());
+        assertEquals(
+            List.of("query", URLEncoder.encode("SELECT * FROM " + expectedEntity.getName(), StandardCharsets.UTF_8)),
+            stringArgumentCaptor.getAllValues());
     }
 
     @Test

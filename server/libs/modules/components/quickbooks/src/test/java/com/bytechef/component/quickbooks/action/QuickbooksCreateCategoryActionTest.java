@@ -19,20 +19,29 @@ package com.bytechef.component.quickbooks.action;
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-class QuickbooksCreateCategoryActionTest extends AbstractQuickbooksActionTest {
+class QuickbooksCreateCategoryActionTest {
+
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(NAME, "Name"));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        mockedParameters = MockParametersFactory.create(Map.of(NAME, "Name"));
-
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
