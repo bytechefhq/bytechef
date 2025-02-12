@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.airtable.action.AirtableCreateRecordAction;
+import com.bytechef.component.airtable.action.AirtableDeleteRecordAction;
+import com.bytechef.component.airtable.action.AirtableGetRecordAction;
 import com.bytechef.component.airtable.connection.AirtableConnection;
 import com.bytechef.component.definition.ComponentDefinition;
 
@@ -33,7 +35,8 @@ public abstract class AbstractAirtableComponentHandler implements OpenApiCompone
         component("airtable")
             .title("Airtable")
             .description("Airtable is a user-friendly and flexible cloud-based database management tool."))
-                .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION))
+                .actions(modifyActions(AirtableCreateRecordAction.ACTION_DEFINITION,
+                    AirtableDeleteRecordAction.ACTION_DEFINITION, AirtableGetRecordAction.ACTION_DEFINITION))
                 .connection(modifyConnection(AirtableConnection.CONNECTION_DEFINITION))
                 .triggers(getTriggers());
 
