@@ -29,6 +29,7 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.github.util.GithubUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -41,19 +42,22 @@ abstract class AbstractGithubTriggerTest {
     protected HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     protected HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     protected WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
-
-    protected Parameters mockedParameters = mock(Parameters.class);
+    protected Parameters mockedParameters;
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected MockedStatic<GithubUtils> githubUtilsMockedStatic;
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
+    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         githubUtilsMockedStatic = mockStatic(GithubUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         githubUtilsMockedStatic.close();
     }
 
