@@ -54,8 +54,8 @@ class GoogleMailNewEmailPollingTriggerTest {
     private final Messages mockedMessages = mock(Messages.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Users mockedUsers = mock(Users.class);
-    private final ArgumentCaptor<String> qArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPoll() throws IOException {
@@ -66,15 +66,15 @@ class GoogleMailNewEmailPollingTriggerTest {
 
         try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
             googleServicesMockedStatic
-                .when(() -> GoogleServices.getMail(parameters))
+                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedGmail);
             when(mockedGmail.users())
                 .thenReturn(mockedUsers);
             when(mockedUsers.messages())
                 .thenReturn(mockedMessages);
-            when(mockedMessages.list(userIdArgumentCaptor.capture()))
+            when(mockedMessages.list(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
-            when(mockedList.setQ(qArgumentCaptor.capture()))
+            when(mockedList.setQ(stringArgumentCaptor.capture()))
                 .thenReturn(mockedList);
 
             when(mockedList.execute())
@@ -83,14 +83,14 @@ class GoogleMailNewEmailPollingTriggerTest {
             PollOutput pollOutput =
                 GoogleMailNewEmailPollingTrigger.poll(parameters, parameters, parameters, mockedTriggerContext);
 
-            assertEquals(ME, userIdArgumentCaptor.getValue());
+            assertEquals(messages, pollOutput.records());
+            assertFalse(pollOutput.pollImmediately());
 
             ZonedDateTime zonedDateTime = startDate.atZone(ZoneId.systemDefault());
 
-            assertEquals("is:unread after:" + zonedDateTime.toEpochSecond(), qArgumentCaptor.getValue());
-
-            assertEquals(messages, pollOutput.records());
-            assertFalse(pollOutput.pollImmediately());
+            assertEquals(List.of(ME, "is:unread after:" + zonedDateTime.toEpochSecond()),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
         }
     }
 }

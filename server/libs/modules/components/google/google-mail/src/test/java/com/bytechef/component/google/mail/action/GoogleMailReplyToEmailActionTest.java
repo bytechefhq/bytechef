@@ -17,18 +17,20 @@
 package com.bytechef.component.google.mail.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -37,10 +39,16 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleMailReplyToEmailActionTest extends AbstractGoogleMailActionTest {
+class GoogleMailReplyToEmailActionTest {
 
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<Gmail> gmailArgumentCaptor = ArgumentCaptor.forClass(Gmail.class);
     private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Gmail mockedGmail = mock(Gmail.class);
     private final Message mockedMessage = mock(Message.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException, MessagingException {
@@ -48,25 +56,35 @@ class GoogleMailReplyToEmailActionTest extends AbstractGoogleMailActionTest {
         Message message = new Message().setThreadId("id")
             .setHistoryId(new BigInteger("123"));
 
-        try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
-            googleMailUtilsMockedStatic.when(() -> GoogleMailUtils.getMessage(parameters, mockedGmail))
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
+            googleMailUtilsMockedStatic.when(() -> GoogleMailUtils.getMessage(
+                parametersArgumentCaptor.capture(), gmailArgumentCaptor.capture()))
                 .thenReturn(message);
             googleMailUtilsMockedStatic
-                .when(() -> GoogleMailUtils.getEncodedEmail(parameters, mockedActionContext, message))
+                .when(() -> GoogleMailUtils.getEncodedEmail(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    messageArgumentCaptor.capture()))
                 .thenReturn("encodedMail");
             googleMailUtilsMockedStatic
-                .when(() -> GoogleMailUtils.sendMail(any(Gmail.class), messageArgumentCaptor.capture()))
+                .when(() -> GoogleMailUtils.sendMail(gmailArgumentCaptor.capture(), messageArgumentCaptor.capture()))
                 .thenReturn(mockedMessage);
 
             Message result = GoogleMailReplyToEmailAction.perform(parameters, parameters, mockedActionContext);
 
             assertEquals(mockedMessage, result);
 
-            Message value = messageArgumentCaptor.getValue();
+            Message expectedMessage = new Message().setRaw("encodedMail")
+                .setThreadId("id")
+                .setHistoryId(new BigInteger("123"));
 
-            assertEquals("encodedMail", value.getRaw());
-            assertEquals("id", value.getThreadId());
-            assertEquals(new BigInteger("123"), value.getHistoryId());
+            assertEquals(List.of(parameters, parameters, parameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedGmail, mockedGmail), gmailArgumentCaptor.getAllValues());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(List.of(message, expectedMessage), messageArgumentCaptor.getAllValues());
         }
     }
 }

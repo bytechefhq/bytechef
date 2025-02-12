@@ -19,61 +19,69 @@ package com.bytechef.component.google.mail.action;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ID;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.LABEL_IDS;
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.ME;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.ModifyMessageRequest;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 
 /**
  * @author J. Iamsamang
  */
-class GoogleMailAddLabelsActionTest extends AbstractGoogleMailActionTest {
+class GoogleMailAddLabelsActionTest {
 
+    private final Gmail mockedGmail = mock(Gmail.class);
     private final Gmail.Users.Messages mockedMessages = mock(Gmail.Users.Messages.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
     private final Message mockedMessage = mock(Message.class);
     private final Gmail.Users.Messages.Modify mockedModify = mock(Gmail.Users.Messages.Modify.class);
-    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> messageIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     private final ArgumentCaptor<ModifyMessageRequest> requestArgumentCaptor =
         ArgumentCaptor.forClass(ModifyMessageRequest.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException {
         Parameters parameters =
-            MockParametersFactory.create(Map.of(ID, "1", LABEL_IDS, Arrays.asList("1", "2", "3")));
+            MockParametersFactory.create(Map.of(ID, "1", LABEL_IDS, List.of("1", "2", "3")));
 
-        when(mockedGmail.users())
-            .thenReturn(mockedUsers);
-        when(mockedUsers.messages())
-            .thenReturn(mockedMessages);
-        when(mockedMessages.modify(
-            userIdArgumentCaptor.capture(),
-            messageIdArgumentCaptor.capture(),
-            requestArgumentCaptor.capture()))
-                .thenReturn(mockedModify);
-        when(mockedModify.execute())
-            .thenReturn(mockedMessage);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
+            when(mockedGmail.users())
+                .thenReturn(mockedUsers);
+            when(mockedUsers.messages())
+                .thenReturn(mockedMessages);
+            when(mockedMessages.modify(
+                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(), requestArgumentCaptor.capture()))
+                    .thenReturn(mockedModify);
+            when(mockedModify.execute())
+                .thenReturn(mockedMessage);
 
-        Message message = GoogleMailAddLabelsAction.perform(parameters, parameters, mockedActionContext);
-        assertEquals(mockedMessage, message);
-        assertEquals(ME, userIdArgumentCaptor.getValue());
-        assertEquals("1", messageIdArgumentCaptor.getValue());
-        ModifyMessageRequest request = requestArgumentCaptor.getValue();
-        assertArrayEquals(Arrays.asList("1", "2", "3")
-            .toArray(),
-            request.getAddLabelIds()
-                .toArray());
+            Message result = GoogleMailAddLabelsAction.perform(parameters, parameters, mock(ActionContext.class));
+
+            assertEquals(mockedMessage, result);
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
+
+            assertEquals(List.of(ME, "1"), stringArgumentCaptor.getAllValues());
+
+            ModifyMessageRequest expectedModifyMessageRequest = new ModifyMessageRequest()
+                .setAddLabelIds(List.of("1", "2", "3"));
+
+            assertEquals(expectedModifyMessageRequest, requestArgumentCaptor.getValue());
+        }
     }
 }
