@@ -50,7 +50,10 @@ public class AirtableUtils {
 
     private static final List<String> SKIP_FIELDS = List.of("singleCollaborator", "multipleCollaborators");
 
-    public static List<Option<String>> getBaseIdOptions(Context context) {
+    public static List<Option<String>> getBaseIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
         Map<String, ?> body = context
             .http(http -> http.get("/meta/bases"))
             .configuration(Http.responseType(ResponseType.JSON))
@@ -144,7 +147,9 @@ public class AirtableUtils {
         };
     }
 
-    public static List<Option<String>> getTableIdOptions(Parameters inputParameters, Context context) {
+    public static List<Option<String>> getTableIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
         String url = "/meta/bases/%s/tables".formatted(inputParameters.getRequiredString(BASE_ID));
 
         Map<String, ?> body = context.http(http -> http.get(url))
@@ -159,7 +164,6 @@ public class AirtableUtils {
         context.log(log -> log.debug("Response for url='%s': %s".formatted(url, body)));
 
         return getOptions(body, "tables");
-
     }
 
     private static List<Option<String>> getOptions(Map<String, ?> response, String name) {

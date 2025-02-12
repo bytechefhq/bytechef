@@ -25,8 +25,8 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.OptionsDataSource.TriggerOptionsFunction;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
-import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.definition.TriggerDefinition.TriggerType;
 import com.bytechef.component.definition.TypeReference;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -45,36 +45,32 @@ public class AirtableNewRecordTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
         .title("New Record")
         .description("Trigger off when a new entry is added to the table that you have selected.")
-        .type(TriggerDefinition.TriggerType.POLLING)
+        .type(TriggerType.POLLING)
         .properties(
             string(BASE_ID)
                 .label("Base ID")
                 .description("ID of the base which contains the table that you want to monitor.")
-                .options(
-                    (TriggerOptionsFunction<String>) (
-                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
-                        context) -> AirtableUtils.getBaseIdOptions(context))
+                .options((TriggerOptionsFunction<String>) AirtableUtils::getBaseIdOptions)
                 .required(true),
             string(TABLE_ID)
                 .label("Table")
                 .description("The table to monitor for new records.")
-                .options(
-                    (TriggerOptionsFunction<String>) (
-                        inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
-                        context) -> AirtableUtils.getTableIdOptions(inputParameters, context))
+                .options((TriggerOptionsFunction<String>) AirtableUtils::getTableIdOptions)
                 .optionsLookupDependsOn(BASE_ID)
                 .required(true),
             string(TRIGGER_FIELD)
                 .label("Trigger Field")
                 .description(
-                    "It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one.")
+                    "It is essential to have a field for Created Time or Last Modified Time in your schema since " +
+                        "this field is used to sort records, and the trigger will not function correctly without it. " +
+                        "Therefore, if you don't have such a field in your schema, please create one.")
                 .required(true))
         .output()
         .poll(AirtableNewRecordTrigger::poll);
 
     protected static PollOutput poll(
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
-        TriggerContext context) {
+        TriggerContext triggerContext) {
 
         LocalDateTime startDate = closureParameters.getLocalDateTime(LAST_TIME_CHECKED, LocalDateTime.now());
         LocalDateTime endDate = LocalDateTime.now();
@@ -86,7 +82,7 @@ public class AirtableNewRecordTrigger {
                 startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))),
             StandardCharsets.UTF_8);
 
-        Http.Response response = context.http(http -> http.get(
+        Http.Response response = triggerContext.http(http -> http.get(
             String.format(
                 "/%s/%s", inputParameters.getRequiredString(BASE_ID), inputParameters.getRequiredString(TABLE_ID))))
             .queryParameter("filterByFormula", filterByFormula)

@@ -59,6 +59,8 @@ class AirtableUtilsTest {
 
     @Test
     void testGetBaseIdOptions() {
+        Parameters parameters = MockParametersFactory.create(Map.of());
+
         when(mockedContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
@@ -68,7 +70,8 @@ class AirtableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("bases", List.of(Map.of("name", "abc", "id", "123"))));
 
-        List<Option<String>> result = AirtableUtils.getBaseIdOptions(mockedContext);
+        List<Option<String>> result =
+            AirtableUtils.getBaseIdOptions(parameters, parameters, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("abc", "123")), result);
     }
@@ -224,7 +227,8 @@ class AirtableUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("tables", List.of(Map.of("name", "abc", "id", "123"))));
 
-        List<Option<String>> result = AirtableUtils.getTableIdOptions(parameters, mockedContext);
+        List<Option<String>> result =
+            AirtableUtils.getTableIdOptions(parameters, parameters, Map.of(), "", mockedContext);
 
         assertEquals(List.of(option("abc", "123")), result);
     }
