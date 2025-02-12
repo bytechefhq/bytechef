@@ -17,6 +17,7 @@
 package com.bytechef.component.airtable;
 
 import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.RECORD_ID;
 import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 
 import com.bytechef.component.OpenApiComponentHandler;
@@ -83,18 +84,18 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
         if (Objects.equals(modifiableProperty.getName(), BASE_ID)) {
             ((ModifiableStringProperty) modifiableProperty).options(
                 (ActionOptionsFunction<String>) AirtableUtils::getBaseIdOptions);
-        }
-
-        if (Objects.equals(modifiableProperty.getName(), "__item")) {
-            ((ModifiableDynamicPropertiesProperty) modifiableProperty)
-                .propertiesLookupDependsOn(BASE_ID, TABLE_ID)
-                .properties(AirtableUtils.getFieldsProperties());
-        }
-
-        if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
+        } else if (Objects.equals(modifiableProperty.getName(), TABLE_ID)) {
             ((ModifiableStringProperty) modifiableProperty)
                 .optionsLookupDependsOn(BASE_ID)
                 .options((ActionOptionsFunction<String>) AirtableUtils::getTableIdOptions);
+        } else if (Objects.equals(modifiableProperty.getName(), RECORD_ID)) {
+            ((ModifiableStringProperty) modifiableProperty)
+                .optionsLookupDependsOn(TABLE_ID, BASE_ID)
+                .options((ActionOptionsFunction<String>) AirtableUtils::getRecordIdOptions);
+        } else if (Objects.equals(modifiableProperty.getName(), "__item")) {
+            ((ModifiableDynamicPropertiesProperty) modifiableProperty)
+                .propertiesLookupDependsOn(BASE_ID, TABLE_ID)
+                .properties(AirtableUtils.getFieldsProperties());
         }
 
         return modifiableProperty;

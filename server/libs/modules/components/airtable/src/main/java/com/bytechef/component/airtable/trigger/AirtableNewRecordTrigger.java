@@ -16,6 +16,8 @@
 
 package com.bytechef.component.airtable.trigger;
 
+import static com.bytechef.component.airtable.constant.AirtableConstants.BASE_ID;
+import static com.bytechef.component.airtable.constant.AirtableConstants.TABLE_ID;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 
@@ -37,8 +39,6 @@ import java.util.Map;
 
 public class AirtableNewRecordTrigger {
 
-    private static final String BASE_ID = "baseId";
-    private static final String TABLE_ID = "tableId";
     protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
     protected static final String TRIGGER_FIELD = "triggerField";
 
