@@ -169,6 +169,8 @@ $outputSchema
         override fun toString(): String {
             return """
 ### $title
+Name: $name
+
 $description
 
 #### Properties
