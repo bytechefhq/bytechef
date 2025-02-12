@@ -24,25 +24,33 @@ import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.SUF
 import static com.bytechef.component.quickbooks.constant.QuickbooksConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
-class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
+class QuickbooksCreateCustomerActionTest {
+
+    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Map<String, Object> parametersMap = Map.of(
+        DISPLAY_NAME, "Name", SUFFIX, "Dr", TITLE, TITLE, MIDDLE_NAME, MIDDLE_NAME, FAMILY_NAME, FAMILY_NAME,
+        GIVEN_NAME, GIVEN_NAME);
+    private final Parameters mockedParameters = MockParametersFactory.create(parametersMap);
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        Map<String, Object> bodyMap = Map.of(
-            DISPLAY_NAME, "Name", SUFFIX, "Dr", TITLE, TITLE, MIDDLE_NAME, MIDDLE_NAME, FAMILY_NAME, FAMILY_NAME,
-            GIVEN_NAME, GIVEN_NAME);
-
-        mockedParameters = MockParametersFactory.create(bodyMap);
-
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -53,12 +61,12 @@ class QuickbooksCreateCustomerActionTest extends AbstractQuickbooksActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = QuickbooksCreateCustomerAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(mockedObject, result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(bodyMap, body.getContent());
+        assertEquals(parametersMap, body.getContent());
     }
 }
