@@ -30,16 +30,19 @@ description: "Working with Triggers as a developer"
      ```
 4. Activate Local Profile:
 
-- Ensure that the `local` profile is added to active profiles in your IntelliJ configuration.
-  ![intellij-scr](intellij-scr.png)
+    - Ensure that the `local` profile is added to active profiles in your IntelliJ configuration.
+      ![intellij-scr](intellij-scr.png)
 
 5. Start the ByteChef application.
 
 ## If You Are Not Using IntelliJ
 
-1. Set Webhook URL:
-    - Open a terminal and paste the following command, replacing (first address under Forwarding) with the copied ngrok URL:
+1. Navigate to the `BYTECHEF_HOME/server` directory create a file named `local.env`
+2. Add the following configuration, replacing (first address under Forwarding) with the ngrok URL you copied:
+
    ```
-    export BYTECHEF_WEBHOOK_URL=(first address under Forwarding)/webhooks/{id}
+    BYTECHEF_WEBHOOK_URL=(first address under Forwarding)/webhooks/{id}
     ```
-2. Start the ByteChef application.
+3. Start the ByteChef application.
+
+**Note:** Docker has to be restarted in order to update any changes made to `BYTECHEF_HOME/server/local.env` file.
