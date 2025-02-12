@@ -154,15 +154,17 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                         </span>
                                     </Link>
                                 ) : (
-                                    <div className="flex items-center gap-1">
-                                        {integration?.icon && (
-                                            <InlineSVG className="size-5 flex-none" src={integration.icon} />
-                                        )}
+                                    <CollapsibleTrigger>
+                                        <div className="flex items-center gap-1">
+                                            {integration?.icon && (
+                                                <InlineSVG className="size-5 flex-none" src={integration.icon} />
+                                            )}
 
-                                        <span className="text-base font-semibold text-gray-900">
-                                            {integration?.name}
-                                        </span>
-                                    </div>
+                                            <span className="text-base font-semibold text-gray-900">
+                                                {integration?.name}
+                                            </span>
+                                        </div>
+                                    </CollapsibleTrigger>
                                 )}
                             </div>
                         </div>
