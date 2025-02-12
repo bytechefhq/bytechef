@@ -33,42 +33,52 @@ const ProjectVersionHistorySheet = ({
                             defaultValue={projectVersions.length > 1 ? [projectVersions[1]!.version!.toString()] : []}
                             type="multiple"
                         >
-                            {projectVersions.map((projectVersion) => (
-                                <AccordionItem
-                                    key={projectVersion.version}
-                                    value={projectVersion.version?.toString() || ''}
-                                >
-                                    <AccordionTrigger disabled={projectVersion.status === ProjectStatus.Draft}>
-                                        <div className="flex w-full items-center justify-between pr-2">
-                                            <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
+                            {projectVersions.map((projectVersion) => {
+                                return (
+                                    <AccordionItem
+                                        key={projectVersion.version}
+                                        value={projectVersion.version?.toString() || ''}
+                                    >
+                                        <AccordionTrigger disabled={projectVersion.status === ProjectStatus.Draft}>
+                                            <div className="flex w-full items-center justify-between pr-2">
+                                                <span className="text-sm font-semibold">{`V${projectVersion.version}`}</span>
 
-                                            <div className="flex items-center space-x-4">
-                                                {projectVersion.publishedDate && (
-                                                    <span className="text-sm">
-                                                        {`${projectVersion.publishedDate?.toLocaleDateString()} ${projectVersion.publishedDate?.toLocaleTimeString()}`}
-                                                    </span>
-                                                )}
+                                                <div className="flex items-center space-x-4">
+                                                    {projectVersion.publishedDate && (
+                                                        <span className="text-sm">
+                                                            {`${projectVersion.publishedDate?.toLocaleDateString()} ${projectVersion.publishedDate?.toLocaleTimeString()}`}
+                                                        </span>
+                                                    )}
 
-                                                <Badge
-                                                    variant={
-                                                        projectVersion.status === ProjectStatus.Published
-                                                            ? 'success'
-                                                            : 'secondary'
-                                                    }
-                                                >
-                                                    {projectVersion.status === ProjectStatus.Published
-                                                        ? `Published`
-                                                        : 'Draft'}
-                                                </Badge>
+                                                    <Badge
+                                                        variant={
+                                                            projectVersion.status === ProjectStatus.Published
+                                                                ? 'success'
+                                                                : 'secondary'
+                                                        }
+                                                    >
+                                                        {projectVersion.status === ProjectStatus.Published
+                                                            ? `Published`
+                                                            : 'Draft'}
+                                                    </Badge>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </AccordionTrigger>
+                                        </AccordionTrigger>
 
-                                    <AccordionContent className="text-muted-foreground">
-                                        {projectVersion.description ? projectVersion.description : 'No description.'}
-                                    </AccordionContent>
-                                </AccordionItem>
-                            ))}
+                                        <AccordionContent className="text-muted-foreground">
+                                            {projectVersion.description
+                                                ? projectVersion.description.split('\n').map((item, idx) => (
+                                                      <span key={idx}>
+                                                          {item}
+
+                                                          <br />
+                                                      </span>
+                                                  ))
+                                                : 'No description.'}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                );
+                            })}
                         </Accordion>
                     )}
                 </div>

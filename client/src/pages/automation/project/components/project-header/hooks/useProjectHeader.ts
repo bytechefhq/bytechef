@@ -10,6 +10,7 @@ import {Project} from '@/shared/middleware/automation/configuration';
 import {WorkflowTestApi} from '@/shared/middleware/platform/workflow/test';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
+import {ProjectVersionKeys} from '@/shared/queries/automation/projectVersions.queries';
 import {ProjectWorkflowKeys, useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
 import {useQueryClient} from '@tanstack/react-query';
@@ -73,6 +74,10 @@ export const useProjectHeader = ({
             if (project) {
                 queryClient.invalidateQueries({
                     queryKey: ProjectKeys.project(project.id!),
+                });
+
+                queryClient.invalidateQueries({
+                    queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
                 });
             }
 

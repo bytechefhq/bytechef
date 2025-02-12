@@ -14,7 +14,7 @@ import {
 } from '@/shared/mutations/automation/workflows.mutations';
 import {ProjectCategoryKeys} from '@/shared/queries/automation/projectCategories.queries';
 import {ProjectTagKeys} from '@/shared/queries/automation/projectTags.queries';
-import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
+import {ProjectVersionKeys, useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
@@ -101,6 +101,10 @@ export const useSettingsMenu = ({project, workflow}: {project: Project; workflow
     const pullProjectFromGitMutation = usePullProjectFromGitMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ProjectKeys.project(project.id!)});
+
+            queryClient.invalidateQueries({
+                queryKey: ProjectVersionKeys.projectProjectVersions(project.id!),
+            });
 
             toast({description: 'Project pulled from git repository successfully.'});
         },
