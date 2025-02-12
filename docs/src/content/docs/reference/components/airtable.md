@@ -70,6 +70,69 @@ Type: OBJECT
 
 
 
+### Delete Record
+Deletes a single record from a table.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| baseId | Base ID | STRING | SELECT  |  ID of the base where table is located.  |  true  |
+| tableId | Table ID | STRING | SELECT  |  ID of the table where the record is located.  |  true  |
+| recordId | Record ID | STRING | SELECT  |  ID of the record that will be deleted.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| deleted | BOOLEAN | SELECT  |
+
+
+
+
+
+
+### Get Record
+Retrieves a single record.
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Control Type     |     Description     |     Required        |
+|:--------------:|:--------------:|:------------:|:--------------------:|:-------------------:|:-------------------:|
+| baseId | Base ID | STRING | SELECT  |  ID of the base where table is located.  |  true  |
+| tableId | Table ID | STRING | SELECT  |  ID of the table where the record is located.  |  true  |
+| recordId | Record ID | STRING | SELECT  |  ID of the record that will be deleted.  |  true  |
+
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Control Type     |
+|:------------:|:------------:|:--------------------:|
+| id | STRING | TEXT  |
+| createdTime | DATE_TIME | DATE_TIME  |
+| fields | {} | OBJECT_BUILDER  |
+
+
+
+
+
+
 
 
 ## Triggers
