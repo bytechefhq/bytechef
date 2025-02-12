@@ -17,17 +17,20 @@
 package com.bytechef.component.google.mail.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import jakarta.mail.MessagingException;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -36,30 +39,51 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleMailSendEmailActionTest extends AbstractGoogleMailActionTest {
+class GoogleMailSendEmailActionTest {
 
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<Gmail> gmailArgumentCaptor = ArgumentCaptor.forClass(Gmail.class);
     private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Gmail mockedGmail = mock(Gmail.class);
     private final Message mockedMessage = mock(Message.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
 
     @Test
     void testPerform() throws IOException, MessagingException {
         Parameters parameters = MockParametersFactory.create(Map.of());
 
-        try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
+            googleServicesMockedStatic
+                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
             googleMailUtilsMockedStatic
-                .when(() -> GoogleMailUtils.getEncodedEmail(parameters, mockedActionContext, null))
+                .when(() -> GoogleMailUtils.getEncodedEmail(
+                    parametersArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    messageArgumentCaptor.capture()))
                 .thenReturn("encodedMail");
             googleMailUtilsMockedStatic
-                .when(() -> GoogleMailUtils.sendMail(any(Gmail.class), messageArgumentCaptor.capture()))
+                .when(() -> GoogleMailUtils.sendMail(gmailArgumentCaptor.capture(), messageArgumentCaptor.capture()))
                 .thenReturn(mockedMessage);
 
-            Message message = GoogleMailSendEmailAction.perform(parameters, parameters, mockedActionContext);
+            Message result = GoogleMailSendEmailAction.perform(parameters, parameters, mockedActionContext);
 
-            assertEquals(mockedMessage, message);
+            assertEquals(mockedMessage, result);
 
-            Message value = messageArgumentCaptor.getValue();
+            assertEquals(List.of(parameters, parameters), parametersArgumentCaptor.getAllValues());
+            assertEquals(mockedGmail, gmailArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
 
-            assertEquals("encodedMail", value.getRaw());
+            Message expecteMessage = new Message().setRaw("encodedMail");
+
+            ArrayList<Object> messages = new ArrayList<>();
+
+            messages.add(null);
+            messages.add(expecteMessage);
+
+            assertEquals(messages, messageArgumentCaptor.getAllValues());
         }
     }
 }

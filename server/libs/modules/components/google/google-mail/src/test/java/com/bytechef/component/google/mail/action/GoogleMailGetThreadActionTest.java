@@ -28,10 +28,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.google.mail.util.GoogleMailUtils;
 import com.bytechef.component.google.mail.util.GoogleMailUtils.SimpleMessage;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.google.commons.GoogleServices;
 import com.google.api.services.gmail.Gmail;
 import com.google.api.services.gmail.model.Message;
 import com.google.api.services.gmail.model.Thread;
@@ -46,72 +48,89 @@ import org.mockito.MockedStatic;
 /**
  * @author Monika Kušter
  */
-class GoogleMailGetThreadActionTest extends AbstractGoogleMailActionTest {
+class GoogleMailGetThreadActionTest {
 
-    private final ArgumentCaptor<String> idArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> formatArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<List> metadataArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
+    private final ArgumentCaptor<Gmail> gmailArgumentCaptor = ArgumentCaptor.forClass(Gmail.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<List> listArgumentCaptor = ArgumentCaptor.forClass(List.class);
+    private final ArgumentCaptor<Message> messageArgumentCaptor = ArgumentCaptor.forClass(Message.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Gmail mockedGmail = mock(Gmail.class);
     private final Gmail.Users.Threads.Get mockedGet = mock(Gmail.Users.Threads.Get.class);
     private final Message mockedMessage = mock(Message.class);
     private final SimpleMessage mockedSimpleMessage = mock(SimpleMessage.class);
     private final Thread mockedThread = mock(Thread.class);
     private final Gmail.Users.Threads mockedThreads = mock(Gmail.Users.Threads.class);
     private final Gmail.Users mockedUsers = mock(Gmail.Users.class);
-    private final ArgumentCaptor<String> userIdArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerform() throws IOException {
         Parameters parameters = MockParametersFactory.create(
             Map.of(ID, "id", FORMAT, MINIMAL, METADATA_HEADERS, List.of("metadata")));
 
-        when(mockedGmail.users())
-            .thenReturn(mockedUsers);
-        when(mockedUsers.threads())
-            .thenReturn(mockedThreads);
-        when(mockedThreads.get(userIdArgumentCaptor.capture(), idArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setFormat(formatArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setMetadataHeaders(metadataArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.execute())
-            .thenReturn(mockedThread);
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
+            googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
+            when(mockedGmail.users())
+                .thenReturn(mockedUsers);
+            when(mockedUsers.threads())
+                .thenReturn(mockedThreads);
+            when(mockedThreads.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setFormat(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setMetadataHeaders(listArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(mockedThread);
 
-        Object result = GoogleMailGetThreadAction.perform(parameters, parameters, mockedActionContext);
+            Object result = GoogleMailGetThreadAction.perform(parameters, parameters, mockedActionContext);
 
-        assertEquals(mockedThread, result);
+            assertEquals(mockedThread, result);
 
-        assertEquals(ME, userIdArgumentCaptor.getValue());
-        assertEquals("id", idArgumentCaptor.getValue());
-        assertEquals(MINIMAL, formatArgumentCaptor.getValue());
-        assertEquals(parameters.getList(METADATA_HEADERS), metadataArgumentCaptor.getValue());
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(ME, "id", MINIMAL), stringArgumentCaptor.getAllValues());
+            assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
+        }
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerformForSimpleFormat() throws IOException {
         Parameters parameters = MockParametersFactory.create(
             Map.of(ID, "id", FORMAT, SIMPLE, METADATA_HEADERS, List.of("metadata")));
 
-        when(mockedGmail.users())
-            .thenReturn(mockedUsers);
-        when(mockedUsers.threads())
-            .thenReturn(mockedThreads);
-        when(mockedThreads.get(userIdArgumentCaptor.capture(), idArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setFormat(formatArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.setMetadataHeaders(metadataArgumentCaptor.capture()))
-            .thenReturn(mockedGet);
-        when(mockedGet.execute())
-            .thenReturn(new Thread().setMessages(List.of(mockedMessage))
-                .setId("id")
-                .setSnippet("snippet")
-                .setHistoryId(new BigInteger("123")));
-
-        try (MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
+        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class);
+            MockedStatic<GoogleMailUtils> googleMailUtilsMockedStatic = mockStatic(GoogleMailUtils.class)) {
             googleMailUtilsMockedStatic
-                .when(() -> GoogleMailUtils.getSimpleMessage(mockedMessage, mockedActionContext, mockedGmail))
+                .when(() -> GoogleMailUtils.getSimpleMessage(
+                    messageArgumentCaptor.capture(), actionContextArgumentCaptor.capture(),
+                    gmailArgumentCaptor.capture()))
                 .thenReturn(mockedSimpleMessage);
+
+            googleServicesMockedStatic.when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
+                .thenReturn(mockedGmail);
+            when(mockedGmail.users())
+                .thenReturn(mockedUsers);
+            when(mockedUsers.threads())
+                .thenReturn(mockedThreads);
+            when(mockedThreads.get(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setFormat(stringArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.setMetadataHeaders(listArgumentCaptor.capture()))
+                .thenReturn(mockedGet);
+            when(mockedGet.execute())
+                .thenReturn(new Thread()
+                    .setMessages(List.of(mockedMessage))
+                    .setId("id")
+                    .setSnippet("snippet")
+                    .setHistoryId(new BigInteger("123")));
 
             Object result = GoogleMailGetThreadAction.perform(parameters, parameters, mockedActionContext);
 
@@ -120,10 +139,12 @@ class GoogleMailGetThreadActionTest extends AbstractGoogleMailActionTest {
 
             assertEquals(expected, result);
 
-            assertEquals(ME, userIdArgumentCaptor.getValue());
-            assertEquals("id", idArgumentCaptor.getValue());
-            assertEquals(FULL, formatArgumentCaptor.getValue());
-            assertEquals(parameters.getList(METADATA_HEADERS), metadataArgumentCaptor.getValue());
+            assertEquals(mockedMessage, messageArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, actionContextArgumentCaptor.getValue());
+            assertEquals(mockedGmail, gmailArgumentCaptor.getValue());
+            assertEquals(parameters, parametersArgumentCaptor.getValue());
+            assertEquals(List.of(ME, "id", FULL), stringArgumentCaptor.getAllValues());
+            assertEquals(parameters.getList(METADATA_HEADERS), listArgumentCaptor.getValue());
         }
     }
 }
