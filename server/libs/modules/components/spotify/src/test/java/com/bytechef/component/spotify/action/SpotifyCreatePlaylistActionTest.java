@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -41,16 +40,16 @@ import org.mockito.ArgumentCaptor;
 class SpotifyCreatePlaylistActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        Map<String, Object> propertyStubsMap = createPropertyStubsMap();
-        Parameters parameters = MockParametersFactory.create(propertyStubsMap);
+        Map<String, Object> map = Map.of(NAME, "name", DESCRIPTION, "desc", PUBLIC, true, COLLABORATIVE, true);
+        Parameters parameters = MockParametersFactory.create(map);
 
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -59,23 +58,12 @@ class SpotifyCreatePlaylistActionTest {
         when(mockedExecutor.execute())
             .thenReturn(mockedResponse);
 
-        Object result = SpotifyCreatePlaylistAction.perform(parameters, parameters, mockedContext);
+        Object result = SpotifyCreatePlaylistAction.perform(parameters, parameters, mockedActionContext);
 
         assertNull(result);
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, Object> createPropertyStubsMap() {
-        Map<String, Object> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(NAME, "name");
-        propertyStubsMap.put(DESCRIPTION, "desc");
-        propertyStubsMap.put(PUBLIC, true);
-        propertyStubsMap.put(COLLABORATIVE, true);
-
-        return propertyStubsMap;
+        assertEquals(map, body.getContent());
     }
 }
