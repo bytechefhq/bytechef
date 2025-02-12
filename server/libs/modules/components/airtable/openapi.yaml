@@ -5,30 +5,30 @@ info:
   description: "Airtable is a user-friendly and flexible cloud-based database management tool."
   version: "v0"
 servers:
-- url: "https://api.airtable.com/v0"
+  - url: "https://api.airtable.com/v0"
 paths:
   /{baseId}/{tableId}:
     post:
       tags:
-      - "records"
+        - "records"
       summary: "Create Record"
       description: "Adds a record into an Airtable table."
       operationId: "createRecord"
       parameters:
-      - name: "baseId"
-        description: "ID of the base where table is located."
-        in: "path"
-        required: true
-        schema:
-          title: "Base ID"
-          type: "string"
-      - name: "tableId"
-        description: "The table where the record will be created."
-        in: "path"
-        required: true
-        schema:
-          title: "Table ID"
-          type: "string"
+        - name: "baseId"
+          description: "ID of the base where table is located."
+          in: "path"
+          required: true
+          schema:
+            title: "Base ID"
+            type: "string"
+        - name: "tableId"
+          description: "The table where the record will be created."
+          in: "path"
+          required: true
+          schema:
+            title: "Table ID"
+            type: "string"
       requestBody:
         content:
           application/json:
@@ -47,6 +47,87 @@ paths:
               schema:
                 type: "object"
                 properties:
+                  createdTime:
+                    type: "string"
+                    format: "date-time"
+                  fields:
+                    type: "object"
+                    additionalProperties: true
+  /{baseId}/{tableId}/{recordId}:
+    delete:
+      summary: "Delete Record"
+      description: "Deletes a single record from a table."
+      operationId: "deleteRecord"
+      parameters:
+        - name: "baseId"
+          description: "ID of the base where table is located."
+          in: "path"
+          required: true
+          schema:
+            title: "Base ID"
+            type: "string"
+        - name: "tableId"
+          description: "ID of the table where the record is located."
+          in: "path"
+          required: true
+          schema:
+            title: "Table ID"
+            type: "string"
+        - name: "recordId"
+          description: "ID of the record that will be deleted."
+          in: "path"
+          required: true
+          schema:
+            title: "Record ID"
+            type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+                  deleted:
+                    type: "boolean"
+    get:
+      summary: "Get Record"
+      description: "Retrieves a single record."
+      operationId: "getRecord"
+      parameters:
+        - name: "baseId"
+          description: "ID of the base where table is located."
+          in: "path"
+          required: true
+          schema:
+            title: "Base ID"
+            type: "string"
+        - name: "tableId"
+          description: "ID of the table where the record is located."
+          in: "path"
+          required: true
+          schema:
+            title: "Table ID"
+            type: "string"
+        - name: "recordId"
+          description: "ID of the record that will be deleted."
+          in: "path"
+          required: true
+          schema:
+            title: "Record ID"
+            type: "string"
+      responses:
+        200:
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
                   createdTime:
                     type: "string"
                     format: "date-time"
