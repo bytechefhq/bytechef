@@ -67,7 +67,7 @@ public class AirtableUtils {
             throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
         }
 
-        return getOptions(body, "bases");
+        return getOptions(body, "bases", "name");
     }
 
     public static ActionPropertiesFunction getFieldsProperties() {
@@ -147,6 +147,24 @@ public class AirtableUtils {
         };
     }
 
+    public static List<Option<String>> getRecordIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        Map<String, ?> body = context.http(http -> http.get(
+            "/%s/%s".formatted(inputParameters.getRequiredString(BASE_ID),
+                inputParameters.getRequiredString(TABLE_ID))))
+            .configuration(Http.responseType(ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.containsKey("error")) {
+            throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
+        }
+
+        return getOptions(body, "records", "id");
+    }
+
     public static List<Option<String>> getTableIdOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
@@ -163,17 +181,17 @@ public class AirtableUtils {
 
         context.log(log -> log.debug("Response for url='%s': %s".formatted(url, body)));
 
-        return getOptions(body, "tables");
+        return getOptions(body, "tables", "name");
     }
 
-    private static List<Option<String>> getOptions(Map<String, ?> response, String name) {
+    private static List<Option<String>> getOptions(Map<String, ?> response, String name, String label) {
         List<Option<String>> options = new ArrayList<>();
 
         if (response.get(name) instanceof List<?> list) {
 
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+                    options.add(option((String) map.get(label), (String) map.get("id")));
                 }
             }
         }
