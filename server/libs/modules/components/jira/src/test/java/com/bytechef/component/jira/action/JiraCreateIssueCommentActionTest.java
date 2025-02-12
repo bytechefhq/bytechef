@@ -18,10 +18,14 @@ package com.bytechef.component.jira.action;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -30,13 +34,18 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Vihar Shah
  */
-class JiraCreateIssueCommentActionTest extends AbstractJiraActionTest {
+class JiraCreateIssueCommentActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of("comment", "This is a comment"));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -47,10 +56,7 @@ class JiraCreateIssueCommentActionTest extends AbstractJiraActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        when(mockedParameters.getRequiredString("comment"))
-            .thenReturn("This is a comment");
-
-        Object result = JiraCreateIssueCommentAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = JiraCreateIssueCommentAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 

@@ -29,10 +29,14 @@ import static com.bytechef.component.jira.constant.JiraConstants.TEXT;
 import static com.bytechef.component.jira.constant.JiraConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -41,26 +45,20 @@ import org.mockito.ArgumentCaptor;
 /**
  * @author Monika Domiter
  */
-class JiraCreateIssueActionTest extends AbstractJiraActionTest {
+class JiraCreateIssueActionTest {
 
     private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(PROJECT, "1", ISSUETYPE, "1", SUMMARY, "summary", ASSIGNEE, "1", PRIORITY, "1",
+            DESCRIPTION, "description"));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Map<String, Object> responseMap = Map.of("key", "value");
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredString(PROJECT))
-            .thenReturn("1");
-        when(mockedParameters.getRequiredString(ISSUETYPE))
-            .thenReturn("1");
-        when(mockedParameters.getRequiredString(SUMMARY))
-            .thenReturn("summary");
-        when(mockedParameters.getString(ASSIGNEE))
-            .thenReturn("1");
-        when(mockedParameters.getString(PRIORITY))
-            .thenReturn("1");
-        when(mockedParameters.getString(DESCRIPTION))
-            .thenReturn("description");
-
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -71,7 +69,7 @@ class JiraCreateIssueActionTest extends AbstractJiraActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Object result = JiraCreateIssueAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result = JiraCreateIssueAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(responseMap, result);
 

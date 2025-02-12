@@ -21,9 +21,14 @@ import static com.bytechef.component.jira.constant.JiraConstants.JQL;
 import static com.bytechef.component.jira.constant.JiraConstants.MAX_RESULTS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -31,16 +36,17 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Monika Domiter
  */
-class JiraSearchForissuesUsingJqlActionTest extends AbstractJiraActionTest {
+class JiraSearchForissuesUsingJqlActionTest {
+
+    private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(MAX_RESULTS, 100, JQL, "projec=ABC"));
+    private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @Test
     void testPerform() {
-        when(mockedParameters.getRequiredInteger(MAX_RESULTS))
-            .thenReturn(100);
-        when(mockedParameters.getString(JQL))
-            .thenReturn("projec=ABC");
-
-        when(mockedContext.http(any()))
+        when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
             .thenReturn(mockedExecutor);
@@ -49,7 +55,8 @@ class JiraSearchForissuesUsingJqlActionTest extends AbstractJiraActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(ISSUES, List.of()));
 
-        Object result = JiraSearchForIssuesUsingJqlAction.perform(mockedParameters, mockedParameters, mockedContext);
+        Object result =
+            JiraSearchForIssuesUsingJqlAction.perform(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(List.of(), result);
     }
