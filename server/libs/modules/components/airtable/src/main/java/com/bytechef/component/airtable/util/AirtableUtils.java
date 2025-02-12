@@ -37,6 +37,7 @@ import com.bytechef.component.definition.PropertiesDataSource.ActionPropertiesFu
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.exception.ProviderException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -194,16 +195,20 @@ public class AirtableUtils {
             .toList();
     }
 
+    @SuppressFBWarnings("EI")
     protected record AirtableChoice(String id, String name, String color) {
     }
 
+    @SuppressFBWarnings("EI")
     protected record AirtableField(
         String id, String name, String description, String type, AirtableOptions options) {
     }
 
+    @SuppressFBWarnings("EI")
     protected record AirtableOptions(List<AirtableChoice> choices) {
     }
 
+    @SuppressFBWarnings("EI")
     protected record AirtableTable(
         String id, String name, List<AirtableField> fields, String description, String primaryFieldId,
         List<AirtableTableView> views) {
