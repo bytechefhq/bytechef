@@ -21,17 +21,17 @@ import static com.bytechef.component.monday.constant.MondayConstants.COLUMN_TYPE
 import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.TITLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.monday.util.MondayUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -39,7 +39,9 @@ import org.mockito.MockedStatic;
  */
 class MondayCreateColumnActionTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
@@ -47,16 +49,18 @@ class MondayCreateColumnActionTest {
             Map.of(BOARD_ID, "board", TITLE, "title", COLUMN_TYPE, "date"));
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(ActionContext.class)))
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(
+                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             Object result = MondayCreateColumnAction.perform(parameters, parameters, mockedActionContext);
 
             assertEquals(Map.of(ID, "abc"), result);
-
-            mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
+            assertEquals(
                 "mutation{create_column(board_id: board, title: \"title\", column_type: date){id title}}",
-                mockedActionContext));
+                stringArgumentCaptor.getValue());
+            assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
         }
     }
 }

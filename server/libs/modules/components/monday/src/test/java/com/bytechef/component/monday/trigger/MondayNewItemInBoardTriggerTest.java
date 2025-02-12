@@ -23,9 +23,7 @@ import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.TEXT;
 import static com.bytechef.component.monday.constant.MondayConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -42,11 +40,11 @@ import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.monday.util.MondayUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -54,6 +52,7 @@ import org.mockito.MockedStatic;
  */
 class MondayNewItemInBoardTriggerTest {
 
+    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
     private final WebhookEnableOutput mockedDynamicWebhookEnableOutput = mock(WebhookEnableOutput.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
@@ -61,22 +60,26 @@ class MondayNewItemInBoardTriggerTest {
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final Parameters parameters = MockParametersFactory.create(Map.of(BOARD_ID, "board"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testWebhookEnable() {
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
-                .when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(Context.class)))
+                .when(() -> MondayUtils.executeGraphQLQuery(
+                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(Map.of(DATA, Map.of("create_webhook", Map.of(ID, "123"))));
 
-            WebhookEnableOutput dynamicWebhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
+            WebhookEnableOutput webhookEnableOutput = MondayNewItemInBoardTrigger.webhookEnable(
                 parameters, parameters, "testWebhookUrl", "testWorkflowExecutionId", mockedTriggerContext);
 
-            Map<String, ?> outputParameters = dynamicWebhookEnableOutput.parameters();
-            LocalDateTime webhookExpirationDate = dynamicWebhookEnableOutput.webhookExpirationDate();
+            WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
 
-            assertEquals(Map.of(ID, "123"), outputParameters);
-            assertNull(webhookExpirationDate);
+            assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+            assertEquals(
+                "mutation{create_webhook(board_id: board, url: \"testWebhookUrl\", event: create_item){id}}",
+                stringArgumentCaptor.getValue());
+            assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
         }
     }
 
@@ -92,7 +95,8 @@ class MondayNewItemInBoardTriggerTest {
 
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
-                .when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(Context.class)))
+                .when(() -> MondayUtils.executeGraphQLQuery(
+                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
                 .thenReturn(
                     Map.of(
                         DATA,
@@ -118,6 +122,11 @@ class MondayNewItemInBoardTriggerTest {
                 "boardId", 345, "pulseId", 123, "columnValues", Map.of("date_id", LocalDate.of(2024, 5, 5)));
 
             assertEquals(expectedResult, result);
+            assertEquals("query{boards(ids:" + 345 + ")" +
+                "{items_page(query_params:{ids: " + 123 + "})" +
+                "{items{id name column_values {column{id title} id type value text " +
+                "... on WeekValue{start_date end_date}}}}}}", stringArgumentCaptor.getValue());
+            assertEquals(mockedTriggerContext, contextArgumentCaptor.getValue());
         }
     }
 }

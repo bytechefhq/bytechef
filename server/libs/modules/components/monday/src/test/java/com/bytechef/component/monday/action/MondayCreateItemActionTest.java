@@ -22,7 +22,6 @@ import static com.bytechef.component.monday.constant.MondayConstants.ID;
 import static com.bytechef.component.monday.constant.MondayConstants.ITEM_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -35,6 +34,7 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -42,9 +42,15 @@ import org.mockito.MockedStatic;
  */
 class MondayCreateItemActionTest {
 
+    private final ArgumentCaptor<ActionContext> actionContextArgumentCaptor =
+        ArgumentCaptor.forClass(ActionContext.class);
     private final ActionContext mockedActionContext = mock(ActionContext.class);
+    @SuppressWarnings("rawtypes")
+    private final ArgumentCaptor<Map> mapArgumentCaptor = ArgumentCaptor.forClass(Map.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
+    @SuppressWarnings("unchecked")
     void testPerform() {
         Map<String, Object> columnValueMap = Map.of(
             "date_id", "2024-08-21",
@@ -71,11 +77,12 @@ class MondayCreateItemActionTest {
             MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
 
             mondayPropertiesUtilsMockedStatic
-                .when(
-                    () -> MondayPropertiesUtils.convertPropertyToMondayColumnValue(
-                        columnValueMap, "board", mockedActionContext))
+                .when(() -> MondayPropertiesUtils.convertPropertyToMondayColumnValue(
+                    mapArgumentCaptor.capture(), stringArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
                 .thenReturn(Map.of());
-            mondayUtilsMockedStatic.when(() -> MondayUtils.executeGraphQLQuery(anyString(), any(ActionContext.class)))
+            mondayUtilsMockedStatic
+                .when(() -> MondayUtils.executeGraphQLQuery(
+                    stringArgumentCaptor.capture(), actionContextArgumentCaptor.capture()))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             String jsonString = "{\"date_id\":{\"date\":\"2024-08-21\"},\"status_id\":{\"label\":\"Stuck\"}," +
@@ -89,12 +96,12 @@ class MondayCreateItemActionTest {
             Object result = MondayCreateItemAction.perform(parameters, parameters, mockedActionContext);
 
             assertEquals(Map.of(ID, "abc"), result);
-
-            mondayUtilsMockedStatic.verify(() -> MondayUtils.executeGraphQLQuery(
+            assertEquals(List.of("board",
                 "mutation{create_item(board_id: board, group_id: \"group\", item_name: \"name\", " +
                     "column_values:\"%s\"){id name}}"
-                        .formatted(jsonString.replace("\"", "\\\"")),
-                mockedActionContext));
+                        .formatted(jsonString.replace("\"", "\\\""))),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(List.of(mockedActionContext, mockedActionContext), actionContextArgumentCaptor.getAllValues());
         }
     }
 }
