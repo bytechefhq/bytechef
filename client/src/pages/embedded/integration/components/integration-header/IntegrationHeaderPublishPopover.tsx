@@ -7,6 +7,7 @@ import {useToast} from '@/hooks/use-toast';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Integration} from '@/shared/middleware/embedded/configuration';
 import {usePublishIntegrationMutation} from '@/shared/mutations/embedded/integrations.mutations';
+import {IntegrationVersionKeys} from '@/shared/queries/embedded/integrationVersions.queries';
 import {IntegrationKeys} from '@/shared/queries/embedded/integrations.queries';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useQueryClient} from '@tanstack/react-query';
@@ -44,6 +45,10 @@ const IntegrationHeaderPublishPopover = ({integration}: {integration: Integratio
 
             queryClient.invalidateQueries({
                 queryKey: IntegrationKeys.filteredIntegrations({}),
+            });
+
+            queryClient.invalidateQueries({
+                queryKey: IntegrationVersionKeys.integrationIntegrationVersions(integration.id!),
             });
 
             toast({
