@@ -32,6 +32,7 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
@@ -47,16 +48,20 @@ abstract class AbstractStripeTriggerTest {
     protected Object mockedObject = mock(Object.class);
     protected Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "abc"));
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
     protected MockedStatic<StripeUtils> stripeUtilsMockedStatic;
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
+        ArgumentCaptor.forClass(TriggerContext.class);
+    protected ArgumentCaptor<WebhookBody> webhookBodyArgumentCaptor = ArgumentCaptor.forClass(WebhookBody.class);
     protected String workflowExecutionId = "testWorkflowExecutionId";
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         stripeUtilsMockedStatic = mockStatic(StripeUtils.class);
     }
 
     @AfterEach
-    public void afterEach() {
+    void afterEach() {
         stripeUtilsMockedStatic.close();
     }
 }
