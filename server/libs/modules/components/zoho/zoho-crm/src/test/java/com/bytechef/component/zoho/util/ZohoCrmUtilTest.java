@@ -44,7 +44,7 @@ class ZohoCrmUtilTest {
     private final Http.Response mockedResponse = mock(Http.Response.class);
 
     @BeforeEach
-    public void beforeEach() {
+    void beforeEach() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.configuration(any()))
