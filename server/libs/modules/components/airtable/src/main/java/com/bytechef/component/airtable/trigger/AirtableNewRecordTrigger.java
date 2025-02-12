@@ -39,8 +39,8 @@ public class AirtableNewRecordTrigger {
 
     private static final String BASE_ID = "baseId";
     private static final String TABLE_ID = "tableId";
-    private static final String LAST_TIME_CHECKED = "lastTimeChecked";
-    private static final String TRIGGER_FIELD = "triggerField";
+    protected static final String LAST_TIME_CHECKED = "lastTimeChecked";
+    protected static final String TRIGGER_FIELD = "triggerField";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newRecord")
         .title("New Record")
