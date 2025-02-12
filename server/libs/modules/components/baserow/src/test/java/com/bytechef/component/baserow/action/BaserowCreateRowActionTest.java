@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -45,14 +46,13 @@ class BaserowCreateRowActionTest {
     private final Parameters mockedParameters =
         MockParametersFactory.create(Map.of(FIELDS, bodyMap, USER_FIELD_NAMES, true));
     private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> queryNameArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<String> queryValueArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
     void testPerform() {
         when(mockedActionContext.http(any()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameter(queryNameArgumentCaptor.capture(), queryValueArgumentCaptor.capture()))
+        when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -67,8 +67,7 @@ class BaserowCreateRowActionTest {
 
         assertEquals(mockedObject, result);
 
-        assertEquals(USER_FIELD_NAMES, queryNameArgumentCaptor.getValue());
-        assertEquals("true", queryValueArgumentCaptor.getValue());
+        assertEquals(List.of(USER_FIELD_NAMES, "true"), stringArgumentCaptor.getAllValues());
 
         Http.Body body = bodyArgumentCaptor.getValue();
 
