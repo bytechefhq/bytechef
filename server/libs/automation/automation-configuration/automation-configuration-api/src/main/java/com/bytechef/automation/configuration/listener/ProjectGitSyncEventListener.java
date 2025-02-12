@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.automation.configuration.repository;
+package com.bytechef.automation.configuration.listener;
 
-import com.bytechef.automation.configuration.domain.Workspace;
-import org.springframework.data.jdbc.repository.query.Query;
-import org.springframework.data.repository.ListCrudRepository;
-import org.springframework.stereotype.Repository;
+import com.bytechef.automation.configuration.domain.Project;
 
 /**
  * @author Ivica Cardic
  */
-@Repository
-public interface WorkspaceRepository extends ListCrudRepository<Workspace, Long> {
+public interface ProjectGitSyncEventListener {
 
-    @Query("""
-        SELECT workspace.* FROM workspace
-        JOIN project ON workspace.id = project.workspace_id
-        WHERE project.id = :projectId
-        """)
-    Workspace findByProjectId(long projectId);
+    void onBeforePublishProject(Project project);
 }

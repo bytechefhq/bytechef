@@ -18,10 +18,13 @@
 
 package com.bytechef.atlas.configuration.repository.git;
 
+import static com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.*;
+
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.domain.Workflow.SourceType;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations;
+import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.HeadFiles;
 import com.bytechef.atlas.configuration.repository.git.operations.JGitWorkflowOperations;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowReader;
 import com.bytechef.atlas.configuration.workflow.mapper.WorkflowResource;
@@ -39,6 +42,7 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Arik Cohen
@@ -74,12 +78,27 @@ public class GitWorkflowRepository implements WorkflowRepository {
     @Override
     public List<Workflow> findAll() {
         synchronized (this) {
-            List<WorkflowResource> resources = gitWorkflowOperations.getHeadFiles();
+            HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
 
-            return resources.stream()
+            return headFiles.workflowResources()
+                .stream()
                 .map(GitWorkflowRepository::readWorkflow)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+        }
+    }
+
+    public GitWorkflows findAllWithGitInfo() {
+        synchronized (this) {
+            HeadFiles headFiles = gitWorkflowOperations.getHeadFiles();
+
+            return new GitWorkflows(
+                headFiles.workflowResources()
+                    .stream()
+                    .map(GitWorkflowRepository::readWorkflow)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList()),
+                headFiles.gitInfo());
         }
     }
 
@@ -123,8 +142,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
         return workflow;
     }
 
-    public void save(List<Workflow> workflows, String commitMessage) {
-        gitWorkflowOperations.write(
+    public String save(@NonNull List<Workflow> workflows, @NonNull String commitMessage) {
+        return gitWorkflowOperations.write(
             workflows.stream()
                 .map(workflow -> new WorkflowResource(
                     workflow.getId(), Map.of(), getResource(workflow), workflow.getFormat()))
@@ -162,5 +181,9 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
     private static String encode(String id) {
         return EncodingUtils.base64EncodeToString(id);
+    }
+
+    @SuppressFBWarnings("EI")
+    public record GitWorkflows(List<Workflow> workflows, GitInfo gitInfo) {
     }
 }

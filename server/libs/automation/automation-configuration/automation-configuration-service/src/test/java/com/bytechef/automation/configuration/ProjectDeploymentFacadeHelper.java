@@ -92,7 +92,7 @@ public class ProjectDeploymentFacadeHelper {
         ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(workflowDTO.getProjectWorkflowId())
             .get();
 
-        projectFacade.publishProject(projectDTO.id(), "Published for test");
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
 
         ProjectDTO publishedProject = projectFacade.getProject(projectDTO.id());
 

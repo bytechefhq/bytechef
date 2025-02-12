@@ -86,7 +86,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
                 EncodingUtils.base64EncodeToString(projectDefinition.getName() + '-' + entry.getKey()));
         }
 
-        projectService.publishProject(project.getId(), null);
+        projectService.publishProject(project.getId(), null, false);
     }
 
     private Project createProject(long workspaceId, ProjectDefinition projectDefinition) {

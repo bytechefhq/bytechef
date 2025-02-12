@@ -109,7 +109,7 @@ public class RemoteProjectFacadeClient implements ProjectFacade {
     }
 
     @Override
-    public void publishProject(long id, String description) {
+    public void publishProject(long id, String description, boolean syncWithGit) {
         throw new UnsupportedOperationException();
     }
 

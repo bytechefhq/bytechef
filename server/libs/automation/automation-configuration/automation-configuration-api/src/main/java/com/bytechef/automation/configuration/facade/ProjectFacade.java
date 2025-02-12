@@ -63,7 +63,7 @@ public interface ProjectFacade {
         long workspaceId, boolean projectDeployments, Long categoryId, Long tagId,
         Status status, List<Long> projectIds, boolean includeAllFields);
 
-    void publishProject(long id, String description);
+    void publishProject(long id, String description, boolean syncWithGit);
 
     void updateProject(@NonNull ProjectDTO projectDTO);
 

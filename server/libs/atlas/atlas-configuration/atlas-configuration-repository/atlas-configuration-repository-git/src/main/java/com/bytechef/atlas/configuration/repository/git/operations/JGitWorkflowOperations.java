@@ -50,6 +50,7 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.lang.NonNull;
 
 /**
  * @author Arik Cohen
@@ -102,31 +103,50 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
     }
 
     @Override
-    public List<WorkflowResource> getHeadFiles() {
+    public HeadFiles getHeadFiles() {
         Repository repository = getRepository();
 
-        return getHeadFiles(repository, extensions, searchPaths);
+        List<WorkflowResource> workflowResources = getHeadFiles(repository, extensions, searchPaths);
+
+        GitInfo gitInfo;
+
+        try {
+            RevCommit latestRevCommit = new Git(repository)
+                .log()
+                .setMaxCount(1)
+                .call()
+                .iterator()
+                .next();
+
+            gitInfo = new GitInfo(latestRevCommit.getName(), latestRevCommit.getShortMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return new HeadFiles(workflowResources, gitInfo);
     }
 
     @Override
-    public synchronized void write(List<WorkflowResource> workflowResources, String commitMessage) {
+    @SuppressFBWarnings("REC_CATCH_EXCEPTION")
+    public synchronized String write(@NonNull List<WorkflowResource> workflowResources, @NonNull String commitMessage) {
         Repository repository = getRepository();
 
         Git git = new Git(repository);
 
         try {
-            RevWalk rw = new RevWalk(repository);
-            try (TreeWalk tw = new TreeWalk(repository)) {
-                RevCommit commitToCheck = rw.parseCommit(repository.resolve("HEAD"));
+            RevWalk revWalk = new RevWalk(repository);
 
-                tw.addTree(commitToCheck.getTree());
-                tw.addTree(new DirCacheIterator(repository.readDirCache()));
-                tw.addTree(new FileTreeIterator(repository));
-                tw.setRecursive(true);
+            try (TreeWalk treeWalk = new TreeWalk(repository)) {
+                RevCommit commitToCheck = revWalk.parseCommit(repository.resolve("HEAD"));
 
-                while (tw.next()) {
+                treeWalk.addTree(commitToCheck.getTree());
+                treeWalk.addTree(new DirCacheIterator(repository.readDirCache()));
+                treeWalk.addTree(new FileTreeIterator(repository));
+                treeWalk.setRecursive(true);
+
+                while (treeWalk.next()) {
                     git.rm()
-                        .addFilepattern(tw.getPathString())
+                        .addFilepattern(treeWalk.getPathString())
                         .call();
                 }
             }
@@ -142,16 +162,26 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 git.add()
                     .addFilepattern(".")
                     .call();
-
             }
 
             git.commit()
                 .setMessage(commitMessage)
                 .call();
 
+            RevCommit latestRevCommit = new Git(repository)
+                .log()
+                .setMaxCount(1)
+                .call()
+                .iterator()
+                .next();
+
+            String latestCommitHash = latestRevCommit.getName();
+
             git.push()
                 .setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password))
                 .call();
+
+            return latestCommitHash;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

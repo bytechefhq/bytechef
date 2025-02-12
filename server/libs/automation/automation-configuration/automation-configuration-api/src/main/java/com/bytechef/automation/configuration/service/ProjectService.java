@@ -49,7 +49,7 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
-    int publishProject(long id, String description);
+    int publishProject(long id, String description, boolean syncWithGit);
 
     Project update(long id, List<Long> tagIds);
 

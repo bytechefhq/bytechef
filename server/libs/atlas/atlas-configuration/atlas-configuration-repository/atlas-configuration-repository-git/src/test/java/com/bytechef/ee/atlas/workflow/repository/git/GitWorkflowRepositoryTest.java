@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.lang.NonNull;
 
 /**
  * @version ee
@@ -46,10 +47,12 @@ public class GitWorkflowRepositoryTest {
         ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
         @Override
-        public List<WorkflowResource> getHeadFiles() {
-            return List.of(
-                new WorkflowResource(
-                    "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML));
+        public HeadFiles getHeadFiles() {
+            return new HeadFiles(
+                List.of(
+                    new WorkflowResource(
+                        "hello/123", Map.of(), resolver.getResource("classpath:workflows/hello.yaml"), Format.YAML)),
+                new GitInfo("master", "aGVsbG8vMTIz"));
         }
 
         @Override
@@ -59,7 +62,8 @@ public class GitWorkflowRepositoryTest {
         }
 
         @Override
-        public void write(List<WorkflowResource> workflowResources, String commitMessage) {
+        public String write(@NonNull List<WorkflowResource> workflowResources, @NonNull String commitMessage) {
+            return "aGVsbG8vMTIz";
         }
     }
 }

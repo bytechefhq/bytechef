@@ -8,6 +8,8 @@
 package com.bytechef.ee.automation.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.repository.git.GitWorkflowRepository.GitWorkflows;
+import com.bytechef.atlas.configuration.repository.git.operations.GitWorkflowOperations.GitInfo;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
@@ -25,6 +27,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,6 +68,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     public void pullProjectFromGit(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -72,19 +76,18 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationService.getProjectGitConfiguration(
             projectId);
 
-        List<Workflow> workflows = projectGitService.getWorkflows(
+        GitWorkflows gitWorkflows = projectGitService.getWorkflows(
             gitConfiguration.url(), projectGitConfiguration.getBranch(), gitConfiguration.username(),
             gitConfiguration.password());
 
         Project project = projectService.getProject(projectId);
 
-        List<Workflow> oldWorkflows = projectWorkflowService
-            .getProjectWorkflows(projectId, project.getLastVersion())
+        List<Workflow> oldWorkflows = projectWorkflowService.getProjectWorkflows(projectId, project.getLastVersion())
             .stream()
             .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId()))
             .toList();
 
-        for (Workflow workflow : workflows) {
+        for (Workflow workflow : gitWorkflows.workflows()) {
             Workflow oldWorkflow = oldWorkflows.stream()
                 .filter(curWorkflow -> Objects.equals(curWorkflow.getLabel(), workflow.getLabel()))
                 .findFirst()
@@ -98,11 +101,28 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
                 projectFacade.updateWorkflow(
                     Objects.requireNonNull(oldWorkflow.getId()), workflow.getDefinition(), oldWorkflow.getVersion());
             }
+
+            GitInfo gitInfo = gitWorkflows.gitInfo();
+            GitConfigurationDTO gitConfigurationDTO = gitConfigurationFacade.getGitConfiguration(workspace.getId());
+
+            projectFacade.publishProject(
+                projectId,
+                """
+                    %s
+
+                    Project pulled from git repository:
+                    Repository: %s
+                    Branch: %s
+                    Commit hash: %s
+                    """.formatted(
+                    gitInfo.message(), gitConfigurationDTO.url(), projectGitConfiguration.getBranch(),
+                    gitInfo.commitHash()),
+                false);
         }
     }
 
     @Override
-    public void pushProjectToGit(long projectId, String commitMessage) {
+    public String pushProjectToGit(long projectId, @NonNull String commitMessage) {
         Project project = projectService.getProject(projectId);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
@@ -114,7 +134,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
         ProjectGitConfiguration projectGitConfiguration = projectGitConfigurationService.getProjectGitConfiguration(
             projectId);
 
-        projectGitService.commit(
+        return projectGitService.save(
             projectWorkflows.stream()
                 .map(projectWorkflow -> workflowService.getWorkflow(projectWorkflow.getWorkflowId()))
                 .toList(),

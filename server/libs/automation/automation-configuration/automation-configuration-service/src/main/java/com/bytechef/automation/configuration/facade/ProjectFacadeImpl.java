@@ -337,7 +337,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
-    public void publishProject(long id, String description) {
+    public void publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
 
         int oldProjectVersion = project.getLastVersion();
@@ -345,7 +345,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         List<ProjectWorkflow> oldProjectWorkflows = projectWorkflowService.getProjectWorkflows(
             project.getId(), oldProjectVersion);
 
-        int newProjectVersion = projectService.publishProject(id, description);
+        int newProjectVersion = projectService.publishProject(id, description, syncWithGit);
 
         for (ProjectWorkflow oldProjectWorkflow : oldProjectWorkflows) {
             String oldWorkflowId = oldProjectWorkflow.getWorkflowId();

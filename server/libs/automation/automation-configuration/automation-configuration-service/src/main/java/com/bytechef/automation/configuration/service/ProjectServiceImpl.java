@@ -19,12 +19,15 @@ package com.bytechef.automation.configuration.service;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
+import com.bytechef.automation.configuration.listener.ProjectGitSyncEventListener;
 import com.bytechef.automation.configuration.repository.ProjectRepository;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +39,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ProjectServiceImpl implements ProjectService {
 
+    private final ApplicationContext applicationContext;
     private final ProjectRepository projectRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository) {
+    public ProjectServiceImpl(ApplicationContext applicationContext, ProjectRepository projectRepository) {
+        this.applicationContext = applicationContext;
         this.projectRepository = projectRepository;
     }
 
@@ -115,10 +120,24 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public int publishProject(long id, String description) {
+    public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = getProject(id);
 
         int newVersion = project.publish(description);
+
+        if (syncWithGit) {
+            Map<String, ProjectGitSyncEventListener> beansOfType = applicationContext.getBeansOfType(
+                ProjectGitSyncEventListener.class);
+
+            if (!beansOfType.isEmpty()) {
+                ProjectGitSyncEventListener projectGitSyncEventListener = beansOfType.values()
+                    .stream()
+                    .findFirst()
+                    .get();
+
+                projectGitSyncEventListener.onBeforePublishProject(project);
+            }
+        }
 
         projectRepository.save(project);
 
