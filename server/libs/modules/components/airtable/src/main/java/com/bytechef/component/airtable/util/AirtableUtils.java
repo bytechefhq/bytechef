@@ -73,9 +73,9 @@ public class AirtableUtils {
             String url = "/meta/bases/%s/tables".formatted(
                 inputParameters.getRequiredString(BASE_ID));
 
-            Http.Response response = context.http(http -> http.get(url)
+            Http.Response response = context.http(http -> http.get(url))
                 .configuration(Http.responseType(ResponseType.JSON))
-                .execute());
+                .execute();
 
             Map<?, ?> body = response.getBody(Map.class);
 
@@ -146,10 +146,10 @@ public class AirtableUtils {
     public static List<Option<String>> getTableIdOptions(Parameters inputParameters, Context context) {
         String url = "/meta/bases/%s/tables".formatted(inputParameters.getRequiredString(BASE_ID));
 
-        Map<String, ?> body = context.http(http -> http.get(url)
+        Map<String, ?> body = context.http(http -> http.get(url))
             .configuration(Http.responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {}));
+            .getBody(new TypeReference<>() {});
 
         if (body.containsKey("error")) {
             throw new ProviderException.BadRequestException((String) ((Map<?, ?>) body.get("error")).get("message"));
