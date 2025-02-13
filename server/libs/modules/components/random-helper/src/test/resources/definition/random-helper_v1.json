@@ -106,9 +106,9 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Int",
-    "processErrorResponse" : null,
+    "title" : "Random Integer",
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   }, {
     "batch" : null,
@@ -209,13 +209,13 @@
       "controlType" : "INTEGER",
       "optionsDataSource" : null
     } ],
-    "title" : "Float",
-    "processErrorResponse" : null,
+    "title" : "Random Float",
     "perform" : { },
+    "processErrorResponse" : null,
     "workflowNodeDescription" : null
   } ],
   "connection" : null,
-  "dataStream" : null,
   "triggers" : null,
+  "dataStream" : null,
   "unifiedApi" : null
 }
