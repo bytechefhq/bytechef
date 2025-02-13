@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Image
+Name: createImage
+
 Create an image using text-to-image models
 
 #### Properties

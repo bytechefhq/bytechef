@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Record
+Name: createRecord
+
 Creates a new record in datasheet.
 
 #### Properties
@@ -54,6 +56,8 @@ Creates a new record in datasheet.
 
 
 ### Find Records
+Name: findRecords
+
 Find records in datasheet
 
 #### Properties
@@ -70,6 +74,8 @@ Find records in datasheet
 
 
 ### Update Record
+Name: updateRecord
+
 Update record in datasheet
 
 #### Properties

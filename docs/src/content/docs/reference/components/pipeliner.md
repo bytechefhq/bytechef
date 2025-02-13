@@ -43,6 +43,8 @@ Version: 1
 
 
 ### Create Account
+Name: createAccount
+
 Creates new account.
 
 #### Properties
@@ -72,6 +74,8 @@ Type: OBJECT
 
 
 ### Create Contact
+Name: createContact
+
 Creates new Contact
 
 #### Properties
@@ -101,6 +105,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates new Task
 
 #### Properties

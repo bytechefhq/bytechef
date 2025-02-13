@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Send message
+Name: sendMessage
+
 Sends a message to a public channel, private channel, or existing direct message conversation.
 
 #### Properties
@@ -75,6 +77,8 @@ Type: OBJECT
 
 
 ### Send Direct Message
+Name: sendDirectMessage
+
 Sends a direct message to another user in a workspace. If it hasn't already, a direct message conversation will be created.
 
 #### Properties

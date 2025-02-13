@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Issue
+Name: createIssue
+
 Creates a new project issue.
 
 #### Properties
@@ -71,6 +73,8 @@ Type: OBJECT
 
 
 ### Create Comment on Issue
+Name: createCommentOnIssue
+
 Adds a comment to the specified issue.
 
 #### Properties

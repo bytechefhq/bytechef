@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Append Row
+Name: appendRow
+
 Append a row of values to an existing worksheet.
 
 #### Properties
@@ -57,6 +59,8 @@ Append a row of values to an existing worksheet.
 
 
 ### Clear Worksheet
+Name: clearWorksheet
+
 Clear a worksheet of all values.
 
 #### Properties
@@ -71,6 +75,8 @@ Clear a worksheet of all values.
 
 
 ### Delete Row
+Name: deleteRow
+
 Delete row on an existing sheet.
 
 #### Properties
@@ -85,6 +91,8 @@ Delete row on an existing sheet.
 
 
 ### Find Row by Number
+Name: findRowByNum
+
 Get row values from the worksheet by the row number.
 
 #### Properties
@@ -100,6 +108,8 @@ Get row values from the worksheet by the row number.
 
 
 ### Update Row
+Name: updateRow
+
 Update a row in a worksheet.
 
 #### Properties

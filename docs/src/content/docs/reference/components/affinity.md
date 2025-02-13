@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Opportunity
+Name: createOpportunity
+
 Creates a new opportunity.
 
 #### Properties
@@ -68,6 +70,8 @@ Type: OBJECT
 
 
 ### Create Organization
+Name: createOrganization
+
 Creates a new organization.
 
 #### Properties
@@ -96,6 +100,8 @@ Type: OBJECT
 
 
 ### Create Person
+Name: createPerson
+
 Creates a new person.
 
 #### Properties

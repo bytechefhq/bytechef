@@ -20,6 +20,8 @@ Type: logger/v1
 
 
 ### Debug
+Name: debug
+
 null
 
 #### Properties
@@ -32,6 +34,8 @@ null
 
 
 ### Error
+Name: error
+
 null
 
 #### Properties
@@ -44,6 +48,8 @@ null
 
 
 ### Info
+Name: info
+
 null
 
 #### Properties
@@ -56,6 +62,8 @@ null
 
 
 ### Warn
+Name: warn
+
 null
 
 #### Properties

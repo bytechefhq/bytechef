@@ -20,6 +20,8 @@ Type: csvFile/v1
 
 
 ### Read from File
+Name: read
+
 Reads data from a csv file.
 
 #### Properties
@@ -57,6 +59,8 @@ Type: ARRAY
 
 
 ### Write to CSV File
+Name: write
+
 Writes the data records into a CSV file. Record values are assembled into line and separated with arbitrary character, mostly comma. CSV may or may not define header line.
 
 #### Properties

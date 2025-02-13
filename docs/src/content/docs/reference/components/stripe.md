@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Customer
+Name: createCustomer
+
 Creates a new customer.
 
 #### Properties
@@ -68,6 +70,8 @@ Type: OBJECT
 
 
 ### Create Invoice
+Name: createInvoice
+
 Creates a new invoice.
 
 #### Properties

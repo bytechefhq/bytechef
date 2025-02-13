@@ -39,6 +39,8 @@ Version: 1
 
 
 ### Play/Resume Playback
+Name: startResumePlayback
+
 Start or resume current playback on an active device.
 
 #### Properties
@@ -52,6 +54,8 @@ Start or resume current playback on an active device.
 
 
 ### Add Items to a Playlist
+Name: addItemsToPlaylist
+
 Adds one or more items to your playlist.
 
 #### Properties
@@ -82,6 +86,8 @@ Type: OBJECT
 
 
 ### Create Playlist
+Name: createPlaylist
+
 Creates a new playlist
 
 #### Properties

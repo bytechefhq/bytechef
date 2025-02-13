@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Task
+Name: createTask
+
 Creates a new task.
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Mark Task as Completed
+Name: markTaskCompleted
+
 Mark a tas as being completed.
 
 #### Properties
@@ -81,6 +85,8 @@ Mark a tas as being completed.
 
 
 ### Create Project
+Name: createProject
+
 Creates a new project.
 
 #### Properties

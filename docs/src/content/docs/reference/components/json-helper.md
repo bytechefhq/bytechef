@@ -20,6 +20,8 @@ Type: jsonHelper/v1
 
 
 ### Convert from JSON String
+Name: parse
+
 Converts the JSON string to object/array.
 
 #### Properties
@@ -32,6 +34,8 @@ Converts the JSON string to object/array.
 
 
 ### Convert to JSON String
+Name: stringify
+
 Writes the object/array to a JSON string.
 
 #### Properties

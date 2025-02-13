@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Customer
+Name: createCustomer
+
 Creates a new customer.
 
 #### Properties
@@ -60,6 +62,8 @@ Creates a new customer.
 
 
 ### Create Customer Payment
+Name: createCustomerPayment
+
 Creates a new customer payment.
 
 #### Properties
@@ -75,6 +79,8 @@ Creates a new customer payment.
 
 
 ### Create Supplier
+Name: createSupplier
+
 Creates a new supplier.
 
 #### Properties
@@ -93,6 +99,8 @@ Creates a new supplier.
 
 
 ### Create Supplier Payment
+Name: createSupplierPayment
+
 Creates a new supplier payment.
 
 #### Properties

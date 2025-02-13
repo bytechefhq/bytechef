@@ -43,6 +43,8 @@ Version: 1
 
 
 ### Get Object
+Name: getObject
+
 Get the AWS S3 object.
 
 #### Properties
@@ -75,6 +77,8 @@ Type: FILE_ENTRY
 
 
 ### Get URL
+Name: getUrl
+
 Get the url of an AWS S3 object.
 
 #### Properties
@@ -102,6 +106,8 @@ Type: STRING
 
 
 ### List Objects
+Name: listObjects
+
 Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.
 
 #### Properties
@@ -130,6 +136,8 @@ Type: ARRAY
 
 
 ### Get Pre-signed Object
+Name: presignGetObject
+
 You can share an object with a pre-signed URL for up to 12 hours or until your session expires.
 
 #### Properties
@@ -153,6 +161,8 @@ Type: STRING
 
 
 ### Put Object
+Name: putObject
+
 Store an object to AWS S3.
 
 #### Properties

@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Record
+Name: createRecord
+
 Adds a record into an Airtable table.
 
 #### Properties
@@ -71,6 +73,8 @@ Type: OBJECT
 
 
 ### Delete Record
+Name: deleteRecord
+
 Deletes a single record from a table.
 
 #### Properties
@@ -102,6 +106,8 @@ Type: OBJECT
 
 
 ### Get Record
+Name: getRecord
+
 Retrieves a single record.
 
 #### Properties

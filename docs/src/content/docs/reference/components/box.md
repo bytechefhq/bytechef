@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Folder
+Name: createFolder
+
 Creates a new empty folder within the specified parent folder.
 
 #### Properties
@@ -73,6 +75,8 @@ Type: OBJECT
 
 
 ### Download File
+Name: downloadFile
+
 Download a selected file.
 
 #### Properties
@@ -105,6 +109,8 @@ Type: FILE_ENTRY
 
 
 ### Upload File
+Name: uploadFile
+
 Uploads a small file to Box.
 
 #### Properties

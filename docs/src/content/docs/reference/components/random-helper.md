@@ -20,6 +20,8 @@ Type: randomHelper/v1
 
 
 ### Int
+Name: randomInt
+
 Generates a random integer value.
 
 #### Properties
@@ -43,6 +45,8 @@ Type: INTEGER
 
 
 ### Float
+Name: randomFloat
+
 Generates a random float value.
 
 #### Properties

@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Account
+Name: createAccount
+
 Creates a new account.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: OBJECT
 
 
 ### Create Contact
+Name: createContact
+
 Add new contact in Freshsales CRM.
 
 #### Properties
@@ -131,6 +135,8 @@ Type: OBJECT
 
 
 ### Create Lead
+Name: createLead
+
 Creates a new lead.
 
 #### Properties

@@ -18,6 +18,8 @@ Type: bash/v1
 
 
 ### Execute
+Name: execute
+
 Creates a temporary script that executes bash commands. The script is afterwards deleted.
 
 #### Properties

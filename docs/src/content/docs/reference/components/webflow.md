@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Fulfill Order
+Name: fulfillOrder
+
 Updates an order's status to fulfilled.
 
 #### Properties
@@ -70,6 +72,8 @@ Type: OBJECT
 
 
 ### Get Collection Item
+Name: getCollectionItem
+
 Get collection item in a collection.
 
 #### Properties

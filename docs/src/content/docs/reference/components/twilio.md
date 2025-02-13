@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Send SMS
+Name: sendSMS
+
 Send a new SMS message
 
 #### Properties

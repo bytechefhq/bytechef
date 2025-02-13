@@ -20,6 +20,8 @@ Type: mathHelper/v1
 
 
 ### Addition
+Name: addition
+
 Add two numbers.
 
 #### Properties
@@ -43,6 +45,8 @@ Type: NUMBER
 
 
 ### Division
+Name: division
+
 Divide two numbers.
 
 #### Properties
@@ -66,6 +70,8 @@ Type: NUMBER
 
 
 ### Modulo
+Name: modulo
+
 Get the remainder of the division of two numbers.
 
 #### Properties
@@ -89,6 +95,8 @@ Type: NUMBER
 
 
 ### Multiplication
+Name: multiplication
+
 Multiply two numbers.
 
 #### Properties
@@ -112,6 +120,8 @@ Type: NUMBER
 
 
 ### Subtraction
+Name: subtraction
+
 Subtract two numbers.
 
 #### Properties

@@ -20,6 +20,8 @@ Type: fileStorage/v1
 
 
 ### Read from File as String
+Name: read
+
 Reads data from the file as string.
 
 #### Properties
@@ -47,6 +49,8 @@ Type: STRING
 
 
 ### Write to File
+Name: write
+
 Writes the data to the file.
 
 #### Properties
@@ -79,6 +83,8 @@ Type: FILE_ENTRY
 
 
 ### Download File
+Name: download
+
 Download a file from the URL.
 
 #### Properties

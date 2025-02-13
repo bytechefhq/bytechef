@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Create Row
+Name: createRow
+
 Creates a new row.
 
 #### Properties
@@ -54,6 +56,8 @@ Creates a new row.
 
 
 ### Delete Row
+Name: deleteRow
+
 Deletes the specified row.
 
 #### Properties
@@ -67,6 +71,8 @@ Deletes the specified row.
 
 
 ### Get Row
+Name: getRow
+
 Fetches a single table row.
 
 #### Properties
@@ -81,6 +87,8 @@ Fetches a single table row.
 
 
 ### List Rows
+Name: listRows
+
 Lists table rows.
 
 #### Properties
@@ -96,6 +104,8 @@ Lists table rows.
 
 
 ### Update Row
+Name: updateRow
+
 Updates the specified row.
 
 #### Properties

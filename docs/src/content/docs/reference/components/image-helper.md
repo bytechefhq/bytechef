@@ -20,6 +20,8 @@ Type: imageHelper/v1
 
 
 ### Compress Image
+Name: compressImage
+
 Compress image with specified quality.
 
 #### Properties
@@ -53,6 +55,8 @@ Type: FILE_ENTRY
 
 
 ### Crop Image
+Name: cropImage
+
 Crops an image to the specified dimensions.
 
 #### Properties
@@ -89,6 +93,8 @@ Type: FILE_ENTRY
 
 
 ### Get Image Metadata
+Name: getImageMetadata
+
 Get metadata of the image.
 
 #### Properties
@@ -102,6 +108,8 @@ Get metadata of the image.
 
 
 ### Image to Base64
+Name: imageToBase64
+
 Converts image to Base64 string.
 
 #### Properties
@@ -124,6 +132,8 @@ Type: STRING
 
 
 ### Resize Image
+Name: resizeImage
+
 Resizes an image to the specified width and height.
 
 #### Properties
@@ -158,6 +168,8 @@ Type: FILE_ENTRY
 
 
 ### Rotate Image
+Name: rotateImage
+
 Rotates an image by a specified degree.
 
 #### Properties

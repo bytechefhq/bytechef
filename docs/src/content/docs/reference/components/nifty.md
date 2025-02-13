@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Project
+Name: createProject
+
 Creates new project.
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates new task
 
 #### Properties
@@ -98,6 +102,8 @@ Type: OBJECT
 
 
 ### Get Task
+Name: getTask
+
 Gets task details.
 
 #### Properties
@@ -126,6 +132,8 @@ Type: OBJECT
 
 
 ### Create Status
+Name: createStatus
+
 Creates new status
 
 #### Properties
@@ -154,6 +162,8 @@ Type: OBJECT
 
 
 ### Get Tracked Time Report
+Name: getTrackedTimeReport
+
 Gets tracked time report information.
 
 #### Properties

@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Email Template
+Name: createEmail
+
 Create email template
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Create People
+Name: createPeople
+
 Creates new People
 
 #### Properties
@@ -97,6 +101,8 @@ Type: OBJECT
 
 
 ### Add Tag
+Name: addTag
+
 Add tag(s) to an existing user.
 
 #### Properties

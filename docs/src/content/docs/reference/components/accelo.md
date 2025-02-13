@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Company
+Name: createCompany
+
 Creates a new company.
 
 #### Properties
@@ -70,6 +72,8 @@ Type: OBJECT
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact.
 
 #### Properties
@@ -98,6 +102,8 @@ Type: OBJECT
 
 
 ### Create Task
+Name: createTask
+
 Creates a new task.
 
 #### Properties

@@ -29,6 +29,8 @@ null
 
 
 ### Send Message
+Name: sendMessage
+
 Send a new RabbitMQ message.
 
 #### Properties

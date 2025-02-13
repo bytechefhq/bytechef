@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact.
 
 #### Properties
@@ -70,6 +72,8 @@ Type: OBJECT
 
 
 ### Create Invoice
+Name: createInvoice
+
 Creates a new invoice.
 
 #### Properties
@@ -99,6 +103,8 @@ Type: OBJECT
 
 
 ### Create Payment
+Name: createPayment
+
 Creates a new payment.
 
 #### Properties

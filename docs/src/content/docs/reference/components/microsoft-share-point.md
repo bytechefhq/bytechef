@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Folder
+Name: createFolder
+
 Creates a new folder at path you specify.
 
 #### Properties
@@ -73,6 +75,8 @@ Type: OBJECT
 
 
 ### Create List
+Name: createList
+
 Creates a new list
 
 #### Properties
@@ -105,6 +109,8 @@ Type: OBJECT
 
 
 ### Create List Item
+Name: createListItem
+
 Creates a new item in a list.
 
 #### Properties
@@ -135,6 +141,8 @@ Type: OBJECT
 
 
 ### Upload File
+Name: uploadFile
+
 Upload file to Microsoft SharePoint folder.
 
 #### Properties

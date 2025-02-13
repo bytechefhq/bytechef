@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Board
+Name: createBoard
+
 Creates a new board.
 
 #### Properties
@@ -54,6 +56,8 @@ Creates a new board.
 
 
 ### Create Card
+Name: createCard
+
 Creates a new card.
 
 #### Properties
@@ -89,6 +93,8 @@ Type: OBJECT
 
 
 ### Get Card
+Name: getCard
+
 Gets a card details.
 
 #### Properties

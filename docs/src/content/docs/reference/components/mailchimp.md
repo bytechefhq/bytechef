@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Add Member to List
+Name: addMemberToList
+
 Adds a new member to the list.
 
 #### Properties

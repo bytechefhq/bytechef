@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Download File
+Name: downloadFile
+
 Download a file from your Microsoft OneDrive.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: FILE_ENTRY
 
 
 ### List Files
+Name: listFiles
+
 List files in a OneDrive folder.
 
 #### Properties
@@ -102,6 +106,8 @@ Type: ARRAY
 
 
 ### List Folders
+Name: listFolders
+
 List folders in a OneDrive folder.
 
 #### Properties
@@ -130,6 +136,8 @@ Type: ARRAY
 
 
 ### Upload File
+Name: uploadFile
+
 Upload a file to your Microsoft OneDrive.
 
 #### Properties

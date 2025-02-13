@@ -40,6 +40,8 @@ Version: 1
 
 
 ### Send Channel Message
+Name: sendChannelMessage
+
 Post a new message to a specific #channel you choose.
 
 #### Properties
@@ -70,6 +72,8 @@ Type: OBJECT
 
 
 ### Create Channel
+Name: createChannel
+
 Create a new channel
 
 #### Properties
@@ -99,6 +103,8 @@ Type: OBJECT
 
 
 ### Send Direct Message
+Name: sendDirectMessage
+
 Send direct message guild member.
 
 #### Properties

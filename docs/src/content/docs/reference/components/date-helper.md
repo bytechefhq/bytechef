@@ -20,6 +20,8 @@ Type: dateHelper/v1
 
 
 ### Add Time
+Name: addTime
+
 Add time to the date.
 
 #### Properties
@@ -49,6 +51,8 @@ Type: STRING
 
 
 ### Convert Date Timestamp
+Name: convertUnixTimestampToIso8601
+
 Converts UNIX timestamp to ISO8601 format.
 
 #### Properties
@@ -72,6 +76,8 @@ Type: STRING
 
 
 ### Date Difference
+Name: dateDifference
+
 Get the difference between two dates.
 
 #### Properties
@@ -96,6 +102,8 @@ Type: NUMBER
 
 
 ### Extract Date Units
+Name: extractDateUnits
+
 Extract date units (year/month/day/hour/minute/second/day of week/month name) from a date.
 
 #### Properties
@@ -119,6 +127,8 @@ Type: STRING
 
 
 ### Get Current Date
+Name: getCurrentDate
+
 Get current date in the specified format.
 
 #### Properties
@@ -142,6 +152,8 @@ Type: STRING
 
 
 ### Subtract Time
+Name: subtractTime
+
 Subtract time from date
 
 #### Properties

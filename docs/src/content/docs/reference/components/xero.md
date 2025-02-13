@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Bill
+Name: createBill
+
 Creates draft bill (Accounts Payable).
 
 #### Properties
@@ -83,6 +85,8 @@ Type: OBJECT
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact.
 
 #### Properties
@@ -132,6 +136,8 @@ Type: OBJECT
 
 
 ### Create Invoice
+Name: createSalesInvoice
+
 Creates draft invoice (Acount Receivable).
 
 #### Properties
@@ -174,6 +180,8 @@ Type: OBJECT
 
 
 ### Create Quote
+Name: createQuote
+
 Creates a new quote draft.
 
 #### Properties

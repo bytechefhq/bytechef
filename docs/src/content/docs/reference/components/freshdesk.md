@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Create Company
+Name: createCompany
+
 Creates a new company
 
 #### Properties
@@ -69,6 +71,8 @@ Type: OBJECT
 
 
 ### Create Contact
+Name: createContact
+
 Creates a new contact
 
 #### Properties
@@ -97,6 +101,8 @@ Type: OBJECT
 
 
 ### Create Ticket
+Name: createTicket
+
 Creates a new ticket
 
 #### Properties

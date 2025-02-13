@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Channel
+Name: createChannel
+
 Creates a new channel within a team.
 
 #### Properties
@@ -74,6 +76,8 @@ Type: OBJECT
 
 
 ### Send Channel Message
+Name: sendChannelMessage
+
 Sends a message to a channel.
 
 #### Properties
@@ -107,6 +111,8 @@ Type: OBJECT
 
 
 ### Send Chat Message
+Name: sendChatMessage
+
 Sends a message in an existing chat.
 
 #### Properties

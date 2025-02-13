@@ -41,6 +41,8 @@ Version: 1
 
 
 ### Update Project
+Name: updateProject
+
 Updates an existing project.
 
 #### Properties

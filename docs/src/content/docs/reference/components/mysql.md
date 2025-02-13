@@ -39,6 +39,8 @@ Version: 1
 
 
 ### Query
+Name: query
+
 Execute an SQL query.
 
 #### Properties
@@ -52,6 +54,8 @@ Execute an SQL query.
 
 
 ### Insert
+Name: insert
+
 Insert rows in database.
 
 #### Properties
@@ -67,6 +71,8 @@ Insert rows in database.
 
 
 ### Update
+Name: update
+
 Update rows in database.
 
 #### Properties
@@ -83,6 +89,8 @@ Update rows in database.
 
 
 ### Delete
+Name: delete
+
 Delete rows from database.
 
 #### Properties
@@ -98,6 +106,8 @@ Delete rows from database.
 
 
 ### Execute
+Name: execute
+
 Execute an SQL DML or DML statement.
 
 #### Properties

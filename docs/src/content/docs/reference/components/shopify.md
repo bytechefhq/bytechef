@@ -42,6 +42,8 @@ Version: 1
 
 
 ### Create Order
+Name: createOrder
+
 Adds an order into a Shopify store.
 
 #### Properties
@@ -77,6 +79,8 @@ Type: OBJECT
 
 
 ### Delete Order
+Name: deleteOrder
+
 Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 #### Properties
@@ -89,6 +93,8 @@ Deletes an order. Orders that interact with an online gateway can't be deleted.
 
 
 ### Cancel an order
+Name: cancelOrder
+
 Cancels an order. Orders that are paid and have fulfillments can't be canceled.
 
 #### Properties
@@ -124,6 +130,8 @@ Type: OBJECT
 
 
 ### Update Order
+Name: updateOrder
+
 Update an existing order.
 
 #### Properties
@@ -160,6 +168,8 @@ Type: OBJECT
 
 
 ### Close Order
+Name: closeOrder
+
 Closes an order. A closed order is one that has no more work to be done. All items have been fulfilled or refunded.
 
 #### Properties

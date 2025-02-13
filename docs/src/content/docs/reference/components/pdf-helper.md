@@ -20,6 +20,8 @@ Type: pdfHelper/v1
 
 
 ### Extract Text
+Name: extractText
+
 Extracts text from a PDF file.
 
 #### Properties
