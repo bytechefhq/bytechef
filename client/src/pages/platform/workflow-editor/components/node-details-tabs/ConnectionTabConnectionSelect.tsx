@@ -96,8 +96,6 @@ const ConnectionTabConnectionSelect = ({
 
             setConnectionId(connectionId);
 
-            const newComponentConnection = componentConnections?.find((connection) => connection.id === connectionId);
-
             if (currentNode) {
                 setCurrentNode({...currentNode, connectionId});
             }
@@ -105,8 +103,6 @@ const ConnectionTabConnectionSelect = ({
             if (currentComponent) {
                 setCurrentComponent({...currentComponent, connectionId});
             }
-
-            setCurrentConnection(newComponentConnection);
 
             queryClient.removeQueries({
                 queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
@@ -117,7 +113,6 @@ const ConnectionTabConnectionSelect = ({
             });
         },
         [
-            componentConnections,
             currentComponent,
             currentNode,
             queryClient,
@@ -134,6 +129,12 @@ const ConnectionTabConnectionSelect = ({
             setConnectionId(workflowTestConfigurationConnection.connectionId);
         }
     }, [workflowTestConfigurationConnection, connectionId]);
+
+    useEffect(() => {
+        const newComponentConnection = componentConnections?.find((connection) => connection.id === connectionId);
+
+        setCurrentConnection(newComponentConnection);
+    }, [componentConnections, connectionId]);
 
     return (
         <div className="flex flex-col gap-6">
